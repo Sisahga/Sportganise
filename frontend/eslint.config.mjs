@@ -6,6 +6,7 @@ import reactHooks from "eslint-plugin-react-hooks";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import testingLibrary from "eslint-plugin-testing-library";
 import jest from "eslint-plugin-jest";
+import prettier from "eslint-config-prettier";
 
 export default [
   {
@@ -15,13 +16,13 @@ export default [
       ...jsxA11y.flatConfigs.recommended.languageOptions,
       globals: {
         ...globals.browser,
-      }
+      },
     },
     settings: {
       react: {
         version: "detect",
-      }
-    }
+      },
+    },
   },
   {
     plugins: {
@@ -35,4 +36,5 @@ export default [
   jsxA11y.flatConfigs.recommended,
   jest.configs['flat/recommended'],
   testingLibrary.configs['flat/react'],
+  prettier,
 ];
