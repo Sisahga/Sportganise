@@ -5,8 +5,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "lint": "eslint .",
     "format": "prettier --write .",
+    "lint": "eslint .",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
