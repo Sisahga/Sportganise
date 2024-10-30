@@ -11,6 +11,9 @@ on:
 jobs:
   format:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
 
     steps:
       - name: Checkout code
@@ -20,9 +23,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '21'
-
-      - name: Navigate frontend workspace
-        run: cd frontend/
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -35,6 +35,9 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
 
     steps:
       - name: Checkout code
@@ -44,9 +47,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '21'
-
-      - name: Navigate frontend workspace
-        run: cd frontend/
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -55,28 +55,4 @@ jobs:
         run: pnpm install
 
       - name: Run linter
-        run: pnpm exec eslint .
-
-  test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '21'
-
-      - name: Navigate frontend workspace
-        run: cd frontend/
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run tests
         run: pnpm exec eslint .
