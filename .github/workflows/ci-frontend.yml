@@ -1,4 +1,4 @@
-name: CI checks
+name: CI checks frontend
 
 on:
   pull_request:
