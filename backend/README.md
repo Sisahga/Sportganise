@@ -2,34 +2,11 @@
 
 A wonderful java app.
 
-## To run the application
+## Commands
 
-Unix systems
+NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./mvnw` instead.
 
-```bash
-./mvnw spring-boot:run
-```
-
-Windows
-
-```powershell
-./mvnw.cmd sprint-boot:run
-```
-
-## To run the test suite
-
-Unix systems
-
-```bash
-./mvnw test
-```
-
-```powershell
-./mvnw.cmd test
-```
-
-## To lint the project
-
-```bash
-./mvnw stylecheck:check
-```
+- run: `./mvnw sprint-boot:run`
+- test: `./mvnw test`
+- format: `./mvnw spotless:apply`
+- lint: `./mvnw stylecheck:check`

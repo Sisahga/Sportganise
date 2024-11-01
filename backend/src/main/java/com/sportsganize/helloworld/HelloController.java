@@ -11,5 +11,4 @@ public class HelloController {
   public String index() {
     return "Hello, world!";
   }
-
 }
