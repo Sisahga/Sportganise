@@ -1,4 +1,4 @@
-package com.sportsganize.hello_world;
+package com.sportsganize.helloworld;
 
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class HelloControllerITest {
 
-	@Autowired
-	private TestRestTemplate template;
+  @Autowired
+  private TestRestTemplate template;
 
     @Test
     public void getHello() throws Exception {

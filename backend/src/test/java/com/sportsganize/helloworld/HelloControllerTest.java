@@ -1,4 +1,4 @@
-package com.sportsganize.hello_world;
+package com.sportsganize.helloworld;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
@@ -18,14 +18,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 @AutoConfigureMockMvc
 public class HelloControllerTest {
 
-	@Autowired
-	private MockMvc mvc;
+  @Autowired
+  private MockMvc mvc;
 
-	@Test
-	public void getHello() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(content().string(not(equalTo(""))))
-				.andExpect(content().string(equalTo("Hello, world!")));
-	}
+  @Test
+  public void getHello() throws Exception {
+    mvc.perform(MockMvcRequestBuilders.get("/").accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().string(not(equalTo(""))))
+        .andExpect(content().string(equalTo("Hello, world!")));
+  }
 }
