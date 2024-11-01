@@ -10,3 +10,5 @@ NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./m
 - test: `./mvnw test`
 - format: `./mvnw spotless:apply`
 - lint: `./mvnw stylecheck:check`
+
+Thanks for reading
