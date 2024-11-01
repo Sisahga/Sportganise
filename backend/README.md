@@ -27,3 +27,9 @@ Unix systems
 ```powershell
 ./mvnw.cmd test
 ```
+
+## To lint the project
+
+```bash
+./mvnw stylecheck:check
+```
