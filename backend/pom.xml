@@ -11,8 +11,8 @@
   <groupId>com.sportsganize</groupId>
   <artifactId>helloworld</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>helloworld</name>
-  <description>Placeholder boilerplate for a Spring Boot application</description>
+  <name>Sportganise</name>
+  <description>All-in-one sports platform for teams and leagues.</description>
   <url/>
   <licenses>
     <license/>
@@ -27,18 +27,26 @@
     <url/>
   </scm>
   <properties>
-    <java.version>17</java.version>
+    <java.version>21</java.version>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.6.0</version>
     </dependency>
   </dependencies>
 
