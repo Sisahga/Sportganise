@@ -14,3 +14,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+
+  database:
+    image: 'postgres:latest'
+
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password 
+      POSTGRES_DB: default_database 
+
+
