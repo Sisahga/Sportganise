@@ -13,7 +13,7 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Omar Alshanyour  | 40209637  | 80709119  | @  |
 | Nusrath Zaman  | 40123819| 92409006  | @  |
 | Vithujanan Vigneswaran  | 40157822  | 92345647  | @  |
-| Arshpreet Singh    | 40172137  | 92754282  | @  |
+| Arshpreet Singh    | 40172137  | 92754282  | arshpreets425@gmail.com  |
 | Sofia Valiante  | 40191897  | 91510546  | valiante.sofia@gmail.com  |
 | Dannick Bujold-Senss  | 40180290 | 44579430 | @ |
 
