@@ -1,4 +1,4 @@
-package com.sportsganize.helloworld;
+package com.sportganise.helloworld;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;

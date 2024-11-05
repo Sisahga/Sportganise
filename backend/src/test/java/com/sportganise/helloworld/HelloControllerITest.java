@@ -1,4 +1,4 @@
-package com.sportsganize.helloworld;
+package com.sportganise.helloworld;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
