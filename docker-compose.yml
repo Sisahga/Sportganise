@@ -20,8 +20,7 @@ services:
     ports: 
       - "5432:5432"
     environment:
-      POSTGRES_USER: username
-      POSTGRES_PASSWORD: password 
-      POSTGRES_DB: default_database 
-
-
+      POSTGRES_URL: "sportganise.c78uoayscpd5.us-west-2.rds.amazonaws.com"
+      POSTGRES_USER: "sportganise"
+      POSTGRES_PASSWORD: "capstone-sportganise"
+      POSTGRES_DB: "sportganise"
