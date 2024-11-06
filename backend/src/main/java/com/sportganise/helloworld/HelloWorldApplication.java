@@ -1,4 +1,4 @@
-package com.sportsganize.helloworld;
+package com.sportganise.helloworld;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
