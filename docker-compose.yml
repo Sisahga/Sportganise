@@ -14,13 +14,14 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8080"
+    env_file:
+      - .env
 
   database:
     image: 'postgres:latest'
     ports: 
       - "5432:5432"
     environment:
-      POSTGRES_URL: "sportganise.c78uoayscpd5.us-west-2.rds.amazonaws.com"
-      POSTGRES_USER: "sportganise"
-      POSTGRES_PASSWORD: "capstone-sportganise"
-      POSTGRES_DB: "sportganise"
+      SPRING_DATASOURCE_URL: ${POSTGRES_URL}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
