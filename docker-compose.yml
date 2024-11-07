@@ -4,7 +4,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "4000:3000"
+      - "3000:3000"
     depends_on:
       - backend
 
@@ -13,15 +13,28 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8080"
+      - "8080:8080"
+    depends_on:
+      - database
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     env_file:
       - .env
 
   database:
     image: 'postgres:latest'
-    ports: 
+    ports:
       - "5432:5432"
     environment:
-      SPRING_DATASOURCE_URL: ${POSTGRES_URL}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
