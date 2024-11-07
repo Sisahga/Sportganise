@@ -25,7 +25,7 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Sisahga Phimmasone  |40210015  | [80082494](https://github.com/Sisahga/Sportganise/commits?author=Sisahga)  | sisahga@gmail.com  |
 | Karyenne Vuong  | 40157011 | [98135955](https://github.com/Sisahga/Sportganise/commits?author=karyennevu)  | vuongkaryenne@gmail.com  |
 | Omar Alshanyour  | 40209637  | [80709119](https://github.com/Sisahga/Sportganise/commits?author=HelloMeFriend)  | omar-alshanyour@outlook.com  |
-|   | 40123819| 92409006  | nusrath.zaman.nz@gmail.com  |
+| Nusrath Zaman  | 40123819| 92409006  | nusrath.zaman.nz@gmail.com  |
 |   | 40157822  | 92345647  | vithujanan0629@gmail.com |
 | Arshpreet Singh    | 40172137  | [92754282](https://github.com/Sisahga/Sportganise/commits?author=Ashx11)  | arshpreets425@gmail.com  |
 | Sofia Valiante  | 40191897  | 91510546  | valiante.sofia@gmail.com  |
