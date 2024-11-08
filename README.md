@@ -21,7 +21,7 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Name           | Student ID     | Github ID      | Email Address  |
 |----------------|----------------|----------------|----------------|
 | **Sana Antoun**| 40209806       | [103603707](https://github.com/Sisahga/Sportganise/commits?author=sanaantoun)      | antounsana@gmail.com |
-|   | 40211001  | 70761047  | cleopatraliakmanoukian@gmail.com |
+| Cleopatr-Aliak Manoukian  | 40211001  | 70761047  | cleopatraliakmanoukian@gmail.com |
 | Sisahga Phimmasone  |40210015  | [80082494](https://github.com/Sisahga/Sportganise/commits?author=Sisahga)  | sisahga@gmail.com  |
 | Karyenne Vuong  | 40157011 | [98135955](https://github.com/Sisahga/Sportganise/commits?author=karyennevu)  | vuongkaryenne@gmail.com  |
 | Omar Alshanyour  | 40209637  | [80709119](https://github.com/Sisahga/Sportganise/commits?author=HelloMeFriend)  | omar-alshanyour@outlook.com  |
