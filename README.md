@@ -25,18 +25,83 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Sisahga Phimmasone  |40210015  | [80082494](https://github.com/Sisahga/Sportganise/commits?author=Sisahga)  | sisahga@gmail.com  |
 | Karyenne Vuong  | 40157011 | [98135955](https://github.com/Sisahga/Sportganise/commits?author=karyennevu)  | vuongkaryenne@gmail.com  |
 | Omar Alshanyour  | 40209637  | [80709119](https://github.com/Sisahga/Sportganise/commits?author=HelloMeFriend)  | omar-alshanyour@outlook.com  |
-|   | 40123819| 92409006  | nusrath.zaman.nz@gmail.com  |
+|   | 40123819| [92409006](https://github.com/Sisahga/Sportganise/commits?author=nusrath-z)  | nusrath.zaman.nz@gmail.com  |
 |  Vithujanan Vigneswaran | 40157822  | [92345647](https://github.com/Sisahga/Sportganise/commits?author=Houdini29)  | vithujanan0629@gmail.com |
 | Arshpreet Singh    | 40172137  | [92754282](https://github.com/Sisahga/Sportganise/commits?author=Ashx11)  | arshpreets425@gmail.com  |
-| Sofia Valiante  | 40191897  | 91510546  | valiante.sofia@gmail.com  |
+| Sofia Valiante  | 40191897  | [91510546](https://github.com/Sisahga/Sportganise/commits?author=s-vali)| valiante.sofia@gmail.com  |
 | Dannick Bujold-Senss  | 40180290 | [44579430](https://github.com/Sisahga/Sportganise/commits?author=Bsenss6) | dannickbsenss@gmail.com |
 
 ## Developer getting started guide
-What would a new developer need to do to get the system up and running?
 This monorepo project is home to two workspaces: frontend and backend.
 
 As a developer, it is recommended to open the editor (e.g. VS Code) in one of these
 two folders instead of in the root of the project.
+
+
+## Frontend - Getting Started with Create React App
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+### Available Scripts
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+### Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Backend - Getting Started 
+
+A wonderful java app.
+
+### Commands
+
+NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./mvnw` instead.
+
+- run: `./mvnw sprint-boot:run`
+- test: `./mvnw test`
+- format: `./mvnw spotless:apply`
+- lint: `./mvnw stylecheck:check`
+
+Thanks for reading
+
+## Docker Developer Set up 
+MISSING
 
 ## Mockups
 The following link will direct you to our Figma page where we implemented the application's UI: [Application Designs](https://www.figma.com/design/8G8sA8UWmxEWocw2baWh3q/Welcome-page?node-id=1-4&t=52E00lTSscxSFA7g-1)
@@ -55,3 +120,4 @@ The following link will direct you to our Figma page where we implemented the ap
 * [Security](https://github.com/Sisahga/Sportganise/wiki/Security)
 * [Performance](https://github.com/Sisahga/Sportganise/wiki/Performance)
 * [Deployment Plan and Infrastructure](https://github.com/Sisahga/Sportganise/wiki/Deployment-Plan-and-Infrastructure)
+* [Mockups](https://github.com/Sisahga/Sportganise/wiki/Mockups)
