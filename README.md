@@ -101,7 +101,16 @@ NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./m
 Thanks for reading
 
 ## Docker Developer Set up 
-MISSING
+TO run the docker, you first need to have docker desktop downloaded (Windows & MacOS):  https://www.docker.com/products/docker-desktop/
+
+For linux: Docker can be installed directly without Docker Desktop. Additionally, you may need to install Docker Compose separately, as it might not be included by default. On Ubuntu, for example, you can install it with:
+### `sudo apt install docker-compose`
+
+Then simply run: 
+### `docker compose up` 
+
+and once you're done:
+## `docker compose down`
 
 ## Mockups
 The following link will direct you to our Figma page where we implemented the application's UI: [Application Designs](https://www.figma.com/design/8G8sA8UWmxEWocw2baWh3q/Welcome-page?node-id=1-4&t=52E00lTSscxSFA7g-1)
