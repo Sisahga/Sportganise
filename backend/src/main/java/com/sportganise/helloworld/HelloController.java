@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
+  // TODO[246]: configure CORS policy
+  @CrossOrigin(origins = "*")
   @GetMapping("/")
   public String index() {
     return "Hello, world!";
