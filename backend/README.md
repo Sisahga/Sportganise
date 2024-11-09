@@ -6,9 +6,9 @@ A wonderful java app.
 
 NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./mvnw` instead.
 
-- run: `./mvnw sprint-boot:run`
+- run: `./mvnw spring-boot:run`
 - test: `./mvnw test`
 - format: `./mvnw spotless:apply`
-- lint: `./mvnw stylecheck:check`
+- lint: `./mvnw checkstyle:check`
 
 Thanks for reading
