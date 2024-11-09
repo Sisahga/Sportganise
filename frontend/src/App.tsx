@@ -1,21 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
+// import logo from './logo.svg';
+import logo from './sportganise-logo.svg';
 import './App.css';
 
+function getApiUrl(): string {
+  return process.env.REACT_APP_API_URL || 'http://localhost:8080';
+}
+
 function App() {
+  const [homeText, setHomeText] = useState('');
+  const apiUrl = getApiUrl();
+
+  useEffect(() => {
+    fetch(`${apiUrl}/`)
+      .then((result) => result.text())
+      .then((text) => setHomeText(text));
+  }, [apiUrl]);
+
   return (
     <div className="App">
       <header className="App-header">
+        <p>Welcome to our app!</p>
         <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello, world!</p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <p>{homeText}</p>
       </header>
     </div>
   );
