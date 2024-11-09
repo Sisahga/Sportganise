@@ -20,6 +20,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <p>Welcome to our app!</p>
         <img src={logo} className="App-logo" alt="logo" />
         <p>{homeText}</p>
       </header>
