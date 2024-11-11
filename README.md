@@ -25,7 +25,7 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Sisahga Phimmasone  |40210015  | [80082494](https://github.com/Sisahga/Sportganise/commits?author=Sisahga)  | sisahga@gmail.com  |
 | Karyenne Vuong  | 40157011 | [98135955](https://github.com/Sisahga/Sportganise/commits?author=karyennevu)  | vuongkaryenne@gmail.com  |
 | Omar Alshanyour  | 40209637  | [80709119](https://github.com/Sisahga/Sportganise/commits?author=HelloMeFriend)  | omar-alshanyour@outlook.com  |
-| Nusrath Zaman  | 40123819| 92409006  | nusrath.zaman.nz@gmail.com  |
+| Nusrath Zaman  | 40123819| [92409006](https://github.com/Sisahga/Sportganise/commits?author=nusrath-z)  | nusrath.zaman.nz@gmail.com  |
 |  Vithujanan Vigneswaran | 40157822  | [92345647](https://github.com/Sisahga/Sportganise/commits?author=Houdini29)  | vithujanan0629@gmail.com |
 | Arshpreet Singh    | 40172137  | [92754282](https://github.com/Sisahga/Sportganise/commits?author=Ashx11)  | arshpreets425@gmail.com  |
 | Sofia Valiante  | 40191897  | [91510546](https://github.com/Sisahga/Sportganise/commits?author=s-vali)| valiante.sofia@gmail.com  |
@@ -44,32 +44,30 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ### Available Scripts
 
-In the project directory, you can run:
+In the project directory, you can run: `npm start`
 
-### `npm start`
-
-Runs the app in the development mode.\
+Runs the app in the development mode.
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.\
+The page will reload if you make edits.
 You will also see any lint errors in the console.
 
-### `npm test`
+ `npm test`
 
-Launches the test runner in the interactive watch mode.\
+Launches the test runner in the interactive watch mode.
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+ `npm run build`
 
-Builds the app for production to the `build` folder.\
+Builds the app for production to the `build` folder.
 It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
+The build is minified and the filenames include the hashes.
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+ `npm run eject`
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
@@ -101,17 +99,19 @@ NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./m
 Thanks for reading
 
 ## Docker Developer Set up 
-TO run the docker, you first need to have docker desktop downloaded (Windows & MacOS):  https://www.docker.com/products/docker-desktop/
+To run the docker, you first need to have docker desktop downloaded (Windows & MacOS):  https://www.docker.com/products/docker-desktop/
+<br>
 
-For linux: Docker can be installed directly without Docker Desktop. Additionally, you may need to install Docker Compose separately, as it might not be included by default. On Ubuntu, for example, you can install it with:
-### `sudo apt install docker-compose`
+For linux: Docker can be installed directly without Docker Desktop. Additionally, you may need to install Docker Compose separately, as it might not be included by default.  <br> 
+ <br> On Ubuntu, for example, you can install it with: <br>
+ `sudo apt install docker-compose`   <br> 
+ <br>
+Then simply run:  <br>
+`docker compose up`  <br>  
 
-Then simply run: 
-### `docker compose up` 
-
-and once you're done:
-## `docker compose down`
-
+and once you're done: <br>
+ `docker compose down`
+ 
 ## Mockups
 The following link will direct you to our Figma page where we implemented the application's UI: [Application Designs](https://www.figma.com/design/8G8sA8UWmxEWocw2baWh3q/Welcome-page?node-id=1-4&t=52E00lTSscxSFA7g-1)
 
@@ -124,9 +124,13 @@ The following link will direct you to our Figma page where we implemented the ap
 * [Personas](https://github.com/Sisahga/Sportganise/wiki/Personas)
 * [Diversity Statement](https://github.com/Sisahga/Sportganise/wiki/Diversity-Statement)
 * [Overall Architecture and Diagrams](https://github.com/Sisahga/Sportganise/wiki/Overall-Architecture-and-Diagrams#database-schema-)
+* [Infrastructure and tools](https://github.com/Sisahga/Sportganise/wiki/Infrastructure-and-tools)
 * [Name Conventions](https://github.com/Sisahga/Sportganise/wiki/Name-Conventions)
 * [Testing Plan and Continuous Integration](https://github.com/Sisahga/Sportganise/wiki/Testing-Plan-and-Continuous-Integration)
 * [Security](https://github.com/Sisahga/Sportganise/wiki/Security)
 * [Performance](https://github.com/Sisahga/Sportganise/wiki/Performance)
 * [Deployment Plan and Infrastructure](https://github.com/Sisahga/Sportganise/wiki/Deployment-Plan-and-Infrastructure)
 * [Mockups](https://github.com/Sisahga/Sportganise/wiki/Mockups)
+
+## Diversity Statement 
+“We’re committed to creating an inclusive environment where everyone feels welcome, no matter their background, gender, or abilities. Our goal is to make sure the app is accessible to all users and helps bring people together in a way that promotes fairness and respect. We believe diversity makes our platform stronger and allows us to better serve all the clubs and players that use it.”
