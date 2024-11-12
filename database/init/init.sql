@@ -17,7 +17,8 @@ CREATE TABLE account (
 	address VARCHAR(100),
 	phone VARCHAR(20) NOT NULL,
 	first_name VARCHAR(50) NOT NULL,
-	last_name VARCHAR(50) NOT NULL
+	last_name VARCHAR(50) NOT NULL,
+	picture  VARCHAR(255)
 );
 
 CREATE TABLE blocklist(
@@ -56,9 +57,9 @@ CREATE TABLE account_organization (
     PRIMARY KEY (org_id, account_id)
 );
 
+--need to populate with settings items
 CREATE TABLE account_settings (
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-	settings JSONB DEFAULT '{}'::jsonb,
 	PRIMARY KEY(account_id)
 );
 
@@ -97,32 +98,32 @@ CREATE TABLE label_program (
 	PRIMARY KEY (label_id, program_id)
 );
 
-CREATE TABLE message_channel (
+CREATE TABLE channel (
 	channel_id SERIAL PRIMARY KEY,
 	name VARCHAR(50),
 	created_at TIMESTAMP NOT NULL
 );
 
 CREATE Table channel_member (
-	channel_id INTEGER NOT NULL REFERENCES message_channel(channel_id) ON DELETE CASCADE,
+	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	PRIMARY KEY(channel_id, account_id)
 	);
 
 CREATE TABLE message (
 	message_id SERIAL PRIMARY KEY,
-	channel_id INTEGER NOT NULL,
-	sender_id INTEGER NOT NULL,
+	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
+	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	content VARCHAR(512) NOT NULL,
 	sent_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE post(
 	post_id SERIAL PRIMARY KEY,
-	account_id INTEGER NOT NULL REFERENCES account(account_id),
+	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	title VARCHAR(100) NOT NULL,
 	description TEXT NOT NULL,
-	attachment BYTEA,
+	attachment VARCHAR(255),
 	date DATE NOT NULL
 );
 
