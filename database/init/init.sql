@@ -66,10 +66,10 @@ CREATE TABLE account_settings (
 CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
 	type VARCHAR(20),
-	title VARCHAR(30),
+	title VARCHAR(30) NOT NULL,
 	description VARCHAR (100),
 	capacity INTEGER,
-	date DATE,
+	occurence_date DATE,
 	duration INTEGER,
 	is_recurring BOOLEAN DEFAULT FALSE,
 	expiry_date DATE,
@@ -101,21 +101,21 @@ CREATE TABLE label_program (
 CREATE TABLE channel (
 	channel_id SERIAL PRIMARY KEY,
 	name VARCHAR(50),
-	created_at TIMESTAMP NOT NULL
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE Table channel_member (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
-	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	PRIMARY KEY(channel_id, account_id)
 	);
 
 CREATE TABLE message (
 	message_id SERIAL PRIMARY KEY,
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
-	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	content VARCHAR(512) NOT NULL,
-	sent_at TIMESTAMP NOT NULL
+	sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TABLE post(
@@ -124,13 +124,13 @@ CREATE TABLE post(
 	title VARCHAR(100) NOT NULL,
 	description TEXT NOT NULL,
 	attachment VARCHAR(255),
-	date DATE NOT NULL
+	creation_date DATE DEFAULT CURRENT_DATE NOT NULL
 );
 
 CREATE TABLE feedback(
 	post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	content TEXT NOT NULL,
-	date DATE NOT NULL,
+	creation_date DATE DEFAULT CURRENT_DATE NOT NULL,
 	PRIMARY KEY (post_id,account_id)
 );
