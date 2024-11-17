@@ -2,10 +2,7 @@ package com.sportganise.Repositories;
 
 import com.sportganise.Entities.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /**
  * Repository for 'Account' Entity
@@ -13,5 +10,5 @@ import java.util.List;
  */
 @Repository // Indicates that this is a Spring Data repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
-    
+
 }
