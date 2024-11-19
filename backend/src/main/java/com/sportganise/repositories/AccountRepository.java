@@ -1,6 +1,6 @@
-package com.sportganise.Repositories;
+package com.sportganise.repositories;
 
-import com.sportganise.Entities.Account;
+import com.sportganise.entities.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

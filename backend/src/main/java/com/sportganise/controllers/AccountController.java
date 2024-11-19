@@ -1,7 +1,7 @@
-package com.sportganise.Controllers;
+package com.sportganise.controllers;
 
-import com.sportganise.Entities.Account;
-import com.sportganise.Services.AccountService;
+import com.sportganise.entities.Account;
+import com.sportganise.services.AccountService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

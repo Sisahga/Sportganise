@@ -1,7 +1,7 @@
-package com.sportganise.Services;
+package com.sportganise.services;
 
-import com.sportganise.Entities.Account;
-import com.sportganise.Repositories.AccountRepository;
+import com.sportganise.entities.Account;
+import com.sportganise.repositories.AccountRepository;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,6 @@
-package com.sportganise.Services;
+package com.sportganise.services;
 
-import com.sportganise.Entities.Account;
+import com.sportganise.entities.Account;
 import java.util.Optional;
 
 /** Service Interface for 'Account' entity. Defines C.R.U.D. operations. */

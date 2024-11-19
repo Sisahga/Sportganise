@@ -1,4 +1,4 @@
-package com.sportganise.Controllers;
+package com.sportganise.controllers;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
@@ -7,8 +7,8 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.sportganise.Entities.Account;
-import com.sportganise.Services.AccountService;
+import com.sportganise.entities.Account;
+import com.sportganise.services.AccountService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
