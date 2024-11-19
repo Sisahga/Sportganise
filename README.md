@@ -14,6 +14,36 @@ A sport Management Application <br>
 ![GitHub Workflow](https://img.shields.io/badge/GitHub_Workflow-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Electron](https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white)
 
+## Release Demos
+Release 1: https://drive.google.com/file/d/1UsRUmvnBbStKwHjvWQnSvQ8CL8Uo43cr/view?usp=drive_link
+
+Release 2 (Jan 26): -
+
+Release 3 (Apr 5): -
+
+## Important Files 
+(To add as project progresses)
+|File  | Description  |
+|-----------|-----------|
+| [docker-compose.yml](https://github.com/Sisahga/Sportganise/blob/v.1.0/docker-compose.yml)    | Sets up Docker Containerization for the app and runs PostgreSql DB on docker volume with initial seed
+| [pom.xml](https://github.com/Sisahga/Sportganise/blob/v.1.0/backend/pom.xml)    | Maintains all currently required dependencies for our backend
+|   -  |   -  |
+|   -  |  -   |
+|  -   |   -  |
+    
+
+## Important Tests  
+(To add as project progresses)
+
+| Test  | Description  | 
+|-----------|-----------|
+| [ci-frontend.yml ](https://github.com/Sisahga/Sportganise/blob/v.1.0/.github/workflows/ci-frontend.yml)   | CI for frontend, makes sure code passes all checks before being able to merge    
+|[ci-backend.yml](https://github.com/Sisahga/Sportganise/blob/v.1.0/.github/workflows/ci-backend.yml)     | CI for backend, makes sure code passes all checks before being able to merge
+|   -  |   -  |
+|   -  |  -   |
+|  -   |   -  |
+
+
 ## Project Summary
 This project is a website and mobile application designed for Accès Badminton, a non-profit organization dedicated to promoting badminton in the Greater Montreal Area. Our application serves as a central platform where players, coaches, and administrators can easily register, log in, and access essential information related to training sessions, upcoming events, competitions, and more. The app features a robust messaging tool to enhance internal communication between coaches and players, a real-time calendar displaying all events, and a feedback section for players to review training sessions. Through this app, players can connect, find partners for competitions, stay updated on club activities, and engage in club events. Additionally, we’ve built the application to be versatile, extending its functionality beyond badminton to any sports club or team. This adaptability allows clubs of various sizes to leverage the app for managing schedules, coordinating teams, and handling administrative tasks, ultimately supporting clubs in streamlining their operations and enhancing their management capabilities.
 
