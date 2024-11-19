@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 // import logo from './logo.svg';
-import logo from './sportganise-logo.svg';
+// changed it to import from assest file where all our logo/pictures will be
+import logo from '../src/assets/sportganise-logo.svg';
 import './App.css';
 
 function getApiUrl(): string {
@@ -17,15 +18,7 @@ function App() {
       .then((text) => setHomeText(text));
   }, [apiUrl]);
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>Welcome to our app!</p>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{homeText}</p>
-      </header>
-    </div>
-  );
+  return <div className="App min-h-screen flex flex-col"></div>;
 }
 
 export default App;
