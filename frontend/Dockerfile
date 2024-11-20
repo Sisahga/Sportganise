@@ -1,6 +1,6 @@
-FROM node:21-alpine
+FROM node:21-alpine AS build
 
-WORKDIR /app 
+WORKDIR /app
 
 COPY package.json . 
 
@@ -8,6 +8,16 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+RUN npm run build
 
-CMD [ "npm", "start"] 
+FROM node:21-alpine
+
+RUN npm install -g serve
+
+WORKDIR /app
+
+COPY --from=build /app/build ./build
+
+EXPOSE 80
+
+CMD ["serve", "-l", "80", "-s", "build"] 

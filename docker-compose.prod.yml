@@ -1,0 +1,16 @@
+services:
+  frontend:
+    image: docker.io/bsenss6/sportganise:frontend-0.1.2
+    ports:
+      - "80:80"
+    env_file:
+      - frontend/.env
+    depends_on:
+      - backend
+
+  backend:
+    image: docker.io/bsenss6/sportganise:backend-0.1.2
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
