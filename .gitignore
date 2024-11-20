@@ -1,1 +1,12 @@
 .env
+
+### IntelliJ IDEA ###
+.idea
+.idea/*
+*.iws
+*.iml
+*.ipr
+
+### MAC OS ###
+.DS_Store
+.github/.DS_Store

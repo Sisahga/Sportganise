@@ -1,13 +1,12 @@
-package com.sportganise.helloworld;
+package com.sportganise;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-/** Runs the application. */
+/** This is our Sportganise SpringBoot application. */
 @SpringBootApplication
-public class HelloWorldApplication {
-
+public class SportganiseApplication {
   public static void main(String[] args) {
-    SpringApplication.run(HelloWorldApplication.class, args);
+    SpringApplication.run(SportganiseApplication.class, args);
   }
 }
