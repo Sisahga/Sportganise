@@ -11,9 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entity Model for Account table.
- */
+/** Entity Model for Account table. */
 @Setter
 @Getter
 @NoArgsConstructor

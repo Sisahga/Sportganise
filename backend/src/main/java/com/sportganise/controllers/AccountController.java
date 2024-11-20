@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
 /**
- * REST Controller for managing 'Account' Entities.
- * Handles HTTP request and routes them to appropriate services.
+ * REST Controller for managing 'Account' Entities. Handles HTTP request and routes them to
+ * appropriate services.
  */
 @RestController
 @RequestMapping("/api/account")
