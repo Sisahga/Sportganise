@@ -2,6 +2,8 @@ package com.sportganise.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -24,7 +26,10 @@ public class Account {
   @Column(name = "account_id")
   private Integer accountId;
 
-  private String type;
+  // Type of user. i.e. is it a coach, admin or regular user.
+  // Role is an enum defined in the Role.java
+  @Enumerated(EnumType.STRING) // Takes string from DB and converts into Role type
+  private Role type;
   private String email;
 
   @Column(name = "auth0_id")
