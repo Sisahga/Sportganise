@@ -1,97 +1,93 @@
-import React from 'react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Bell, Calendar, Home, MessageSquare, User } from "lucide-react";
 
-const FooterNav: React.FC = () => {
+export default function FooterNav() {
+  const [selected, setSelected] = useState("Home");
+
   return (
-    <footer className="shadow fixed bottom-0 left-0 right-0 p-2 border-t bg-white">
-      <nav className="flex justify-around text-primaryColour">
-        <button className="flex flex-col items-center rounded bg-secondaryColour text-primaryColour">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 7.5l8.25 5.25L19.5 7.5v9l-8.25 5.25L3 16.5v-9z"
-            />
-          </svg>
-          <span className="text-sm">Home</span>
-        </button>
-        <button className="flex flex-col items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 4.5h18m-6 4.5h6m-6 4.5h6M3 9h6M3 13.5h6"
-            />
-          </svg>
-          <span className="text-sm">Calendar</span>
-        </button>
-        <button className="flex flex-col items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 7.5l6 6H6l6-6z"
-            />
-          </svg>
-          <span className="text-sm">Alerts</span>
-        </button>
-        <button className="flex flex-col items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 4.5h18m-6 4.5h6m-6 4.5h6M3 9h6M3 13.5h6"
-            />
-          </svg>
-          <span className="text-sm">Inbox</span>
-        </button>
-        <button className="flex flex-col items-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 2.25c-2.213 0-4.322.778-6 2.25M18 4.5C16.322 3.028 14.213 2.25 12 2.25m0 0V7.5"
-            />
-          </svg>
-          <span className="text-sm">Profile</span>
-        </button>
-      </nav>
-    </footer>
-  );
-};
+    <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50">
+      <nav className="flex justify-around p-2">
+        {/* Home Button */}
+        <Button
+          variant="ghost"
+          className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
+          onClick={() => setSelected("Home")}
+        >
+          <Home
+            className={`h-5 w-5 ${
+              selected === "Home"
+                ? "text-secondaryColour"
+                : "text-primaryColour"
+            }`}
+          />
+          <span className="text-xs">Home</span>
+        </Button>
 
-export default FooterNav;
+        {/* Calendar Button */}
+        <Button
+          variant="ghost"
+          className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
+          onClick={() => setSelected("Calendar")}
+        >
+          <Calendar
+            className={`h-5 w-5 ${
+              selected === "Calendar"
+                ? "text-secondaryColour"
+                : "text-primaryColour"
+            }`}
+          />
+          <span className="text-xs">Calendar</span>
+        </Button>
+
+        {/* Alerts Button */}
+        <Button
+          variant="ghost"
+          className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
+          onClick={() => setSelected("Alerts")}
+        >
+          <Bell
+            className={`h-5 w-5 ${
+              selected === "Alerts"
+                ? "text-secondaryColour"
+                : "text-primaryColour"
+            }`}
+          />
+          <span className="text-xs">Alerts</span>
+        </Button>
+
+        {/* Inbox Button */}
+        <Button
+          variant="ghost"
+          className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
+          onClick={() => setSelected("Inbox")}
+        >
+          <MessageSquare
+            className={`h-5 w-5 ${
+              selected === "Inbox"
+                ? "text-secondaryColour"
+                : "text-primaryColour"
+            }`}
+          />
+          <span className="text-xs">Inbox</span>
+        </Button>
+
+        {/* Profile Button */}
+        <Button
+          variant="ghost"
+          className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
+          onClick={() => setSelected("Profile")}
+        >
+          <User
+            className={`h-5 w-5 ${
+              selected === "Profile"
+                ? "text-secondaryColour"
+                : "text-primaryColour"
+            }`}
+          />
+          <span className="text-xs">Profile</span>
+        </Button>
+      </nav>
+    </div>
+  );
+}

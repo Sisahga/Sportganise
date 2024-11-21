@@ -1,16 +1,66 @@
-import React from 'react';
-import logo from '../../assets/Logo.png';
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import logo from "../../assets/Logo.png";
 
-const HeaderNav: React.FC = () => {
+export default function HeaderNav() {
   return (
-    <nav className="flex items-center justify-between px-4 py-6 bg-primaryColour">
-      <div className="bg-primaryColour">
-        <div className="flex items-center">
-          <img src={logo} alt="Logo" className="h-14" />
+    <div>
+      <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <img src={logo} alt="Logo" className="h-20" />
         </div>
-      </div>
-    </nav>
-  );
-};
 
-export default HeaderNav;
+        <Drawer>
+          <DrawerTrigger className="bg-primaryColour hover:outline-none">
+            <Menu className="h-10 w-10" />
+          </DrawerTrigger>
+          <DrawerContent className="w-[80%]">
+            <DrawerHeader>
+              <div className="flex justify-center items-center py-10 gap-2">
+                <img src={logo} alt="Logo" className="h-24 rounded-lg" />
+              </div>
+            </DrawerHeader>
+            <nav className="flex flex-col gap-4">
+              <Button
+                variant="link"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              >
+                Home
+              </Button>
+              <Button
+                variant="link"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              >
+                Forum
+              </Button>
+              <Button
+                variant="link"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              >
+                Training Session
+              </Button>
+              <Button
+                variant="link"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              >
+                Training Plan
+              </Button>
+              <Button
+                variant="link"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              >
+                Setting
+              </Button>
+            </nav>
+          </DrawerContent>
+        </Drawer>
+      </header>
+    </div>
+  );
+}
