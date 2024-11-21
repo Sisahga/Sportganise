@@ -20,6 +20,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
+    /**
+     * Gets an Account by Id.
+     * @param accountId Id of the account to retrieve
+     * @return Account object if exists, null if not.
+     */
     public Optional<Account> getAccount(int accountId) {
         return accountRepository.findById(accountId);
     }
