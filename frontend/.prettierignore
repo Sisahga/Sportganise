@@ -1,0 +1,44 @@
+# Ignore node_modules folder
+node_modules/
+
+# Ignore build and dist directories
+build/
+dist/
+out/
+coverage/
+
+# Ignore environment and config files
+.env
+*.config.js
+*.config.cjs
+*.config.mjs
+*.config.ts
+tsconfig.json
+
+# Ignore generated files (e.g., TypeScript declaration files)
+*.d.ts
+
+# Ignore lock files
+yarn.lock
+package-lock.json
+pnpm-lock.yaml
+
+# Ignore assets
+public/
+static/
+
+# Ignore specific files or folders
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Ignore compiled or minified files
+*.min.js
+*.min.css
+*.bundle.js
+
+# Ignore temporary files and local environment files
+.tmp/
+*.tmp
+*.cache/
