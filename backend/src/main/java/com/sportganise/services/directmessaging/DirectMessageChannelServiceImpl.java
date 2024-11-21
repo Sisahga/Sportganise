@@ -1,17 +1,22 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
+import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DirectMessageChannelServiceImpl implements DirectMessageChannelService {
     private final DirectMessageChannelRepository directMessageChannelRepository;
+    private final AccountRepository accountRepository;
 
     @Autowired
-    public DirectMessageChannelServiceImpl(DirectMessageChannelRepository directMessageChannelRepository) {
+    public DirectMessageChannelServiceImpl(DirectMessageChannelRepository directMessageChannelRepository, AccountRepository accountRepository) {
         this.directMessageChannelRepository = directMessageChannelRepository;
+        this.accountRepository = accountRepository;
     }
 
     /**
@@ -39,16 +44,26 @@ public class DirectMessageChannelServiceImpl implements DirectMessageChannelServ
      * @param members String of member ids, separated by a ','
      * @return Formatted string for the channel name composed of the name of the members
      */
-    private static StringBuilder createChannelNameFromMembers(String members) {
-        StringBuilder channelNameBuilder = new StringBuilder();
+    private StringBuilder createChannelNameFromMembers(String members) {
         String[] membersArray = members.split(",");
+        Integer[] memberIds = new Integer[membersArray.length];
+        for (int i = 0; i < memberIds.length; i++) {
+            memberIds[i] = Integer.parseInt(membersArray[i]);
+        }
 
-        for (int i = 0; i < membersArray.length; i++) {
-            channelNameBuilder.append(members.split(",")[i]);
-            if (i == membersArray.length - 2) {
-                channelNameBuilder.append(" and ");
+        List<String> firstNames = this.accountRepository.findFirstNamesByAccountId(memberIds);
+
+        StringBuilder channelNameBuilder = new StringBuilder();
+        for (int i = 0; i < firstNames.size(); i++) {
+            // Can't have channel name longer than 50 chars.
+            if (channelNameBuilder.length() + firstNames.get(i).length() > 45) {
+                channelNameBuilder.append(", ...");
+                return channelNameBuilder;
             }
-            else if (i < membersArray.length - 1) {
+            channelNameBuilder.append(firstNames.get(i));
+            if (i == membersArray.length - 2) {
+                channelNameBuilder.append(" and "); // Appends ' and ' if it's the before last element of the list. Ex: "Max and James", not "Max, James"
+            } else if (i < membersArray.length - 1) {
                 channelNameBuilder.append(", ");
             }
         }
