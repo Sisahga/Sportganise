@@ -57,7 +57,7 @@ const drawerContentVariants = cva(
     defaultVariants: {
       direction: "right",
     },
-  }
+  },
 );
 
 const DrawerContent = React.forwardRef<
@@ -112,7 +112,7 @@ const DrawerTitle = React.forwardRef<
     ref={ref}
     className={cn(
       "text-lg font-semibold leading-none tracking-tight",
-      className
+      className,
     )}
     {...props}
   />
