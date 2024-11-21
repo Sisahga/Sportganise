@@ -1,9 +1,27 @@
 package com.sportganise.services;
 
 import com.sportganise.entities.Account;
+import com.sportganise.repositories.AccountRepository;
+
 import java.util.Optional;
 
-/** Service Interface for 'Account' entity. Defines C.R.U.D. operations. */
-public interface AccountService {
-  Optional<Account> getAccount(int accountId);
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * Implementation of AccountService.
+ */
+@Service
+public class AccountService {
+    private final AccountRepository accountRepository;
+
+    @Autowired
+    public AccountService(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
+    }
+
+    public Optional<Account> getAccount(int accountId) {
+        return accountRepository.findById(accountId);
+    }
 }
+
