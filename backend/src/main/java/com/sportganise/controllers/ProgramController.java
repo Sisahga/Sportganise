@@ -1,6 +1,6 @@
 package com.sportganise.controllers;
 
-import com.sportganise.dto.ProgramParticipantDTO;
+import com.sportganise.dto.ProgramParticipantDto;
 import com.sportganise.entities.Account;
 import com.sportganise.services.AccountService;
 import com.sportganise.services.ProgramService;
@@ -30,8 +30,15 @@ public class ProgramController {
     this.accountService = accountService;
   }
 
+  /**
+   * Get mapping for program session details.
+   *
+   * @param sessionId Id of session
+   * @param accountId Id of account
+   * @return HTTP Response
+   */
   @GetMapping("/{sessionId}/details")
-  public ResponseEntity<List<ProgramParticipantDTO>> getParticipantsInSession(
+  public ResponseEntity<List<ProgramParticipantDto>> getParticipantsInSession(
       @PathVariable Integer sessionId, Integer accountId) {
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = accountService.getAccount(accountId);
@@ -43,9 +50,13 @@ public class ProgramController {
       // Check if this user has permissions to see training sessions attendees
       if (accountService.hasPermissions(user.getType())) {
         // Retrieve the list of attendees of the training session
-        List<ProgramParticipantDTO> attendees = programService.getParticipants(sessionId);
+        List<ProgramParticipantDto> attendees = programService.getParticipants(sessionId);
         return ResponseEntity.ok(attendees);
-      } else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-    } else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      } else {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      }
+    } else { 
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
   }
 }

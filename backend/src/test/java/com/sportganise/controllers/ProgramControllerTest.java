@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.sportganise.dto.ProgramParticipantDTO;
+import com.sportganise.dto.ProgramParticipantDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Role;
 import com.sportganise.services.AccountService;
@@ -42,8 +42,8 @@ class ProgramControllerTest {
     Mockito.when(accountService.hasPermissions(Role.ADMIN)).thenReturn(true);
 
     // Mock list of 2 participants
-    ProgramParticipantDTO participant1 =
-        new ProgramParticipantDTO(
+    ProgramParticipantDto participant1 =
+        new ProgramParticipantDto(
             1,
             Role.PLAYER,
             "johndoe@gmail.com",
@@ -51,8 +51,8 @@ class ProgramControllerTest {
             "5141234567",
             "John",
             "Doe");
-    ProgramParticipantDTO participant2 =
-        new ProgramParticipantDTO(
+    ProgramParticipantDto participant2 =
+        new ProgramParticipantDto(
             2,
             Role.PLAYER,
             "janesmith@gmail.com",
