@@ -7,10 +7,10 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<HomePage />} />
         <Route path="/" element={<Layout />}>
           {" "}
           {/*Place the routes to all your pages nested in this Route tag */}
-          <Route path="/" element={<HomePage />} />
           <Route
             path="/pages/CreateTrainingSession"
             element={<CreateTrainingSession />}
