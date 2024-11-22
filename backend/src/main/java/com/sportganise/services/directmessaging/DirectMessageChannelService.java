@@ -1,5 +1,6 @@
 package com.sportganise.services.directmessaging;
 
+import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDTO;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
@@ -8,54 +9,68 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service Class related to Direct Message Channel
+ */
 @Service
 public class DirectMessageChannelService {
     private final DirectMessageChannelRepository directMessageChannelRepository;
     private final AccountRepository accountRepository;
+    private final DirectMessageChannelMemberService directMessageChannelMemberService;
 
+    /**
+     * Service Constructor.
+     *
+     * @param directMessageChannelRepository    Direct Message Channel Repository
+     * @param accountRepository                 Account Repository
+     * @param directMessageChannelMemberService Direct Message Channel Member Repository
+     */
     @Autowired
-    public DirectMessageChannelService(DirectMessageChannelRepository directMessageChannelRepository, AccountRepository accountRepository) {
+    public DirectMessageChannelService(DirectMessageChannelRepository directMessageChannelRepository,
+                                       AccountRepository accountRepository,
+                                       DirectMessageChannelMemberService directMessageChannelMemberService) {
         this.directMessageChannelRepository = directMessageChannelRepository;
         this.accountRepository = accountRepository;
+        this.directMessageChannelMemberService = directMessageChannelMemberService;
     }
 
     /**
      * Creates a new DM Channel and stores it in the Database.
      *
-     * @param members     String of member ids, separated by a ',' (min. 2 members)
+     * @param memberIds   String of member ids, separated by a ',' (min. 2 members)
      * @param channelName Name of the message channel. Can be null.
      * @return DM Channel created.
      */
-    public DirectMessageChannel createDirectMessageChannel(String members, String channelName) {
+    public CreateDirectMessageChannelDTO createDirectMessageChannel(List<Integer> memberIds, String channelName) {
         // Set the Channel Name to be the first names of members in the channel if it is null or empty.
         if (channelName == null || channelName.isBlank()) {
-            StringBuilder channelNameBuilder = createChannelNameFromMembers(members);
+            StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
             channelName = channelNameBuilder.toString();
         }
         DirectMessageChannel dmChannel = new DirectMessageChannel();
         dmChannel.setName(channelName);
 
         DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
-
+        int createdDmChannelId = createdDmChannel.getChannelId();
         // Create Channel Members
+        this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId);
 
+        // Return the DM Channel DTO
+        CreateDirectMessageChannelDTO dmChannelDTO = new CreateDirectMessageChannelDTO();
+        dmChannelDTO.setChannelId(createdDmChannelId);
+        dmChannelDTO.setChannelName(channelName);
+        dmChannelDTO.setMemberIds(memberIds);
 
-        return createdDmChannel;
+        return dmChannelDTO;
     }
 
     /**
      * Formats the channel name to be the first names of all members in the channel if no name was given.
      *
-     * @param members String of member ids, separated by a ','
+     * @param memberIds String of member ids, separated by a ','
      * @return Formatted string for the channel name composed of the name of the members
      */
-    private StringBuilder createChannelNameFromMembers(String members) {
-        String[] membersArray = members.split(",");
-        Integer[] memberIds = new Integer[membersArray.length];
-        for (int i = 0; i < memberIds.length; i++) {
-            memberIds[i] = Integer.parseInt(membersArray[i]);
-        }
-
+    private StringBuilder createChannelNameFromMembers(List<Integer> memberIds) {
         List<String> firstNames = this.accountRepository.findFirstNamesByAccountId(memberIds);
 
         StringBuilder channelNameBuilder = new StringBuilder();
@@ -66,9 +81,9 @@ public class DirectMessageChannelService {
                 return channelNameBuilder;
             }
             channelNameBuilder.append(firstNames.get(i));
-            if (i == membersArray.length - 2) {
+            if (i == memberIds.size() - 2) {
                 channelNameBuilder.append(" and "); // Appends ' and ' if it's the before last element of the list. Ex: "Max and James", not "Max, James"
-            } else if (i < membersArray.length - 1) {
+            } else if (i < memberIds.size() - 1) {
                 channelNameBuilder.append(", ");
             }
         }

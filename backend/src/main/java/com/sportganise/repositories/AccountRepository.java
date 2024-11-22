@@ -19,6 +19,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
      * @param ids Concerned account ids
      * @return List of first names
      */
-    @Query("SELECT firstName FROM Account WHERE accountId = :ids")
-    List<String> findFirstNamesByAccountId(@Param("ids") Integer[] ids);
+    @Query("SELECT firstName FROM Account WHERE accountId IN :ids")
+    List<String> findFirstNamesByAccountId(@Param("ids") List<Integer> ids);
 }
