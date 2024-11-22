@@ -21,7 +21,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-public class ProgramParticipants {
+public class ProgramParticipant {
     private String type;
 
     @Column(name = "is_confirmed")

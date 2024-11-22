@@ -3,8 +3,10 @@ package com.sportganise.controllers;
 import com.sportganise.entities.Account;
 import com.sportganise.services.AccountService;
 import com.sportganise.services.ProgramService;
+import com.sportganise.dto.ProgramParticipantDTO;
+
+import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/training-sessions")
+@CrossOrigin(origins = "*")
 public class ProgramController {
     private final ProgramService programService;
     private final AccountService accountService;
@@ -29,7 +32,7 @@ public class ProgramController {
     }
 
     @GetMapping("/{sessionId}/details")
-    public ResponseEntity<List<MemberDTO>> getPlayersInSession(@PathVariable Integer sessionId, Integer accountId) {
+    public ResponseEntity<List<ProgramParticipantDTO>> getPlayersInSession(@PathVariable Integer sessionId, Integer accountId) {
         // Get account from accountId
         Optional<Account> userOptional = accountService.getAccount(accountId);
 
@@ -40,7 +43,7 @@ public class ProgramController {
             // Check if this user has permissions to see training sessions attendees 
             if(accountService.hasPermissions(user.getType())) {
                 // Retrieve the list of attendees of the training session
-                List<MemberDTO> attendees = programService.getAttendees(sessionId);
+                List<ProgramParticipantDTO> attendees = programService.getAttendees(sessionId);
                 return ResponseEntity.ok(attendees);
             }
             else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

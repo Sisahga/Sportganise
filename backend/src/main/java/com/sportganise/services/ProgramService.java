@@ -2,7 +2,10 @@ package com.sportganise.services;
 
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Program;
+import com.sportganise.dto.ProgramParticipantDTO;
 import com.sportganise.repositories.ProgramRepository;
+
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
@@ -19,13 +22,13 @@ public class ProgramService {
         return programRepository.findById(id);
     }
 
-    public List<MemberDTO> getAttendees(Integer sessionId) {
-        // Fetch the list of attendees (e.g., Account or Player entities) for the session
-        List<Account> attendees = programRepository.findAttendeesBySessionId(sessionId);
+    public List<ProgramParticipantDTO> getAttendees(Integer sessionId) {
+        // Get the list of attendees for the program
+        List<Account> attendees = programRepository.findParticipantsByProgramId(sessionId);
     
-        // Map each Account to a MemberDTO
+        // Map each Account to a ProgramParticipantDTO
         return attendees.stream()
-            .map(account -> new MemberDTO(account.getId(), account.getName(), account.getEmail()))
+            .map(account -> new ProgramParticipantDTO(account.getAccountId(), account.getFirstName(), account.getLastName(), account.getEmail()))
             .toList();
     }
 }
