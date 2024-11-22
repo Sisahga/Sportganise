@@ -32,6 +32,14 @@ public class ProgramParticipantDTO {
         this.accountId = accountId;
     }
 
+    public Role getType() {
+        return type;
+    }
+
+    public void setType(Role type) {
+        this.type = type;
+    }
+
     public String getEmail() {
         return email;
     }
