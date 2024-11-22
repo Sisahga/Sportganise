@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/training-sessions")
 public class ProgramController {
-    private final ProgramService trainingSessionService;
+    private final ProgramService programService;
     private final AccountService accountService;
 
-    public ProgramController(ProgramService trainingSessionService, AccountService accountService) {
-        this.trainingSessionService = trainingSessionService;
+    public ProgramController(ProgramService programService, AccountService accountService) {
+        this.programService = programService;
         this.accountService = accountService;
     }
 
@@ -40,7 +40,7 @@ public class ProgramController {
             // Check if this user has permissions to see training sessions attendees 
             if(accountService.hasPermissions(user.getType())) {
                 // Retrieve the list of attendees of the training session
-                List<MemberDTO> attendees = trainingSessionService.getAttendees(sessionId);
+                List<MemberDTO> attendees = programService.getAttendees(sessionId);
                 return ResponseEntity.ok(attendees);
             }
             else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

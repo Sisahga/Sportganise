@@ -1,32 +1,32 @@
 package com.sportganise.services;
 
 import com.sportganise.entities.Account;
-import com.sportganise.entities.Role;
 import com.sportganise.entities.Program;
-import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.ProgramRepository;
-
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ProgramService {
 
-    private final ProgramRepository trainingSessionRepository;
+    private final ProgramRepository programRepository;
 
-    public ProgramService(ProgramRepository trainingSessionRepository) {
-        this.trainingSessionRepository = trainingSessionRepository;
+    public ProgramService(ProgramRepository programRepository) {
+        this.programRepository = programRepository;
     }
 
     public Optional<Program> getSessionById(Integer id) {
-        return trainingSessionRepository.findById(id);
+        return programRepository.findById(id);
     }
 
-    public Optional<Program> getAttendees(Integer session_id) {
-        return trainingSessionRepository.findById(session_id);
+    public List<MemberDTO> getAttendees(Integer sessionId) {
+        // Fetch the list of attendees (e.g., Account or Player entities) for the session
+        List<Account> attendees = programRepository.findAttendeesBySessionId(sessionId);
+    
+        // Map each Account to a MemberDTO
+        return attendees.stream()
+            .map(account -> new MemberDTO(account.getId(), account.getName(), account.getEmail()))
+            .toList();
     }
 }
 
