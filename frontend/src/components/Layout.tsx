@@ -8,7 +8,7 @@ const Layout = () => {
   return (
     <div>
       <HeaderNav />
-      <main style={{ padding: "1rem" }}>
+      <main className="my-40 mx-6">
         <Outlet /> {/* This will render the routed page content */}
       </main>
       <FooterNav />
