@@ -30,6 +30,7 @@ public class Account {
   // Role is an enum defined in the Role.java
   @Enumerated(EnumType.STRING) // Takes string from DB and converts into Role type
   private Role type;
+
   private String email;
 
   @Column(name = "auth0_id")

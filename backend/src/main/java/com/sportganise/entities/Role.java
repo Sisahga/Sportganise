@@ -1,7 +1,7 @@
 package com.sportganise.entities;
 
 public enum Role {
-    ADMIN,
-    COACH,
-    PLAYER
+  ADMIN,
+  COACH,
+  PLAYER
 }

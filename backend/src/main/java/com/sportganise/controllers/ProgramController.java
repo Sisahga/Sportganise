@@ -1,10 +1,9 @@
 package com.sportganise.controllers;
 
+import com.sportganise.dto.ProgramParticipantDTO;
 import com.sportganise.entities.Account;
 import com.sportganise.services.AccountService;
 import com.sportganise.services.ProgramService;
-import com.sportganise.dto.ProgramParticipantDTO;
-
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
@@ -23,33 +22,30 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/programs")
 @CrossOrigin(origins = "*")
 public class ProgramController {
-    private final ProgramService programService;
-    private final AccountService accountService;
+  private final ProgramService programService;
+  private final AccountService accountService;
 
-    public ProgramController(ProgramService programService, AccountService accountService) {
-        this.programService = programService;
-        this.accountService = accountService;
-    }
+  public ProgramController(ProgramService programService, AccountService accountService) {
+    this.programService = programService;
+    this.accountService = accountService;
+  }
 
-    @GetMapping("/{sessionId}/details")
-    public ResponseEntity<List<ProgramParticipantDTO>> getParticipantsInSession(@PathVariable Integer sessionId, Integer accountId) {
-        // Get account from accountId (this is a wrapper, not the actual)
-        Optional<Account> userOptional = accountService.getAccount(accountId);
+  @GetMapping("/{sessionId}/details")
+  public ResponseEntity<List<ProgramParticipantDTO>> getParticipantsInSession(
+      @PathVariable Integer sessionId, Integer accountId) {
+    // Get account from accountId (this is a wrapper, not the actual)
+    Optional<Account> userOptional = accountService.getAccount(accountId);
 
-        // Check if there is the value of getAccount is empty
-        if(!userOptional.isEmpty()){
-            // If not empty, then we go fetch the actual Account value of this user
-            Account user = userOptional.get();
-            // Check if this user has permissions to see training sessions attendees 
-            if(accountService.hasPermissions(user.getType())) {
-                // Retrieve the list of attendees of the training session
-                List<ProgramParticipantDTO> attendees = programService.getParticipants(sessionId);
-                return ResponseEntity.ok(attendees);
-            }
-            else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-
-    
+    // Check if there is the value of getAccount is empty
+    if (!userOptional.isEmpty()) {
+      // If not empty, then we go fetch the actual Account value of this user
+      Account user = userOptional.get();
+      // Check if this user has permissions to see training sessions attendees
+      if (accountService.hasPermissions(user.getType())) {
+        // Retrieve the list of attendees of the training session
+        List<ProgramParticipantDTO> attendees = programService.getParticipants(sessionId);
+        return ResponseEntity.ok(attendees);
+      } else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    } else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+  }
 }

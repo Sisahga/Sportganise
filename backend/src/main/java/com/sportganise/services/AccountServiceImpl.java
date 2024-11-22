@@ -22,10 +22,9 @@ public class AccountServiceImpl implements AccountService {
     return accountRepository.findById(accountId);
   }
 
-  public boolean hasPermissions (Role type){
-    if(type == Role.ADMIN || type == Role.COACH){
+  public boolean hasPermissions(Role type) {
+    if (type == Role.ADMIN || type == Role.COACH) {
       return true;
-    }
-    else return false;
+    } else return false;
   }
 }

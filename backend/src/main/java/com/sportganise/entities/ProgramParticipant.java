@@ -1,13 +1,12 @@
 package com.sportganise.entities;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,23 +21,23 @@ import lombok.Setter;
 @Builder
 @Entity
 public class ProgramParticipant {
-    private String type;
+  private String type;
 
-    @Column(name = "is_confirmed")
-    private boolean isConfirmed;
+  @Column(name = "is_confirmed")
+  private boolean isConfirmed;
 
-    @Column(name = "confirm_date")
-    private LocalDateTime confirmedDate;
+  @Column(name = "confirm_date")
+  private LocalDateTime confirmedDate;
 
-    // Each Program Participant can be linked to one or more Programs
-    @OneToMany
-    @MapsId("programId")
-    @JoinColumn(name = "program_id")
-    private Program program;
+  // Each Program Participant can be linked to one or more Programs
+  @OneToMany
+  @MapsId("programId")
+  @JoinColumn(name = "program_id")
+  private Program program;
 
-    // Each Program Participant is linked to exactly one Account
-    @OneToOne
-    @MapsId("accountId")
-    @JoinColumn(name = "account_id")
-    private Account account;
+  // Each Program Participant is linked to exactly one Account
+  @OneToOne
+  @MapsId("accountId")
+  @JoinColumn(name = "account_id")
+  private Account account;
 }
