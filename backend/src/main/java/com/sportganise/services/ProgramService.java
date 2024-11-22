@@ -28,7 +28,7 @@ public class ProgramService {
     
         // Map each Account to a ProgramParticipantDTO
         return attendees.stream()
-            .map(account -> new ProgramParticipantDTO(account.getAccountId(), account.getFirstName(), account.getLastName(), account.getEmail()))
+            .map(account -> new ProgramParticipantDTO(account.getAccountId(), account.getType(), account.getEmail(), account.getAddress(), account.getPhone(), account.getFirstName(), account.getLastName()))
             .toList();
     }
 }
