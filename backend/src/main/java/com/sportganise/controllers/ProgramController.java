@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * appropriate services.
  */
 @RestController
-@RequestMapping("/api/training-sessions")
+@RequestMapping("/api/programs")
 @CrossOrigin(origins = "*")
 public class ProgramController {
     private final ProgramService programService;
@@ -32,8 +32,8 @@ public class ProgramController {
     }
 
     @GetMapping("/{sessionId}/details")
-    public ResponseEntity<List<ProgramParticipantDTO>> getPlayersInSession(@PathVariable Integer sessionId, Integer accountId) {
-        // Get account from accountId
+    public ResponseEntity<List<ProgramParticipantDTO>> getParticipantsInSession(@PathVariable Integer sessionId, Integer accountId) {
+        // Get account from accountId (this is a wrapper, not the actual)
         Optional<Account> userOptional = accountService.getAccount(accountId);
 
         // Check if there is the value of getAccount is empty
@@ -43,7 +43,7 @@ public class ProgramController {
             // Check if this user has permissions to see training sessions attendees 
             if(accountService.hasPermissions(user.getType())) {
                 // Retrieve the list of attendees of the training session
-                List<ProgramParticipantDTO> attendees = programService.getAttendees(sessionId);
+                List<ProgramParticipantDTO> attendees = programService.getParticipants(sessionId);
                 return ResponseEntity.ok(attendees);
             }
             else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

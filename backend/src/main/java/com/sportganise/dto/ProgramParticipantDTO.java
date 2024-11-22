@@ -13,7 +13,7 @@ public class ProgramParticipantDTO {
     
 
     // Constructor
-    public ProgramParticipantDTO(Integer accountId, Role type, String email, String address, String phone,String firstName, String lastName) {
+    public ProgramParticipantDTO(Integer accountId, Role type, String email, String address, String phone, String firstName, String lastName) {
         this.accountId = accountId;
         this.type = type;
         this.email = email;

@@ -22,7 +22,7 @@ public class ProgramService {
         return programRepository.findById(id);
     }
 
-    public List<ProgramParticipantDTO> getAttendees(Integer sessionId) {
+    public List<ProgramParticipantDTO> getParticipants(Integer sessionId) {
         // Get the list of attendees for the program
         List<Account> attendees = programRepository.findParticipantsByProgramId(sessionId);
     
