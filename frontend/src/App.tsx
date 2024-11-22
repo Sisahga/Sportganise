@@ -1,30 +1,23 @@
-import React, { useEffect, useState } from 'react';
-// import logo from './logo.svg';
-import logo from './sportganise-logo.svg';
-import './App.css';
-
-function getApiUrl(): string {
-  return process.env.REACT_APP_API_URL || 'http://localhost:8080';
-}
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import CreateTrainingSession from "./pages/CreateTrainingSession";
+import Layout from "./components/Layout";
 
 function App() {
-  const [homeText, setHomeText] = useState('');
-  const apiUrl = getApiUrl();
-
-  useEffect(() => {
-    fetch(`${apiUrl}/`)
-      .then((result) => result.text())
-      .then((text) => setHomeText(text));
-  }, [apiUrl]);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>Welcome to our app!</p>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{homeText}</p>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          {" "}
+          {/*Place the routes to all your pages nested in this Route tag */}
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/pages/CreateTrainingSession"
+            element={<CreateTrainingSession />}
+          ></Route>
+        </Route>
+      </Routes>
+    </Router>
   );
 }
 
