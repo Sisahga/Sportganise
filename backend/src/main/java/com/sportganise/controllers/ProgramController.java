@@ -1,0 +1,52 @@
+package com.sportganise.controllers;
+
+import com.sportganise.entities.Account;
+import com.sportganise.services.AccountService;
+import com.sportganise.services.ProgramService;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/**
+ * REST Controller for managing 'Account' Entities. Handles HTTP request and routes them to
+ * appropriate services.
+ */
+@RestController
+@RequestMapping("/api/training-sessions")
+public class ProgramController {
+    private final ProgramService trainingSessionService;
+    private final AccountService accountService;
+
+    public ProgramController(ProgramService trainingSessionService, AccountService accountService) {
+        this.trainingSessionService = trainingSessionService;
+        this.accountService = accountService;
+    }
+
+    @GetMapping("/{sessionId}/details")
+    public ResponseEntity<List<MemberDTO>> getPlayersInSession(@PathVariable Integer sessionId, Integer accountId) {
+        // Get account from accountId
+        Optional<Account> userOptional = accountService.getAccount(accountId);
+
+        // Check if there is the value of getAccount is empty
+        if(!userOptional.isEmpty()){
+            // If not empty, then we go fetch the actual Account value of this user
+            Account user = userOptional.get();
+            // Check if this user has permissions to see training sessions attendees 
+            if(accountService.hasPermissions(user.getType())) {
+                // Retrieve the list of attendees of the training session
+                List<MemberDTO> attendees = trainingSessionService.getAttendees(sessionId);
+                return ResponseEntity.ok(attendees);
+            }
+            else return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    
+}
