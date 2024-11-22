@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 
-/**
- * Service layer for Programs.
- */
+/** Service layer for Programs. */
 @Service
 public class ProgramService {
 

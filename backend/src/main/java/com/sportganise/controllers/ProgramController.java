@@ -55,7 +55,7 @@ public class ProgramController {
       } else {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
       }
-    } else { 
+    } else {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
   }

@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * API DTO for Program Participants.
- */
+/** API DTO for Program Participants. */
 @Setter
 @Getter
 @NoArgsConstructor

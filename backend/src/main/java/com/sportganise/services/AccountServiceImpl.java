@@ -22,13 +22,11 @@ public class AccountServiceImpl implements AccountService {
     return accountRepository.findById(accountId);
   }
 
-  /**
-   * Method to check if user has permissions role.
-   */
+  /** Method to check if user has permissions role. */
   public boolean hasPermissions(Role type) {
     if (type == Role.ADMIN || type == Role.COACH) {
       return true;
-    } else { 
+    } else {
       return false;
     }
   }

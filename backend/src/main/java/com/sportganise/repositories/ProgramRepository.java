@@ -8,9 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repository for Program.
- */
+/** Repository for Program. */
 @Repository // Indicates that this is a Spring Data repository
 public interface ProgramRepository extends JpaRepository<Program, Integer> {
 
