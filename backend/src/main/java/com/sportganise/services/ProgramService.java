@@ -32,7 +32,7 @@ public class ProgramService {
     // Get the list of participants for the program
     List<Account> participants = programRepository.findParticipantsByProgramId(sessionId);
 
-    // Map each Account to a ProgramParticipantDTO
+    // Map each Account to a ProgramParticipantDto
     return participants.stream()
         .map(
             account ->
