@@ -127,6 +127,23 @@
           </java>
         </configuration>
       </plugin>
+      <!-- Add Lombok Annotation Processor -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version> <!-- or the latest version -->
+        <configuration>
+          <source>21</source> <!-- or the version of Java you are using -->
+          <target>21</target> <!-- or the version of Java you are using -->
+          <annotationProcessorPaths>
+            <annotationProcessorPath>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>1.18.36</version> <!-- or the latest version -->
+            </annotationProcessorPath>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

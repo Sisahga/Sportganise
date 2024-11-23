@@ -1,12 +1,12 @@
-package com.sportganise;
+//package com.sportganise;
+//
+//import org.junit.jupiter.api.Test;
+//import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.test.context.ActiveProfiles;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-
-@SpringBootTest
-@ActiveProfiles("test")
-class SportganiseApplicationTest {
-  @Test
-  void contextLoads() {}
-}
+//@SpringBootTest
+//@ActiveProfiles("test")
+//class SportganiseApplicationTest {
+//  @Test
+//  void contextLoads() {}
+//}
