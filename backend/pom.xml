@@ -6,7 +6,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.3.4</version>
-    <relativePath/> <!-- lookup parent from repository -->
+    <relativePath/>
   </parent>
   <groupId>com.sportsganize</groupId>
   <artifactId>helloworld</artifactId>
@@ -123,13 +123,13 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>21</source> <!-- or the version of Java you are using -->
-          <target>21</target> <!-- or the version of Java you are using -->
+          <source>21</source>
+          <target>21</target>
           <annotationProcessorPaths>
             <annotationProcessorPath>
               <groupId>org.projectlombok</groupId>
               <artifactId>lombok</artifactId>
-              <version>1.18.36</version> <!-- or the latest version -->
+              <version>1.18.36</version>
             </annotationProcessorPath>
           </annotationProcessorPaths>
         </configuration>

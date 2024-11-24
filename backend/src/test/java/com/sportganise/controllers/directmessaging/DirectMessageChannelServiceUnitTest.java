@@ -61,11 +61,8 @@ public class DirectMessageChannelServiceUnitTest {
 
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
-    System.out.println("Channel ID: " + dmChannel.getChannelId());
     assertEquals(dmChannelDTO.getChannelName(), result.getChannelName());
-    System.out.println("Channel Name: " + result.getChannelName());
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
-    System.out.println("Member IDs: " + Arrays.toString(result.getMemberIds().toArray()));
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
     verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt());
@@ -87,11 +84,8 @@ public class DirectMessageChannelServiceUnitTest {
 
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
-    System.out.println("Channel ID: " + dmChannel.getChannelId());
     assertEquals(dmChannel.getName(), result.getChannelName());
-    System.out.println("Channel Name: " + result.getChannelName());
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
-    System.out.println("Member IDs: " + Arrays.toString(result.getMemberIds().toArray()));
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
     verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt());
@@ -117,11 +111,8 @@ public class DirectMessageChannelServiceUnitTest {
 
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
-    System.out.println("Channel ID: " + dmChannel.getChannelId());
     assertEquals(dmChannel.getName(), result.getChannelName());
-    System.out.println("Channel Name: " + result.getChannelName());
     assertEquals(longTestMemberIds, result.getMemberIds());
-    System.out.println("Member IDs: " + Arrays.toString(result.getMemberIds().toArray()));
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
     verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt());
