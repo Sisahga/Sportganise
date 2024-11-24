@@ -27,10 +27,7 @@ function App() {
             path="/pages/EditProfilePage"
             element={<EditProfilePage />}
           ></Route>
-          <Route
-            path="/pages/ProfilePage"
-            element={<ProfilePage />}
-          ></Route>
+          <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
           <Route
             path="/pages/ChangePasswordPage"
             element={<ChangePasswordPage />}

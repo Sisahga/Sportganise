@@ -29,8 +29,7 @@ const ProfileContent: React.FC = () => {
             {/* Profile image */}
             <img
               className="h-48 w-48 rounded-full border-2 border-white dark:border-gray-800 mx-auto my-2"
-              src= "https://via.placeholder.com/150"
-
+              src="https://via.placeholder.com/150"
               alt="Profile"
             />
 

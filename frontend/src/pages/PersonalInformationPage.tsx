@@ -3,7 +3,7 @@ import { PersonalInformationContent } from "@/components/PersonalInformationCont
 export default function PersonalInformationPage() {
   return (
     <div className="">
-      <PersonalInformationContent/>
+      <PersonalInformationContent />
     </div>
   );
 }

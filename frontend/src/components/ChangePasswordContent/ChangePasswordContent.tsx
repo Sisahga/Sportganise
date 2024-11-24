@@ -13,14 +13,14 @@ const ChangePasswordContent: React.FC = () => {
   const [passwordAgain, setPasswordAgain] = useState("");
   const [isValid, setIsValid] = useState(false);
   const [message, setMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false); 
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
   const handlePasswordAgainChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setPasswordAgain(e.target.value);
   };
@@ -63,13 +63,7 @@ const ChangePasswordContent: React.FC = () => {
             />
 
             <PasswordChecklist
-              rules={[
-                "minLength",
-                "specialChar",
-                "number",
-                "capital",
-                "match",
-              ]}
+              rules={["minLength", "specialChar", "number", "capital", "match"]}
               minLength={8}
               value={password}
               valueAgain={passwordAgain}
@@ -95,7 +89,7 @@ const ChangePasswordContent: React.FC = () => {
             <span
               className={cn(
                 "font-medium",
-                isSuccess ? "text-green-500" : "text-red"
+                isSuccess ? "text-green-500" : "text-red",
               )}
             >
               {message}

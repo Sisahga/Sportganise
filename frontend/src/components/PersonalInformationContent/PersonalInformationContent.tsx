@@ -48,7 +48,7 @@ const PersonalInformationContent: React.FC = () => {
                   key={index}
                   className={cn(
                     "px-4 py-5",
-                    index % 2 === 0 ? "bg-gray-50" : "bg-white" 
+                    index % 2 === 0 ? "bg-gray-50" : "bg-white",
                   )}
                 >
                   <Label>{label}</Label>
@@ -64,4 +64,3 @@ const PersonalInformationContent: React.FC = () => {
 };
 
 export default PersonalInformationContent;
-

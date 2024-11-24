@@ -1,1 +1,1 @@
-export { default as ChangePasswordContent} from "./ChangePasswordContent";
+export { default as ChangePasswordContent } from "./ChangePasswordContent";
