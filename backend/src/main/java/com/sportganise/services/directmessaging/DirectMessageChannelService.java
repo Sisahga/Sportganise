@@ -76,8 +76,9 @@ public class DirectMessageChannelService {
         StringBuilder channelNameBuilder = new StringBuilder();
         for (int i = 0; i < firstNames.size(); i++) {
             // Can't have channel name longer than 50 chars.
-            if (channelNameBuilder.length() + firstNames.get(i).length() > 45) {
-                channelNameBuilder.append(", ...");
+            if (i != firstNames.size() - 1 && channelNameBuilder.length() + firstNames.get(i).length() + firstNames.get(i + 1).length() > 44) {
+                channelNameBuilder.append("and ");
+                channelNameBuilder.append(firstNames.get(i));
                 return channelNameBuilder;
             }
             channelNameBuilder.append(firstNames.get(i));
