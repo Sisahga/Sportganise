@@ -55,6 +55,11 @@ public class DirectMessageChannelService {
     }
     DirectMessageChannel dmChannel = new DirectMessageChannel();
     dmChannel.setName(channelName);
+    if (memberIds.size() > 2) {
+      dmChannel.setType("GROUP");
+    } else {
+      dmChannel.setType("SIMPLE");
+    }
 
     DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
     int createdDmChannelId = createdDmChannel.getChannelId();
@@ -64,7 +69,8 @@ public class DirectMessageChannelService {
     // Return the DM Channel DTO
     CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
     dmChannelDto.setChannelId(createdDmChannelId);
-    dmChannelDto.setChannelName(channelName);
+    dmChannelDto.setChannelName(createdDmChannel.getName());
+    dmChannelDto.setChannelType(createdDmChannel.getType());
     dmChannelDto.setMemberIds(memberIds);
 
     return dmChannelDto;
