@@ -5,6 +5,8 @@ import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,9 @@ public class DirectMessageChannelService {
       dmChannel.setType("SIMPLE");
     }
 
+    LocalDateTime timestamp = LocalDateTime.now();
+    dmChannel.setCreatedAt(timestamp);
+
     DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
     int createdDmChannelId = createdDmChannel.getChannelId();
     // Create Channel Members
@@ -72,6 +77,7 @@ public class DirectMessageChannelService {
     dmChannelDto.setChannelName(createdDmChannel.getName());
     dmChannelDto.setChannelType(createdDmChannel.getType());
     dmChannelDto.setMemberIds(memberIds);
+    dmChannelDto.setCreatedAt(timestamp.toString());
 
     return dmChannelDto;
   }

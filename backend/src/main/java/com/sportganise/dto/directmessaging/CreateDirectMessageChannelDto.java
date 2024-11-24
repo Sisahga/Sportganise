@@ -16,4 +16,5 @@ public class CreateDirectMessageChannelDto {
   private String channelName;
   private String channelType;
   private List<Integer> memberIds;
+  private String createdAt;
 }
