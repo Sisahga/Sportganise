@@ -101,14 +101,15 @@ CREATE TABLE label_program (
 CREATE TABLE channel (
 	channel_id SERIAL PRIMARY KEY,
 	name VARCHAR(50),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    type VARCHAR(10) NOT NULL,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE Table channel_member (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	PRIMARY KEY(channel_id, account_id)
-	);
+);
 
 CREATE TABLE message (
 	message_id SERIAL PRIMARY KEY,
