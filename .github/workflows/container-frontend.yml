@@ -16,11 +16,11 @@ jobs:
       run:
         working-directory: ./frontend
 
-    # permissions:
-    #   packages: write
-    #   contents: read
-    #   attestations: write
-    #   id-token: write
+    permissions:
+      packages: write
+      contents: read
+      attestations: write
+      id-token: write
 
     steps:
       # Checkout the code
