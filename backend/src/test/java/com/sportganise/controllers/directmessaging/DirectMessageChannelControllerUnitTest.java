@@ -2,6 +2,8 @@ package com.sportganise.controllers.directmessaging;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -54,5 +56,6 @@ class DirectMessageChannelControllerUnitTest {
                 .andExpect(jsonPath("$.memberIds", is(createDmChannelDTO.getMemberIds())))
                 .andExpect(jsonPath("$.memberIds.length()").value(2))
                 .andReturn();
+        verify(dmChannelService, times(1)).createDirectMessageChannel(createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName());
     }
 }
