@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
  * Repository for 'Account' Entity.
  * Provides custom C.R.U.D. queries through the JpaRepository in JPQL.
  */
-@Repository // Indicates that this is a Spring Data repository
+@Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
   /**
    * Gets the first names for each account id provided.
