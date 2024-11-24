@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function CreateTrainingSession() {
   return (
     <div className="grid grid-rows-2 ">
