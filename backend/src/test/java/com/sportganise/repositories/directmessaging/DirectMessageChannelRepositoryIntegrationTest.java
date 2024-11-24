@@ -18,7 +18,6 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
 public class DirectMessageChannelRepositoryIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgres =
