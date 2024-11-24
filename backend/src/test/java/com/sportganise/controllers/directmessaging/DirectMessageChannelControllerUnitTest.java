@@ -65,8 +65,9 @@ class DirectMessageChannelControllerUnitTest {
   public void deleteDirectMessageChannelTest_ChannelExists() throws Exception {
     int channelId = 1;
     given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(true);
-    mockMvc.perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
-            .andExpect(status().isNoContent());
+    mockMvc
+        .perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
+        .andExpect(status().isNoContent());
     verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
   }
 
@@ -74,8 +75,9 @@ class DirectMessageChannelControllerUnitTest {
   public void deleteDirectMessageChannelTest_ChannelDoesNotExists() throws Exception {
     int channelId = 1;
     given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(false);
-    mockMvc.perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
-            .andExpect(status().isNotFound());
+    mockMvc
+        .perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
+        .andExpect(status().isNotFound());
     verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
   }
 }

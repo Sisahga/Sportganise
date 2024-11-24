@@ -132,7 +132,7 @@ public class DirectMessageChannelServiceUnitTest {
     verify(directMessageChannelRepository, times(1)).existsById(channelId);
     verify(directMessageChannelRepository, times(1)).deleteById(channelId);
     verify(directMessageChannelMemberRepository, times(1))
-            .deleteDirectMessageChannelMemberByChannelId(channelId);
+        .deleteDirectMessageChannelMemberByChannelId(channelId);
   }
 
   @Test
@@ -147,6 +147,6 @@ public class DirectMessageChannelServiceUnitTest {
     verify(directMessageChannelRepository, times(1)).existsById(channelId);
     verify(directMessageChannelRepository, times(0)).deleteById(anyInt());
     verify(directMessageChannelMemberRepository, times(0))
-            .deleteDirectMessageChannelMemberByChannelId(anyInt());
+        .deleteDirectMessageChannelMemberByChannelId(anyInt());
   }
 }

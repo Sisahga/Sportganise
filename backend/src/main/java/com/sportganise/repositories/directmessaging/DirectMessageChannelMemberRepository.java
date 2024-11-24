@@ -11,8 +11,8 @@ import org.springframework.data.repository.query.Param;
 /** Repository for a Direct Channel Member. */
 public interface DirectMessageChannelMemberRepository
     extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
-    @Transactional
-    @Modifying
-    @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
-    void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
+  void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
 }

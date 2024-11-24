@@ -51,6 +51,8 @@ public class DirectMessageChannelController {
   @DeleteMapping("/delete-channel/{id}")
   public ResponseEntity<Void> deleteChannel(@PathVariable Integer id) {
     boolean deleted = directMessageChannelService.deleteDirectMessageChannel(id);
-    return deleted ? new ResponseEntity<>(HttpStatus.NO_CONTENT) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    return deleted
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }
