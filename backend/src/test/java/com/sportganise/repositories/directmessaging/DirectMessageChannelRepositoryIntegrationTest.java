@@ -1,6 +1,7 @@
 package com.sportganise.repositories.directmessaging;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -11,9 +12,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-/**
- * Repository Integration Test for Direct Message Channel.
- */
+/** Repository Integration Test for Direct Message Channel. */
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
