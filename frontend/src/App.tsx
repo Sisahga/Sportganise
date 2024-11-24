@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import CreateTrainingSession from "./pages/CreateTrainingSession";
+import CreateTrainingSessionPage from "./pages/CreateTrainingSessionPage";
 import Layout from "./components/Layout";
 
 function App() {
@@ -12,8 +12,8 @@ function App() {
           {" "}
           {/*Place the routes to all your pages nested in this Route tag */}
           <Route
-            path="/pages/CreateTrainingSession"
-            element={<CreateTrainingSession />}
+            path="/pages/CreateTrainingSessionPage"
+            element={<CreateTrainingSessionPage />}
           ></Route>
         </Route>
       </Routes>
