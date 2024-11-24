@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,5 +46,19 @@ public class DirectMessageChannelController {
         this.directMessageChannelService.createDirectMessageChannel(memberIds, channelName);
 
     return new ResponseEntity<>(dmChannelDto, HttpStatus.CREATED);
+  }
+
+  /**
+   * Endpoint /api/messaging/delete-channel: Delete Mapping for Deleting a Direct Message Channel.
+   *
+   * @param id The Id of the DM Channel to delete.
+   * @return HTTP Code 204 with No Content.
+   */
+  @DeleteMapping("/delete-channel/{id}")
+  public ResponseEntity<Void> deleteChannel(@PathVariable Integer id) {
+    boolean deleted = directMessageChannelService.deleteDirectMessageChannel(id);
+    return deleted
+        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 }

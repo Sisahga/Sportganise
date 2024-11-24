@@ -3,6 +3,7 @@ package com.sportganise.services.directmessaging;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DirectMessageChannelService {
   private final DirectMessageChannelRepository directMessageChannelRepository;
+  private final DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
   private final AccountRepository accountRepository;
   private final DirectMessageChannelMemberService directMessageChannelMemberService;
 
@@ -25,9 +27,11 @@ public class DirectMessageChannelService {
   @Autowired
   public DirectMessageChannelService(
       DirectMessageChannelRepository directMessageChannelRepository,
+      DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
       AccountRepository accountRepository,
       DirectMessageChannelMemberService directMessageChannelMemberService) {
     this.directMessageChannelRepository = directMessageChannelRepository;
+    this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
     this.accountRepository = accountRepository;
     this.directMessageChannelMemberService = directMessageChannelMemberService;
   }
@@ -41,8 +45,10 @@ public class DirectMessageChannelService {
    */
   public CreateDirectMessageChannelDto createDirectMessageChannel(
       List<Integer> memberIds, String channelName) {
-    // Set the Channel Name to be the first names of members
-    // in the channel if it is null or empty.
+    /*
+    Set the Channel Name to be the first names of members
+    in the channel if it is null or empty.
+    */
     if (channelName == null || channelName.isBlank()) {
       StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
       channelName = channelNameBuilder.toString();
@@ -62,6 +68,23 @@ public class DirectMessageChannelService {
     dmChannelDto.setMemberIds(memberIds);
 
     return dmChannelDto;
+  }
+
+  /**
+   * Deletes a DM Channel and all of its channel members.
+   *
+   * @param channelId The ID of the channel to delete.
+   */
+  public boolean deleteDirectMessageChannel(int channelId) {
+    if (directMessageChannelRepository.existsById(channelId)) {
+      // Delete the channel.
+      directMessageChannelRepository.deleteById(channelId);
+      // Delete all related channel members.
+      directMessageChannelMemberRepository.deleteDirectMessageChannelMemberByChannelId(channelId);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
