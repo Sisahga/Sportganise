@@ -56,12 +56,12 @@ public class DirectMessageChannelService {
     this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId);
 
     // Return the DM Channel DTO
-    CreateDirectMessageChannelDto dmChannelDTO = new CreateDirectMessageChannelDto();
-    dmChannelDTO.setChannelId(createdDmChannelId);
-    dmChannelDTO.setChannelName(channelName);
-    dmChannelDTO.setMemberIds(memberIds);
+    CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
+    dmChannelDto.setChannelId(createdDmChannelId);
+    dmChannelDto.setChannelName(channelName);
+    dmChannelDto.setMemberIds(memberIds);
 
-    return dmChannelDTO;
+    return dmChannelDto;
   }
 
   /**
