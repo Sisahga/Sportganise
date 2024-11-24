@@ -41,7 +41,7 @@ class DirectMessageChannelControllerUnitTest {
   }
 
   @Test
-  void createDirectMessageChannelTest() throws Exception {
+  public void createDirectMessageChannelTest() throws Exception {
     given(
             dmChannelService.createDirectMessageChannel(
                 createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName()))
@@ -59,5 +59,25 @@ class DirectMessageChannelControllerUnitTest {
     verify(dmChannelService, times(1))
         .createDirectMessageChannel(
             createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName());
+  }
+
+  @Test
+  public void deleteDirectMessageChannelTest_ChannelExists() throws Exception {
+    int channelId = 1;
+    given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(true);
+    mockMvc
+        .perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
+        .andExpect(status().isNoContent());
+    verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
+  }
+
+  @Test
+  public void deleteDirectMessageChannelTest_ChannelDoesNotExists() throws Exception {
+    int channelId = 1;
+    given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(false);
+    mockMvc
+        .perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
+        .andExpect(status().isNotFound());
+    verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
   }
 }

@@ -1,7 +1,6 @@
 package com.sportganise.controllers.directmessaging;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
@@ -12,6 +11,7 @@ import static org.mockito.Mockito.anyList;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import com.sportganise.services.directmessaging.DirectMessageChannelMemberService;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
@@ -27,6 +27,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageChannelServiceUnitTest {
   @Mock private DirectMessageChannelRepository directMessageChannelRepository;
+
+  @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
 
   @Mock private DirectMessageChannelMemberService directMessageChannelMemberService;
 
@@ -116,5 +118,35 @@ public class DirectMessageChannelServiceUnitTest {
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
     verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt());
+  }
+
+  @Test
+  public void deleteDirectMessageChannelTest_ChannelExists() {
+    int channelId = 1;
+
+    given(directMessageChannelRepository.existsById(channelId)).willReturn(true);
+
+    boolean result = directMessageChannelService.deleteDirectMessageChannel(channelId);
+
+    assertTrue(result);
+    verify(directMessageChannelRepository, times(1)).existsById(channelId);
+    verify(directMessageChannelRepository, times(1)).deleteById(channelId);
+    verify(directMessageChannelMemberRepository, times(1))
+        .deleteDirectMessageChannelMemberByChannelId(channelId);
+  }
+
+  @Test
+  public void deleteDirectMessageChannelTest_ChannelDoesNotExist() {
+    int channelId = 1;
+
+    given(directMessageChannelRepository.existsById(channelId)).willReturn(false);
+
+    boolean result = directMessageChannelService.deleteDirectMessageChannel(channelId);
+
+    assertFalse(result);
+    verify(directMessageChannelRepository, times(1)).existsById(channelId);
+    verify(directMessageChannelRepository, times(0)).deleteById(anyInt());
+    verify(directMessageChannelMemberRepository, times(0))
+        .deleteDirectMessageChannelMemberByChannelId(anyInt());
   }
 }
