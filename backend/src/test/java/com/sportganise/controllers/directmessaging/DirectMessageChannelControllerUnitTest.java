@@ -53,7 +53,6 @@ class DirectMessageChannelControllerUnitTest {
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(createDmChannelDTO)))
         .andExpect(status().isCreated())
-        .andDo(print())
         .andExpect(jsonPath("$.channelName", is(createDmChannelDTO.getChannelName())))
         .andExpect(jsonPath("$.memberIds", is(createDmChannelDTO.getMemberIds())))
         .andExpect(jsonPath("$.memberIds.length()").value(2))

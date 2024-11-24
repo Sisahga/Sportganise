@@ -64,7 +64,6 @@ class AccountControllerTest {
     mockMvc
         .perform(MockMvcRequestBuilders.get("/api/account/{id}", 1))
         .andExpect(status().isOk())
-        .andDo(print())
         .andExpect(jsonPath("$.accountId", is(account.getAccountId())))
         .andExpect(jsonPath("$.type", is(account.getType())))
         .andExpect(jsonPath("$.email", is(account.getEmail())))
