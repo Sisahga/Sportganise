@@ -30,6 +30,13 @@ import icon from "../../assets/file-document-svgrepo-com.svg";
 
 export default function CreateTrainingSessionForm() {
   const [date, setDate] = React.useState<Date>();
+
+  /*
+  const handleSelect = (date: Date | undefined) => {
+    console.log("Selected date:", date);
+    
+  };
+  */
   return (
     <div>
       <form>
@@ -85,7 +92,7 @@ export default function CreateTrainingSessionForm() {
                   variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground",
+                    !date && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="h-4 w-4 opacity-50" />
