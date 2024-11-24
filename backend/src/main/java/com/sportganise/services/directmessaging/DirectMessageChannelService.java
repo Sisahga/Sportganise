@@ -73,11 +73,16 @@ public class DirectMessageChannelService {
    *
    * @param channelId The ID of the channel to delete.
    */
-  public void deleteDirectMessageChannel(int channelId) {
-    // Delete the channel.
-    directMessageChannelRepository.deleteById(channelId);
-    // Delete all related channel members.
-    directMessageChannelMemberRepository.deleteDirectMessageChannelMemberByChannelId(channelId);
+  public boolean deleteDirectMessageChannel(int channelId) {
+    if (directMessageChannelRepository.existsById(channelId)) {
+      // Delete the channel.
+      directMessageChannelRepository.deleteById(channelId);
+      // Delete all related channel members.
+      directMessageChannelMemberRepository.deleteDirectMessageChannelMemberByChannelId(channelId);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
