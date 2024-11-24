@@ -1,7 +1,6 @@
 package com.sportganise.repositories.directmessaging;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
 import org.junit.Test;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
