@@ -45,8 +45,10 @@ public class DirectMessageChannelService {
    */
   public CreateDirectMessageChannelDto createDirectMessageChannel(
       List<Integer> memberIds, String channelName) {
-    // Set the Channel Name to be the first names of members
-    // in the channel if it is null or empty.
+    /*
+    Set the Channel Name to be the first names of members
+    in the channel if it is null or empty.
+    */
     if (channelName == null || channelName.isBlank()) {
       StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
       channelName = channelNameBuilder.toString();
