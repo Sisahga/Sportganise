@@ -1,5 +1,7 @@
 package com.sportganise.repositories.directmessaging;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -12,34 +14,32 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-/**
- * Repository Integration test for Direct Message Channel
- */
+/** Repository Integration test for Direct Message Channel */
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 public class DirectMessageChannelRepositoryIntegrationTest {
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
-    static {
-        postgres.start();
-    }
-    @DynamicPropertySource
-    static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
-        dynamicPropertyRegistry.add("spring.datasource.url", postgres::getJdbcUrl);
-        dynamicPropertyRegistry.add("spring.datasource.username", postgres::getUsername);
-        dynamicPropertyRegistry.add("spring.datasource.password", postgres::getPassword);
-    }
+  @Container
+  static PostgreSQLContainer<?> postgres =
+      new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"));
 
-    @Autowired
-    DirectMessageChannelRepository dmChannelRepository;
+  static {
+    postgres.start();
+  }
 
-    @Test
-    public void connectionEstablished() {
-        assertThat(postgres.isCreated()).isTrue();
-        assertThat(postgres.isRunning()).isTrue();
-    }
+  @DynamicPropertySource
+  static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
+    dynamicPropertyRegistry.add("spring.datasource.url", postgres::getJdbcUrl);
+    dynamicPropertyRegistry.add("spring.datasource.username", postgres::getUsername);
+    dynamicPropertyRegistry.add("spring.datasource.password", postgres::getPassword);
+  }
+
+  @Autowired DirectMessageChannelRepository dmChannelRepository;
+
+  @Test
+  public void connectionEstablished() {
+    assertThat(postgres.isCreated()).isTrue();
+    assertThat(postgres.isRunning()).isTrue();
+  }
 }

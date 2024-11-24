@@ -12,9 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entity for channel.
- */
+/** Entity for channel. */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,11 +20,13 @@ import lombok.Setter;
 @Entity
 @Table(name = "channel")
 public class DirectMessageChannel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "channel_id")
-    private Integer channelId;
-    private String name;
-    @Column(name = "created_at")
-    private Timestamp createdAt;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "channel_id")
+  private Integer channelId;
+
+  private String name;
+
+  @Column(name = "created_at")
+  private Timestamp createdAt;
 }

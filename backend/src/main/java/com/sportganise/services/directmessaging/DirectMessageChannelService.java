@@ -8,92 +8,93 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Service Class related to Direct Message Channel.
- */
+/** Service Class related to Direct Message Channel. */
 @Service
 public class DirectMessageChannelService {
-    private final DirectMessageChannelRepository directMessageChannelRepository;
-    private final AccountRepository accountRepository;
-    private final DirectMessageChannelMemberService directMessageChannelMemberService;
+  private final DirectMessageChannelRepository directMessageChannelRepository;
+  private final AccountRepository accountRepository;
+  private final DirectMessageChannelMemberService directMessageChannelMemberService;
 
-    /**
-     * Service Constructor.
-     *
-     * @param directMessageChannelRepository    Direct Message Channel Repository.
-     * @param accountRepository                 Account Repository.
-     * @param directMessageChannelMemberService Direct Message Channel Member Repository.
-     */
-    @Autowired
-    public DirectMessageChannelService(
-            DirectMessageChannelRepository directMessageChannelRepository,
-            AccountRepository accountRepository,
-            DirectMessageChannelMemberService directMessageChannelMemberService) {
-        this.directMessageChannelRepository = directMessageChannelRepository;
-        this.accountRepository = accountRepository;
-        this.directMessageChannelMemberService = directMessageChannelMemberService;
+  /**
+   * Service Constructor.
+   *
+   * @param directMessageChannelRepository Direct Message Channel Repository.
+   * @param accountRepository Account Repository.
+   * @param directMessageChannelMemberService Direct Message Channel Member Repository.
+   */
+  @Autowired
+  public DirectMessageChannelService(
+      DirectMessageChannelRepository directMessageChannelRepository,
+      AccountRepository accountRepository,
+      DirectMessageChannelMemberService directMessageChannelMemberService) {
+    this.directMessageChannelRepository = directMessageChannelRepository;
+    this.accountRepository = accountRepository;
+    this.directMessageChannelMemberService = directMessageChannelMemberService;
+  }
+
+  /**
+   * Creates a new DM Channel and stores it in the Database.
+   *
+   * @param memberIds String of member ids, separated by a ',' (min. 2 members)
+   * @param channelName Name of the message channel. Can be null.
+   * @return DM Channel created.
+   */
+  public CreateDirectMessageChannelDto createDirectMessageChannel(
+      List<Integer> memberIds, String channelName) {
+    // Set the Channel Name to be the first names of members
+    // in the channel if it is null or empty.
+    if (channelName == null || channelName.isBlank()) {
+      StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
+      channelName = channelNameBuilder.toString();
     }
+    DirectMessageChannel dmChannel = new DirectMessageChannel();
+    dmChannel.setName(channelName);
 
-    /**
-     * Creates a new DM Channel and stores it in the Database.
-     *
-     * @param memberIds   String of member ids, separated by a ',' (min. 2 members)
-     * @param channelName Name of the message channel. Can be null.
-     * @return DM Channel created.
-     */
-    public CreateDirectMessageChannelDto createDirectMessageChannel(
-            List<Integer> memberIds, String channelName) {
-        // Set the Channel Name to be the first names of members
-        // in the channel if it is null or empty.
-        if (channelName == null || channelName.isBlank()) {
-            StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
-            channelName = channelNameBuilder.toString();
-        }
-        DirectMessageChannel dmChannel = new DirectMessageChannel();
-        dmChannel.setName(channelName);
+    DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
+    int createdDmChannelId = createdDmChannel.getChannelId();
+    // Create Channel Members
+    this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId);
 
-        DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
-        int createdDmChannelId = createdDmChannel.getChannelId();
-        // Create Channel Members
-        this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId);
+    // Return the DM Channel DTO
+    CreateDirectMessageChannelDto dmChannelDTO = new CreateDirectMessageChannelDto();
+    dmChannelDTO.setChannelId(createdDmChannelId);
+    dmChannelDTO.setChannelName(channelName);
+    dmChannelDTO.setMemberIds(memberIds);
 
-        // Return the DM Channel DTO
-        CreateDirectMessageChannelDto dmChannelDTO = new CreateDirectMessageChannelDto();
-        dmChannelDTO.setChannelId(createdDmChannelId);
-        dmChannelDTO.setChannelName(channelName);
-        dmChannelDTO.setMemberIds(memberIds);
+    return dmChannelDTO;
+  }
 
-        return dmChannelDTO;
-    }
+  /**
+   * Formats the channel name to be the first names of all members in the channel if no name was
+   * given.
+   *
+   * @param memberIds String of member ids, separated by a ','
+   * @return Formatted string for the channel name composed of the name of the members
+   */
+  private StringBuilder createChannelNameFromMembers(List<Integer> memberIds) {
+    List<String> firstNames = this.accountRepository.findFirstNamesByAccountId(memberIds);
 
-    /**
-     * Formats the channel name to be the first names of all members in the channel
-     * if no name was given.
-     *
-     * @param memberIds String of member ids, separated by a ','
-     * @return Formatted string for the channel name composed of the name of the members
-     */
-    private StringBuilder createChannelNameFromMembers(List<Integer> memberIds) {
-        List<String> firstNames = this.accountRepository.findFirstNamesByAccountId(memberIds);
-
-        StringBuilder channelNameBuilder = new StringBuilder();
-        for (int i = 0; i < firstNames.size(); i++) {
-            // Can't have channel name longer than 50 chars.
-            if (i != firstNames.size() - 1 && channelNameBuilder.length() +
-                    firstNames.get(i).length() + firstNames.get(i + 1).length() > 44) {
-                channelNameBuilder.append("and ");
-                channelNameBuilder.append(firstNames.get(i));
-                return channelNameBuilder;
-            }
-            channelNameBuilder.append(firstNames.get(i));
-            if (i == memberIds.size() - 2) {
-                // Appends ' and ' if it's the before last element of the list.
-                // Ex: "Max and James", not "Max, James".
-                channelNameBuilder.append(" and ");
-            } else if (i < memberIds.size() - 1) {
-                channelNameBuilder.append(", ");
-            }
-        }
+    StringBuilder channelNameBuilder = new StringBuilder();
+    for (int i = 0; i < firstNames.size(); i++) {
+      // Can't have channel name longer than 50 chars.
+      if (i != firstNames.size() - 1
+          && channelNameBuilder.length()
+                  + firstNames.get(i).length()
+                  + firstNames.get(i + 1).length()
+              > 44) {
+        channelNameBuilder.append("and ");
+        channelNameBuilder.append(firstNames.get(i));
         return channelNameBuilder;
+      }
+      channelNameBuilder.append(firstNames.get(i));
+      if (i == memberIds.size() - 2) {
+        // Appends ' and ' if it's the before last element of the list.
+        // Ex: "Max and James", not "Max, James".
+        channelNameBuilder.append(" and ");
+      } else if (i < memberIds.size() - 1) {
+        channelNameBuilder.append(", ");
+      }
     }
+    return channelNameBuilder;
+  }
 }

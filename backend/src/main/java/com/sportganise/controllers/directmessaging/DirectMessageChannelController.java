@@ -12,40 +12,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST Controller for handling HTTP requests related to Direct Message Channels.
- */
+/** REST Controller for handling HTTP requests related to Direct Message Channels. */
 @RestController
 @RequestMapping("/api/messaging")
 @CrossOrigin("*")
 public class DirectMessageChannelController {
-    private final DirectMessageChannelService directMessageChannelService;
+  private final DirectMessageChannelService directMessageChannelService;
 
-    /**
-     * Controller Constructor.
-     *
-     * @param directMessageChannelService Direct Message Channel Service.
-     */
-    @Autowired
-    public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService) {
-        this.directMessageChannelService = directMessageChannelService;
-    }
+  /**
+   * Controller Constructor.
+   *
+   * @param directMessageChannelService Direct Message Channel Service.
+   */
+  @Autowired
+  public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService) {
+    this.directMessageChannelService = directMessageChannelService;
+  }
 
-    /**
-     * Endpoint /api/messaging/create-channel: Post Mapping for Creating a new Direct
-     * Message Channel.
-     *
-     * @param channelDto API object for Created Channel Response.
-     * @return HTTP Code 201 and Created DM Channel DTO.
-     */
-    @PostMapping("/create-channel")
-    public ResponseEntity<CreateDirectMessageChannelDto> createChannel(
-            @RequestBody CreateDirectMessageChannelDto channelDto) {
-        String channelName = channelDto.getChannelName();
-        List<Integer> memberIds = channelDto.getMemberIds();
-        CreateDirectMessageChannelDto dmChannelDto = this.directMessageChannelService
-                .createDirectMessageChannel(memberIds, channelName);
+  /**
+   * Endpoint /api/messaging/create-channel: Post Mapping for Creating a new Direct Message Channel.
+   *
+   * @param channelDto API object for Created Channel Response.
+   * @return HTTP Code 201 and Created DM Channel DTO.
+   */
+  @PostMapping("/create-channel")
+  public ResponseEntity<CreateDirectMessageChannelDto> createChannel(
+      @RequestBody CreateDirectMessageChannelDto channelDto) {
+    String channelName = channelDto.getChannelName();
+    List<Integer> memberIds = channelDto.getMemberIds();
+    CreateDirectMessageChannelDto dmChannelDto =
+        this.directMessageChannelService.createDirectMessageChannel(memberIds, channelName);
 
-        return new ResponseEntity<>(dmChannelDto, HttpStatus.CREATED);
-    }
+    return new ResponseEntity<>(dmChannelDto, HttpStatus.CREATED);
+  }
 }
