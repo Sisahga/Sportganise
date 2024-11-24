@@ -62,6 +62,7 @@ export default function FooterNav() {
         </Button>
 
         {/* Inbox Button */}
+        {/* Inbox Button */}
         <Button
           variant="ghost"
           className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"

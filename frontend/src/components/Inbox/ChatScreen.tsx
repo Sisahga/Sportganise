@@ -1,24 +1,45 @@
-// ChatScreen.tsx
-import { useState } from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, MoreVertical, Send, Plus } from "lucide-react";
-import useChatMessages from "./useChatMessages";
-import defaultAvatar from "./defaultAvatar.png";
-import defaultGroupAvatar from "./GroupAvatar.png";
+import {
+  FaArrowLeft,
+  FaEllipsisV,
+  FaPaperPlane,
+  FaPlus,
+} from "react-icons/fa";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   // Access chat data from location state
-  const { state } = location || {};
+  const { state } = location;
   const chatName = state?.chatName || "Chat";
-  const chatAvatar = state?.chatAvatar || defaultAvatar;
+  const chatAvatar = state?.chatAvatar || "https://via.placeholder.com/40";
   const chatType = state?.chatType || "individual"; // Default to individual chat
-  const channelId = state?.channelId || 1; // Use a default channel ID for testing
 
-  // Use custom hook to fetch messages
-  const { messages, setMessages, loading, error } = useChatMessages(channelId);
+  // Dummy data for chat messages
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: chatType === "group" ? "Member1" : chatName,
+      text: "Hello, welcome to the chat!",
+      time: "02/28/2024 at 11:30 am",
+      senderAvatar: chatAvatar,
+    },
+    {
+      id: 2,
+      sender: "You",
+      text: "Thanks! Glad to be here.",
+      time: "",
+    },
+    {
+      id: 3,
+      sender: chatType === "group" ? "Member2" : chatName,
+      text: "Looking forward to our discussion.",
+      time: "",
+      senderAvatar: chatAvatar,
+    },
+  ]);
 
   const [newMessage, setNewMessage] = useState("");
 
@@ -26,7 +47,7 @@ const ChatScreen = () => {
   const handleSend = () => {
     if (newMessage.trim() === "") return; // Do nothing if the input is empty
 
-    // Add the new message to the messages array locally
+    // Add the new message to the messages array
     setMessages((prevMessages) => [
       ...prevMessages,
       {
@@ -41,23 +62,6 @@ const ChatScreen = () => {
     setNewMessage("");
   };
 
-  // Handle loading and error states
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       {/* Header */}
@@ -65,9 +69,9 @@ const ChatScreen = () => {
         {/* Back Button */}
         <button
           className="p-2 rounded-full bg-white hover:bg-gray-300"
-          onClick={() => navigate(-1)} // Navigate back to previous page
+          onClick={() => navigate("/messages")} // Navigate back to messages list
         >
-          <ArrowLeft className="text-gray-800" size={24} />
+          <FaArrowLeft className="text-gray-800 text-lg" />
         </button>
 
         {/* Chat Information */}
@@ -82,7 +86,7 @@ const ChatScreen = () => {
 
         {/* Options Button */}
         <button className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
-          <MoreVertical className="text-gray-800" size={24} />
+          <FaEllipsisV className="text-gray-800 text-lg" />
         </button>
       </header>
 
@@ -108,7 +112,7 @@ const ChatScreen = () => {
                   src={
                     message.senderAvatar ||
                     (chatType === "group"
-                      ? defaultGroupAvatar // Use local image for group member avatars
+                      ? "https://via.placeholder.com/40" // Placeholder for group member avatars
                       : chatAvatar)
                   }
                   alt={message.sender}
@@ -138,7 +142,7 @@ const ChatScreen = () => {
       <div className="flex items-center gap-3 px-4 py-3 bg-white shadow">
         {/* Attachment Button */}
         <button className="p-3 rounded-full bg-gray-200 hover:bg-gray-300">
-          <Plus className="text-gray-800" size={24} />
+          <FaPlus className="text-gray-800 text-lg" />
         </button>
 
         {/* Text Input */}
@@ -152,15 +156,10 @@ const ChatScreen = () => {
 
         {/* Send Button */}
         <button
-          className={`p-3 rounded-full ${
-            newMessage.trim() === ""
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-secondaryColour hover:bg-secondaryColour-light"
-          }`}
+          className="p-3 rounded-full bg-secondaryColour hover:bg-secondaryColour-light"
           onClick={handleSend}
-          disabled={newMessage.trim() === ""}
         >
-          <Send className="text-white" size={24} />
+          <FaPaperPlane className="text-white text-lg" />
         </button>
       </div>
     </div>
