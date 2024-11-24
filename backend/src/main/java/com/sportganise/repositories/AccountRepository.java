@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository // Indicates that this is a Spring Data repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
   /**
-   * Gets the first names for each account id provided
+   * Gets the first names for each account id provided.
    *
-   * @param ids Concerned account ids
-   * @return List of first names
+   * @param ids Concerned account ids.
+   * @return List of first names.
    */
   @Query("SELECT firstName FROM Account WHERE accountId IN :ids")
   List<String> findFirstNamesByAccountId(@Param("ids") List<Integer> ids);
