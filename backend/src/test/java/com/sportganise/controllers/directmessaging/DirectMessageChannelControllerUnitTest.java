@@ -38,6 +38,7 @@ class DirectMessageChannelControllerUnitTest {
     List<Integer> memberIds = Arrays.asList(1, 2);
     createDmChannelDTO.setMemberIds(memberIds);
     createDmChannelDTO.setChannelName("Test Channel");
+    createDmChannelDTO.setChannelType("SIMPLE");
   }
 
   @Test
@@ -53,6 +54,7 @@ class DirectMessageChannelControllerUnitTest {
                 .content(objectMapper.writeValueAsString(createDmChannelDTO)))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.channelName", is(createDmChannelDTO.getChannelName())))
+        .andExpect(jsonPath("$.channelType", is(createDmChannelDTO.getChannelType())))
         .andExpect(jsonPath("$.memberIds", is(createDmChannelDTO.getMemberIds())))
         .andExpect(jsonPath("$.memberIds.length()").value(2))
         .andReturn();

@@ -73,6 +73,7 @@ public class DirectMessageChannelServiceUnitTest {
   @Test
   public void createDirectMessageChannelTest_WithoutChannelNameShort() {
     dmChannel.setName("Brett and Aaron");
+    dmChannel.setType("SIMPLE");
     dmChannelDTO.setChannelName(null);
     given(accountRepository.findFirstNamesByAccountId(dmChannelDTO.getMemberIds()))
         .willReturn(Arrays.asList("Brett", "Aaron"));
@@ -87,6 +88,7 @@ public class DirectMessageChannelServiceUnitTest {
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
     assertEquals(dmChannel.getName(), result.getChannelName());
+    assertEquals(dmChannel.getType(), result.getChannelType());
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
@@ -96,6 +98,7 @@ public class DirectMessageChannelServiceUnitTest {
   @Test
   public void createDirectMessageChannelTest_WithoutChannelNameLong() {
     dmChannel.setName("James, Mark, Brett, Alex, Mindy, and Frederic");
+    dmChannel.setType("GROUP");
     dmChannelDTO.setChannelName(null);
 
     List<Integer> longTestMemberIds = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
@@ -114,6 +117,7 @@ public class DirectMessageChannelServiceUnitTest {
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
     assertEquals(dmChannel.getName(), result.getChannelName());
+    assertEquals(dmChannel.getType(), result.getChannelType());
     assertEquals(longTestMemberIds, result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
