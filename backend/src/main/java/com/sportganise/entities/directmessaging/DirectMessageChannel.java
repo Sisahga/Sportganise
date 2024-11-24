@@ -26,6 +26,7 @@ public class DirectMessageChannel {
   private Integer channelId;
 
   private String name;
+  private String type;
 
   @Column(name = "created_at")
   private Timestamp createdAt;
