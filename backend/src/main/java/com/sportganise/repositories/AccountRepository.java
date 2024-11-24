@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
- * Repository for 'Account' Entity.
- * Provides custom C.R.U.D. queries through the JpaRepository in JPQL.
+ * Repository for 'Account' Entity. Provides custom C.R.U.D. queries through the JpaRepository in
+ * JPQL.
  */
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Integer> {
