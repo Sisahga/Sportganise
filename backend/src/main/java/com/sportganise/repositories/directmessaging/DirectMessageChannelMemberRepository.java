@@ -13,7 +13,6 @@ public interface DirectMessageChannelMemberRepository
     extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
     @Transactional
     @Modifying
-    @Query("DELETE FROM DirectMessageChannelMember " +
-            "WHERE DirectMessageChannelMember.compositeKey.channelId = :channelId")
-    void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") Integer channelId);
+    @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
+    void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
 }
