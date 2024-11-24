@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entity for channel_member.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

@@ -7,7 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDTO;
+import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,12 +33,12 @@ class DirectMessageChannelControllerUnitTest {
 
     private ObjectMapper objectMapper;
 
-    CreateDirectMessageChannelDTO createDmChannelDTO;
+    CreateDirectMessageChannelDto createDmChannelDTO;
 
     @BeforeEach
     public void setup() {
         objectMapper = new ObjectMapper();
-        createDmChannelDTO = new CreateDirectMessageChannelDTO();
+        createDmChannelDTO = new CreateDirectMessageChannelDto();
         List<Integer> memberIds = Arrays.asList(1, 2);
         createDmChannelDTO.setMemberIds(memberIds);
         createDmChannelDTO.setChannelName("Test Channel");

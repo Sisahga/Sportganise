@@ -4,5 +4,10 @@ import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface DirectMessageChannelMemberRepository extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
+/**
+ * Repository for a Direct Channel Member.
+ */
+public interface DirectMessageChannelMemberRepository
+        extends JpaRepository<DirectMessageChannelMember,
+        DirectMessageChannelMemberCompositeKey> {
 }

@@ -2,13 +2,15 @@ package com.sportganise.entities.directmessaging;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
+/**
+ * Composite Key ID for channel member.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

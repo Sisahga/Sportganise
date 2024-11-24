@@ -2,9 +2,7 @@ package com.sportganise.services;
 
 import com.sportganise.entities.Account;
 import com.sportganise.repositories.AccountRepository;
-
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +20,7 @@ public class AccountService {
 
     /**
      * Gets an Account by Id.
+     *
      * @param accountId Id of the account to retrieve
      * @return Account object if exists, null if not.
      */

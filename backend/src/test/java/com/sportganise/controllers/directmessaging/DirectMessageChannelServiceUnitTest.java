@@ -1,6 +1,6 @@
 package com.sportganise.controllers.directmessaging;
 
-import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDTO;
+import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
@@ -39,12 +39,12 @@ public class DirectMessageChannelServiceUnitTest {
     @InjectMocks
     private DirectMessageChannelService directMessageChannelService;
 
-    CreateDirectMessageChannelDTO dmChannelDTO;
+    CreateDirectMessageChannelDto dmChannelDTO;
     DirectMessageChannel dmChannel;
 
     @BeforeEach
     public void setUp() {
-        dmChannelDTO = new CreateDirectMessageChannelDTO();
+        dmChannelDTO = new CreateDirectMessageChannelDto();
         List<Integer> memberIds = Arrays.asList(1, 2);
         dmChannelDTO.setMemberIds(memberIds);
 
@@ -59,7 +59,7 @@ public class DirectMessageChannelServiceUnitTest {
         // Mock the repository save call
         given(directMessageChannelRepository.save(any(DirectMessageChannel.class))).willReturn(dmChannel);
         // Call the service method
-        CreateDirectMessageChannelDTO result = directMessageChannelService.createDirectMessageChannel(
+        CreateDirectMessageChannelDto result = directMessageChannelService.createDirectMessageChannel(
                 dmChannelDTO.getMemberIds(), dmChannelDTO.getChannelName()
         );
 
@@ -83,7 +83,7 @@ public class DirectMessageChannelServiceUnitTest {
         // Mock the repository save call
         given(directMessageChannelRepository.save(any(DirectMessageChannel.class))).willReturn(dmChannel);
         // Call the service method
-        CreateDirectMessageChannelDTO result = directMessageChannelService.createDirectMessageChannel(
+        CreateDirectMessageChannelDto result = directMessageChannelService.createDirectMessageChannel(
                 dmChannelDTO.getMemberIds(), dmChannelDTO.getChannelName()
         );
 
@@ -111,7 +111,7 @@ public class DirectMessageChannelServiceUnitTest {
         // Mock the repository save call
         given(directMessageChannelRepository.save(any(DirectMessageChannel.class))).willReturn(dmChannel);
         // Call the service method
-        CreateDirectMessageChannelDTO result = directMessageChannelService.createDirectMessageChannel(
+        CreateDirectMessageChannelDto result = directMessageChannelService.createDirectMessageChannel(
                 longTestMemberIds, dmChannelDTO.getChannelName()
         );
 
