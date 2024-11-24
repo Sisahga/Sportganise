@@ -1,4 +1,3 @@
-// src/components/Layout.tsx
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { HeaderNav } from "./HeaderNav";
@@ -8,7 +7,7 @@ const Layout = () => {
   return (
     <div>
       <HeaderNav />
-      <main style={{ padding: "1rem" }}>
+      <main className="my-40 mx-6">
         <Outlet /> {/* This will render the routed page content */}
       </main>
       <FooterNav />
