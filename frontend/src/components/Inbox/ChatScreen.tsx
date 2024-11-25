@@ -1,11 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  FaArrowLeft,
-  FaEllipsisV,
-  FaPaperPlane,
-  FaPlus,
-} from "react-icons/fa";
+import { FaArrowLeft, FaEllipsisV, FaPaperPlane, FaPlus } from "react-icons/fa";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
