@@ -102,7 +102,6 @@ CREATE TABLE channel (
 	channel_id SERIAL PRIMARY KEY,
 	name VARCHAR(50),
     type VARCHAR(10) NOT NULL,
-    last_message_id INTEGER REFERENCES message(message_id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
@@ -120,6 +119,9 @@ CREATE TABLE message (
 	content VARCHAR(512) NOT NULL,
 	sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
+
+ALTER TABLE channel
+ADD last_message_id INTEGER REFERENCES message(message_id);
 
 CREATE TABLE post(
 	post_id SERIAL PRIMARY KEY,
