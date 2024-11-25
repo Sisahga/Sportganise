@@ -7,6 +7,6 @@ import org.springframework.test.context.ActiveProfiles;
 @SpringBootTest
 @ActiveProfiles("test")
 class SportganiseApplicationTest {
- @Test
+  @Test
   void contextLoads() {}
 }

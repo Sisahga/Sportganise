@@ -4,9 +4,7 @@ import com.sportganise.dto.auth.AccountDTO;
 import com.sportganise.dto.auth.Auth0AccountDTO;
 import com.sportganise.entities.Account;
 import com.sportganise.repositories.AccountRepository;
-
 import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 
 /** Implementation of AccountService. */
@@ -29,11 +27,9 @@ public class AccountService {
    */
   public String createAccount(AccountDTO accountDTO) {
     try {
-      Auth0AccountDTO auth0AccountDTO = new Auth0AccountDTO(
-              accountDTO.getEmail(),
-              accountDTO.getPassword(),
-              "Username-Password-Authentication"
-      );
+      Auth0AccountDTO auth0AccountDTO =
+          new Auth0AccountDTO(
+              accountDTO.getEmail(), accountDTO.getPassword(), "Username-Password-Authentication");
       String auth0Id = auth0ApiService.createUserInAuth0(auth0AccountDTO);
 
       Account account = new Account();
@@ -65,5 +61,4 @@ public class AccountService {
   public Optional<Account> getAccount(Integer id) {
     return accountRepository.findById(id);
   }
-
 }

@@ -6,29 +6,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Data Transfer Object for Account
- */
+/** Data Transfer Object for Account */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountDTO {
 
-    @NotNull
-    private String type;
+  @NotNull private String type;
 
-    @NotNull
-    @Email(message = "Invalid email format")
-    private String email;
+  @NotNull
+  @Email(message = "Invalid email format")
+  private String email;
 
-    @NotNull
-    private String password;
+  @NotNull private String password;
 
-
-    private String phone;
-    private String address;
-    private String firstName;
-    private String lastName;
-
-
+  private String phone;
+  private String address;
+  private String firstName;
+  private String lastName;
 }

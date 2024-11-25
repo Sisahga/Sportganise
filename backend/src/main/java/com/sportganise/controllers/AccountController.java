@@ -1,10 +1,8 @@
 package com.sportganise.controllers;
 
 import com.sportganise.entities.Account;
-
-import java.util.Optional;
-
 import com.sportganise.services.auth.AccountService;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,8 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class AccountController {
 
-  @Autowired
-  private AccountService accountService;
+  @Autowired private AccountService accountService;
 
   @GetMapping("/")
   public String index() {
