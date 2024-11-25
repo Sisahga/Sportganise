@@ -1,4 +1,4 @@
-package com.sportganise.controllers.directmessaging;
+package com.sportganise.services.directmessaging;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -13,8 +13,7 @@ import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
-import com.sportganise.services.directmessaging.DirectMessageChannelMemberService;
-import com.sportganise.services.directmessaging.DirectMessageChannelService;
+
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
