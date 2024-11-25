@@ -14,7 +14,6 @@ const Layout = () => {
   // Function to check if the current path matches any hide paths
   const shouldHide = (paths: string[]): boolean =>
     paths.some((path: string) => location.pathname.startsWith(path));
-  
 
   const hideHeader = shouldHide(hideHeaderPaths);
   const hideFooter = shouldHide(hideFooterPaths);
