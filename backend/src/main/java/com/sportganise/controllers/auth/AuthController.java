@@ -26,49 +26,61 @@ public class AuthController {
     this.accountService = accountService;
   }
 
+  /**
+   * POST: Create a new Account.
+   *
+   * @param accountDto AccountDto object containing the account information.
+   * @return ResponseEntity containing the response message.
+   */
   @PostMapping("/signup")
-  public ResponseEntity<ResponseDto<String>> signup(@Valid @RequestBody AccountDto accountDTO) {
-    ResponseDto<String> responseDTO = new ResponseDto<>();
+  public ResponseEntity<ResponseDto<String>> signup(@Valid @RequestBody AccountDto accountDto) {
+    ResponseDto<String> responseDto = new ResponseDto<>();
     try {
-      String auth0Id = accountService.createAccount(accountDTO);
+      String auth0Id = accountService.createAccount(accountDto);
 
-      responseDTO.setData(auth0Id);
-      responseDTO.setMessage("User created with Auth0 ID: " + auth0Id);
-      responseDTO.setStatusCode(HttpStatus.CREATED.value());
+      responseDto.setData(auth0Id);
+      responseDto.setMessage("User created with Auth0 ID: " + auth0Id);
+      responseDto.setStatusCode(HttpStatus.CREATED.value());
 
-      return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+      return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     } catch (Exception e) {
 
-      responseDTO.setMessage("Error creating user:" + e.getMessage());
-      responseDTO.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+      responseDto.setMessage("Error creating user:" + e.getMessage());
+      responseDto.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
     }
   }
 
+  /**
+   * POST: Authenticate an Account.
+   *
+   * @param auth0AccountDto Auth0AccountDto object containing the account information.
+   * @return ResponseEntity containing the response message.
+   */
   @PostMapping("/login")
   public ResponseEntity<ResponseDto<String>> login(
-      @Valid @RequestBody Auth0AccountDto auth0AccountDTO) {
-    ResponseDto<String> responseDTO = new ResponseDto<>();
+      @Valid @RequestBody Auth0AccountDto auth0AccountDto) {
+    ResponseDto<String> responseDto = new ResponseDto<>();
     try {
-      boolean isValid = accountService.authenticateAccount(auth0AccountDTO);
+      boolean isValid = accountService.authenticateAccount(auth0AccountDto);
 
       if (isValid) {
-        responseDTO.setMessage("Login successful");
-        responseDTO.setStatusCode(HttpStatus.OK.value());
+        responseDto.setMessage("Login successful");
+        responseDto.setStatusCode(HttpStatus.OK.value());
 
-        return ResponseEntity.ok(responseDTO);
+        return ResponseEntity.ok(responseDto);
       } else {
-        responseDTO.setMessage("Invalid credentials");
-        responseDTO.setStatusCode(HttpStatus.UNAUTHORIZED.value());
+        responseDto.setMessage("Invalid credentials");
+        responseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseDTO);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseDto);
       }
     } catch (Exception e) {
-      responseDTO.setMessage("Error during login: " + e.getMessage());
-      responseDTO.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
+      responseDto.setMessage("Error during login: " + e.getMessage());
+      responseDto.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDTO);
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
     }
   }
 }

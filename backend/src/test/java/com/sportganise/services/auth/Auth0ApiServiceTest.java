@@ -20,11 +20,11 @@ public class Auth0ApiServiceTest {
 
   @Spy @InjectMocks private Auth0ApiService auth0ApiService;
 
-  private Auth0AccountDto auth0AccountDTO;
+  private Auth0AccountDto auth0AccountDto;
 
   @BeforeEach
   public void setup() {
-    auth0AccountDTO =
+    auth0AccountDto =
         new Auth0AccountDto(
             "userx@example.com", "password!123", "Username-Password-Authentication");
     ReflectionTestUtils.setField(auth0ApiService, "auth0Domain", "placeholder.com");
@@ -39,7 +39,7 @@ public class Auth0ApiServiceTest {
     String auth0Id = "mockAuth0Id";
     doReturn(auth0Id).when(auth0ApiService).createUserInAuth0(any(Auth0AccountDto.class));
 
-    String result = auth0ApiService.createUserInAuth0(auth0AccountDTO);
+    String result = auth0ApiService.createUserInAuth0(auth0AccountDto);
     assertEquals(auth0Id, result);
   }
 
@@ -48,14 +48,14 @@ public class Auth0ApiServiceTest {
     Map<String, Object> responseMap = Map.of("access_token", "mockAccessToken");
     doReturn(responseMap).when(auth0ApiService).loginUserWithAuth0(any(Auth0AccountDto.class));
 
-    Map<String, Object> result = auth0ApiService.loginUserWithAuth0(auth0AccountDTO);
+    Map<String, Object> result = auth0ApiService.loginUserWithAuth0(auth0AccountDto);
     assertEquals("mockAccessToken", result.get("access_token"));
   }
 
   @Test
   public void verifyPassword_shouldCallLoginUserWithAuth0() {
-    auth0ApiService.verifyPassword(auth0AccountDTO);
+    auth0ApiService.verifyPassword(auth0AccountDto);
 
-    verify(auth0ApiService).loginUserWithAuth0(auth0AccountDTO);
+    verify(auth0ApiService).loginUserWithAuth0(auth0AccountDto);
   }
 }

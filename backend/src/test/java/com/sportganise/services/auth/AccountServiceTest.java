@@ -26,28 +26,28 @@ public class AccountServiceTest {
 
   @InjectMocks private AccountService accountService;
 
-  private AccountDto accountDTO;
-  private Auth0AccountDto auth0AccountDTO;
+  private AccountDto accountDto;
+  private Auth0AccountDto auth0AccountDto;
 
   @BeforeEach
   public void setup() {
-    accountDTO = new AccountDto();
-    accountDTO.setEmail("userx@example.com");
-    accountDTO.setPassword("password!123");
-    accountDTO.setFirstName("John");
-    accountDTO.setLastName("Doe");
-    accountDTO.setPhone("555-555-5555");
-    accountDTO.setAddress("maisonneuve");
-    accountDTO.setType("general");
+    accountDto = new AccountDto();
+    accountDto.setEmail("userx@example.com");
+    accountDto.setPassword("password!123");
+    accountDto.setFirstName("John");
+    accountDto.setLastName("Doe");
+    accountDto.setPhone("555-555-5555");
+    accountDto.setAddress("maisonneuve");
+    accountDto.setType("general");
 
-    auth0AccountDTO = new Auth0AccountDto("userx@example.com", "password!123", null);
+    auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
   }
 
   @Test
   public void authenticateAccount_shouldReturnTrue() {
     given(auth0ApiService.verifyPassword(any(Auth0AccountDto.class))).willReturn(true);
 
-    boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDTO);
+    boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDto);
     assertTrue(isAuthenticated);
 
     verify(auth0ApiService, times(1)).verifyPassword(any(Auth0AccountDto.class));
@@ -57,7 +57,7 @@ public class AccountServiceTest {
   public void authenticateAccount_shouldReturnFalse() {
     given(auth0ApiService.verifyPassword(any(Auth0AccountDto.class))).willReturn(false);
 
-    boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDTO);
+    boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDto);
     assertFalse(isAuthenticated);
 
     verify(auth0ApiService, times(1)).verifyPassword(any(Auth0AccountDto.class));
@@ -72,7 +72,7 @@ public class AccountServiceTest {
         assertThrows(
             RuntimeException.class,
             () -> {
-              accountService.createAccount(accountDTO);
+              accountService.createAccount(accountDto);
             });
 
     assertEquals("Failed to create account: Internal server error", exception.getMessage());
@@ -87,7 +87,7 @@ public class AccountServiceTest {
     given(accountRepository.save(any(Account.class))).willReturn(account);
     given(auth0ApiService.createUserInAuth0(any(Auth0AccountDto.class))).willReturn("auth0Id");
 
-    String auth0Id = accountService.createAccount(accountDTO);
+    String auth0Id = accountService.createAccount(accountDto);
     assertEquals("auth0Id", auth0Id);
 
     verify(accountRepository, times(1)).save(any(Account.class));

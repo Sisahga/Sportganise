@@ -33,7 +33,7 @@ public class Auth0ApiService {
   }
 
   /** Create a user in Auth0 and return the Auth0 ID. */
-  public String createUserInAuth0(Auth0AccountDto auth0AccountDTO) {
+  public String createUserInAuth0(Auth0AccountDto auth0AccountDto) {
     String token = auth0TokenService.getManagementApiToken();
     String url = auth0Audience + "/users";
 
@@ -41,7 +41,7 @@ public class Auth0ApiService {
     headers.add("Authorization", "Bearer " + token);
     headers.add("Content-Type", "application/json");
 
-    HttpEntity<Auth0AccountDto> request = new HttpEntity<>(auth0AccountDTO, headers);
+    HttpEntity<Auth0AccountDto> request = new HttpEntity<>(auth0AccountDto, headers);
 
     ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
@@ -53,7 +53,7 @@ public class Auth0ApiService {
   }
 
   /** Login a user with Auth0 and return the access token. */
-  public Map<String, Object> loginUserWithAuth0(Auth0AccountDto auth0AccountDTO) {
+  public Map<String, Object> loginUserWithAuth0(Auth0AccountDto auth0AccountDto) {
     String url = "https://" + auth0Domain + "/oauth/token";
 
     Map<String, String> payload =
@@ -61,9 +61,9 @@ public class Auth0ApiService {
             "grant_type",
             "password",
             "username",
-            auth0AccountDTO.getEmail(),
+            auth0AccountDto.getEmail(),
             "password",
-            auth0AccountDTO.getPassword(),
+            auth0AccountDto.getPassword(),
             "audience",
             auth0Audience,
             "client_id",
@@ -86,9 +86,9 @@ public class Auth0ApiService {
   }
 
   /** Verify a user's password with Auth0. */
-  public boolean verifyPassword(Auth0AccountDto auth0AccountDTO) {
+  public boolean verifyPassword(Auth0AccountDto auth0AccountDto) {
     try {
-      Map<String, Object> result = loginUserWithAuth0(auth0AccountDTO);
+      Map<String, Object> result = loginUserWithAuth0(auth0AccountDto);
       return result != null && result.containsKey("access_token");
     } catch (Exception e) {
       return false;

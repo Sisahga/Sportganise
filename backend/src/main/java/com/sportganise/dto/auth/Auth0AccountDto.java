@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-/** Data Transfer Object for Auth0 account */
+/** Data Transfer Object for Auth0 account. */
 @Data
 @AllArgsConstructor
 public class Auth0AccountDto {

@@ -22,24 +22,24 @@ public class AccountService {
   /**
    * Creates an account in the database and in Auth0.
    *
-   * @param accountDTO Account data.
+   * @param accountDto Account data.
    * @return Auth0 ID of the created account.
    */
-  public String createAccount(AccountDto accountDTO) {
+  public String createAccount(AccountDto accountDto) {
     try {
-      Auth0AccountDto auth0AccountDTO =
+      Auth0AccountDto auth0AccountDto =
           new Auth0AccountDto(
-              accountDTO.getEmail(), accountDTO.getPassword(), "Username-Password-Authentication");
-      String auth0Id = auth0ApiService.createUserInAuth0(auth0AccountDTO);
+              accountDto.getEmail(), accountDto.getPassword(), "Username-Password-Authentication");
+      String auth0Id = auth0ApiService.createUserInAuth0(auth0AccountDto);
 
       Account account = new Account();
       account.setAuth0Id(auth0Id);
-      account.setEmail(accountDTO.getEmail());
-      account.setFirstName(accountDTO.getFirstName());
-      account.setLastName(accountDTO.getLastName());
-      account.setPhone(accountDTO.getPhone());
-      account.setAddress(accountDTO.getAddress());
-      account.setType(accountDTO.getType());
+      account.setEmail(accountDto.getEmail());
+      account.setFirstName(accountDto.getFirstName());
+      account.setLastName(accountDto.getLastName());
+      account.setPhone(accountDto.getPhone());
+      account.setAddress(accountDto.getAddress());
+      account.setType(accountDto.getType());
       accountRepository.save(account);
 
       return auth0Id;
@@ -51,11 +51,11 @@ public class AccountService {
   /**
    * Authenticates an account in Auth0.
    *
-   * @param auth0AccountDTO Account data.
+   * @param auth0AccountDto Account data.
    * @return True if the account is authenticated, false otherwise.
    */
-  public boolean authenticateAccount(Auth0AccountDto auth0AccountDTO) {
-    return auth0ApiService.verifyPassword(auth0AccountDTO);
+  public boolean authenticateAccount(Auth0AccountDto auth0AccountDto) {
+    return auth0ApiService.verifyPassword(auth0AccountDto);
   }
 
   public Optional<Account> getAccount(Integer id) {

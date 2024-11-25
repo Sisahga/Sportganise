@@ -28,22 +28,22 @@ public class AuthControllerTest {
   @MockBean private AccountService accountService;
 
   private ObjectMapper objectMapper;
-  private AccountDto accountDTO;
-  private Auth0AccountDto auth0AccountDTO;
+  private AccountDto accountDto;
+  private Auth0AccountDto auth0AccountDto;
 
   @BeforeEach
   public void setup() {
     objectMapper = new ObjectMapper();
-    accountDTO = new AccountDto();
-    accountDTO.setEmail("userx@example.com");
-    accountDTO.setPassword("password!123");
-    accountDTO.setFirstName("John");
-    accountDTO.setLastName("Doe");
-    accountDTO.setPhone("555-555-5555");
-    accountDTO.setAddress("maisonneuve");
-    accountDTO.setType("general");
+    accountDto = new AccountDto();
+    accountDto.setEmail("userx@example.com");
+    accountDto.setPassword("password!123");
+    accountDto.setFirstName("John");
+    accountDto.setLastName("Doe");
+    accountDto.setPhone("555-555-5555");
+    accountDto.setAddress("maisonneuve");
+    accountDto.setType("general");
 
-    auth0AccountDTO = new Auth0AccountDto("userx@example.com", "password!123", null);
+    auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
   }
 
   @Test
@@ -55,7 +55,7 @@ public class AuthControllerTest {
         .perform(
             post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDTO)))
+                .content(objectMapper.writeValueAsString(accountDto)))
         .andExpect(status().isCreated());
   }
 
@@ -69,7 +69,7 @@ public class AuthControllerTest {
         .perform(
             post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(auth0AccountDTO)))
+                .content(objectMapper.writeValueAsString(auth0AccountDto)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Login successful"))
         .andExpect(jsonPath("$.statusCode").value(200));
@@ -85,7 +85,7 @@ public class AuthControllerTest {
         .perform(
             post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(auth0AccountDTO)))
+                .content(objectMapper.writeValueAsString(auth0AccountDto)))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.message").value("Invalid credentials"))
         .andExpect(jsonPath("$.statusCode").value(401));
@@ -101,7 +101,7 @@ public class AuthControllerTest {
         .perform(
             post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(accountDTO)))
+                .content(objectMapper.writeValueAsString(accountDto)))
         .andExpect(status().isInternalServerError())
         .andExpect(jsonPath("$.message").value("Error creating user:Internal server error"))
         .andExpect(jsonPath("$.statusCode").value(500));
@@ -117,7 +117,7 @@ public class AuthControllerTest {
         .perform(
             post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(auth0AccountDTO)))
+                .content(objectMapper.writeValueAsString(auth0AccountDto)))
         .andExpect(status().isInternalServerError())
         .andExpect(jsonPath("$.message").value("Error during login: Internal server error"))
         .andExpect(jsonPath("$.statusCode").value(500));
