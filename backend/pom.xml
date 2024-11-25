@@ -6,7 +6,7 @@
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.3.4</version>
-    <relativePath/>
+    <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.sportsganize</groupId>
   <artifactId>helloworld</artifactId>
@@ -60,6 +60,17 @@
       <artifactId>lombok</artifactId>
       <version>1.18.36</version>
       <scope>provided</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.persistence</groupId>
+      <artifactId>jakarta.persistence-api</artifactId>
+      <version>3.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.2</version>
     </dependency>
     <dependency>
       <groupId>me.paulschwarz</groupId>
@@ -75,6 +86,10 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-testcontainers</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -93,6 +108,14 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+            </exclude>
+          </excludes>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -111,27 +134,6 @@
           <java>
             <googleJavaFormat/>
           </java>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.1.2</version>
-      </plugin>
-      <!-- Add Lombok Annotation Processor -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>21</source>
-          <target>21</target>
-          <annotationProcessorPaths>
-            <annotationProcessorPath>
-              <groupId>org.projectlombok</groupId>
-              <artifactId>lombok</artifactId>
-              <version>1.18.36</version>
-            </annotationProcessorPath>
-          </annotationProcessorPaths>
         </configuration>
       </plugin>
     </plugins>
