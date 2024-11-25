@@ -68,8 +68,7 @@ public class DirectMessageChannelServiceUnitTest {
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
-    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(),
-            anyInt());
+    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(), anyInt());
   }
 
   @Test
@@ -94,8 +93,7 @@ public class DirectMessageChannelServiceUnitTest {
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
-    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(),
-            anyInt());
+    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(), anyInt());
   }
 
   @Test
@@ -124,8 +122,7 @@ public class DirectMessageChannelServiceUnitTest {
     assertEquals(longTestMemberIds, result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
-    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(),
-            anyInt());
+    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(), anyInt());
   }
 
   @Test
@@ -162,36 +159,22 @@ public class DirectMessageChannelServiceUnitTest {
   public void getDirectMessageChannelsTest_HasChannels() {
     int accountId = 1;
 
-    ListDirectMessageChannelDto channel1 = new ListDirectMessageChannelDto(
-            1,
-            "GROUP",
-            "Channel 1",
-            "image_blob_1",
-            "I love you.",
-            false,
-            LocalDateTime.now()
-    );
-    ListDirectMessageChannelDto channel2 = new ListDirectMessageChannelDto(
-            2,
-            "SIMPLE",
-            "Channel 2",
-            null,
-            null,
-            true,
-            null
-    );
+    ListDirectMessageChannelDto channel1 =
+        new ListDirectMessageChannelDto(
+            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, LocalDateTime.now());
+    ListDirectMessageChannelDto channel2 =
+        new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2", null, null, true, null);
     List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
 
     given(directMessageChannelRepository.getDirectMessageChannelsByAccountId(1))
-            .willReturn(expectedChannels);
+        .willReturn(expectedChannels);
 
     List<ListDirectMessageChannelDto> actualChannels =
         directMessageChannelService.getDirectMessageChannels(accountId);
 
     assertEquals(2, actualChannels.size()); // Check that the list has 2 elements
     assertEquals(expectedChannels, actualChannels); // Check that the list is the same
-    verify(directMessageChannelRepository, times(1))
-            .getDirectMessageChannelsByAccountId(accountId);
+    verify(directMessageChannelRepository, times(1)).getDirectMessageChannelsByAccountId(accountId);
   }
 
   @Test
@@ -199,7 +182,7 @@ public class DirectMessageChannelServiceUnitTest {
     int accountId = 1;
 
     given(directMessageChannelRepository.getDirectMessageChannelsByAccountId(1))
-            .willReturn(Collections.emptyList());
+        .willReturn(Collections.emptyList());
 
     List<ListDirectMessageChannelDto> actualChannels =
         directMessageChannelService.getDirectMessageChannels(accountId);
@@ -207,36 +190,26 @@ public class DirectMessageChannelServiceUnitTest {
     assertEquals(0, actualChannels.size()); // Check that the list is empty
     assertEquals(Collections.emptyList(), actualChannels); // Check that the list is empty
 
-    verify(directMessageChannelRepository, times(1))
-            .getDirectMessageChannelsByAccountId(accountId);
+    verify(directMessageChannelRepository, times(1)).getDirectMessageChannelsByAccountId(accountId);
   }
 
   @Test
   public void getDirectMessageChannels_ChannelsWithNoMessages() {
     int accountId = 1;
 
-    ListDirectMessageChannelDto channel = new ListDirectMessageChannelDto(
-            1,
-            "GROUP",
-            "Channel 1",
-            null,
-            null,
-            true,
-            null
-    );
+    ListDirectMessageChannelDto channel =
+        new ListDirectMessageChannelDto(1, "GROUP", "Channel 1", null, null, true, null);
 
     given(directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId))
-            .willReturn(List.of(channel));
+        .willReturn(List.of(channel));
 
     List<ListDirectMessageChannelDto> actualChannels =
-            directMessageChannelService.getDirectMessageChannels(accountId);
+        directMessageChannelService.getDirectMessageChannels(accountId);
 
     assertEquals(1, actualChannels.size());
     assertNull(actualChannels.getFirst().getChannelImageBlob());
     assertNull(actualChannels.getFirst().getLastMessage());
     assertNull(actualChannels.getFirst().getLastEvent());
-    verify(directMessageChannelRepository, times(1))
-            .getDirectMessageChannelsByAccountId(accountId);
+    verify(directMessageChannelRepository, times(1)).getDirectMessageChannelsByAccountId(accountId);
   }
-
 }

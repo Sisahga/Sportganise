@@ -6,7 +6,6 @@ import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +70,8 @@ public class DirectMessageChannelService {
     DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
     int createdDmChannelId = createdDmChannel.getChannelId();
     // Create Channel Members
-    this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId, creatorAccountId);
+    this.directMessageChannelMemberService.saveMembers(
+        memberIds, createdDmChannelId, creatorAccountId);
 
     // Return the DM Channel DTO
     CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
@@ -111,10 +111,12 @@ public class DirectMessageChannelService {
     List<ListDirectMessageChannelDto> dmChannels =
         directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
     for (ListDirectMessageChannelDto dmChannel : dmChannels) {
-      // Set image blob of channel to be the image blob of the other member of the channel if it is SIMPLE.
+      // Set image blob of channel to be the image blob of the other member of the channel if it is
+      // SIMPLE.
       if (dmChannel.getChannelType().equals("SIMPLE")) {
-        int otherMemberId = directMessageChannelMemberRepository
-                .getOtherMemberIdInSimpleChannel(dmChannel.getChannelId(), accountId);
+        int otherMemberId =
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                dmChannel.getChannelId(), accountId);
         dmChannel.setChannelImageBlob(accountRepository.getPictureBlobByAccountId(otherMemberId));
       }
     }

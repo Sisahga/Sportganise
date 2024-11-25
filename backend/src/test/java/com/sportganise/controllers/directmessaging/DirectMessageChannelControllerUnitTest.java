@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -90,24 +89,11 @@ class DirectMessageChannelControllerUnitTest {
   public void getDirectMessageChannelsTest() throws Exception {
     int accountId = 1;
 
-    ListDirectMessageChannelDto channel1 = new ListDirectMessageChannelDto(
-            1,
-            "GROUP",
-            "Channel 1",
-            "image_blob_1",
-            "I love you.",
-            false,
-            LocalDateTime.now()
-    );
-    ListDirectMessageChannelDto channel2 = new ListDirectMessageChannelDto(
-            2,
-            "SIMPLE",
-            "Channel 2",
-            null,
-            null,
-            true,
-            null
-    );
+    ListDirectMessageChannelDto channel1 =
+        new ListDirectMessageChannelDto(
+            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, LocalDateTime.now());
+    ListDirectMessageChannelDto channel2 =
+        new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2", null, null, true, null);
     List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
 
     given(dmChannelService.getDirectMessageChannels(accountId)).willReturn(expectedChannels);

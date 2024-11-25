@@ -34,12 +34,12 @@ public class DirectMessageChannelController {
    */
   @PostMapping("/create-channel/{account_id}")
   public ResponseEntity<CreateDirectMessageChannelDto> createChannel(
-      @RequestBody CreateDirectMessageChannelDto channelDto,
-      @PathVariable int account_id) {
+      @RequestBody CreateDirectMessageChannelDto channelDto, @PathVariable int account_id) {
     String channelName = channelDto.getChannelName();
     List<Integer> memberIds = channelDto.getMemberIds();
     CreateDirectMessageChannelDto dmChannelDto =
-        this.directMessageChannelService.createDirectMessageChannel(memberIds, channelName, account_id);
+        this.directMessageChannelService.createDirectMessageChannel(
+            memberIds, channelName, account_id);
 
     return new ResponseEntity<>(dmChannelDto, HttpStatus.CREATED);
   }
@@ -59,14 +59,17 @@ public class DirectMessageChannelController {
   }
 
   /**
-   * Endpoint /api/messaging/get-channels/{account_id}: Get Mapping for Retrieving all Direct Message.
+   * Endpoint /api/messaging/get-channels/{account_id}: Get Mapping for Retrieving all Direct
+   * Message.
    *
    * @param account_id Id of the account to get Direct Message Channels for.
    * @return HTTP Code 200 and List of Direct Message Channels.
    */
   @GetMapping("/get-channels/{account_id}")
-  public ResponseEntity<List<ListDirectMessageChannelDto>> getChannels(@PathVariable int account_id) {
-    List<ListDirectMessageChannelDto> channels = directMessageChannelService.getDirectMessageChannels(account_id);
+  public ResponseEntity<List<ListDirectMessageChannelDto>> getChannels(
+      @PathVariable int account_id) {
+    List<ListDirectMessageChannelDto> channels =
+        directMessageChannelService.getDirectMessageChannels(account_id);
     return new ResponseEntity<>(channels, HttpStatus.OK);
   }
 }
