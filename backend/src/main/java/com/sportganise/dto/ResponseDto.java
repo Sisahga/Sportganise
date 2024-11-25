@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** ResponseDTO */
+/** ResponseDTO. */
 @Data
 @NoArgsConstructor // Generates a no-argument constructor
 @AllArgsConstructor

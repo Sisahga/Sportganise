@@ -32,10 +32,6 @@ public class Auth0TokenService {
    * @return Auth0 Management API token.
    */
   public String getManagementApiToken() {
-    RestTemplate restTemplate = new RestTemplate();
-
-    String url = "https://" + auth0Domain + "/oauth/token";
-
     Map<String, String> body = new HashMap<>();
     body.put("grant_type", "client_credentials");
     body.put("client_id", auth0ClientId);
@@ -45,6 +41,8 @@ public class Auth0TokenService {
     HttpHeaders headers = new HttpHeaders();
     headers.add("Content-Type", "application/json");
 
+    String url = "https://" + auth0Domain + "/oauth/token";
+    RestTemplate restTemplate = new RestTemplate();
     HttpEntity<Map<String, String>> request = new HttpEntity<>(body, headers);
     ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, request, Map.class);
 
