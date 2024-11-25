@@ -102,12 +102,14 @@ CREATE TABLE channel (
 	channel_id SERIAL PRIMARY KEY,
 	name VARCHAR(50),
     type VARCHAR(10) NOT NULL,
+    last_message_id INTEGER REFERENCES message(message_id),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE Table channel_member (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
+    read BOOLEAN NOT NULL,
 	PRIMARY KEY(channel_id, account_id)
 );
 
