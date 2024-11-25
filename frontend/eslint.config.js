@@ -1,5 +1,6 @@
 import js from "@eslint/js";
 import globals from "globals";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 import prettier from "eslint-config-prettier";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
@@ -14,11 +15,13 @@ export default tseslint.config(
       ...tseslint.configs.recommended,
       react.configs.flat.recommended,
       react.configs.flat["jsx-runtime"],
+      jsxA11y.flatConfigs.recommended,
       prettier,
     ],
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ...react.configs.flat.recommended.languageOptions,
+      ...jsxA11y.flatConfigs.recommended.languageOptions,
       ecmaVersion: 2020,
       globals: globals.browser,
     },

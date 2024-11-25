@@ -92,7 +92,7 @@ export default function CreateTrainingSessionForm() {
                   variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground",
+                    !date && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="h-4 w-4 opacity-50" />
@@ -188,6 +188,7 @@ export default function CreateTrainingSessionForm() {
               Add Attachment
             </Label>
             <div className="flex gap-2">
+              {/* eslint-disable-next-line jsx-a11y/alt-text -- TODO Sofia replace by lucide icon */}
               <img src={icon} className="content-center"></img>
               <Input id="attachment" type="file" />
             </div>
