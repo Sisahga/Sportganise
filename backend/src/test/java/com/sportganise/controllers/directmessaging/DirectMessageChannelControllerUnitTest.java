@@ -7,7 +7,10 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
+
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,12 +77,68 @@ class DirectMessageChannelControllerUnitTest {
   }
 
   @Test
-  public void deleteDirectMessageChannelTest_ChannelDoesNotExists() throws Exception {
+  public void deleteDirectMessageChannelTest_NoChannels() throws Exception {
     int channelId = 1;
     given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(false);
     mockMvc
         .perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
         .andExpect(status().isNotFound());
     verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
+  }
+
+  @Test
+  public void getDirectMessageChannelsTest() throws Exception {
+    int accountId = 1;
+
+    ListDirectMessageChannelDto channel1 = new ListDirectMessageChannelDto(
+            1,
+            "GROUP",
+            "Channel 1",
+            "image_blob_1",
+            "I love you.",
+            false,
+            LocalDateTime.now()
+    );
+    ListDirectMessageChannelDto channel2 = new ListDirectMessageChannelDto(
+            2,
+            "SIMPLE",
+            "Channel 2",
+            null,
+            null,
+            true,
+            null
+    );
+    List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
+
+    given(dmChannelService.getDirectMessageChannels(accountId)).willReturn(expectedChannels);
+    mockMvc
+        .perform(MockMvcRequestBuilders.get("/api/messaging/get-channels/" + accountId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].channelId", is(channel1.getChannelId())))
+        .andExpect(jsonPath("$[0].channelType", is(channel1.getChannelType())))
+        .andExpect(jsonPath("$[0].channelName", is(channel1.getChannelName())))
+        .andExpect(jsonPath("$[0].channelImageBlob", is(channel1.getChannelImageBlob())))
+        .andExpect(jsonPath("$[0].lastMessage", is(channel1.getLastMessage())))
+        .andExpect(jsonPath("$[0].read", is(channel1.getRead())))
+        .andExpect(jsonPath("$[0].lastEvent", is(channel1.getLastEvent().toString())))
+        .andExpect(jsonPath("$[1].channelId", is(channel2.getChannelId())))
+        .andExpect(jsonPath("$[1].channelType", is(channel2.getChannelType())))
+        .andExpect(jsonPath("$[1].channelName", is(channel2.getChannelName())))
+        .andExpect(jsonPath("$[1].channelImageBlob", is(channel2.getChannelImageBlob())))
+        .andExpect(jsonPath("$[1].lastMessage", is(channel2.getLastMessage())))
+        .andExpect(jsonPath("$[1].read", is(channel2.getRead())))
+        .andExpect(jsonPath("$[1].lastEvent").doesNotExist());
+    verify(dmChannelService, times(1)).getDirectMessageChannels(accountId);
+  }
+
+  @Test
+  public void getDirectMessageChannelsTest_NoChannels() throws Exception {
+    int accountId = 1;
+    given(dmChannelService.getDirectMessageChannels(accountId)).willReturn(null);
+    mockMvc
+        .perform(MockMvcRequestBuilders.get("/api/messaging/get-channels/" + accountId))
+        .andExpect(status().isOk())
+        .andExpect(content().string(""));
+    verify(dmChannelService, times(1)).getDirectMessageChannels(accountId);
   }
 }
