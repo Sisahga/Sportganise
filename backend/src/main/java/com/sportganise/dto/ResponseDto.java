@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 /** ResponseDTO. */
 @Data
-@NoArgsConstructor // Generates a no-argument constructor
+@NoArgsConstructor
 @AllArgsConstructor
 public class ResponseDto<T> {
   private int statusCode;

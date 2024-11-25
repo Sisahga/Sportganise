@@ -14,5 +14,7 @@ import lombok.Setter;
 public class CreateDirectMessageChannelDto {
   private Integer channelId;
   private String channelName;
+  private String channelType;
   private List<Integer> memberIds;
+  private String createdAt;
 }

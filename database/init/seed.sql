@@ -7,4 +7,4 @@ VALUES
     ('PLAYER', 'coach.smith@example.com', 'auth3_smith', '123 Maple Ave', '5145555678',
      'John', 'Smith', null),
     ('COACH', 'admin.alex@example.com', 'auth4_alex', '789 Pine Rd', '5145559876',
-     'Alex', 'Johnson', null);
+     'Alex', 'Johnson', 'https://testblob-test');

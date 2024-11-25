@@ -1,6 +1,7 @@
 package com.sportganise.controllers.directmessaging;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,15 +37,17 @@ public class DirectMessageChannelController {
    * Endpoint /api/messaging/create-channel: Post Mapping for Creating a new Direct Message Channel.
    *
    * @param channelDto API object for Created Channel Response.
+   * @param accountId Id of the account creating the channel.
    * @return HTTP Code 201 and Created DM Channel DTO.
    */
-  @PostMapping("/create-channel")
+  @PostMapping("/create-channel/{accountId}")
   public ResponseEntity<CreateDirectMessageChannelDto> createChannel(
-      @RequestBody CreateDirectMessageChannelDto channelDto) {
+      @RequestBody CreateDirectMessageChannelDto channelDto, @PathVariable int accountId) {
     String channelName = channelDto.getChannelName();
     List<Integer> memberIds = channelDto.getMemberIds();
     CreateDirectMessageChannelDto dmChannelDto =
-        this.directMessageChannelService.createDirectMessageChannel(memberIds, channelName);
+        this.directMessageChannelService.createDirectMessageChannel(
+            memberIds, channelName, accountId);
 
     return new ResponseEntity<>(dmChannelDto, HttpStatus.CREATED);
   }
@@ -60,5 +64,20 @@ public class DirectMessageChannelController {
     return deleted
         ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
         : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+  }
+
+  /**
+   * Endpoint /api/messaging/get-channels/{account_id}: Get Mapping for Retrieving all Direct
+   * Message.
+   *
+   * @param accountId Id of the account to get Direct Message Channels for.
+   * @return HTTP Code 200 and List of Direct Message Channels.
+   */
+  @GetMapping("/get-channels/{accountId}")
+  public ResponseEntity<List<ListDirectMessageChannelDto>> getChannels(
+      @PathVariable int accountId) {
+    List<ListDirectMessageChannelDto> channels =
+        directMessageChannelService.getDirectMessageChannels(accountId);
+    return new ResponseEntity<>(channels, HttpStatus.OK);
   }
 }

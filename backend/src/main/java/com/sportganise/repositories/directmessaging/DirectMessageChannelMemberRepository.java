@@ -15,4 +15,14 @@ public interface DirectMessageChannelMemberRepository
   @Modifying
   @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
   void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
+
+  @Query(
+      """
+            SELECT d.compositeKey.accountId
+            FROM DirectMessageChannelMember d
+            WHERE d.compositeKey.channelId = :channelId
+            AND d.compositeKey.accountId != :accountId
+            """)
+  int getOtherMemberIdInSimpleChannel(
+      @Param("channelId") int channelId, @Param("accountId") int accountId);
 }
