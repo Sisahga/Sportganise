@@ -1,6 +1,7 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
@@ -98,6 +99,16 @@ public class DirectMessageChannelService {
     } else {
       return false;
     }
+  }
+
+  /**
+   * Get all Direct Message Channels for an account.
+   *
+   * @param accountId Id of the account to get Direct Message Channels for.
+   * @return List of Direct Message Channels for the account.
+   */
+  public List<ListDirectMessageChannelDto> getDirectMessageChannels(int accountId) {
+    return directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
   }
 
   /**
