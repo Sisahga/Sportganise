@@ -108,7 +108,17 @@ public class DirectMessageChannelService {
    * @return List of Direct Message Channels for the account.
    */
   public List<ListDirectMessageChannelDto> getDirectMessageChannels(int accountId) {
-    return directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
+    List<ListDirectMessageChannelDto> dmChannels =
+        directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
+    for (ListDirectMessageChannelDto dmChannel : dmChannels) {
+      // Set image blob of channel to be the image blob of the other member of the channel if it is SIMPLE.
+      if (dmChannel.getChannelType().equals("SIMPLE")) {
+        int otherMemberId = directMessageChannelMemberRepository
+                .getOtherMemberIdInSimpleChannel(dmChannel.getChannelId(), accountId);
+        dmChannel.setChannelImageBlob(accountRepository.getPictureBlobByAccountId(otherMemberId));
+      }
+    }
+    return dmChannels;
   }
 
   /**
