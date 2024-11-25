@@ -102,6 +102,7 @@ CREATE TABLE channel (
 	channel_id SERIAL PRIMARY KEY,
 	name VARCHAR(50),
     type VARCHAR(10) NOT NULL,
+    image_blob VARCHAR(512),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
