@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: docker.io/bsenss6/sportganise:frontend-0.1.2
+    image: ghcr.io/sisahga/sportganise-frontend:latest
     ports:
       - "80:80"
     env_file:
@@ -9,7 +9,7 @@ services:
       - backend
 
   backend:
-    image: docker.io/bsenss6/sportganise:backend-0.1.2
+    image: ghcr.io/sisahga/sportganise-backend:latest
     ports:
       - "8080:8080"
     env_file:
