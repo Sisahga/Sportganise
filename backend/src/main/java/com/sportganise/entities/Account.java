@@ -38,4 +38,7 @@ public class Account {
 
   @Column(name = "last_name")
   private String lastName;
+
+  @Column(name = "picture")
+  private String pictureBlob;
 }
