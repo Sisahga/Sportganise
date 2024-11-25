@@ -60,6 +60,7 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Arshpreet Singh    | 40172137  | [92754282](https://github.com/Sisahga/Sportganise/commits?author=Ashx11)  | arshpreets425@gmail.com  |
 | Sofia Valiante  | 40191897  | [91510546](https://github.com/Sisahga/Sportganise/commits?author=s-vali)| valiante.sofia@gmail.com  |
 | Dannick Bujold-Senss  | 40180290 | [44579430](https://github.com/Sisahga/Sportganise/commits?author=Bsenss6) | dannickbsenss@gmail.com |
+| Jeremy Rimokh | 40110746 | [98069409](https://github.com/Sisahga/Sportganise/commits?author=j3rrimmy) | jeremy5727@hotmail.com |
 
 ## Developer getting started guide
 This monorepo project is home to two workspaces: frontend and backend.
