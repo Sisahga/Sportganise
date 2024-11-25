@@ -18,10 +18,12 @@ public interface DirectMessageChannelRepository
    */
   @Query(
       """
-            SELECT new com.sportganise.dto.directmessaging.ListDirectMessageChannelDto(c.channelId, c.type, c.name, c.imageBlob, m.content, cm.read, m.sentAt)
+            SELECT new com.sportganise.dto.directmessaging.ListDirectMessageChannelDto(
+                c.channelId, c.type, c.name, c.imageBlob, m.content, cm.read, m.sentAt)
             FROM DirectMessageChannel c
             INNER JOIN DirectMessageChannelMember cm ON c.channelId = cm.compositeKey.channelId
-            LEFT JOIN DirectMessage m ON c.channelId = m.channelId AND m.sentAt = (SELECT MAX(sentAt) FROM DirectMessage WHERE channelId = c.channelId)
+            LEFT JOIN DirectMessage m ON c.channelId = m.channelId AND m.sentAt = (
+                        SELECT MAX(sentAt) FROM DirectMessage WHERE channelId = c.channelId)
             WHERE cm.compositeKey.accountId = :accountId
             """)
   List<ListDirectMessageChannelDto> getDirectMessageChannelsByAccountId(
