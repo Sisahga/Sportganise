@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import {
-  FaArrowLeft
-} from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 
 // Mock data to simulate user and message information
 const mockGroups = [
@@ -74,29 +72,9 @@ const mockMessages = [
 ];
 
 function MessagingApp() {
-  const [messages, setMessages] = useState(mockMessages);
+  const [messages] = useState(mockMessages);
   const navigate = useNavigate();
 
-  // Placeholder for API call to send a new message
-  const sendMessage = async (message:any) => {
-    try {
-      // Uncomment when backend is ready
-      // const response = await fetch('/api/messages', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(message),
-      // });
-      // const data = await response.json();
-      // setMessages((prevMessages) => [...prevMessages, data]);
-      console.log("Message sent:", message);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
-
-  // Placeholder for reflecting newly sent message in the current channel
   useEffect(() => {
     // Logic to update the message list in real-time can be added here
     // This can include WebSocket or polling mechanism to fetch new messages
@@ -125,9 +103,8 @@ function MessagingApp() {
 
       {/* Groups Section */}
       <div className="mt-4 px-4">
-      <h2 className="font-semibold text-lg text-gray-700 ">Groups</h2>
+        <h2 className="font-semibold text-lg text-gray-700 ">Groups</h2>
         <div className="px-4 py-3 bg-white mt-4 rounded-lg shadow">
-          
           <div className="flex gap-4 overflow-x-auto">
             {mockGroups.map((group) => (
               <div
@@ -161,9 +138,7 @@ function MessagingApp() {
 
       {/* Messages Section */}
       <div className="mt-4 px-4">
-        <h2 className="font-semibold text-lg text-gray-700 mb-4">
-          Messages
-        </h2>
+        <h2 className="font-semibold text-lg text-gray-700 mb-4">Messages</h2>
         <div className="bg-white rounded-lg shadow divide-y divide-gray-200">
           {messages.map((message) => (
             <div
