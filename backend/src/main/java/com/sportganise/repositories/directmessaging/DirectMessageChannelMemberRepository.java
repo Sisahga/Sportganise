@@ -8,11 +8,22 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-/** Repository for a Direct Channel Member. */
+/**
+ * Repository for a Direct Channel Member.
+ */
 public interface DirectMessageChannelMemberRepository
-    extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
-  @Transactional
-  @Modifying
-  @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
-  void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
+        extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
+    void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
+
+    @Query("""
+            SELECT d.compositeKey.accountId
+            FROM DirectMessageChannelMember d
+            WHERE d.compositeKey.channelId = :channelId
+            AND d.compositeKey.accountId != :accountId
+            """)
+    int getOtherMemberIdInSimpleChannel(@Param("channelId") int channelId,
+                                        @Param("accountId") int accountId);
 }
