@@ -1,0 +1,6 @@
+{
+  "name": "sportganise",
+  "scripts": {
+    "preinstall": "echo You should install from within the frontend folder && exit 1"
+  }
+}

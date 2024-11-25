@@ -7,7 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.sportganise.entities.Account;
-import com.sportganise.services.AccountService;
+import com.sportganise.services.auth.AccountService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;

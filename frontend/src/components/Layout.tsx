@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { HeaderNav } from "./HeaderNav";
 import { FooterNav } from "./FooterNav";
 
-const Layout = () => {
+export default function Layout() {
   return (
     <div>
       <HeaderNav />
@@ -12,6 +12,4 @@ const Layout = () => {
       <FooterNav />
     </div>
   );
-};
-
-export default Layout;
+}

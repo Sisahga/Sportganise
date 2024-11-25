@@ -188,6 +188,7 @@ export default function CreateTrainingSessionForm() {
               Add Attachment
             </Label>
             <div className="flex gap-2">
+              {/* eslint-disable-next-line jsx-a11y/alt-text -- TODO Sofia replace by lucide icon */}
               <img src={icon} className="content-center"></img>
               <Input id="attachment" type="file" />
             </div>
