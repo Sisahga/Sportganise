@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
 import { Bell, Calendar, Home, MessageSquare, User } from "lucide-react";
 
 export default function FooterNav() {

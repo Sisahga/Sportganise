@@ -1,5 +1,6 @@
 import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/Button";
+import { useNavigate } from "react-router-dom";
 import {
   Drawer,
   DrawerContent,
@@ -9,6 +10,7 @@ import {
 import logo from "../../assets/Logo.png";
 
 export default function HeaderNav() {
+  const navigate = useNavigate();
   return (
     <div>
       <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
@@ -56,6 +58,13 @@ export default function HeaderNav() {
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
               >
                 Setting
+              </Button>
+              <Button
+                variant="link"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+                onClick={() => navigate("/signup")} //redirect to the SignUp page
+              >
+                Sign Up
               </Button>
             </nav>
           </DrawerContent>
