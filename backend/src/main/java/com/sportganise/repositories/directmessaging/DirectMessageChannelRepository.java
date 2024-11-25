@@ -1,8 +1,12 @@
 package com.sportganise.repositories.directmessaging;
 
+import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /** Repository for Direct Message Channel. */
 public interface DirectMessageChannelRepository
@@ -22,5 +26,5 @@ public interface DirectMessageChannelRepository
                 )
             WHERE cm.compositeKey.accountId = :accountId
             """)
-    void getDirectMessageChannelsByAccountId(int accountId);
+    List<ListDirectMessageChannelDto> getDirectMessageChannelsByAccountId(@Param("accountId") int accountId);
 }
