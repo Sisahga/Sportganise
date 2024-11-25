@@ -30,7 +30,7 @@ jobs:
       # Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/sisahga/sportganise:frontend-${{ github.sha }} .
+          docker build -t ghcr.io/sisahga/sportganise-frontend:${{ github.sha }} .
 
       # Log in to GHCR
       - name: Log in to GitHub Container Registry
@@ -43,4 +43,4 @@ jobs:
       # Push the Docker image to GHCR
       - name: Push Docker image
         run: |
-          docker push ghcr.io/sisahga/sportganise:frontend-${{ github.sha }}
+          docker push ghcr.io/sisahga/sportganise-frontend:${{ github.sha }}
