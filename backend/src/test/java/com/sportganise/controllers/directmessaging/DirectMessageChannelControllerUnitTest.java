@@ -45,11 +45,11 @@ class DirectMessageChannelControllerUnitTest {
   public void createDirectMessageChannelTest() throws Exception {
     given(
             dmChannelService.createDirectMessageChannel(
-                createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName()))
+                createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1))
         .willReturn(createDmChannelDTO);
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/messaging/create-channel")
+            MockMvcRequestBuilders.post("/api/messaging/create-channel/1")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(createDmChannelDTO)))
         .andExpect(status().isCreated())
@@ -60,7 +60,7 @@ class DirectMessageChannelControllerUnitTest {
         .andReturn();
     verify(dmChannelService, times(1))
         .createDirectMessageChannel(
-            createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName());
+            createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1);
   }
 
   @Test

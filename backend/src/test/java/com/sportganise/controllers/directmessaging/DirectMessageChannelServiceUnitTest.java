@@ -59,7 +59,7 @@ public class DirectMessageChannelServiceUnitTest {
     // Call the service method
     CreateDirectMessageChannelDto result =
         directMessageChannelService.createDirectMessageChannel(
-            dmChannelDTO.getMemberIds(), dmChannelDTO.getChannelName());
+            dmChannelDTO.getMemberIds(), dmChannelDTO.getChannelName(), 1);
 
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
@@ -67,7 +67,8 @@ public class DirectMessageChannelServiceUnitTest {
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
-    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt());
+    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(),
+            anyInt());
   }
 
   @Test
@@ -83,7 +84,7 @@ public class DirectMessageChannelServiceUnitTest {
     // Call the service method
     CreateDirectMessageChannelDto result =
         directMessageChannelService.createDirectMessageChannel(
-            dmChannelDTO.getMemberIds(), dmChannelDTO.getChannelName());
+            dmChannelDTO.getMemberIds(), dmChannelDTO.getChannelName(), 1);
 
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
@@ -92,7 +93,8 @@ public class DirectMessageChannelServiceUnitTest {
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
-    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt());
+    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(),
+            anyInt());
   }
 
   @Test
@@ -112,7 +114,7 @@ public class DirectMessageChannelServiceUnitTest {
     // Call the service method
     CreateDirectMessageChannelDto result =
         directMessageChannelService.createDirectMessageChannel(
-            longTestMemberIds, dmChannelDTO.getChannelName());
+            longTestMemberIds, dmChannelDTO.getChannelName(), 1);
 
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
@@ -121,7 +123,8 @@ public class DirectMessageChannelServiceUnitTest {
     assertEquals(longTestMemberIds, result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
-    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt());
+    verify(directMessageChannelMemberService, times(1)).saveMembers(anyList(), anyInt(),
+            anyInt());
   }
 
   @Test
