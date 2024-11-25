@@ -13,17 +13,15 @@ public interface DirectMessageChannelRepository
     extends JpaRepository<DirectMessageChannel, Integer> {
     /**
      * Query that gets DTO object for all Direct Message Channels for an account.
+     * Uses Constructor-Based Projection to create a List of ListDirectMessageChannelDto.
      *
      * @param accountId Id of the account to get Direct Message Channels for.
      */
     @Query("""
-            SELECT c.channelId, c.name as channelName, c.type as channelType, c.imageBlob as channelImageBlob,
-                        cm.read, m.content as lastMessage, m.sentAt as lastEvent
+            SELECT new com.sportganise.dto.directmessaging.ListDirectMessageChannelDto(c.channelId, c.type, c.name, c.imageBlob, m.content, cm.read, m.sentAt)
             FROM DirectMessageChannel c
             INNER JOIN DirectMessageChannelMember cm ON c.channelId = cm.compositeKey.channelId
-            LEFT JOIN DirectMessage m ON c.channelId = m.channelId AND m.sentAt = (
-                    SELECT MAX(sentAt) FROM DirectMessage WHERE channelId = c.channelId
-                )
+            LEFT JOIN DirectMessage m ON c.channelId = m.channelId AND m.sentAt = (SELECT MAX(sentAt) FROM DirectMessage WHERE channelId = c.channelId)
             WHERE cm.compositeKey.accountId = :accountId
             """)
     List<ListDirectMessageChannelDto> getDirectMessageChannelsByAccountId(@Param("accountId") int accountId);
