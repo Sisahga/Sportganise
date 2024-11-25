@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 /**
  * API DTO for retrieving a list of all DM Channels for an account.
  */
@@ -19,5 +21,5 @@ public class ListDirectMessageChannelDto {
     private String channelImageBlob;
     private String lastMessage;
     private Boolean read;
-    private String lastEvent;
+    private LocalDateTime lastEvent;
 }
