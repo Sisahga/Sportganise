@@ -29,6 +29,9 @@ public class DirectMessageChannel {
   private String name;
   private String type;
 
+  @Column(name = "last_message_id")
+  private Integer lastMessageId;
+
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 }

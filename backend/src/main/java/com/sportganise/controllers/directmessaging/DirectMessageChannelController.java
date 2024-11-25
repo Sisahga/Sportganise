@@ -37,13 +37,14 @@ public class DirectMessageChannelController {
    * @param channelDto API object for Created Channel Response.
    * @return HTTP Code 201 and Created DM Channel DTO.
    */
-  @PostMapping("/create-channel")
+  @PostMapping("/create-channel/{account_id}")
   public ResponseEntity<CreateDirectMessageChannelDto> createChannel(
-      @RequestBody CreateDirectMessageChannelDto channelDto) {
+      @RequestBody CreateDirectMessageChannelDto channelDto,
+      @PathVariable int account_id) {
     String channelName = channelDto.getChannelName();
     List<Integer> memberIds = channelDto.getMemberIds();
     CreateDirectMessageChannelDto dmChannelDto =
-        this.directMessageChannelService.createDirectMessageChannel(memberIds, channelName);
+        this.directMessageChannelService.createDirectMessageChannel(memberIds, channelName, account_id);
 
     return new ResponseEntity<>(dmChannelDto, HttpStatus.CREATED);
   }

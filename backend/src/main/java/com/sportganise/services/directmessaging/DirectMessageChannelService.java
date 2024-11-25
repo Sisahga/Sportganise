@@ -43,10 +43,11 @@ public class DirectMessageChannelService {
    *
    * @param memberIds String of member ids, separated by a ',' (min. 2 members)
    * @param channelName Name of the message channel. Can be null.
+   * @param creatorAccountId Id of the account who created the channel.
    * @return DM Channel created.
    */
   public CreateDirectMessageChannelDto createDirectMessageChannel(
-      List<Integer> memberIds, String channelName) {
+      List<Integer> memberIds, String channelName, int creatorAccountId) {
     /*
     Set the Channel Name to be the first names of members
     in the channel if it is null or empty.
@@ -69,7 +70,7 @@ public class DirectMessageChannelService {
     DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
     int createdDmChannelId = createdDmChannel.getChannelId();
     // Create Channel Members
-    this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId);
+    this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId, creatorAccountId);
 
     // Return the DM Channel DTO
     CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();

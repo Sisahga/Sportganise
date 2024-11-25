@@ -17,4 +17,6 @@ import lombok.Setter;
 @Table(name = "channel_member")
 public class DirectMessageChannelMember {
   @EmbeddedId DirectMessageChannelMemberCompositeKey compositeKey;
+
+  private Boolean read;
 }
