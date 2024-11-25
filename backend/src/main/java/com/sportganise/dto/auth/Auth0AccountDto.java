@@ -8,7 +8,7 @@ import lombok.Data;
 /** Data Transfer Object for Auth0 account */
 @Data
 @AllArgsConstructor
-public class Auth0AccountDTO {
+public class Auth0AccountDto {
   @NotNull
   @Email(message = "Invalid email format")
   private String email;

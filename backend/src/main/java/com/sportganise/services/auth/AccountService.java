@@ -1,7 +1,7 @@
 package com.sportganise.services.auth;
 
-import com.sportganise.dto.auth.AccountDTO;
-import com.sportganise.dto.auth.Auth0AccountDTO;
+import com.sportganise.dto.auth.AccountDto;
+import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Optional;
@@ -25,10 +25,10 @@ public class AccountService {
    * @param accountDTO Account data.
    * @return Auth0 ID of the created account.
    */
-  public String createAccount(AccountDTO accountDTO) {
+  public String createAccount(AccountDto accountDTO) {
     try {
-      Auth0AccountDTO auth0AccountDTO =
-          new Auth0AccountDTO(
+      Auth0AccountDto auth0AccountDTO =
+          new Auth0AccountDto(
               accountDTO.getEmail(), accountDTO.getPassword(), "Username-Password-Authentication");
       String auth0Id = auth0ApiService.createUserInAuth0(auth0AccountDTO);
 
@@ -54,7 +54,7 @@ public class AccountService {
    * @param auth0AccountDTO Account data.
    * @return True if the account is authenticated, false otherwise.
    */
-  public boolean authenticateAccount(Auth0AccountDTO auth0AccountDTO) {
+  public boolean authenticateAccount(Auth0AccountDto auth0AccountDTO) {
     return auth0ApiService.verifyPassword(auth0AccountDTO);
   }
 

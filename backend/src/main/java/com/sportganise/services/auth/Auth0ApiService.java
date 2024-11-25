@@ -1,6 +1,6 @@
 package com.sportganise.services.auth;
 
-import com.sportganise.dto.auth.Auth0AccountDTO;
+import com.sportganise.dto.auth.Auth0AccountDto;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -33,7 +33,7 @@ public class Auth0ApiService {
   }
 
   /** Create a user in Auth0 and return the Auth0 ID. */
-  public String createUserInAuth0(Auth0AccountDTO auth0AccountDTO) {
+  public String createUserInAuth0(Auth0AccountDto auth0AccountDTO) {
     String token = auth0TokenService.getManagementApiToken();
     String url = auth0Audience + "/users";
 
@@ -41,7 +41,7 @@ public class Auth0ApiService {
     headers.add("Authorization", "Bearer " + token);
     headers.add("Content-Type", "application/json");
 
-    HttpEntity<Auth0AccountDTO> request = new HttpEntity<>(auth0AccountDTO, headers);
+    HttpEntity<Auth0AccountDto> request = new HttpEntity<>(auth0AccountDTO, headers);
 
     ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
@@ -53,7 +53,7 @@ public class Auth0ApiService {
   }
 
   /** Login a user with Auth0 and return the access token. */
-  public Map<String, Object> loginUserWithAuth0(Auth0AccountDTO auth0AccountDTO) {
+  public Map<String, Object> loginUserWithAuth0(Auth0AccountDto auth0AccountDTO) {
     String url = "https://" + auth0Domain + "/oauth/token";
 
     Map<String, String> payload =
@@ -86,7 +86,7 @@ public class Auth0ApiService {
   }
 
   /** Verify a user's password with Auth0. */
-  public boolean verifyPassword(Auth0AccountDTO auth0AccountDTO) {
+  public boolean verifyPassword(Auth0AccountDto auth0AccountDTO) {
     try {
       Map<String, Object> result = loginUserWithAuth0(auth0AccountDTO);
       return result != null && result.containsKey("access_token");

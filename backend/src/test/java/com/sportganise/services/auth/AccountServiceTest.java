@@ -6,8 +6,8 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.sportganise.dto.auth.AccountDTO;
-import com.sportganise.dto.auth.Auth0AccountDTO;
+import com.sportganise.dto.auth.AccountDto;
+import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.repositories.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,12 +26,12 @@ public class AccountServiceTest {
 
   @InjectMocks private AccountService accountService;
 
-  private AccountDTO accountDTO;
-  private Auth0AccountDTO auth0AccountDTO;
+  private AccountDto accountDTO;
+  private Auth0AccountDto auth0AccountDTO;
 
   @BeforeEach
   public void setup() {
-    accountDTO = new AccountDTO();
+    accountDTO = new AccountDto();
     accountDTO.setEmail("userx@example.com");
     accountDTO.setPassword("password!123");
     accountDTO.setFirstName("John");
@@ -40,27 +40,27 @@ public class AccountServiceTest {
     accountDTO.setAddress("maisonneuve");
     accountDTO.setType("general");
 
-    auth0AccountDTO = new Auth0AccountDTO("userx@example.com", "password!123", null);
+    auth0AccountDTO = new Auth0AccountDto("userx@example.com", "password!123", null);
   }
 
   @Test
   public void authenticateAccount_shouldReturnTrue() {
-    given(auth0ApiService.verifyPassword(any(Auth0AccountDTO.class))).willReturn(true);
+    given(auth0ApiService.verifyPassword(any(Auth0AccountDto.class))).willReturn(true);
 
     boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDTO);
     assertTrue(isAuthenticated);
 
-    verify(auth0ApiService, times(1)).verifyPassword(any(Auth0AccountDTO.class));
+    verify(auth0ApiService, times(1)).verifyPassword(any(Auth0AccountDto.class));
   }
 
   @Test
   public void authenticateAccount_shouldReturnFalse() {
-    given(auth0ApiService.verifyPassword(any(Auth0AccountDTO.class))).willReturn(false);
+    given(auth0ApiService.verifyPassword(any(Auth0AccountDto.class))).willReturn(false);
 
     boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDTO);
     assertFalse(isAuthenticated);
 
-    verify(auth0ApiService, times(1)).verifyPassword(any(Auth0AccountDTO.class));
+    verify(auth0ApiService, times(1)).verifyPassword(any(Auth0AccountDto.class));
   }
 
   @Test
@@ -85,7 +85,7 @@ public class AccountServiceTest {
     Account account = new Account();
     account.setAuth0Id("auth0Id");
     given(accountRepository.save(any(Account.class))).willReturn(account);
-    given(auth0ApiService.createUserInAuth0(any(Auth0AccountDTO.class))).willReturn("auth0Id");
+    given(auth0ApiService.createUserInAuth0(any(Auth0AccountDto.class))).willReturn("auth0Id");
 
     String auth0Id = accountService.createAccount(accountDTO);
     assertEquals("auth0Id", auth0Id);

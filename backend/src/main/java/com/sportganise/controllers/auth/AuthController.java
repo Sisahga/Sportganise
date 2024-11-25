@@ -1,8 +1,8 @@
 package com.sportganise.controllers.auth;
 
-import com.sportganise.dto.ResponseDTO;
-import com.sportganise.dto.auth.AccountDTO;
-import com.sportganise.dto.auth.Auth0AccountDTO;
+import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.auth.AccountDto;
+import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.services.auth.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,8 +27,8 @@ public class AuthController {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity<ResponseDTO<String>> signup(@Valid @RequestBody AccountDTO accountDTO) {
-    ResponseDTO<String> responseDTO = new ResponseDTO<>();
+  public ResponseEntity<ResponseDto<String>> signup(@Valid @RequestBody AccountDto accountDTO) {
+    ResponseDto<String> responseDTO = new ResponseDto<>();
     try {
       String auth0Id = accountService.createAccount(accountDTO);
 
@@ -47,9 +47,9 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public ResponseEntity<ResponseDTO<String>> login(
-      @Valid @RequestBody Auth0AccountDTO auth0AccountDTO) {
-    ResponseDTO<String> responseDTO = new ResponseDTO<>();
+  public ResponseEntity<ResponseDto<String>> login(
+      @Valid @RequestBody Auth0AccountDto auth0AccountDTO) {
+    ResponseDto<String> responseDTO = new ResponseDto<>();
     try {
       boolean isValid = accountService.authenticateAccount(auth0AccountDTO);
 
