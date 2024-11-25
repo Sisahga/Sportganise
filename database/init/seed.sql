@@ -1,4 +1,5 @@
 
+
 INSERT INTO organization (name, type, description) VALUES
 ('OniBad', 'Non-Profit', 'Non-Profit for Badminton'),
 ('BasketTeam', 'Private', 'Team Basket');

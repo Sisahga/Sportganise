@@ -29,8 +29,9 @@ public class DirectMessageChannelMemberService {
    *
    * @param memberIds Ids of members to link to Channel Id.
    * @param channelId Id of DM Channel.
+   * @param creatorId Id of the member who created the channel.
    */
-  public void saveMembers(List<Integer> memberIds, int channelId) {
+  public void saveMembers(List<Integer> memberIds, int channelId, int creatorId) {
     List<DirectMessageChannelMember> dmChannelMembers = new ArrayList<>();
     for (int memberId : memberIds) {
       DirectMessageChannelMember dmChannelMember = new DirectMessageChannelMember();
@@ -40,6 +41,7 @@ public class DirectMessageChannelMemberService {
       ck.setAccountId(memberId);
       // Set the composite key as the id of the dmChannelMember
       dmChannelMember.setCompositeKey(ck);
+      dmChannelMember.setRead(memberId == creatorId);
       dmChannelMembers.add(dmChannelMember);
     }
     this.directMessageChannelMemberRepository.saveAll(dmChannelMembers);

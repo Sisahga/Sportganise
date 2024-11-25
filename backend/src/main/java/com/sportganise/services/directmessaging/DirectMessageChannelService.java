@@ -1,10 +1,12 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,10 +43,11 @@ public class DirectMessageChannelService {
    *
    * @param memberIds String of member ids, separated by a ',' (min. 2 members)
    * @param channelName Name of the message channel. Can be null.
+   * @param creatorAccountId Id of the account who created the channel.
    * @return DM Channel created.
    */
   public CreateDirectMessageChannelDto createDirectMessageChannel(
-      List<Integer> memberIds, String channelName) {
+      List<Integer> memberIds, String channelName, int creatorAccountId) {
     /*
     Set the Channel Name to be the first names of members
     in the channel if it is null or empty.
@@ -55,17 +58,28 @@ public class DirectMessageChannelService {
     }
     DirectMessageChannel dmChannel = new DirectMessageChannel();
     dmChannel.setName(channelName);
+    if (memberIds.size() > 2) {
+      dmChannel.setType("GROUP");
+    } else {
+      dmChannel.setType("SIMPLE");
+    }
+
+    LocalDateTime timestamp = LocalDateTime.now();
+    dmChannel.setCreatedAt(timestamp);
 
     DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
     int createdDmChannelId = createdDmChannel.getChannelId();
     // Create Channel Members
-    this.directMessageChannelMemberService.saveMembers(memberIds, createdDmChannelId);
+    this.directMessageChannelMemberService.saveMembers(
+        memberIds, createdDmChannelId, creatorAccountId);
 
     // Return the DM Channel DTO
     CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
     dmChannelDto.setChannelId(createdDmChannelId);
-    dmChannelDto.setChannelName(channelName);
+    dmChannelDto.setChannelName(createdDmChannel.getName());
+    dmChannelDto.setChannelType(createdDmChannel.getType());
     dmChannelDto.setMemberIds(memberIds);
+    dmChannelDto.setCreatedAt(timestamp.toString());
 
     return dmChannelDto;
   }
@@ -85,6 +99,28 @@ public class DirectMessageChannelService {
     } else {
       return false;
     }
+  }
+
+  /**
+   * Get all Direct Message Channels for an account.
+   *
+   * @param accountId Id of the account to get Direct Message Channels for.
+   * @return List of Direct Message Channels for the account.
+   */
+  public List<ListDirectMessageChannelDto> getDirectMessageChannels(int accountId) {
+    List<ListDirectMessageChannelDto> dmChannels =
+        directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
+    for (ListDirectMessageChannelDto dmChannel : dmChannels) {
+      // Set image blob of channel to be the image blob of the other member of the channel if it is
+      // SIMPLE.
+      if (dmChannel.getChannelType().equals("SIMPLE")) {
+        int otherMemberId =
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                dmChannel.getChannelId(), accountId);
+        dmChannel.setChannelImageBlob(accountRepository.getPictureBlobByAccountId(otherMemberId));
+      }
+    }
+    return dmChannels;
   }
 
   /**

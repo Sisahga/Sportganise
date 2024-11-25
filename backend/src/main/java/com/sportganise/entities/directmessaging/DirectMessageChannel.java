@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,14 @@ public class DirectMessageChannel {
   private Integer channelId;
 
   private String name;
+  private String type;
+
+  @Column(name = "image_blob")
+  private String imageBlob;
+
+  @Column(name = "last_message_id")
+  private Integer lastMessageId;
 
   @Column(name = "created_at")
-  private Timestamp createdAt;
+  private LocalDateTime createdAt;
 }

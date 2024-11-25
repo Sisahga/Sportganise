@@ -6,9 +6,17 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /** Entity for message. */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "message")
 public class DirectMessage {
@@ -26,5 +34,5 @@ public class DirectMessage {
   private String content;
 
   @Column(name = "sent_at")
-  private Timestamp sentAt;
+  private LocalDateTime sentAt;
 }
