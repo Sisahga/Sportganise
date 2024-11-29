@@ -26,7 +26,10 @@ jobs:
       # Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/sisahga/sportganise:frontend-latest .
+          docker build \
+            -t ghcr.io/sisahga/sportganise:frontend-latest \
+            -t ghcr.io/sisahga/sportganise:frontend-${{ github.sha }} \
+            .
 
       # Log in to GHCR
       - name: Log in to GitHub Container Registry
@@ -39,6 +42,7 @@ jobs:
       # Push the Docker image to GHCR
       - name: Push Docker image
         run: |
+          docker push ghcr.io/sisahga/sportganise:frontend-${{ github.sha }}
           docker push ghcr.io/sisahga/sportganise:frontend-latest
 
   build-and-publish-backend:
@@ -61,7 +65,10 @@ jobs:
       # Build the Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/sisahga/sportganise:backend-latest .
+          docker build \
+            -t ghcr.io/sisahga/sportganise:backend-latest \
+            -t ghcr.io/sisahga/sportganise:backend-${{ github.sha }} \
+            .
 
       # Log in to GHCR
       - name: Log in to GitHub Container Registry
@@ -74,4 +81,5 @@ jobs:
       # Push the Docker image to GHCR
       - name: Push Docker image
         run: |
+          docker push ghcr.io/sisahga/sportganise:backend-${{ github.sha }}
           docker push ghcr.io/sisahga/sportganise:backend-latest

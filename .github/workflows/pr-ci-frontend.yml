@@ -57,7 +57,7 @@ jobs:
       - name: Run linter
         run: pnpm exec eslint .
 
-  build-publish:
+  build-image:
     runs-on: ubuntu-latest
     needs: [format, lint]
 
@@ -65,30 +65,13 @@ jobs:
       run:
         working-directory: ./frontend
 
-    permissions:
-      packages: write
-      contents: read
-      attestations: write
-      id-token: write
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/sisahga/sportganise-frontend:${{ github.sha }} .
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Push Docker image
-        run: |
-          docker push ghcr.io/sisahga/sportganise-frontend:${{ github.sha }}
+          docker build .
 
   test:
     runs-on: ubuntu-latest
