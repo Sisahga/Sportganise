@@ -1,4 +1,3 @@
-// GroupSection.tsx
 import { useNavigate } from "react-router-dom";
 
 interface Group {
@@ -20,9 +19,10 @@ function GroupSection({ groups }: GroupSectionProps) {
       <div className="px-4 py-3 bg-white mt-4 rounded-lg shadow">
         <div className="flex gap-4 overflow-x-auto">
           {groups.map((group) => (
-            <div
+            <button
               key={group.channelId}
-              className="flex flex-col items-center w-20 cursor-pointer"
+              type="button"
+              className="flex flex-col items-center w-20 cursor-pointer focus:outline-none"
               onClick={() =>
                 navigate("/chat", {
                   state: {
@@ -37,12 +37,12 @@ function GroupSection({ groups }: GroupSectionProps) {
               <img
                 src={group.channelImageBlob}
                 alt={group.channelName}
-                className="w-16 h-16 rounded-full border border-gray-300 object-cover"
+                className="w-16 h-16 rounded-full object-cover"
               />
               <span className="text-sm text-gray-600 mt-2 text-center">
                 {group.channelName}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       </div>

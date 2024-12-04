@@ -1,7 +1,8 @@
 // MessagesSection.tsx
+import React from "react";
 import { useNavigate } from "react-router-dom";
 
-interface Message {
+interface ChannelMessage {
   channelId: number;
   channelType: string;
   channelName: string;
@@ -12,11 +13,28 @@ interface Message {
 }
 
 interface MessagesSectionProps {
-  messages: Message[];
+  messages: ChannelMessage[];
 }
 
 function MessagesSection({ messages }: MessagesSectionProps) {
   const navigate = useNavigate();
+
+  const handleKeyDown = (
+    event: React.KeyboardEvent<HTMLDivElement>,
+    message: ChannelMessage,
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      navigate("/chat", {
+        state: {
+          chatName: message.channelName,
+          chatAvatar: message.channelImageBlob,
+          chatType: message.channelType.toLowerCase(), // 'simple' or 'group'
+          channelId: message.channelId,
+        },
+      });
+    }
+  };
 
   return (
     <div className="mt-4 px-4 flex-1 overflow-y-auto">
@@ -36,6 +54,9 @@ function MessagesSection({ messages }: MessagesSectionProps) {
                 },
               })
             }
+            tabIndex={0}
+            role="button"
+            onKeyDown={(event) => handleKeyDown(event, message)}
           >
             {/* User Profile Picture */}
             <img
@@ -62,8 +83,7 @@ function MessagesSection({ messages }: MessagesSectionProps) {
             {/* Unread Messages Indicator */}
             {!message.read && (
               <div className="ml-4 p-1 rounded-full bg-secondaryColour w-6 h-6 text-white text-center text-xs">
-                {/* Indicator for unread messages */}
-                ●
+                {/* Indicator for unread messages */}●
               </div>
             )}
           </div>

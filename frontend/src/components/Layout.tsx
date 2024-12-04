@@ -40,5 +40,5 @@ const Layout = () => {
       {!hideFooter && <FooterNav />}
     </div>
   );
-}
+};
 export default Layout;

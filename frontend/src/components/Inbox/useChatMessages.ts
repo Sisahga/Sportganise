@@ -10,8 +10,13 @@ interface Message {
 }
 
 function useChatMessages(
-  channelId: number | null
-): [Message[], React.Dispatch<React.SetStateAction<Message[]>>, boolean, string | null] {
+  channelId: number | null,
+): [
+  Message[],
+  React.Dispatch<React.SetStateAction<Message[]>>,
+  boolean,
+  string | null,
+] {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
