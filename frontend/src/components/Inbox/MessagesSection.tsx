@@ -1,9 +1,7 @@
 // MessagesSection.tsx
-import SectionWrapper from "./SectionWrapper";
-import ChannelItem , {Channel} from "./ChannelItem";
+import { useNavigate } from "react-router-dom";
 
-
-interface ChannelMessage {
+interface Message {
   channelId: number;
   channelType: string;
   channelName: string;
@@ -14,42 +12,64 @@ interface ChannelMessage {
 }
 
 interface MessagesSectionProps {
-  messages: ChannelMessage[];
+  messages: Message[];
 }
 
 function MessagesSection({ messages }: MessagesSectionProps) {
-  // Convert ChannelMessage[] to Channel[] shape if needed
-  const channels: Channel[] = messages.map((m) => ({
-    channelId: m.channelId,
-    channelType: m.channelType,
-    channelName: m.channelName,
-    channelImageBlob: m.channelImageBlob,
-    lastMessage: m.lastMessage,
-    lastEvent: m.lastEvent,
-    read: m.read,
-  }));
+  const navigate = useNavigate();
 
   return (
-    <SectionWrapper title="Messages">
-      <div className="divide-y divide-gray-200">
-        {channels.map((channel) => (
-          <ChannelItem
-            key={channel.channelId}
-            channel={channel}
-            layout="horizontal" // display them in a horizontal row with extra info
-            extraInfo={
-              <>
+    <div className="mt-4 px-4 flex-1 overflow-y-auto">
+      <h2 className="font-semibold text-lg text-gray-700 mb-4">Messages</h2>
+      <div className="bg-white rounded-lg shadow divide-y divide-gray-200">
+        {messages.map((message) => (
+          <div
+            key={message.channelId}
+            className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer"
+            onClick={() =>
+              navigate("/chat", {
+                state: {
+                  chatName: message.channelName,
+                  chatAvatar: message.channelImageBlob,
+                  chatType: message.channelType.toLowerCase(), // 'simple' or 'group'
+                  channelId: message.channelId,
+                },
+              })
+            }
+          >
+            {/* User Profile Picture */}
+            <img
+              src={message.channelImageBlob}
+              alt={message.channelName}
+              className="w-12 h-12 rounded-full object-cover"
+            />
+            {/* Message Details */}
+            <div className="ml-4 flex-1">
+              <div className="flex justify-between">
+                <h3 className="text-md font-bold text-gray-800">
+                  {message.channelName}
+                </h3>
                 <span className="text-sm text-gray-400">
-                  {channel.lastEvent
-                    ? new Date(channel.lastEvent).toLocaleString()
+                  {message.lastEvent
+                    ? new Date(message.lastEvent).toLocaleString()
                     : ""}
                 </span>
-              </>
-            }
-          />
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                {message.lastMessage || "No messages yet"}
+              </p>
+            </div>
+            {/* Unread Messages Indicator */}
+            {!message.read && (
+              <div className="ml-4 p-1 rounded-full bg-secondaryColour w-6 h-6 text-white text-center text-xs">
+                {/* Indicator for unread messages */}
+                ●
+              </div>
+            )}
+          </div>
         ))}
       </div>
-    </SectionWrapper>
+    </div>
   );
 }
 

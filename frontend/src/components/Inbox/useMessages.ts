@@ -41,6 +41,8 @@ function useMessages() {
             lastEvent: new Date().toISOString(),
           },
         ];
+        // Simulate network delay
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         setMessages(mockMessages);
       } catch (err) {
         console.error("Error fetching messages:", err);
