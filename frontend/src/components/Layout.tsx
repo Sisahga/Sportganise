@@ -2,25 +2,25 @@ import { Outlet, useLocation } from "react-router-dom";
 import { HeaderNav } from "./HeaderNav";
 import { FooterNav } from "./FooterNav";
 
+// Paths where the header should be hidden
+const hideHeaderPaths = ["/messages", "/chat"]; // Header hidden on both
+
+// Paths where the footer should be hidden
+const hideFooterPaths = ["/chat"]; // Footer hidden only on /chat
+
+// Define paths where you don't want horizontal margins (like full-width pages)
+const fullWidthPaths = ["/messages", "/chat"]; // Full-width layout on these paths
+
+// Function to check if the current path matches any hide paths
+const shouldHide = (paths: string[], pathname: string): boolean =>
+  paths.some((path: string) => pathname.startsWith(path));
+
 const Layout = () => {
   const location = useLocation();
 
-  // Paths where the header should be hidden
-  const hideHeaderPaths = ["/messages", "/chat"]; // Header hidden on both
-
-  // Paths where the footer should be hidden
-  const hideFooterPaths = ["/chat"]; // Footer hidden only on /chat
-
-  // Function to check if the current path matches any hide paths
-  const shouldHide = (paths: string[]): boolean =>
-    paths.some((path: string) => location.pathname.startsWith(path));
-
-  const hideHeader = shouldHide(hideHeaderPaths);
-  const hideFooter = shouldHide(hideFooterPaths);
-
-  // Define paths where you don't want horizontal margins (like full-width pages)
-  const fullWidthPaths = ["/messages", "/chat"]; // Full-width layout on these paths
-  const isFullWidth = shouldHide(fullWidthPaths);
+  const hideHeader = shouldHide(hideHeaderPaths, location.pathname);
+  const hideFooter = shouldHide(hideFooterPaths, location.pathname);
+  const isFullWidth = shouldHide(fullWidthPaths, location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen">
