@@ -4,6 +4,7 @@ import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,4 +29,8 @@ public interface DirectMessageChannelRepository
             """)
   List<ListDirectMessageChannelDto> getDirectMessageChannelsByAccountId(
       @Param("accountId") int accountId);
+
+  @Modifying
+  @Query("UPDATE DirectMessageChannel SET lastMessageId = :messageId WHERE channelId = :channelId")
+  void updateLastMessageId(@Param(("channelId")) int channelId, @Param("messageId") int messageId);
 }
