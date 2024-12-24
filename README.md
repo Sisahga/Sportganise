@@ -5,7 +5,6 @@ A sport Management Application <br>
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![Snowflake](https://img.shields.io/badge/Snowflake-29B5E8?style=for-the-badge&logo=snowflake&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
 ![JUnit](https://img.shields.io/badge/JUnit-25A162?style=for-the-badge&logo=junit5&logoColor=white)
@@ -60,6 +59,7 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Arshpreet Singh    | 40172137  | [92754282](https://github.com/Sisahga/Sportganise/commits?author=Ashx11)  | arshpreets425@gmail.com  |
 | Sofia Valiante  | 40191897  | [91510546](https://github.com/Sisahga/Sportganise/commits?author=s-vali)| valiante.sofia@gmail.com  |
 | Dannick Bujold-Senss  | 40180290 | [44579430](https://github.com/Sisahga/Sportganise/commits?author=Bsenss6) | dannickbsenss@gmail.com |
+| Jeremy Rimokh | 40110746 | [98069409](https://github.com/Sisahga/Sportganise/commits?author=j3rrimmy) | jeremy5727@hotmail.com |
 
 ## Developer getting started guide
 This monorepo project is home to two workspaces: frontend and backend.
@@ -68,50 +68,68 @@ As a developer, it is recommended to open the editor (e.g. VS Code) in one of th
 two folders instead of in the root of the project.
 
 
-## Frontend - Getting Started with Create React App
+## Frontend - Getting Started with React Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a **React application** bootstrapped with [Vite](https://vitejs.dev/), a fast build tool and development server.
 
-### Available Scripts
+### Prerequisites
+Before proceeding, ensure you have the following installed:
 
-In the project directory, you can run: `npm start`
+- **Node.js** (v16 or higher recommended)  
+- **pnpm** (Package manager)  
+- **Git** (for version control)
 
-Runs the app in the development mode.
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-The page will reload if you make edits.
-You will also see any lint errors in the console.
+### Get Started
+**Clone the Repository**
 
- `npm test`
+If you don’t already have the repository cloned, run:
 
-Launches the test runner in the interactive watch mode.
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+git clone <https://github.com/Sisahga/Sportganise.git>
+```
 
- `npm run build`
+**Switch to the Main Branch**
 
-Builds the app for production to the `build` folder.
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Make sure you are on the latest main branch:
+```
+git checkout main
+git pull
+```
 
-The build is minified and the filenames include the hashes.
-Your app is ready to be deployed!
+**Navigate to the Frontend Directory**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Move into the frontend directory:
 
- `npm run eject`
+```
+cd frontend
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**Install Dependencies**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Install the required project dependencies using pnpm:
+```
+pnpm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+**Start the Development Server**
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+Run the application locally:
+```
+pnpm dev
+```
+This will start the Vite development server. Open the provided URL in your browser (commonly http://localhost:5173) to view the app.
 
-### Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Development Workflow
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**Hot Reloading**
+The Vite development server supports **hot module replacement (HMR)**. Any changes made to the code will automatically reflect in the browser without requiring a full page refresh.
+
+### Stopping the Development Server
+
+To stop the development server, press `Ctrl + C` in the terminal.
+
 
 ## Backend - Getting Started 
 
@@ -161,6 +179,8 @@ The following link will direct you to our Figma page where we implemented the ap
 * [Performance](https://github.com/Sisahga/Sportganise/wiki/Performance)
 * [Deployment Plan and Infrastructure](https://github.com/Sisahga/Sportganise/wiki/Deployment-Plan-and-Infrastructure)
 * [Mockups](https://github.com/Sisahga/Sportganise/wiki/Mockups)
+* [Budget](https://github.com/Sisahga/Sportganise/wiki/Budget)
+* [API Endpoint Documentation](https://github.com/Sisahga/Sportganise/wiki/API-Endpoint-Documentation)
 
 ## Diversity Statement 
 “We’re committed to creating an inclusive environment where everyone feels welcome, no matter their background, gender, or abilities. Our goal is to make sure the app is accessible to all users and helps bring people together in a way that promotes fairness and respect. We believe diversity makes our platform stronger and allows us to better serve all the clubs and players that use it.”

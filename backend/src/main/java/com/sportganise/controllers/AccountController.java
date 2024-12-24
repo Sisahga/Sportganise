@@ -1,7 +1,7 @@
 package com.sportganise.controllers;
 
 import com.sportganise.entities.Account;
-import com.sportganise.services.AccountService;
+import com.sportganise.services.auth.AccountService;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,12 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 // TODO[246]: configure CORS policy
 @CrossOrigin(origins = "*")
 public class AccountController {
-  private final AccountService accountService;
 
-  @Autowired
-  public AccountController(AccountService accountService) {
-    this.accountService = accountService;
-  }
+  @Autowired private AccountService accountService;
 
   @GetMapping("/")
   public String index() {

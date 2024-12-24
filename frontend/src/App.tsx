@@ -1,7 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import CreateTrainingSession from "./pages/CreateTrainingSession";
+import CreateTrainingSessionPage from "./pages/CreateTrainingSessionPage";
 import Layout from "./components/Layout";
+import ProfilePage from "./pages/ProfilePage";
+import EditProfilePage from "./pages/EditProfilePage";
+import PersonalInformationPage from "./pages/PersonalInformationPage";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
 
 function App() {
   return (
@@ -12,8 +16,21 @@ function App() {
           {" "}
           {/*Place the routes to all your pages nested in this Route tag */}
           <Route
-            path="/pages/CreateTrainingSession"
-            element={<CreateTrainingSession />}
+            path="/pages/CreateTrainingSessionPage"
+            element={<CreateTrainingSessionPage />}
+          ></Route>
+          <Route
+            path="/pages/PersonalInformationPage"
+            element={<PersonalInformationPage />}
+          ></Route>
+          <Route
+            path="/pages/EditProfilePage"
+            element={<EditProfilePage />}
+          ></Route>
+          <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
+          <Route
+            path="/pages/ChangePasswordPage"
+            element={<ChangePasswordPage />}
           ></Route>
         </Route>
       </Routes>
