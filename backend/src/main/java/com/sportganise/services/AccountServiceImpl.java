@@ -24,10 +24,6 @@ public class AccountServiceImpl implements AccountService {
 
   /** Method to check if user has permissions role. */
   public boolean hasPermissions(Role type) {
-    if (type == Role.ADMIN || type == Role.COACH) {
-      return true;
-    } else {
-      return false;
-    }
+    return type == Role.ADMIN || type == Role.COACH;
   }
 }
