@@ -33,11 +33,10 @@ import icon from "../../assets/file-document-svgrepo-com.svg";
 
 export default function CreateTrainingSessionForm() {
   const [date, setDate] = React.useState<Date>();
-
   const [error, setError] = useState(false); //error in fetching data from server with api url
 
   /*Handle input changes in form fields and update the state of the form*/
-  const [formData, setFormData] = useState({ title: "" }); //useState is a state management approach to track the input values.
+  const [formData, setFormData] = useState({ title: "", type: "" }); //useState is a state management approach to track the input values.
 
   /*Handle form submission and networking logic (sending formValue to server using API url)*/
   const handleSubmit = (event: any) => {
@@ -47,7 +46,11 @@ export default function CreateTrainingSessionForm() {
   };
 
   const handleChange = (event: any) => {
-    title: "";
+    //console.log(event);
+
+    //onValueChange for 'select inputs' registers event as the value passed in the form (ex. frundraisor)
+    formData.type = event;
+    console.log("formData.type" + formData.type);
   };
 
   /*
@@ -88,7 +91,12 @@ export default function CreateTrainingSessionForm() {
             <Label className="font-semibold" htmlFor="type">
               Type of Event
             </Label>
-            <Select required>
+            <Select
+              name="type"
+              value={formData.type}
+              onValueChange={handleChange}
+              required
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
