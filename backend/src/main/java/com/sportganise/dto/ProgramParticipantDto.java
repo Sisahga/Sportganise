@@ -15,7 +15,7 @@ import lombok.Setter;
 @Entity
 public class ProgramParticipantDto {
   private Integer accountId;
-  private Role type;
+  private Role participantType;
   private String email;
   private String address;
   private String phone;
