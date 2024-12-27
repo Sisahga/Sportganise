@@ -2,8 +2,8 @@ package com.sportganise.controllers;
 
 import com.sportganise.dto.ProgramParticipantDto;
 import com.sportganise.entities.Account;
-import com.sportganise.services.AccountService;
 import com.sportganise.services.ProgramService;
+import com.sportganise.services.auth.AccountService;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.http.HttpStatus;
