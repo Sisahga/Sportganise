@@ -27,9 +27,8 @@ public class Account {
   private Integer accountId;
 
   // Type of user. i.e. is it a coach, admin or regular user.
-  // Role is an enum defined in the Role.java
-  @Enumerated(EnumType.STRING) // Takes string from DB and converts into Role type
-  private Role type;
+  @Column(name = type)
+  private String type;
 
   private String email;
 

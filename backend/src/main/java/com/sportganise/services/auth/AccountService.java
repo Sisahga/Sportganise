@@ -61,4 +61,14 @@ public class AccountService {
   public Optional<Account> getAccount(Integer id) {
     return accountRepository.findById(id);
   }
+
+  /**
+   * Method to check if user has role with permissions
+   *
+   * @param roleType string
+   * @return True if user is an ADMIN or COACH, false otherwise
+   */
+  public boolean hasPermissions(String roleType) {
+    return roleType.equals("ADMIN") || roleType.equals("COACH");
+  }
 }
