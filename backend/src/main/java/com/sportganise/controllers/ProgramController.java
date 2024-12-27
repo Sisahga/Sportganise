@@ -31,13 +31,13 @@ public class ProgramController {
   }
 
   /**
-   * Get mapping for program session details.
+   * Get mapping for program session participants.
    *
    * @param accountId Id of account
    * @param sessionId Id of session
    * @return HTTP Response
    */
-  @GetMapping("/{accountId}/{sessionId}/details")
+  @GetMapping("/{accountId}/{sessionId}/participants")
   public ResponseEntity<List<ProgramParticipantDto>> getParticipantsInSession(
       @PathVariable Integer sessionId, Integer accountId) {
     // Get account from accountId (this is a wrapper, not the actual)
