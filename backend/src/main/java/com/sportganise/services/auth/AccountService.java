@@ -63,7 +63,7 @@ public class AccountService {
   }
 
   /**
-   * Method to check if user has role with permissions
+   * Method to check if user has role with permissions.
    *
    * @param roleType string
    * @return True if user is an ADMIN or COACH, false otherwise
