@@ -1,5 +1,8 @@
 import React from "react";
 
+//React imports
+import { useState } from "react";
+
 //shadcn imports
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
@@ -31,6 +34,22 @@ import icon from "../../assets/file-document-svgrepo-com.svg";
 export default function CreateTrainingSessionForm() {
   const [date, setDate] = React.useState<Date>();
 
+  const [error, setError] = useState(false); //error in fetching data from server with api url
+
+  /*Handle input changes in form fields and update the state of the form*/
+  const [formData, setFormData] = useState({ title: "" }); //useState is a state management approach to track the input values.
+
+  /*Handle form submission and networking logic (sending formValue to server using API url)*/
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+    // Perform form submission logic, e.g., send data to API
+    //Networking code
+  };
+
+  const handleChange = (event: any) => {
+    title: "";
+  };
+
   /*
   const handleSelect = (date: Date | undefined) => {
     console.log("Selected date:", date);
@@ -39,7 +58,8 @@ export default function CreateTrainingSessionForm() {
   */
   return (
     <div>
-      <form>
+      <form onSubmit={handleSubmit}>
+        {/*when form is submitted, calls handleSubmit function to handle form logic */}
         <div className="grid grid-rows-* gap-y-6">
           {/*Form Title*/}
           <div>
@@ -55,7 +75,10 @@ export default function CreateTrainingSessionForm() {
             <Input
               type="text"
               id="title"
+              name="title"
               placeholder="Name the event"
+              value={formData.title}
+              onChange={handleChange}
               required
             />
           </div>
@@ -65,7 +88,7 @@ export default function CreateTrainingSessionForm() {
             <Label className="font-semibold" htmlFor="type">
               Type of Event
             </Label>
-            <Select>
+            <Select required>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
@@ -92,7 +115,7 @@ export default function CreateTrainingSessionForm() {
                   variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal",
-                    !date && "text-muted-foreground",
+                    !date && "text-muted-foreground"
                   )}
                 >
                   <CalendarIcon className="h-4 w-4 opacity-50" />
@@ -105,6 +128,7 @@ export default function CreateTrainingSessionForm() {
                   selected={date}
                   onSelect={setDate}
                   initialFocus
+                  required
                 />
               </PopoverContent>
             </Popover>
@@ -116,8 +140,8 @@ export default function CreateTrainingSessionForm() {
               Time
             </Label>
             <div className="flex gap-2">
-              <Input id="start-time" type="time" />
-              <Input id="end-time" type="time" />
+              <Input id="start-time" type="time" required />
+              <Input id="end-time" type="time" required />
             </div>
           </div>
 
@@ -126,7 +150,7 @@ export default function CreateTrainingSessionForm() {
             <Label className="font-semibold" htmlFor="location">
               Location
             </Label>
-            <Select>
+            <Select required>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select location" />
               </SelectTrigger>
@@ -146,7 +170,7 @@ export default function CreateTrainingSessionForm() {
 
           {/*Recurring*/}
           <div className="flex items-center space-x-2">
-            <Checkbox id="recurring" />
+            <Checkbox id="recurring" required />
             <Label
               htmlFor="recurring"
               className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -160,7 +184,7 @@ export default function CreateTrainingSessionForm() {
             <Label className="font-semibold" htmlFor="visibility">
               Visibility
             </Label>
-            <Select>
+            <Select required>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select visibility" />
               </SelectTrigger>
@@ -203,12 +227,13 @@ export default function CreateTrainingSessionForm() {
               type="number"
               min="0"
               placeholder="Write the max number of attendees"
+              required
             ></Input>
           </div>
 
           {/*Invitation and Player List*/}
           <div className="flex gap-1 items-center space-x-2">
-            <Checkbox className="self-start" />
+            <Checkbox className="self-start" required />
             <div className="flex flex-col">
               <Label
                 htmlFor="attendance"
@@ -221,8 +246,12 @@ export default function CreateTrainingSessionForm() {
               </a>
             </div>
           </div>
+
+          {/*Submit Button or Cancel */}
           <div>
-            <Button className="w-full font-semibold">Create New Event</Button>
+            <Button className="w-full font-semibold" type="submit">
+              Create New Event
+            </Button>
           </div>
           <div className="text-center self-center">
             <a href="../" className="underline text-neutral-400">
