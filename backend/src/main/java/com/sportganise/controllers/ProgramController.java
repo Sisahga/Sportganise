@@ -59,6 +59,5 @@ public class ProgramController {
     // Retrieve the list of attendees of the training session
     List<ProgramParticipantDto> attendees = programService.getParticipants(sessionId);
     return ResponseEntity.ok(attendees);
-
   }
 }

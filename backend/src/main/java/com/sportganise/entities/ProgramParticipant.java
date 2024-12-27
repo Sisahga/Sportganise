@@ -19,7 +19,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class ProgramParticipant {
-  // Could be a coach or a player. As for right now, not sure if there are other types of participants?
+  // Could be a coach or a player. As for right now, not sure if there are other types of
+  // participants?
   private String participantType;
 
   @Column(name = "is_confirmed")
