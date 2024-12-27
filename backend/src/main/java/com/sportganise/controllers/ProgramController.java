@@ -33,30 +33,32 @@ public class ProgramController {
   /**
    * Get mapping for program session details.
    *
-   * @param sessionId Id of session
    * @param accountId Id of account
+   * @param sessionId Id of session
    * @return HTTP Response
    */
-  @GetMapping("/{sessionId}/details")
+  @GetMapping("/{accountId}/{sessionId}/details")
   public ResponseEntity<List<ProgramParticipantDto>> getParticipantsInSession(
       @PathVariable Integer sessionId, Integer accountId) {
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = accountService.getAccount(accountId);
 
     // Check if there is the value of getAccount is empty
-    if (!userOptional.isEmpty()) {
-      // If not empty, then we go fetch the actual Account value of this user
-      Account user = userOptional.get();
-      // Check if this user has permissions to see training sessions attendees
-      if (accountService.hasPermissions(user.getType())) {
-        // Retrieve the list of attendees of the training session
-        List<ProgramParticipantDto> attendees = programService.getParticipants(sessionId);
-        return ResponseEntity.ok(attendees);
-      } else {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-      }
-    } else {
+    if (userOptional.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    // If not empty, then we go fetch the actual Account value of this user
+    Account user = userOptional.get();
+
+    // Check if this user has permissions to see training sessions attendees
+    if (!accountService.hasPermissions(user.getType())) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    // Retrieve the list of attendees of the training session
+    List<ProgramParticipantDto> attendees = programService.getParticipants(sessionId);
+    return ResponseEntity.ok(attendees);
+
   }
 }

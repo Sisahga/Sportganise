@@ -25,7 +25,8 @@ public class Program {
   @Column(name = "program_id")
   private Integer programId;
 
-  private String type;
+  // Could be a tournament, an event of some sort or a training session
+  private String programType;
   private String title;
   private String description;
   private Integer capacity;
@@ -33,7 +34,8 @@ public class Program {
   @Column(name = "occurence_date")
   private LocalDateTime occurenceDate;
 
-  private Integer duration;
+  // Duration of the program in terms of minutes
+  private Integer durationMins;
 
   @Column(name = "is_recurring")
   private boolean isRecurring;
