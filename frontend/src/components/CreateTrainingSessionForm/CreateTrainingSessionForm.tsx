@@ -64,6 +64,12 @@ const formSchema = z.object({
     .optional(),
   capacity: z.number().min(0),
   notify: z.boolean().default(true),
+  start_time: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
+  end_time: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
 });
 
 //PAGE CONTENT --------------------------------------------
@@ -123,19 +129,14 @@ export default function CreateTrainingSessionForm() {
       //default values that will considered for each state when page is loaded and also what is rendered when the page loads
       start_day: new Date(),
       end_date: new Date(),
-      title: "",
-      attachment: [],
-      notify: true,
-      recurring: true, //match with specified in formSchema
-      capacity: 0,
-      type: "",
-      visibility: "",
-      description: "",
+      //title: "",
     },
   });
 
   /** Handle form submission and networking logic */
   function onSubmit(values: z.infer<typeof formSchema>) {
+    //values.preventDefault();
+
     try {
       console.log(JSON.stringify(values, null, 2));
       toast(
@@ -329,6 +330,44 @@ export default function CreateTrainingSessionForm() {
               <FormDescription>
                 Enter the last day of a recurring event.
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/**Start Time */}
+        <FormField
+          control={form.control}
+          name="start_time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-base">
+                Start Time
+              </FormLabel>
+              <FormControl>
+                <Input type="time" {...field} />
+              </FormControl>
+              <FormDescription>
+                Select the time the event starts.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/**End Time */}
+        <FormField
+          control={form.control}
+          name="end_time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-base">
+                End Time
+              </FormLabel>
+              <FormControl>
+                <Input type="time" {...field} />
+              </FormControl>
+              <FormDescription>Select the time the event ends.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

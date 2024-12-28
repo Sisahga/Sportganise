@@ -5,8 +5,6 @@ export default function CreateTrainingSession() {
   return (
     <div className="">
       <CreateTrainingSessionForm />
-      <h1>NEW</h1>
-      <TestForm />
     </div>
   );
 }
