@@ -102,6 +102,20 @@ export default function CreateTrainingSessionForm() {
       value: "Collège-de-Maisonnneuve",
     },
   ] as const;
+
+  /** Handle files for file upload in form*/
+  const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
+  const dropZoneConfig = {
+    //File configurations
+    maxFiles: 5,
+    maxSize: 1024 * 1024 * 4,
+    multiple: true,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg"],
+      "application/pdf": [".pdf"],
+    },
+  };
+
   const [date, setDate] = React.useState<Date>();
   const [error, setError] = useState(false); //error in fetching data from server with api url
 
