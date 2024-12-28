@@ -177,6 +177,70 @@ export default function CreateTrainingSessionForm() {
             </FormItem>
           )}
         />
+
+        {/** Type */}
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel className="font-semibold text-base">
+                Type of Event
+              </FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? types.find((type) => type.value === field.value)
+                            ?.label
+                        : "Select type"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search type..." />
+                    <CommandList>
+                      <CommandEmpty>No type found.</CommandEmpty>
+                      <CommandGroup>
+                        {types.map((type) => (
+                          <CommandItem
+                            value={type.label}
+                            key={type.value}
+                            onSelect={() => {
+                              form.setValue("type", type.value);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                type.value === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {type.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );
