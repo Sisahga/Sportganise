@@ -356,6 +356,73 @@ export default function CreateTrainingSessionForm() {
             </FormItem>
           )}
         />
+
+        {/** Visibility */}
+        <FormField
+          control={form.control}
+          name="visibility"
+          render={({ field }) => (
+            <FormItem className="flex flex-col">
+              <FormLabel className="font-semibold text-base">
+                Visibility
+              </FormLabel>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? visibilities.find(
+                            (visibility) => visibility.value === field.value
+                          )?.label
+                        : "Select type"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search type..." />
+                    <CommandList>
+                      <CommandEmpty>No type found.</CommandEmpty>
+                      <CommandGroup>
+                        {visibilities.map((visibility) => (
+                          <CommandItem
+                            value={visibility.label}
+                            key={visibility.value}
+                            onSelect={() => {
+                              form.setValue("visibility", visibility.value);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                visibility.value === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {visibility.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormDescription>
+                Select who can view the event in their dashboard.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );
