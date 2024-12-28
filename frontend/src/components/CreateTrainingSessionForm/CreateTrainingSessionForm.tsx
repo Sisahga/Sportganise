@@ -423,6 +423,28 @@ export default function CreateTrainingSessionForm() {
             </FormItem>
           )}
         />
+
+        {/** Description */}
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-base">
+                Description
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Add description of the event here ..."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );
