@@ -155,7 +155,29 @@ export default function CreateTrainingSessionForm() {
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 max-w-3xl mx-auto py-10"
-      ></form>
+      >
+        {/*Form Title*/}
+        <div>
+          <h2 className="text-2xl font-semibold">Create New Event</h2>
+          <h2>Complete the form and submit</h2>
+        </div>
+
+        {/** Title */}
+        <FormField
+          control={form.control}
+          name="title"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-base">Title</FormLabel>
+              <FormControl>
+                <Input placeholder="Name the event" type="text" {...field} />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </form>
     </Form>
   );
 }
