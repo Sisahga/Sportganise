@@ -151,6 +151,11 @@ export default function CreateTrainingSessionForm() {
 
   return (
     //RETURN ----------------------------------------------
-    <Form {...form}></Form>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 max-w-3xl mx-auto py-10"
+      ></form>
+    </Form>
   );
 }
