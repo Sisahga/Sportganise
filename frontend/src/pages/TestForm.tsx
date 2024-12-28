@@ -1,3 +1,4 @@
+// IMPORTS ------------------------------------------
 import { useState } from "react";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
@@ -43,7 +44,8 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
-//Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.
+//GLOBAL --------------------------------------------
+/** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
 const formSchema = z.object({
   title: z.string(),
   type: z.string(),
@@ -64,24 +66,44 @@ const formSchema = z.object({
   notify: z.boolean().default(true),
 });
 
+//PAGE CONTENT --------------------------------------------
+/**All select element options */
 export default function MyForm() {
-  //Select options for 'type'
-  const languages = [
+  //Options for type select
+  const types = [
     {
-      label: "English",
-      value: "en",
+      label: "Training Session",
+      value: "training-session",
     },
     {
-      label: "French",
-      value: "fr",
+      label: "Fundraisor",
+      value: "fundraisor",
+    },
+  ] as const;
+  //Options for visibility select
+  const visibilities = [
+    {
+      label: "Public",
+      value: "public",
     },
     {
-      label: "German",
-      value: "de",
+      label: "Members only",
+      value: "members",
+    },
+  ] as const;
+  //Options for location select
+  const locations = [
+    {
+      label: "Centre de loisirs St-Denis",
+      value: "Centre-de-loisirs-St-Denis",
+    },
+    {
+      label: "Collège de Maisonnneuve",
+      value: "Collège-de-Maisonnneuve",
     },
   ] as const;
 
-  //Handle files for file upload in form
+  /** Handle files for file upload in form*/
   const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
   const dropZoneConfig = {
     //File configurations
@@ -94,7 +116,7 @@ export default function MyForm() {
     },
   };
 
-  //Initializes a form in a React component using react-hook-form with a Zod schema for validation
+  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -104,7 +126,7 @@ export default function MyForm() {
       title: "",
       attachment: [],
       notify: true,
-      recurring: true,
+      recurring: true, //match with specified in formSchema
       capacity: 0,
       type: "",
       visibility: "",
@@ -112,6 +134,7 @@ export default function MyForm() {
     },
   });
 
+  /** Handle form submission and networking logic */
   function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       console.log(JSON.stringify(values, null, 2));
@@ -127,17 +150,19 @@ export default function MyForm() {
   }
 
   return (
+    //RETURN ----------------------------------------------
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 max-w-3xl mx-auto py-10"
       >
+        {/** Title */}
         <FormField
           control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Title</FormLabel>
+              <FormLabel className="font-semibold text-base">Title</FormLabel>
               <FormControl>
                 <Input placeholder="Name the event" type="text" {...field} />
               </FormControl>
@@ -146,12 +171,16 @@ export default function MyForm() {
             </FormItem>
           )}
         />
+
+        {/** Type */}
         <FormField
           control={form.control}
           name="type"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Type of Event</FormLabel>
+              <FormLabel className="font-semibold text-base">
+                Type of Event
+              </FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -159,42 +188,41 @@ export default function MyForm() {
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        "w-[200px] justify-between",
+                        "justify-between",
                         !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value
-                        ? languages.find(
-                            (language) => language.value === field.value
-                          )?.label
-                        : "Select language"}
+                        ? types.find((type) => type.value === field.value)
+                            ?.label
+                        : "Select type"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0">
                   <Command>
-                    <CommandInput placeholder="Search language..." />
+                    <CommandInput placeholder="Search type..." />
                     <CommandList>
-                      <CommandEmpty>No language found.</CommandEmpty>
+                      <CommandEmpty>No type found.</CommandEmpty>
                       <CommandGroup>
-                        {languages.map((language) => (
+                        {types.map((type) => (
                           <CommandItem
-                            value={language.label}
-                            key={language.value}
+                            value={type.label}
+                            key={type.value}
                             onSelect={() => {
-                              form.setValue("type", language.value);
+                              form.setValue("type", type.value);
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                language.value === field.value
+                                type.value === field.value
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
                             />
-                            {language.label}
+                            {type.label}
                           </CommandItem>
                         ))}
                       </CommandGroup>
@@ -208,19 +236,22 @@ export default function MyForm() {
           )}
         />
 
+        {/** Start Date */}
         <FormField
           control={form.control}
           name="start_day"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Start Date</FormLabel>
+              <FormLabel className="font-semibold text-base">
+                Start Date
+              </FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
+                        "pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -252,19 +283,22 @@ export default function MyForm() {
           )}
         />
 
+        {/** End Date */}
         <FormField
           control={form.control}
           name="end_date"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>End Date</FormLabel>
+              <FormLabel className="font-semibold text-base">
+                End Date
+              </FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
+                        "pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -293,6 +327,8 @@ export default function MyForm() {
             </FormItem>
           )}
         />
+
+        {/** Recurring */}
         <FormField
           control={form.control}
           name="recurring"
@@ -305,7 +341,7 @@ export default function MyForm() {
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>Recurring event</FormLabel>
+                <FormLabel className="font-semibold">Recurring event</FormLabel>
                 <FormDescription>
                   The event recurs on the day and at the times entered.
                 </FormDescription>
@@ -314,12 +350,16 @@ export default function MyForm() {
             </FormItem>
           )}
         />
+
+        {/** Visibility */}
         <FormField
           control={form.control}
           name="visibility"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Visibility</FormLabel>
+              <FormLabel className="font-semibold text-base">
+                Visibility
+              </FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
@@ -327,42 +367,42 @@ export default function MyForm() {
                       variant="outline"
                       role="combobox"
                       className={cn(
-                        "w-[200px] justify-between",
+                        "justify-between",
                         !field.value && "text-muted-foreground"
                       )}
                     >
                       {field.value
-                        ? languages.find(
-                            (language) => language.value === field.value
+                        ? visibilities.find(
+                            (visibility) => visibility.value === field.value
                           )?.label
-                        : "Select language"}
+                        : "Select type"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0">
                   <Command>
-                    <CommandInput placeholder="Search language..." />
+                    <CommandInput placeholder="Search type..." />
                     <CommandList>
-                      <CommandEmpty>No language found.</CommandEmpty>
+                      <CommandEmpty>No type found.</CommandEmpty>
                       <CommandGroup>
-                        {languages.map((language) => (
+                        {visibilities.map((visibility) => (
                           <CommandItem
-                            value={language.label}
-                            key={language.value}
+                            value={visibility.label}
+                            key={visibility.value}
                             onSelect={() => {
-                              form.setValue("visibility", language.value);
+                              form.setValue("visibility", visibility.value);
                             }}
                           >
                             <Check
                               className={cn(
                                 "mr-2 h-4 w-4",
-                                language.value === field.value
+                                visibility.value === field.value
                                   ? "opacity-100"
                                   : "opacity-0"
                               )}
                             />
-                            {language.label}
+                            {visibility.label}
                           </CommandItem>
                         ))}
                       </CommandGroup>
@@ -378,12 +418,15 @@ export default function MyForm() {
           )}
         />
 
+        {/** Description */}
         <FormField
           control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel className="font-semibold text-base">
+                Description
+              </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="Add description of the event here ..."
@@ -397,12 +440,15 @@ export default function MyForm() {
           )}
         />
 
+        {/** Add Attachment */}
         <FormField
           control={form.control}
           name="attachment"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Add Attachment</FormLabel>
+              <FormLabel className="font-semibold text-base">
+                Add Attachment
+              </FormLabel>
               <FormControl>
                 <FileUploader
                   value={files}
@@ -446,12 +492,15 @@ export default function MyForm() {
           )}
         />
 
+        {/** Attendance Capacity */}
         <FormField
           control={form.control}
           name="capacity"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Attendance Capacity</FormLabel>
+              <FormLabel className="font-semibold text-base">
+                Attendance Capacity
+              </FormLabel>
               <FormControl>
                 <Input
                   placeholder="Write the max number of attendees"
@@ -469,6 +518,8 @@ export default function MyForm() {
             </FormItem>
           )}
         />
+
+        {/** Notify All Players */}
         <FormField
           control={form.control}
           name="notify"
@@ -481,7 +532,9 @@ export default function MyForm() {
                 />
               </FormControl>
               <div className="space-y-1 leading-none">
-                <FormLabel>Notify all players</FormLabel>
+                <FormLabel className="font-semibold">
+                  Notify all players
+                </FormLabel>
                 <FormDescription>
                   Notifies all subscribed members.
                 </FormDescription>
@@ -490,7 +543,16 @@ export default function MyForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+
+        {/** Submit Button */}
+        <Button type="submit" className="w-full font-semibold">
+          Create new Event
+        </Button>
+        <div className="text-center self-center">
+          <a href="../" className="underline text-neutral-400">
+            Cancel
+          </a>
+        </div>
       </form>
     </Form>
   );
