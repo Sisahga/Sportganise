@@ -134,6 +134,21 @@ export default function CreateTrainingSessionForm() {
     },
   });
 
+  /** Handle form submission and networking logic */
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      console.log(JSON.stringify(values, null, 2));
+      toast(
+        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
+        </pre>
+      );
+    } catch (error) {
+      console.error("Form submission error", error);
+      toast.error("Failed to submit the form. Please try again.");
+    }
+  }
+
   const [date, setDate] = React.useState<Date>();
   const [error, setError] = useState(false); //error in fetching data from server with api url
 
