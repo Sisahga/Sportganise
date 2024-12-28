@@ -136,21 +136,52 @@ export default function CreateTrainingSessionForm() {
   });
 
   /** Handle form submission and networking logic */
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    //values.preventDefault();
-
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    //async request which may result error
     try {
       console.log(JSON.stringify(values, null, 2));
+
+      //await fetch()
+      //---------UPDATE WITH PROPER API URL
+      const response = await fetch("/api/module/createTrainingSessionForm", {
+        //response is what is returned by the backend, like 200 OK. Can return info as well.
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", //If sending JSON
+        },
+        body: JSON.stringify(values, null, 2), //stringify form values 'values' in JSON format and send through url
+      });
+
+      // Check for HTTP errors
+      if (!response.ok) {
+        /*
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
+        const errorMessage =
+          errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
+        throw new Error(errorMessage);
+        */
+        throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
+      }
+
+      //...rest of success handling
+      const data = await response.json(); //data sent back from backend response to url call
+      console.log("Form submitted successfully:", data);
+      //toast popup for user to say form submitted successfully
+      //Reset form fields
+
       toast(
         <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
           <code className="text-white">{JSON.stringify(values, null, 2)}</code>
         </pre>
       );
-    } catch (error) {
-      console.error("Form submission error", error);
+    } catch (error: any) {
+      console.error("Form submission error (error)", error);
+      console.error("Error submitting form (message):", error.message);
       toast.error("Failed to submit the form. Please try again.");
     }
-  }
+  };
 
   return (
     //RETURN ----------------------------------------------
