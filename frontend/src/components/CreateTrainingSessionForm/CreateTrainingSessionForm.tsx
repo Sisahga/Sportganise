@@ -70,6 +70,7 @@ const formSchema = z.object({
   end_time: z
     .string()
     .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
+  location: z.string(),
 });
 
 //PAGE CONTENT --------------------------------------------
@@ -335,39 +336,112 @@ export default function CreateTrainingSessionForm() {
           )}
         />
 
-        {/**Start Time */}
-        <FormField
-          control={form.control}
-          name="start_time"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-semibold text-base">
-                Start Time
-              </FormLabel>
-              <FormControl>
-                <Input type="time" {...field} />
-              </FormControl>
-              <FormDescription>
-                Select the time the event starts.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/** Time */}
+        <div className="flex gap-2">
+          {/**Start Time */}
+          <FormField
+            control={form.control}
+            name="start_time"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel className="font-semibold text-base">
+                  Start Time
+                </FormLabel>
+                <FormControl>
+                  <Input type="time" className="w-full" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Select the time the event starts.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/**End Time */}
+          {/**End Time */}
+          <FormField
+            control={form.control}
+            name="end_time"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel className="font-semibold text-base">
+                  End Time
+                </FormLabel>
+                <FormControl>
+                  <Input type="time" {...field} />
+                </FormControl>
+                <FormDescription>
+                  Select the time the event ends.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/** Location */}
         <FormField
           control={form.control}
-          name="end_time"
+          name="location"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="flex flex-col">
               <FormLabel className="font-semibold text-base">
-                End Time
+                Location
               </FormLabel>
-              <FormControl>
-                <Input type="time" {...field} />
-              </FormControl>
-              <FormDescription>Select the time the event ends.</FormDescription>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <FormControl>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {field.value
+                        ? locations.find(
+                            (location) => location.value === field.value
+                          )?.label
+                        : "Select location"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </FormControl>
+                </PopoverTrigger>
+                <PopoverContent className="w-[200px] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search location..." />
+                    <CommandList>
+                      <CommandEmpty>No location found.</CommandEmpty>
+                      <CommandGroup>
+                        {locations.map((location) => (
+                          <CommandItem
+                            value={location.label}
+                            key={location.value}
+                            onSelect={() => {
+                              form.setValue("location", location.value);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                location.value === field.value
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              )}
+                            />
+                            {location.label}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <FormDescription>
+                Select the location from the list of locations under your
+                organization.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -420,16 +494,16 @@ export default function CreateTrainingSessionForm() {
                         ? visibilities.find(
                             (visibility) => visibility.value === field.value
                           )?.label
-                        : "Select type"}
+                        : "Select visibility"}
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
                 <PopoverContent className="w-[200px] p-0">
                   <Command>
-                    <CommandInput placeholder="Search type..." />
+                    <CommandInput placeholder="Search visibility..." />
                     <CommandList>
-                      <CommandEmpty>No type found.</CommandEmpty>
+                      <CommandEmpty>No visibility found.</CommandEmpty>
                       <CommandGroup>
                         {visibilities.map((visibility) => (
                           <CommandItem
