@@ -116,6 +116,24 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
+  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      //default values that will considered for each state when page is loaded and also what is rendered when the page loads
+      start_day: new Date(),
+      end_date: new Date(),
+      title: "",
+      attachment: [],
+      notify: true,
+      recurring: true, //match with specified in formSchema
+      capacity: 0,
+      type: "",
+      visibility: "",
+      description: "",
+    },
+  });
+
   const [date, setDate] = React.useState<Date>();
   const [error, setError] = useState(false); //error in fetching data from server with api url
 
