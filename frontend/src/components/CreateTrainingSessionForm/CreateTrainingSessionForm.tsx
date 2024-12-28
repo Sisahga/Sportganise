@@ -44,6 +44,28 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
+//GLOBAL --------------------------------------------
+/** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
+const formSchema = z.object({
+  title: z.string(),
+  type: z.string(),
+  start_day: z.coerce.date(),
+  end_date: z.coerce.date(),
+  recurring: z.boolean().default(true),
+  visibility: z.string(),
+  description: z.string(),
+  attachment: z
+    .array(
+      //array of files
+      z.custom<File>((file) => file instanceof File && file.size > 0, {
+        message: "Each file must be a valid file and not empty.",
+      })
+    )
+    .optional(),
+  capacity: z.number().min(0),
+  notify: z.boolean().default(true),
+});
+
 export default function CreateTrainingSessionForm() {
   const [date, setDate] = React.useState<Date>();
   const [error, setError] = useState(false); //error in fetching data from server with api url
