@@ -549,6 +549,16 @@ export default function CreateTrainingSessionForm() {
             </FormItem>
           )}
         />
+
+        {/** Submit Button */}
+        <Button type="submit" className="w-full font-semibold">
+          Create new Event
+        </Button>
+        <div className="text-center self-center">
+          <a href="../" className="underline text-neutral-400">
+            Cancel
+          </a>
+        </div>
       </form>
     </Form>
   );
