@@ -1,6 +1,8 @@
 // IMPORTS ------------------------------------------
-import { useState } from "react";
-import { toast } from "sonner";
+import { useEffect, useState } from "react";
+//import { toast } from "sonner";
+import * as Toast from "@radix-ui/react-toast";
+import { toast, useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -131,7 +133,9 @@ export default function CreateTrainingSessionForm() {
       start_day: new Date(),
       end_date: new Date(),
       //title: "", //controlled/uncontrolled component error
-      //capacity: 0,
+      //capacity: 100,
+      //type: "fundraisor",
+      //title: "hello",
     },
   });
 
@@ -143,6 +147,7 @@ export default function CreateTrainingSessionForm() {
 
       //await fetch()
       //---------UPDATE WITH PROPER API URL
+      /*
       const response = await fetch("/api/module/createTrainingSessionForm", {
         //response is what is returned by the backend, like 200 OK. Can return info as well.
         method: "POST",
@@ -154,7 +159,8 @@ export default function CreateTrainingSessionForm() {
 
       // Check for HTTP errors
       if (!response.ok) {
-        /*
+      */
+      /*
         const errorData = await response
           .json()
           .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
@@ -162,24 +168,44 @@ export default function CreateTrainingSessionForm() {
           errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
         throw new Error(errorMessage);
         */
+      /*
         throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
 
       //...rest of success handling
       const data = await response.json(); //data sent back from backend response to url call
       console.log("Form submitted successfully:", data);
+      
+*/
       //toast popup for user to say form submitted successfully
-      //Reset form fields
+      toast({
+        title: "Form submitted successfully!",
+        description: "Your data has been saved.",
+      });
 
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      //Reset form fields
+      form.reset();
+      form.setValue("title", "");
+      form.setValue("type", "");
+      form.setValue("start_day", new Date());
+      form.setValue("end_date", new Date());
+      form.setValue("recurring", false);
+      form.setValue("visibility", "");
+      form.setValue("description", "");
+      form.setValue("attachment", undefined);
+      form.setValue("capacity", 0);
+      form.setValue("notify", false);
+      form.setValue("start_time", "");
+      form.setValue("end_time", "");
+      form.setValue("location", "");
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
-      toast.error("Failed to submit the form. Please try again.");
+      toast({
+        title: "Uh oh! Something went wrong.",
+        description:
+          "There was a problem with your request. Event was not created.",
+      });
     }
   };
 

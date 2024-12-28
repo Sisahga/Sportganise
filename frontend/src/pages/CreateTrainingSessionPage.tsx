@@ -1,10 +1,13 @@
 import { CreateTrainingSessionForm } from "@/components/CreateTrainingSessionForm";
-import TestForm from "./TestForm";
+import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
 
 export default function CreateTrainingSession() {
   return (
     <div className="">
-      <CreateTrainingSessionForm />
+      <ToastProvider>
+        <CreateTrainingSessionForm />
+        <ToastViewport />
+      </ToastProvider>
     </div>
   );
 }
