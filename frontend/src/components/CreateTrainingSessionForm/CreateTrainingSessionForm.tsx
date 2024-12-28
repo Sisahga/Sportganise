@@ -497,6 +497,33 @@ export default function CreateTrainingSessionForm() {
             </FormItem>
           )}
         />
+
+        {/** Attendance Capacity */}
+        <FormField
+          control={form.control}
+          name="capacity"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="font-semibold text-base">
+                Attendance Capacity
+              </FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Write the max number of attendees"
+                  type="number"
+                  {...field}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value ? Number(e.target.value) : undefined
+                    )
+                  }
+                />
+              </FormControl>
+
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </form>
     </Form>
   );
