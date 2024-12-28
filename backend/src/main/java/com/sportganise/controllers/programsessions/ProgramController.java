@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST Controller for managing 'Account' Entities. Handles HTTP request and routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
  * appropriate services.
  */
 @RestController
@@ -31,19 +31,20 @@ public class ProgramController {
   }
 
   /**
-   * Get mapping for program session participants.
+   * Get mapping for program session details.
    *
    * @param accountId Id of account
    * @param sessionId Id of session
    * @return HTTP Response
    */
-  @GetMapping("/{accountId}/{sessionId}/participants")
-  public ResponseEntity<List<ProgramParticipantDto>> getParticipantsInSession(
-      @PathVariable Integer sessionId, Integer accountId) {
+  @GetMapping("/{accountId}/{sessionId}/details")
+  public ResponseEntity<ProgramDetailsParticipantsDto> getProgramDetails(
+      @PathVariable Integer sessionId, @PathVariable Integer accountId) {
+
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = accountService.getAccount(accountId);
 
-    // Check if there is the value of getAccount is empty
+    // Check if the value of getAccount is empty
     if (userOptional.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -51,13 +52,23 @@ public class ProgramController {
     // If not empty, then we go fetch the actual Account value of this user
     Account user = userOptional.get();
 
+    // Fetch program details
+    ProgramDto programDto = programService.getProgramDetails(programId);
+
+    // Initialize the participants list as null
+    List<ProgramParticipantDto> participants = null;
+
     // Check if this user has permissions to see training sessions attendees
-    if (!accountService.hasPermissions(user.getType())) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    // (i.e. if the user is of type COACH or ADMIN)
+    // If they have permission, then they can see the list of participants
+    if (accountService.hasPermissions(user.getType())) {
+      participants = programService.getParticipants(sessionId);
     }
 
-    // Retrieve the list of attendees of the training session
-    List<ProgramParticipantDto> attendees = programService.getParticipants(sessionId);
-    return ResponseEntity.ok(attendees);
+    // Wrap program details and participants into the ProgramDetailsParticipantsDto response DTO
+    ProgramDetailsParticipantsDto response = new ProgramDetailsParticipantsDto(programDto, participants);
+
+    return ResponseEntity.ok(response);
   }
 }
+

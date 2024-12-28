@@ -26,7 +26,9 @@ public class Program {
   private Integer programId;
 
   // Could be a tournament, an event of some sort or a training session
+  @Column(name = "type")
   private String programType;
+
   private String title;
   private String description;
   private Integer capacity;
