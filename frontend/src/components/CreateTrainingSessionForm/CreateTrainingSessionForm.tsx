@@ -66,7 +66,42 @@ const formSchema = z.object({
   notify: z.boolean().default(true),
 });
 
+//PAGE CONTENT --------------------------------------------
 export default function CreateTrainingSessionForm() {
+  /**All select element options */
+  //Options for type select
+  const types = [
+    {
+      label: "Training Session",
+      value: "training-session",
+    },
+    {
+      label: "Fundraisor",
+      value: "fundraisor",
+    },
+  ] as const;
+  //Options for visibility select
+  const visibilities = [
+    {
+      label: "Public",
+      value: "public",
+    },
+    {
+      label: "Members only",
+      value: "members",
+    },
+  ] as const;
+  //Options for location select
+  const locations = [
+    {
+      label: "Centre de loisirs St-Denis",
+      value: "Centre-de-loisirs-St-Denis",
+    },
+    {
+      label: "Collège de Maisonnneuve",
+      value: "Collège-de-Maisonnneuve",
+    },
+  ] as const;
   const [date, setDate] = React.useState<Date>();
   const [error, setError] = useState(false); //error in fetching data from server with api url
 
