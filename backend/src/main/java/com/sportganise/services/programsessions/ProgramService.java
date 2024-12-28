@@ -1,9 +1,9 @@
 package com.sportganise.services;
 
-import com.sportganise.dto.ProgramParticipantDto;
+import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.Account;
-import com.sportganise.entities.Program;
-import com.sportganise.repositories.ProgramRepository;
+import com.sportganise.entities.programsessions.Program;
+import com.sportganise.repositories.programsessions.ProgramRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;

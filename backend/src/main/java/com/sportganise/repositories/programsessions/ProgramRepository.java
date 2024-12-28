@@ -1,7 +1,7 @@
 package com.sportganise.repositories;
 
 import com.sportganise.entities.Account;
-import com.sportganise.entities.Program;
+import com.sportganise.entities.programsessions.Program;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +18,8 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
           + "JOIN Program p ON pp.program.programId = p.programId "
           + "WHERE p.programId = :sessionId")
   List<Account> findParticipantsByProgramId(@Param("sessionId") Integer sessionId);
+
+  @Query(
+      "SELECT "
+  )
 }
