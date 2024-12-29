@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+import com.sportganise.entities.programsessions.Program;
+
 /** API DTO for Programs. */
 @Setter
 @Getter
@@ -24,6 +26,25 @@ public class ProgramDto {
     private boolean isRecurring;
     private LocalDateTime expiryDate;
     private String frequency;
+    private String location;
+    private String visibility;
+    private String attachment;
+
+    // Constructor that converts a Program entity to ProgramDto
+    public ProgramDto(Program program) {
+        this.programId = program.getProgramId();
+        this.programType = program.getProgramType();
+        this.title = program.getTitle();
+        this.description = program.getDescription();
+        this.capacity = program.getCapacity();
+        this.occurenceDate = program.getOccurenceDate();
+        this.durationMins = program.getDurationMins();
+        this.isRecurring = program.isRecurring();
+        this.expiryDate = program.getExpiryDate();
+        this.frequency = program.getFrequency();
+        this.location = program.getLocation();
+        this.visibility = program.getVisibility();
+        this.attachment = null; // The "Program" entity doesn't handle file attachments directly, it will be in
+                                // the handleFileUpload() method
+    }
 }
-
-

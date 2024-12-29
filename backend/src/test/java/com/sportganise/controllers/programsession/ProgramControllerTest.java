@@ -2,6 +2,7 @@ package com.sportganise.controllers.programsession;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,9 +17,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import com.sportganise.controllers.programsessions.ProgramController;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
@@ -46,14 +44,12 @@ public class ProgramControllerTest {
     private ProgramController programController;
 
     // Initialize Dtos
-    private ObjectMapper objectMapper;
     private ProgramDto mockProgramDto;
     private ProgramParticipantDto mockProgramParticipantDto;
     private ProgramDetailsParticipantsDto mockProgramDetailsParticipantsDto;
 
     @BeforeEach
     public void setup() {
-        objectMapper = new ObjectMapper();
         mockProgramDto = new ProgramDto();
         mockProgramParticipantDto = new ProgramParticipantDto();
         mockProgramDetailsParticipantsDto = new ProgramDetailsParticipantsDto();

@@ -129,6 +129,8 @@ public class ProgramServiceTest {
                 .isRecurring(false)
                 .expiryDate(LocalDateTime.of(2025, 5, 16, 0, 0))
                 .frequency("None")
+                .location("111 Random Ave")
+                .visibility("public")
                 .build();
         
         // Mock the repository behavior of findProgramById with mockProgram
@@ -151,5 +153,7 @@ public class ProgramServiceTest {
         assertFalse(programDto.isRecurring());
         assertEquals(LocalDateTime.of(2025, 5, 16, 0, 0), programDto.getExpiryDate());
         assertEquals("None", programDto.getFrequency());
+        assertEquals("111 Random Ave", programDto.getLocation());
+        assertEquals("public", programDto.getVisibility());
     }
 }
