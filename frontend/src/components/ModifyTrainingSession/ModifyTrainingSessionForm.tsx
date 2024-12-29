@@ -816,7 +816,7 @@ export default function ModifyTrainingSessionForm() {
           </Button>
           <div className="text-center self-center">
             <a href="../" className="underline text-neutral-400">
-              Cancel
+              Done
             </a>
           </div>
         </form>
