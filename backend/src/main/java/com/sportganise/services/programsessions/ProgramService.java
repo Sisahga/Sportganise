@@ -6,6 +6,7 @@ import com.sportganise.entities.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.auth.AccountService;
 
 import java.io.IOException;
@@ -24,9 +25,11 @@ public class ProgramService {
 
     private final ProgramRepository programRepository;
     private final AccountService accountService;
+    private final AccountRepository accountRepository;
 
-    public ProgramService(ProgramRepository programRepository, AccountService accountService) {
+    public ProgramService(ProgramRepository programRepository, AccountService accountService, AccountRepository accountRepository) {
         this.programRepository = programRepository;
+        this.accountRepository = accountRepository;
         this.accountService = accountService;
     }
 
@@ -165,6 +168,7 @@ public class ProgramService {
                 occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, filePath);
         Program savedProgram = programRepository.save(newProgram);
 
+        notifyAllMembers();
         // Return ProgramDto to send back to the client
         return new ProgramDto(savedProgram);
     }
@@ -235,5 +239,16 @@ public class ProgramService {
 
         // Return the file path or URL
         return "file_upload_path";
+    }
+
+    /**
+     * Method to notify all the members of a newly create/posted program
+     */
+    private void notifyAllMembers() {
+        
+        List<Account> accounts = accountRepository.findAll();
+        for (Account account : accounts) {
+            //TODO: Implement logic to notify all members when new program is created/posted.
+        }
     }
 }
