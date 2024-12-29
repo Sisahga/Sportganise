@@ -7,7 +7,6 @@ import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
-import { SuccessModifyTrainingSessionForm } from "./components/ModifyTrainingSession";
 
 function App() {
   return (
@@ -37,10 +36,6 @@ function App() {
           <Route
             path="/pages/ModifyTrainingSessionPage"
             element={<ModifyTrainingSessionPage />}
-          ></Route>
-          <Route
-            path="/components/ModifyTrainingSession"
-            element={<SuccessModifyTrainingSessionForm />}
           ></Route>
         </Route>
       </Routes>

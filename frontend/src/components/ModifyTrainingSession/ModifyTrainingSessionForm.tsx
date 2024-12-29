@@ -1,9 +1,5 @@
 // IMPORTS ------------------------------------------
 import { useEffect, useState } from "react";
-//import { toast } from "sonner";
-//import * as Toast from "@radix-ui/react-toast";
-//import { toast, useToast } from "@/hooks/use-toast";
-//import Popup from "react-popup";
 import { MoveLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -107,11 +103,13 @@ export default function ModifyTrainingSessionForm() {
 
   useEffect(() => {
     const url = "/api/training-sessions/" + trainingSessionId;
-    fetch("https://catfact.ninja/fact") //"https://catfact.ninja/fact" | url
+    fetch("https://catfact.ninja/fact") //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
+      //replace fetch("...") with 'url' for actual api call
       .then((response) => {
         if (response.status === 404) {
           //render 404 component on the page
           setNotFound(true);
+          console.log("notFound: " + notFound);
         }
         return response.json(); //turns response into a javascript object
       })
@@ -134,7 +132,7 @@ export default function ModifyTrainingSessionForm() {
         form.setValue("recurring", data.recurring);
         form.setValue("visibility", data.visibility);
         form.setValue("description", data.description);
-        form.setValue("attachment", data.attachment);
+        form.setValue("attachment", data.attachment); //undefined
         form.setValue("notify", data.notify);
         form.setValue("start_time", data.start_time);
         form.setValue("end_time", data.end_time);
@@ -204,42 +202,57 @@ export default function ModifyTrainingSessionForm() {
     //async request which may result error
     try {
       console.log(values);
-      console.log(JSON.stringify(values, null, 2));
+
+      // Merge the trainingSessionId into the values object
+      let json_payload = {
+        ...values,
+        trainingSessionId: trainingSessionId ?? null,
+        attachment: files ?? [], //ensure attachment: appears in json payload body
+      };
+
+      console.log(json_payload);
+      console.log(
+        "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2)
+      );
 
       //await fetch()
       //---------UPDATE WITH PROPER API URL
-
+      /*
       const response = await fetch("/api/module/createTrainingSessionForm", {
-        //response is what is returned by the backend, like 200 OK. Can return info as well.
-        method: "POST",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json", //If sending JSON
         },
-        body: JSON.stringify(values, null, 2), //stringify form values 'values' in JSON format and send through url
+        body: JSON.stringify(json_payload, null, 2),
       });
 
       // Check for HTTP errors
-
       if (!response.ok) {
+      */
+      /*
         const errorData = await response
           .json()
           .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
         const errorMessage =
           errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
-        //throw new Error(errorMessage);
+        throw new Error(errorMessage);
+        */
+      /*
         throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
+      
 
       //...rest of success handling
       const data = await response.json(); //data sent back from backend response to url call
       console.log("Form submitted successfully:", data);
+      */
 
       //toast popup for user to say form submitted successfully
       toast("Event updated successfully!");
       //Reset form fields
-      form.reset();
-      //Navigate to homepage
-      navigate("/SuccessModifyTrainingSession/");
+      //form.reset();
+      // If successful, navigate to the success page with a message
+
       /*
       form.setValue("title", "");
       form.setValue("type", "");
@@ -284,7 +297,8 @@ export default function ModifyTrainingSessionForm() {
           {/*Form Title*/}
           <div>
             <h2 className="text-2xl font-semibold">
-              Edit {formData.fact} Event
+              Edit <span style={{ color: "#82DBD8" }}>{formData.fact}</span>{" "}
+              Event
             </h2>
             <h2>Edit fields and update the form</h2>
           </div>
