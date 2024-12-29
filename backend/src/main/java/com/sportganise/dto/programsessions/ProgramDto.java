@@ -1,10 +1,11 @@
-package com.sportganise.dto;
+package com.sportganise.dto.programsessions;
 
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 /** API DTO for Programs. */
 @Setter

@@ -1,4 +1,4 @@
-package com.sportganise.entities;
+package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Entity Model for TrainingSession table. */
+/** Entity Model for Program table. */
 @Setter
 @Getter
 @NoArgsConstructor

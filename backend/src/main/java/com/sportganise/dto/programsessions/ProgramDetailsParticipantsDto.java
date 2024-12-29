@@ -1,12 +1,11 @@
-package com.sportganise.dto;
+package com.sportganise.dto.programsessions;
 
-import com.sportganise.dto.programsessions.ProgramDto;
-import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.List;
 
 /** API DTO for Program Details and Participants. */
 @Setter

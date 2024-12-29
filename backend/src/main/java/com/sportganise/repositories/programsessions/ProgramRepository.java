@@ -1,7 +1,7 @@
-package com.sportganise.repositories;
+package com.sportganise.repositories.programsessions;
 
-import com.sportganise.entities.Account;
 import com.sportganise.entities.programsessions.Program;
+import com.sportganise.entities.programsessions.ProgramParticipant;
 
 import java.util.List;
 
@@ -24,13 +24,13 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
     @Query(
             "SELECT p FROM Program p "
                     + "WHERE p.programId = :programId")
-    Optional<Program> findProgramById(@Param("programId") Integer programId);
+    Program findProgramById(@Param("programId") Integer programId);
 
     @Query(
             "SELECT a FROM Account a "
                     + "JOIN ProgramParticipant pp ON pp.account.accountId = a.accountId "
                     + "JOIN Program p ON pp.program.programId = p.programId "
                     + "WHERE p.programId = :sessionId")
-    List<Account> findParticipantsByProgramId(@Param("sessionId") Integer sessionId);
+    List<ProgramParticipant> findParticipantsByProgramId(@Param("sessionId") Integer sessionId);
 
 }

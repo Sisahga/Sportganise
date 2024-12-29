@@ -1,6 +1,8 @@
-package com.sportganise.controllers;
+package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
+import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.entities.Account;
 import com.sportganise.services.programsessions.ProgramService;
 import com.sportganise.services.auth.AccountService;
@@ -34,12 +36,12 @@ public class ProgramController {
    * Get mapping for program session details.
    *
    * @param accountId Id of account
-   * @param sessionId Id of session
+   * @param programId Id of program
    * @return HTTP Response
    */
   @GetMapping("/{accountId}/{sessionId}/details")
   public ResponseEntity<ProgramDetailsParticipantsDto> getProgramDetails(
-      @PathVariable Integer sessionId, @PathVariable Integer accountId) {
+      @PathVariable Integer programId, @PathVariable Integer accountId) {
 
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = accountService.getAccount(accountId);
@@ -62,7 +64,7 @@ public class ProgramController {
     // (i.e. if the user is of type COACH or ADMIN)
     // If they have permission, then they can see the list of participants
     if (accountService.hasPermissions(user.getType())) {
-      participants = programService.getParticipants(sessionId);
+      participants = programService.getParticipants(programId);
     }
 
     // Wrap program details and participants into the ProgramDetailsParticipantsDto response DTO

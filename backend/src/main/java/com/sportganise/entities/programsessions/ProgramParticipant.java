@@ -1,18 +1,15 @@
-package com.sportganise.entities;
+package com.sportganise.entities.programsessions;
 
+import com.sportganise.entities.Account;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Entity Model for TrainingSession table. */
+/** Entity Model for ProgramParticipant table. */
 @Setter
 @Getter
 @NoArgsConstructor
@@ -29,15 +26,9 @@ public class ProgramParticipant {
   @Column(name = "confirm_date")
   private LocalDateTime confirmedDate;
 
-  // Each Program Participant can be linked to one or more Programs
-  @OneToMany
-  @MapsId("programId")
-  @JoinColumn(name = "program_id")
+  @Column(name = "program_id")
   private Program program;
 
-  // Each Program Participant is linked to exactly one Account
-  @OneToOne
-  @MapsId("accountId")
-  @JoinColumn(name = "account_id")
+  @Column(name = "account_id")
   private Account account;
 }

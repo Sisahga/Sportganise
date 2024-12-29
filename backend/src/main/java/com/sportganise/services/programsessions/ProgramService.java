@@ -1,8 +1,9 @@
-package com.sportganise.services;
+package com.sportganise.services.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
-import com.sportganise.entities.Account;
+import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.entities.programsessions.Program;
+import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 
 import java.util.List;
@@ -29,38 +30,41 @@ public class ProgramService {
     /**
      * Get participants list of a program.
      *
-     * @param sessionId Id of session
+     * @param programId Id of session
      * @return List of participants of a program
      */
-    public List<ProgramParticipantDto> getParticipants(Integer sessionId) {
+    public List<ProgramParticipantDto> getParticipants(Integer programId) {
         // Get the list of participants for the program
-        List<Account> participants = programRepository.findParticipantsByProgramId(sessionId);
+        List<ProgramParticipant> participants = programRepository.findParticipantsByProgramId(programId);
 
         // Map each Account to a ProgramParticipantDto
         return participants.stream()
                 .map(
-                        account ->
+                        participant ->
                                 new ProgramParticipantDto(
-                                        account.getAccountId(),
-                                        account.getType(),
-                                        account.getEmail(),
-                                        account.getAddress(),
-                                        account.getPhone(),
-                                        account.getFirstName(),
-                                        account.getLastName()))
+                                    participant.getAccount().getAccountId(),
+                                    participant.getAccount().getType(),
+                                    participant.getAccount().getFirstName(),
+                                    participant.getAccount().getLastName(),
+                                    participant.getAccount().getEmail(),
+                                    participant.getAccount().getAddress(),
+                                    participant.getAccount().getPhone(),
+                                    participant.isConfirmed(),
+                                    participant.getConfirmedDate()))
                 .toList();
     }
 
     /**
-     * Method to retrieve list of all programs.
-     *
-     * @return List of all program.
+     * Method to fetch program details.
+     * 
+     * @param programId Id of the program.
+     * @return ProgramDto with details of the program we are looking for.
      */
-    public ProgramDto getProgramDetails(Integer sessionId) {
+    public ProgramDto getProgramDetails(Integer programId) {
         // Get the program details
-        Program program = programRepository.findProgramById(sessionId);
+        Program program = programRepository.findProgramById(programId);
 
-        return new ProgramParticipantDto(
+        return new ProgramDto(
                         program.getProgramId(),
                         program.getProgramType(),
                         program.getTitle(),
@@ -68,7 +72,7 @@ public class ProgramService {
                         program.getCapacity(),
                         program.getOccurenceDate(),
                         program.getDurationMins(),
-                        program.getIsRecurring(),
+                        program.isRecurring(),
                         program.getExpiryDate(),
                         program.getFrequency());
     }
