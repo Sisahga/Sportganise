@@ -37,7 +37,7 @@ public class ProgramDto {
         this.title = program.getTitle();
         this.description = program.getDescription();
         this.capacity = program.getCapacity();
-        this.occurenceDate = program.getOccurenceDate();
+        this.occurenceDate = program.getOccurrenceDate();
         this.durationMins = program.getDurationMins();
         this.isRecurring = program.isRecurring();
         this.expiryDate = program.getExpiryDate();

@@ -35,7 +35,7 @@ public class Program {
   private Integer capacity;
 
   @Column(name = "occurence_date")
-  private LocalDateTime occurenceDate;
+  private LocalDateTime occurrenceDate;
 
   // Duration of the program in terms of minutes
   private Integer durationMins;
@@ -53,4 +53,22 @@ public class Program {
   private String visibility;
 
   private String attachment;
+
+  // Constructor excluding programId since it's generated automatically
+  public Program(String programType, String title, String description, Integer capacity,
+                 LocalDateTime occurrenceDate, Integer durationMins, Boolean isRecurring, 
+                 LocalDateTime expiryDate, String frequency, String location, String visibility, String attachment) {
+    this.programType = programType;
+    this.title = title;
+    this.description = description;
+    this.capacity = capacity;
+    this.occurrenceDate = occurrenceDate;
+    this.durationMins = durationMins;
+    this.isRecurring = isRecurring;
+    this.expiryDate = expiryDate;
+    this.frequency = frequency;
+    this.location = location;
+    this.visibility = visibility;
+    this.attachment = attachment;
+  }
 }

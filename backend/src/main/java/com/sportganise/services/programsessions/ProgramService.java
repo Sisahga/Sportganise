@@ -94,7 +94,7 @@ public class ProgramService {
                 program.getTitle(),
                 program.getDescription(),
                 program.getCapacity(),
-                program.getOccurenceDate(),
+                program.getOccurrenceDate(),
                 program.getDurationMins(),
                 program.isRecurring(),
                 program.getExpiryDate(),
@@ -124,7 +124,7 @@ public class ProgramService {
      * @param attachment     Files attached to this program/session.
      * @return A new programDto.
      */
-    public ProgramDto createProgramDto(Integer accountId, String programType, String title, String description,
+    public ProgramDto createProgramDto(String programType, String title, String description,
             Integer capacity, LocalDateTime occurrenceDate, Integer durationMins, Boolean isRecurring,
             LocalDateTime expiryDate, String frequency, String location, String visibility, MultipartFile attachment) {
 
@@ -163,8 +163,10 @@ public class ProgramService {
             }
         }
 
+        // Generate new programId
+
         // Save program details in the database
-        Program newProgram = new Program(accountId, programType, title, description, capacity,
+        Program newProgram = new Program(programType, title, description, capacity,
                 occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, filePath);
         Program savedProgram = programRepository.save(newProgram);
 
@@ -188,14 +190,14 @@ public class ProgramService {
         List<Program> programs = programRepository.findAll();
         for (Program program : programs) {
             // This is the existing program's end DateTime
-            LocalDateTime programEndDateTime = program.getOccurenceDate().plusMinutes(program.getDurationMins());
+            LocalDateTime programEndDateTime = program.getOccurrenceDate().plusMinutes(program.getDurationMins());
 
             // Check for overlapping times. If the program we want to create starts before
             // the end of another program
             // and ends after the start of another program, then it is overlapping and will
             // return true.
             if ((startDateTime.isBefore(programEndDateTime)
-                    && endDateTime.isAfter(program.getOccurenceDate()))) {
+                    && endDateTime.isAfter(program.getOccurrenceDate()))) {
                 return true;
             }
         }

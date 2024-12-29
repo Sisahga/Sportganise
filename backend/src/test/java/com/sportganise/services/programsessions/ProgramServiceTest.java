@@ -114,7 +114,7 @@ public class ProgramServiceTest {
         assertEquals(participant2.getConfirmedDate(), participantDto2.getConfirmedDate());
     }
 
-    //Test for findParticipantsByProgramId() method
+    //Test for getProgramDetails() method
     @Test
     public void testGetProgramDetails() {
         // Mock a Program object with the below attributes
@@ -124,13 +124,14 @@ public class ProgramServiceTest {
                 .title("Training Program")
                 .description("This is a training program.")
                 .capacity(10)
-                .occurenceDate(LocalDateTime.of(2025, 5, 15, 10, 0))
+                .occurrenceDate(LocalDateTime.of(2025, 5, 15, 10, 0))
                 .durationMins(120)
                 .isRecurring(false)
                 .expiryDate(LocalDateTime.of(2025, 5, 16, 0, 0))
                 .frequency("None")
                 .location("111 Random Ave")
                 .visibility("public")
+                .attachment("/banner.pdf")
                 .build();
         
         // Mock the repository behavior of findProgramById with mockProgram
@@ -155,5 +156,6 @@ public class ProgramServiceTest {
         assertEquals("None", programDto.getFrequency());
         assertEquals("111 Random Ave", programDto.getLocation());
         assertEquals("public", programDto.getVisibility());
+        assertEquals("/banner.pdf", programDto.getAttachment());
     }
 }

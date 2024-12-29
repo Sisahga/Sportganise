@@ -137,13 +137,13 @@ public class ProgramController {
 
     // If user is not a COACH or ADMIN then they will get an error
     // as they are not allowed to access this feature
-    if (accountService.hasPermissions(user.getType())) {
+    if (!accountService.hasPermissions(user.getType())) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     // Call the service to handle program creation
     try {
-      ProgramDto programDto = programService.createProgramDto(accountId, programType, title, description, capacity,
+      ProgramDto programDto = programService.createProgramDto(programType, title, description, capacity,
           occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, attachment);
       return new ResponseEntity<>(programDto, HttpStatus.CREATED);
     } catch (Exception e) {
