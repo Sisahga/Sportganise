@@ -6,6 +6,7 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
 
 function App() {
   return (
@@ -31,6 +32,10 @@ function App() {
           <Route
             path="/pages/ChangePasswordPage"
             element={<ChangePasswordPage />}
+          ></Route>
+          <Route
+            path="/pages/ModifyTrainingSessionPage"
+            element={<ModifyTrainingSessionPage />}
           ></Route>
         </Route>
       </Routes>
