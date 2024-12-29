@@ -1,11 +1,11 @@
 // IMPORTS ------------------------------------------
-import { useState } from "react";
+import { useEffect, useState } from "react";
 //import { toast } from "sonner";
 //import * as Toast from "@radix-ui/react-toast";
 //import { toast, useToast } from "@/hooks/use-toast";
 //import Popup from "react-popup";
 import { MoveLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,7 +81,66 @@ const formSchema = z.object({
 
 //PAGE CONTENT --------------------------------------------
 export default function ModifyTrainingSessionForm() {
+  const { trainingSessionId } = useParams();
   const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    fact: "", //TO DELETE
+    length: 0, //TO DELETE
+    title: "",
+    type: "",
+    start_day: new Date(),
+    end_date: new Date(),
+    recurring: false,
+    visibility: "",
+    description: "",
+    attachment: [],
+    capacity: 0,
+    notify: false,
+    start_time: "",
+    end_time: "",
+    location: "",
+  }); //Assuming response is an object. Values will be overriden in fetch.
+  const [notFound, setNotFound] = useState(false);
+
+  /** Fetch form data from database using API call*/
+
+  useEffect(() => {
+    const url = "/api/training-sessions/" + trainingSessionId;
+    fetch("https://catfact.ninja/fact") //"https://catfact.ninja/fact" | url
+      .then((response) => {
+        if (response.status === 404) {
+          //render 404 component on the page
+          setNotFound(true);
+        }
+        return response.json(); //turns response into a javascript object
+      })
+      .then((data) => {
+        console.log(data);
+        setFormData(data); //grab the value/data in the response.json()
+        //const fields = Object.keys(data); // Array of field names
+        //console.log(fields);
+        //const parseData = formSchema.safeParse(formData);
+        //console.log("PARSE DATA:" + parseData.data);
+        //console.log("FACT2:" + formData.length);
+        //console.log("formData: " + Object.values(formData));
+
+        //Set form defaults and update field values
+        form.setValue("title", data.fact);
+        form.setValue("capacity", data.capacity);
+        form.setValue("type", data.type);
+        form.setValue("start_day", data.start_day);
+        form.setValue("end_date", data.end_date);
+        form.setValue("recurring", data.recurring);
+        form.setValue("visibility", data.visibility);
+        form.setValue("description", data.description);
+        form.setValue("attachment", data.attachment);
+        form.setValue("notify", data.notify);
+        form.setValue("start_time", data.start_time);
+        form.setValue("end_time", data.end_time);
+        form.setValue("location", data.location);
+      });
+  }, []);
 
   /**All select element options */
   //Options for type select
@@ -135,13 +194,8 @@ export default function ModifyTrainingSessionForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      //default values that will considered for each state when page is loaded and also what is rendered when the page loads
       start_day: new Date(),
       end_date: new Date(),
-      //title: "", //controlled/uncontrolled component error
-      //capacity: 100,
-      //type: "fundraisor",
-      //title: "hello",
     },
   });
 
@@ -149,11 +203,12 @@ export default function ModifyTrainingSessionForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
     try {
+      console.log(values);
       console.log(JSON.stringify(values, null, 2));
 
       //await fetch()
       //---------UPDATE WITH PROPER API URL
-      /*
+
       const response = await fetch("/api/module/createTrainingSessionForm", {
         //response is what is returned by the backend, like 200 OK. Can return info as well.
         method: "POST",
@@ -162,9 +217,9 @@ export default function ModifyTrainingSessionForm() {
         },
         body: JSON.stringify(values, null, 2), //stringify form values 'values' in JSON format and send through url
       });
-*/
+
       // Check for HTTP errors
-      /*
+
       if (!response.ok) {
         const errorData = await response
           .json()
@@ -174,17 +229,18 @@ export default function ModifyTrainingSessionForm() {
         //throw new Error(errorMessage);
         throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
-        */
 
       //...rest of success handling
-      //const data = await response.json(); //data sent back from backend response to url call
-      //console.log("Form submitted successfully:", data);
+      const data = await response.json(); //data sent back from backend response to url call
+      console.log("Form submitted successfully:", data);
 
       //toast popup for user to say form submitted successfully
-      toast("Form submitted successfully!");
-
+      toast("Event updated successfully!");
       //Reset form fields
       form.reset();
+      //Navigate to homepage
+      navigate("/SuccessModifyTrainingSession/");
+      /*
       form.setValue("title", "");
       form.setValue("type", "");
       form.setValue("start_day", new Date());
@@ -199,10 +255,11 @@ export default function ModifyTrainingSessionForm() {
       form.setValue("end_time", "");
       form.setValue("location", "");
       form.reset();
+      */
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
-      toast("There was a problem with your request. Event was not created.");
+      toast("There was a problem with your request. Event was not updated.");
     }
   };
 
@@ -210,6 +267,7 @@ export default function ModifyTrainingSessionForm() {
     //RETURN ----------------------------------------------
     <>
       {/** Navigate to previous page */}
+
       <Button
         className="rounded-full"
         variant="outline"
@@ -225,8 +283,10 @@ export default function ModifyTrainingSessionForm() {
         >
           {/*Form Title*/}
           <div>
-            <h2 className="text-2xl font-semibold">Create New Event</h2>
-            <h2>Complete the form and submit</h2>
+            <h2 className="text-2xl font-semibold">
+              Edit {formData.fact} Event
+            </h2>
+            <h2>Edit fields and update the form</h2>
           </div>
 
           {/** Title */}
@@ -738,7 +798,7 @@ export default function ModifyTrainingSessionForm() {
 
           {/** Submit Button */}
           <Button type="submit" className="w-full font-semibold">
-            Create new Event
+            Update Event
           </Button>
           <div className="text-center self-center">
             <a href="../" className="underline text-neutral-400">
