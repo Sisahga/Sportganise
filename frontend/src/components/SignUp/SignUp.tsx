@@ -20,7 +20,7 @@ export default function SignUp() {
       <div className="bg-white w-screen pt-32">
         <div className="flex-1 max-w-[100vw] bg-white rounded-t-2xl pb-16">
           <div className="min-h-screen">
-            <h1 className="p-10 text-4xl space-y-6">
+            <h1 className="p-10 text-4xl space-y-6 text-center flex flex-col items-center justify-center">
               Welcome !
               <p className="mt-4 text-lg text-primaryColour-600">
                 Create a new account
