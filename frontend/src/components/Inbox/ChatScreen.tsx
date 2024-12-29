@@ -18,7 +18,7 @@ const ChatScreen = () => {
   const channelId = state?.channelId || 1; // Use a default channel ID for testing
 
   // Use custom hook to fetch messages
-  const [messages, setMessages, loading, error] = useChatMessages(channelId);
+  const {messages, setMessages, loading, error} = useChatMessages(channelId);
 
   const [newMessage, setNewMessage] = useState("");
 

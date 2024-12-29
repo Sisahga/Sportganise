@@ -18,17 +18,15 @@ function useGroups() {
       const mockGroups: Group[] = [
         {
           channelId: 1,
-          channelName: "Mock Group Chat",
+          channelName: "GC1",
           channelImageBlob: "/assets/defaultGroupAvatar.png",
         },
         {
           channelId: 3,
-          channelName: "Another Group",
+          channelName: "GC2",
           channelImageBlob: "/assets/defaultGroupAvatar.png",
         },
       ];
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       setGroups(mockGroups);
       setLoading(false);
     };
