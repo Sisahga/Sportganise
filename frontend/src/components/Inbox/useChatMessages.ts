@@ -1,4 +1,4 @@
-// useChatMessages.ts
+// useChatMessages.ts (Updated)
 import { useState, useEffect } from "react";
 
 interface Message {
@@ -9,9 +9,7 @@ interface Message {
   senderAvatar?: string;
 }
 
-function useChatMessages(
-  channelId: number | null
-): [Message[], React.Dispatch<React.SetStateAction<Message[]>>, boolean, string | null] {
+function useChatMessages(channelId: number | null) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,10 +21,9 @@ function useChatMessages(
       return;
     }
 
-    // Simulate fetching messages with mock data
+    // Fetch messages with mock data (no artificial delay)
     const fetchMessages = async () => {
       try {
-        // Mock data
         const mockMessages: Message[] = [
           {
             id: 1,
@@ -49,8 +46,7 @@ function useChatMessages(
             senderAvatar: "/assets/defaultAvatar.png",
           },
         ];
-        // Simulate network delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Directly set mock messages (no setTimeout)
         setMessages(mockMessages);
       } catch (err) {
         console.error("Error fetching chat messages:", err);
@@ -63,7 +59,13 @@ function useChatMessages(
     fetchMessages();
   }, [channelId]);
 
-  return [messages, setMessages, loading, error];
+  // Return an OBJECT with named keys
+  return {
+    messages,
+    setMessages,
+    loading,
+    error,
+  };
 }
 
 export default useChatMessages;

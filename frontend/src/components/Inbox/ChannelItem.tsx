@@ -79,6 +79,7 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
       </div>
     );
   }
+  
 
   // Vertical layout (Groups)
   return (
