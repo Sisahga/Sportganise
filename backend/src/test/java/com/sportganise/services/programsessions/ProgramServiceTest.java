@@ -3,6 +3,7 @@ package com.sportganise.services.programsessions;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.sportganise.dto.programsessions.ProgramDto;
@@ -158,4 +161,122 @@ public class ProgramServiceTest {
         assertEquals("public", programDto.getVisibility());
         assertEquals("/banner.pdf", programDto.getAttachment());
     }
+
+    /* 
+    // Tests for the creation of a new programDto
+    @Test
+    public void testCreateProgramDto_NonRecurring_NoConflict() {
+        // Given these attributes
+        String programType = "Training";
+        String title = "Training Program";
+        String description = "Dummy Description";
+        Integer capacity = 20;
+        LocalDateTime occurrenceDate = LocalDateTime.of(2024, 12, 15, 10, 0, 0, 0);
+        Integer durationMins = 120;
+        Boolean isRecurring = false;
+        LocalDateTime expiryDate = null;
+        String frequency = null;
+        String location = "Gym";
+        String visibility = "Public";
+        MultipartFile mockFile = new MockMultipartFile("file", "test.pdf", "application/pdf", "dummy content".getBytes());
+
+        // Mock repository behavior
+        Mockito.when(programRepository.findAll()).thenReturn(Collections.emptyList()); // No existing programs
+
+        // TODO: Mock file upload behavior 
+        // Mockito.when(fileStorageService.storeFile(mockFile)).thenReturn("file_path");
+
+        // Call the method
+        ProgramDto programDto = programService.createProgramDto(programType, title, description, capacity,
+                occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, mockFile);
+
+        assertNotNull(programDto);
+        assertEquals("file_path", programDto.getAttachment()); // Check that file path is correctly returned
+    }
+
+    @Test
+    public void testCreateProgramDto_Recurring_NoConflict() {
+        // Given these attributes
+        String programType = "Training";
+        String title = "Training Program";
+        String description = "Training Description";
+        Integer capacity = 20;
+        LocalDateTime occurrenceDate = LocalDateTime.of(2024, 1, 15, 10, 0, 0, 0);
+        Integer durationMins = 120;
+        Boolean isRecurring = true;
+        LocalDateTime expiryDate = LocalDateTime.of(2024, 1, 30, 10, 0, 0, 0);
+        String frequency = "daily";
+        String location = "Gym";
+        String visibility = "Public";
+        MultipartFile mockFile = new MockMultipartFile("file", "test.pdf", "application/pdf", "dummy content".getBytes());
+
+        // Mock repository behavior
+        Mockito.when(programRepository.findAll()).thenReturn(Collections.emptyList()); // No existing programs
+
+        // TODO: Mock file upload behavior
+        // Mockito.when(fileStorageService.storeFile(mockFile)).thenReturn("file_path");
+
+        // Call the method
+        ProgramDto programDto = programService.createProgramDto(programType, title, description, capacity,
+                occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, mockFile);
+
+        assertNotNull(programDto);
+        assertEquals("file_path", programDto.getAttachment()); // Check that file path is correctly returned
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testCreateProgramDto_Recurring_WithSchedulingConflict() {
+        // Given these attributes
+        String programType = "Training";
+        String title = "Training Program";
+        String description = "Training Description";
+        Integer capacity = 20;
+        LocalDateTime occurrenceDate = LocalDateTime.of(2024, 1, 15, 10, 0, 0, 0);
+        Integer durationMins = 120;
+        Boolean isRecurring = true;
+        LocalDateTime expiryDate = LocalDateTime.of(2024, 1, 30, 10, 0, 0, 0);
+        String frequency = "daily";
+        String location = "Gym";
+        String visibility = "Public";
+        MultipartFile mockFile = new MockMultipartFile("file", "test.pdf", "application/pdf", "dummy content".getBytes());
+
+        // Mock repository behavior
+        Program existingProgram = new Program("Training", "Existing Program", "Existing Description", 20,
+                LocalDateTime.of(2024, 1, 15, 10, 0, 0, 0), 120, true, LocalDateTime.of(2024, 1, 30, 10, 0, 0, 0),
+                "daily", "Gym", "Public", "file_path");
+        Mockito.when(programRepository.findAll()).thenReturn(Collections.singletonList(existingProgram)); // One existing program
+
+        // TODO: Mock file upload behavior
+        // Mockito.when(fileStorageService.storeFile(mockFile)).thenReturn("file_path");
+
+        // Call the method
+        programService.createProgramDto(programType, title, description, capacity,
+                occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, mockFile);
+
+        //Should throw exception
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateProgramDto_InvalidFrequency() {
+        // Given these attributes
+        String programType = "Training";
+        String title = "Training Program";
+        String description = "Training Description";
+        Integer capacity = 20;
+        LocalDateTime occurrenceDate = LocalDateTime.of(2024, 1, 15, 10, 0, 0, 0);
+        Integer durationMins = 120;
+        Boolean isRecurring = true;
+        LocalDateTime expiryDate = LocalDateTime.of(2024, 1, 30, 10, 0, 0, 0);
+        String frequency = "invalidFrequency"; // Invalid frequency
+        String location = "Gym";
+        String visibility = "Public";
+        MultipartFile mockFile = new MockMultipartFile("file", "test.pdf", "application/pdf", "dummy content".getBytes());
+
+        // Call the method
+        programService.createProgramDto(programType, title, description, capacity,
+                occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, mockFile);
+
+        // Should throw exception due to invalid frequency
+    }
+        */
 }
