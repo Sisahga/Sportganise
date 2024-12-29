@@ -218,7 +218,7 @@ export default function ModifyTrainingSessionForm() {
       //await fetch()
       //---------UPDATE WITH PROPER API URL
       /*
-      const response = await fetch("/api/module/createTrainingSessionForm", {
+      const response = await fetch("/api/module/modifyTrainingSessionForm", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json", //If sending JSON
