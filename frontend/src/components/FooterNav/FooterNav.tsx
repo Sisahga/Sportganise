@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Bell, Calendar, Home, MessageSquare, User } from "lucide-react";
@@ -5,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function FooterNav() {
   const [selected, setSelected] = useState("Home");
-  const navigate = useNavigate();
   const navigate = useNavigate();
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50">
