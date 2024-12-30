@@ -17,7 +17,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   chatName,
   chatAvatar,
   channelId,
-  chatType,
   onDeleteChat,
   onBlockUser,
 }) => {
@@ -78,23 +77,22 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             {/* Delete Chat */}
             {onDeleteChat && (
               <button
-              className="flex items-center gap-2 w-full px-4 py-2 bg-white text-red-500 hover:bg-gray-100"
-              onClick={handleDeleteClick}
-            >
-              Delete Chat
-              <Trash size={16} />
-            </button>
-            
+                className="flex items-center gap-2 w-full px-4 py-2 bg-white text-red-500 hover:bg-gray-100"
+                onClick={handleDeleteClick}
+              >
+                Delete Chat
+                <Trash size={16} />
+              </button>
             )}
             {/* Block User */}
             {onBlockUser && (
               <button
-              className="flex items-center gap-2 w-full px-4 py-2 bg-white text-red-500 hover:bg-gray-100"
-              onClick={handleBlockClick}
-            >
-              Block User
-              <UserX size={16} />
-            </button>
+                className="flex items-center gap-2 w-full px-4 py-2 bg-white text-red-500 hover:bg-gray-100"
+                onClick={handleBlockClick}
+              >
+                Block User
+                <UserX size={16} />
+              </button>
             )}
           </div>
         )}

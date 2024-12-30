@@ -52,8 +52,12 @@ const ChatScreen: React.FC = () => {
     try {
       await deleteChannel(chanId);
       navigate(-1);
-    } catch (err: any) {
-      alert(err.message || "Could not delete channel");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message || "Could not delete channel");
+      } else {
+        alert("An unknown error occurred");
+      }
     }
   };
 
@@ -62,8 +66,12 @@ const ChatScreen: React.FC = () => {
     try {
       await blockUser(9999);
       alert("User blocked!");
-    } catch (err: any) {
-      alert(err.message || "Could not block user");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message || "Could not block user");
+      } else {
+        alert("An unknown error occurred");
+      }
     }
   };
 

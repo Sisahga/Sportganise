@@ -83,11 +83,11 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
   // Vertical layout (Groups)
   return (
     <button
-    type="button"
-    className="flex flex-col items-center w-20 cursor-pointer 
+      type="button"
+      className="flex flex-col items-center w-20 cursor-pointer 
                focus:outline-none bg-white" // add bg-white here
-    onClick={handleClick}
-  >
+      onClick={handleClick}
+    >
       <img
         src={channel.channelImageBlob}
         alt={channel.channelName}

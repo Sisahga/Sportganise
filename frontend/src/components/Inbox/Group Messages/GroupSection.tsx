@@ -28,7 +28,7 @@ function GroupSection({ groups }: GroupSectionProps) {
           <ChannelItem
             key={channel.channelId}
             channel={channel}
-            layout="vertical" 
+            layout="vertical"
           />
         ))}
       </div>
