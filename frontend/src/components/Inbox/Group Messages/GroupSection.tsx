@@ -1,6 +1,6 @@
 // GroupSection.tsx
-import SectionWrapper from "./SectionWrapper";
-import ChannelItem, { Channel } from "./ChannelItem";
+import SectionWrapper from "../SectionWrapper";
+import ChannelItem, { Channel } from "../ChannelItem";
 
 interface Group {
   channelId: number;
