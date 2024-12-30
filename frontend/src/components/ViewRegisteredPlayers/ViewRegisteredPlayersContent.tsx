@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+//import { useNavigate, useLocation } from "react-router-dom";
 import { Badge } from "../ui/badge";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 
@@ -30,7 +31,7 @@ export default function ViewRegisteredPlayersContent() {
   const [error, setError] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<Attendees[]>([]);
   const { trainingSessionId } = useParams();
-  const accountId = ""; //TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAININ SESSION CARD
+  const accountId = ""; //TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
 
   // fetch data on component mount
   useEffect(() => {
@@ -103,11 +104,11 @@ export default function ViewRegisteredPlayersContent() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold my-3">Attendees</h2>
+      <h2 className="text-xl font-semibold my-4">Attendees</h2>
       {attendees.length > 0 ? (
         attendees.map((attendee) => (
-          <div>
-            <div key={attendee.accountId} className="flex my-4">
+          <div key={attendee.accountId}>
+            <div className="flex my-3">
               <div className="mr-4 self-center">
                 <Avatar>
                   {" "}
@@ -115,7 +116,7 @@ export default function ViewRegisteredPlayersContent() {
                 </Avatar>
               </div>
               <div>
-                <h4 className="text-sm font-semibold mb-1">
+                <h4 className="text-sm font-medium mb-1">
                   {attendee.firstName} {attendee.lastName}
                 </h4>
 
