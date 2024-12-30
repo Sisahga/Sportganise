@@ -1,8 +1,8 @@
 // ChatMessages.tsx
 import React from "react";
-import defaultGroupAvatar from "../SampleImages/defaultGroupAvatar.png";
 
-interface Message {
+// 1) Define the structure of each message
+export interface Message {
   id: number;
   sender: string;
   text: string;
@@ -10,12 +10,14 @@ interface Message {
   senderAvatar?: string;
 }
 
+// 2) Define the props that ChatMessages expects
 interface ChatMessagesProps {
   messages: Message[];
   chatAvatar: string;
-  chatType?: string;
+  chatType?: string; // "individual" | "group" etc.
 }
 
+// 3) Define the component with React.FC<ChatMessagesProps>
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   messages,
   chatAvatar,
@@ -23,34 +25,26 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 }) => {
   return (
     <div className="flex-1 overflow-y-auto px-4 py-3">
+      {/* Render messages */}
       {messages.map((message) => (
         <div key={message.id} className="mb-4">
-          {/* Timestamp */}
-          {message.time && (
-            <div className="text-xs text-gray-500 text-center mb-2">
-              {message.time}
-            </div>
-          )}
-          {/* Message Bubble */}
+          {/* Example layout code */}
+          <div className="text-xs text-gray-500 text-center mb-2">
+            {message.time}
+          </div>
+
           <div
             className={`flex ${
               message.sender === "You" ? "justify-end" : "justify-start"
             } items-center gap-3`}
           >
-            {/* Sender Avatar (only if not "You") */}
             {message.sender !== "You" && (
               <img
-                src={
-                  message.senderAvatar ||
-                  (chatType === "group"
-                    ? defaultGroupAvatar
-                    : chatAvatar)
-                }
+                src={message.senderAvatar || chatAvatar}
                 alt={message.sender}
                 className="w-8 h-8 rounded-full object-cover"
               />
             )}
-            {/* Bubble */}
             <div
               className={`px-4 py-2 rounded-lg ${
                 message.sender === "You"
@@ -58,7 +52,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                   : "bg-gray-200 text-gray-800"
               }`}
             >
-              {/* Display sender's name in group chats */}
               {chatType === "group" && message.sender !== "You" && (
                 <p className="text-xs font-bold">{message.sender}</p>
               )}
@@ -71,4 +64,5 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   );
 };
 
+// 4) Export the component as default
 export default ChatMessages;

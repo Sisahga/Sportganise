@@ -1,5 +1,5 @@
 // ChatScreen.tsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useChatMessages from "../apiCalls/useChatMessages";
 import useDeleteChannel from "../apiCalls/useDeleteChannel";
@@ -7,7 +7,6 @@ import useBlockUser from "../apiCalls/useBlockUser";
 import ChatHeader from "./ChatHeader";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
-import defaultAvatar from "../SampleImages/defaultAvatar.png";
 
 const ChatScreen: React.FC = () => {
   const navigate = useNavigate();
@@ -15,20 +14,27 @@ const ChatScreen: React.FC = () => {
 
   const { state } = location || {};
   const chatName = state?.chatName || "Chat";
-  const chatAvatar = state?.chatAvatar || defaultAvatar;
+  const chatAvatar = state?.chatAvatar; // optional
   const chatType = state?.chatType || "individual";
-  const channelId = state?.channelId || 1;
+  const channelId = state?.channelId || 1; // fallback ID for testing
 
-  // 1) For fetching messages
+  // 1) Fetch messages
   const { messages, setMessages, loading, error } = useChatMessages(channelId);
 
-  // 2) For deleting a channel
+  // 2) Delete channel
   const { deleteChannel } = useDeleteChannel();
 
-  // 3) For blocking a user
+  // 3) Block user
   const { blockUser } = useBlockUser();
 
-  // Send a new message
+  // For debug:
+  useEffect(() => {
+    console.log("ChatScreen state:", state);
+    console.log("messages:", messages);
+    console.log("loading:", loading, "error:", error);
+  }, [state, messages, loading, error]);
+
+  // Handlers
   const handleSendMessage = (messageText: string) => {
     setMessages((prev) => [
       ...prev,
@@ -41,42 +47,31 @@ const ChatScreen: React.FC = () => {
     ]);
   };
 
-  // Delete channel handler
   const handleDeleteChat = async (chanId: number) => {
-    const confirmed = window.confirm("Are you sure you want to delete this chat?");
-    if (!confirmed) return;
-
+    if (!window.confirm("Are you sure you want to delete this chat?")) return;
     try {
       await deleteChannel(chanId);
-      // If successful, navigate back
       navigate(-1);
     } catch (err: any) {
-      console.error("Error deleting channel:", err);
-      alert(err.message || "Could not delete channel.");
+      alert(err.message || "Could not delete channel");
     }
   };
 
-  // Block user handler
   const handleBlockUser = async () => {
-    const confirmed = window.confirm("Block this user?");
-    if (!confirmed) return;
-
+    if (!window.confirm("Block this user?")) return;
     try {
-      // For demonstration, we assume a user ID to block
-      const userIdToBlock = 9999;
-      await blockUser(userIdToBlock);
+      await blockUser(9999);
       alert("User blocked!");
     } catch (err: any) {
-      console.error("Error blocking user:", err);
-      alert(err.message || "Could not block user.");
+      alert(err.message || "Could not block user");
     }
   };
 
-  // loading & error states
+  // If loading or error
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
+        <p>Loading chat...</p>
       </div>
     );
   }
@@ -88,12 +83,12 @@ const ChatScreen: React.FC = () => {
     );
   }
 
-  // Render
+  // Render the screen if not loading/error
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <ChatHeader
         chatName={chatName}
-        chatAvatar={chatAvatar}
+        chatAvatar={chatAvatar || ""}
         channelId={channelId}
         chatType={chatType}
         onDeleteChat={handleDeleteChat}
@@ -102,7 +97,7 @@ const ChatScreen: React.FC = () => {
 
       <ChatMessages
         messages={messages}
-        chatAvatar={chatAvatar}
+        chatAvatar={chatAvatar || ""}
         chatType={chatType}
       />
 

@@ -5,7 +5,7 @@ import { ArrowLeft, MoreVertical, Trash, UserX } from "lucide-react";
 
 interface ChatHeaderProps {
   chatName: string;
-  chatAvatar: string;
+  chatAvatar: string; // or potentially optional if you plan a fallback
   channelId: number;
   // If it's an individual or group, etc. (optional)
   chatType?: string;
@@ -24,24 +24,22 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
 
-  // Toggle the 3-dot menu
   const handleOptionsClick = () => {
     setShowMenu((prev) => !prev);
   };
 
   const handleDeleteClick = () => {
-    if (onDeleteChat) {
-      onDeleteChat(channelId);
-    }
+    onDeleteChat?.(channelId);
     setShowMenu(false);
   };
 
   const handleBlockClick = () => {
-    if (onBlockUser) {
-      onBlockUser();
-    }
+    onBlockUser?.();
     setShowMenu(false);
   };
+
+  // Example fallback if chatAvatar is sometimes empty
+  const finalChatAvatar = chatAvatar || "https://img.icons8.com/ios-filled/150/000000/user-male-circle.png";
 
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-white shadow relative">
@@ -56,7 +54,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       {/* Chat Info */}
       <div className="flex items-center gap-3">
         <img
-          src={chatAvatar}
+          src={finalChatAvatar}
           alt={chatName}
           className="w-10 h-10 rounded-full object-cover"
         />
@@ -74,30 +72,29 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
 
         {/* Dropdown Menu */}
         {showMenu && (
-          <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md z-10">
-            {/* Delete Chat */}
-            {onDeleteChat && (
-              <button
-              className="flex items-center gap-2 w-full px-4 py-2 bg-white text-red-500 hover:bg-gray-100"
-              onClick={handleDeleteClick}
-            >
-              Delete Chat
-              <Trash size={16} />
-            </button>
-            
-            )}
-            {/* Block User */}
-            {onBlockUser && (
-              <button
-              className="flex items-center gap-2 w-full px-4 py-2 bg-white text-red-500 hover:bg-gray-100"
-              onClick={handleBlockClick}
-            >
-              Block User
-              <UserX size={16} />
-            </button>
-            )}
-          </div>
-        )}
+  <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md z-10">
+    {onDeleteChat && (
+      <button
+        className="flex items-center gap-2 w-full px-4 py-2 
+                   bg-white text-red-500 hover:bg-gray-100"
+        onClick={handleDeleteClick}
+      >
+        <Trash size={16} />
+        <span>Delete Chat</span>
+      </button>
+    )}
+    {onBlockUser && (
+      <button
+        className="flex items-center gap-2 w-full px-4 py-2 
+                   bg-white text-red-500 hover:bg-gray-100"
+        onClick={handleBlockClick}
+      >
+        <UserX size={16} />
+        <span>Block User</span>
+      </button>
+    )}
+  </div>
+)}
       </div>
     </header>
   );
