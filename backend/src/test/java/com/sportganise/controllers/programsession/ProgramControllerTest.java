@@ -63,7 +63,7 @@ public class ProgramControllerTest {
         mockProgramDto.setTitle("Training Program");
         mockProgramDto.setDescription("This is a training program.");
         mockProgramDto.setCapacity(10);
-        mockProgramDto.setOccurenceDate(LocalDateTime.of(2025, 5, 15, 10, 0));
+        mockProgramDto.setOccurrenceDate(LocalDateTime.of(2025, 5, 15, 10, 0));
         mockProgramDto.setDurationMins(120);
         mockProgramDto.setRecurring(false);
         mockProgramDto.setExpiryDate(LocalDateTime.of(2025, 5, 16, 0, 0));

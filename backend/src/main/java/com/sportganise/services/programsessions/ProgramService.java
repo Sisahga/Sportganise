@@ -9,7 +9,11 @@ import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.auth.AccountService;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +31,8 @@ public class ProgramService {
     private final AccountService accountService;
     private final AccountRepository accountRepository;
 
-    public ProgramService(ProgramRepository programRepository, AccountService accountService, AccountRepository accountRepository) {
+    public ProgramService(ProgramRepository programRepository, AccountService accountService,
+            AccountRepository accountRepository) {
         this.programRepository = programRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
@@ -154,8 +159,9 @@ public class ProgramService {
         }
 
         String filePath = null;
-        // Handle file upload (i.e. store the file into database) and returns a String filePath
-        if (!attachment.isEmpty()){
+        // Handle file upload (i.e. store the file into database) and returns a String
+        // filePath
+        if (!attachment.isEmpty()) {
             try {
                 filePath = handleFileUpload(attachment);
             } catch (IOException e) {
@@ -163,16 +169,119 @@ public class ProgramService {
             }
         }
 
-        // Generate new programId
-
         // Save program details in the database
         Program newProgram = new Program(programType, title, description, capacity,
                 occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, filePath);
         Program savedProgram = programRepository.save(newProgram);
 
-        notifyAllMembers();
+        notifyAllMembers(newProgram);
         // Return ProgramDto to send back to the client
         return new ProgramDto(savedProgram);
+    }
+
+    /**
+     * Method to modify an existing program.
+     * 
+     * @param programDtoToModify programDto of the program to be modified.
+     * @param programType        Type of the program.
+     * @param title              Title of the program.
+     * @param description        Description of the program.
+     * @param capacity           Capacity of the program.
+     * @param occurrenceDate     DateTime of occurrence of the program.
+     * @param durationMins       Duration in minutes of the program.
+     * @param isRecurring        Whether or not the program is a recurring one.
+     * @param expiryDate         Expiry Date of a program.
+     * @param frequency          Frequency of a program. i.e. if it has multiple
+     *                           sessions/occurrences.
+     * @param location           Location of the program/session.
+     * @param visibility         Visibility of the program. If it can be seen by
+     *                           registered members only or all members.
+     * @param attachment         Files uploaded, if any.
+     */
+    public void modifyProgram(ProgramDto programDtoToModify, String programType, String title, String description,
+            Integer capacity, LocalDateTime occurrenceDate, Integer durationMins, Boolean isRecurring,
+            LocalDateTime expiryDate, String frequency, String location, String visibility, MultipartFile attachment) {
+
+        // Fetch the existing program by its Id if it exists. Other
+        Program existingProgram = programRepository.findById(programDtoToModify.getProgramId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Program not found with ID: " + programDtoToModify.getProgramId()));
+
+        // TODO: Need to add additional logic for the files upload/delete/modifications
+        // once I figure out how the storage is handled
+        String filePath = existingProgram.getAttachment();
+        if (attachment != null && !attachment.isEmpty()) {
+            if (filePath != null) {
+                // Delete the old file (We delete all the files since attachment also includes 
+                //the already uploaded files that we want to keep)
+                deleteFile(filePath); 
+            }
+            // We re-upload the previous ones that we want to keep along with the new ones
+            try {
+                filePath = handleFileUpload(attachment);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // If anything regarding the dates is modified, then we need to
+        // re-verify if there is any overlap with other programs
+        if (!existingProgram.getOccurrenceDate().isEqual(occurrenceDate)
+                || existingProgram.getDurationMins() != durationMins
+                || existingProgram.isRecurring() != isRecurring
+                || existingProgram.getExpiryDate().isEqual(expiryDate)
+                || existingProgram.getFrequency().equalsIgnoreCase(frequency)) {
+            // If this program is a recurring one (or will become a recurring one) then we
+            // need to check if each
+            // occurence overlaps an already existing program
+            if (isRecurring) {
+                LocalDateTime currentOccurrence = occurrenceDate;
+
+                // While currentOccurrence is before or on the day of the expiryDate
+                while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
+                    // Verify/Validate scheduling conflicts
+                    if (checkForSchedulingConflicts(currentOccurrence, durationMins)) {
+                        throw new RuntimeException(
+                                "Scheduling conflict detected for recurring program at: " + currentOccurrence);
+                    }
+
+                    // Calculate the next occurrence based on the frequency
+                    currentOccurrence = getNextOccurrence(currentOccurrence, frequency);
+                    if (currentOccurrence == null) {
+                        throw new IllegalArgumentException("Invalid frequency value: " + frequency);
+                    }
+                }
+            } else {
+                if (checkForSchedulingConflicts(occurrenceDate, durationMins)) {
+                    throw new RuntimeException("Scheduling conflict detected.");
+                }
+            }
+        }
+
+        // Create a new Program object with updated fields
+        Program updatedProgram = new Program(
+                programType,
+                title,
+                description,
+                capacity,
+                occurrenceDate,
+                durationMins,
+                isRecurring,
+                expiryDate,
+                frequency,
+                location,
+                visibility,
+                filePath);
+
+        // Set the same ID as the existing program (to update the same record in the
+        // database)
+        updatedProgram.setProgramId(existingProgram.getProgramId());
+
+        // Save the updated program
+        programRepository.save(updatedProgram);
+
+        // Notify players about changes to the program
+        notifyAllMembers(updatedProgram);
     }
 
     /**
@@ -238,19 +347,35 @@ public class ProgramService {
      */
     private String handleFileUpload(MultipartFile file) throws IOException {
         // TODO: Implement logic to save file to database
+        if (!file.isEmpty()) {
+            // Return the file path or URL
+            return "file_upload_path";
+        }
+        return null;
+    }
 
-        // Return the file path or URL
-        return "file_upload_path";
+    /**
+     * 
+     * @param filePath file path of the file that we want to delete.
+     */
+    public void deleteFile(String filePath) {
+        // TODO: Not sure yet if this logic is good since I am not sure how we are
+        // dealing with file storage
+        try {
+            Files.deleteIfExists(Paths.get(filePath));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to delete file: " + filePath, e);
+        }
     }
 
     /**
      * Method to notify all the members of a newly create/posted program
      */
-    private void notifyAllMembers() {
-        
+    private void notifyAllMembers(Program programToBeNotifiedAbout) {
         List<Account> accounts = accountRepository.findAll();
         for (Account account : accounts) {
-            //TODO: Implement logic to notify all members when new program is created/posted.
+            // TODO: Implement logic to notify all members when new program is
+            // created/posted.
         }
     }
 }

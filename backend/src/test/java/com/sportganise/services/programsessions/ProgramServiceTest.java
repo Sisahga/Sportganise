@@ -152,7 +152,7 @@ public class ProgramServiceTest {
         assertEquals("Training Program", programDto.getTitle());
         assertEquals("This is a training program.", programDto.getDescription());
         assertEquals(10, programDto.getCapacity());
-        assertEquals(LocalDateTime.of(2025, 5, 15, 10, 0), programDto.getOccurenceDate());
+        assertEquals(LocalDateTime.of(2025, 5, 15, 10, 0), programDto.getOccurrenceDate());
         assertEquals(120, programDto.getDurationMins());
         assertFalse(programDto.isRecurring());
         assertEquals(LocalDateTime.of(2025, 5, 16, 0, 0), programDto.getExpiryDate());

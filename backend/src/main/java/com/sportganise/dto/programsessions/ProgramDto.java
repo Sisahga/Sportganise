@@ -21,7 +21,7 @@ public class ProgramDto {
     private String title;
     private String description;
     private Integer capacity;
-    private LocalDateTime occurenceDate;
+    private LocalDateTime occurrenceDate;
     private Integer durationMins; // Duration of the program in terms of minutes
     private boolean isRecurring;
     private LocalDateTime expiryDate;
@@ -37,7 +37,7 @@ public class ProgramDto {
         this.title = program.getTitle();
         this.description = program.getDescription();
         this.capacity = program.getCapacity();
-        this.occurenceDate = program.getOccurrenceDate();
+        this.occurrenceDate = program.getOccurrenceDate();
         this.durationMins = program.getDurationMins();
         this.isRecurring = program.isRecurring();
         this.expiryDate = program.getExpiryDate();

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -93,19 +94,21 @@ public class ProgramController {
   /**
    * Get mapping for creating new program.
    * 
-   * @param accountId Id of user who is making the request.
-   * @param programType Type of the program.
-   * @param title Title of the program.
-   * @param description Description of the program.
-   * @param capacity Participants capacity.
+   * @param accountId      Id of user who is making the request.
+   * @param programType    Type of the program.
+   * @param title          Title of the program.
+   * @param description    Description of the program.
+   * @param capacity       Participants capacity.
    * @param occurrenceDate Date of the program.
-   * @param durationMins Duration of the program/session in minutes.
-   * @param isRecurring Boolean for whether this program is recurring.
-   * @param expiryDate Expiry Date of the program i.e. when is the last occurence.
-   * @param frequency Frequency of program/sessions.
-   * @param location Location of the program/session.
-   * @param visibility Visibility of the program i.e. is it only visible to registered members or all members.
-   * @param attachment Files attached to this program/session.
+   * @param durationMins   Duration of the program/session in minutes.
+   * @param isRecurring    Boolean for whether this program is recurring.
+   * @param expiryDate     Expiry Date of the program i.e. when is the last
+   *                       occurence.
+   * @param frequency      Frequency of program/sessions.
+   * @param location       Location of the program/session.
+   * @param visibility     Visibility of the program i.e. is it only visible to
+   *                       registered members or all members.
+   * @param attachment     File paths of files attached to this program/session.
    * @return HTTP Response for newly created program.
    */
   @PostMapping("/{accountId}/create-program")
@@ -122,7 +125,7 @@ public class ProgramController {
       @RequestParam("frequency") String frequency,
       @RequestParam("location") String location,
       @RequestParam("visibility") String visibility,
-      @RequestParam("file") MultipartFile attachment) {
+      @RequestParam("attachment") MultipartFile attachment) {
 
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = accountService.getAccount(accountId);
@@ -141,11 +144,83 @@ public class ProgramController {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    // Call the service to handle program creation
+    // Call the service createProgramDto method to handle program creation
     try {
       ProgramDto programDto = programService.createProgramDto(programType, title, description, capacity,
           occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, attachment);
       return new ResponseEntity<>(programDto, HttpStatus.CREATED);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    }
+  }
+
+  /**
+   * Put mapping for modifying/updating an existing program.
+   * 
+   * @param accountId      Id of user who is making the request.
+   * @param programType    Type of the program.
+   * @param title          Title of the program.
+   * @param description    Description of the program.
+   * @param capacity       Participants capacity.
+   * @param occurrenceDate Date of the program.
+   * @param durationMins   Duration of the program/session in minutes.
+   * @param isRecurring    Boolean for whether this program is recurring.
+   * @param expiryDate     Expiry Date of the program i.e. when is the last
+   *                       occurence.
+   * @param frequency      Frequency of program/sessions.
+   * @param location       Location of the program/session.
+   * @param visibility     Visibility of the program i.e. is it only visible to
+   *                       registered members or all members.
+   * @param attachment     File paths of files attached to this program/session.
+   * @return HTTP Response for modified/updated data
+   */
+  @PutMapping("/{accountId}/{programId}/modify-program")
+  ResponseEntity<ProgramDto> modifyProgram(
+      @PathVariable Integer accountId,
+      @PathVariable Integer programId,
+      @RequestParam("type") String programType,
+      @RequestParam("title") String title,
+      @RequestParam("description") String description,
+      @RequestParam("capacity") Integer capacity,
+      @RequestParam("occurrenceDate") LocalDateTime occurrenceDate,
+      @RequestParam("durationMins") Integer durationMins,
+      @RequestParam("isRecurring") Boolean isRecurring,
+      @RequestParam("expiryDate") LocalDateTime expiryDate,
+      @RequestParam("frequency") String frequency,
+      @RequestParam("location") String location,
+      @RequestParam("visibility") String visibility,
+      @RequestParam("attachment") MultipartFile attachment) {
+
+    // Get account from accountId (this is a wrapper, not the actual)
+    Optional<Account> userOptional = accountService.getAccount(accountId);
+
+    // Check if the value of userOptional is empty
+    if (userOptional.isEmpty()) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    // If not empty, then we go fetch the actual user value
+    Account user = userOptional.get();
+
+    // If user is not a COACH or ADMIN then they will get an error
+    // as they are not allowed to access this feature
+    if (!accountService.hasPermissions(user.getType())) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    // Fetch program details
+    ProgramDto programDtoToModify = programService.getProgramDetails(programId);
+
+    // Check if the value of programDtoOptional is null
+    if (programDtoToModify == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    // Call the service modifyProgram method to handle program creation
+    try {
+      programService.modifyProgram(programDtoToModify, programType, title, description, capacity, occurrenceDate,
+          durationMins, isRecurring, expiryDate, frequency, location, visibility, attachment);
+      return new ResponseEntity<>(HttpStatus.OK);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
