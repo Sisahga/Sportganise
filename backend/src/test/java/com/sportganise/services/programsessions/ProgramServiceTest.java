@@ -2,12 +2,13 @@ package com.sportganise.services.programsessions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -22,6 +23,9 @@ import com.sportganise.entities.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.services.auth.AccountService;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import com.sportganise.repositories.programsessions.ProgramRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -162,7 +166,7 @@ public class ProgramServiceTest {
         assertEquals("/banner.pdf", programDto.getAttachment());
     }
 
-    /* 
+    /* Commenting out for new as I still need to figure some of the underlying methods
     // Tests for the creation of a new programDto
     @Test
     public void testCreateProgramDto_NonRecurring_NoConflict() {
@@ -278,5 +282,71 @@ public class ProgramServiceTest {
 
         // Should throw exception due to invalid frequency
     }
-        */
+        
+
+
+        @Test
+        void testModifyProgram_Success() throws IOException {
+            // Arrange an existing Program
+            Program existingProgram = new Program(
+                            "Training", "Existing Title", "Existing Description", 20,
+                            LocalDateTime.of(2024, 1, 10, 10, 0),
+                            120, true, LocalDateTime.of(2024, 1, 30, 10, 0),
+                            "weekly", "Existing Location", "public", "oldFilePath.pdf");
+            existingProgram.setProgramId(1);
+
+            ProgramDto programDtoToModify = new ProgramDto(existingProgram);
+
+            MultipartFile mockFile = new MockMultipartFile("file", "test.pdf", "application/pdf",
+                            "dummy content".getBytes());
+            String newFilePath = "newFilePath.pdf";
+
+            Mockito.when(programRepository.findById(1)).thenReturn(Optional.of(existingProgram));
+
+            // Call the modifyProgram method
+            programService.modifyProgram(
+                            programDtoToModify, "Updated Type", "Updated Title", "Updated Description", 30,
+                            LocalDateTime.of(2024, 1, 15, 10, 0), 90, false,
+                            LocalDateTime.of(2024, 2, 1, 10, 0), "daily", "Updated Location", "private", mockFile);
+
+            // Verify
+            ArgumentCaptor<Program> programCaptor = ArgumentCaptor.forClass(Program.class);
+            Mockito.verify(programRepository).save(programCaptor.capture());
+
+            Program savedProgram = programCaptor.getValue();
+            assertEquals("Updated Type", savedProgram.getProgramType());
+            assertEquals("Updated Title", savedProgram.getTitle());
+            assertEquals("Updated Description", savedProgram.getDescription());
+            assertEquals(30, savedProgram.getCapacity());
+            assertEquals(LocalDateTime.of(2024, 1, 15, 10, 0), savedProgram.getOccurrenceDate());
+            assertEquals(90, savedProgram.getDurationMins());
+            assertFalse(savedProgram.isRecurring());
+            assertEquals(LocalDateTime.of(2024, 2, 1, 10, 0), savedProgram.getExpiryDate());
+            assertEquals("daily", savedProgram.getFrequency());
+            assertEquals("Updated Location", savedProgram.getLocation());
+            assertEquals("private", savedProgram.getVisibility());
+            assertEquals(newFilePath, savedProgram.getAttachment());
+    }
+    */
+
+        @Test
+        void testModifyProgram_ProgramNotFound() {
+            // Arrange an empty program. i.e. a program that does not exist in the database
+            ProgramDto programDtoToModify = new ProgramDto();
+            programDtoToModify.setProgramId(1);
+
+            Mockito.when(programRepository.findById(1)).thenReturn(Optional.empty());
+
+            // Act & Assert
+            EntityNotFoundException exception = assertThrows(
+                            EntityNotFoundException.class,
+                            () -> programService.modifyProgram(
+                                            programDtoToModify, "Updated Type", "Updated Title", "Updated Description",
+                                            30,
+                                            LocalDateTime.of(2024, 1, 15, 10, 0), 90, false,
+                                            LocalDateTime.of(2024, 2, 1, 10, 0), "daily", "Updated Location", "private",
+                                            null));
+            assertEquals("Program not found with ID: 1", exception.getMessage());
+    }
+    
 }
