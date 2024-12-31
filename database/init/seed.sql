@@ -55,17 +55,17 @@ INSERT INTO label_program (label_id, program_id, type) VALUES
 (1, 1, 'Private'),
 (1, 2, 'Public');
 
-INSERT INTO channel (name) VALUES
-('Sunday Group'),
-(null);
+INSERT INTO channel (name, type) VALUES
+('Sunday Group', 'GROUP'),
+(null, 'SIMPLE');
 
 
-INSERT INTO channel_member (channel_id, account_id) VALUES
-(1, 2),
-(1, 3),
-(1, 4),
-(2,1),
-(2,2);
+INSERT INTO channel_member (channel_id, account_id, read) VALUES
+(1, 2, false),
+(1, 3, false),
+(1, 4, true),
+(2,1, true),
+(2,2, false);
 
 INSERT INTO message (channel_id, sender_id, content) VALUES
 (1, 2, 'Welcome to sunday group chat.'),
