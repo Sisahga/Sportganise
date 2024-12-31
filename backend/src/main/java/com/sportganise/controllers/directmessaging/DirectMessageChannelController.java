@@ -2,11 +2,17 @@ package com.sportganise.controllers.directmessaging;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
+import com.sportganise.dto.directmessaging.SendDirectMessageResponseDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import java.util.List;
+
+import com.sportganise.services.directmessaging.DirectMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin("*")
 public class DirectMessageChannelController {
   private final DirectMessageChannelService directMessageChannelService;
+  private final DirectMessageService directMessageService;
 
   /**
    * Controller Constructor.
@@ -29,8 +36,27 @@ public class DirectMessageChannelController {
    * @param directMessageChannelService Direct Message Channel Service.
    */
   @Autowired
-  public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService) {
+  public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService,
+                                        DirectMessageService directMessageService) {
     this.directMessageChannelService = directMessageChannelService;
+    this.directMessageService = directMessageService;
+  }
+
+  /**
+   *
+   * @param messageDto Direct message request DTO for sending a message.
+   * @return HHTP Status 201 with the sent message.
+   */
+  @MessageMapping("/send-message")
+  @SendTo("/app/directmessage")
+  public ResponseEntity<SendDirectMessageResponseDto> sendDirectMessage(SendDirectMessageRequestDto messageDto) {
+    // TODO: Configure Direct Message Service Class.
+    try {
+      SendDirectMessageResponseDto responseDto = directMessageService.sendDirectMessage(messageDto);
+        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+    } catch (Exception e) {
+      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**
