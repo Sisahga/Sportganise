@@ -9,10 +9,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SendDirectMessageDto {
+public class SendDirectMessageResponseDto {
     private Integer senderId;
     private Integer channelId;
     private String messageContent;
-    private String[] attachmentBlobs;
+    private String[] attachments;
     private String sentAt;
 }
