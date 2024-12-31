@@ -12,6 +12,8 @@ import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import com.sportganise.services.directmessaging.DirectMessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ class DirectMessageChannelControllerUnitTest {
   @Autowired private MockMvc mockMvc;
 
   @MockBean private DirectMessageChannelService dmChannelService;
+  @MockBean private DirectMessageService dmService;
 
   private ObjectMapper objectMapper;
 
