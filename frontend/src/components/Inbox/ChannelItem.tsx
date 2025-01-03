@@ -63,7 +63,6 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
       </button>
     );
   }
-  
 
   // "Messages" style layout
   return (
