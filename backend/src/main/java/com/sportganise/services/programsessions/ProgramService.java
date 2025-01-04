@@ -1,10 +1,12 @@
 package com.sportganise.services.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.auth.AccountService;
@@ -30,12 +32,15 @@ public class ProgramService {
     private final ProgramRepository programRepository;
     private final AccountService accountService;
     private final AccountRepository accountRepository;
+    private final ProgramParticipantRepository participantRepository;
+    private final ProgramParticipantDto programParticipant;
 
     public ProgramService(ProgramRepository programRepository, AccountService accountService,
-            AccountRepository accountRepository) {
+            AccountRepository accountRepository, ProgramParticipantDto programParticipant) {
         this.programRepository = programRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
+        this.programParticipant = programParticipant;
     }
 
     public Optional<Program> getSessionById(Integer id) {
@@ -71,12 +76,7 @@ public class ProgramService {
                     // ProgramParticipantDto
                     return new ProgramParticipantDto(
                             account.getAccountId(),
-                            account.getType(),
-                            account.getFirstName(),
-                            account.getLastName(),
-                            account.getEmail(),
-                            account.getAddress(),
-                            account.getPhone(),
+                            programId,
                             participant.isConfirmed(),
                             participant.getConfirmedDate());
                 })
@@ -177,6 +177,35 @@ public class ProgramService {
         notifyAllMembers(newProgram);
         // Return ProgramDto to send back to the client
         return new ProgramDto(savedProgram);
+    }
+
+
+    /**
+     * Method to create new ProgramParticipantDTO.
+     * 
+     * @param account       Id of user who is making the request.
+     * @param isConfirmed   Confirmation status of the participant.
+     * @param confirmedDate Date in which participant was confirmed for the program.
+     * @return A new ProgramParticipantDto.
+     */
+    public ProgramParticipantDto createProgramParticipantDto(AccountDto account, Integer programId, Integer accountId){
+        
+        //Checks if an account has already signed up to the program
+        if(checkForStatus(accountId, programId)){
+            return null; // revisit this
+        }
+        
+        ProgramParticipant newParticipant = new ProgramParticipant(programId, accountId, account.getType(), false, null);
+        ProgramParticipant savedParticipant = participantRepository.save(newParticipant);
+
+        return new ProgramParticipantDto(savedParticipant.getAccountId(), savedParticipant.getProgramId(), savedParticipant.isConfirmed(), savedParticipant.getConfirmedDate());
+    }
+
+    public boolean checkForStatus(Integer accountId, Integer programId){
+        List<ProgramParticipantDto> attendees = getParticipants(programId);
+
+        return attendees.stream()
+            .anyMatch(participant -> participant.getAccountId().equals(accountId));
     }
 
     /**
@@ -378,4 +407,6 @@ public class ProgramService {
             // created/posted.
         }
     }
+
+
 }

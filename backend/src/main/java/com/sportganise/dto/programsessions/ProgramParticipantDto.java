@@ -1,5 +1,4 @@
 package com.sportganise.dto.programsessions;
-
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
@@ -16,12 +15,7 @@ import lombok.Setter;
 @Entity
 public class ProgramParticipantDto {
   private Integer accountId;
-  private String participantType;
-  private String firstName;
-  private String lastName;
-  private String email;
-  private String address;
-  private String phone;
+  private Integer programId;
   private boolean isConfirmed;
   private LocalDateTime confirmedDate;
 }

@@ -99,24 +99,14 @@ public class ProgramServiceTest {
         // Verify that participant1 is correctly retrieved along with its attributes
         ProgramParticipantDto participantDto1 = participantDtos.get(0);
         assertEquals(101, participantDto1.getAccountId());
-        assertEquals("Player", participantDto1.getParticipantType());
-        assertEquals("John", participantDto1.getFirstName());
-        assertEquals("Doe", participantDto1.getLastName());
-        assertEquals("john.doe@example.com", participantDto1.getEmail());
-        assertEquals("123 Main St", participantDto1.getAddress());
-        assertEquals("555-555-5555", participantDto1.getPhone());
+        assertEquals(101, participantDto1.getProgramId());
         assertTrue(participantDto1.isConfirmed());
         assertEquals(participant1.getConfirmedDate(), participantDto1.getConfirmedDate());
 
         // Verify that participant2 is correctly retrieved along with the correct attributes
         ProgramParticipantDto participantDto2 = participantDtos.get(1);
         assertEquals(102, participantDto2.getAccountId());
-        assertEquals("Coach", participantDto2.getParticipantType());
-        assertEquals("Jane", participantDto2.getFirstName());
-        assertEquals("Smith", participantDto2.getLastName());
-        assertEquals("jane.smith@example.com", participantDto2.getEmail());
-        assertEquals("456 Random St", participantDto2.getAddress());
-        assertEquals("222-222-2222", participantDto2.getPhone());
+        assertEquals(102, participantDto2.getProgramId());
         assertFalse(participantDto2.isConfirmed());
         assertEquals(participant2.getConfirmedDate(), participantDto2.getConfirmedDate());
     }

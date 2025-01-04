@@ -32,5 +32,4 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
                     + "JOIN Program p ON pp.program.programId = p.programId "
                     + "WHERE p.programId = :sessionId")
     List<ProgramParticipant> findParticipantsByProgramId(@Param("sessionId") Integer sessionId);
-
 }
