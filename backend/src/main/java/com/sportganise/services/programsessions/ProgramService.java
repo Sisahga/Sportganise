@@ -33,14 +33,13 @@ public class ProgramService {
     private final AccountService accountService;
     private final AccountRepository accountRepository;
     private final ProgramParticipantRepository participantRepository;
-    private final ProgramParticipantDto programParticipant;
 
     public ProgramService(ProgramRepository programRepository, AccountService accountService,
-            AccountRepository accountRepository, ProgramParticipantDto programParticipant) {
+            AccountRepository accountRepository, ProgramParticipantRepository participantRepository) {
         this.programRepository = programRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
-        this.programParticipant = programParticipant;
+        this.participantRepository = participantRepository;
     }
 
     public Optional<Program> getSessionById(Integer id) {

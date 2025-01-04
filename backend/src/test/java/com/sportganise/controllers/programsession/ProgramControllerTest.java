@@ -74,12 +74,7 @@ public class ProgramControllerTest {
 
         // Set the programParticipantDto
         mockProgramParticipantDto.setAccountId(1);
-        mockProgramParticipantDto.setParticipantType("Player");
-        mockProgramParticipantDto.setFirstName("John");
-        mockProgramParticipantDto.setLastName("Doe");
-        mockProgramParticipantDto.setEmail("john.doe@example.com");
-        mockProgramParticipantDto.setAddress("123 Main St");
-        mockProgramParticipantDto.setPhone("555-555-5555");
+        mockProgramParticipantDto.setProgramId(1);
         mockProgramParticipantDto.setConfirmed(true);
         mockProgramParticipantDto.setConfirmedDate(LocalDateTime.now());
 
