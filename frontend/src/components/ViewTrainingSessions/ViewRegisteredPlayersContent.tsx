@@ -15,11 +15,11 @@ interface Attendees {
 }
 
 function badgeType(participantType: string) {
-  if (participantType == "COACH") {
+  if (participantType.toLowerCase() == "coach") {
     return "secondary";
-  } else if (participantType == "ADMIN") {
+  } else if (participantType.toLowerCase() == "admin") {
     return "outline";
-  } else if (participantType == "PLAYER") {
+  } else if (participantType.toLowerCase() == "player") {
     return "default";
   } else {
     return "destructive";

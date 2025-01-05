@@ -56,7 +56,7 @@ const TrainingSessionContent = () => {
   // Navigate back to Calendar page
   const navigate = useNavigate();
   // Handle account type. Only coach or admin can view list of attendees.
-  const [accountType, setAccountType] = useState<string>("COACH");
+  const [accountType, setAccountType] = useState<string>("coach");
 
   return (
     <div className="mb-32">

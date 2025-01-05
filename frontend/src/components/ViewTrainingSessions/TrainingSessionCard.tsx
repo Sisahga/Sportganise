@@ -41,8 +41,6 @@ interface Event {
   attendees: Attendees[];
 }
 
-// View more details, be taken to training session details page
-
 const TrainingSessionCard: React.FC<Event> = ({
   programId,
   programDetails,

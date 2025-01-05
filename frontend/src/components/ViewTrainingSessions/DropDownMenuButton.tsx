@@ -45,7 +45,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
           accountType.toLowerCase() === "admin" ? (
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onClick={() => navigate("/pages/ModifyTrainingSessionPage")}
+                onClick={() => navigate("/pages/CreateTrainingSessionPage")}
               >
                 <Pencil />
                 <span>Edit Event</span>

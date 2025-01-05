@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 // Component imports
 import TrainingSessionCard from "./TrainingSessionCard";
 import { Calendar } from "@/components/ui/calendar";
-import { Drawer } from "@/components/ui/drawer";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Mock data for now
 const mockAttendees: Attendees[] = [
@@ -167,14 +167,30 @@ export default function TrainingSessionsList() {
 
   return (
     <div className="mb-32">
+      {/**Title */}
       <h2 className="font-semibold text-2xl text-center">Schedule</h2>
 
-      <div>
-        <Calendar className="my-5" />
+      {/**Tabs content */}
+      <div className="my-5">
+        <Tabs defaultValue="month" className="w-[400px]">
+          <TabsList>
+            <TabsTrigger value="day">Day</TabsTrigger>
+            <TabsTrigger value="week">Week</TabsTrigger>
+            <TabsTrigger value="month">Month</TabsTrigger>
+          </TabsList>
+          <TabsContent value="day">Day view here...</TabsContent>
+          <TabsContent value="week">Week view here...</TabsContent>
+          <TabsContent value="month">
+            <div>
+              <Calendar />
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
 
       <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
 
+      {/**List of events */}
       {events.map((event) => (
         <div key={event.programId} className="my-5">
           <TrainingSessionCard
