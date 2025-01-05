@@ -37,7 +37,7 @@ const mockAttendees: Attendees[] = [
   },
 ];
 
-const mockProgramDetails: ProgramDetails = {
+const mockProgramDetails1: ProgramDetails = {
   programId: 1000,
   title: "Training Session Fun Title",
   type: "TRAINING",
@@ -49,6 +49,21 @@ const mockProgramDetails: ProgramDetails = {
   expiryDate: new Date(2025, 1, 20),
   coach: "Coach Benjamin Luijan",
   location: "Rue Valois, Vaudreuil-Dorion, QC J7V 0H4",
+  attachment: null,
+};
+
+const mockProgramDetails2: ProgramDetails = {
+  programId: 1000,
+  title: "2 Training Session Fun Title",
+  type: "TRAINING",
+  description: "2 This is the description of a training session event.",
+  capacity: 92,
+  occurenceDate: new Date(),
+  duration: 92,
+  recurring: true,
+  expiryDate: new Date(2025, 1, 20),
+  coach: "2 Coach Benjamin Luijan",
+  location: "2 Rue Valois, Vaudreuil-Dorion, QC J7V 0H4",
   attachment: null,
 };
 
@@ -100,17 +115,17 @@ export default function TrainingSessionsList() {
         const mockEvents: Event[] = [
           {
             programId: 1000,
-            programDetails: mockProgramDetails,
+            programDetails: mockProgramDetails1,
             attendees: mockAttendees,
           },
           {
             programId: 2000,
-            programDetails: mockProgramDetails,
+            programDetails: mockProgramDetails2,
             attendees: mockAttendees,
           },
           {
             programId: 3000,
-            programDetails: mockProgramDetails,
+            programDetails: mockProgramDetails2,
             attendees: mockAttendees,
           },
         ];

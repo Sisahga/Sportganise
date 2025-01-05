@@ -37,7 +37,6 @@ export default function ViewRegisteredPlayersContent() {
   useEffect(() => {
     const fetchAttendees = async () => {
       try {
-        /*
         const mockAttendees: Attendees[] = [
           {
             accountId: 1000,
@@ -66,10 +65,46 @@ export default function ViewRegisteredPlayersContent() {
             firstName: "John3",
             lastName: "Doe3",
           },
+          {
+            accountId: 4000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
+          {
+            accountId: 5000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
+          {
+            accountId: 6000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
+          {
+            accountId: 7000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
         ];
         setAttendees(mockAttendees);
-        */
 
+        /*
         const response = await fetch(
           `/api/${accountId}/${trainingSessionId}/details`
           //"https://catfact.ninja/facts?limit=4" //a testing api
@@ -90,6 +125,7 @@ export default function ViewRegisteredPlayersContent() {
             `Fetching registered players content: HTTP error! status: ${response.status}`
           ); // re-throw for the catch block below
         }
+        */
       } catch (error) {
         console.error(
           "Error fetching registered players content HTTP error:",
@@ -108,7 +144,7 @@ export default function ViewRegisteredPlayersContent() {
       {attendees.length > 0 ? (
         attendees.map((attendee) => (
           <div key={attendee.accountId}>
-            <div className="flex my-3">
+            <div className="flex my-2">
               <div className="mr-4 self-center">
                 <Avatar>
                   {" "}
@@ -116,7 +152,7 @@ export default function ViewRegisteredPlayersContent() {
                 </Avatar>
               </div>
               <div>
-                <h4 className="text-sm font-medium mb-1">
+                <h4 className="text-sm font-normal mb-1">
                   {attendee.firstName} {attendee.lastName}
                 </h4>
                 <Badge variant={badgeType(attendee.participantType)}>
