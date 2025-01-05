@@ -64,19 +64,18 @@ export default function VerificationCode() {
               className="my-2 ml-5 text-sm text-black"
             >
               Did not receive a code?
-
               <Button
-                      className="ml-2 text-secondaryColour font-bold underline p-0 bg-white border-none hover:bg-transparent"
-                      onClick={handleResend}   
-                    >
-                      Resend
-                    </Button>
+                className="ml-2 text-secondaryColour font-bold underline p-0 bg-white border-none hover:bg-transparent"
+                onClick={handleResend}
+              >
+                Resend
+              </Button>
             </p>
             <Link
               className="text-white bg-primaryColour py-1 rounded-lg flex items-center justify-center"
-              to="/"    // TODO : When "Verify" link is pressed, it needs to check if code is correct, then redirect to homepage
+              to="/" // TODO : When "Verify" link is pressed, it needs to check if code is correct, then redirect to homepage
             >
-              Verify   
+              Verify
             </Link>
           </form>
         </div>

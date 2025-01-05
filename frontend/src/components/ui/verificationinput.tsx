@@ -3,10 +3,17 @@ import React from "react";
 interface VerificationInputProps {
   id: string;
   nextInputId?: string;
-  handleInput: (e: React.ChangeEvent<HTMLInputElement>, nextInputId: string | undefined) => void;
+  handleInput: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    nextInputId: string | undefined
+  ) => void;
 }
 
-const VerificationInput: React.FC<VerificationInputProps> = ({ id, nextInputId, handleInput }) => {
+const VerificationInput: React.FC<VerificationInputProps> = ({
+  id,
+  nextInputId,
+  handleInput,
+}) => {
   return (
     <div>
       <label htmlFor={id} className="sr-only">

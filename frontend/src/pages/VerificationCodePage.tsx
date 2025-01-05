@@ -1,4 +1,3 @@
-
 import React from "react";
 import { VerificationCode } from "../components/VerificationCode/index";
 import { SecondaryHeader } from "../components/SecondaryHeader";

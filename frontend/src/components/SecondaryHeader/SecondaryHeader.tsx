@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function SecondaryHeader() {
   const navigate = useNavigate();
 
-  // Function to handle navigation to previous page using the history 
+  // Function to handle navigation to previous page using the history
   const handleGoBack = () => {
     navigate(-1); //Brings you to previous page
   };
@@ -28,4 +28,3 @@ export default function SecondaryHeader() {
     </div>
   );
 }
-

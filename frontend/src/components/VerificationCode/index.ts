@@ -1,1 +1,1 @@
-export { default as VerificationCode} from "./VerificationCode";
+export { default as VerificationCode } from "./VerificationCode";
