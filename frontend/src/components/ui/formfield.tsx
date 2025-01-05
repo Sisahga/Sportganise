@@ -24,7 +24,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
         {...inputProps}
       />
     </div>
-  )
+  ),
 );
 
 FormField.displayName = "FormField";

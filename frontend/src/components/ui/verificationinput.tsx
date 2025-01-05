@@ -5,7 +5,7 @@ interface VerificationInputProps {
   nextInputId?: string;
   handleInput: (
     e: React.ChangeEvent<HTMLInputElement>,
-    nextInputId: string | undefined
+    nextInputId: string | undefined,
   ) => void;
 }
 
