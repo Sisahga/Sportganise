@@ -178,7 +178,6 @@ public class ProgramService {
         return new ProgramDto(savedProgram);
     }
 
-
     /**
      * Method to create new ProgramParticipantDTO.
      * 
@@ -187,24 +186,26 @@ public class ProgramService {
      * @param confirmedDate Date in which participant was confirmed for the program.
      * @return A new ProgramParticipantDto.
      */
-    public ProgramParticipantDto createProgramParticipantDto(AccountDto account, Integer programId, Integer accountId){
-        
-        //Checks if an account has already signed up to the program
-        if(checkForStatus(accountId, programId)){
+    public ProgramParticipantDto createProgramParticipantDto(AccountDto account, Integer programId, Integer accountId) {
+
+        // Checks if an account has already signed up to the program
+        if (checkForStatus(accountId, programId)) {
             return null; // revisit this
         }
-        
-        ProgramParticipant newParticipant = new ProgramParticipant(programId, accountId, account.getType(), false, null);
+
+        ProgramParticipant newParticipant = new ProgramParticipant(programId, accountId, account.getType(), false,
+                null);
         ProgramParticipant savedParticipant = participantRepository.save(newParticipant);
 
-        return new ProgramParticipantDto(savedParticipant.getAccountId(), savedParticipant.getProgramId(), savedParticipant.isConfirmed(), savedParticipant.getConfirmedDate());
+        return new ProgramParticipantDto(savedParticipant.getAccountId(), savedParticipant.getProgramId(),
+                savedParticipant.isConfirmed(), savedParticipant.getConfirmedDate());
     }
 
-    public boolean checkForStatus(Integer accountId, Integer programId){
+    public boolean checkForStatus(Integer accountId, Integer programId) {
         List<ProgramParticipantDto> attendees = getParticipants(programId);
 
         return attendees.stream()
-            .anyMatch(participant -> participant.getAccountId().equals(accountId));
+                .anyMatch(participant -> participant.getAccountId().equals(accountId));
     }
 
     /**
@@ -240,9 +241,9 @@ public class ProgramService {
         String filePath = existingProgram.getAttachment();
         if (attachment != null && !attachment.isEmpty()) {
             if (filePath != null) {
-                // Delete the old file (We delete all the files since attachment also includes 
-                //the already uploaded files that we want to keep)
-                deleteFile(filePath); 
+                // Delete the old file (We delete all the files since attachment also includes
+                // the already uploaded files that we want to keep)
+                deleteFile(filePath);
             }
             // We re-upload the previous ones that we want to keep along with the new ones
             try {
@@ -407,5 +408,17 @@ public class ProgramService {
         }
     }
 
+    public void confirmParticipant(Integer programId, Integer accountId) {
 
+        ProgramParticipant waitlistParticipant = participantRepository
+                .findParticipant(programId, accountId);
+        if (waitlistParticipant == null){
+            throw new IllegalArgumentException("Participant not found");
+        }
+
+        LocalDateTime timestamp = LocalDateTime.now();
+        participantRepository.updateConfirmationStatus(waitlistParticipant.getProgramId(),
+                waitlistParticipant.getAccountId(), true, timestamp);
+
+    }
 }

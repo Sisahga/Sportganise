@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,5 +35,16 @@ public class ProgramParticipantController {
 
         ProgramParticipantDto participant = programService.createProgramParticipantDto(account, accountId, programId);
         return ResponseEntity.ok(participant);
+    }
+
+    @PatchMapping("/confirm-participant")
+    public ResponseEntity<String> updateConfirmationStatus(
+        @RequestParam Integer programId,
+        @RequestParam Integer accountId,
+        @RequestParam Boolean isConfirmed) {
+
+        // Update the participant's confirmation status
+        programService.confirmParticipant(programId, accountId);
+        return ResponseEntity.ok("Success!");
     }
 }
