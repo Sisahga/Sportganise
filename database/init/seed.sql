@@ -67,11 +67,11 @@ INSERT INTO channel_member (channel_id, account_id, read) VALUES
 (2,1, true),
 (2,2, false);
 
-INSERT INTO message (channel_id, sender_id, content) VALUES
-(1, 2, 'Welcome to sunday group chat.'),
-(1,3, 'Hello everyone!'),
-(1,4, 'Hi!'),
-(2, 1, 'Hello Mr White');
+INSERT INTO message (channel_id, sender_id, content, type) VALUES
+(1, 2, 'Welcome to sunday group chat.', 'CHAT'),
+(1,3, 'Hello everyone!', 'CHAT'),
+(1,4, 'Hi!', 'CHAT'),
+(2, 1, 'Hello Mr White', 'CHAT');
 
 INSERT INTO post (account_id, title, description) VALUES
 (1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!'),
