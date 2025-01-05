@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Entity class for the DirectMessageBlob table. */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,9 +19,10 @@ import lombok.Setter;
 @Entity
 @Table(name = "message_blob")
 public class DirectMessageBlob {
-    @Id
-    @Column(name = "message_id")
-    private Integer messageId;
-    @Column(name = "blob_url")
-    private String blobUrl;
+  @Id
+  @Column(name = "message_id")
+  private Integer messageId;
+
+  @Column(name = "blob_url")
+  private String blobUrl;
 }
