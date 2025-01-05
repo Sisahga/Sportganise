@@ -1,17 +1,15 @@
 package com.sportganise.controllers.programsessions;
 
-import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
+import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.Account;
-import com.sportganise.services.programsessions.ProgramService;
 import com.sportganise.services.auth.AccountService;
-
+import com.sportganise.services.programsessions.ProgramService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * REST Controller for managing 'Program' Entities. Handles HTTP request and
- * routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
  * appropriate services.
  */
 @RestController
@@ -52,8 +49,7 @@ public class ProgramController {
    */
   @GetMapping("/{accountId}/{programId}/details")
   public ResponseEntity<ProgramDetailsParticipantsDto> getProgramDetails(
-      @PathVariable Integer accountId,
-      @PathVariable Integer programId) {
+      @PathVariable Integer accountId, @PathVariable Integer programId) {
 
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = accountService.getAccount(accountId);
@@ -86,29 +82,29 @@ public class ProgramController {
 
     // Wrap program details and participants into the ProgramDetailsParticipantsDto
     // response DTO
-    ProgramDetailsParticipantsDto response = new ProgramDetailsParticipantsDto(programDto, participants);
+    ProgramDetailsParticipantsDto response =
+        new ProgramDetailsParticipantsDto(programDto, participants);
 
     return ResponseEntity.ok(response);
   }
 
   /**
    * Get mapping for creating new program.
-   * 
-   * @param accountId      Id of user who is making the request.
-   * @param programType    Type of the program.
-   * @param title          Title of the program.
-   * @param description    Description of the program.
-   * @param capacity       Participants capacity.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programType Type of the program.
+   * @param title Title of the program.
+   * @param description Description of the program.
+   * @param capacity Participants capacity.
    * @param occurrenceDate Date of the program.
-   * @param durationMins   Duration of the program/session in minutes.
-   * @param isRecurring    Boolean for whether this program is recurring.
-   * @param expiryDate     Expiry Date of the program i.e. when is the last
-   *                       occurence.
-   * @param frequency      Frequency of program/sessions.
-   * @param location       Location of the program/session.
-   * @param visibility     Visibility of the program i.e. is it only visible to
-   *                       registered members or all members.
-   * @param attachment     File paths of files attached to this program/session.
+   * @param durationMins Duration of the program/session in minutes.
+   * @param isRecurring Boolean for whether this program is recurring.
+   * @param expiryDate Expiry Date of the program i.e. when is the last occurence.
+   * @param frequency Frequency of program/sessions.
+   * @param location Location of the program/session.
+   * @param visibility Visibility of the program i.e. is it only visible to registered members or
+   *     all members.
+   * @param attachment File paths of files attached to this program/session.
    * @return HTTP Response for newly created program.
    */
   @PostMapping("/{accountId}/create-program")
@@ -146,8 +142,20 @@ public class ProgramController {
 
     // Call the service createProgramDto method to handle program creation
     try {
-      ProgramDto programDto = programService.createProgramDto(programType, title, description, capacity,
-          occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, attachment);
+      ProgramDto programDto =
+          programService.createProgramDto(
+              programType,
+              title,
+              description,
+              capacity,
+              occurrenceDate,
+              durationMins,
+              isRecurring,
+              expiryDate,
+              frequency,
+              location,
+              visibility,
+              attachment);
       return new ResponseEntity<>(programDto, HttpStatus.CREATED);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -156,22 +164,21 @@ public class ProgramController {
 
   /**
    * Put mapping for modifying/updating an existing program.
-   * 
-   * @param accountId      Id of user who is making the request.
-   * @param programType    Type of the program.
-   * @param title          Title of the program.
-   * @param description    Description of the program.
-   * @param capacity       Participants capacity.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programType Type of the program.
+   * @param title Title of the program.
+   * @param description Description of the program.
+   * @param capacity Participants capacity.
    * @param occurrenceDate Date of the program.
-   * @param durationMins   Duration of the program/session in minutes.
-   * @param isRecurring    Boolean for whether this program is recurring.
-   * @param expiryDate     Expiry Date of the program i.e. when is the last
-   *                       occurence.
-   * @param frequency      Frequency of program/sessions.
-   * @param location       Location of the program/session.
-   * @param visibility     Visibility of the program i.e. is it only visible to
-   *                       registered members or all members.
-   * @param attachment     File paths of files attached to this program/session.
+   * @param durationMins Duration of the program/session in minutes.
+   * @param isRecurring Boolean for whether this program is recurring.
+   * @param expiryDate Expiry Date of the program i.e. when is the last occurence.
+   * @param frequency Frequency of program/sessions.
+   * @param location Location of the program/session.
+   * @param visibility Visibility of the program i.e. is it only visible to registered members or
+   *     all members.
+   * @param attachment File paths of files attached to this program/session.
    * @return HTTP Response for modified/updated data
    */
   @PutMapping("/{accountId}/{programId}/modify-program")
@@ -218,8 +225,20 @@ public class ProgramController {
 
     // Call the service modifyProgram method to handle program creation
     try {
-      programService.modifyProgram(programDtoToModify, programType, title, description, capacity, occurrenceDate,
-          durationMins, isRecurring, expiryDate, frequency, location, visibility, attachment);
+      programService.modifyProgram(
+          programDtoToModify,
+          programType,
+          title,
+          description,
+          capacity,
+          occurrenceDate,
+          durationMins,
+          isRecurring,
+          expiryDate,
+          frequency,
+          location,
+          visibility,
+          attachment);
       return new ResponseEntity<>(HttpStatus.OK);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,9 +54,19 @@ public class Program {
   private String attachment;
 
   // Constructor excluding programId since it's generated automatically
-  public Program(String programType, String title, String description, Integer capacity,
-                 LocalDateTime occurrenceDate, Integer durationMins, Boolean isRecurring, 
-                 LocalDateTime expiryDate, String frequency, String location, String visibility, String attachment) {
+  public Program(
+      String programType,
+      String title,
+      String description,
+      Integer capacity,
+      LocalDateTime occurrenceDate,
+      Integer durationMins,
+      Boolean isRecurring,
+      LocalDateTime expiryDate,
+      String frequency,
+      String location,
+      String visibility,
+      String attachment) {
     this.programType = programType;
     this.title = title;
     this.description = description;
