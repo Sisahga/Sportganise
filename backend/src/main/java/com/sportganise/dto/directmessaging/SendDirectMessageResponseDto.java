@@ -3,10 +3,12 @@ package com.sportganise.dto.directmessaging;
 import com.sportganise.entities.directmessaging.DirectMessageType;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /** DTO for sending a direct message response. */
+@Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
