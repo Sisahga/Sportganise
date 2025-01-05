@@ -9,11 +9,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
-import java.time.LocalDateTime;
+import com.sportganise.services.directmessaging.DirectMessageService;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-
-import com.sportganise.services.directmessaging.DirectMessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +93,7 @@ class DirectMessageChannelControllerUnitTest {
 
     ListDirectMessageChannelDto channel1 =
         new ListDirectMessageChannelDto(
-            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, LocalDateTime.now());
+            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, ZonedDateTime.now());
     ListDirectMessageChannelDto channel2 =
         new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2", null, null, true, null);
     List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
