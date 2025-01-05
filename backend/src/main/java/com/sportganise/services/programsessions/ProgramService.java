@@ -421,4 +421,15 @@ public class ProgramService {
                 waitlistParticipant.getAccountId(), true, timestamp);
 
     }
+
+    public void removeParticipant(Integer programId, Integer accountId) {
+
+        ProgramParticipant waitlistParticipant = participantRepository
+                .findParticipant(programId, accountId);
+            if (waitlistParticipant == null){
+                throw new IllegalArgumentException("Participant not found");
+            }
+
+        participantRepository.delete(waitlistParticipant);
+    }
 }

@@ -43,13 +43,13 @@ public interface ProgramParticipantRepository extends JpaRepository<ProgramParti
         @Param("confirmDate") LocalDateTime confirmDate
     );
 
-    @Modifying
-    @Transactional
-    @Query("DELETE FROM ProgramParticipant pp WHERE pp.id.programId = :programId AND pp.id.accountId = :accountId")
-    void deleteProgramParticipant(
-        @Param("programId") Integer programId, 
-        @Param("accountId") Integer accountId
-    );
+    // @Modifying
+    // @Transactional
+    // @Query("DELETE FROM ProgramParticipant pp WHERE pp.id.programId = :programId AND pp.id.accountId = :accountId")
+    // void deleteProgramParticipant(
+    //     @Param("programId") Integer programId, 
+    //     @Param("accountId") Integer accountId
+    // );
 
     //Maybe unneeded
     @Query(
