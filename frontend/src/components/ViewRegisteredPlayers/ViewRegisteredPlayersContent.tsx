@@ -104,7 +104,7 @@ export default function ViewRegisteredPlayersContent() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold my-4">Attendees</h2>
+      <h2 className="text-l font-semibold my-4">Attendees</h2>
       {attendees.length > 0 ? (
         attendees.map((attendee) => (
           <div key={attendee.accountId}>

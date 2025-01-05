@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 //Component imports
 import { Card } from "@/components/ui/card";
@@ -40,9 +41,21 @@ interface Event {
   attendees: Attendees[];
 }
 
-const TrainingSessionCard: React.FC<Event> = ({ programDetails }) => {
+// View more details, be taken to training session details page
+
+const TrainingSessionCard: React.FC<Event> = ({
+  programId,
+  programDetails,
+  attendees,
+}) => {
   //const [progamDetails, setProgramDetails] = useState<ProgramDetails>();
   //setProgramDetails(programDetails);
+
+  // Handle navigation to training session detail page
+  const navigate = useNavigate();
+  const handleNavigation = (path: string, data: Event) => {
+    navigate(path, { state: data });
+  };
 
   return (
     <Card>
@@ -86,7 +99,16 @@ const TrainingSessionCard: React.FC<Event> = ({ programDetails }) => {
           <Badge>{programDetails.type}</Badge>
 
           {/*Click to view details */}
-          <div className="ml-2 flex items-center">
+          <div
+            onClick={() =>
+              handleNavigation("/pages/ViewTrainingSessionPage", {
+                programId,
+                programDetails,
+                attendees,
+              })
+            }
+            className="ml-2 flex items-center"
+          >
             <ChevronRight size={17} color="#82DBD8" />
             <p className="font-medium text-secondaryColour">View details</p>
           </div>

@@ -153,9 +153,11 @@ export default function TrainingSessionsList() {
   return (
     <div className="mb-32">
       <h2 className="font-semibold text-2xl text-center">Schedule</h2>
+
       <div>
         <Calendar className="my-5" />
       </div>
+
       <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
 
       {events.map((event) => (

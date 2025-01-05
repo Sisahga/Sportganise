@@ -7,7 +7,6 @@ export default function ViewTrainingSessionPage() {
     <div className="">
       {/*<ViewRegisteredPlayersContent >*/}
       <TrainingSessionContent />
-      <TrainingSessionsList />
     </div>
   );
 }
