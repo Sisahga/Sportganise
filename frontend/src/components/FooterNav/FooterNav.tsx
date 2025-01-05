@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Bell, Calendar, Home, MessageSquare, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function FooterNav() {
   const [selected, setSelected] = useState("Home");
-
+  const navigate = useNavigate();
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50">
       <nav className="flex justify-around p-2">
@@ -12,7 +13,10 @@ export default function FooterNav() {
         <Button
           variant="ghost"
           className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
-          onClick={() => setSelected("Home")}
+          onClick={() => {
+            setSelected("Home");
+            navigate("/HomePage");
+          }}
         >
           <Home
             className={`h-5 w-5 ${
@@ -60,7 +64,10 @@ export default function FooterNav() {
         <Button
           variant="ghost"
           className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
-          onClick={() => setSelected("Inbox")}
+          onClick={() => {
+            setSelected("Inbox");
+            navigate("/messages"); // Navigate to the messages route
+          }}
         >
           <MessageSquare
             className={`h-5 w-5 ${
