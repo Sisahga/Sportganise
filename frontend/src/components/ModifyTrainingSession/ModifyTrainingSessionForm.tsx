@@ -248,7 +248,7 @@ export default function ModifyTrainingSessionForm() {
       */
 
       //toast popup for user to say form submitted successfully
-      toast("Event updated successfully!");
+      toast("✔ Event updated successfully!");
       //Reset form fields
       //form.reset();
       // If successful, navigate to the success page with a message
@@ -272,15 +272,14 @@ export default function ModifyTrainingSessionForm() {
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
-      toast("There was a problem with your request. Event was not updated.");
+      toast("✖ There was a problem with your request. Event was not updated.");
     }
   };
 
   return (
     //RETURN ----------------------------------------------
-    <>
+    <div>
       {/** Navigate to previous page */}
-
       <Button
         className="rounded-full"
         variant="outline"
@@ -288,6 +287,7 @@ export default function ModifyTrainingSessionForm() {
       >
         <MoveLeft />
       </Button>
+
       {/** Create Training Session Form */}
       <Form {...form}>
         <form
@@ -821,6 +821,6 @@ export default function ModifyTrainingSessionForm() {
           </div>
         </form>
       </Form>
-    </>
+    </div>
   );
 }
