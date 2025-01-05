@@ -1,5 +1,5 @@
 //This is the view of the training session page
-import { ViewRegisteredPlayersContent } from "@/components/ViewRegisteredPlayers";
+import ViewRegisteredPlayersContent from "./ViewRegisteredPlayersContent";
 
 // Components imports
 import {
@@ -63,7 +63,6 @@ const TrainingSessionContent = () => {
   // Location state data sent from Calendar page card
   const location = useLocation();
   const programDetails = location.state.programDetails;
-
   // Navigate back to Calendar page
   const navigate = useNavigate();
 
@@ -146,6 +145,7 @@ const TrainingSessionContent = () => {
           <DropdownMenuContent className="w-56">
             <DropdownMenuLabel>Options</DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {/**CHANGE GROUP HERE DEPENDING ON ACCOUNT TYPE*/}
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Pencil />
@@ -153,7 +153,7 @@ const TrainingSessionContent = () => {
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <UsersRound />
-                <span>Member List</span>
+                <span>Contact all Members</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Trash2 color="red" />
