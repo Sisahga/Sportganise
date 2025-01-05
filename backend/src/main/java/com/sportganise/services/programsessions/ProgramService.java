@@ -432,4 +432,36 @@ public class ProgramService {
 
         participantRepository.delete(waitlistParticipant);
     }
+
+    public List<ProgramParticipantDto> getOptedParticipants(Integer programId){
+
+        List<ProgramParticipant> participants = participantRepository.findOptedInParticipants(programId);
+
+        // Taken from above function
+        // Map each Account to a ProgramParticipantDto
+        return participants.stream()
+                .map(participant -> {
+
+                    // Get account from accountId (this is a wrapper, not the actual)
+                    Optional<Account> accountOptional = accountService.getAccount(participant.getAccountId());
+
+                    // Check if the value of accountOptional is empty
+                    if (!accountOptional.isPresent()) {
+                        throw new IllegalArgumentException("Account not found for id: " + participant.getAccountId());
+                    }
+
+                    // Get the actual account object
+                    Account account = accountOptional.get();
+
+                    // map account information and participant information into a list of
+                    // ProgramParticipantDto
+                    return new ProgramParticipantDto(
+                            account.getAccountId(),
+                            programId,
+                            participant.isConfirmed(),
+                            participant.getConfirmedDate());
+                })
+                .toList();
+
+    }
 }
