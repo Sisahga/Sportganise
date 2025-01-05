@@ -27,13 +27,16 @@ public interface DirectMessageChannelMemberRepository
       @Param("channelId") int channelId, @Param("accountId") int accountId);
 
   /**
-   * Sets the read status for a channel's member to true when it is the sender id, false when it is not.
+   * Sets the read status for a channel's member to true when it is the sender id, false when it is
+   * not.
    *
    * @param channelId Channel ID to update read status for.
    * @param senderId Sender ID of the message.
    */
+  @Transactional
   @Modifying
-  @Query("""
+  @Query(
+      """
             UPDATE DirectMessageChannelMember
             SET read = CASE
                 WHEN compositeKey.accountId = :senderId THEN true
