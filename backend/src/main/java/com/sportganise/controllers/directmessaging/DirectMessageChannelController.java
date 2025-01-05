@@ -4,15 +4,22 @@ import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageResponseDto;
+import com.sportganise.entities.Account;
+import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
-import java.util.List;
-
 import com.sportganise.services.directmessaging.DirectMessageService;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,10 +32,13 @@ import org.springframework.web.bind.annotation.RestController;
 /** REST Controller for handling HTTP requests related to Direct Message Channels. */
 @RestController
 @RequestMapping("/api/messaging")
+@Slf4j
 @CrossOrigin("*")
 public class DirectMessageChannelController {
   private final DirectMessageChannelService directMessageChannelService;
   private final DirectMessageService directMessageService;
+  private final DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
+  private final AccountRepository accountRepository;
 
   /**
    * Controller Constructor.
@@ -36,26 +46,61 @@ public class DirectMessageChannelController {
    * @param directMessageChannelService Direct Message Channel Service.
    */
   @Autowired
-  public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService,
-                                        DirectMessageService directMessageService) {
+  public DirectMessageChannelController(
+      DirectMessageChannelService directMessageChannelService,
+      DirectMessageService directMessageService,
+      DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
+      AccountRepository accountRepository) {
     this.directMessageChannelService = directMessageChannelService;
     this.directMessageService = directMessageService;
+    this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
+    this.accountRepository = accountRepository;
   }
 
   /**
+   * Send a direct message.
    *
    * @param messageDto Direct message request DTO for sending a message.
-   * @return HHTP Status 201 with the sent message.
+   * @return Response DTO for sending a message.
    */
-  @MessageMapping("/send-message")
-  @SendTo("/app/directmessage")
-  public ResponseEntity<SendDirectMessageResponseDto> sendDirectMessage(SendDirectMessageRequestDto messageDto) {
-    // TODO: Configure Direct Message Service Class.
+  @MessageMapping("/chat.send-message")
+  @SendTo("/directmessage/public")
+  public SendDirectMessageResponseDto sendDirectMessage(
+      @Payload SendDirectMessageRequestDto messageDto) {
     try {
-      SendDirectMessageResponseDto responseDto = directMessageService.sendDirectMessage(messageDto);
-        return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+      log.info("Controller received message request.");
+      return directMessageService.sendDirectMessage(messageDto);
     } catch (Exception e) {
-      return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+      log.error("Error sending message", e);
+      return null;
+    }
+  }
+
+  /**
+   * Notifies a channel that a member is active in the channel.
+   *
+   * @param messageDto Direct message request DTO for adding a member.
+   * @param headerAccessor SimpMessageHeaderAccessor for the web socket session.
+   * @return Response DTO for adding a member.
+   */
+  // TODO (In Progress, next sprint): Create association between new member and channel in database.
+  @MessageMapping("/chat.add-member")
+  @SendTo("/directmessage/public")
+  public SendDirectMessageResponseDto addMember(
+      @Payload SendDirectMessageRequestDto messageDto, SimpMessageHeaderAccessor headerAccessor) {
+    try {
+      SendDirectMessageResponseDto responseDto = directMessageService.addMember(messageDto);
+      // Expect content to be id of new user when adding a new user to a message channel.
+      int newUserId = Integer.parseInt(messageDto.getMessageContent());
+      Optional<Account> newMember = accountRepository.findById(newUserId);
+      // Add username in web socket session
+      newMember.ifPresent(
+          account ->
+              Objects.requireNonNull(headerAccessor.getSessionAttributes())
+                  .put("username", account.getFirstName()));
+      return responseDto;
+    } catch (Exception e) {
+      return null;
     }
   }
 
