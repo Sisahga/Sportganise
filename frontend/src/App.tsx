@@ -9,6 +9,7 @@ import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
+import TrainingSessionsContent from "./components/ViewTrainingSessions/TrainingSessionContent";
 
 function App() {
   return (
@@ -40,6 +41,10 @@ function App() {
           <Route
             path="/pages/ViewTrainingSessionPage"
             element={<ViewTrainingSessionPage />}
+          ></Route>
+          <Route
+            path="/pages/ViewTrainingSessionPage/:trainingSessionId"
+            element={<TrainingSessionsContent />}
           ></Route>
         </Route>
       </Routes>
