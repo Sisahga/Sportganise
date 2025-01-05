@@ -6,13 +6,14 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+/** Configuration class for AWS S3 Storage Bucket. */
 @Configuration
 public class AwsS3Config {
-    @Value("${aws.s3.region}")
-    private String region;
+  @Value("${aws.s3.region}")
+  private String region;
 
-    @Bean
-    public S3Client s3Client() {
-        return S3Client.builder().region(Region.of(region)).build();
-    }
+  @Bean
+  public S3Client s3Client() {
+    return S3Client.builder().region(Region.of(region)).build();
+  }
 }
