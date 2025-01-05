@@ -15,6 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class ProgramParticipantDto {
+  private Integer programId;
   private Integer accountId;
   private String participantType;
   private String firstName;

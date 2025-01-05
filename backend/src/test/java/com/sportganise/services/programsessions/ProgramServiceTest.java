@@ -2,19 +2,15 @@ package com.sportganise.services.programsessions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import com.sportganise.dto.programsessions.ProgramDto;

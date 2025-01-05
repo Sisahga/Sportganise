@@ -70,6 +70,7 @@ public class ProgramService {
                     // map account information and participant information into a list of
                     // ProgramParticipantDto
                     return new ProgramParticipantDto(
+                            programId,
                             account.getAccountId(),
                             account.getType(),
                             account.getFirstName(),
@@ -212,9 +213,9 @@ public class ProgramService {
         String filePath = existingProgram.getAttachment();
         if (attachment != null && !attachment.isEmpty()) {
             if (filePath != null) {
-                // Delete the old file (We delete all the files since attachment also includes 
-                //the already uploaded files that we want to keep)
-                deleteFile(filePath); 
+                // Delete the old file (We delete all the files since attachment also includes
+                // the already uploaded files that we want to keep)
+                deleteFile(filePath);
             }
             // We re-upload the previous ones that we want to keep along with the new ones
             try {
