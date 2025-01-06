@@ -31,8 +31,7 @@ public class DirectMessageChannelController {
    * @param directMessageChannelService Direct Message Channel Service.
    */
   @Autowired
-  public DirectMessageChannelController(
-      DirectMessageChannelService directMessageChannelService) {
+  public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService) {
     this.directMessageChannelService = directMessageChannelService;
   }
 
