@@ -53,7 +53,7 @@ class DirectMessageChannelControllerUnitTest {
         .willReturn(createDmChannelDTO);
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/messaging/create-channel/1")
+            MockMvcRequestBuilders.post("/api/messaging/channel/create-channel/1")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(createDmChannelDTO)))
         .andExpect(status().isCreated())
@@ -72,7 +72,7 @@ class DirectMessageChannelControllerUnitTest {
     int channelId = 1;
     given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(true);
     mockMvc
-        .perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
+        .perform(MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
         .andExpect(status().isNoContent());
     verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
   }
@@ -82,7 +82,7 @@ class DirectMessageChannelControllerUnitTest {
     int channelId = 1;
     given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(false);
     mockMvc
-        .perform(MockMvcRequestBuilders.delete("/api/messaging/delete-channel/" + channelId))
+        .perform(MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
         .andExpect(status().isNotFound());
     verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
   }
@@ -93,14 +93,16 @@ class DirectMessageChannelControllerUnitTest {
 
     ListDirectMessageChannelDto channel1 =
         new ListDirectMessageChannelDto(
-            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, ZonedDateTime.now());
+            1, "GROUP", "Channel 1", "image_blob_1",
+                "I love you.", false, ZonedDateTime.now());
     ListDirectMessageChannelDto channel2 =
-        new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2", null, null, true, null);
+        new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2",
+                null, null, true, null);
     List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
 
     given(dmChannelService.getDirectMessageChannels(accountId)).willReturn(expectedChannels);
     mockMvc
-        .perform(MockMvcRequestBuilders.get("/api/messaging/get-channels/" + accountId))
+        .perform(MockMvcRequestBuilders.get("/api/messaging/channel/get-channels/" + accountId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].channelId", is(channel1.getChannelId())))
         .andExpect(jsonPath("$[0].channelType", is(channel1.getChannelType())))
@@ -108,14 +110,12 @@ class DirectMessageChannelControllerUnitTest {
         .andExpect(jsonPath("$[0].channelImageBlob", is(channel1.getChannelImageBlob())))
         .andExpect(jsonPath("$[0].lastMessage", is(channel1.getLastMessage())))
         .andExpect(jsonPath("$[0].read", is(channel1.getRead())))
-        .andExpect(jsonPath("$[0].lastEvent", is(channel1.getLastEvent().toString())))
         .andExpect(jsonPath("$[1].channelId", is(channel2.getChannelId())))
         .andExpect(jsonPath("$[1].channelType", is(channel2.getChannelType())))
         .andExpect(jsonPath("$[1].channelName", is(channel2.getChannelName())))
         .andExpect(jsonPath("$[1].channelImageBlob", is(channel2.getChannelImageBlob())))
         .andExpect(jsonPath("$[1].lastMessage", is(channel2.getLastMessage())))
-        .andExpect(jsonPath("$[1].read", is(channel2.getRead())))
-        .andExpect(jsonPath("$[1].lastEvent").doesNotExist());
+        .andExpect(jsonPath("$[1].read", is(channel2.getRead())));
     verify(dmChannelService, times(1)).getDirectMessageChannels(accountId);
   }
 
@@ -124,7 +124,7 @@ class DirectMessageChannelControllerUnitTest {
     int accountId = 1;
     given(dmChannelService.getDirectMessageChannels(accountId)).willReturn(null);
     mockMvc
-        .perform(MockMvcRequestBuilders.get("/api/messaging/get-channels/" + accountId))
+        .perform(MockMvcRequestBuilders.get("/api/messaging/channel/get-channels/" + accountId))
         .andExpect(status().isOk())
         .andExpect(content().string(""));
     verify(dmChannelService, times(1)).getDirectMessageChannels(accountId);
