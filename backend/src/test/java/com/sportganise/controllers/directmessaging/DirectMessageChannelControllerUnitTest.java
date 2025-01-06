@@ -72,7 +72,8 @@ class DirectMessageChannelControllerUnitTest {
     int channelId = 1;
     given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(true);
     mockMvc
-        .perform(MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
+        .perform(
+            MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
         .andExpect(status().isNoContent());
     verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
   }
@@ -82,7 +83,8 @@ class DirectMessageChannelControllerUnitTest {
     int channelId = 1;
     given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(false);
     mockMvc
-        .perform(MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
+        .perform(
+            MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
         .andExpect(status().isNotFound());
     verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
   }
@@ -93,11 +95,9 @@ class DirectMessageChannelControllerUnitTest {
 
     ListDirectMessageChannelDto channel1 =
         new ListDirectMessageChannelDto(
-            1, "GROUP", "Channel 1", "image_blob_1",
-                "I love you.", false, ZonedDateTime.now());
+            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, ZonedDateTime.now());
     ListDirectMessageChannelDto channel2 =
-        new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2",
-                null, null, true, null);
+        new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2", null, null, true, null);
     List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
 
     given(dmChannelService.getDirectMessageChannels(accountId)).willReturn(expectedChannels);
