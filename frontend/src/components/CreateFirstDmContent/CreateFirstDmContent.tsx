@@ -72,7 +72,7 @@ export default function CreateFirstDmContent() {
 
   //updates user search to be more specific by letter as they type player's name
   const filteredPlayers = mockPlayers.filter((player: Player) =>
-    player.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+    player.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
   );
 
   //user can also select more than one user when creating a msg at first
