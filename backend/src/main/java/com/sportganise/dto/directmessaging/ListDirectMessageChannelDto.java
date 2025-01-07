@@ -1,6 +1,6 @@
 package com.sportganise.dto.directmessaging;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,5 +18,5 @@ public class ListDirectMessageChannelDto {
   private String channelImageBlob;
   private String lastMessage;
   private Boolean read;
-  private LocalDateTime lastEvent;
+  private ZonedDateTime lastEvent;
 }
