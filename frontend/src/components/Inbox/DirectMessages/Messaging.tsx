@@ -1,9 +1,9 @@
 // MessagingApp.tsx
 import { useNavigate } from "react-router-dom";
 import { Plus, ArrowLeft } from "lucide-react";
-import useGroups from "./useGroups";
-import useMessages from "./useMessages";
-import GroupSection from "./GroupSection";
+import useGroups from "../apiCalls/useGroups";
+import useMessages from "../apiCalls/useMessages";
+import GroupSection from "@/components/Inbox/GroupMessages/GroupSection";
 import MessagesSection from "./MessagesSection";
 
 function MessagingApp() {
