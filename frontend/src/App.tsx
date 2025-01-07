@@ -9,6 +9,8 @@ import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
+import SignUpPage from "./pages/SignUpPage";
+import VerificationCodePage from "./pages/VerificationCodePage";
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
             path="/pages/ViewTrainingSessionPage"
             element={<ViewTrainingSessionPage />}
           ></Route>
+          <Route path="/signup" element={<SignUpPage />}></Route>
+          <Route path="/verificationcode" element={<VerificationCodePage />} />
         </Route>
       </Routes>
     </Router>
