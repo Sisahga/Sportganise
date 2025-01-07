@@ -2,7 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CreateTrainingSessionPage from "./pages/CreateTrainingSessionPage";
 import Layout from "./components/Layout";
-import MessagingApp from "./components/Inbox/Direct Messages/Messaging";
+import MessagingApp from "@/components/Inbox/DirectMessages/Messaging";
 import ChatScreen from "./components/Inbox/ChatScreen/ChatScreen";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";

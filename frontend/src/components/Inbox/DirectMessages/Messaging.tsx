@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Plus, ArrowLeft } from "lucide-react";
 import useGroups from "../apiCalls/useGroups";
 import useMessages from "../apiCalls/useMessages";
-import GroupSection from "../Group Messages/GroupSection";
+import GroupSection from "@/components/Inbox/GroupMessages/GroupSection";
 import MessagesSection from "./MessagesSection";
 
 function MessagingApp() {
