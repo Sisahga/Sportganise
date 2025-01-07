@@ -1,11 +1,11 @@
-// ChatScreen.tsx
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, MoreVertical, Send, Plus } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, Send, Plus } from "lucide-react";
 import useChatMessages from "./apiCalls/useChatMessages";
-import defaultAvatar from "./defaultAvatar.png";
-import defaultGroupAvatar from "./GroupAvatar.png";
+import defaultAvatar from "./SampleImages/defaultAvatar.png";
+import defaultGroupAvatar from "./SampleImages/defaultGroupAvatar.png";
 import { Message } from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
+import "./ChatScreen.css";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -60,7 +60,7 @@ const ChatScreen = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
+    <div id={"chatScreenMainCtn"} className="flex flex-col h-screen bg-gray-100">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-white shadow">
         {/* Back Button */}
@@ -83,7 +83,7 @@ const ChatScreen = () => {
 
         {/* Options Button */}
         <button className="p-2 rounded-full bg-gray-200 hover:bg-gray-300">
-          <MoreVertical className="text-gray-800" size={24} />
+          <MoreHorizontal className="text-gray-800" size={24} />
         </button>
       </header>
 
