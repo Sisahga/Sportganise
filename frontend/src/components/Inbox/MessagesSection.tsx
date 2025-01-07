@@ -1,7 +1,6 @@
 // MessagesSection.tsx
 import SectionWrapper from "./SectionWrapper";
-import ChannelItem , {Channel} from "./ChannelItem";
-
+import ChannelItem, { Channel } from "./ChannelItem";
 
 interface ChannelMessage {
   channelId: number;
