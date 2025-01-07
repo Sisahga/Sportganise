@@ -5,7 +5,7 @@ import { ArrowLeft, MoreVertical, Send, Plus } from "lucide-react";
 import useChatMessages from "./apiCalls/useChatMessages";
 import defaultAvatar from "./defaultAvatar.png";
 import defaultGroupAvatar from "./GroupAvatar.png";
-import {Message} from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
+import { Message } from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
