@@ -2,7 +2,7 @@
 import SectionWrapper from "./SectionWrapper";
 import ChannelItem, { Channel } from "./ChannelItem";
 
-interface Message {
+interface ChannelMessage {
   channelId: number;
   channelType: string;
   channelName: string;
@@ -13,7 +13,7 @@ interface Message {
 }
 
 interface MessagesSectionProps {
-  messages: Message[];
+  messages: ChannelMessage[];
 }
 
 function MessagesSection({ messages }: MessagesSectionProps) {
