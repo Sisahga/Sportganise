@@ -5,6 +5,7 @@ import { ArrowLeft, MoreVertical, Send, Plus } from "lucide-react";
 import useChatMessages from "./apiCalls/useChatMessages";
 import defaultAvatar from "./defaultAvatar.png";
 import defaultGroupAvatar from "./GroupAvatar.png";
+import {Message} from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const ChatScreen = () => {
     if (newMessage.trim() === "") return; // Do nothing if the input is empty
 
     // Add the new message to the messages array locally
-    setMessages((prevMessages: any[]) => [
+    setMessages((prevMessages: Message[]) => [
       ...prevMessages,
       {
         id: prevMessages.length + 1,
