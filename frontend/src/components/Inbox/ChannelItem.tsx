@@ -26,7 +26,7 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate("/chat", {
+    navigate("/pages/DirectMessageChannelPage", {
       state: {
         chatName: channel.channelName,
         chatAvatar: channel.channelImageBlob,
