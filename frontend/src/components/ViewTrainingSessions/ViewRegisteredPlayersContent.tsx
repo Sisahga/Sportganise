@@ -4,16 +4,7 @@ import { useParams } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-interface Attendees {
-  accountId: number;
-  participantType: "COACH" | "ADMIN" | "PLAYER";
-  email: string;
-  address: string;
-  phone: string;
-  firstName: string;
-  lastName: string;
-}
-
+// Handle badge variants
 function badgeType(participantType: string) {
   if (participantType.toLowerCase() == "coach") {
     return "secondary";
@@ -26,12 +17,30 @@ function badgeType(participantType: string) {
   }
 }
 
-export default function ViewRegisteredPlayersContent() {
+// Data structures
+interface Attendees {
+  accountId: number;
+  participantType: "COACH" | "ADMIN" | "PLAYER";
+  email: string;
+  address: string;
+  phone: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface ViewRegisteredPlayersContentProps {
+  programId: number;
+  //add to as necessary
+}
+
+export default function ViewRegisteredPlayersContent({
+  programId,
+}: ViewRegisteredPlayersContentProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<Attendees[]>([]);
-  const { trainingSessionId } = useParams();
-  const accountId = ""; //TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
+  //const { trainingSessionId } = useParams();
+  const accountId = ""; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
 
   // fetch data on component mount
   useEffect(() => {
@@ -106,7 +115,7 @@ export default function ViewRegisteredPlayersContent() {
 
         /*
         const response = await fetch(
-          `/api/${accountId}/${trainingSessionId}/details`
+          `/api/${accountId}/${programId}/details`
           //"https://catfact.ninja/facts?limit=4" //a testing api
         );
 

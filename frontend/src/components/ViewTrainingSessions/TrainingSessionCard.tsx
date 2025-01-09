@@ -98,7 +98,7 @@ const TrainingSessionCard: React.FC<Event> = ({
             variant={
               programDetails.type.toLowerCase() == "training"
                 ? "default"
-                : "outline"
+                : "secondary"
             }
           >
             {programDetails.type}

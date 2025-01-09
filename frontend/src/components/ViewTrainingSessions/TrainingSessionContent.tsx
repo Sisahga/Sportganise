@@ -53,10 +53,11 @@ const TrainingSessionContent = () => {
   // Location state data sent from Calendar page card
   const location = useLocation();
   const programDetails = location.state.programDetails;
+  const programId = location.state.programId;
   // Navigate back to Calendar page
   const navigate = useNavigate();
   // Handle account type. Only coach or admin can view list of attendees.
-  const [accountType, setAccountType] = useState<string>("player");
+  const [accountType, setAccountType] = useState<string>("admin");
 
   return (
     <div className="mb-32">
@@ -134,7 +135,7 @@ const TrainingSessionContent = () => {
         {(accountType.toLowerCase() === "coach" ||
           accountType.toLowerCase() === "admin") && (
           <div>
-            <ViewRegisteredPlayersContent />
+            <ViewRegisteredPlayersContent programId={programId} />
           </div>
         )}
 
