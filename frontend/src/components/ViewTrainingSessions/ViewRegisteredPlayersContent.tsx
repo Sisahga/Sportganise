@@ -145,7 +145,7 @@ export default function ViewRegisteredPlayersContent({
       }
     };
     fetchAttendees();
-  }, []);
+  }, [programId]);
 
   return (
     <div>
