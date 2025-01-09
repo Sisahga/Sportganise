@@ -82,7 +82,7 @@ const TrainingSessionContent = () => {
 
       {/**Session details */}
       <div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 my-1">
           <Calendar
             size={15}
             color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
@@ -98,7 +98,7 @@ const TrainingSessionContent = () => {
           />
           <p className="text-sm text-gray-500">{programDetails.duration}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 my-1">
           <CircleUserRound
             size={15}
             color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
