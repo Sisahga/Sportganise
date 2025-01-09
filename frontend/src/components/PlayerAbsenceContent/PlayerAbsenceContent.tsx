@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Frown } from "lucide-react";
 import { LogOut } from "lucide-react";
 
