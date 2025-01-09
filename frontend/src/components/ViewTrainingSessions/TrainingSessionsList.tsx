@@ -55,7 +55,7 @@ const mockProgramDetails1: ProgramDetails = {
 const mockProgramDetails2: ProgramDetails = {
   programId: 1000,
   title: "2 Training Session Fun Title",
-  type: "TRAINING",
+  type: "FUNDRAISOR",
   description: "2 This is the description of a training session event.",
   capacity: 92,
   occurenceDate: new Date(),

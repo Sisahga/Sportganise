@@ -7,8 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-// TODO: Function to handle badge color of event type
-
 // Data structure for data received from API call
 interface Attendees {
   accountId: number;
@@ -48,6 +46,8 @@ const TrainingSessionCard: React.FC<Event> = ({
 }) => {
   //const [progamDetails, setProgramDetails] = useState<ProgramDetails>();
   //setProgramDetails(programDetails);
+
+  // Handle badge variant
 
   // Handle navigation to training session detail page
   const navigate = useNavigate();
@@ -94,7 +94,15 @@ const TrainingSessionCard: React.FC<Event> = ({
           {programDetails.description}
         </span>
         <div className="flex">
-          <Badge>{programDetails.type}</Badge>
+          <Badge
+            variant={
+              programDetails.type.toLowerCase() == "training"
+                ? "default"
+                : "outline"
+            }
+          >
+            {programDetails.type}
+          </Badge>
 
           {/*Click to view details */}
           <div
