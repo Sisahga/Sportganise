@@ -4,6 +4,7 @@ import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 /** REST Controller for handling HTTP requests related to Direct Message Channels. */
 @RestController
-@RequestMapping("/api/messaging")
+@RequestMapping("/api/messaging/channel")
+@Slf4j
 @CrossOrigin("*")
 public class DirectMessageChannelController {
   private final DirectMessageChannelService directMessageChannelService;

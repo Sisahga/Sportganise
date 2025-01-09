@@ -1,5 +1,6 @@
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { Link } from "react-router-dom";
 import {
   Drawer,
   DrawerContent,
@@ -57,6 +58,12 @@ export default function HeaderNav() {
               >
                 Setting
               </Button>
+              <Link
+                to="/signup"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none inline-flex items-center justify-center"
+              >
+                Sign Up
+              </Link>
             </nav>
           </DrawerContent>
         </Drawer>

@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, MoreVertical, Send, Plus } from "lucide-react";
-import useChatMessages from "./useChatMessages";
+import useChatMessages from "./apiCalls/useChatMessages";
 import defaultAvatar from "./defaultAvatar.png";
 import defaultGroupAvatar from "./GroupAvatar.png";
+import { Message } from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const ChatScreen = () => {
   const channelId = state?.channelId || 1; // Use a default channel ID for testing
 
   // Use custom hook to fetch messages
-  const {messages, setMessages, loading, error} = useChatMessages(channelId);
+  const { messages, setMessages, loading, error } = useChatMessages(channelId);
 
   const [newMessage, setNewMessage] = useState("");
 
@@ -27,7 +28,7 @@ const ChatScreen = () => {
     if (newMessage.trim() === "") return; // Do nothing if the input is empty
 
     // Add the new message to the messages array locally
-    setMessages((prevMessages) => [
+    setMessages((prevMessages: Message[]) => [
       ...prevMessages,
       {
         id: prevMessages.length + 1,
