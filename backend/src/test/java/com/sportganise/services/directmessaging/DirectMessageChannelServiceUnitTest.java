@@ -14,7 +14,7 @@ import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -161,7 +161,7 @@ public class DirectMessageChannelServiceUnitTest {
 
     ListDirectMessageChannelDto channel1 =
         new ListDirectMessageChannelDto(
-            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, LocalDateTime.now());
+            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, ZonedDateTime.now());
     ListDirectMessageChannelDto channel2 =
         new ListDirectMessageChannelDto(2, "SIMPLE", "Channel 2", null, null, true, null);
     List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
