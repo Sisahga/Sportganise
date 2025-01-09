@@ -155,7 +155,7 @@ export default function TrainingSessionsList() {
       } catch (error) {
         console.error(
           "Error fetching registered players content HTTP error:",
-          error
+          error,
         );
       } finally {
         setLoading(false);
