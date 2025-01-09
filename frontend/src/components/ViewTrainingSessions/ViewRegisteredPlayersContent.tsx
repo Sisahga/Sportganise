@@ -138,7 +138,7 @@ export default function ViewRegisteredPlayersContent({
       } catch (error) {
         console.error(
           "Error fetching registered players content HTTP error:",
-          error
+          error,
         );
       } finally {
         setLoading(false);
