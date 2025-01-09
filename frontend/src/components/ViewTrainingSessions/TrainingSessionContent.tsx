@@ -127,7 +127,7 @@ const TrainingSessionContent = () => {
               size={15}
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
-            <p className="text-sm text-gray-500">FILE</p>
+            <p className="text-sm text-gray-500">TODO: File blob array</p>
           </div>
         </div>
 

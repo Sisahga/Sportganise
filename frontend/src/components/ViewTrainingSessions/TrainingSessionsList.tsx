@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+/**For now, this is the content shown on the Calendar Page. Might be changed later */
+
 //import React from "react";
+import { useEffect, useState } from "react";
 
 // Component imports
 import TrainingSessionCard from "./TrainingSessionCard";
@@ -103,10 +105,7 @@ export default function TrainingSessionsList() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-  const accountId = ""; //TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
-
-  //calendar
-  //const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const accountId = ""; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
 
   // Fetch data on component mount
   useEffect(() => {

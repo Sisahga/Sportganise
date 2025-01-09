@@ -1,7 +1,7 @@
-import { useState } from "react";
+//import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-//Component imports
+// Component imports
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
@@ -46,8 +46,6 @@ const TrainingSessionCard: React.FC<Event> = ({
 }) => {
   //const [progamDetails, setProgramDetails] = useState<ProgramDetails>();
   //setProgramDetails(programDetails);
-
-  // Handle badge variant
 
   // Handle navigation to training session detail page
   const navigate = useNavigate();
