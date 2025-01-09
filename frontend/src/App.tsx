@@ -8,6 +8,7 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import CreateFirstDmPage from "./pages/CreateFirstDmPage";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
@@ -17,6 +18,12 @@ function App() {
     <Router>
       <Routes>
         <Route path="/HomePage" element={<HomePage />} />
+        {/*placed route here as it does not use original layout with Nav, bottom
+        nav, ...*/}
+        <Route
+          path="/pages/CreateFirstDmPage"
+          element={<CreateFirstDmPage />}
+        ></Route>
         <Route path="/" element={<Layout />}>
           {" "}
           <Route path="/messages" element={<MessagingApp />} />
