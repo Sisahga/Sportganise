@@ -32,9 +32,17 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const handleButtonClick = () => {
+  // Handle player leaving
+  const handleButtonClickPlayer = () => {
     setModalVisible(true); // Show the modal on button click
   };
+
+  // Handle waitlisted joining
+  /*
+  const handleButtonClickWaitlisted = () => {
+    setModalVisible(true); // Show the modal on button click
+  };
+  */
 
   const handleLeave = () => {
     setModalVisible(false); // Close the modal
@@ -90,7 +98,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <UserRound />
                 <span>Contact Member</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleButtonClick}>
+              <DropdownMenuItem onClick={handleButtonClickPlayer}>
                 <LogOut color="red" />
                 <span className="text-red">Mark as absent</span>
               </DropdownMenuItem>
