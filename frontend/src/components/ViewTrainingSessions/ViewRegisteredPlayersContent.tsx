@@ -149,7 +149,12 @@ export default function ViewRegisteredPlayersContent({
 
   return (
     <div>
-      <h2 className="text-l font-semibold my-4">Attendees</h2>
+      <div className="flex items-center">
+        <h2 className="text-l font-semibold my-4">Attendees</h2>
+        <p className="text-sm font-medium text-gray-500 ml-3">
+          {attendees.length}
+        </p>
+      </div>
       {attendees.length > 0 ? (
         attendees.map((attendee) => (
           <div key={attendee.accountId}>
