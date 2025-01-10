@@ -2,11 +2,13 @@ package com.sportganise.entities.directmessaging;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,5 +36,8 @@ public class DirectMessage {
   private String content;
 
   @Column(name = "sent_at")
-  private LocalDateTime sentAt;
+  private ZonedDateTime sentAt;
+
+  @Enumerated(EnumType.STRING)
+  private DirectMessageType type;
 }

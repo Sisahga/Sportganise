@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 //import { useNavigate, useLocation } from "react-router-dom";
-import { Badge } from "../ui/badge";
-import { Avatar, AvatarFallback } from "../ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
+// Handle badge variants
+function badgeType(participantType: string) {
+  if (participantType.toLowerCase() == "coach") {
+    return "secondary";
+  } else if (participantType.toLowerCase() == "admin") {
+    return "outline";
+  } else if (participantType.toLowerCase() == "player") {
+    return "default";
+  } else {
+    return "destructive";
+  }
+}
+
+// Data structures
 interface Attendees {
   accountId: number;
   participantType: "COACH" | "ADMIN" | "PLAYER";
@@ -14,24 +27,18 @@ interface Attendees {
   lastName: string;
 }
 
-function badgeType(participantType: string) {
-  if (participantType == "COACH") {
-    return "secondary";
-  } else if (participantType == "ADMIN") {
-    return "outline";
-  } else if (participantType == "PLAYER") {
-    return "default";
-  } else {
-    return "destructive";
-  }
+interface ViewRegisteredPlayersContentProps {
+  programId: number;
+  //add to as necessary
 }
 
-export default function ViewRegisteredPlayersContent() {
+export default function ViewRegisteredPlayersContent({
+  programId,
+}: ViewRegisteredPlayersContentProps) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<Attendees[]>([]);
-  const { trainingSessionId } = useParams();
-  const accountId = ""; //TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
+  const accountId = ""; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
 
   // fetch data on component mount
   useEffect(() => {
@@ -66,12 +73,48 @@ export default function ViewRegisteredPlayersContent() {
             firstName: "John3",
             lastName: "Doe3",
           },
+          {
+            accountId: 4000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
+          {
+            accountId: 5000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
+          {
+            accountId: 6000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
+          {
+            accountId: 7000,
+            participantType: "ADMIN",
+            email: "email3@gmail.com",
+            address: "8889 Rue Street",
+            phone: "514-555-555",
+            firstName: "John3",
+            lastName: "Doe3",
+          },
         ];
         setAttendees(mockAttendees);
         */
 
         const response = await fetch(
-          `/api/${accountId}/${trainingSessionId}/details`,
+          `/api/${accountId}/${programId}/details`,
           //"https://catfact.ninja/facts?limit=4" //a testing api
         );
 
@@ -100,15 +143,20 @@ export default function ViewRegisteredPlayersContent() {
       }
     };
     fetchAttendees();
-  }, []);
+  }, [programId]);
 
   return (
     <div>
-      <h2 className="text-xl font-semibold my-4">Attendees</h2>
+      <div className="flex items-center">
+        <h2 className="text-l font-semibold my-4">Attendees</h2>
+        <p className="text-sm font-medium text-gray-500 ml-3">
+          {attendees.length}
+        </p>
+      </div>
       {attendees.length > 0 ? (
         attendees.map((attendee) => (
           <div key={attendee.accountId}>
-            <div className="flex my-3">
+            <div className="flex my-2">
               <div className="mr-4 self-center">
                 <Avatar>
                   {" "}
@@ -116,10 +164,9 @@ export default function ViewRegisteredPlayersContent() {
                 </Avatar>
               </div>
               <div>
-                <h4 className="text-sm font-medium mb-1">
+                <h4 className="text-sm font-normal mb-1">
                   {attendee.firstName} {attendee.lastName}
                 </h4>
-
                 <Badge variant={badgeType(attendee.participantType)}>
                   {attendee.participantType}
                 </Badge>
@@ -131,7 +178,7 @@ export default function ViewRegisteredPlayersContent() {
       ) : loading ? (
         <p>Loading attendees...</p>
       ) : (
-        <p>Error loading attendees: {error}</p>
+        <p className="text-red font-medium">Error loading attendees: {error}</p>
       )}
     </div>
   );
