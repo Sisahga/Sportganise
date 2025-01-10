@@ -114,7 +114,7 @@ export default function ViewRegisteredPlayersContent({
         */
 
         const response = await fetch(
-          `/api/${accountId}/${programId}/details`
+          `/api/${accountId}/${programId}/details`,
           //"https://catfact.ninja/facts?limit=4" //a testing api
         );
 
@@ -124,19 +124,19 @@ export default function ViewRegisteredPlayersContent({
         } else {
           console.log(
             "Error fetching registered players content: ",
-            response.status
+            response.status,
           );
           setError(
-            "Error fetching registered players content: " + response.status
+            "Error fetching registered players content: " + response.status,
           );
           throw new Error(
-            `Fetching registered players content: HTTP error! status: ${response.status}`
+            `Fetching registered players content: HTTP error! status: ${response.status}`,
           ); // re-throw for the catch block below
         }
       } catch (error) {
         console.error(
           "Error fetching registered players content HTTP error:",
-          error
+          error,
         );
       } finally {
         setLoading(false);
