@@ -16,12 +16,10 @@ import lombok.Setter;
 public class ProgramParticipantDto {
   private Integer programId;
   private Integer accountId;
-  private String participantType;
+
   private String firstName;
   private String lastName;
-  private String email;
-  private String address;
-  private String phone;
+
   private boolean isConfirmed;
   private LocalDateTime confirmedDate;
 }

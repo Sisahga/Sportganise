@@ -70,14 +70,14 @@ public class ProgramController {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    // Initialize the participants list as null
+    // Initialize a list of AccountDto as an empty/null arraylist
     List<ProgramParticipantDto> participants = new ArrayList<>();
 
     // Check if this user has permissions to see training sessions attendees
     // (i.e. if the user is of type COACH or ADMIN)
     // If they have permission, then they can see the list of participants
     if (accountService.hasPermissions(user.getType())) {
-      participants = programService.getParticipants(programId);
+       participants = programService.getParticipants(programId);
     }
 
     // Wrap program details and participants into the ProgramDetailsParticipantsDto
