@@ -87,7 +87,18 @@ const formSchema = z
   .refine((data) => data.end_time >= data.start_time, {
     message: "End time cannot be earlier than start time.",
     path: ["end_time"],
-  });
+  })
+  .refine(
+    (data) =>
+      !(
+        data.start_date.getTime() === data.end_date.getTime() && data.recurring
+      ),
+    {
+      message:
+        "Event start and end dates are the same and therefore cannot reccur.",
+      path: ["recurring"],
+    }
+  );
 
 //PAGE CONTENT -----------------------------------------------------------------------------------------------------------
 export default function CreateTrainingSessionForm() {
@@ -416,7 +427,8 @@ export default function CreateTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the last day of a recurring event.
+                  Enter the last day of a recurring event. If same-day event,
+                  pick the day entered for start date.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
