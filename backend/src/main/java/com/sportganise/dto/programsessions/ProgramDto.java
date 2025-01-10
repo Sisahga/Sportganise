@@ -30,7 +30,11 @@ public class ProgramDto {
   private String visibility;
   private List<String> attachment;
 
-  // Constructor that converts a Program entity to ProgramDto
+  /**
+   * Constructor that converts a Program entity to ProgramDto.
+   *
+   * @param program program object that is used for the conversion.
+   */
   public ProgramDto(Program program) {
     this.programId = program.getProgramId();
     this.programType = program.getProgramType();

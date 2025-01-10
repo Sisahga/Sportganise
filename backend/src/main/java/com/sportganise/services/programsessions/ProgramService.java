@@ -24,6 +24,13 @@ public class ProgramService {
   private final AccountService accountService;
   private final AccountRepository accountRepository;
 
+  /**
+   * Constructor for ProgramService.
+   *
+   * @param programRepository program repository object.
+   * @param accountService account service object.
+   * @param accountRepository account repository object.
+   */
   public ProgramService(
       ProgramRepository programRepository,
       AccountService accountService,
@@ -108,21 +115,21 @@ public class ProgramService {
   /**
    * Method to create new ProgramDto.
    *
-   * @param accountId Id of user who is making the request.
-   * @param programType Type of the program.
    * @param title Title of the program.
-   * @param description Description of the program.
-   * @param capacity Participants capacity.
-   * @param occurrenceDate Date of the program.
-   * @param durationMins Duration of the program/session in minutes.
+   * @param programType Type of the program.
+   * @param startDate The first or only date of occurrence of the program.
+   * @param endDate The end date of the first or only program occurrence.
    * @param isRecurring Boolean for whether this program is recurring.
-   * @param expiryDate Expiry Date of the program i.e. when is the last occurence.
-   * @param frequency Frequency of program/sessions.
-   * @param location Location of the program/session.
    * @param visibility Visibility of the program i.e. is it only visible to registered members or
    *     all members.
-   * @param attachment String paths of files attached to this program/session.
-   * @return A new programDto.
+   * @param description Description of the program.
+   * @param capacity Participants capacity.
+   * @param notify Boolean for whether or not to notify all participants.
+   * @param startTime Start time of each occurrence of the program.
+   * @param endTime End time of each occurrence of the program.
+   * @param location Location of the program/session.
+   * @param attachments String paths of files attached to this program/session.
+   * @return A newly created programDto.
    */
   public ProgramDto createProgramDto(
       String title,
@@ -343,9 +350,9 @@ public class ProgramService {
   /**
    * Method to verify if there is a scheduling conflict.
    *
-   * @param occurrenceDate
-   * @param durationMins
-   * @return
+   * @param occurrenceDate the date of the program's occurrence (start date).
+   * @param durationMins the duration of a program in minutes.
+   * @return a boolean for whether there is a scheduling conflict or not.
    */
   private boolean checkForSchedulingConflicts(LocalDateTime occurrenceDate, Integer durationMins) {
     LocalDateTime startDateTime = occurrenceDate;
@@ -393,7 +400,7 @@ public class ProgramService {
     }
   }
 
-  /** Method to notify all the members of a newly create/posted program */
+  /** Method to notify all the members of a newly create/posted program. */
   private void notifyAllMembers(Program programToBeNotifiedAbout) {
     List<Account> accounts = accountRepository.findAll();
     for (Account account : accounts) {

@@ -54,7 +54,22 @@ public class Program {
 
   private List<String> attachment;
 
-  // Constructor excluding programId since it's generated automatically
+  /**
+   * Constructor excluding programId since it's generated automatically
+   *
+   * @param programType type of the program.
+   * @param title title of the program.
+   * @param description description of the program.
+   * @param capacity capacity of the program.
+   * @param occurrenceDate start date and time of the first program occurrence.
+   * @param durationMins duration of the program in minutes.
+   * @param isRecurring boolean for whether or not this program is a recurring one.
+   * @param expiryDate date and time of the last occurrence of the program.
+   * @param frequency frequency of the program if it is recurring.
+   * @param location location of the program.
+   * @param visibility visibility type of the program to the members.
+   * @param attachment list of strings of attachment paths for upload.
+   */
   public Program(
       String programType,
       String title,
