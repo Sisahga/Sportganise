@@ -1,4 +1,3 @@
-// IMPORTS ------------------------------------------
 import { useEffect, useState } from "react";
 import { MoveLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -46,7 +45,7 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
-//GLOBAL --------------------------------------------
+//GLOBAL ---------------------------------------------------------------------------------------------------------------------------
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
 const formSchema = z
   .object({
@@ -98,7 +97,8 @@ const formSchema = z
 //PAGE CONTENT ---------------------------------------------------------------------------------------------------
 export default function ModifyTrainingSessionForm() {
   const { toast } = useToast();
-  const { trainingSessionId } = useParams();
+  const { programId } = useParams();
+  const accountId = ""; //get from cookie
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -122,9 +122,8 @@ export default function ModifyTrainingSessionForm() {
 
   /** Fetch form data from database using API call*/
   useEffect(() => {
-    const url = "/api/training-sessions/" + trainingSessionId;
+    const url = `/${accountId}/${programId}/modify-program`;
     fetch(url) //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
-      //replace fetch("...") with 'url' for actual api call
       .then((response) => {
         if (response.status === 404) {
           //render 404 component on the page
@@ -226,7 +225,7 @@ export default function ModifyTrainingSessionForm() {
       // Merge the trainingSessionId into the values object
       let json_payload = {
         ...values,
-        trainingSessionId: trainingSessionId ?? null,
+        programId: programId ?? null,
         attachment: files ?? [], //ensure attachment: appears in json payload body
       };
 
@@ -325,7 +324,7 @@ export default function ModifyTrainingSessionForm() {
           {/*Form Title*/}
           <div>
             <h2 className="text-2xl font-semibold">
-              Edit <span style={{ color: "#82DBD8" }}>{formData.fact}</span>{" "}
+              Edit <span style={{ color: "#82DBD8" }}>{formData.title}</span>{" "}
               Event
             </h2>
             <h2>Edit fields and update the form</h2>

@@ -178,7 +178,7 @@ export default function CreateTrainingSessionForm() {
       console.log(JSON.stringify(json_payload, null, 2));
 
       // API submit form
-      const response = await fetch(`/api/module/${accountId}`, {
+      const response = await fetch(`/${accountId}/create-program`, {
         //response is what is returned by the backend, like 200 OK. Can return info as well.
         method: "POST",
         headers: {
