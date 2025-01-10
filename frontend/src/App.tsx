@@ -12,6 +12,7 @@ import CreateFirstDmPage from "./pages/CreateFirstDmPage";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
+import CalendarPage from "./pages/CalendarPage";
 
 function App() {
   return (
@@ -52,6 +53,7 @@ function App() {
           ></Route>
           <Route path="/signup" element={<SignUpPage />}></Route>
           <Route path="/verificationcode" element={<VerificationCodePage />} />
+          <Route path="/pages/CalendarPage" element={<CalendarPage />}></Route>
         </Route>
       </Routes>
     </Router>
