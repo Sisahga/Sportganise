@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { MoveLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -48,35 +48,45 @@ import {
 
 //GLOBAL --------------------------------------------
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
-const formSchema = z.object({
-  title: z.string(),
-  type: z.string(),
-  start_day: z.coerce.date(),
-  end_date: z.coerce.date(),
-  recurring: z.boolean().default(true),
-  visibility: z.string(),
-  description: z.string(),
-  attachment: z
-    .array(
-      //array of files
-      z.custom<File>((file) => file instanceof File && file.size > 0, {
-        message: "Each file must be a valid file and not empty.",
-      })
-    )
-    .optional(),
-  capacity: z.number().min(0),
-  notify: z.boolean().default(true),
-  start_time: z
-    .string()
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
-  end_time: z
-    .string()
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
-  location: z.string(),
-});
+const formSchema = z
+  .object({
+    title: z.string(),
+    type: z.string(),
+    start_date: z.coerce.date(),
+    end_date: z.coerce.date(),
+    recurring: z.boolean().default(true),
+    visibility: z.string(),
+    description: z.string(),
+    attachment: z
+      .array(
+        //array of files
+        z.custom<File>((file) => file instanceof File && file.size > 0, {
+          message: "Each file must be a valid file and not empty.",
+        })
+      )
+      .optional(),
+    capacity: z.number().min(0),
+    notify: z.boolean().default(true),
+    start_time: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
+    end_time: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
+    location: z.string(),
+  })
+  .refine((data) => data.end_date >= data.start_date, {
+    message: "End date cannot be earlier than the start date.",
+    path: ["end_date"], //points to the end_date field in the error message
+  })
+  .refine((data) => data.end_time >= data.start_time, {
+    message: "End time cannot be earlier than start time.",
+    path: ["end_time"],
+  });
 
-//PAGE CONTENT --------------------------------------------
+//PAGE CONTENT ---------------------------------------------------------------------------------------------------
 export default function ModifyTrainingSessionForm() {
+  const { toast } = useToast();
   const { trainingSessionId } = useParams();
   const navigate = useNavigate();
 
@@ -85,7 +95,7 @@ export default function ModifyTrainingSessionForm() {
     length: 0, //TO DELETE
     title: "",
     type: "",
-    start_day: new Date(),
+    start_date: new Date(),
     end_date: new Date(),
     recurring: false,
     visibility: "",
@@ -96,11 +106,10 @@ export default function ModifyTrainingSessionForm() {
     start_time: "",
     end_time: "",
     location: "",
-  }); //Assuming response is an object. Values will be overriden in fetch.
+  }); //assuming response is an object. Values will be overriden in fetch.
   const [notFound, setNotFound] = useState(false);
 
   /** Fetch form data from database using API call*/
-
   useEffect(() => {
     const url = "/api/training-sessions/" + trainingSessionId;
     fetch("https://catfact.ninja/fact") //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
@@ -127,7 +136,7 @@ export default function ModifyTrainingSessionForm() {
         form.setValue("title", data.fact);
         form.setValue("capacity", data.capacity);
         form.setValue("type", data.type);
-        form.setValue("start_day", data.start_day);
+        form.setValue("start_date", data.start_date);
         form.setValue("end_date", data.end_date);
         form.setValue("recurring", data.recurring);
         form.setValue("visibility", data.visibility);
@@ -192,8 +201,8 @@ export default function ModifyTrainingSessionForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      start_day: new Date(),
-      end_date: new Date(),
+      //start_date: new Date(),
+      //end_date: new Date(),
     },
   });
 
@@ -248,7 +257,10 @@ export default function ModifyTrainingSessionForm() {
       */
 
       //toast popup for user to say form submitted successfully
-      toast("✔ Event updated successfully!");
+      toast({
+        title: "Form updated successfully ✔",
+        description: "Event was updated in your calendar.",
+      });
       //Reset form fields
       //form.reset();
       // If successful, navigate to the success page with a message
@@ -256,7 +268,7 @@ export default function ModifyTrainingSessionForm() {
       /*
       form.setValue("title", "");
       form.setValue("type", "");
-      form.setValue("start_day", new Date());
+      form.setValue("start_date", new Date());
       form.setValue("end_date", new Date());
       form.setValue("recurring", false);
       form.setValue("visibility", "");
@@ -272,7 +284,12 @@ export default function ModifyTrainingSessionForm() {
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
-      toast("✖ There was a problem with your request. Event was not updated.");
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong ✖",
+        description:
+          "There was a problem with your request. Event was not updated.",
+      });
     }
   };
 
@@ -385,7 +402,7 @@ export default function ModifyTrainingSessionForm() {
           {/** Start Date */}
           <FormField
             control={form.control}
-            name="start_day"
+            name="start_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">

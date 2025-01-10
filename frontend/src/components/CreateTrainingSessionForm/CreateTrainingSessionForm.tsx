@@ -83,6 +83,10 @@ const formSchema = z
   .refine((data) => data.end_date >= data.start_day, {
     message: "End date cannot be earlier than the start date.",
     path: ["end_date"], //points to the end_date field in the error message
+  })
+  .refine((data) => data.end_time >= data.start_time, {
+    message: "End time cannot be earlier than start time.",
+    path: ["end_time"],
   });
 
 //PAGE CONTENT -----------------------------------------------------------------------------------------------------------
