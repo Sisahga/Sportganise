@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 //import { useNavigate, useLocation } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -39,13 +38,13 @@ export default function ViewRegisteredPlayersContent({
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [attendees, setAttendees] = useState<Attendees[]>([]);
-  //const { trainingSessionId } = useParams();
   const accountId = ""; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
 
   // fetch data on component mount
   useEffect(() => {
     const fetchAttendees = async () => {
       try {
+        /*
         const mockAttendees: Attendees[] = [
           {
             accountId: 1000,
@@ -112,8 +111,8 @@ export default function ViewRegisteredPlayersContent({
           },
         ];
         setAttendees(mockAttendees);
+        */
 
-        /*
         const response = await fetch(
           `/api/${accountId}/${programId}/details`
           //"https://catfact.ninja/facts?limit=4" //a testing api
@@ -134,11 +133,10 @@ export default function ViewRegisteredPlayersContent({
             `Fetching registered players content: HTTP error! status: ${response.status}`
           ); // re-throw for the catch block below
         }
-        */
       } catch (error) {
         console.error(
           "Error fetching registered players content HTTP error:",
-          error,
+          error
         );
       } finally {
         setLoading(false);
@@ -180,7 +178,7 @@ export default function ViewRegisteredPlayersContent({
       ) : loading ? (
         <p>Loading attendees...</p>
       ) : (
-        <p>Error loading attendees: {error}</p>
+        <p className="text-red font-medium">Error loading attendees: {error}</p>
       )}
     </div>
   );

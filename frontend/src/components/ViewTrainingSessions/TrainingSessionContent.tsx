@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // Created components imports
 import ViewRegisteredPlayersContent from "./ViewRegisteredPlayersContent";
@@ -14,10 +15,10 @@ import {
   MoveLeft,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 
 // Data structure for data received from API call
+/*
 interface Attendees {
   accountId: number;
   participantType: "COACH" | "ADMIN" | "PLAYER";
@@ -27,6 +28,13 @@ interface Attendees {
   firstName: string;
   lastName: string;
 }
+
+interface Event {
+  programId: number;
+  programDetails: ProgramDetails;
+  attendees: Attendees[];
+}
+*/
 
 interface ProgramDetails {
   programId: number;
@@ -43,21 +51,40 @@ interface ProgramDetails {
   attachment: File[] | null;
 }
 
-interface Event {
-  programId: number;
-  programDetails: ProgramDetails;
-  attendees: Attendees[];
-}
-
 const TrainingSessionContent = () => {
-  // Location state data sent from Calendar page card
-  const location = useLocation();
-  const programDetails = location.state.programDetails;
-  const programId = location.state.programId;
-  // Navigate back to Calendar page
-  const navigate = useNavigate();
+  const location = useLocation(); // Location state data sent from Calendar page card
+  const navigate = useNavigate(); // Navigate back to Calendar page
+
+  const [programDetails, setProgramDetails] = useState<ProgramDetails>({
+    programId: 0,
+    title: "",
+    type: "",
+    description: "",
+    capacity: 0,
+    occurenceDate: new Date(),
+    duration: 0,
+    recurring: false,
+    expiryDate: new Date(),
+    coach: "",
+    location: "",
+    attachment: null,
+  });
+  // Update state safely using useEffect
+  useEffect(() => {
+    if (location.state && location.state.programDetails) {
+      setProgramDetails(location.state.programDetails);
+    }
+  }, [location.state]);
+
+  const [programId, setProgramId] = useState<number>(0);
+  useEffect(() => {
+    if (location.state && location.state.programId) {
+      setProgramId(location.state.programId);
+    }
+  }, [location.state]);
+
   // Handle account type. Only coach or admin can view list of attendees.
-  const [accountType, setAccountType] = useState<string>("admin");
+  const [accountType /*, setAccountType*/] = useState<string>("admin");
 
   return (
     <div className="mb-32">

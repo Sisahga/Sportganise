@@ -103,9 +103,9 @@ interface Event {
 
 export default function TrainingSessionsList() {
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  //const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-  const accountId = ""; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
+  //const accountId = ""; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
 
   // Fetch data on component mount
   useEffect(() => {
@@ -155,7 +155,7 @@ export default function TrainingSessionsList() {
       } catch (error) {
         console.error(
           "Error fetching registered players content HTTP error:",
-          error,
+          error
         );
       } finally {
         setLoading(false);
@@ -190,15 +190,17 @@ export default function TrainingSessionsList() {
       <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
 
       {/**List of events */}
-      {events.map((event) => (
-        <div key={event.programId} className="my-5">
-          <TrainingSessionCard
-            programId={event.programId}
-            programDetails={event.programDetails}
-            attendees={event.attendees}
-          />
-        </div>
-      ))}
+      {loading
+        ? "Loading events... "
+        : events.map((event) => (
+            <div key={event.programId} className="my-5">
+              <TrainingSessionCard
+                programId={event.programId}
+                programDetails={event.programDetails}
+                attendees={event.attendees}
+              />
+            </div>
+          ))}
     </div>
   );
 }
