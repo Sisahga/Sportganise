@@ -93,6 +93,7 @@ const formSchema = z
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const accountId = ""; //update with cookie
 
   /**All select element options */
   //Options for type select
@@ -157,6 +158,7 @@ export default function CreateTrainingSessionForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
     try {
+      // Prepare data to send through API as necessary
       let json_payload = {
         ...values,
         attachment: files ?? [], //ensure attachment: appears in json payload body
@@ -164,60 +166,57 @@ export default function CreateTrainingSessionForm() {
       console.log(json_payload);
       console.log(JSON.stringify(json_payload, null, 2));
 
-      //await fetch()
-      //---------UPDATE WITH PROPER API URL
-      /*
-      const response = await fetch("/api/module/createTrainingSessionForm", {
+      // API submit form
+      const response = await fetch(`/api/module/${accountId}`, {
         //response is what is returned by the backend, like 200 OK. Can return info as well.
         method: "POST",
         headers: {
           "Content-Type": "application/json", //If sending JSON
         },
-        body: JSON.stringify(values, null, 2), //stringify form values 'values' in JSON format and send through url
+        body: JSON.stringify(json_payload, null, 2), //stringify form values in JSON format and send through url
       });
-*/
+
       // Check for HTTP errors
-      /*
-      if (!response.ok) {
+      if (response.status === 201) {
+        // Success handling
+        const data = await response.json(); //data sent back from backend response to url call
+        console.log("Event created successfully:", data);
+
+        // Toast popup for user to say form submitted successfully
+        toast({
+          title: "Form submitted successfully ✔",
+          description: "Event was added to your calendar.",
+        });
+
+        // Reset form fields
+        form.reset();
+        form.setValue("title", "");
+        form.setValue("type", "");
+        form.setValue("start_date", new Date());
+        form.setValue("end_date", new Date());
+        form.setValue("recurring", false);
+        form.setValue("visibility", "");
+        form.setValue("description", "");
+        form.setValue("attachment", undefined);
+        form.setValue("capacity", 0);
+        form.setValue("notify", false);
+        form.setValue("start_time", "");
+        form.setValue("end_time", "");
+        form.setValue("location", "");
+        form.reset();
+
+        // Navigate to home page
+        navigate("/");
+      } else {
         const errorData = await response
           .json()
           .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
         const errorMessage =
           errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
-        //throw new Error(errorMessage);
-        throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
+        form.reset();
+        throw new Error(errorMessage);
+        //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
-        */
-
-      //...rest of success handling
-      //const data = await response.json(); //data sent back from backend response to url call
-      //console.log("Form submitted successfully:", data);
-
-      // Toast popup for user to say form submitted successfully
-      toast({
-        title: "Form submitted successfully ✔",
-        description: "Event was added to your calendar.",
-      });
-
-      // Reset form fields
-      form.reset();
-      form.setValue("title", "");
-      form.setValue("type", "");
-      form.setValue("start_date", new Date());
-      form.setValue("end_date", new Date());
-      form.setValue("recurring", false);
-      form.setValue("visibility", "");
-      form.setValue("description", "");
-      form.setValue("attachment", undefined);
-      form.setValue("capacity", 0);
-      form.setValue("notify", false);
-      form.setValue("start_time", "");
-      form.setValue("end_time", "");
-      form.setValue("location", "");
-      form.reset();
-
-      // Navigate to home page
-      navigate("/");
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
