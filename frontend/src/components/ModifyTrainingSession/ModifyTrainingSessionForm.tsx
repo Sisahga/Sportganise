@@ -104,6 +104,7 @@ export default function ModifyTrainingSessionForm() {
   const [formData, setFormData] = useState({
     //fact: "", //TO DELETE
     //length: 0, //TO DELETE
+    //programId: 0,
     title: "",
     type: "",
     start_date: new Date(),
@@ -111,7 +112,7 @@ export default function ModifyTrainingSessionForm() {
     recurring: false,
     visibility: "",
     description: "",
-    attachment: [],
+    //attachment: File[],
     capacity: 0,
     notify: false,
     start_time: "",
@@ -122,41 +123,62 @@ export default function ModifyTrainingSessionForm() {
 
   /** Fetch form data from database using API call*/
   useEffect(() => {
-    const url = `/${accountId}/${programId}/modify-program`;
-    fetch(url) //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
-      .then((response) => {
-        if (response.status === 404) {
-          //render 404 component on the page
-          setNotFound(true);
-          console.log("notFound: " + notFound);
-        }
-        return response.json(); //turns response into a javascript object
-      })
-      .then((data) => {
-        console.log(data);
-        setFormData(data); //grab the value/data in the response.json()
-        //const fields = Object.keys(data); // Array of field names
-        //console.log(fields);
-        //const parseData = formSchema.safeParse(formData);
-        //console.log("PARSE DATA:" + parseData.data);
-        //console.log("FACT2:" + formData.length);
-        //console.log("formData: " + Object.values(formData));
+    const fetchSavedFormFields = async () => {
+      try {
+        const url = `/${accountId}/${programId}/modify-program`;
+        fetch("https://catfact.ninja/fact") //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
+          .then((response) => {
+            if (!response.ok) {
+              // Handle specific HTTP statuses
+              if (response.status === 404) {
+                //render 404 component on the page
+                setNotFound(true);
+                console.log("Resource was notFound: " + notFound);
+              }
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json(); //turns response into a javascript object
+          })
+          .then((data) => {
+            console.log("Fetched data: ", data);
+            setFormData(data); //grab the value/data in the response.json()
 
-        //Set form defaults and update field values
-        form.setValue("title", data.title);
-        form.setValue("capacity", data.capacity);
-        form.setValue("type", data.type);
-        form.setValue("start_date", data.start_date);
-        form.setValue("end_date", data.end_date);
-        form.setValue("recurring", data.recurring);
-        form.setValue("visibility", data.visibility);
-        form.setValue("description", data.description);
-        form.setValue("attachment", data.attachment); //undefined
-        form.setValue("notify", data.notify);
-        form.setValue("start_time", data.start_time);
-        form.setValue("end_time", data.end_time);
-        form.setValue("location", data.location);
-      });
+            /*
+            const fields = Object.keys(data); // Array of field names
+            console.log("fields: ", fields);
+            const parseData = formSchema.safeParse(data); //uses formSchema.safeParse to validate formData against the schema (formSchema)
+            console.log("PARSE DATA:" + parseData.data); //undefined if form data is invalid
+            console.log("formData: " + Object.values(formData));
+            if (parseData == undefined) {
+              throw new Error("Fetched data did not match form schema!");
+            }
+            */
+
+            // Set form defaults and update field values
+            form.setValue("title", data.title);
+            form.setValue("capacity", data.capacity);
+            form.setValue("type", data.type);
+            form.setValue("start_date", data.start_date);
+            form.setValue("end_date", data.end_date);
+            form.setValue("recurring", data.recurring);
+            form.setValue("visibility", data.visibility);
+            form.setValue("description", data.description);
+            form.setValue("attachment", data.attachment); //undefined
+            form.setValue("notify", data.notify);
+            form.setValue("start_time", data.start_time);
+            form.setValue("end_time", data.end_time);
+            form.setValue("location", data.location);
+          });
+      } catch (error) {
+        console.log(error);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong ✖",
+          description: "Event data could not be fetched. ",
+        });
+      }
+    };
+    fetchSavedFormFields();
   }, []);
 
   /**All select element options */
@@ -220,22 +242,18 @@ export default function ModifyTrainingSessionForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
     try {
-      console.log(values);
-
-      // Merge the trainingSessionId into the values object
+      // Merge the programId into the values object
       let json_payload = {
         ...values,
         programId: programId ?? null,
         attachment: files ?? [], //ensure attachment: appears in json payload body
       };
-
       console.log(json_payload);
       console.log(
         "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2)
       );
 
-      //await fetch()
-      //---------UPDATE WITH PROPER API URL
+      // onSubmit API call
       /*
       const response = await fetch("/api/module/modifyTrainingSessionForm", {
         method: "PUT",
@@ -304,7 +322,7 @@ export default function ModifyTrainingSessionForm() {
   };
 
   return (
-    //RETURN ----------------------------------------------
+    //RETURN -----------------------------------------------------------------------------------------------------------
     <div>
       {/** Navigate to previous page */}
       <Button
