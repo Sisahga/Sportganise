@@ -1,17 +1,14 @@
 // IMPORTS ------------------------------------------
 import { useState } from "react";
-//import { toast } from "sonner";
-//import * as Toast from "@radix-ui/react-toast";
-//import { toast, useToast } from "@/hooks/use-toast";
-//import Popup from "react-popup";
 import { MoveLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
+import { useToast } from "@/hooks/use-toast";
+
 import {
   Form,
   FormControl,
@@ -37,7 +34,6 @@ import {
 } from "@/components/ui/popover";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
-
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -52,36 +48,42 @@ import {
 
 //GLOBAL --------------------------------------------
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
-const formSchema = z.object({
-  title: z.string(),
-  type: z.string(),
-  start_day: z.coerce.date(),
-  end_date: z.coerce.date(),
-  recurring: z.boolean().default(true),
-  visibility: z.string(),
-  description: z.string(),
-  attachment: z
-    .array(
-      //array of files
-      z.custom<File>((file) => file instanceof File && file.size > 0, {
-        message: "Each file must be a valid file and not empty.",
-      })
-    )
-    .optional(),
-  capacity: z.number().min(0),
-  notify: z.boolean().default(true),
-  start_time: z
-    .string()
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
-  end_time: z
-    .string()
-    .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
-  location: z.string(),
-});
+const formSchema = z
+  .object({
+    title: z.string(),
+    type: z.string(),
+    start_day: z.coerce.date(),
+    end_date: z.coerce.date(),
+    recurring: z.boolean().default(false),
+    visibility: z.string(),
+    description: z.string(),
+    attachment: z
+      .array(
+        //array of files
+        z.custom<File>((file) => file instanceof File && file.size > 0, {
+          message: "Each file must be a valid file and not empty.",
+        })
+      )
+      .optional(),
+    capacity: z.number().min(0),
+    notify: z.boolean().default(false),
+    start_time: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
+    end_time: z
+      .string()
+      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
+    location: z.string(),
+  })
+  .refine((data) => data.end_date >= data.start_day, {
+    message: "End date cannot be earlier than the start date.",
+    path: ["end_date"], // Points to the end_date field in the error message
+  });
 
-//PAGE CONTENT --------------------------------------------
+//PAGE CONTENT -----------------------------------------------------------------------------------------------------------
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   /**All select element options */
   //Options for type select
@@ -136,12 +138,9 @@ export default function CreateTrainingSessionForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       //default values that will considered for each state when page is loaded and also what is rendered when the page loads
-      start_day: new Date(),
-      end_date: new Date(),
+      //start_day: new Date(),
+      //end_date: new Date(),
       //title: "", //controlled/uncontrolled component error
-      //capacity: 100,
-      //type: "fundraisor",
-      //title: "hello",
     },
   });
 
@@ -149,7 +148,12 @@ export default function CreateTrainingSessionForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
     try {
-      console.log(JSON.stringify(values, null, 2));
+      let json_payload = {
+        ...values,
+        attachment: files ?? [], //ensure attachment: appears in json payload body
+      };
+      console.log(json_payload);
+      console.log(JSON.stringify(json_payload, null, 2));
 
       //await fetch()
       //---------UPDATE WITH PROPER API URL
@@ -181,7 +185,11 @@ export default function CreateTrainingSessionForm() {
       //console.log("Form submitted successfully:", data);
 
       //toast popup for user to say form submitted successfully
-      toast("Form submitted successfully!");
+      toast({
+        title: "Form submitted successfully!",
+        description: "Event was added to your calendar.",
+      });
+      navigate("/");
 
       //Reset form fields
       form.reset();
@@ -202,7 +210,12 @@ export default function CreateTrainingSessionForm() {
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
-      toast("There was a problem with your request. Event was not created.");
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description:
+          "There was a problem with your request. Event was not created.",
+      });
     }
   };
 
@@ -221,7 +234,7 @@ export default function CreateTrainingSessionForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto py-10"
+          className="space-y-8 max-w-3xl mx-auto pt-10"
         >
           {/*Form Title*/}
           <div>
