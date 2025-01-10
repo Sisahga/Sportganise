@@ -31,17 +31,13 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 @AutoConfigureMockMvc
 public class ProgramControllerTest {
 
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @MockBean
-  private AccountService accountService;
+  @MockBean private AccountService accountService;
 
-  @MockBean
-  private ProgramService programService;
+  @MockBean private ProgramService programService;
 
-  @InjectMocks
-  private ProgramController programController;
+  @InjectMocks private ProgramController programController;
 
   // Initialize Dtos
   private ProgramDto mockProgramDto;
@@ -81,23 +77,24 @@ public class ProgramControllerTest {
     mockProgramDetailsParticipantsDto.setAttendees(List.of(mockProgramParticipantDto));
 
     // Prepare a dummy JSON payload
-    jsonPayload = "{"
-        + "\"title\": \"Title\","
-        + "\"type\": \"Type\","
-        + "\"start_date\": \"2024-01-30T10:00:00Z\","
-        + "\"end_date\": \"2024-02-01T10:00:00Z\","
-        + "\"recurring\": false,"
-        + "\"visibility\": \"public\","
-        + "\"description\": \"description\","
-        + "\"attachment\": ["
-        + "   {\"path\": \"./Lab4.pdf\", \"relativePath\": \"./Lab4.pdf\"}"
-        + "],"
-        + "\"capacity\": 10,"
-        + "\"notify\": true,"
-        + "\"start_time\": \"10:30\","
-        + "\"end_time\": \"12:30\","
-        + "\"location\": \"Centre-de-loisirs-St-Denis\""
-        + "}";
+    jsonPayload =
+        "{"
+            + "\"title\": \"Title\","
+            + "\"type\": \"Type\","
+            + "\"start_date\": \"2024-01-30T10:00:00Z\","
+            + "\"end_date\": \"2024-02-01T10:00:00Z\","
+            + "\"recurring\": false,"
+            + "\"visibility\": \"public\","
+            + "\"description\": \"description\","
+            + "\"attachment\": ["
+            + "   {\"path\": \"./Lab4.pdf\", \"relativePath\": \"./Lab4.pdf\"}"
+            + "],"
+            + "\"capacity\": 10,"
+            + "\"notify\": true,"
+            + "\"start_time\": \"10:30\","
+            + "\"end_time\": \"12:30\","
+            + "\"location\": \"Centre-de-loisirs-St-Denis\""
+            + "}";
   }
 
   // Test getProgramDetails for when user account does not exist
@@ -191,27 +188,29 @@ public class ProgramControllerTest {
     // Mocking service calls
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
-    Mockito.when(programService.createProgramDto(
-        Mockito.anyString(),
-        Mockito.anyString(),
-        Mockito.anyString(),
-        Mockito.anyString(),
-        Mockito.anyBoolean(),
-        Mockito.anyString(),
-        Mockito.anyString(),
-        Mockito.anyInt(),
-        Mockito.anyBoolean(),
-        Mockito.anyString(),
-        Mockito.anyString(),
-        Mockito.anyString(),
-        Mockito.<List<Map<String, String>>>any()))
+    Mockito.when(
+            programService.createProgramDto(
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyBoolean(),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyInt(),
+                Mockito.anyBoolean(),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.anyString(),
+                Mockito.<List<Map<String, String>>>any()))
         .thenReturn(mockProgramDto);
 
     // Perform request with the dummy JSON payload from above
-    mockMvc.perform(MockMvcRequestBuilders
-        .post("/api/programs/2/create-program") // Use POST for creation
-        .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-        .content(jsonPayload)) // Pass the JSON payload
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/programs/2/create-program") // Use POST for creation
+                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
+                .content(jsonPayload)) // Pass the JSON payload
         .andExpect(status().isCreated()) // Expect status 201 Created
         .andExpect(jsonPath("$.capacity").value(10)) // Check that capacity is returned
         .andExpect(jsonPath("$.title").value("Training Program")); // Check the title
@@ -229,10 +228,11 @@ public class ProgramControllerTest {
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
     // Perform request with the dummy JSON payload from above
-    mockMvc.perform(MockMvcRequestBuilders
-        .post("/api/programs/3/create-program") // Use POST for creation
-        .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-        .content(jsonPayload)) // Pass the JSON payload
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/programs/3/create-program") // Use POST for creation
+                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
+                .content(jsonPayload)) // Pass the JSON payload
         .andExpect(status().isForbidden());
   }
 
@@ -249,28 +249,31 @@ public class ProgramControllerTest {
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
 
     // Perform request with the dummy JSON payload from above
-    mockMvc.perform(MockMvcRequestBuilders
-        .put("/api/programs/2/111/modify-program") // Use POST for creation
-        .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-        .content(jsonPayload)) // Pass the JSON payload
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put(
+                    "/api/programs/2/111/modify-program") // Use POST for creation
+                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
+                .content(jsonPayload)) // Pass the JSON payload
         .andExpect(status().isOk());
 
     // Verify that the modifyProgram method was called
-    Mockito.verify(programService).modifyProgram(
-        Mockito.eq(mockProgramDto),
-        Mockito.eq("Title"),
-        Mockito.eq("Type"),
-        Mockito.eq("2024-01-30T10:00:00Z"),
-        Mockito.eq("2024-02-01T10:00:00Z"),
-        Mockito.eq(false),
-        Mockito.eq("public"),
-        Mockito.eq("description"),
-        Mockito.eq(10),
-        Mockito.eq(true),
-        Mockito.eq("10:30"),
-        Mockito.eq("12:30"),
-        Mockito.eq("Centre-de-loisirs-St-Denis"),
-        Mockito.<List<Map<String, String>>>any());
+    Mockito.verify(programService)
+        .modifyProgram(
+            Mockito.eq(mockProgramDto),
+            Mockito.eq("Title"),
+            Mockito.eq("Type"),
+            Mockito.eq("2024-01-30T10:00:00Z"),
+            Mockito.eq("2024-02-01T10:00:00Z"),
+            Mockito.eq(false),
+            Mockito.eq("public"),
+            Mockito.eq("description"),
+            Mockito.eq(10),
+            Mockito.eq(true),
+            Mockito.eq("10:30"),
+            Mockito.eq("12:30"),
+            Mockito.eq("Centre-de-loisirs-St-Denis"),
+            Mockito.<List<Map<String, String>>>any());
   }
 
   @Test
@@ -280,10 +283,12 @@ public class ProgramControllerTest {
     Mockito.when(accountService.getAccount(123)).thenReturn(Optional.empty());
 
     // Perform request with the dummy JSON payload from above
-    mockMvc.perform(MockMvcRequestBuilders
-        .put("/api/programs/123/111/modify-program") // Use POST for creation
-        .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-        .content(jsonPayload)) // Pass the JSON payload
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put(
+                    "/api/programs/123/111/modify-program") // Use POST for creation
+                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
+                .content(jsonPayload)) // Pass the JSON payload
         .andExpect(status().isNotFound()); // Expect 404 when user is not found
   }
 
@@ -299,10 +304,12 @@ public class ProgramControllerTest {
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
     // Perform request with the dummy JSON payload from above
-    mockMvc.perform(MockMvcRequestBuilders
-        .put("/api/programs/3/111/modify-program") // Use POST for creation
-        .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-        .content(jsonPayload)) // Pass the JSON payload
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put(
+                    "/api/programs/3/111/modify-program") // Use POST for creation
+                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
+                .content(jsonPayload)) // Pass the JSON payload
         .andExpect(status().isForbidden());
   }
 
@@ -319,11 +326,12 @@ public class ProgramControllerTest {
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
 
     // Perform request with the dummy JSON payload from above
-    mockMvc.perform(MockMvcRequestBuilders
-        .put("/api/programs/2/111/modify-program") // Use POST for creation
-        .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-        .content(jsonPayload)) // Pass the JSON payload
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put(
+                    "/api/programs/2/111/modify-program") // Use POST for creation
+                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
+                .content(jsonPayload)) // Pass the JSON payload
         .andExpect(status().isNotFound());
   }
-
 }

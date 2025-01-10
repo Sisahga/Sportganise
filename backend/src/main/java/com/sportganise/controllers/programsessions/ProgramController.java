@@ -6,7 +6,6 @@ import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.Account;
 import com.sportganise.services.auth.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST Controller for managing 'Program' Entities. Handles HTTP request and
- * routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
  * appropriate services.
  */
 @RestController
@@ -83,22 +81,22 @@ public class ProgramController {
 
     // Wrap program details and participants into the ProgramDetailsParticipantsDto
     // response DTO
-    ProgramDetailsParticipantsDto response = new ProgramDetailsParticipantsDto(programDto, participants);
+    ProgramDetailsParticipantsDto response =
+        new ProgramDetailsParticipantsDto(programDto, participants);
 
     return ResponseEntity.ok(response);
   }
 
-   /**
-    * Get mapping for creating new program.
-    *
-    * @param accountId Id of user who is making the request.
-    * @param payload Json payload passed from frontend.
-    * @return HTTP Response for newly created program.
-    */
+  /**
+   * Get mapping for creating new program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param payload Json payload passed from frontend.
+   * @return HTTP Response for newly created program.
+   */
   @PostMapping("/{accountId}/create-program")
   public ResponseEntity<ProgramDto> createProgram(
-      @PathVariable Integer accountId,
-      @RequestBody Map<String, Object> payload) {
+      @PathVariable Integer accountId, @RequestBody Map<String, Object> payload) {
 
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = accountService.getAccount(accountId);
@@ -136,20 +134,21 @@ public class ProgramController {
       @SuppressWarnings("unchecked")
       List<Map<String, String>> attachments = (List<Map<String, String>>) payload.get("attachment");
 
-      ProgramDto programDto = programService.createProgramDto(
-          title,
-          programType,
-          startDate,
-          endDate,
-          isRecurring,
-          visibility,
-          description,
-          capacity,
-          notify,
-          startTime,
-          endTime,
-          location,
-          attachments);
+      ProgramDto programDto =
+          programService.createProgramDto(
+              title,
+              programType,
+              startDate,
+              endDate,
+              isRecurring,
+              visibility,
+              description,
+              capacity,
+              notify,
+              startTime,
+              endTime,
+              location,
+              attachments);
       return new ResponseEntity<>(programDto, HttpStatus.CREATED);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
