@@ -13,20 +13,15 @@ import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.auth.AccountService;
 import jakarta.persistence.EntityNotFoundException;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class ProgramServiceTest {
@@ -132,7 +127,7 @@ public class ProgramServiceTest {
                 .frequency("None")
                 .location("111 Random Ave")
                 .visibility("public")
-                .attachment("/banner.pdf")
+                .attachment(List.of("/banner.pdf"))
                 .build();
 
         // Mock the repository behavior of findProgramById with mockProgram
@@ -159,7 +154,7 @@ public class ProgramServiceTest {
         assertEquals("None", programDto.getFrequency());
         assertEquals("111 Random Ave", programDto.getLocation());
         assertEquals("public", programDto.getVisibility());
-        assertEquals("/banner.pdf", programDto.getAttachment());
+        assertEquals("/banner.pdf", programDto.getAttachment().get(0));
     }
 
     @Test
@@ -175,17 +170,18 @@ public class ProgramServiceTest {
                 EntityNotFoundException.class,
                 () -> programService.modifyProgram(
                         programDtoToModify,
-                        "Updated Type",
                         "Updated Title",
+                        "Updated Type",
+                        "2024-01-30T10:00:00Z",
+                        "2024-01-30T10:00:00Z",
+                        false,
+                        "private",
                         "Updated Description",
                         30,
-                        LocalDateTime.of(2024, 1, 15, 10, 0),
-                        90,
-                        false,
-                        LocalDateTime.of(2024, 2, 1, 10, 0),
-                        "daily",
-                        "Updated Location",
-                        "private",
+                        true,
+                        "10:30",
+                        "12:30",
+                        "Updated Location",                   
                         null));
         assertEquals("Program not found with ID: 1", exception.getMessage());
     }

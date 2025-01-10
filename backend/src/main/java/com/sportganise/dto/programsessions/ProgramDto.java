@@ -3,6 +3,8 @@ package com.sportganise.dto.programsessions;
 import com.sportganise.entities.programsessions.Program;
 import jakarta.persistence.Entity;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,7 +29,7 @@ public class ProgramDto {
   private String frequency;
   private String location;
   private String visibility;
-  private String attachment;
+  private List<String> attachment;
 
   // Constructor that converts a Program entity to ProgramDto
   public ProgramDto(Program program) {
@@ -43,8 +45,6 @@ public class ProgramDto {
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
     this.visibility = program.getVisibility();
-    this.attachment =
-        null; // The "Program" entity doesn't handle file attachments directly, it will be in
-    // the handleFileUpload() method
+    this.attachment = program.getAttachment();
   }
 }

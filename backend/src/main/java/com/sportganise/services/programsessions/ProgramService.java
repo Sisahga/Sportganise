@@ -1,7 +1,6 @@
 package com.sportganise.services.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
-import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.programsessions.Program;
@@ -12,15 +11,13 @@ import com.sportganise.services.auth.AccountService;
 
 import jakarta.persistence.EntityNotFoundException;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Service layer for Programs.
@@ -124,17 +121,40 @@ public class ProgramService {
      * @param location       Location of the program/session.
      * @param visibility     Visibility of the program i.e. is it only visible to
      *                       registered members or all members.
-     * @param attachment     Files attached to this program/session.
+     * @param attachment     String paths of files attached to this program/session.
      * @return A new programDto.
      */
-    public ProgramDto createProgramDto(String programType, String title, String description,
-            Integer capacity, LocalDateTime occurrenceDate, Integer durationMins, Boolean isRecurring,
-            LocalDateTime expiryDate, String frequency, String location, String visibility, MultipartFile attachment) {
+    public ProgramDto createProgramDto(String title, String programType, String startDate,
+    String endDate, Boolean isRecurring, String visibility, String description,
+    Integer capacity, Boolean notify, String startTime, String endTime, String location,
+    List<Map<String, String>> attachments) {
+        
+        // Get the path of each attachment
+        List<String> attachmentPaths = null;
+        if (attachments != null && !attachments.isEmpty()) {
+            // Map each attachment to its "path" value and collect as a list
+            attachmentPaths = attachments.stream()
+                    .map(attachment -> attachment.get("path"))
+                    .toList(); // Collect the attachment paths into a List
+        }
+
+        // Parse dates and times
+        // occurrenceDate is the date, time and day of the week of the first occurrence
+        // of the program
+        LocalDateTime occurrenceDate = LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
+        LocalDateTime endDateTime = LocalDateTime.parse(endDate).with(LocalTime.parse(endTime));
+        int durationMins = (int) java.time.Duration.between(occurrenceDate, endDateTime).toMinutes();
+
+        LocalDateTime expiryDate = null;
+        String frequency = null;
 
         // If this new program is a recurring one then we need to check if each
         // occurence overlaps an already existing program
-        if (isRecurring) {
+        if (isRecurring != null && isRecurring) {
             LocalDateTime currentOccurrence = occurrenceDate;
+            frequency = "weekly";
+            // The program recurs weekly on the same day of the week
+            expiryDate = endDateTime.plusDays(7);
 
             // While currentOccurrence is before or on the day of the expiryDate
             while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
@@ -156,20 +176,9 @@ public class ProgramService {
             }
         }
 
-        String filePath = null;
-        // Handle file upload (i.e. store the file into database) and returns a String
-        // filePath
-        if (!attachment.isEmpty()) {
-            try {
-                filePath = handleFileUpload(attachment);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
         // Save program details in the database
         Program newProgram = new Program(programType, title, description, capacity,
-                occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, filePath);
+                occurrenceDate, durationMins, isRecurring, expiryDate, frequency, location, visibility, attachmentPaths);
         Program savedProgram = programRepository.save(newProgram);
 
         notifyAllMembers(newProgram);
@@ -179,47 +188,57 @@ public class ProgramService {
 
     /**
      * Method to modify an existing program.
-     * 
+     *
      * @param programDtoToModify programDto of the program to be modified.
-     * @param programType        Type of the program.
      * @param title              Title of the program.
-     * @param description        Description of the program.
-     * @param capacity           Capacity of the program.
-     * @param occurrenceDate     DateTime of occurrence of the program.
-     * @param durationMins       Duration in minutes of the program.
+     * @param programType        Type of the program.
+     * @param startDate          Start date of the first or only occurrence.
+     * @param endDate            End date of the last or only occurrence.
      * @param isRecurring        Whether or not the program is a recurring one.
-     * @param expiryDate         Expiry Date of a program.
-     * @param frequency          Frequency of a program. i.e. if it has multiple
-     *                           sessions/occurrences.
-     * @param location           Location of the program/session.
      * @param visibility         Visibility of the program. If it can be seen by
      *                           registered members only or all members.
-     * @param attachment         Files uploaded, if any.
+     * @param description        Description of the program.
+     * @param capacity           Capacity of the program.
+     * @param notify             Boolean for whether or not to notify all
+     *                           participants/members.
+     * @param startTime          Start time of each occurrence of the program.
+     * @param endTime            End time of each occurrence of the program.
+     * @param location           Location of the program/session.
+     * @param attachments        List of Strings of paths uploaded, if any.
      */
-    public void modifyProgram(ProgramDto programDtoToModify, String programType, String title, String description,
-            Integer capacity, LocalDateTime occurrenceDate, Integer durationMins, Boolean isRecurring,
-            LocalDateTime expiryDate, String frequency, String location, String visibility, MultipartFile attachment) {
+    public void modifyProgram(ProgramDto programDtoToModify, String title, String programType, String startDate,
+            String endDate, Boolean isRecurring, String visibility, String description,
+            Integer capacity, Boolean notify, String startTime, String endTime, String location,
+            List<Map<String, String>> attachments) {
 
         // Fetch the existing program by its Id if it exists. Other
         Program existingProgram = programRepository.findById(programDtoToModify.getProgramId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         "Program not found with ID: " + programDtoToModify.getProgramId()));
 
-        // TODO: Need to add additional logic for the files upload/delete/modifications
-        // once I figure out how the storage is handled
-        String filePath = existingProgram.getAttachment();
-        if (attachment != null && !attachment.isEmpty()) {
-            if (filePath != null) {
-                // Delete the old file (We delete all the files since attachment also includes
-                // the already uploaded files that we want to keep)
-                deleteFile(filePath);
-            }
-            // We re-upload the previous ones that we want to keep along with the new ones
-            try {
-                filePath = handleFileUpload(attachment);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        // Get the path of each attachment
+        List<String> attachmentPaths = null;
+        if (attachments != null && !attachments.isEmpty()) {
+            // Map each attachment to its "path" value and collect as a list
+            attachmentPaths = attachments.stream()
+                    .map(attachment -> attachment.get("path"))
+                    .toList(); // Collect the attachment paths into a List
+        }
+
+        // Parse dates and times
+        // occurrenceDate is the date, time and day of the week of the first occurrence
+        // of the program
+        LocalDateTime occurrenceDate = LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
+        LocalDateTime endDateTime = LocalDateTime.parse(endDate).with(LocalTime.parse(endTime));
+        int durationMins = (int) java.time.Duration.between(occurrenceDate, endDateTime).toMinutes();
+
+        LocalDateTime expiryDate = null;
+        String frequency = null;
+
+        if (isRecurring != null && isRecurring) {
+            frequency = "weekly";
+            // The program recurs weekly on the same day of the week
+            expiryDate = endDateTime.plusDays(7);
         }
 
         // If anything regarding the dates is modified, then we need to
@@ -232,7 +251,7 @@ public class ProgramService {
             // If this program is a recurring one (or will become a recurring one) then we
             // need to check if each
             // occurence overlaps an already existing program
-            if (isRecurring) {
+            if (isRecurring != null && isRecurring) {
                 LocalDateTime currentOccurrence = occurrenceDate;
 
                 // While currentOccurrence is before or on the day of the expiryDate
@@ -269,7 +288,7 @@ public class ProgramService {
                 frequency,
                 location,
                 visibility,
-                filePath);
+                attachmentPaths);
 
         // Set the same ID as the existing program (to update the same record in the
         // database)
@@ -320,8 +339,6 @@ public class ProgramService {
      * @return LocalDateTime of the next occurrence.
      */
     private LocalDateTime getNextOccurrence(LocalDateTime current, String frequency) {
-        // TODO: There may be more frequencies, may need to change (also, maybe making
-        // an enum will be better but for now I will keep it as is)
         switch (frequency.toLowerCase()) {
             case "daily":
                 return current.plusDays(1);
@@ -333,36 +350,6 @@ public class ProgramService {
                 return current.plusYears(1);
             default:
                 return null; // Invalid frequency
-        }
-    }
-
-    /**
-     * Handle file upload (e.g., save file path).
-     * 
-     * @param file File to be saved/uploaded.
-     * @return Path of file saved/uploaded.
-     * @throws IOException
-     */
-    private String handleFileUpload(MultipartFile file) throws IOException {
-        // TODO: Implement logic to save file to database
-        if (!file.isEmpty()) {
-            // Return the file path or URL
-            return "file_upload_path";
-        }
-        return null;
-    }
-
-    /**
-     * 
-     * @param filePath file path of the file that we want to delete.
-     */
-    public void deleteFile(String filePath) {
-        // TODO: Not sure yet if this logic is good since I am not sure how we are
-        // dealing with file storage
-        try {
-            Files.deleteIfExists(Paths.get(filePath));
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete file: " + filePath, e);
         }
     }
 
