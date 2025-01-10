@@ -82,7 +82,18 @@ const formSchema = z
   .refine((data) => data.end_time >= data.start_time, {
     message: "End time cannot be earlier than start time.",
     path: ["end_time"],
-  });
+  })
+  .refine(
+    (data) =>
+      !(
+        data.start_date.getTime() === data.end_date.getTime() && data.recurring
+      ),
+    {
+      message:
+        "Event start and end dates are the same and therefore cannot reccur.",
+      path: ["recurring"],
+    }
+  );
 
 //PAGE CONTENT ---------------------------------------------------------------------------------------------------
 export default function ModifyTrainingSessionForm() {
@@ -91,8 +102,8 @@ export default function ModifyTrainingSessionForm() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    fact: "", //TO DELETE
-    length: 0, //TO DELETE
+    //fact: "", //TO DELETE
+    //length: 0, //TO DELETE
     title: "",
     type: "",
     start_date: new Date(),
@@ -112,7 +123,7 @@ export default function ModifyTrainingSessionForm() {
   /** Fetch form data from database using API call*/
   useEffect(() => {
     const url = "/api/training-sessions/" + trainingSessionId;
-    fetch("https://catfact.ninja/fact") //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
+    fetch(url) //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
       //replace fetch("...") with 'url' for actual api call
       .then((response) => {
         if (response.status === 404) {
@@ -133,7 +144,7 @@ export default function ModifyTrainingSessionForm() {
         //console.log("formData: " + Object.values(formData));
 
         //Set form defaults and update field values
-        form.setValue("title", data.fact);
+        form.setValue("title", data.title);
         form.setValue("capacity", data.capacity);
         form.setValue("type", data.type);
         form.setValue("start_date", data.start_date);
