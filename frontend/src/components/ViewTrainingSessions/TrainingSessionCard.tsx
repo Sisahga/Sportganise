@@ -104,7 +104,7 @@ const TrainingSessionCard: React.FC<Event> = ({
           </Badge>
 
           {/*Click to view details */}
-          <div
+          <a
             onClick={() =>
               handleNavigation("/pages/ViewTrainingSessionPage", {
                 programId,
@@ -116,7 +116,7 @@ const TrainingSessionCard: React.FC<Event> = ({
           >
             <ChevronRight size={17} color="#82DBD8" />
             <p className="font-medium text-secondaryColour">View details</p>
-          </div>
+          </a>
         </div>
       </div>
     </Card>
