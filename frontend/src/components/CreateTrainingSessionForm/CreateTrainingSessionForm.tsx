@@ -1,14 +1,13 @@
-// IMPORTS ------------------------------------------
 import { useState } from "react";
-import { MoveLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/hooks/use-toast";
-
 import {
   Form,
   FormControl,
@@ -32,13 +31,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { CloudUpload, Paperclip } from "lucide-react";
 import {
   FileInput,
   FileUploader,
@@ -46,7 +43,15 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
-//GLOBAL --------------------------------------------
+import {
+  MoveLeft,
+  Check,
+  ChevronsUpDown,
+  CloudUpload,
+  Paperclip,
+} from "lucide-react";
+
+//GLOBAL --------------------------------------------------------------------------------------------------------------
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
 const formSchema = z
   .object({
@@ -77,7 +82,7 @@ const formSchema = z
   })
   .refine((data) => data.end_date >= data.start_day, {
     message: "End date cannot be earlier than the start date.",
-    path: ["end_date"], // Points to the end_date field in the error message
+    path: ["end_date"], //points to the end_date field in the error message
   });
 
 //PAGE CONTENT -----------------------------------------------------------------------------------------------------------
@@ -184,14 +189,13 @@ export default function CreateTrainingSessionForm() {
       //const data = await response.json(); //data sent back from backend response to url call
       //console.log("Form submitted successfully:", data);
 
-      //toast popup for user to say form submitted successfully
+      // Toast popup for user to say form submitted successfully
       toast({
-        title: "Form submitted successfully!",
+        title: "Form submitted successfully ✔",
         description: "Event was added to your calendar.",
       });
-      navigate("/");
 
-      //Reset form fields
+      // Reset form fields
       form.reset();
       form.setValue("title", "");
       form.setValue("type", "");
@@ -207,12 +211,15 @@ export default function CreateTrainingSessionForm() {
       form.setValue("end_time", "");
       form.setValue("location", "");
       form.reset();
+
+      // Navigate to home page
+      navigate("/");
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
       toast({
         variant: "destructive",
-        title: "Uh oh! Something went wrong.",
+        title: "Uh oh! Something went wrong ✖",
         description:
           "There was a problem with your request. Event was not created.",
       });
@@ -220,7 +227,7 @@ export default function CreateTrainingSessionForm() {
   };
 
   return (
-    //RETURN ----------------------------------------------
+    //RETURN ---------------------------------------------------------------------------------------------------------
     <>
       {/** Navigate to previous page */}
       <Button
