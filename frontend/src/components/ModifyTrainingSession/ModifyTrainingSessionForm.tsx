@@ -126,7 +126,7 @@ export default function ModifyTrainingSessionForm() {
     const fetchSavedFormFields = async () => {
       try {
         const url = `/${accountId}/${programId}/modify-program`;
-        fetch("https://catfact.ninja/fact") //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
+        fetch(url) //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
           .then((response) => {
             if (!response.ok) {
               // Handle specific HTTP statuses
@@ -254,35 +254,31 @@ export default function ModifyTrainingSessionForm() {
       );
 
       // onSubmit API call
-      /*
-      const response = await fetch("/api/module/modifyTrainingSessionForm", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json", //If sending JSON
-        },
-        body: JSON.stringify(json_payload, null, 2),
-      });
+      const response = await fetch(
+        `/${accountId}/${programId}/modify-program`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json", //If sending JSON
+          },
+          body: JSON.stringify(json_payload, null, 2),
+        }
+      );
 
       // Check for HTTP errors
       if (!response.ok) {
-      */
-      /*
         const errorData = await response
           .json()
           .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
         const errorMessage =
           errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
         throw new Error(errorMessage);
-        */
-      /*
-        throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
+        //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
-      
 
       //...rest of success handling
       const data = await response.json(); //data sent back from backend response to url call
       console.log("Form submitted successfully:", data);
-      */
 
       //toast popup for user to say form submitted successfully
       toast({
