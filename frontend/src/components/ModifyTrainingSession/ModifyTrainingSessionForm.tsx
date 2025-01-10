@@ -94,6 +94,23 @@ const formSchema = z
     }
   );
 
+// Define the form data structure
+interface FormData {
+  title: string;
+  type: string;
+  start_date: Date;
+  end_date: Date;
+  recurring: boolean;
+  visibility: string;
+  description: string;
+  attachment: File[]; //typed as an array of File objects
+  capacity: number;
+  notify: boolean;
+  start_time: string;
+  end_time: string;
+  location: string;
+}
+
 //PAGE CONTENT ---------------------------------------------------------------------------------------------------
 export default function ModifyTrainingSessionForm() {
   const { toast } = useToast();
@@ -101,7 +118,7 @@ export default function ModifyTrainingSessionForm() {
   const accountId = ""; //get from cookie
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     //fact: "", //TO DELETE
     //length: 0, //TO DELETE
     //programId: 0,
@@ -112,7 +129,7 @@ export default function ModifyTrainingSessionForm() {
     recurring: false,
     visibility: "",
     description: "",
-    //attachment: File[],
+    attachment: [], //values are set here as opposed to types, thus File[] does not work
     capacity: 0,
     notify: false,
     start_time: "",
@@ -276,20 +293,18 @@ export default function ModifyTrainingSessionForm() {
         //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
 
-      //...rest of success handling
+      // ...Rest of success handling
       const data = await response.json(); //data sent back from backend response to url call
       console.log("Form submitted successfully:", data);
 
-      //toast popup for user to say form submitted successfully
+      // Toast popup for user to say form submitted successfully
       toast({
         title: "Form updated successfully ✔",
         description: "Event was updated in your calendar.",
       });
-      //Reset form fields
-      //form.reset();
-      // If successful, navigate to the success page with a message
 
-      /*
+      // Reset form fields
+      form.reset();
       form.setValue("title", "");
       form.setValue("type", "");
       form.setValue("start_date", new Date());
@@ -304,7 +319,9 @@ export default function ModifyTrainingSessionForm() {
       form.setValue("end_time", "");
       form.setValue("location", "");
       form.reset();
-      */
+
+      // If successful, navigate to the success page with a message
+      navigate("/");
     } catch (error: any) {
       console.error("Form submission error (error)", error);
       console.error("Error submitting form (message):", error.message);
