@@ -55,7 +55,7 @@ public class Program {
   private List<String> attachment;
 
   /**
-   * Constructor excluding programId since it's generated automatically
+   * Constructor excluding programId since it's generated automatically.
    *
    * @param programType type of the program.
    * @param title title of the program.
