@@ -57,7 +57,7 @@ const formSchema = z
   .object({
     title: z.string(),
     type: z.string(),
-    start_day: z.coerce.date(),
+    start_date: z.coerce.date(),
     end_date: z.coerce.date(),
     recurring: z.boolean().default(false),
     visibility: z.string(),
@@ -80,7 +80,7 @@ const formSchema = z
       .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
     location: z.string(),
   })
-  .refine((data) => data.end_date >= data.start_day, {
+  .refine((data) => data.end_date >= data.start_date, {
     message: "End date cannot be earlier than the start date.",
     path: ["end_date"], //points to the end_date field in the error message
   })
@@ -147,7 +147,7 @@ export default function CreateTrainingSessionForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       //default values that will considered for each state when page is loaded and also what is rendered when the page loads
-      //start_day: new Date(),
+      //start_date: new Date(),
       //end_date: new Date(),
       //title: "", //controlled/uncontrolled component error
     },
@@ -203,7 +203,7 @@ export default function CreateTrainingSessionForm() {
       form.reset();
       form.setValue("title", "");
       form.setValue("type", "");
-      form.setValue("start_day", new Date());
+      form.setValue("start_date", new Date());
       form.setValue("end_date", new Date());
       form.setValue("recurring", false);
       form.setValue("visibility", "");
@@ -335,7 +335,7 @@ export default function CreateTrainingSessionForm() {
           {/** Start Date */}
           <FormField
             control={form.control}
-            name="start_day"
+            name="start_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
