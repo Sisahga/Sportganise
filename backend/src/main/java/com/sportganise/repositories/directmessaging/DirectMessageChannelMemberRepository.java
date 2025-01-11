@@ -3,13 +3,12 @@ package com.sportganise.repositories.directmessaging;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 /** Repository for a Direct Channel Member. */
 @Repository
@@ -65,10 +64,12 @@ public interface DirectMessageChannelMemberRepository
 
   @Transactional
   @Modifying
-  @Query("""
+  @Query(
+      """
         UPDATE DirectMessageChannelMember cm
         SET cm.read = true
         WHERE cm.compositeKey.channelId = :channelId AND cm.compositeKey.accountId = :accountId
         """)
-  int updateChannelMemberReadStatus(@Param("accountId") int accountId, @Param("channelId") int channelId);
+  int updateChannelMemberReadStatus(
+      @Param("accountId") int accountId, @Param("channelId") int channelId);
 }

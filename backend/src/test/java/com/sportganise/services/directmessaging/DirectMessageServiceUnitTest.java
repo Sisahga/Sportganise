@@ -5,9 +5,9 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.sportganise.dto.directmessaging.DirectMessageDto;
 import com.sportganise.dto.directmessaging.MemberDetailsDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
-import com.sportganise.dto.directmessaging.DirectMessageDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
 import com.sportganise.entities.directmessaging.DirectMessageType;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,8 +83,7 @@ public class DirectMessageServiceUnitTest {
               return message;
             });
 
-    DirectMessageDto response =
-        directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
+    DirectMessageDto response = directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());
@@ -120,8 +118,7 @@ public class DirectMessageServiceUnitTest {
         .willReturn("https://mockblobstorage.com/file1.jpg")
         .willReturn("https://mockblobstorage.com/file2.jpg");
 
-    DirectMessageDto response =
-        directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
+    DirectMessageDto response = directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());

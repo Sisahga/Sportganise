@@ -21,22 +21,28 @@ function App() {
           {" "}
           {/*Place the routes to all your pages nested beneath this Route tag */}
           <Route
-              path="/pages/ChangePasswordPage"
-              element={<ChangePasswordPage />}
+            path="/pages/ChangePasswordPage"
+            element={<ChangePasswordPage />}
           ></Route>
           <Route
             path="/pages/CreateTrainingSessionPage"
             element={<CreateTrainingSessionPage />}
           ></Route>
-          <Route path="/pages/DirectMessageChannelPage" element={<DirectMessageChatPage />} />
+          <Route
+            path="/pages/DirectMessageChannelPage"
+            element={<DirectMessageChatPage />}
+          />
           <Route
             path="/pages/EditProfilePage"
             element={<EditProfilePage />}
           ></Route>
-          <Route path="/pages/DirectMessagesDashboard" element={<MessagingDashboard />} />
           <Route
-              path="/pages/PersonalInformationPage"
-              element={<PersonalInformationPage />}
+            path="/pages/DirectMessagesDashboard"
+            element={<MessagingDashboard />}
+          />
+          <Route
+            path="/pages/PersonalInformationPage"
+            element={<PersonalInformationPage />}
           ></Route>
           <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
           <Route path="/signup" element={<SignUpPage />}></Route>

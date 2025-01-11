@@ -10,14 +10,12 @@ function useChatMessages(channelId: number, read: boolean) {
 
   const fetchMessages = async () => {
     try {
-      directMessagingApi.getDirectMessages(channelId).then(
-        (response) => {
-          setMessages(response);
-          if (!read) {
-            directMessagingApi.markChannelAsRead(channelId, userId);
-          }
+      directMessagingApi.getDirectMessages(channelId).then((response) => {
+        setMessages(response);
+        if (!read) {
+          directMessagingApi.markChannelAsRead(channelId, userId);
         }
-      );
+      });
     } catch (err) {
       console.error("Error fetching chat messages:", err);
       setError("Failed to load messages.");
@@ -31,7 +29,7 @@ function useChatMessages(channelId: number, read: boolean) {
       return;
     }
     fetchMessages().then(() => {
-        setLoading(false);
+      setLoading(false);
     });
   }, [channelId]);
 

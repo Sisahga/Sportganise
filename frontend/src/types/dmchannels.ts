@@ -1,26 +1,26 @@
 import React from "react";
 
 export interface Channel {
-    channelId: number;
-    channelName: string;
-    channelImageBlob: string;
-    channelType: string;
+  channelId: number;
+  channelName: string;
+  channelImageBlob: string;
+  channelType: string;
 
-    lastMessage: string | null;
-    lastEvent: string | null;
-    read: boolean;
+  lastMessage: string | null;
+  lastEvent: string | null;
+  read: boolean;
 }
 
 export interface MessagesSectionProps {
-    messageChannels: Channel[];
+  messageChannels: Channel[];
 }
 
 export interface GroupSectionProps {
-    groupChannels: Channel[];
+  groupChannels: Channel[];
 }
 
 export interface ChannelItemProps {
-    channel: Channel;
-    layout?: "horizontal" | "vertical";
-    extraInfo?: React.ReactNode; // Holds 'read' and 'lastEvent' info
+  channel: Channel;
+  layout?: "horizontal" | "vertical";
+  extraInfo?: React.ReactNode; // Holds 'read' and 'lastEvent' info
 }

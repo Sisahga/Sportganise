@@ -1,11 +1,10 @@
 package com.sportganise.controllers.directmessaging;
 
-import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.dto.directmessaging.DirectMessageDto;
+import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.entities.Account;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.directmessaging.DirectMessageService;
-
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,7 +15,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for direct messaging. */
 @RestController
@@ -52,8 +54,7 @@ public class DirectMessageController {
    */
   @MessageMapping("/chat.send-message")
   @SendTo("/directmessage/public")
-  public DirectMessageDto sendDirectMessage(
-      @Payload SendDirectMessageRequestDto messageDto) {
+  public DirectMessageDto sendDirectMessage(@Payload SendDirectMessageRequestDto messageDto) {
     try {
       log.info("Controller received message request.");
       return directMessageService.sendDirectMessage(messageDto);

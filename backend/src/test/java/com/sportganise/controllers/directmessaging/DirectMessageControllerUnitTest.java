@@ -6,8 +6,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.dto.directmessaging.DirectMessageDto;
+import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.entities.directmessaging.DirectMessageType;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.directmessaging.DirectMessageService;
@@ -61,8 +61,7 @@ class DirectMessageControllerUnitTest {
     given(directMessageService.sendDirectMessage(any(SendDirectMessageRequestDto.class)))
         .willReturn(messageResponseDto);
 
-    DirectMessageDto response =
-        directMessageController.sendDirectMessage(messageRequestDto);
+    DirectMessageDto response = directMessageController.sendDirectMessage(messageRequestDto);
 
     assertNotNull(response);
     assertEquals(messageResponseDto.getChannelId(), response.getChannelId());
@@ -82,8 +81,7 @@ class DirectMessageControllerUnitTest {
     given(directMessageService.sendDirectMessage(any(SendDirectMessageRequestDto.class)))
         .willReturn(messageResponseDto);
 
-    DirectMessageDto response =
-        directMessageController.sendDirectMessage(messageRequestDto);
+    DirectMessageDto response = directMessageController.sendDirectMessage(messageRequestDto);
 
     assertNotNull(response);
     assertTrue(response.getAttachments().isEmpty());
@@ -96,8 +94,7 @@ class DirectMessageControllerUnitTest {
     given(directMessageService.sendDirectMessage(any(SendDirectMessageRequestDto.class)))
         .willThrow(new RuntimeException("Test exception"));
 
-    DirectMessageDto response =
-        directMessageController.sendDirectMessage(messageRequestDto);
+    DirectMessageDto response = directMessageController.sendDirectMessage(messageRequestDto);
 
     assertNull(response);
     verify(directMessageService, times(1))
@@ -116,8 +113,7 @@ class DirectMessageControllerUnitTest {
     given(directMessageService.sendDirectMessage(any(SendDirectMessageRequestDto.class)))
         .willReturn(messageResponseDto);
 
-    DirectMessageDto response =
-        directMessageController.sendDirectMessage(messageRequestDto);
+    DirectMessageDto response = directMessageController.sendDirectMessage(messageRequestDto);
 
     assertNotNull(response);
     assertEquals(2, response.getAttachments().size());

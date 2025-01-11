@@ -16,7 +16,7 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
         channelName: channel.channelName,
         channelImageBlob: channel.channelImageBlob,
         channelType: channel.channelType,
-        read: channel.read
+        read: channel.read,
       },
     });
   };
@@ -51,7 +51,9 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
           <div className="flex flex-col overflow-hidden">
             <p className="text-md font-semibold">{channel.channelName}</p>
             {channel.lastMessage && (
-                <p className="text-sm text-gray-500 mt-1 truncate">{channel.lastMessage}</p>
+              <p className="text-sm text-gray-500 mt-1 truncate">
+                {channel.lastMessage}
+              </p>
             )}
           </div>
           <div className="flex flex-col min-w-fit">{extraInfo}</div>
@@ -73,8 +75,10 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
         alt={channel.channelName}
         className="w-12 h-12 rounded-full object-cover"
       />
-      <span className="text-xs text-gray-600 mt-2 text-center inline-block
-      max-w-full overflow-hidden overflow-ellipsis">
+      <span
+        className="text-xs text-gray-600 mt-2 text-center inline-block
+      max-w-full overflow-hidden overflow-ellipsis"
+      >
         {channel.channelName}
       </span>
       <div className="absolute top-0">{extraInfo}</div>

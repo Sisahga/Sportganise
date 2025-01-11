@@ -12,12 +12,16 @@ function DirectMessagesDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const simpleChannels = channels.filter(channel => channel.channelType === "SIMPLE");
-  const groupChannels = channels.filter(channel => channel.channelType === "GROUP");
+  const simpleChannels = channels.filter(
+    (channel) => channel.channelType === "SIMPLE",
+  );
+  const groupChannels = channels.filter(
+    (channel) => channel.channelType === "GROUP",
+  );
 
   const fetchChannels = async () => {
     try {
-      const response = await directMessagingApi.getChannels(accountId)
+      const response = await directMessagingApi.getChannels(accountId);
       setChannels(response);
     } catch (err) {
       console.error("Error fetching chat messages:", err);
