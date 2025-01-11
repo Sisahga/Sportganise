@@ -12,7 +12,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class ProgramDetailsParticipantsDto {
   private ProgramDto programDetails;
   private List<ProgramParticipantDto> attendees;
