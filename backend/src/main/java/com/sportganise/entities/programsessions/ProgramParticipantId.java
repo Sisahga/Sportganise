@@ -1,0 +1,25 @@
+package com.sportganise.entities.programsessions;
+
+import java.io.Serializable;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Embeddable
+public class ProgramParticipantId implements Serializable{
+
+    @Column( name = "program_id")
+    private Integer programId;
+
+    @Column( name = "account_id")
+    private Integer accountId;
+    
+}

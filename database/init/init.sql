@@ -67,16 +67,17 @@ CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
 	type VARCHAR(20),
 	title VARCHAR(30) NOT NULL,
-	description VARCHAR (100),
+	description VARCHAR(100),
 	capacity INTEGER,
-	occurence_date DATE,
+	occurence_date TIMESTAMP(6),
 	duration INTEGER,
 	is_recurring BOOLEAN DEFAULT FALSE,
-	expiry_date DATE,
+	expiry_date TIMESTAMP(6),
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10)
-	filePath VARCHAR(100)
+	visibility VARCHAR(10),
+	filePath VARCHAR(100),
+	attachment VARCHAR(255)
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
@@ -87,6 +88,7 @@ CREATE TABLE program_participants (
 	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	type VARCHAR(20),
+	rank INTEGER, 
 	is_confirmed BOOLEAN DEFAULT FALSE,
 	confirm_date TIMESTAMP,
 	PRIMARY KEY (program_id, account_id),

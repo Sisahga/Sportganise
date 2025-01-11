@@ -1,6 +1,5 @@
 package com.sportganise.dto.programsessions;
 
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,6 @@ import com.sportganise.entities.programsessions.Program;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class ProgramDto {
     private Integer programId;
     private String programType; // Could be an event of some sort, tournament or training sessions

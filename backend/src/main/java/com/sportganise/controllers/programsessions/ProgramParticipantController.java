@@ -17,54 +17,54 @@ import org.springframework.web.bind.annotation.RestController;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.services.programsessions.ProgramService;
+import com.sportganise.services.programsessions.WaitlistService;
 
 @RestController
 @RequestMapping("/api/program-participant")
 public class ProgramParticipantController {
 
     private ProgramService programService;
+    private WaitlistService waitlistService;
 
     @Autowired
-    public ProgramParticipantController(ProgramService programService) {
+    public ProgramParticipantController(ProgramService programService, WaitlistService waitlistService) {
         this.programService = programService;
+        this.waitlistService = waitlistService;
     }
 
-    @PostMapping("/create-participant")
-    public ResponseEntity<ProgramParticipantDto> createProgramParticipant(
-            @RequestParam Integer programId,
-            @RequestParam Integer accountId,
-            @RequestParam AccountDto account,
-            @RequestParam Boolean isConfirmed,
-            @RequestParam LocalDateTime confirmedDate) {
-
-        ProgramParticipantDto participant = programService.createProgramParticipantDto(account, accountId, programId);
-        return ResponseEntity.ok(participant);
-    }
-
-    @PatchMapping("/confirm-participant")
-    public ResponseEntity<String> updateConfirmationStatus(
+    @PatchMapping("/opt-participant")
+    public ResponseEntity<ProgramParticipantDto> optProgramParticipant(
             @RequestParam Integer programId,
             @RequestParam Integer accountId) {
 
-        // Update the participant's confirmation status
-        programService.confirmParticipant(programId, accountId);
-        return ResponseEntity.ok("Success!");
+        ProgramParticipantDto participant = waitlistService.optProgramParticipantDto(programId, accountId);
+        return ResponseEntity.ok(participant);
     }
 
-    @DeleteMapping("/delete-participant")
-    public ResponseEntity<String> removeParticipant(
-            @RequestParam Integer accountId,
-            @RequestParam Integer programId) {
+    // @PatchMapping("/confirm-participant")
+    // public ResponseEntity<String> updateConfirmationStatus(
+    //         @RequestParam Integer programId,
+    //         @RequestParam Integer accountId) {
 
-        programService.removeParticipant(programId, accountId);
-        return ResponseEntity.ok("Success!");
-    }
+    //     // Update the participant's confirmation status
+    //     programService.confirmParticipant(programId, accountId);
+    //     return ResponseEntity.ok("Success!");
+    // }
 
-    @GetMapping("/opted-participants")
-    public ResponseEntity<List<ProgramParticipantDto>> getOptedParticipants(
-            @RequestParam Integer programId) {
+    // @DeleteMapping("/delete-participant")
+    // public ResponseEntity<String> removeParticipant(
+    //         @RequestParam Integer accountId,
+    //         @RequestParam Integer programId) {
 
-        List<ProgramParticipantDto> optedInParticipants = programService.getOptedParticipants(programId);
-        return ResponseEntity.ok(optedInParticipants);
-    }
+    //     programService.removeParticipant(programId, accountId);
+    //     return ResponseEntity.ok("Success!");
+    // }
+
+    // @GetMapping("/opted-participants")
+    // public ResponseEntity<List<ProgramParticipantDto>> getOptedParticipants(
+    //         @RequestParam Integer programId) {
+
+    //     List<ProgramParticipantDto> optedInParticipants = programService.getOptedParticipants(programId);
+    //     return ResponseEntity.ok(optedInParticipants);
+    // }
 }

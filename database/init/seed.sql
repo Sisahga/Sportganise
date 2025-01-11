@@ -21,7 +21,7 @@ INSERT INTO sport (name) VALUES
 ('Badminton');
 
 INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility, filePath) VALUES
-    ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01', 120, TRUE, '2024-08-01', 'Weekly'),
+     ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01', 120, TRUE, '2024-08-01', 'Weekly', NULL, 'Public', './Lab4.pdf'),
     ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15', 90, FALSE, NULL, NULL, '123 Main St', 'Public', './Lab4.pdf');
 
 
@@ -48,24 +48,25 @@ INSERT INTO account_organization (org_id, account_id) VALUES
 -- Skipping account-settings
 
 INSERT INTO program_participants (program_id, account_id, type, is_confirmed, confirm_date) VALUES
-(1, 3, 'Player', TRUE, '2024-06-20 10:30:00');
+(1, 3, 'Player', TRUE, '2024-06-20 10:30:00'),
+(1, 4, 'Player', FALSE, null);
 
 
 INSERT INTO label_program (label_id, program_id, type) VALUES
 (1, 1, 'Private'),
 (1, 2, 'Public');
 
-INSERT INTO channel (name) VALUES
-('Sunday Group'),
-(null);
+INSERT INTO channel (name, type) VALUES
+('Sunday Group', 'Group'),
+('Monday Group', 'Group');
 
 
-INSERT INTO channel_member (channel_id, account_id) VALUES
-(1, 2),
-(1, 3),
-(1, 4),
-(2,1),
-(2,2);
+INSERT INTO channel_member (channel_id, account_id, read) VALUES
+(1, 2, FALSE),
+(1, 3, FALSE),
+(1, 4, FALSE),
+(2,1, FALSE),
+(2,2, FALSE);
 
 INSERT INTO message (channel_id, sender_id, content) VALUES
 (1, 2, 'Welcome to sunday group chat.'),
