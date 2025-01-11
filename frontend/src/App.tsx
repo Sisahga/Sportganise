@@ -13,6 +13,7 @@ import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
+import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
 
 function App() {
   return (
@@ -54,6 +55,10 @@ function App() {
           <Route path="/signup" element={<SignUpPage />}></Route>
           <Route path="/verificationcode" element={<VerificationCodePage />} />
           <Route path="/pages/CalendarPage" element={<CalendarPage />}></Route>
+          <Route
+            path="/pages/ModifyTrainingSessionPage"
+            element={<ModifyTrainingSessionPage />}
+          ></Route>
         </Route>
       </Routes>
     </Router>
