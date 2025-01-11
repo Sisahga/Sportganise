@@ -228,9 +228,9 @@ export default function CreateTrainingSessionForm() {
         throw new Error(errorMessage);
         //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Form submission error (error)", error);
-      console.error("Error submitting form (message):", error.message);
+      //console.error("Error submitting form (message):", error.message);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
