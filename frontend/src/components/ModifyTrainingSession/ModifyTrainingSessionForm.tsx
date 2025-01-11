@@ -61,7 +61,7 @@ const formSchema = z
         //array of files
         z.custom<File>((file) => file instanceof File && file.size > 0, {
           message: "Each file must be a valid file and not empty.",
-        })
+        }),
       )
       .optional(),
     capacity: z.number().min(0),
@@ -91,7 +91,7 @@ const formSchema = z
       message:
         "Event start and end dates are the same and therefore cannot reccur.",
       path: ["recurring"],
-    }
+    },
   );
 
 // Define the form data structure
@@ -267,7 +267,7 @@ export default function ModifyTrainingSessionForm() {
       };
       console.log(json_payload);
       console.log(
-        "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2)
+        "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2),
       );
 
       // onSubmit API call
@@ -279,7 +279,7 @@ export default function ModifyTrainingSessionForm() {
             "Content-Type": "application/json", //If sending JSON
           },
           body: JSON.stringify(json_payload, null, 2),
-        }
+        },
       );
 
       // Check for HTTP errors
@@ -393,7 +393,7 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value
@@ -423,7 +423,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0"
+                                    : "opacity-0",
                                 )}
                               />
                               {type.label}
@@ -456,7 +456,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -503,7 +503,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -592,12 +592,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value
+                              (location) => location.value === field.value,
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -623,7 +623,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0"
+                                    : "opacity-0",
                                 )}
                               />
                               {location.label}
@@ -685,12 +685,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value
+                              (visibility) => visibility.value === field.value,
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -716,7 +716,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0"
+                                    : "opacity-0",
                                 )}
                               />
                               {visibility.label}
@@ -825,7 +825,7 @@ export default function ModifyTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined
+                        e.target.value ? Number(e.target.value) : undefined,
                       )
                     }
                   />
