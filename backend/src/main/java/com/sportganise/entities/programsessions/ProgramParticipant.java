@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +20,7 @@ import lombok.Setter;
 public class ProgramParticipant {
 
   /** Composite primary key (program_id + account_id) */
-  @EmbeddedId
-  private ProgramParticipantId id;
+  @EmbeddedId private ProgramParticipantId id;
 
   // Could be an admin, coach or player
   @Column(name = "type")
@@ -36,7 +34,7 @@ public class ProgramParticipant {
 
   /**
    * Returns the ID of the program
-   * 
+   *
    * @return The current value of the program ID.
    */
   public Integer getProgramId() {
@@ -45,7 +43,7 @@ public class ProgramParticipant {
 
   /**
    * Changes the ID of the program.
-   * 
+   *
    * @param programId The new program ID.
    */
   public void setProgramId(Integer programId) {
@@ -54,7 +52,7 @@ public class ProgramParticipant {
 
   /**
    * ID of the account.
-   * 
+   *
    * @return The current value of the account ID.
    */
   public Integer getAccountId() {
@@ -63,11 +61,10 @@ public class ProgramParticipant {
 
   /**
    * Changes the ID of the participant.
-   * 
+   *
    * @param accountId The new account ID.
    */
   public void setAccountId(Integer accountId) {
     id.setAccountId(accountId);
   }
-
 }

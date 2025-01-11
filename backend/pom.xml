@@ -9,7 +9,7 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.sportsganize</groupId>
-  <artifactId>helloworld</artifactId>
+  <artifactId>sportganise</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>Sportganise</name>
   <description>All-in-one sports platform for teams and leagues.</description>
