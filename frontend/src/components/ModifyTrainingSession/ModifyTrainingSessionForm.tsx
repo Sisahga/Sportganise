@@ -138,6 +138,15 @@ export default function ModifyTrainingSessionForm() {
   }); //assuming response is an object. Values will be overriden in fetch.
   const [notFound, setNotFound] = useState(false);
 
+  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      //start_date: new Date(),
+      //end_date: new Date(),
+    },
+  });
+
   /** Fetch form data from database using API call*/
   useEffect(() => {
     const fetchSavedFormFields = async () => {
@@ -196,7 +205,7 @@ export default function ModifyTrainingSessionForm() {
       }
     };
     fetchSavedFormFields();
-  }, []);
+  }, [form, notFound, programId, toast]);
 
   /**All select element options */
   //Options for type select
@@ -245,15 +254,6 @@ export default function ModifyTrainingSessionForm() {
       "application/pdf": [".pdf"],
     },
   };
-
-  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      //start_date: new Date(),
-      //end_date: new Date(),
-    },
-  });
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -341,7 +341,7 @@ export default function ModifyTrainingSessionForm() {
       <Button
         className="rounded-full"
         variant="outline"
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/HomePage")}
       >
         <MoveLeft />
       </Button>
