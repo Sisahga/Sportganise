@@ -7,8 +7,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /** Repository for a Direct Channel Member. */
+@Repository
 public interface DirectMessageChannelMemberRepository
     extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
   @Transactional
@@ -49,4 +53,22 @@ public interface DirectMessageChannelMemberRepository
             )
         """)
   void updateReadStatus(@Param("channelId") int channelId, @Param("senderId") int senderId);
+
+  @Query(
+      """
+      SELECT cm.compositeKey.accountId, a.firstName, a.pictureBlob
+      FROM DirectMessageChannelMember cm
+      JOIN Account a ON cm.compositeKey.accountId = a.accountId
+      WHERE cm.compositeKey.channelId = :channelId
+      """)
+  List<Object[]> getChannelMembersDetails(int channelId);
+
+  @Transactional
+  @Modifying
+  @Query("""
+        UPDATE DirectMessageChannelMember cm
+        SET cm.read = true
+        WHERE cm.compositeKey.channelId = :channelId AND cm.compositeKey.accountId = :accountId
+        """)
+  int updateChannelMemberReadStatus(@Param("accountId") int accountId, @Param("channelId") int channelId);
 }
