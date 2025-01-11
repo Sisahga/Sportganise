@@ -38,6 +38,7 @@ public class Program {
   private LocalDateTime occurrenceDate;
 
   // Duration of the program in terms of minutes
+  @Column(name = "duration")
   private Integer durationMins;
 
   @Column(name = "is_recurring")

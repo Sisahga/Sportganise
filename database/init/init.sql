@@ -74,14 +74,14 @@ CREATE TABLE program (
 	title VARCHAR(30) NOT NULL,
 	description VARCHAR (100),
 	capacity INTEGER,
-	occurence_date DATE,
+	occurence_date TIMESTAMP,
 	duration INTEGER,
 	is_recurring BOOLEAN DEFAULT FALSE,
-	expiry_date DATE,
+	expiry_date TIMESTAMP,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
 	visibility VARCHAR(10),
-	filePath VARCHAR(100),
+	attachment VARCHAR(100)[],
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
