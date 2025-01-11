@@ -1,6 +1,7 @@
 package com.sportganise.dto.directmessaging;
 
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,6 @@ public class SendDirectMessageRequestDto {
   private List<MultipartFile> attachments;
   private String sentAt;
   private String type;
+  private String senderFirstName;
+  private String avatarUrl;
 }
