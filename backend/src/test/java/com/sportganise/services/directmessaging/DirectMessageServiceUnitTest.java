@@ -5,8 +5,9 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.sportganise.dto.directmessaging.MemberDetailsDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
-import com.sportganise.dto.directmessaging.SendDirectMessageResponseDto;
+import com.sportganise.dto.directmessaging.DirectMessageDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
 import com.sportganise.entities.directmessaging.DirectMessageType;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
@@ -16,7 +17,10 @@ import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,16 +32,14 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageServiceUnitTest {
   @Mock private DirectMessageRepository directMessageRepository;
-
   @Mock private DirectMessageChannelRepository directMessageChannelRepository;
-
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
-
   @Mock private BlobService blobService;
-
   @InjectMocks private DirectMessageService directMessageService;
 
   private SendDirectMessageRequestDto sendDirectMessageRequestDto;
+  private static final String mock_first_name = "John";
+  private static final String mock_avatar_url = "https://example.com/avatar.jpg";
 
   @BeforeEach
   public void setUp() {
@@ -48,6 +50,20 @@ public class DirectMessageServiceUnitTest {
     sendDirectMessageRequestDto.setSentAt(ZonedDateTime.now().toString());
     sendDirectMessageRequestDto.setAttachments(Collections.emptyList());
     sendDirectMessageRequestDto.setType("CHAT");
+
+    // Setup mock member details
+    Map<Integer, MemberDetailsDto> mockMemberDetails = new HashMap<>();
+    MemberDetailsDto memberDetailsDto = new MemberDetailsDto();
+    memberDetailsDto.setFirstName(mock_first_name);
+    memberDetailsDto.setAvatarUrl(mock_avatar_url);
+    mockMemberDetails.put(2, memberDetailsDto);
+
+    // Mock getChannelMembersDetails method
+    try {
+      when(directMessageService.getChannelMembersDetails(1)).thenReturn(mockMemberDetails);
+    } catch (Exception e) {
+      fail("Failed to setup mock for getChannelMembersDetails");
+    }
 
     DirectMessage directMessage = new DirectMessage();
     directMessage.setMessageId(1);
@@ -68,12 +84,14 @@ public class DirectMessageServiceUnitTest {
               return message;
             });
 
-    SendDirectMessageResponseDto response =
+    DirectMessageDto response =
         directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());
     assertEquals(2, response.getSenderId());
+    assertEquals(mock_first_name, response.getSenderFirstName());
+    assertEquals(mock_avatar_url, response.getAvatarUrl());
     assertEquals("Hello, World!", response.getMessageContent());
     assertTrue(response.getAttachments().isEmpty());
 
@@ -102,12 +120,14 @@ public class DirectMessageServiceUnitTest {
         .willReturn("https://mockblobstorage.com/file1.jpg")
         .willReturn("https://mockblobstorage.com/file2.jpg");
 
-    SendDirectMessageResponseDto response =
+    DirectMessageDto response =
         directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());
     assertEquals(2, response.getSenderId());
+    assertEquals(mock_first_name, response.getSenderFirstName());
+    assertEquals(mock_avatar_url, response.getAvatarUrl());
     assertEquals("Hello, World!", response.getMessageContent());
     assertEquals(2, response.getAttachments().size());
     assertTrue(response.getAttachments().contains("https://mockblobstorage.com/file1.jpg"));
