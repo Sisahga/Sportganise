@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CreateTrainingSessionPage from "./pages/CreateTrainingSessionPage";
 import Layout from "./components/Layout";
-import MessagingApp from "@/components/Inbox/DirectMessages/Messaging";
-import DirectMessageChannelPage from "@/pages/DirectMessageChannelPage.tsx";
+import MessagingDashboard from "@/components/Inbox/DirectMessagesDashboard/MessagingDashboard.tsx";
+import DirectMessageChatPage from "@/pages/DirectMessageChannelPage.tsx";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
@@ -19,7 +19,6 @@ function App() {
         <Route path="/HomePage" element={<HomePage />} />
         <Route path="/" element={<Layout />}>
           {" "}
-          <Route path="/messages" element={<MessagingApp />} />
           {/*Place the routes to all your pages nested beneath this Route tag */}
           <Route
               path="/pages/ChangePasswordPage"
@@ -29,11 +28,12 @@ function App() {
             path="/pages/CreateTrainingSessionPage"
             element={<CreateTrainingSessionPage />}
           ></Route>
-          <Route path="/pages/DirectMessageChannelPage" element={<DirectMessageChannelPage />} />
+          <Route path="/pages/DirectMessageChannelPage" element={<DirectMessageChatPage />} />
           <Route
             path="/pages/EditProfilePage"
             element={<EditProfilePage />}
           ></Route>
+          <Route path="/pages/DirectMessagesDashboard" element={<MessagingDashboard />} />
           <Route
               path="/pages/PersonalInformationPage"
               element={<PersonalInformationPage />}
