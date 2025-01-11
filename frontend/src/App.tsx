@@ -8,15 +8,24 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
+import CreateFirstDmPage from "./pages/CreateFirstDmPage";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
+import CalendarPage from "./pages/CalendarPage";
+import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/HomePage" element={<HomePage />} />
+        {/*placed route here as it does not use original layout with Nav, bottom
+        nav, ...*/}
+        <Route
+          path="/pages/CreateFirstDmPage"
+          element={<CreateFirstDmPage />}
+        ></Route>
         <Route path="/" element={<Layout />}>
           {" "}
           {/*Place the routes to all your pages nested beneath this Route tag */}
@@ -36,6 +45,7 @@ function App() {
             path="/pages/EditProfilePage"
             element={<EditProfilePage />}
           ></Route>
+          <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
           <Route
             path="/pages/DirectMessagesDashboard"
             element={<MessagingDashboard />}
@@ -50,6 +60,13 @@ function App() {
           <Route
             path="/pages/ViewTrainingSessionPage"
             element={<ViewTrainingSessionPage />}
+          ></Route>
+          <Route path="/signup" element={<SignUpPage />}></Route>
+          <Route path="/verificationcode" element={<VerificationCodePage />} />
+          <Route path="/pages/CalendarPage" element={<CalendarPage />}></Route>
+          <Route
+            path="/pages/ModifyTrainingSessionPage"
+            element={<ModifyTrainingSessionPage />}
           ></Route>
         </Route>
       </Routes>

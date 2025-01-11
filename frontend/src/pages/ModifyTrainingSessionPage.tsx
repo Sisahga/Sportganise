@@ -1,11 +1,11 @@
-import { CreateTrainingSessionForm } from "@/components/CreateTrainingSessionForm";
+import { ModifyTrainingSessionForm } from "@/components/ModifyTrainingSession";
 import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
 
-export default function CreateTrainingSession() {
+export default function ModifyTrainingSessionPage() {
   return (
     <div className="">
       <ToastProvider>
-        <CreateTrainingSessionForm />
+        <ModifyTrainingSessionForm />
         <ToastViewport />
       </ToastProvider>
     </div>

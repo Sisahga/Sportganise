@@ -1,13 +1,12 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { useEffect, useState } from "react";
+import { MoveLeft } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/hooks/use-toast";
 import {
   Form,
   FormControl,
@@ -31,11 +30,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
+
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
+import { CloudUpload, Paperclip } from "lucide-react";
 import {
   FileInput,
   FileUploader,
@@ -43,15 +45,7 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
-import {
-  MoveLeft,
-  Check,
-  ChevronsUpDown,
-  CloudUpload,
-  Paperclip,
-} from "lucide-react";
-
-//GLOBAL --------------------------------------------------------------------------------------------------------------
+//GLOBAL ---------------------------------------------------------------------------------------------------------------------------
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
 const formSchema = z
   .object({
@@ -59,7 +53,7 @@ const formSchema = z
     type: z.string(),
     start_date: z.coerce.date(),
     end_date: z.coerce.date(),
-    recurring: z.boolean().default(false),
+    recurring: z.boolean().default(true),
     visibility: z.string(),
     description: z.string(),
     attachment: z
@@ -71,7 +65,7 @@ const formSchema = z
       )
       .optional(),
     capacity: z.number().min(0),
-    notify: z.boolean().default(false),
+    notify: z.boolean().default(true),
     start_time: z
       .string()
       .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
@@ -100,11 +94,118 @@ const formSchema = z
     },
   );
 
-//PAGE CONTENT -----------------------------------------------------------------------------------------------------------
-export default function CreateTrainingSessionForm() {
-  const navigate = useNavigate();
+// Define the form data structure
+interface FormData {
+  title: string;
+  type: string;
+  start_date: Date;
+  end_date: Date;
+  recurring: boolean;
+  visibility: string;
+  description: string;
+  attachment: File[]; //typed as an array of File objects
+  capacity: number;
+  notify: boolean;
+  start_time: string;
+  end_time: string;
+  location: string;
+}
+
+//PAGE CONTENT ---------------------------------------------------------------------------------------------------
+export default function ModifyTrainingSessionForm() {
   const { toast } = useToast();
-  const accountId = ""; //update with cookie
+  const { programId } = useParams();
+  const accountId = ""; //get from cookie
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState<FormData>({
+    //fact: "", //TO DELETE
+    //length: 0, //TO DELETE
+    //programId: 0,
+    title: "",
+    type: "",
+    start_date: new Date(),
+    end_date: new Date(),
+    recurring: false,
+    visibility: "",
+    description: "",
+    attachment: [], //values are set here as opposed to types, thus File[] does not work
+    capacity: 0,
+    notify: false,
+    start_time: "",
+    end_time: "",
+    location: "",
+  }); //assuming response is an object. Values will be overriden in fetch.
+  const [notFound, setNotFound] = useState(false);
+
+  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      //start_date: new Date(),
+      //end_date: new Date(),
+    },
+  });
+
+  /** Fetch form data from database using API call*/
+  useEffect(() => {
+    const fetchSavedFormFields = async () => {
+      try {
+        const url = `/${accountId}/${programId}/modify-program`;
+        fetch(url) //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
+          .then((response) => {
+            if (!response.ok) {
+              // Handle specific HTTP statuses
+              if (response.status === 404) {
+                //render 404 component on the page
+                setNotFound(true);
+                console.log("Resource was notFound: " + notFound);
+              }
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json(); //turns response into a javascript object
+          })
+          .then((data) => {
+            console.log("Fetched data: ", data);
+            setFormData(data); //grab the value/data in the response.json()
+
+            /*
+            const fields = Object.keys(data); // Array of field names
+            console.log("fields: ", fields);
+            const parseData = formSchema.safeParse(data); //uses formSchema.safeParse to validate formData against the schema (formSchema)
+            console.log("PARSE DATA:" + parseData.data); //undefined if form data is invalid
+            console.log("formData: " + Object.values(formData));
+            if (parseData == undefined) {
+              throw new Error("Fetched data did not match form schema!");
+            }
+            */
+
+            // Set form defaults and update field values
+            form.setValue("title", data.title);
+            form.setValue("capacity", data.capacity);
+            form.setValue("type", data.type);
+            form.setValue("start_date", data.start_date);
+            form.setValue("end_date", data.end_date);
+            form.setValue("recurring", data.recurring);
+            form.setValue("visibility", data.visibility);
+            form.setValue("description", data.description);
+            form.setValue("attachment", data.attachment); //undefined
+            form.setValue("notify", data.notify);
+            form.setValue("start_time", data.start_time);
+            form.setValue("end_time", data.end_time);
+            form.setValue("location", data.location);
+          });
+      } catch (error) {
+        console.log(error);
+        toast({
+          variant: "destructive",
+          title: "Uh oh! Something went wrong ✖",
+          description: "Event data could not be fetched. ",
+        });
+      }
+    };
+    fetchSavedFormFields();
+  }, [form, notFound, programId, toast]);
 
   /**All select element options */
   //Options for type select
@@ -154,80 +255,73 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
-  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      //default values that will considered for each state when page is loaded and also what is rendered when the page loads
-      //start_date: new Date(),
-      //end_date: new Date(),
-      //title: "", //controlled/uncontrolled component error
-    },
-  });
-
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
     try {
-      // Prepare data to send through API as necessary
+      // Merge the programId into the values object
       const json_payload = {
         ...values,
+        programId: programId ?? null,
         attachment: files ?? [], //ensure attachment: appears in json payload body
       };
       console.log(json_payload);
-      console.log(JSON.stringify(json_payload, null, 2));
+      console.log(
+        "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2),
+      );
 
-      // API submit form
-      const response = await fetch(`/${accountId}/create-program`, {
-        //response is what is returned by the backend, like 200 OK. Can return info as well.
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", //If sending JSON
+      // onSubmit API call
+      const response = await fetch(
+        `/${accountId}/${programId}/modify-program`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json", //If sending JSON
+          },
+          body: JSON.stringify(json_payload, null, 2),
         },
-        body: JSON.stringify(json_payload, null, 2), //stringify form values in JSON format and send through url
-      });
+      );
 
       // Check for HTTP errors
-      if (response.status === 201) {
-        // Success handling
-        const data = await response.json(); //data sent back from backend response to url call
-        console.log("Event created successfully:", data);
-
-        // Toast popup for user to say form submitted successfully
-        toast({
-          title: "Form submitted successfully ✔",
-          description: "Event was added to your calendar.",
-        });
-
-        // Reset form fields
-        form.reset();
-        form.setValue("title", "");
-        form.setValue("type", "");
-        form.setValue("start_date", new Date());
-        form.setValue("end_date", new Date());
-        form.setValue("recurring", false);
-        form.setValue("visibility", "");
-        form.setValue("description", "");
-        form.setValue("attachment", undefined);
-        form.setValue("capacity", 0);
-        form.setValue("notify", false);
-        form.setValue("start_time", "");
-        form.setValue("end_time", "");
-        form.setValue("location", "");
-        form.reset();
-
-        // Navigate to home page
-        navigate("/HomePage");
-      } else {
+      if (!response.ok) {
         const errorData = await response
           .json()
           .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
         const errorMessage =
           errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
-        form.reset();
         throw new Error(errorMessage);
         //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
       }
+
+      // ...Rest of success handling
+      const data = await response.json(); //data sent back from backend response to url call
+      console.log("Form submitted successfully:", data);
+
+      // Toast popup for user to say form submitted successfully
+      toast({
+        title: "Form updated successfully ✔",
+        description: "Event was updated in your calendar.",
+      });
+
+      // Reset form fields
+      form.reset();
+      form.setValue("title", "");
+      form.setValue("type", "");
+      form.setValue("start_date", new Date());
+      form.setValue("end_date", new Date());
+      form.setValue("recurring", false);
+      form.setValue("visibility", "");
+      form.setValue("description", "");
+      form.setValue("attachment", undefined);
+      form.setValue("capacity", 0);
+      form.setValue("notify", false);
+      form.setValue("start_time", "");
+      form.setValue("end_time", "");
+      form.setValue("location", "");
+      form.reset();
+
+      // If successful, navigate to the success page with a message
+      navigate("/");
     } catch (error) {
       console.error("Form submission error (error)", error);
       //console.error("Error submitting form (message):", error.message);
@@ -235,14 +329,14 @@ export default function CreateTrainingSessionForm() {
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description:
-          "There was a problem with your request. Event was not created.",
+          "There was a problem with your request. Event was not updated.",
       });
     }
   };
 
   return (
-    //RETURN ---------------------------------------------------------------------------------------------------------
-    <>
+    //RETURN -----------------------------------------------------------------------------------------------------------
+    <div>
       {/** Navigate to previous page */}
       <Button
         className="rounded-full"
@@ -251,16 +345,20 @@ export default function CreateTrainingSessionForm() {
       >
         <MoveLeft />
       </Button>
+
       {/** Create Training Session Form */}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto pt-10"
+          className="space-y-8 max-w-3xl mx-auto py-10"
         >
           {/*Form Title*/}
           <div>
-            <h2 className="text-2xl font-semibold">Create New Event</h2>
-            <h2>Complete the form and submit</h2>
+            <h2 className="text-2xl font-semibold">
+              Edit <span style={{ color: "#82DBD8" }}>{formData.title}</span>{" "}
+              Event
+            </h2>
+            <h2>Edit fields and update the form</h2>
           </div>
 
           {/** Title */}
@@ -427,8 +525,7 @@ export default function CreateTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the last day of a recurring event. If same-day event,
-                  pick the day entered for start date.
+                  Enter the last day of a recurring event.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -773,15 +870,15 @@ export default function CreateTrainingSessionForm() {
 
           {/** Submit Button */}
           <Button type="submit" className="w-full font-semibold">
-            Create new Event
+            Update Event
           </Button>
           <div className="text-center self-center">
             <a href="../" className="underline text-neutral-400">
-              Cancel
+              Done
             </a>
           </div>
         </form>
       </Form>
-    </>
+    </div>
   );
 }

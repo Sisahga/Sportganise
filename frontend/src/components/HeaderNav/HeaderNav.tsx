@@ -8,8 +8,10 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import logo from "../../assets/Logo.png";
+import { useNavigate } from "react-router-dom";
 
 export default function HeaderNav() {
+  const navigate = useNavigate();
   return (
     <div>
       <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
@@ -42,6 +44,7 @@ export default function HeaderNav() {
               </Button>
               <Button
                 variant="link"
+                onClick={() => navigate("/pages/CreateTrainingSessionPage")}
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
               >
                 Training Session

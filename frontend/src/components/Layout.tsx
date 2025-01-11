@@ -1,6 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import { HeaderNav } from "./HeaderNav";
 import { FooterNav } from "./FooterNav";
+import { Toaster } from "@/components/ui/toaster";
 
 // Paths where the header should be hidden
 const hideHeaderPaths = [
@@ -30,6 +31,7 @@ const Layout = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <Toaster />
       {/* Conditionally render HeaderNav */}
       {!hideHeader && <HeaderNav />}
 
