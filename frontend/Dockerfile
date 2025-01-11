@@ -20,6 +20,6 @@ WORKDIR /app
 
 COPY --from=build /app/dist ./dist
 
-EXPOSE 80
+EXPOSE 3000
 
-CMD ["serve", "-l", "80", "-s", "dist"] 
+CMD ["serve", "-l", "3000", "-s", "dist"]

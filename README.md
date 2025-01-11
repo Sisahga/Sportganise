@@ -180,7 +180,7 @@ The following link will direct you to our Figma page where we implemented the ap
 * [Deployment Plan and Infrastructure](https://github.com/Sisahga/Sportganise/wiki/Deployment-Plan-and-Infrastructure)
 * [Mockups](https://github.com/Sisahga/Sportganise/wiki/Mockups)
 * [Budget](https://github.com/Sisahga/Sportganise/wiki/Budget)
-* [API Endpoint Documentation](https://github.com/Sisahga/Sportganise/wiki/API-Endpoint-Documentation)
+* [API Endpoint Documentation](https://github.com/Sisahga/Sportganise/wiki/API-Endpoint)
 
 ## Diversity Statement 
 “We’re committed to creating an inclusive environment where everyone feels welcome, no matter their background, gender, or abilities. Our goal is to make sure the app is accessible to all users and helps bring people together in a way that promotes fairness and respect. We believe diversity makes our platform stronger and allows us to better serve all the clubs and players that use it.”

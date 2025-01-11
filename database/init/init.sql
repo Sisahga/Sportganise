@@ -5,7 +5,7 @@ GRANT ALL PRIVILEGES ON DATABASE sportganise TO sportganise;
 CREATE TABLE organization(
 	org_id SERIAL PRIMARY KEY,
 	name VARCHAR(50) NOT NULL,
-	type VARCHAR(20) ,
+	type VARCHAR(20),
 	description VARCHAR(100)
 );
 
@@ -19,6 +19,11 @@ CREATE TABLE account (
 	first_name VARCHAR(50) NOT NULL,
 	last_name VARCHAR(50) NOT NULL,
 	picture VARCHAR(255)
+);
+
+CREATE TABLE blob (
+    blob_id SERIAL PRIMARY KEY,
+    blob_url VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE blocklist(
@@ -73,7 +78,10 @@ CREATE TABLE program (
 	duration INTEGER,
 	is_recurring BOOLEAN DEFAULT FALSE,
 	expiry_date DATE,
-	frequency VARCHAR(10)
+	frequency VARCHAR(10),
+	location VARCHAR(50),
+	visibility VARCHAR(10)
+	filePath VARCHAR(100)
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
@@ -106,7 +114,7 @@ CREATE TABLE channel (
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
-CREATE Table channel_member (
+CREATE TABLE channel_member (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
     read BOOLEAN NOT NULL,
@@ -118,7 +126,14 @@ CREATE TABLE message (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	content VARCHAR(512) NOT NULL,
-	sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+	sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    type VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE message_blob (
+    message_id INTEGER NOT NULL REFERENCES message(message_id) ON DELETE SET NULL,
+    blob_url VARCHAR(255) NOT NULL,
+    PRIMARY KEY (message_id)
 );
 
 ALTER TABLE channel

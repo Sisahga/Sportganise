@@ -1,0 +1,86 @@
+package com.sportganise.services;
+
+import com.sportganise.entities.Blob;
+import com.sportganise.entities.directmessaging.DirectMessageBlob;
+import com.sportganise.repositories.BlobRepository;
+import com.sportganise.repositories.directmessaging.DirectMessageBlobRepository;
+import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+
+/** Service class for handling operations related to Blobs. */
+@Slf4j
+@Service
+public class BlobService {
+  private final BlobRepository blobRepository;
+  private final DirectMessageBlobRepository directMessageBlobRepository;
+  private final S3Client s3Client;
+
+  /**
+   * Constructor for the BlobService class.
+   *
+   * @param blobRepository Repository for the Blob entity.
+   * @param directMessageBlobRepository Repository for the DirectMessageBlob entity.
+   * @param s3Client S3Client object for interacting with the AWS S3 Bucket.
+   */
+  public BlobService(
+      BlobRepository blobRepository,
+      DirectMessageBlobRepository directMessageBlobRepository,
+      S3Client s3Client) {
+    this.blobRepository = blobRepository;
+    this.directMessageBlobRepository = directMessageBlobRepository;
+    this.s3Client = s3Client;
+  }
+
+  @Value("${aws.s3.bucket.name}")
+  private String bucketName;
+
+  @Value("${aws.s3.region}")
+  private String region;
+
+  /**
+   * Uploads a file to the AWS S3 Bucket.
+   *
+   * @param file File to be uploaded.
+   * @param isMessageFile Boolean indicating if the file is part of a direct message.
+   * @param messageId Id of the direct message, if the file is part of a direct message.
+   * @return String indicating the status of the upload.
+   * @throws IOException If an error occurs while uploading the file.
+   */
+  public String uploadFile(MultipartFile file, boolean isMessageFile, String messageId)
+      throws IOException {
+    String fileName = file.getOriginalFilename();
+    log.debug("Uploading file: {}", fileName);
+    try {
+      assert fileName != null;
+      PutObjectRequest objectRequest =
+          PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
+      s3Client.putObject(objectRequest, RequestBody.fromBytes(file.getBytes()));
+      String s3Url =
+          String.format(
+              "https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName.replace(" ", "+"));
+
+      // ** Save the URL in the Database.
+      // Case where it is not a message file.
+      if (!isMessageFile) {
+        Blob blob = new Blob();
+        blob.setBlobUrl(s3Url);
+        blobRepository.save(blob);
+      } else { // Case where it is a message file.
+        DirectMessageBlob directMessageBlob = new DirectMessageBlob();
+        directMessageBlob.setMessageId(Integer.parseInt(messageId));
+        directMessageBlob.setBlobUrl(s3Url);
+        directMessageBlobRepository.save(directMessageBlob);
+      }
+      return s3Url;
+    } catch (IOException e) {
+      log.error("Error uploading file: {}", e.getMessage());
+      throw new IOException("Error uploading file: " + e.getMessage());
+    }
+  }
+}

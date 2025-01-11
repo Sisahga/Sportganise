@@ -2,5 +2,9 @@
   "name": "sportganise",
   "scripts": {
     "preinstall": "echo You should install from within the frontend folder && exit 1"
+  },
+  "dependencies": {
+    "react-router-dom": "^7.0.1",
+    "date-fns": "^2.28.0"
   }
 }
