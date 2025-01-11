@@ -1,4 +1,4 @@
-import ChatScreen from "@/components/Inbox/ChatScreen.tsx";
+import ChatScreen from "@/components/Inbox/ChatScreen/ChatScreen.tsx";
 
 export default function DirectMessageChannelPage() {
   return (
