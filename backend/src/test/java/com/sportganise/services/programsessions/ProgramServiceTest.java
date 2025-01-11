@@ -35,21 +35,17 @@ public class ProgramServiceTest {
   @Test
   public void testGetParticipants() {
     // Mock a Program object with the below attributes
-    ProgramParticipant participant1 =
-        ProgramParticipant.builder()
-            .programId(1)
-            .accountId(101)
-            .isConfirmed(true)
-            .confirmedDate(LocalDateTime.now())
-            .build();
+    ProgramParticipant participant1 = new ProgramParticipant();
+    participant1.setProgramId(1);
+    participant1.setAccountId(101);
+    participant1.setConfirmed(true);
+    participant1.setConfirmedDate(LocalDateTime.now());
 
-    ProgramParticipant participant2 =
-        ProgramParticipant.builder()
-            .programId(1)
-            .accountId(102)
-            .isConfirmed(false)
-            .confirmedDate(LocalDateTime.now().minusDays(1))
-            .build();
+    ProgramParticipant participant2 = new ProgramParticipant();
+    participant2.setProgramId(1);
+    participant2.setAccountId(102);
+    participant2.setConfirmed(false);
+    participant2.setConfirmedDate(LocalDateTime.now().minusDays(1));
 
     List<ProgramParticipant> mockParticipants = List.of(participant1, participant2);
 

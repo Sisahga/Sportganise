@@ -1,24 +1,24 @@
-package com.sportganise.entities.directmessaging;
+package com.sportganise.entities.programsessions;
+
+import java.io.Serializable;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Composite Key ID for channel member. */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @Embeddable
-public class DirectMessageChannelMemberCompositeKey implements Serializable {
-  @Column(name = "channel_id")
-  private Integer channelId;
+public class ProgramParticipantId implements Serializable {
+  @Column(name = "program_id")
+  private Integer programId;
 
   @Column(name = "account_id")
   private Integer accountId;
