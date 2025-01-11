@@ -170,7 +170,7 @@ export default function CreateTrainingSessionForm() {
     //async request which may result error
     try {
       // Prepare data to send through API as necessary
-      let json_payload = {
+      const json_payload = {
         ...values,
         attachment: files ?? [], //ensure attachment: appears in json payload body
       };
