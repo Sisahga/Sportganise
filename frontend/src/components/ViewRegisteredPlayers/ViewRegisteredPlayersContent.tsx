@@ -100,7 +100,7 @@ export default function ViewRegisteredPlayersContent() {
       }
     };
     fetchAttendees();
-  }, []);
+  }, [trainingSessionId]);
 
   return (
     <div>
