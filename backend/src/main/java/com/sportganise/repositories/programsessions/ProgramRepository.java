@@ -17,8 +17,8 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
 
   @Query(
       "SELECT a FROM Account a "
-          + "JOIN ProgramParticipant pp ON pp.account.accountId = a.accountId "
-          + "JOIN Program p ON pp.program.programId = p.programId "
+          + "JOIN ProgramParticipant pp ON pp.id.accountId = a.accountId "
+          + "JOIN Program p ON pp.id.programId = p.programId "
           + "WHERE p.programId = :sessionId")
   List<ProgramParticipant> findParticipantsByProgramId(@Param("sessionId") Integer sessionId);
 }
