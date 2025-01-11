@@ -66,7 +66,7 @@ export default function FooterNav() {
           className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
           onClick={() => {
             setSelected("Inbox");
-            navigate("/messages"); // Navigate to the messages route
+            navigate("/pages/DirectMessagesDashboard"); // Navigate to the messages route
           }}
         >
           <MessageSquare
