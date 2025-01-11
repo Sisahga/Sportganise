@@ -80,8 +80,8 @@ CREATE TABLE program (
 	expiry_date DATE,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10)
-	filePath VARCHAR(100)
+	visibility VARCHAR(10),
+	filePath VARCHAR(100),
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
