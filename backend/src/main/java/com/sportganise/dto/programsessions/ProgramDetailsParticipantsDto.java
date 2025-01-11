@@ -1,6 +1,5 @@
 package com.sportganise.dto.programsessions;
 
-import jakarta.persistence.Entity;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
