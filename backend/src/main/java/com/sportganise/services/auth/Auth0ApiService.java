@@ -16,10 +16,10 @@ public class Auth0ApiService {
   @Value("${auth0.domain}")
   private String auth0Domain;
 
-  @Value("${auth0.client_id}")
+  @Value("${auth0.client-id}")
   private String auth0ClientId;
 
-  @Value("${auth0.client_secret}")
+  @Value("${auth0.client-secret}")
   private String auth0ClientSecret;
 
   @Value("${auth0.audience}")
