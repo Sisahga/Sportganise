@@ -49,7 +49,7 @@ public class Verification {
   }
 
   /**
-   * Non default constructor
+   * Non default constructor.
    *
    * @param account user account
    * @param code verification code
