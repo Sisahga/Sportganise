@@ -84,6 +84,6 @@ public class AccountController {
           "Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    return ResponseEntity.ok().build();
+    return ResponseEntity.noContent().build();
   }
 }
