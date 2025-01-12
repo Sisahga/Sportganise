@@ -1,5 +1,7 @@
 package com.sportganise.controllers.auth;
 
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -7,7 +9,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
+import com.sportganise.entities.Account;
+import com.sportganise.entities.Verification;
 import com.sportganise.services.auth.AccountService;
+import com.sportganise.services.auth.EmailService;
+import com.sportganise.services.auth.VerificationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -18,6 +24,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.Optional;
 
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc
@@ -26,6 +35,10 @@ public class AuthControllerTest {
   @Autowired private MockMvc mockMvc;
 
   @MockBean private AccountService accountService;
+
+  @MockBean private EmailService emailService;
+
+  @MockBean private VerificationService verificationService;
 
   private ObjectMapper objectMapper;
   private AccountDto accountDto;
@@ -44,6 +57,8 @@ public class AuthControllerTest {
     accountDto.setType("general");
 
     auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
+
+
   }
 
   @Test
@@ -122,4 +137,66 @@ public class AuthControllerTest {
         .andExpect(jsonPath("$.message").value("Error during login: Internal server error"))
         .andExpect(jsonPath("$.statusCode").value(500));
   }
+
+  @Test
+  @Order(6)
+  public void sendCode_shouldCallServices() throws Exception {
+    Mockito.when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
+    Mockito.when(verificationService.createVerification(Mockito.any(Account.class)))
+        .thenReturn(mock(Verification.class));
+    mockMvc
+            .perform(
+                    post("/api/auth/send-code")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"email\":\"userx@example.com\"}"))
+            .andExpect(status().isCreated());
+
+    Mockito.verify(accountService).getAccountByEmail("userx@example.com");
+    Mockito.verify(verificationService).createVerification(Mockito.any(Account.class));
+    Mockito.verify(emailService).sendVerificationCode(anyString(), Mockito.anyInt());
+  }
+
+  @Test
+  @Order(7)
+  public void verifyCode_shouldCallServices() throws Exception {
+    Mockito.when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
+    Mockito.when(verificationService.validateCode(Mockito.anyInt(), Mockito.anyInt()))
+        .thenReturn(Optional.ofNullable(mock(Verification.class)));
+    mockMvc
+            .perform(
+                    post("/api/auth/verify-code")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"email\":\"userx@example.com\",\"code\":\"123456\"}"))
+            .andExpect(status().isCreated());
+
+    Mockito.verify(accountService).getAccountByEmail("userx@example.com");
+    Mockito.verify(verificationService).validateCode(Mockito.anyInt(), Mockito.anyInt());
+  }
+
+  @Test
+  @Order(8)
+  public void resetPassword_shouldCallAccountService() throws Exception {
+    String requestBody = "{\"email\":\"userx@example.com\",\"newPassword\":\"newPassword123\"}";
+
+    mockMvc.perform(MockMvcRequestBuilders.patch("/api/auth/reset-password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+            .andExpect(status().isOk());
+
+    Mockito.verify(accountService).resetPassword("userx@example.com", "newPassword123");
+  }
+
+  @Test
+  @Order(9)
+  public void modifyPassword_shouldCallAccountService() throws Exception {
+    String requestBody = "{\"email\":\"userx@example.com\",\"oldPassword\":\"oldPassword123\",\"newPassword\":\"newPassword123\"}";
+
+    mockMvc.perform(MockMvcRequestBuilders.patch("/api/auth/modify-password")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(requestBody))
+            .andExpect(status().isOk());
+
+    Mockito.verify(accountService).modifyPassword("userx@example.com", "oldPassword123", "newPassword123");
+  }
+
 }

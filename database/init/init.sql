@@ -26,6 +26,14 @@ CREATE TABLE blob (
     blob_url VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE verification (
+    verification_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    code INTEGER NOT NULL,
+    expiry_date TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE blocklist(
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	blocked_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
