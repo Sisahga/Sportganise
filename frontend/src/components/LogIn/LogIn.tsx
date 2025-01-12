@@ -1,18 +1,9 @@
-import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { FormField } from "@/components/ui/formfield";
-import { useNavigate } from "react-router-dom";
 import logo from "../../assets/Logo.png";
 import { Link } from "react-router-dom";
 
 export default function LogIn() {
-  const navigate = useNavigate();
-
-  const handleLogIn = () => {
-    // Redirect to the VerificationCode page
-    navigate("/verificationcode");
-  };
-
   return (
     <div className="flex flex-col items-center justify center min-h-screen bg-white pt-10">
       <img
@@ -36,12 +27,12 @@ export default function LogIn() {
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Button
-            className="w-full text-white bg-primaryColour"
-            onClick={handleLogIn}
+          <Link
+            className="w-full text-white bg-primaryColour py-2 md:py-3 rounded-lg flex items-center justify-center text-sm md:text-base"
+            to="/" 
           >
             Log In
-          </Button>
+          </Link>
         </CardFooter>
         <p
           id="helper-text-explanation"
@@ -56,10 +47,10 @@ export default function LogIn() {
           </Link>
         </p>
         <Link
-        className="ml-6 mb-6 text-primaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent"
-        to="/"
+          className="ml-6 mb-6 text-primaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent"
+          to="/"
         >
-            Forgot password?
+          Forgot password?
         </Link>
       </Card>
     </div>
