@@ -32,7 +32,10 @@ export default function FooterNav() {
         <Button
           variant="ghost"
           className="flex-1 flex-col items-center gap-1 h-auto py-2 bg-white"
-          onClick={() => setSelected("Calendar")}
+          onClick={() => {
+            setSelected("Calendar");
+            navigate("/pages/CalendarPage");
+          }}
         >
           <Calendar
             className={`h-5 w-5 ${

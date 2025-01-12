@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
-
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,12 +55,37 @@ public class Program {
 
   private String visibility;
 
-  private String attachment;
+  private List<String> attachment;
 
-  // Constructor excluding programId since it's generated automatically
-  public Program(String programType, String title, String description, Integer capacity,
-                 LocalDateTime occurrenceDate, Integer durationMins, Boolean isRecurring, 
-                 LocalDateTime expiryDate, String frequency, String location, String visibility, String attachment) {
+  /**
+   * Constructor excluding programId since it's generated automatically.
+   *
+   * @param programType type of the program.
+   * @param title title of the program.
+   * @param description description of the program.
+   * @param capacity capacity of the program.
+   * @param occurrenceDate start date and time of the first program occurrence.
+   * @param durationMins duration of the program in minutes.
+   * @param isRecurring boolean for whether or not this program is a recurring one.
+   * @param expiryDate date and time of the last occurrence of the program.
+   * @param frequency frequency of the program if it is recurring.
+   * @param location location of the program.
+   * @param visibility visibility type of the program to the members.
+   * @param attachment list of strings of attachment paths for upload.
+   */
+  public Program(
+      String programType,
+      String title,
+      String description,
+      Integer capacity,
+      LocalDateTime occurrenceDate,
+      Integer durationMins,
+      Boolean isRecurring,
+      LocalDateTime expiryDate,
+      String frequency,
+      String location,
+      String visibility,
+      List<String> attachment) {
     this.programType = programType;
     this.title = title;
     this.description = description;

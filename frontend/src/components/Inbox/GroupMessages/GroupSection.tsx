@@ -1,6 +1,6 @@
 // GroupSection.tsx
-import SectionWrapper from "./SectionWrapper";
-import ChannelItem, { Channel } from "./ChannelItem";
+import SectionWrapper from "../SectionWrapper";
+import ChannelItem, { Channel } from "../ChannelItem";
 
 interface Group {
   channelId: number;
@@ -28,7 +28,7 @@ function GroupSection({ groups }: GroupSectionProps) {
           <ChannelItem
             key={channel.channelId}
             channel={channel}
-            layout="vertical" 
+            layout="vertical"
           />
         ))}
       </div>
