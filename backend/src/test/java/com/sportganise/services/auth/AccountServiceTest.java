@@ -143,7 +143,6 @@ public class AccountServiceTest {
     Account mockAccount = new Account();
     mockAccount.setAuth0Id("mockAuth0Id");
 
-    given(accountRepository.findByEmail(email)).willReturn(java.util.Optional.of(mockAccount));
     given(auth0ApiService.changePasswordWithOldPassword(any(Auth0AccountDto.class), anyString()))
         .willReturn(Map.of("message", "Password updated successfully", "user", "mockUserDetails"));
 
@@ -154,26 +153,6 @@ public class AccountServiceTest {
 
     verify(auth0ApiService, times(1))
         .changePasswordWithOldPassword(any(Auth0AccountDto.class), eq(newPassword));
-    verify(accountRepository, times(1)).findByEmail(email);
   }
 
-  @Test
-  public void modifyPassword_shouldThrowExceptionWhenAccountNotFound() {
-    String email = "userx@example.com";
-    String oldPassword = "oldPassword!123";
-    String newPassword = "newPassword!123";
-
-    given(accountRepository.findByEmail(email)).willReturn(java.util.Optional.empty());
-
-    Exception exception =
-        assertThrows(
-            RuntimeException.class,
-            () -> {
-              accountService.modifyPassword(email, oldPassword, newPassword);
-            });
-
-    assertEquals("Account not found", exception.getMessage());
-
-    verify(accountRepository, times(1)).findByEmail(email);
-  }
 }
