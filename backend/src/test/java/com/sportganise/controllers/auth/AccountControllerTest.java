@@ -1,12 +1,18 @@
-package com.sportganise.controllers;
+package com.sportganise.controllers.auth;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.sportganise.controllers.AccountController;
+import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.auth.AccountService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,5 +78,36 @@ class AccountControllerTest {
         .andExpect(jsonPath("$.phone", is(account.getPhone())))
         .andExpect(jsonPath("$.firstName", is(account.getFirstName())))
         .andExpect(jsonPath("$.lastName", is(account.getLastName())));
+  }
+
+  @Test
+  public void updateAccountTest_NotFound() throws Exception {
+    int accountId = 2;
+    String requestBody = "{}";
+
+    doThrow(new ResourceNotFoundException("Account not found"))
+        .when(accountService)
+        .updateAccount(anyInt(), any(UpdateAccountDto.class));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/account/{id}", accountId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+        .andExpect((status().isNotFound()));
+  }
+
+  @Test
+  public void updateAccountTest_Success() throws Exception {
+
+    int accountId = 3;
+    String requestBody = "{}";
+
+    mockMvc
+        .perform(
+            (MockMvcRequestBuilders.put("/api/account/{id}", accountId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)))
+        .andExpect((status().isNoContent()));
   }
 }
