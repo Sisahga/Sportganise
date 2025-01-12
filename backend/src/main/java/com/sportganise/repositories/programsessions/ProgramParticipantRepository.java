@@ -49,4 +49,11 @@ public interface ProgramParticipantRepository extends JpaRepository<ProgramParti
           + "AND pp.isConfirmed = FALSE "
           + "AND pp.rank >= 1")
   List<ProgramParticipant> findOptedParticipants(@Param("programId") Integer programId);
+
+  @Query(
+      "SELECT pp FROM ProgramParticipant pp "
+          + "WHERE pp.programParticipantId.programId = :programId "
+          + "AND pp.programParticipantId.accountId = :accountId")
+  ProgramParticipant findParticipant(
+      @Param("programId") Integer programId, @Param("accountId") Integer accountId);
 }

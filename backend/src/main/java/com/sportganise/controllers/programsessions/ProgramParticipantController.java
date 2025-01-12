@@ -94,4 +94,12 @@ public class ProgramParticipantController {
         waitlistService.allOptedParticipants(programId);
     return ResponseEntity.ok(optedInParticipants);
   }
+
+  @PatchMapping("/mark-absent")
+  public ResponseEntity<ProgramParticipantDto> markAbsent(
+      @RequestParam Integer programId, @RequestParam Integer accountId) {
+
+    ProgramParticipantDto absentParticipant = waitlistService.markAbsent(programId, accountId);
+    return ResponseEntity.ok(absentParticipant);
+  }
 }

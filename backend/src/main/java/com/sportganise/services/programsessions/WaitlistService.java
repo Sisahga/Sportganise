@@ -129,4 +129,24 @@ public class WaitlistService {
 
     return queueDto;
   }
+
+  public ProgramParticipantDto markAbsent(Integer programId, Integer accountId) {
+
+    ProgramParticipant absParticipant = participantRepository.findParticipant(programId, accountId);
+    if (absParticipant.isConfirmed() == false) {
+      return null;
+    }
+
+    absParticipant.setConfirmed(false);
+    absParticipant.setConfirmedDate(null);
+
+    ProgramParticipant savedParticipant = participantRepository.save(absParticipant);
+
+    return new ProgramParticipantDto(
+        savedParticipant.getAccountId(),
+        savedParticipant.getProgramId(),
+        savedParticipant.getRank(),
+        savedParticipant.isConfirmed(),
+        savedParticipant.getConfirmedDate());
+  }
 }
