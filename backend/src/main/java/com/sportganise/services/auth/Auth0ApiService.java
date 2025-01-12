@@ -3,6 +3,8 @@ package com.sportganise.services.auth;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.repositories.AccountRepository;
+
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +33,7 @@ public class Auth0ApiService {
   @Value("${auth0.audience}")
   private String auth0Audience;
 
-  @Autowired private AccountService accountService;
+  @Autowired private AccountRepository accountRepository;
 
   private final Auth0TokenService auth0TokenService;
   private final RestTemplate restTemplate = new RestTemplate();
@@ -153,7 +155,11 @@ public class Auth0ApiService {
       throw new RuntimeException("Old password is incorrect.");
     }
 
-    Account account = accountService.getAccountByEmail(auth0AccountDto.getEmail());
+    Account account =
+    accountRepository
+        .findByEmail(auth0AccountDto.getEmail())
+        .orElseThrow(() -> new RuntimeException("Account not found"));
+
 
     String auth0UserId = account.getAuth0Id();
 
