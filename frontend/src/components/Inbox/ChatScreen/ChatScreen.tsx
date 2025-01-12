@@ -43,7 +43,7 @@ const ChatScreen = () => {
     if (newMessage.trim() === "") return;
 
     // Send the new message to the server
-    let messagePayload: SendMessageComponent = {
+    const messagePayload: SendMessageComponent = {
       senderId: 2, // TODO: Replace with actual sender ID from cookies
       channelId: channelId,
       messageContent: newMessage,
@@ -70,7 +70,7 @@ const ChatScreen = () => {
         }
       });
     }
-  }, []);
+  });
 
   useEffect(() => {
     console.log("Messages fetched:", messages);
