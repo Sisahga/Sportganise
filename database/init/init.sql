@@ -82,7 +82,7 @@ CREATE TABLE program (
 	location VARCHAR(50),
 	visibility VARCHAR(10),
 	filePath VARCHAR(100),
-	attachment VARCHAR(255)
+	attachment TEXT[]
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
