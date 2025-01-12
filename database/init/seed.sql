@@ -104,7 +104,11 @@ UPDATE channel SET last_message_id = 6 WHERE channel_id = 4;
 INSERT INTO post (account_id, title, description) VALUES
 (1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!'),
 (2, 'Sunday Training',
- 'This week we did usual intensive training. Please Let me know if you have questions.');
+ 'This week we did usual intensive training. Please Let me know if you have questions.'),(3, 'Hackathon Announcement', 'Sign up for the upcoming hackathon event, solve challenges, and win prizes.'),
+(1, 'Training Class for Beginners', 'We offer beginner-friendly sessions exlusive.'),
+(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.'),
+(2, 'Weekly Tennis Challenge', 'Participate in our tennis challenge and win a high-five.'),
+(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.');
 
 INSERT INTO feedback (post_id, account_id, content) VALUES
 (1, 2, 'Are cats aloud??'),

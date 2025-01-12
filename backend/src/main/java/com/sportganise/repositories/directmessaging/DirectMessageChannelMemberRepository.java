@@ -55,7 +55,7 @@ public interface DirectMessageChannelMemberRepository
 
   @Query(
       """
-      SELECT cm.compositeKey.accountId, a.firstName, a.pictureBlob
+      SELECT cm.compositeKey.accountId, a.firstName, a.pictureUrl
       FROM DirectMessageChannelMember cm
       JOIN Account a ON cm.compositeKey.accountId = a.accountId
       WHERE cm.compositeKey.channelId = :channelId
