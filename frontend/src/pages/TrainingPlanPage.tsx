@@ -1,9 +1,9 @@
-import { UploadTrainingPlanFiles } from "@/components/TrainingPlan";
+import { AddTrainingPlanButton } from "@/components/TrainingPlan";
 
 export default function TrainingPlanPage() {
   return (
     <div>
-      <UploadTrainingPlanFiles />
+      <AddTrainingPlanButton />
     </div>
   );
 }
