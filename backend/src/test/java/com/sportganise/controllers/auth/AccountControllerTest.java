@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.sportganise.controllers.AccountController;
 import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.entities.Account;
-import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.auth.AccountService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -85,7 +85,7 @@ class AccountControllerTest {
     int accountId = 2;
     String requestBody = "{}";
 
-    doThrow(new ResourceNotFoundException("Account not found"))
+    doThrow(new AccountNotFoundException("Account not found"))
         .when(accountService)
         .updateAccount(anyInt(), any(UpdateAccountDto.class));
 

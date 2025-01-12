@@ -2,7 +2,7 @@ package com.sportganise.controllers;
 
 import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.entities.Account;
-import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.auth.AccountService;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class AccountController {
 
     try {
       this.accountService.updateAccount(accountId, body);
-    } catch (ResourceNotFoundException e) {
+    } catch (AccountNotFoundException e) {
       return ResponseEntity.notFound().build();
     }
 
@@ -77,7 +77,7 @@ public class AccountController {
 
     try {
       this.accountService.updateAccountPicture(accountId, file);
-    } catch (ResourceNotFoundException e) {
+    } catch (AccountNotFoundException e) {
       return new ResponseEntity<>("Failed to find user with ID " + accountId, HttpStatus.NOT_FOUND);
     } catch (IOException e) {
       return new ResponseEntity<>(

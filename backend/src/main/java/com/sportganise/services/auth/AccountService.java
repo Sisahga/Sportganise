@@ -4,11 +4,10 @@ import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
-import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
 import java.io.IOException;
-import com.sportganise.exceptions.AccountNotFoundException;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,12 +75,12 @@ public class AccountService {
    * @param updatedAccount The new account data.
    */
   public void updateAccount(Integer accountId, UpdateAccountDto updatedAccount)
-      throws ResourceNotFoundException {
+      throws AccountNotFoundException {
     Account previousAccount =
         accountRepository
             .findById(accountId)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Failed to find account with id " + accountId));
+                () -> new AccountNotFoundException("Failed to find account with id " + accountId));
 
     if (updatedAccount.getFirstName() != null) {
       previousAccount.setFirstName(updatedAccount.getFirstName());
@@ -107,14 +106,14 @@ public class AccountService {
    */
   // TODO: clean-up unreferenced profile pictures from storage
   public void updateAccountPicture(Integer accountId, MultipartFile file)
-      throws ResourceNotFoundException, IOException {
+      throws AccountNotFoundException, IOException {
 
     // Validate account exists
     Account account =
         accountRepository
             .findById(accountId)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Failed to find account with id " + accountId));
+                () -> new AccountNotFoundException("Failed to find account with id " + accountId));
 
     // Upload file to data store
     String url = blobService.uploadFile(file);

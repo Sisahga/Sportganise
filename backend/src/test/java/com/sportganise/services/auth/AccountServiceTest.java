@@ -13,11 +13,10 @@ import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
-import com.sportganise.exceptions.ResourceNotFoundException;
-import com.sportganise.repositories.AccountRepository;
-import java.util.Optional;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -126,7 +125,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void updateAccountTest_SuccessPartialUpdate() throws ResourceNotFoundException {
+    public void updateAccountTest_SuccessPartialUpdate() throws AccountNotFoundException {
       int accountId = originalAccount.getAccountId();
       given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
 
@@ -140,7 +139,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void updateAccountTest_SuccessFullUpdate() throws ResourceNotFoundException {
+    public void updateAccountTest_SuccessFullUpdate() throws AccountNotFoundException {
       int accountId = originalAccount.getAccountId();
       given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
 
@@ -158,7 +157,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void updateAccountTest_SuccessNoUpdate() throws ResourceNotFoundException {
+    public void updateAccountTest_SuccessNoUpdate() throws AccountNotFoundException {
       int accountId = originalAccount.getAccountId();
       given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
 
@@ -178,7 +177,7 @@ public class AccountServiceTest {
           new UpdateAccountDto("John", "Doe", "john@email.com", "1231231234", "lorem");
 
       assertThrows(
-          ResourceNotFoundException.class,
+          AccountNotFoundException.class,
           () -> accountService.updateAccount(notAccountId, newAccount));
 
       verify(accountRepository, times(1)).findById(notAccountId);
