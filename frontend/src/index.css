@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 :root {
-  font-family: Avenir Next;
+  font-family: "Avenir Next", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -14,6 +14,50 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --primary-colour: #383c42;
+  --primary-navbar-colour: #d9d9d9;
+  --secondary-colour: #82d8d8;
+  --primary-white: #fff;
+  --faded-primary-colour: #b3b3b3;
+  --text-placheolder-colour: #f0f0f0;
+  --primary-red: #ff3b30;
+}
+
+.primary-colour {
+  color: var(--primary-colour);
+}
+.primary-navbar-colour {
+  color: var(--primary-navbar-colour);
+}
+.secondary-colour {
+  color: var(--secondary-colour);
+}
+.primary-white {
+  color: var(--primary-white);
+}
+.faded-primary-colour {
+  color: var(--faded-primary-colour);
+}
+.text-placheolder-colour {
+  color: var(--text-placheolder-colour);
+}
+.primary-red {
+  color: var(--primary-red);
+}
+
+.border-faded-primary-colour {
+  border: 2px solid var(--faded-primary-colour);
+}
+
+.bg-placeholder-colour {
+  background-color: var(--text-placheolder-colour);
+}
+.bg-secondary-colour {
+  background-color: var(--secondary-colour);
+}
+.bg-primary-white {
+  background-color: var(--primary-white);
 }
 
 a {
@@ -41,13 +85,6 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
-button:hover {
-  border-color: primaryColour;
-}
-/* button:focus,
-button:focus-visible {
-  outline: 0.5px solid white;
-} */
 
 @media (prefers-color-scheme: light) {
   :root {
