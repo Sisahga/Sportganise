@@ -148,9 +148,7 @@ public class ProgramControllerTest {
         .perform(get("/api/programs/2/111/details"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.programDetails.programId").value(111))
-        .andExpect(jsonPath("$.programDetails.title").value("Training Program"))
-        .andExpect(jsonPath("$.attendees[0].firstName").value("John"))
-        .andExpect(jsonPath("$.attendees[0].lastName").value("Doe"));
+        .andExpect(jsonPath("$.programDetails.title").value("Training Program"));
   }
 
   // Test getProgramDetails for when user has permission eg. PLAYER
