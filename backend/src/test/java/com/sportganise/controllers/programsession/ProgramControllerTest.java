@@ -133,8 +133,6 @@ public class ProgramControllerTest {
     ProgramParticipantDto mockProgramParticipantDto = new ProgramParticipantDto();
     mockProgramParticipantDto.setProgramId(111);
     mockProgramParticipantDto.setAccountId(3); // Example account ID for a participant
-    mockProgramParticipantDto.setFirstName("John");
-    mockProgramParticipantDto.setLastName("Doe");
     mockProgramParticipantDto.setConfirmed(true);
     mockProgramParticipantDto.setConfirmedDate(LocalDateTime.now());
 
