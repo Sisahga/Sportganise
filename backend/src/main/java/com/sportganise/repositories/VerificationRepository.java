@@ -6,9 +6,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+
 /**
- * Repository for 'Verification' Entity. Provides custom C.R.U.D. queries through the JpaRepository in
- * JPQL.
+ * Repository for 'Verification' Entity. Provides custom C.R.U.D. queries through the JpaRepository
+ * in JPQL.
  */
 @Repository
 public interface VerificationRepository extends JpaRepository<Verification, Long> {
