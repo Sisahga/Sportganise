@@ -1,5 +1,4 @@
 import { Menu } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { Link } from "react-router-dom";
 import {
   Drawer,
@@ -8,10 +7,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import logo from "../../assets/Logo.png";
-import { useNavigate } from "react-router-dom";
 
 export default function HeaderNav() {
-  const navigate = useNavigate();
   return (
     <div>
       <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
@@ -30,40 +27,39 @@ export default function HeaderNav() {
               </div>
             </DrawerHeader>
             <nav className="flex flex-col gap-4">
-              <Button
-                variant="link"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              <Link
+                to="/"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Home
-              </Button>
-              <Button
-                variant="link"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              </Link>
+              <Link
+                to="/" //add actual redirect once forum page is set up
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Forum
-              </Button>
-              <Button
-                variant="link"
-                onClick={() => navigate("/pages/CreateTrainingSessionPage")}
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              </Link>
+              <Link
+                to="/pages/CreateTrainingSessionPage"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Training Session
-              </Button>
-              <Button
-                variant="link"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              </Link>
+              <Link
+                to="/" //add actual redirect once training plan page is set up
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Training Plan
-              </Button>
-              <Button
-                variant="link"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
+              </Link>
+              <Link
+                to="/" //add actual redirect once setting page is set up
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Setting
-              </Button>
+              </Link>
               <Link
                 to="/signup"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none inline-flex items-center justify-center"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Sign Up
               </Link>
