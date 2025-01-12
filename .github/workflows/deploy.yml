@@ -6,11 +6,17 @@ on:
     branches:
       - main
 
+# on:
+#   push:
+#     tags:
+#       - 'v*.*.*'
+
 env:
   AWS_REGION: us-east-2
 
 permissions:
   contents: read
+  packages: write
 
 jobs:
   build-and-publish:
