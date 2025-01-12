@@ -130,6 +130,13 @@ public class WaitlistService {
     return queueDto;
   }
 
+  /**
+   * Marks as absent a player that's attending a program.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the account
+   * @return A ProgramParticipantDto of the player who's now marked absent --> is_confirmed = FALSE.
+   */
   public ProgramParticipantDto markAbsent(Integer programId, Integer accountId) {
 
     ProgramParticipant absParticipant = participantRepository.findParticipant(programId, accountId);

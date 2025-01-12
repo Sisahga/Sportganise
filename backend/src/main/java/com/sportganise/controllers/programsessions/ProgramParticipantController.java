@@ -95,6 +95,13 @@ public class ProgramParticipantController {
     return ResponseEntity.ok(optedInParticipants);
   }
 
+  /**
+   * Marks a player that's part of a session as absent.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A list of DTOs representing the opted-in participants.
+   */
   @PatchMapping("/mark-absent")
   public ResponseEntity<ProgramParticipantDto> markAbsent(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
