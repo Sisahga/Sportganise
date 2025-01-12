@@ -122,7 +122,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void updateAccountTest_SuccessPartialUpdate() {
+    public void updateAccountTest_SuccessPartialUpdate() throws ResourceNotFoundException {
       int accountId = originalAccount.getAccountId();
       given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
 
@@ -136,7 +136,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void updateAccountTest_SuccessFullUpdate() {
+    public void updateAccountTest_SuccessFullUpdate() throws ResourceNotFoundException {
       int accountId = originalAccount.getAccountId();
       given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
 
@@ -154,7 +154,7 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void updateAccountTest_SuccessNoUpdate() {
+    public void updateAccountTest_SuccessNoUpdate() throws ResourceNotFoundException {
       int accountId = originalAccount.getAccountId();
       given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
 
