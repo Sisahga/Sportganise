@@ -1,7 +1,7 @@
 import React from "react";
-import { HomeContent } from "../components/HomeContent/index";
-import { FooterNav } from "../components/FooterNav/index";
-import { HeaderNav } from "../components/HeaderNav/index";
+import { HomeContent } from "@/components/HomeContent";
+import { FooterNav } from "@/components/FooterNav";
+import { HeaderNav } from "@/components/HeaderNav";
 
 const HomePage: React.FC = () => {
   return (
