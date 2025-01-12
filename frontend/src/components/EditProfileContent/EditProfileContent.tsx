@@ -9,7 +9,7 @@ const EditProfileContent: React.FC = () => {
   const navigate = useNavigate();
 
   const [image, setImage] = useState<string | null>(
-    "https://via.placeholder.com/150",
+    "https://via.placeholder.com/150"
   );
 
   const [formData, setFormData] = useState({
