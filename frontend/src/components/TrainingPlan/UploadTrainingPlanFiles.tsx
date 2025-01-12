@@ -1,3 +1,7 @@
 export default function UploadTrainingPlanFiles() {
-  return <div></div>;
+  return (
+    <div>
+      <p>this is UploadTrainingPlanFiles component on TrainingPlanPage</p>
+    </div>
+  );
 }

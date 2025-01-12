@@ -14,6 +14,7 @@ import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
 import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
+import TrainingPlanPage from "./pages/TrainingPlanPage";
 
 function App() {
   return (
@@ -58,6 +59,10 @@ function App() {
           <Route
             path="/pages/ModifyTrainingSessionPage"
             element={<ModifyTrainingSessionPage />}
+          ></Route>
+          <Route
+            path="/pages/TrainingPlanPage"
+            element={<TrainingPlanPage />}
           ></Route>
         </Route>
       </Routes>
