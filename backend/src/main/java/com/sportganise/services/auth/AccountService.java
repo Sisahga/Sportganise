@@ -8,6 +8,8 @@ import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
 import java.io.IOException;
+import com.sportganise.exceptions.AccountNotFoundException;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -144,5 +146,46 @@ public class AccountService {
    */
   public boolean hasPermissions(String roleType) {
     return roleType.equals("ADMIN") || roleType.equals("COACH");
+  }
+
+  /**
+   * Method used for password reset in case of loss.
+   *
+   * @param email email of the account
+   * @param newPassword new password to be set
+   * @return Map containing the response
+   */
+  public Map<String, Object> resetPassword(String email, String newPassword)
+      throws AccountNotFoundException {
+    Account account = getAccountByEmail(email);
+    String auth0Id = account.getAuth0Id();
+    return auth0ApiService.changePassword(auth0Id, newPassword);
+  }
+
+  /**
+   * Method used for password modification.
+   *
+   * @param email email of the account
+   * @param oldPassword old password
+   * @param newPassword new password
+   * @return Map containing the response
+   */
+  public Map<String, Object> modifyPassword(String email, String oldPassword, String newPassword)
+      throws AccountNotFoundException {
+    Auth0AccountDto auth0Account = new Auth0AccountDto(email, oldPassword, null);
+
+    return auth0ApiService.changePasswordWithOldPassword(auth0Account, newPassword);
+  }
+
+  /**
+   * Method used to retrieve an account by its email.
+   *
+   * @param email email of the account
+   * @return Account object
+   */
+  public Account getAccountByEmail(String email) throws AccountNotFoundException {
+    return accountRepository
+        .findByEmail(email)
+        .orElseThrow(() -> new AccountNotFoundException("Account not found"));
   }
 }
