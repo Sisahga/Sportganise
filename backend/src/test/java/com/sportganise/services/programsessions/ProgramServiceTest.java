@@ -7,6 +7,7 @@ import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramParticipantCompositeKey;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.auth.AccountService;
@@ -37,16 +38,14 @@ public class ProgramServiceTest {
     // Mock a Program object with the below attributes
     ProgramParticipant participant1 =
         ProgramParticipant.builder()
-            .programId(1)
-            .accountId(101)
+            .compositeKey(new ProgramParticipantCompositeKey(1, 101))
             .isConfirmed(true)
             .confirmedDate(LocalDateTime.now())
             .build();
 
     ProgramParticipant participant2 =
         ProgramParticipant.builder()
-            .programId(1)
-            .accountId(102)
+            .compositeKey(new ProgramParticipantCompositeKey(1, 102))
             .isConfirmed(false)
             .confirmedDate(LocalDateTime.now().minusDays(1))
             .build();
@@ -93,7 +92,7 @@ public class ProgramServiceTest {
     assertEquals(2, participantDtos.size());
 
     // Verify that participant1 is correctly retrieved along with its attributes
-    ProgramParticipantDto participantDto1 = participantDtos.get(0);
+    ProgramParticipantDto participantDto1 = participantDtos.getFirst();
     assertEquals(1, participantDto1.getProgramId());
     assertEquals(101, participantDto1.getAccountId());
     assertTrue(participantDto1.isConfirmed());

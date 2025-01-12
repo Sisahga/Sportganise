@@ -62,12 +62,12 @@ public class ProgramService {
 
               // Get account from accountId (this is a wrapper, not the actual)
               Optional<Account> accountOptional =
-                  accountService.getAccount(participant.getAccountId());
+                  accountService.getAccount(participant.getCompositeKey().getAccountId());
 
               // Check if the value of accountOptional is empty
-              if (!accountOptional.isPresent()) {
+              if (accountOptional.isEmpty()) {
                 throw new IllegalArgumentException(
-                    "Account not found for id: " + participant.getAccountId());
+                    "Account not found for id: " + participant.getCompositeKey().getAccountId());
               }
 
               // If not empty, then we go fetch the actual user value
@@ -77,7 +77,7 @@ public class ProgramService {
               // ProgramParticipantDto
               return new ProgramParticipantDto(
                   programId,
-                  participant.getAccountId(),
+                  participant.getCompositeKey().getAccountId(),
                   account.getFirstName(),
                   account.getLastName(),
                   participant.isConfirmed(),

@@ -1,8 +1,11 @@
 package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,13 +19,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "program_participants")
 public class ProgramParticipant {
-  @Column(name = "program_id")
-  private Integer programId;
-
-  @Column(name = "account_id")
-  private Integer accountId;
-
+  @EmbeddedId ProgramParticipantCompositeKey compositeKey;
   // Could be an admin, coach or player
   @Column(name = "type")
   private String participantType;
