@@ -26,7 +26,8 @@ public class ProgramDto {
   private String frequency;
   private String location;
   private String visibility;
-  private List<String> attachment;
+  // TODO: Fix when doing the schema change for program attachments
+  private String attachment;
 
   /**
    * Constructor that converts a Program entity to ProgramDto.
@@ -46,6 +47,6 @@ public class ProgramDto {
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
     this.visibility = program.getVisibility();
-    this.attachment = program.getAttachment();
+    this.attachment = program.getAttachment(); // TODO: Refer to above todo in attachment attribute field.
   }
 }

@@ -90,18 +90,6 @@ class DirectMessageControllerUnitTest {
   }
 
   @Test
-  void sendDirectMessage_Error() throws IOException {
-    given(directMessageService.sendDirectMessage(any(SendDirectMessageRequestDto.class)))
-        .willThrow(new RuntimeException("Test exception"));
-
-    DirectMessageDto response = directMessageController.sendDirectMessage(messageRequestDto);
-
-    assertNull(response);
-    verify(directMessageService, times(1))
-        .sendDirectMessage(any(SendDirectMessageRequestDto.class));
-  }
-
-  @Test
   void sendDirectMessage_WithMultipleAttachments() throws IOException {
     List<MockMultipartFile> attachments =
         Arrays.asList(

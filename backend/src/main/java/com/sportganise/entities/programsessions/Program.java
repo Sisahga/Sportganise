@@ -38,6 +38,7 @@ public class Program {
   private LocalDateTime occurrenceDate;
 
   // Duration of the program in terms of minutes
+  @Column(name = "duration")
   private Integer durationMins;
 
   @Column(name = "is_recurring")
@@ -52,7 +53,8 @@ public class Program {
 
   private String visibility;
 
-  private List<String> attachment;
+  // TODO: Change Schema, create a table called program_attachments if there is more than 1 attachment per program
+  private String attachment;
 
   /**
    * Constructor excluding programId since it's generated automatically.
@@ -82,7 +84,7 @@ public class Program {
       String frequency,
       String location,
       String visibility,
-      List<String> attachment) {
+      String attachment) {
     this.programType = programType;
     this.title = title;
     this.description = description;

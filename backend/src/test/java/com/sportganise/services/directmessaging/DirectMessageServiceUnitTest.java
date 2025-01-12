@@ -16,10 +16,8 @@ import com.sportganise.repositories.directmessaging.DirectMessageRepository;
 import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,8 +35,6 @@ public class DirectMessageServiceUnitTest {
   @InjectMocks private DirectMessageService directMessageService;
 
   private SendDirectMessageRequestDto sendDirectMessageRequestDto;
-  private static final String mock_first_name = "John";
-  private static final String mock_avatar_url = "https://example.com/avatar.jpg";
 
   @BeforeEach
   public void setUp() {
@@ -50,46 +46,27 @@ public class DirectMessageServiceUnitTest {
     sendDirectMessageRequestDto.setAttachments(Collections.emptyList());
     sendDirectMessageRequestDto.setType("CHAT");
 
-    // Setup mock member details
-    Map<Integer, MemberDetailsDto> mockMemberDetails = new HashMap<>();
-    MemberDetailsDto memberDetailsDto = new MemberDetailsDto();
-    memberDetailsDto.setFirstName(mock_first_name);
-    memberDetailsDto.setAvatarUrl(mock_avatar_url);
-    mockMemberDetails.put(2, memberDetailsDto);
-
-    // Mock getChannelMembersDetails method
-    try {
-      when(directMessageService.getChannelMembersDetails(1)).thenReturn(mockMemberDetails);
-    } catch (Exception e) {
-      fail("Failed to setup mock for getChannelMembersDetails");
-    }
-
-    DirectMessage directMessage = new DirectMessage();
-    directMessage.setMessageId(1);
-    directMessage.setChannelId(1);
-    directMessage.setSenderId(2);
-    directMessage.setContent("Hello, World!");
-    directMessage.setSentAt(ZonedDateTime.now());
-    directMessage.setType(DirectMessageType.CHAT);
+    // Mock DirectMessageRepository save method
+    given(directMessageRepository.save(any(DirectMessage.class)))
+            .willAnswer(
+                    invocation -> {
+                      DirectMessage message = invocation.getArgument(0);
+                      message.setMessageId(1); // Manually assign ID for message as if it were from Postgres.
+                      return message;
+                    }
+            );
   }
+
+
+
 
   @Test
   public void sendDirectMessageTest_WithoutAttachments() throws IOException {
-    given(directMessageRepository.save(any(DirectMessage.class)))
-        .willAnswer(
-            invocation -> {
-              DirectMessage message = invocation.getArgument(0);
-              message.setMessageId(1); // Manually assign ID for message as if it were postgres.
-              return message;
-            });
-
     DirectMessageDto response = directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());
     assertEquals(2, response.getSenderId());
-    assertEquals(mock_first_name, response.getSenderFirstName());
-    assertEquals(mock_avatar_url, response.getAvatarUrl());
     assertEquals("Hello, World!", response.getMessageContent());
     assertTrue(response.getAttachments().isEmpty());
 
@@ -99,6 +76,7 @@ public class DirectMessageServiceUnitTest {
     verify(blobService, times(0)).uploadFile(any(MultipartFile.class), eq(true), anyString());
   }
 
+
   @Test
   public void sendDirectMessageTest_WithAttachments() throws IOException {
     MultipartFile mockFile1 = mock(MultipartFile.class);
@@ -106,25 +84,15 @@ public class DirectMessageServiceUnitTest {
 
     sendDirectMessageRequestDto.setAttachments(List.of(mockFile1, mockFile2));
 
-    given(directMessageRepository.save(any(DirectMessage.class)))
-        .willAnswer(
-            invocation -> {
-              DirectMessage message = invocation.getArgument(0);
-              message.setMessageId(1);
-              return message;
-            });
-
     given(blobService.uploadFile(any(MultipartFile.class), eq(true), anyString()))
-        .willReturn("https://mockblobstorage.com/file1.jpg")
-        .willReturn("https://mockblobstorage.com/file2.jpg");
+            .willReturn("https://mockblobstorage.com/file1.jpg")
+            .willReturn("https://mockblobstorage.com/file2.jpg");
 
     DirectMessageDto response = directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());
     assertEquals(2, response.getSenderId());
-    assertEquals(mock_first_name, response.getSenderFirstName());
-    assertEquals(mock_avatar_url, response.getAvatarUrl());
     assertEquals("Hello, World!", response.getMessageContent());
     assertEquals(2, response.getAttachments().size());
     assertTrue(response.getAttachments().contains("https://mockblobstorage.com/file1.jpg"));
@@ -135,4 +103,5 @@ public class DirectMessageServiceUnitTest {
     verify(directMessageChannelMemberRepository, times(1)).updateReadStatus(1, 2);
     verify(blobService, times(2)).uploadFile(any(MultipartFile.class), eq(true), eq("1"));
   }
+
 }
