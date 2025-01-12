@@ -4,6 +4,7 @@ import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.entities.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
@@ -93,6 +94,31 @@ public class AccountService {
     }
     if (updatedAccount.getEmail() != null) {
       previousAccount.setEmail(updatedAccount.getEmail());
+    }
+    if (updatedAccount.getAddress() != null) {
+      Address updatedAddress = updatedAccount.getAddress();
+      Address previousAddress = previousAccount.getAddress();
+      if (previousAddress == null) {
+        previousAddress = new Address();
+      }
+
+      if (updatedAddress.getLine() != null) {
+        previousAddress.setLine(updatedAddress.getLine());
+      }
+      if (updatedAddress.getCity() != null) {
+        previousAddress.setCity(updatedAddress.getCity());
+      }
+      if (updatedAddress.getProvince() != null) {
+        previousAddress.setProvince(updatedAddress.getLine());
+      }
+      if (updatedAddress.getCountry() != null) {
+        previousAddress.setCountry(updatedAddress.getCountry());
+      }
+      if (updatedAddress.getPostalCode() != null) {
+        previousAddress.setPostalCode(updatedAddress.getPostalCode());
+      }
+
+      previousAccount.setAddress(previousAddress);
     }
 
     accountRepository.save(previousAccount);
