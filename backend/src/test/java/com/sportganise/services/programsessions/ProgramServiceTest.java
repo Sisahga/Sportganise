@@ -32,27 +32,29 @@ public class ProgramServiceTest {
 
   @InjectMocks private ProgramService programService;
 
-        // Test for getParticipants() method
-        @Test
-        public void testGetParticipants() {
-                // Mock a Program object with the below attributes
-                ProgramParticipant participant1 = new ProgramParticipant(
-                                new ProgramParticipantId(1, 101),
-                                null, // rank is not provided, so set it to null or provide an appropriate value if
-                                      // needed
-                                "Player",
-                                true,
-                                LocalDateTime.now());
+  // Test for getParticipants() method
+  @Test
+  public void testGetParticipants() {
+    // Mock a Program object with the below attributes
+    ProgramParticipant participant1 =
+        new ProgramParticipant(
+            new ProgramParticipantId(1, 101),
+            null, // rank is not provided, so set it to null or provide an appropriate value if
+            // needed
+            "Player",
+            true,
+            LocalDateTime.now());
 
-                ProgramParticipant participant2 = new ProgramParticipant(
-                                new ProgramParticipantId(2, 102),
-                                null, // rank is not provided, so set it to null or provide an appropriate value if
-                                      // needed
-                                "Coach",
-                                false,
-                                LocalDateTime.now().minusDays(1));
+    ProgramParticipant participant2 =
+        new ProgramParticipant(
+            new ProgramParticipantId(2, 102),
+            null, // rank is not provided, so set it to null or provide an appropriate value if
+            // needed
+            "Coach",
+            false,
+            LocalDateTime.now().minusDays(1));
 
-                List<ProgramParticipant> mockParticipants = List.of(participant1, participant2);
+    List<ProgramParticipant> mockParticipants = List.of(participant1, participant2);
 
     // Mock account objects with the below attributes
     Account account1 =

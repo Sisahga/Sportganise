@@ -1,9 +1,8 @@
 package com.sportganise.entities;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +17,9 @@ import lombok.Setter;
 @Embeddable
 public class LabelAccountId implements Serializable {
 
-    @Column(name = "account_id")
-    private Integer accountId;
+  @Column(name = "account_id")
+  private Integer accountId;
 
-    @Column(name = "label_id")
-    private Integer labelId;
-    
+  @Column(name = "label_id")
+  private Integer labelId;
 }

@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,11 +18,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table (name = "program_participants")
+@Table(name = "program_participants")
 public class ProgramParticipant {
 
-  @EmbeddedId
-  private ProgramParticipantId programParticipantId;
+  @EmbeddedId private ProgramParticipantId programParticipantId;
 
   @Column(name = "rank")
   private Integer rank;
@@ -50,7 +48,7 @@ public class ProgramParticipant {
     this.programParticipantId.setAccountId(accountId);
   }
 
-  public void setProgramId(Integer programId){
+  public void setProgramId(Integer programId) {
     this.programParticipantId.setProgramId(programId);
   }
 }

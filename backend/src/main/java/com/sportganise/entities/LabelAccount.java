@@ -16,13 +16,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table( name = "label_account")
+@Table(name = "label_account")
 public class LabelAccount {
-    
-    @EmbeddedId
-    private LabelAccountId labelAccountsId;
 
-    @Column( name = "role")
-    private String role;
+  @EmbeddedId private LabelAccountId labelAccountsId;
 
+  @Column(name = "role")
+  private String role;
 }

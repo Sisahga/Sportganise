@@ -73,17 +73,17 @@ public class ProgramService {
               // If not empty, then we go fetch the actual user value
               Account account = accountOptional.get();
 
-                    // map account information and participant information into a list of
-                    // ProgramParticipantDto
-                    return new ProgramParticipantDto(
-                            account.getAccountId(),
-                            programId,
-                            participant.getRank(),
-                            participant.isConfirmed(),
-                            participant.getConfirmedDate());
-                })
-                .toList();
-    }
+              // map account information and participant information into a list of
+              // ProgramParticipantDto
+              return new ProgramParticipantDto(
+                  account.getAccountId(),
+                  programId,
+                  participant.getRank(),
+                  participant.isConfirmed(),
+                  participant.getConfirmedDate());
+            })
+        .toList();
+  }
 
   /**
    * Method to fetch program details.

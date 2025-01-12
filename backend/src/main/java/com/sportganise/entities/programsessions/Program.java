@@ -33,14 +33,14 @@ public class Program {
   private String title;
 
   private String description;
-  
+
   private Integer capacity;
 
   @Column(name = "occurence_date")
   private LocalDateTime occurrenceDate;
 
   // Duration of the program in terms of minutes
-  @Column( name = "duration")
+  @Column(name = "duration")
   private Integer durationMins;
 
   @Column(name = "is_recurring")

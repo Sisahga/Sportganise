@@ -1,57 +1,51 @@
 package com.sportganise.repositories.programsessions;
 
 import com.sportganise.entities.programsessions.ProgramParticipant;
-
 import jakarta.transaction.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/**
- * Repository for Program.
- */
+/** Repository for Program. */
 @Repository // Indicates that this is a Spring Data repository
 public interface ProgramParticipantRepository extends JpaRepository<ProgramParticipant, Integer> {
 
-        @Query("SELECT pp FROM ProgramParticipant pp " +
-                        "JOIN LabelAccount la ON pp.programParticipantId.accountId = la.labelAccountsId.accountId " +
-                        "WHERE pp.programParticipantId.programId = :programId " +
-                        "AND pp.programParticipantId.accountId = :accountId " +
-                        "AND la.role = 'Waitlisted'")
-        ProgramParticipant findWaitlistParticipant(
-                        @Param("programId") Integer programId,
-                        @Param("accountId") Integer accountId);
+  @Query(
+      "SELECT pp FROM ProgramParticipant pp "
+          + "JOIN LabelAccount la ON pp.programParticipantId.accountId = la.labelAccountsId.accountId "
+          + "WHERE pp.programParticipantId.programId = :programId "
+          + "AND pp.programParticipantId.accountId = :accountId "
+          + "AND la.role = 'Waitlisted'")
+  ProgramParticipant findWaitlistParticipant(
+      @Param("programId") Integer programId, @Param("accountId") Integer accountId);
 
-        @Query("SELECT MAX(pp.rank) " +
-                        "FROM ProgramParticipant pp " +
-                        "WHERE pp.programParticipantId.programId = :programId " +
-                        "AND pp.isConfirmed = FALSE")
-        Integer findMaxRank(@Param("programId") Integer programId);
+  @Query(
+      "SELECT MAX(pp.rank) "
+          + "FROM ProgramParticipant pp "
+          + "WHERE pp.programParticipantId.programId = :programId "
+          + "AND pp.isConfirmed = FALSE")
+  Integer findMaxRank(@Param("programId") Integer programId);
 
-        @Modifying
-        @Transactional
-        @Query("UPDATE ProgramParticipant pp " +
-                        "SET pp.rank = pp.rank - 1 " +
-                        "WHERE pp.programParticipantId.programId = :programId " +
-                        "AND pp.isConfirmed = FALSE " +
-                        "AND pp.rank > (SELECT p.rank FROM ProgramParticipant p " +
-                        "               WHERE p.programParticipantId.programId = :programId " +
-                        "               AND p.isConfirmed = FALSE " +
-                        "               AND p.programParticipantId.accountId = :accountId)")
-        void updateRanks(@Param("programId") Integer programId,
-                        @Param("accountId") Integer accountId);
+  @Modifying
+  @Transactional
+  @Query(
+      "UPDATE ProgramParticipant pp "
+          + "SET pp.rank = pp.rank - 1 "
+          + "WHERE pp.programParticipantId.programId = :programId "
+          + "AND pp.isConfirmed = FALSE "
+          + "AND pp.rank > (SELECT p.rank FROM ProgramParticipant p "
+          + "               WHERE p.programParticipantId.programId = :programId "
+          + "               AND p.isConfirmed = FALSE "
+          + "               AND p.programParticipantId.accountId = :accountId)")
+  void updateRanks(@Param("programId") Integer programId, @Param("accountId") Integer accountId);
 
-        @Query("SELECT pp FROM ProgramParticipant pp " +
-                        "WHERE pp.programParticipantId.programId = :programId " +
-                        "AND pp.isConfirmed = FALSE " +
-                        "AND pp.rank >= 1")
-        List<ProgramParticipant> findOptedParticipants(
-                        @Param("programId") Integer programId);
-
+  @Query(
+      "SELECT pp FROM ProgramParticipant pp "
+          + "WHERE pp.programParticipantId.programId = :programId "
+          + "AND pp.isConfirmed = FALSE "
+          + "AND pp.rank >= 1")
+  List<ProgramParticipant> findOptedParticipants(@Param("programId") Integer programId);
 }

@@ -18,18 +18,17 @@ import lombok.Setter;
 @Entity
 @Table(name = "organization")
 public class Organization {
-    
-    @Id
-    @Column(name = "org_id")
-    private Integer orgId;
 
-    @Column(name = "name")
-    private String orgName;
+  @Id
+  @Column(name = "org_id")
+  private Integer orgId;
 
-    @Column(name = "type")
-    private String orgType;
+  @Column(name = "name")
+  private String orgName;
 
-    @Column(name = "description")
-    private String orgDescription;
+  @Column(name = "type")
+  private String orgType;
 
+  @Column(name = "description")
+  private String orgDescription;
 }
