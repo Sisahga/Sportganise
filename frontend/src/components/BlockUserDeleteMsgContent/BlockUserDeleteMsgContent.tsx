@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Ban, Trash2 } from "lucide-react";
+import { MoreVertical, Ban, Trash2 } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,10 +10,15 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-export default function ActionButtonsWithConfirmation() {
+export default function BlockDeleteButtons() {
   const [isBlockOpen, setIsBlockOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -28,17 +33,32 @@ export default function ActionButtonsWithConfirmation() {
   };
 
   return (
-    <div className="w-[120px] divide-y divide-x-0 divide-gray-200 border border-gray-200 rounded-md overflow-hidden font-font">
-      <AlertDialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
-        <AlertDialogTrigger asChild>
-          <Button
-            variant="ghost"
-            className="w-full text-red hover:text-white hover:bg-red rounded-none h-10 justify-between px-3 font-medium transition-colors"
-          >
-            Block
-            <Ban className="w-4 h-4 ml-2" />
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+            <MoreVertical className="h-4 w-4" />
           </Button>
-        </AlertDialogTrigger>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="font-font">
+          <DropdownMenuItem
+            onSelect={() => setIsBlockOpen(true)}
+            className="text-red hover:text-white hover:bg-red cursor-pointer flex justify-between items-center"
+          >
+            <span>Block</span>
+            <Ban className="h-4 w-4 ml-2" />
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={() => setIsDeleteOpen(true)}
+            className="text-red hover:text-white hover:bg-red cursor-pointer flex justify-between items-center"
+          >
+            <span>Delete</span>
+            <Trash2 className="h-4 w-4 ml-2" />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <AlertDialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
         <AlertDialogContent className="font-font">
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -64,15 +84,6 @@ export default function ActionButtonsWithConfirmation() {
       </AlertDialog>
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogTrigger asChild>
-          <Button
-            variant="ghost"
-            className="w-full text-red hover:text-white hover:bg-red rounded-none h-10 justify-between px-3 font-medium transition-colors"
-          >
-            Delete
-            <Trash2 className="w-4 h-4 ml-2" />
-          </Button>
-        </AlertDialogTrigger>
         <AlertDialogContent className="font-font">
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -96,6 +107,7 @@ export default function ActionButtonsWithConfirmation() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 }
+
