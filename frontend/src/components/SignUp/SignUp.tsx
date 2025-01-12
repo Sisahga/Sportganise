@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { FormField } from "@/components/ui/formfield";
-import { SecondaryHeader } from "../SecondaryHeader";
 import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
@@ -14,7 +13,6 @@ export default function SignUp() {
 
   return (
     <div>
-      <SecondaryHeader />
       <div className="bg-white w-screen pt-32">
         <div className="flex-1 max-w-[100vw] bg-white rounded-t-2xl pb-16">
           <div className="min-h-screen">
