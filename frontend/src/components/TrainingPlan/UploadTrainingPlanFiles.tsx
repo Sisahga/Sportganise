@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/Button";
 import {
@@ -89,9 +88,11 @@ export default function UploadTrainingPlanFiles() {
           <FormField
             control={form.control}
             name="trainingPlans"
-            render={({ field }) => (
+            render={() => (
               <FormItem>
-                <FormLabel>Select File</FormLabel>
+                <FormLabel className="font-semibold text-base">
+                  Add Training Plans
+                </FormLabel>
                 <FormControl>
                   <FileUploader
                     value={files}
@@ -110,7 +111,7 @@ export default function UploadTrainingPlanFiles() {
                           &nbsp; or drag and drop
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          SVG, PNG, JPG or GIF
+                          DOC
                         </p>
                       </div>
                     </FileInput>
@@ -126,12 +127,16 @@ export default function UploadTrainingPlanFiles() {
                     </FileUploaderContent>
                   </FileUploader>
                 </FormControl>
-                <FormDescription>Select a file to upload.</FormDescription>
+                <FormDescription>
+                  Select a file to upload. Only .doc accepted.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <Button type="submit" className="w-full">
+            Submit
+          </Button>
         </form>
       </Form>
     </div>
