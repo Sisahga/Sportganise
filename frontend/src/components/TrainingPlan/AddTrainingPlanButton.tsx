@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import UploadTrainingPlanFiles from "./UploadTrainingPlanFiles";
+import UploadTrainingPlanFiles from "./UploadTrainingPlanForm";
 
 import {
   Sheet,
