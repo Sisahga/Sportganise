@@ -32,6 +32,13 @@ public class AuthController {
   private final EmailService emailService;
   private final VerificationService verificationService;
 
+  /**
+   * Constructor for the AuthController.
+   *
+   * @param accountService AccountService object.
+   * @param emailService EmailService object.
+   * @param verificationService VerificationService object.
+   */
   @Autowired
   public AuthController(
       AccountService accountService,
