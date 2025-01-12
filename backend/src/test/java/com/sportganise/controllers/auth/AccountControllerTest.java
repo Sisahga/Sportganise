@@ -91,7 +91,7 @@ class AccountControllerTest {
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put("/api/account/{id}", accountId)
+            MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
         .andExpect((status().isNotFound()));
@@ -105,7 +105,7 @@ class AccountControllerTest {
 
     mockMvc
         .perform(
-            (MockMvcRequestBuilders.put("/api/account/{id}", accountId)
+            (MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)))
         .andExpect((status().isNoContent()));

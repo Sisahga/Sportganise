@@ -49,7 +49,7 @@ public class BlobService {
    * @param file File to be uploaded.
    * @param isMessageFile Boolean indicating if the file is part of a direct message.
    * @param messageId Id of the direct message, if the file is part of a direct message.
-   * @return String indicating the status of the upload.
+   * @return The URL of the newly uploaded file.
    * @throws IOException If an error occurs while uploading the file.
    */
   public String uploadFile(MultipartFile file, boolean isMessageFile, String messageId)

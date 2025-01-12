@@ -46,12 +46,12 @@ public class AccountController {
    * @param body The updated fields of the account.
    * @return The status of the update, 204 No Content for successful updates and an error code otherwise.
    */
-  @PutMapping("/{id}")
+  @PutMapping("/{accountId}")
   public ResponseEntity<Void> updateAccount(
-      @PathVariable Integer id, @RequestBody @Valid UpdateAccountDto body) {
+      @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountDto body) {
 
     try {
-      this.accountService.updateAccount(id, body);
+      this.accountService.updateAccount(accountId, body);
     } catch (ResourceNotFoundException e) {
       return ResponseEntity.notFound().build();
     }

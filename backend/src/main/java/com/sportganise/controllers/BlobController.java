@@ -36,8 +36,8 @@ public class BlobController {
       @RequestParam("isMessageFile") boolean isMessageFile,
       @RequestParam("messageId") String messageId) {
     try {
-      String status = blobService.uploadFile(file, isMessageFile, messageId);
-      return new ResponseEntity<>(status, HttpStatus.OK);
+      String url = blobService.uploadFile(file, isMessageFile, messageId);
+      return new ResponseEntity<>(url, HttpStatus.OK);
     } catch (IOException e) {
       log.error("Error uploading file: {}", e.getMessage());
       return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

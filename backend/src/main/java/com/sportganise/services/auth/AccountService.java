@@ -53,17 +53,17 @@ public class AccountService {
   /**
    * Updates an account in the database.
    *
-   * @param id ID of the account.
+   * @param accountId ID of the account.
    * @param updatedAccount The new account data.
    * @throws ResourceNotFoundException
    */
-  public void updateAccount(Integer id, UpdateAccountDto updatedAccount)
+  public void updateAccount(Integer accountId, UpdateAccountDto updatedAccount)
       throws ResourceNotFoundException {
     Account previousAccount =
         accountRepository
-            .findById(id)
+            .findById(accountId)
             .orElseThrow(
-                () -> new ResourceNotFoundException("Failed to find account with id " + id));
+                () -> new ResourceNotFoundException("Failed to find account with id " + accountId));
 
     if (updatedAccount.getFirstName() != null)
       previousAccount.setFirstName(updatedAccount.getFirstName());

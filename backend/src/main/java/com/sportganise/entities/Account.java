@@ -43,5 +43,5 @@ public class Account {
   private String lastName;
 
   @Column(name = "picture")
-  private String pictureBlob;
+  private String pictureUrl;
 }
