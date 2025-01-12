@@ -3,12 +3,15 @@ package com.sportganise.services.auth;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +29,8 @@ public class Auth0ApiServiceTest {
 
   @Mock private AccountService accountService;
   private Auth0AccountDto auth0AccountDto;
+
+  @Mock private AccountRepository accountRepository;
 
   @BeforeEach
   public void setup() {
@@ -85,7 +90,7 @@ public class Auth0ApiServiceTest {
     String newPassword = "newPassword!123";
     Account mockAccount = mock(Account.class);
 
-    when(accountService.getAccountByEmail(auth0AccountDto.getEmail())).thenReturn(mockAccount);
+    when(accountRepository.findByEmail(anyString())).thenReturn(Optional.of(mockAccount));
     when(mockAccount.getAuth0Id()).thenReturn("mockAuth0Id");
 
     doReturn(true).when(auth0ApiService).verifyPassword(eq(auth0AccountDto)); // Use eq() here
