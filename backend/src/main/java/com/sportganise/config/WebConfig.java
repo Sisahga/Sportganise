@@ -14,7 +14,7 @@ public class WebConfig implements WebMvcConfigurer {
         .addMapping("/**")
         .allowedOriginPatterns("http://localhost:3000")
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        .allowedHeaders("Content-Type", "Authorization", "X-Requested-With")
+        .allowedHeaders("*")
         .allowCredentials(true)
         .maxAge(3600L);
   }
