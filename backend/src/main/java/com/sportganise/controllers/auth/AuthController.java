@@ -97,7 +97,7 @@ public class AuthController {
   }
 
   /**
-   * POST: generate code to send to a user's email
+   * POST: generate code to send to a user's email.
    *
    * @param requestBody email
    * @return ResponseEntity containing the response message.
@@ -118,7 +118,7 @@ public class AuthController {
   }
 
   /**
-   * POST: verify a code given by an end user
+   * POST: verify a code given by an end user.
    *
    * @param requestBody email and code
    * @return ResponseEntity containing the response message.
@@ -144,7 +144,7 @@ public class AuthController {
   }
 
   /**
-   * PATCH: reset forgotten password
+   * PATCH: reset forgotten password.
    *
    * @param requestBody email and new password
    * @return ResponseEntity containing the response message.
@@ -169,7 +169,7 @@ public class AuthController {
   }
 
   /**
-   * PATCH: Modify password
+   * PATCH: Modify password.
    *
    * @param requestBody email, old password and new password
    * @return ResponseEntity containing the response message.

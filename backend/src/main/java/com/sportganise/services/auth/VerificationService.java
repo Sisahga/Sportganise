@@ -10,14 +10,14 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/** Service for verification */
+/** Service for handling verification codes. */
 @Service
 public class VerificationService {
 
   @Autowired private VerificationRepository verificationRepository;
 
   /**
-   * Generate a 6 digit integer
+   * Generate a 6 digit integer.
    *
    * @return 6 digit integer
    */
@@ -27,7 +27,7 @@ public class VerificationService {
   }
 
   /**
-   * Calculate expiry timestamp
+   * Calculate expiry timestamp.
    *
    * @param minutes amount of time to expiry
    * @return expiry value
@@ -37,7 +37,7 @@ public class VerificationService {
   }
 
   /**
-   * Create a verification instance
+   * Create a verification instance.
    *
    * @param account user account
    * @return verification instance
@@ -50,7 +50,7 @@ public class VerificationService {
   }
 
   /**
-   * Validate given code against database
+   * Validate given code against database.
    *
    * @param accountId account id
    * @param code verification code
@@ -67,7 +67,7 @@ public class VerificationService {
   }
 
   /**
-   * delete existing instance of a verification
+   * delete existing instance of a verification.
    *
    * @param accountId account id
    */

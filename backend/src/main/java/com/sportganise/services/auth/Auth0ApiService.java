@@ -101,7 +101,7 @@ public class Auth0ApiService {
   }
 
   /**
-   * Method used to change password while communicating with auth0
+   * Method used to change password while communicating with auth0.
    *
    * @param auth0UserId user id mapped to auth0
    * @param newPassword new password to be set
@@ -136,7 +136,7 @@ public class Auth0ApiService {
   }
 
   /**
-   * Method used to change password given checks and account access
+   * Method used to change password given checks and account access.
    *
    * @param auth0AccountDto account details
    * @param newPassword new password to be set

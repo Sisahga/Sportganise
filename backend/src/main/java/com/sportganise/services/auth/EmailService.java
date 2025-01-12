@@ -6,7 +6,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-/** Email service used for communication */
+/** Service for sending emails to users. */
 @Service
 public class EmailService {
 
@@ -21,7 +21,7 @@ public class EmailService {
   }
 
   /**
-   * Send an email to an email
+   * Send an email to an email.
    *
    * @param toEmail email to send to
    * @param code verification code

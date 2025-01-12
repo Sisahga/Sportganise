@@ -1,13 +1,24 @@
 package com.sportganise.entities;
 
-import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Verification entity.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

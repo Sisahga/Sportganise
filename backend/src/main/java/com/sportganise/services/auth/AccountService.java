@@ -74,7 +74,7 @@ public class AccountService {
   }
 
   /**
-   * Method used for password reset in case of loss
+   * Method used for password reset in case of loss.
    *
    * @param email email of the account
    * @param newPassword new password to be set
@@ -90,7 +90,7 @@ public class AccountService {
   }
 
   /**
-   * Method used for password modification
+   * Method used for password modification.
    *
    * @param email email of the account
    * @param oldPassword old password
@@ -104,7 +104,7 @@ public class AccountService {
   }
 
   /**
-   * Method used to retrieve an account by its email
+   * Method used to retrieve an account by its email.
    *
    * @param email email of the account
    * @return Account object
