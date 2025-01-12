@@ -31,9 +31,21 @@ export default function SignUp() {
                 placeholder="Password"
                 inputProps={{ type: "password" }}
               />
-              <FormField id="FirstName" label="First Name" placeholder="First Name" />
-              <FormField id="LastName" label="Last Name" placeholder="Last Name" />
-              <FormField id="Address" label="Address" placeholder="Street #, Name" />
+              <FormField
+                id="FirstName"
+                label="First Name"
+                placeholder="First Name"
+              />
+              <FormField
+                id="LastName"
+                label="Last Name"
+                placeholder="Last Name"
+              />
+              <FormField
+                id="Address"
+                label="Address"
+                placeholder="Street #, Name"
+              />
               <div className="grid grid-cols-2 gap-4">
                 <FormField id="City" label="City" placeholder="City" />
                 <FormField id="Province" label="Province" placeholder="Prov" />
