@@ -22,7 +22,7 @@ public class WaitlistService {
         Integer maxRank = participantRepository.findMaxRank(programId);
         int newRank = (maxRank == null) ? 1 : maxRank + 1;
 
-        ProgramParticipant optedParticipant = participantRepository.findParticipant(programId, accountId);
+        ProgramParticipant optedParticipant = participantRepository.findWaitlistParticipant(programId, accountId);
         optedParticipant.setRank(newRank);
 
         ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);

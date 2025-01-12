@@ -422,16 +422,16 @@ public class ProgramService {
 
     // }
 
-    public void removeParticipant(Integer programId, Integer accountId) {
+    // public void removeParticipant(Integer programId, Integer accountId) {
 
-        ProgramParticipant waitlistParticipant = participantRepository
-                .findParticipant(programId, accountId);
-            if (waitlistParticipant == null){
-                throw new IllegalArgumentException("Participant not found");
-            }
+    //     ProgramParticipant waitlistParticipant = participantRepository
+    //             .findParticipant(programId, accountId);
+    //         if (waitlistParticipant == null){
+    //             throw new IllegalArgumentException("Participant not found");
+    //         }
 
-        participantRepository.delete(waitlistParticipant);
-    }
+    //     participantRepository.delete(waitlistParticipant);
+    // }
 
     // public List<ProgramParticipantDto> getOptedParticipants(Integer programId){
 

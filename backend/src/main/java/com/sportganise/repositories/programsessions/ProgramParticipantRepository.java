@@ -60,10 +60,11 @@ public interface ProgramParticipantRepository extends JpaRepository<ProgramParti
         // sessionId);
 
         @Query("SELECT pp FROM ProgramParticipant pp " +
-                        "JOIN FETCH pp.programParticipantId ppi " +
-                        "JOIN FETCH pp.participantType pt " +
-                        "WHERE ppi.programId = :programId AND ppi.accountId = :accountId")
-        ProgramParticipant findParticipant(
+                        "JOIN LabelAccount la ON pp.programParticipantId.accountId = la.labelAccountsId.accountId " +
+                        "WHERE pp.programParticipantId.programId = :programId " +
+                        "AND pp.programParticipantId.accountId = :accountId " +
+                        "AND la.role = 'Waitlisted'")
+        ProgramParticipant findWaitlistParticipant(
                         @Param("programId") Integer programId,
                         @Param("accountId") Integer accountId);
 
