@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 /** Repository for Direct Message Channel. */
+@Repository
 public interface DirectMessageChannelRepository
     extends JpaRepository<DirectMessageChannel, Integer> {
   /**
@@ -20,14 +22,22 @@ public interface DirectMessageChannelRepository
    */
   @Query(
       """
-            SELECT new com.sportganise.dto.directmessaging.ListDirectMessageChannelDto(
-                c.channelId, c.type, c.name, c.imageBlob, m.content, cm.read, m.sentAt)
-            FROM DirectMessageChannel c
-            INNER JOIN DirectMessageChannelMember cm ON c.channelId = cm.compositeKey.channelId
-            LEFT JOIN DirectMessage m ON c.channelId = m.channelId AND m.sentAt = (
-                        SELECT MAX(sentAt) FROM DirectMessage WHERE channelId = c.channelId)
-            WHERE cm.compositeKey.accountId = :accountId
-            """)
+
+      SELECT new com.sportganise.dto.directmessaging.ListDirectMessageChannelDto(
+        ch.channelId,
+        ch.type,
+        ch.name,
+        ch.imageBlob,
+        m.content,
+        cm.read,
+        m.sentAt
+      )
+      FROM DirectMessageChannel ch
+      LEFT JOIN DirectMessage m ON ch.lastMessageId = m.messageId
+      JOIN DirectMessageChannelMember cm ON ch.channelId = cm.compositeKey.channelId
+      WHERE cm.compositeKey.accountId = :accountId
+      ORDER BY m.sentAt DESC
+      """)
   List<ListDirectMessageChannelDto> getDirectMessageChannelsByAccountId(
       @Param("accountId") int accountId);
 

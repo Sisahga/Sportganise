@@ -74,7 +74,7 @@ CREATE TABLE program (
 	title VARCHAR(30) NOT NULL,
 	description VARCHAR(100),
 	capacity INTEGER,
-	occurence_date TIMESTAMP(6),
+	occurence_date TIMESTAMP,
 	duration INTEGER,
 	is_recurring BOOLEAN DEFAULT FALSE,
 	expiry_date TIMESTAMP(6),
@@ -128,7 +128,7 @@ CREATE TABLE message (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	content VARCHAR(512) NOT NULL,
-	sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     type VARCHAR(10) NOT NULL
 );
 
@@ -157,3 +157,5 @@ CREATE TABLE feedback(
 	creation_date DATE DEFAULT CURRENT_DATE NOT NULL,
 	PRIMARY KEY (post_id,account_id)
 );
+
+SET TIME ZONE 'America/New_York';

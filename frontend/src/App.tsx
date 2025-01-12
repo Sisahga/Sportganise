@@ -2,8 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import CreateTrainingSessionPage from "./pages/CreateTrainingSessionPage";
 import Layout from "./components/Layout";
-import MessagingApp from "@/components/Inbox/DirectMessages/Messaging";
-import ChatScreen from "./components/Inbox/ChatScreen/ChatScreen";
+import MessagingDashboard from "@/components/Inbox/DirectMessagesDashboard/MessagingDashboard.tsx";
+import DirectMessageChatPage from "@/pages/DirectMessageChannelPage.tsx";
 import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
@@ -13,6 +13,7 @@ import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
+import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
 
 function App() {
   return (
@@ -27,26 +28,35 @@ function App() {
         ></Route>
         <Route path="/" element={<Layout />}>
           {" "}
-          <Route path="/messages" element={<MessagingApp />} />
-          <Route path="/chat" element={<ChatScreen />} />
-          {/*Place the routes to all your pages nested in this Route tag */}
+          {/*Place the routes to all your pages nested beneath this Route tag */}
+          <Route
+            path="/pages/ChangePasswordPage"
+            element={<ChangePasswordPage />}
+          ></Route>
           <Route
             path="/pages/CreateTrainingSessionPage"
             element={<CreateTrainingSessionPage />}
           ></Route>
           <Route
-            path="/pages/PersonalInformationPage"
-            element={<PersonalInformationPage />}
-          ></Route>
+            path="/pages/DirectMessageChannelPage"
+            element={<DirectMessageChatPage />}
+          />
           <Route
             path="/pages/EditProfilePage"
             element={<EditProfilePage />}
           ></Route>
           <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
           <Route
-            path="/pages/ChangePasswordPage"
-            element={<ChangePasswordPage />}
+            path="/pages/DirectMessagesDashboard"
+            element={<MessagingDashboard />}
+          />
+          <Route
+            path="/pages/PersonalInformationPage"
+            element={<PersonalInformationPage />}
           ></Route>
+          <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
+          <Route path="/signup" element={<SignUpPage />}></Route>
+          <Route path="/verificationcode" element={<VerificationCodePage />} />
           <Route
             path="/pages/ViewTrainingSessionPage"
             element={<ViewTrainingSessionPage />}
@@ -54,6 +64,10 @@ function App() {
           <Route path="/signup" element={<SignUpPage />}></Route>
           <Route path="/verificationcode" element={<VerificationCodePage />} />
           <Route path="/pages/CalendarPage" element={<CalendarPage />}></Route>
+          <Route
+            path="/pages/ModifyTrainingSessionPage"
+            element={<ModifyTrainingSessionPage />}
+          ></Route>
         </Route>
       </Routes>
     </Router>
