@@ -2,7 +2,6 @@ package com.sportganise.dto.programsessions;
 
 import com.sportganise.entities.programsessions.Program;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,6 +46,7 @@ public class ProgramDto {
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
     this.visibility = program.getVisibility();
-    this.attachment = program.getAttachment(); // TODO: Refer to above todo in attachment attribute field.
+    this.attachment =
+        program.getAttachment(); // TODO: Refer to above todo in attachment attribute field.
   }
 }

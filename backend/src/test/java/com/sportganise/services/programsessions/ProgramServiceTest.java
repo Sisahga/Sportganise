@@ -1,29 +1,29 @@
-//package com.sportganise.services.programsessions;
+// package com.sportganise.services.programsessions;
 //
-//import static org.junit.jupiter.api.Assertions.*;
+// import static org.junit.jupiter.api.Assertions.*;
 //
-//import com.sportganise.dto.programsessions.ProgramDto;
-//import com.sportganise.dto.programsessions.ProgramParticipantDto;
-//import com.sportganise.entities.Account;
-//import com.sportganise.entities.programsessions.Program;
-//import com.sportganise.entities.programsessions.ProgramParticipant;
-//import com.sportganise.entities.programsessions.ProgramParticipantCompositeKey;
-//import com.sportganise.repositories.AccountRepository;
-//import com.sportganise.repositories.programsessions.ProgramRepository;
-//import com.sportganise.services.auth.AccountService;
-//import jakarta.persistence.EntityNotFoundException;
-//import java.time.LocalDateTime;
-//import java.util.List;
-//import java.util.Optional;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.Mockito;
-//import org.mockito.junit.jupiter.MockitoExtension;
+// import com.sportganise.dto.programsessions.ProgramDto;
+// import com.sportganise.dto.programsessions.ProgramParticipantDto;
+// import com.sportganise.entities.Account;
+// import com.sportganise.entities.programsessions.Program;
+// import com.sportganise.entities.programsessions.ProgramParticipant;
+// import com.sportganise.entities.programsessions.ProgramParticipantCompositeKey;
+// import com.sportganise.repositories.AccountRepository;
+// import com.sportganise.repositories.programsessions.ProgramRepository;
+// import com.sportganise.services.auth.AccountService;
+// import jakarta.persistence.EntityNotFoundException;
+// import java.time.LocalDateTime;
+// import java.util.List;
+// import java.util.Optional;
+// import org.junit.jupiter.api.Test;
+// import org.junit.jupiter.api.extension.ExtendWith;
+// import org.mockito.InjectMocks;
+// import org.mockito.Mock;
+// import org.mockito.Mockito;
+// import org.mockito.junit.jupiter.MockitoExtension;
 //
-//@ExtendWith(MockitoExtension.class)
-//public class ProgramServiceTest {
+// @ExtendWith(MockitoExtension.class)
+// public class ProgramServiceTest {
 //  @Mock private ProgramRepository programRepository;
 //
 //  @Mock private AccountService accountService;
@@ -185,4 +185,4 @@
 //                    null));
 //    assertEquals("Program not found with ID: 1", exception.getMessage());
 //  }
-//}
+// }

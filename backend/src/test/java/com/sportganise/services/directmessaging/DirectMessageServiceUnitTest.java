@@ -6,10 +6,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.directmessaging.DirectMessageDto;
-import com.sportganise.dto.directmessaging.MemberDetailsDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
-import com.sportganise.entities.directmessaging.DirectMessageType;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageRepository;
@@ -17,7 +15,6 @@ import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.*;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,17 +45,14 @@ public class DirectMessageServiceUnitTest {
 
     // Mock DirectMessageRepository save method
     given(directMessageRepository.save(any(DirectMessage.class)))
-            .willAnswer(
-                    invocation -> {
-                      DirectMessage message = invocation.getArgument(0);
-                      message.setMessageId(1); // Manually assign ID for message as if it were from Postgres.
-                      return message;
-                    }
-            );
+        .willAnswer(
+            invocation -> {
+              DirectMessage message = invocation.getArgument(0);
+              message.setMessageId(
+                  1); // Manually assign ID for message as if it were from Postgres.
+              return message;
+            });
   }
-
-
-
 
   @Test
   public void sendDirectMessageTest_WithoutAttachments() throws IOException {
@@ -76,7 +70,6 @@ public class DirectMessageServiceUnitTest {
     verify(blobService, times(0)).uploadFile(any(MultipartFile.class), eq(true), anyString());
   }
 
-
   @Test
   public void sendDirectMessageTest_WithAttachments() throws IOException {
     MultipartFile mockFile1 = mock(MultipartFile.class);
@@ -85,8 +78,8 @@ public class DirectMessageServiceUnitTest {
     sendDirectMessageRequestDto.setAttachments(List.of(mockFile1, mockFile2));
 
     given(blobService.uploadFile(any(MultipartFile.class), eq(true), anyString()))
-            .willReturn("https://mockblobstorage.com/file1.jpg")
-            .willReturn("https://mockblobstorage.com/file2.jpg");
+        .willReturn("https://mockblobstorage.com/file1.jpg")
+        .willReturn("https://mockblobstorage.com/file2.jpg");
 
     DirectMessageDto response = directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
@@ -103,5 +96,4 @@ public class DirectMessageServiceUnitTest {
     verify(directMessageChannelMemberRepository, times(1)).updateReadStatus(1, 2);
     verify(blobService, times(2)).uploadFile(any(MultipartFile.class), eq(true), eq("1"));
   }
-
 }

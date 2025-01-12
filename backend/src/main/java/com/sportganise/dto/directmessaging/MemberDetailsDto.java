@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * MemberDetailsDto
- */
+/** MemberDetailsDto. */
 @Getter
 @Setter
 @NoArgsConstructor

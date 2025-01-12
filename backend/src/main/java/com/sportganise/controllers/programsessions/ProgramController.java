@@ -1,34 +1,34 @@
-//package com.sportganise.controllers.programsessions;
+// package com.sportganise.controllers.programsessions;
 //
-//import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
-//import com.sportganise.dto.programsessions.ProgramDto;
-//import com.sportganise.dto.programsessions.ProgramParticipantDto;
-//import com.sportganise.entities.Account;
-//import com.sportganise.services.auth.AccountService;
-//import com.sportganise.services.programsessions.ProgramService;
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Optional;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.web.bind.annotation.CrossOrigin;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//import org.springframework.web.bind.annotation.PostMapping;
-//import org.springframework.web.bind.annotation.PutMapping;
-//import org.springframework.web.bind.annotation.RequestBody;
-//import org.springframework.web.bind.annotation.RequestMapping;
-//import org.springframework.web.bind.annotation.RestController;
+// import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
+// import com.sportganise.dto.programsessions.ProgramDto;
+// import com.sportganise.dto.programsessions.ProgramParticipantDto;
+// import com.sportganise.entities.Account;
+// import com.sportganise.services.auth.AccountService;
+// import com.sportganise.services.programsessions.ProgramService;
+// import java.util.ArrayList;
+// import java.util.List;
+// import java.util.Map;
+// import java.util.Optional;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.http.HttpStatus;
+// import org.springframework.http.ResponseEntity;
+// import org.springframework.web.bind.annotation.CrossOrigin;
+// import org.springframework.web.bind.annotation.GetMapping;
+// import org.springframework.web.bind.annotation.PathVariable;
+// import org.springframework.web.bind.annotation.PostMapping;
+// import org.springframework.web.bind.annotation.PutMapping;
+// import org.springframework.web.bind.annotation.RequestBody;
+// import org.springframework.web.bind.annotation.RequestMapping;
+// import org.springframework.web.bind.annotation.RestController;
 //
-///**
+/// **
 // * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
 // * appropriate services.
 // */
-//@RestController
-//@RequestMapping("/api/programs")
-//public class ProgramController {
+// @RestController
+// @RequestMapping("/api/programs")
+// public class ProgramController {
 //  private final ProgramService programService;
 //  private final AccountService accountService;
 //
@@ -131,7 +131,8 @@
 //
 //      // Extract and process attachments
 //      @SuppressWarnings("unchecked")
-//      List<Map<String, String>> attachments = (List<Map<String, String>>) payload.get("attachment");
+//      List<Map<String, String>> attachments = (List<Map<String, String>>)
+// payload.get("attachment");
 //
 //      ProgramDto programDto =
 //          programService.createProgramDto(
@@ -210,7 +211,8 @@
 //
 //      // Extract and process attachments
 //      @SuppressWarnings("unchecked")
-//      List<Map<String, String>> attachments = (List<Map<String, String>>) payload.get("attachment");
+//      List<Map<String, String>> attachments = (List<Map<String, String>>)
+// payload.get("attachment");
 //
 //      // Call the service modifyProgram method
 //      programService.modifyProgram(
@@ -234,4 +236,4 @@
 //      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 //    }
 //  }
-//}
+// }

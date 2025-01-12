@@ -2,13 +2,13 @@ package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.io.Serializable;
-
+/** Composite key for the ProgramParticipant entity. */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class ProgramParticipantCompositeKey implements Serializable {
   @Column(name = "program_id")
   private Integer programId;
+
   @Column(name = "account_id")
   private Integer accountId;
 }

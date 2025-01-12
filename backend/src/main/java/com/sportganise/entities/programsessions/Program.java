@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -53,7 +52,8 @@ public class Program {
 
   private String visibility;
 
-  // TODO: Change Schema, create a table called program_attachments if there is more than 1 attachment per program
+  // TODO: Change Schema, create a table called program_attachments if there is more than 1
+  // attachment per program
   private String attachment;
 
   /**

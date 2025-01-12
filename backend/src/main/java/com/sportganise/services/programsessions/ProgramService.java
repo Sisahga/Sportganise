@@ -1,24 +1,24 @@
-//package com.sportganise.services.programsessions;
+// package com.sportganise.services.programsessions;
 //
-//import com.sportganise.dto.programsessions.ProgramDto;
-//import com.sportganise.dto.programsessions.ProgramParticipantDto;
-//import com.sportganise.entities.Account;
-//import com.sportganise.entities.programsessions.Program;
-//import com.sportganise.entities.programsessions.ProgramParticipant;
-//import com.sportganise.repositories.AccountRepository;
-//import com.sportganise.repositories.programsessions.ProgramRepository;
-//import com.sportganise.services.auth.AccountService;
-//import jakarta.persistence.EntityNotFoundException;
-//import java.time.LocalDateTime;
-//import java.time.LocalTime;
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Optional;
-//import org.springframework.stereotype.Service;
+// import com.sportganise.dto.programsessions.ProgramDto;
+// import com.sportganise.dto.programsessions.ProgramParticipantDto;
+// import com.sportganise.entities.Account;
+// import com.sportganise.entities.programsessions.Program;
+// import com.sportganise.entities.programsessions.ProgramParticipant;
+// import com.sportganise.repositories.AccountRepository;
+// import com.sportganise.repositories.programsessions.ProgramRepository;
+// import com.sportganise.services.auth.AccountService;
+// import jakarta.persistence.EntityNotFoundException;
+// import java.time.LocalDateTime;
+// import java.time.LocalTime;
+// import java.util.List;
+// import java.util.Map;
+// import java.util.Optional;
+// import org.springframework.stereotype.Service;
 //
-///** Service layer for Programs. */
-//@Service
-//public class ProgramService {
+/// ** Service layer for Programs. */
+// @Service
+// public class ProgramService {
 //
 //  private final ProgramRepository programRepository;
 //  private final AccountService accountService;
@@ -159,7 +159,8 @@
 //    // Parse dates and times
 //    // occurrenceDate is the date, time and day of the week of the first occurrence
 //    // of the program
-//    LocalDateTime occurrenceDate = LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
+//    LocalDateTime occurrenceDate =
+// LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
 //    LocalDateTime endDateTime = LocalDateTime.parse(endDate).with(LocalTime.parse(endTime));
 //    int durationMins = (int) java.time.Duration.between(occurrenceDate, endDateTime).toMinutes();
 //
@@ -273,7 +274,8 @@
 //    // Parse dates and times
 //    // occurrenceDate is the date, time and day of the week of the first occurrence
 //    // of the program
-//    LocalDateTime occurrenceDate = LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
+//    LocalDateTime occurrenceDate =
+// LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
 //    LocalDateTime endDateTime = LocalDateTime.parse(endDate).with(LocalTime.parse(endTime));
 //    int durationMins = (int) java.time.Duration.between(occurrenceDate, endDateTime).toMinutes();
 //
@@ -354,7 +356,8 @@
 //   * @param durationMins the duration of a program in minutes.
 //   * @return a boolean for whether there is a scheduling conflict or not.
 //   */
-//  private boolean checkForSchedulingConflicts(LocalDateTime occurrenceDate, Integer durationMins) {
+//  private boolean checkForSchedulingConflicts(LocalDateTime occurrenceDate, Integer durationMins)
+// {
 //    LocalDateTime startDateTime = occurrenceDate;
 //    LocalDateTime endDateTime = startDateTime.plusMinutes(durationMins);
 //
@@ -408,4 +411,4 @@
 //      // created/posted.
 //    }
 //  }
-//}
+// }
