@@ -3,9 +3,8 @@ import defaultAvatar from "../../../assets/defaultAvatar.png";
 import {
   format,
   isToday,
-  isThisWeek,
   parseISO,
-  differenceInMinutes,
+  differenceInMinutes, differenceInDays,
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
@@ -20,14 +19,13 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
     const zonedDate = toZonedTime(date, timeZone);
 
     if (isToday(zonedDate)) {
-      return format(zonedDate, "hh:mm a");
+      return format(zonedDate, "h:mm a"); // Just show the time
     }
 
-    if (isThisWeek(zonedDate)) {
-      return format(zonedDate, "EEEE hh:mm a");
+    if (differenceInDays(new Date(), zonedDate) < 7) {
+      return `${format(zonedDate, "eee").toUpperCase()} ${format(zonedDate, "h:mm a")}`; // Format: SAT 12:00 PM
     }
-
-    return format(zonedDate, "MM/dd/yyyy 'at' hh:mm a");
+    return format(zonedDate, "MM/dd/yyyy 'at' h:mm a");
   };
 
   return (
