@@ -10,10 +10,8 @@ import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
-
 import java.util.Map;
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,8 +30,7 @@ public class Auth0ApiServiceTest {
   @Mock private AccountService accountService;
   private Auth0AccountDto auth0AccountDto;
 
-  @Mock
-  private AccountRepository accountRepository;
+  @Mock private AccountRepository accountRepository;
 
   @BeforeEach
   public void setup() {
