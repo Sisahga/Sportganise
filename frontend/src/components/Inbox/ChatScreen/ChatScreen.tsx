@@ -71,7 +71,7 @@ const ChatScreen = () => {
         }
       });
     }
-  });
+  }, []);
 
   useEffect(() => {
     console.log("Messages fetched:", messages);

@@ -31,7 +31,7 @@ function useChatMessages(channelId: number, read: boolean) {
     fetchMessages().then(() => {
       setLoading(false);
     });
-  });
+  }, []);
 
   return {
     messages,
