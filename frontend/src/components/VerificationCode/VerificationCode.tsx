@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/Button";
 export default function VerificationCode() {
   const handleInput = (
     e: React.ChangeEvent<HTMLInputElement>,
-    nextInputId: string | undefined,
+    nextInputId: string | undefined
   ) => {
     if (e.target.value.length === e.target.maxLength && nextInputId) {
       const nextInput = document.getElementById(
-        nextInputId,
+        nextInputId
       ) as HTMLInputElement;
       if (nextInput) {
         nextInput.focus();
@@ -22,26 +22,25 @@ export default function VerificationCode() {
   const navigate = useNavigate();
 
   const handleResend = () => {
-    // Triggers another email with a verification code being sent
-    navigate("/");
+    navigate("/"); // Triggers another email with a verification code
   };
 
   return (
-    <div>
-      <div className="bg-white w-screen pt-32">
-        <div className="m-5 p-4">
-          <h1 className="text-4xl space-y-6 text-left">
+    <div className="bg-white min-h-screen overflow-x-hidden">
+      <div className="w-full pt-32">
+        <div className="mx-4 md:mx-8 lg:mx-16 p-4">
+          <h1 className="text-2xl md:text-4xl text-left">
             Email Verification
-            <p className="mt-4 text-lg text-primaryColour-600">
+            <p className="mt-4 text-sm md:text-lg text-primaryColour-600">
               Please enter the verification code that was sent to your email
               address.
             </p>
           </h1>
         </div>
-        <div className="mx-20 mt-20 p-10">
-          <p className="text-lg mb-4">Enter Verification Code</p>
-          <form className="max-w-sm mx-auto">
-            <div className="flex mb-2 space-x-7">
+        <div className="mx-4 md:mx-8 lg:mx-16 mt-10 md:mt-20 p-5 md:p-10">
+          <p className="text-sm md:text-lg mb-4">Enter Verification Code</p>
+          <form className="max-w-full sm:max-w-md mx-auto">
+            <div className="flex mb-2 space-x-4 sm:space-x-7">
               <VerificationInput
                 id="code-1"
                 nextInputId="code-2"
@@ -61,7 +60,7 @@ export default function VerificationCode() {
             </div>
             <p
               id="helper-text-explanation"
-              className="my-2 ml-5 text-sm text-black"
+              className="my-2 text-xs md:text-sm text-black"
             >
               Did not receive a code?
               <Button
@@ -72,7 +71,7 @@ export default function VerificationCode() {
               </Button>
             </p>
             <Link
-              className="text-white bg-primaryColour py-1 rounded-lg flex items-center justify-center"
+              className="text-white bg-primaryColour py-2 md:py-3 rounded-lg flex items-center justify-center text-sm md:text-base"
               to="/" // TODO : When "Verify" link is pressed, it needs to check if code is correct, then redirect to homepage
             >
               Verify

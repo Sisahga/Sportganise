@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { FormField } from "@/components/ui/formfield";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -32,21 +31,9 @@ export default function SignUp() {
                 placeholder="Password"
                 inputProps={{ type: "password" }}
               />
-              <FormField
-                id="FirstName"
-                label="First Name"
-                placeholder="First Name"
-              />
-              <FormField
-                id="LastName"
-                label="Last Name"
-                placeholder="Last Name"
-              />
-              <FormField
-                id="Address"
-                label="Address"
-                placeholder="Street #, Name"
-              />
+              <FormField id="FirstName" label="First Name" placeholder="First Name" />
+              <FormField id="LastName" label="Last Name" placeholder="Last Name" />
+              <FormField id="Address" label="Address" placeholder="Street #, Name" />
               <div className="grid grid-cols-2 gap-4">
                 <FormField id="City" label="City" placeholder="City" />
                 <FormField id="Province" label="Province" placeholder="Prov" />
