@@ -9,13 +9,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-/** Repository for Program. */
-@Repository // Indicates that this is a Spring Data repository
+/** Repository for ProgramParticipant. */
+@Repository
 public interface ProgramParticipantRepository extends JpaRepository<ProgramParticipant, Integer> {
 
   @Query(
       "SELECT pp FROM ProgramParticipant pp "
-          + "JOIN LabelAccount la ON pp.programParticipantId.accountId = la.labelAccountsId.accountId "
+          + "JOIN LabelAccount la "
+          + "ON pp.programParticipantId.accountId = la.labelAccountsId.accountId "
           + "WHERE pp.programParticipantId.programId = :programId "
           + "AND pp.programParticipantId.accountId = :accountId "
           + "AND la.role = 'Waitlisted'")

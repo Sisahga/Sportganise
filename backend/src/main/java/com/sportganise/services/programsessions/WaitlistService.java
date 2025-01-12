@@ -8,18 +8,29 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
+/** Service for managing the waitlist and participation in program sessions. */
 @Service
 public class WaitlistService {
 
   private final ProgramParticipantRepository participantRepository;
 
+  /**
+   * Constructor for WaitlistService.
+   *
+   * @param participantRepository Repository for managing program participants.
+   */
   public WaitlistService(ProgramParticipantRepository participantRepository) {
-
     this.participantRepository = participantRepository;
   }
 
+  /**
+   * Adds a participant to the waitlist for a program and assigns them a rank.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return The rank assigned to the participant.
+   */
   public Integer optProgramParticipantDto(Integer programId, Integer accountId) {
-
     Integer maxRank = participantRepository.findMaxRank(programId);
     int newRank = (maxRank == null) ? 1 : maxRank + 1;
 
@@ -34,8 +45,14 @@ public class WaitlistService {
     return savedParticipant.getRank();
   }
 
+  /**
+   * Confirms a participant's spot in a program, updating ranks of other participants.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the confirmed participant, or null if not found.
+   */
   public ProgramParticipantDto confirmParticipant(Integer programId, Integer accountId) {
-
     ProgramParticipant optedParticipant =
         participantRepository.findWaitlistParticipant(programId, accountId);
     if (optedParticipant == null) {
@@ -44,11 +61,11 @@ public class WaitlistService {
     // Update ranks of others in queue
     participantRepository.updateRanks(programId, accountId);
 
-    // Confirm participants
+    // Confirm participant
     LocalDateTime ldt = LocalDateTime.now();
     optedParticipant.setConfirmedDate(ldt);
     optedParticipant.setConfirmed(true);
-    // Take out of the waitlist
+    // Remove from the waitlist
     optedParticipant.setRank(null);
 
     ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
@@ -61,15 +78,21 @@ public class WaitlistService {
         savedParticipant.getConfirmedDate());
   }
 
+  /**
+   * Removes a participant from the waitlist and updates ranks of other participants.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the opted-out participant, or null if not found.
+   */
   public ProgramParticipantDto optOutParticipant(Integer programId, Integer accountId) {
-
     ProgramParticipant optedParticipant =
         participantRepository.findWaitlistParticipant(programId, accountId);
     if (optedParticipant == null) {
       return null;
     }
 
-    // Update the ranks of everybody
+    // Update the ranks of everyone
     participantRepository.updateRanks(programId, accountId);
     optedParticipant.setRank(null);
 
@@ -83,8 +106,13 @@ public class WaitlistService {
         savedParticipant.getConfirmedDate());
   }
 
+  /**
+   * Retrieves a list of all participants currently opted into a program.
+   *
+   * @param programId The ID of the program.
+   * @return A list of DTOs representing the opted-in participants.
+   */
   public List<ProgramParticipantDto> allOptedParticipants(Integer programId) {
-
     List<ProgramParticipant> queue = participantRepository.findOptedParticipants(programId);
 
     List<ProgramParticipantDto> queueDto =

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/** REST controller for managing program participants and their waitlist operations. */
 @RestController
 @RequestMapping("/api/program-participant")
 public class ProgramParticipantController {
@@ -19,6 +20,12 @@ public class ProgramParticipantController {
   private ProgramService programService;
   private WaitlistService waitlistService;
 
+  /**
+   * Constructor for ProgramParticipantController.
+   *
+   * @param programService Service for managing programs.
+   * @param waitlistService Service for managing the waitlist and participant operations.
+   */
   @Autowired
   public ProgramParticipantController(
       ProgramService programService, WaitlistService waitlistService) {
@@ -26,6 +33,13 @@ public class ProgramParticipantController {
     this.waitlistService = waitlistService;
   }
 
+  /**
+   * Adds a participant to a program's waitlist and assigns them a rank.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return The rank assigned to the participant.
+   */
   @PatchMapping("/opt-participant")
   public ResponseEntity<Integer> optProgramParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
@@ -34,6 +48,13 @@ public class ProgramParticipantController {
     return ResponseEntity.ok(rank);
   }
 
+  /**
+   * Confirms a participant's spot in a program.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the confirmed participant.
+   */
   @PatchMapping("/confirm-participant")
   public ResponseEntity<ProgramParticipantDto> confirmParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
@@ -44,6 +65,13 @@ public class ProgramParticipantController {
     return ResponseEntity.ok(confirmedParticipant);
   }
 
+  /**
+   * Removes a participant from a program's waitlist.
+   *
+   * @param accountId The ID of the participant's account.
+   * @param programId The ID of the program.
+   * @return A DTO representing the participant who opted out.
+   */
   @PatchMapping("/out-participant")
   public ResponseEntity<ProgramParticipantDto> optOutParticipant(
       @RequestParam Integer accountId, @RequestParam Integer programId) {
@@ -52,6 +80,12 @@ public class ProgramParticipantController {
     return ResponseEntity.ok(outParticipant);
   }
 
+  /**
+   * Retrieves a list of all participants currently opted into a program.
+   *
+   * @param programId The ID of the program.
+   * @return A list of DTOs representing the opted-in participants.
+   */
   @GetMapping("/queue")
   public ResponseEntity<List<ProgramParticipantDto>> getOptedParticipants(
       @RequestParam Integer programId) {

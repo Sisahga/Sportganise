@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Entity Model for Organization table. */
 @Setter
 @Getter
 @AllArgsConstructor

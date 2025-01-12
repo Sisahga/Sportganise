@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Composite Key Id for LabelAccount. */
 @Setter
 @Getter
 @NoArgsConstructor

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Composite Key Id for ProgramParticipant. */
 @Getter
 @Setter
 @NoArgsConstructor
