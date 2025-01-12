@@ -19,7 +19,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/HomePage" element={<HomePage />} />
+        <Route path="/" element={<HomePage />} />
         {/*placed route here as it does not use original layout with Nav, bottom
         nav, ...*/}
         <Route
