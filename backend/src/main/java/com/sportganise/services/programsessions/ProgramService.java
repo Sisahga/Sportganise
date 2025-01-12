@@ -1,7 +1,6 @@
 package com.sportganise.services.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
-import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.programsessions.Program;
@@ -178,36 +177,6 @@ public class ProgramService {
         // Return ProgramDto to send back to the client
         return new ProgramDto(savedProgram);
     }
-
-    /**
-     * Method to create new ProgramParticipantDTO.
-     * 
-     * @param account       Id of user who is making the request.
-     * @param isConfirmed   Confirmation status of the participant.
-     * @param confirmedDate Date in which participant was confirmed for the program.
-     * @return A new ProgramParticipantDto.
-     */
-    // public ProgramParticipantDto createProgramParticipantDto(AccountDto account, Integer programId, Integer accountId) {
-
-    //     // Checks if an account has already signed up to the program
-    //     if (checkForStatus(accountId, programId)) {
-    //         return null; // revisit this
-    //     }
-
-    //     ProgramParticipant newParticipant = new ProgramParticipant(programId, accountId, account.getType(), false,
-    //             null);
-    //     ProgramParticipant savedParticipant = participantRepository.save(newParticipant);
-
-    //     return new ProgramParticipantDto(savedParticipant.getAccountId(), savedParticipant.getProgramId(),
-    //             savedParticipant.isConfirmed(), savedParticipant.getConfirmedDate());
-    // }
-
-    // public boolean checkForStatus(Integer accountId, Integer programId) {
-    //     List<ProgramParticipantDto> attendees = getParticipants(programId);
-
-    //     return attendees.stream()
-    //             .anyMatch(participant -> participant.getAccountId().equals(accountId));
-    // }
 
     /**
      * Method to modify an existing program.
@@ -408,61 +377,4 @@ public class ProgramService {
             // created/posted.
         }
     }
-
-    // public void confirmParticipant(Integer programId, Integer accountId) {
-
-    //     ProgramParticipant waitlistParticipant = participantRepository
-    //             .findParticipant(programId, accountId);
-    //     if (waitlistParticipant == null){
-    //         throw new IllegalArgumentException("Participant not found");
-    //     }
-
-    //     LocalDateTime timestamp = LocalDateTime.now();
-    //     participantRepository.updateConfirmationStatus(waitlistParticipant.getProgramId(),
-    //             waitlistParticipant.getAccountId(), true, timestamp);
-
-    // }
-
-    // public void removeParticipant(Integer programId, Integer accountId) {
-
-    //     ProgramParticipant waitlistParticipant = participantRepository
-    //             .findParticipant(programId, accountId);
-    //         if (waitlistParticipant == null){
-    //             throw new IllegalArgumentException("Participant not found");
-    //         }
-
-    //     participantRepository.delete(waitlistParticipant);
-    // }
-
-    // public List<ProgramParticipantDto> getOptedParticipants(Integer programId){
-
-    //     List<ProgramParticipant> participants = participantRepository.findOptedInParticipants(programId);
-
-    //     // Taken from above function
-    //     // Map each Account to a ProgramParticipantDto
-    //     return participants.stream()
-    //             .map(participant -> {
-
-    //                 // Get account from accountId (this is a wrapper, not the actual)
-    //                 Optional<Account> accountOptional = accountService.getAccount(participant.getAccountId());
-
-    //                 // Check if the value of accountOptional is empty
-    //                 if (!accountOptional.isPresent()) {
-    //                     throw new IllegalArgumentException("Account not found for id: " + participant.getAccountId());
-    //                 }
-
-    //                 // Get the actual account object
-    //                 Account account = accountOptional.get();
-
-    //                 // map account information and participant information into a list of
-    //                 // ProgramParticipantDto
-    //                 return new ProgramParticipantDto(
-    //                         account.getAccountId(),
-    //                         programId,
-    //                         participant.isConfirmed(),
-    //                         participant.getConfirmedDate());
-    //             })
-    //             .toList();
-
-    // }
 }
