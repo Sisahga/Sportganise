@@ -24,7 +24,10 @@ public class Account {
   @Column(name = "account_id")
   private Integer accountId;
 
+  // Type of user. i.e. is it a coach, admin or regular user.
+  @Column(name = "type")
   private String type;
+
   private String email;
 
   @Column(name = "auth0_id")

@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function HomeContent() {
   return (
     <div className="bg-primaryColour w-screen mt-32 z-40">
+      <Toaster />
       <div className="flex-1 max-w-[100vw] bg-white shadow-lg rounded-t-2xl pb-16">
         <div className="min-h-screen">
           <div className="p-4 space-y-6">

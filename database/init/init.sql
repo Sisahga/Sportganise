@@ -74,11 +74,14 @@ CREATE TABLE program (
 	title VARCHAR(30) NOT NULL,
 	description VARCHAR (100),
 	capacity INTEGER,
-	occurence_date DATE,
+	occurence_date TIMESTAMP,
 	duration INTEGER,
 	is_recurring BOOLEAN DEFAULT FALSE,
-	expiry_date DATE,
-	frequency VARCHAR(10)
+	expiry_date TIMESTAMP,
+	frequency VARCHAR(10),
+	location VARCHAR(50),
+	visibility VARCHAR(10),
+	attachment VARCHAR(100)
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
@@ -123,7 +126,7 @@ CREATE TABLE message (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	content VARCHAR(512) NOT NULL,
-	sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     type VARCHAR(10) NOT NULL
 );
 
@@ -152,3 +155,5 @@ CREATE TABLE feedback(
 	creation_date DATE DEFAULT CURRENT_DATE NOT NULL,
 	PRIMARY KEY (post_id,account_id)
 );
+
+SET TIME ZONE 'America/New_York';

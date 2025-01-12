@@ -1,9 +1,9 @@
-import { ViewRegisteredPlayersContent } from "@/components/ViewRegisteredPlayers";
+import { TrainingSessionContent } from "@/components/ViewTrainingSessions";
 
 export default function ViewTrainingSessionPage() {
   return (
     <div className="">
-      <ViewRegisteredPlayersContent />
+      <TrainingSessionContent />
     </div>
   );
 }
