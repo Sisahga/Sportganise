@@ -12,14 +12,13 @@ import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.repositories.AccountRepository;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Map;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
@@ -45,7 +44,6 @@ public class AccountServiceTest {
     accountDto.setType("general");
 
     auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
-
   }
 
   @Test
@@ -107,7 +105,7 @@ public class AccountServiceTest {
 
     given(accountRepository.findByEmail(email)).willReturn(java.util.Optional.of(mockAccount));
     given(auth0ApiService.changePassword(anyString(), anyString()))
-            .willReturn(Map.of("message", "Password updated successfully", "user", "mockUserDetails"));
+        .willReturn(Map.of("message", "Password updated successfully", "user", "mockUserDetails"));
 
     Map<String, Object> result = accountService.resetPassword(email, newPassword);
 
@@ -125,9 +123,12 @@ public class AccountServiceTest {
 
     given(accountRepository.findByEmail(email)).willReturn(java.util.Optional.empty());
 
-    Exception exception = assertThrows(RuntimeException.class, () -> {
-      accountService.resetPassword(email, newPassword);
-    });
+    Exception exception =
+        assertThrows(
+            RuntimeException.class,
+            () -> {
+              accountService.resetPassword(email, newPassword);
+            });
 
     assertEquals("Account not found", exception.getMessage());
 
@@ -144,14 +145,15 @@ public class AccountServiceTest {
 
     given(accountRepository.findByEmail(email)).willReturn(java.util.Optional.of(mockAccount));
     given(auth0ApiService.changePasswordWithOldPassword(any(Auth0AccountDto.class), anyString()))
-            .willReturn(Map.of("message", "Password updated successfully", "user", "mockUserDetails"));
+        .willReturn(Map.of("message", "Password updated successfully", "user", "mockUserDetails"));
 
     Map<String, Object> result = accountService.modifyPassword(email, oldPassword, newPassword);
 
     assertEquals("Password updated successfully", result.get("message"));
     assertEquals("mockUserDetails", result.get("user"));
 
-    verify(auth0ApiService, times(1)).changePasswordWithOldPassword(any(Auth0AccountDto.class), eq(newPassword));
+    verify(auth0ApiService, times(1))
+        .changePasswordWithOldPassword(any(Auth0AccountDto.class), eq(newPassword));
     verify(accountRepository, times(1)).findByEmail(email);
   }
 
@@ -163,14 +165,15 @@ public class AccountServiceTest {
 
     given(accountRepository.findByEmail(email)).willReturn(java.util.Optional.empty());
 
-    Exception exception = assertThrows(RuntimeException.class, () -> {
-      accountService.modifyPassword(email, oldPassword, newPassword);
-    });
+    Exception exception =
+        assertThrows(
+            RuntimeException.class,
+            () -> {
+              accountService.modifyPassword(email, oldPassword, newPassword);
+            });
 
     assertEquals("Account not found", exception.getMessage());
 
     verify(accountRepository, times(1)).findByEmail(email);
   }
-
-
 }

@@ -6,10 +6,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.auth.Auth0AccountDto;
-import java.util.Map;
-
 import com.sportganise.entities.Account;
 import com.sportganise.repositories.AccountRepository;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,14 +27,12 @@ public class Auth0ApiServiceTest {
   @Mock private AccountRepository accountRepository;
   private Auth0AccountDto auth0AccountDto;
 
-
   @BeforeEach
   public void setup() {
     MockitoAnnotations.openMocks(this);
     auth0AccountDto =
         new Auth0AccountDto(
             "userx@example.com", "password!123", "Username-Password-Authentication");
-
 
     ReflectionTestUtils.setField(auth0ApiService, "auth0Domain", "placeholder.com");
     ReflectionTestUtils.setField(auth0ApiService, "auth0ClientId", "placeholderClientId");
@@ -69,10 +66,10 @@ public class Auth0ApiServiceTest {
     verify(auth0ApiService).loginUserWithAuth0(auth0AccountDto);
   }
 
-
   @Test
   public void changePassword_shouldReturnSuccessMessage() {
-    Map<String, Object> mockResponse = Map.of("message", "Password updated successfully", "user", "mockUserDetails");
+    Map<String, Object> mockResponse =
+        Map.of("message", "Password updated successfully", "user", "mockUserDetails");
 
     doReturn(mockResponse).when(auth0ApiService).changePassword(anyString(), anyString());
 
@@ -87,17 +84,18 @@ public class Auth0ApiServiceTest {
     String newPassword = "newPassword!123";
     Account mockAccount = mock(Account.class);
 
-    when(accountRepository.findByEmail(auth0AccountDto.getEmail())).thenReturn(java.util.Optional.of(mockAccount));
+    when(accountRepository.findByEmail(auth0AccountDto.getEmail()))
+        .thenReturn(java.util.Optional.of(mockAccount));
     when(mockAccount.getAuth0Id()).thenReturn("mockAuth0Id");
 
     doReturn(true).when(auth0ApiService).verifyPassword(eq(auth0AccountDto)); // Use eq() here
     doReturn(Map.of("message", "Password updated successfully", "user", "mockUserDetails"))
-            .when(auth0ApiService).changePassword(anyString(), anyString()); // Stub changePassword
+        .when(auth0ApiService)
+        .changePassword(anyString(), anyString()); // Stub changePassword
 
     auth0ApiService.changePasswordWithOldPassword(auth0AccountDto, newPassword);
 
-    verify(auth0ApiService, times(1)).changePassword(eq("mockAuth0Id"), eq(newPassword)); // Use eq() for both args
+    verify(auth0ApiService, times(1))
+        .changePassword(eq("mockAuth0Id"), eq(newPassword)); // Use eq() for both args
   }
-
-
 }

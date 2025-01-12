@@ -14,6 +14,7 @@ import com.sportganise.entities.Verification;
 import com.sportganise.services.auth.AccountService;
 import com.sportganise.services.auth.EmailService;
 import com.sportganise.services.auth.VerificationService;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.util.Optional;
 
 @WebMvcTest(controllers = AuthController.class)
 @AutoConfigureMockMvc
@@ -57,8 +56,6 @@ public class AuthControllerTest {
     accountDto.setType("general");
 
     auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
-
-
   }
 
   @Test
@@ -145,11 +142,11 @@ public class AuthControllerTest {
     Mockito.when(verificationService.createVerification(Mockito.any(Account.class)))
         .thenReturn(mock(Verification.class));
     mockMvc
-            .perform(
-                    post("/api/auth/send-code")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("{\"email\":\"userx@example.com\"}"))
-            .andExpect(status().isCreated());
+        .perform(
+            post("/api/auth/send-code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"userx@example.com\"}"))
+        .andExpect(status().isCreated());
 
     Mockito.verify(accountService).getAccountByEmail("userx@example.com");
     Mockito.verify(verificationService).createVerification(Mockito.any(Account.class));
@@ -163,11 +160,11 @@ public class AuthControllerTest {
     Mockito.when(verificationService.validateCode(Mockito.anyInt(), Mockito.anyInt()))
         .thenReturn(Optional.ofNullable(mock(Verification.class)));
     mockMvc
-            .perform(
-                    post("/api/auth/verify-code")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content("{\"email\":\"userx@example.com\",\"code\":\"123456\"}"))
-            .andExpect(status().isCreated());
+        .perform(
+            post("/api/auth/verify-code")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\":\"userx@example.com\",\"code\":\"123456\"}"))
+        .andExpect(status().isCreated());
 
     Mockito.verify(accountService).getAccountByEmail("userx@example.com");
     Mockito.verify(verificationService).validateCode(Mockito.anyInt(), Mockito.anyInt());
@@ -178,10 +175,12 @@ public class AuthControllerTest {
   public void resetPassword_shouldCallAccountService() throws Exception {
     String requestBody = "{\"email\":\"userx@example.com\",\"newPassword\":\"newPassword123\"}";
 
-    mockMvc.perform(MockMvcRequestBuilders.patch("/api/auth/reset-password")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody))
-            .andExpect(status().isOk());
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/auth/reset-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+        .andExpect(status().isOk());
 
     Mockito.verify(accountService).resetPassword("userx@example.com", "newPassword123");
   }
@@ -189,14 +188,17 @@ public class AuthControllerTest {
   @Test
   @Order(9)
   public void modifyPassword_shouldCallAccountService() throws Exception {
-    String requestBody = "{\"email\":\"userx@example.com\",\"oldPassword\":\"oldPassword123\",\"newPassword\":\"newPassword123\"}";
+    String requestBody =
+        "{\"email\":\"userx@example.com\",\"oldPassword\":\"oldPassword123\",\"newPassword\":\"newPassword123\"}";
 
-    mockMvc.perform(MockMvcRequestBuilders.patch("/api/auth/modify-password")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(requestBody))
-            .andExpect(status().isOk());
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/auth/modify-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+        .andExpect(status().isOk());
 
-    Mockito.verify(accountService).modifyPassword("userx@example.com", "oldPassword123", "newPassword123");
+    Mockito.verify(accountService)
+        .modifyPassword("userx@example.com", "oldPassword123", "newPassword123");
   }
-
 }

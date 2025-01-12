@@ -44,5 +44,4 @@ public class Account {
 
   @Column(name = "picture")
   private String pictureBlob;
-
 }
