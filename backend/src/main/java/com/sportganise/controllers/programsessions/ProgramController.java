@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/programs")
-@CrossOrigin(origins = "*")
 public class ProgramController {
   private final ProgramService programService;
   private final AccountService accountService;
