@@ -51,6 +51,7 @@ export default function HeaderNav() {
               </Button>
               <Button
                 variant="link"
+                onClick={() => navigate("/pages/TrainingPlanPage")}
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:bg-white hover:outline-none"
               >
                 Training Plan
