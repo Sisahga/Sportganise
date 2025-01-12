@@ -1,6 +1,5 @@
 package com.sportganise.dto.programsessions;
 
-import jakarta.persistence.Entity;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +11,6 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class ProgramDetailsParticipantsDto {
   private ProgramDto programDetails;
   private List<ProgramParticipantDto> attendees;

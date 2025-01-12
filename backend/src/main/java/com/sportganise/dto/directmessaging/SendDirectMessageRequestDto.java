@@ -19,4 +19,6 @@ public class SendDirectMessageRequestDto {
   private List<MultipartFile> attachments;
   private String sentAt;
   private String type;
+  private String senderFirstName;
+  private String avatarUrl;
 }

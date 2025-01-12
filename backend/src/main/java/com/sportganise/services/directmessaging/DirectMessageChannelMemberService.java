@@ -46,4 +46,16 @@ public class DirectMessageChannelMemberService {
     }
     this.directMessageChannelMemberRepository.saveAll(dmChannelMembers);
   }
+
+  /**
+   * Marks a channel as read for a specific account.
+   *
+   * @param channelId The channel id.
+   * @param accountId The account id.
+   * @return The number of rows affected.
+   */
+  public int markChannelAsRead(int channelId, int accountId) {
+    return this.directMessageChannelMemberRepository.updateChannelMemberReadStatus(
+        accountId, channelId);
+  }
 }

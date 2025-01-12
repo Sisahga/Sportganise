@@ -4,13 +4,19 @@ import { FooterNav } from "./FooterNav";
 import { Toaster } from "@/components/ui/toaster";
 
 // Paths where the header should be hidden
-const hideHeaderPaths = ["/messages", "/chat"]; // Header hidden on both
+const hideHeaderPaths = [
+  "/pages/DirectMessagesDashboard",
+  "/pages/DirectMessageChannelPage",
+]; // Header hidden on both
 
 // Paths where the footer should be hidden
-const hideFooterPaths = ["/chat"]; // Footer hidden only on /chat
+const hideFooterPaths = ["/pages/DirectMessageChannelPage"]; // Footer hidden only on /chat
 
 // Define paths where you don't want horizontal margins (like full-width pages)
-const fullWidthPaths = ["/messages", "/chat"]; // Full-width layout on these paths
+const fullWidthPaths = [
+  "/pages/DirectMessagesDashboard",
+  "/pages/DirectMessageChannelPage",
+]; // Full-width layout on these paths
 
 // Function to check if the current path matches any hide paths
 const shouldHide = (paths: string[], pathname: string): boolean =>
