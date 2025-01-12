@@ -157,7 +157,7 @@ public class Auth0ApiService {
     Account account =
         accountRepository
             .findByEmail(auth0AccountDto.getEmail())
-            .orElseThrow(() -> new RuntimeException("Account not found"));
+            .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
     String auth0UserId = account.getAuth0Id();
 
