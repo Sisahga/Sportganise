@@ -20,7 +20,7 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
-import { toast, useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 import { CloudUpload, Paperclip } from "lucide-react";
 
@@ -49,15 +49,23 @@ export default function UploadTrainingPlanFiles() {
     },
   };
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      console.log(values);
       const response = await fetch(`/${accountId}/upload-trainingplans`, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", //If sending JSON
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(values, null, 2), //stringify form values in JSON format and send through url
+        body: JSON.stringify(values, null, 2),
       });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
     } catch (err) {
       console.log("UploadFile form error: ", err);
       setError("An error occured! The files could not be uploaded.");
@@ -71,5 +79,61 @@ export default function UploadTrainingPlanFiles() {
     }
   };
 
-  return <div></div>;
+  return (
+    <div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8 max-w-3xl mx-auto py-10"
+        >
+          <FormField
+            control={form.control}
+            name="trainingPlans"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Select File</FormLabel>
+                <FormControl>
+                  <FileUploader
+                    value={files}
+                    onValueChange={setFiles}
+                    dropzoneOptions={dropZoneConfig}
+                    className="relative bg-background rounded-lg p-2"
+                  >
+                    <FileInput
+                      id="fileInput"
+                      className="outline-dashed outline-1 outline-slate-500"
+                    >
+                      <div className="flex items-center justify-center flex-col p-8 w-full ">
+                        <CloudUpload className="text-gray-500 w-10 h-10" />
+                        <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                          <span className="font-semibold">Click to upload</span>
+                          &nbsp; or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          SVG, PNG, JPG or GIF
+                        </p>
+                      </div>
+                    </FileInput>
+                    <FileUploaderContent>
+                      {files &&
+                        files.length > 0 &&
+                        files.map((file, i) => (
+                          <FileUploaderItem key={i} index={i}>
+                            <Paperclip className="h-4 w-4 stroke-current" />
+                            <span>{file.name}</span>
+                          </FileUploaderItem>
+                        ))}
+                    </FileUploaderContent>
+                  </FileUploader>
+                </FormControl>
+                <FormDescription>Select a file to upload.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit">Submit</Button>
+        </form>
+      </Form>
+    </div>
+  );
 }
