@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { MoreVertical, Ban, Trash2 } from 'lucide-react';
+import { MoreVertical, Ban, Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -110,4 +110,3 @@ export default function BlockDeleteButtons() {
     </>
   );
 }
-
