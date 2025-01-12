@@ -19,7 +19,7 @@ import lombok.Setter;
 @Table(name = "program_participants")
 public class ProgramParticipant {
 
-  /** Composite primary key (program_id + account_id) */
+  /** Composite primary key (program_id + account_id). */
   @EmbeddedId private ProgramParticipantId id;
 
   // Could be an admin, coach or player
@@ -33,7 +33,7 @@ public class ProgramParticipant {
   private LocalDateTime confirmedDate;
 
   /**
-   * Returns the ID of the program
+   * Returns the ID of the program.
    *
    * @return The current value of the program ID.
    */

@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Composite Key ID for program participant. */
 @Getter
 @Setter
 @NoArgsConstructor
