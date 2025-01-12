@@ -21,6 +21,13 @@ public class AccountService {
   private final Auth0ApiService auth0ApiService;
   private BlobService blobService;
 
+  /**
+   * Constructor for account service.
+   *
+   * @param accountRepository Account repository
+   * @param auth0ApiService Authentication service
+   * @param blobService File upload service
+   */
   @Autowired
   public AccountService(
       AccountRepository accountRepository,
@@ -65,7 +72,6 @@ public class AccountService {
    *
    * @param accountId ID of the account.
    * @param updatedAccount The new account data.
-   * @throws ResourceNotFoundException
    */
   public void updateAccount(Integer accountId, UpdateAccountDto updatedAccount)
       throws ResourceNotFoundException {
@@ -75,12 +81,18 @@ public class AccountService {
             .orElseThrow(
                 () -> new ResourceNotFoundException("Failed to find account with id " + accountId));
 
-    if (updatedAccount.getFirstName() != null)
+    if (updatedAccount.getFirstName() != null) {
       previousAccount.setFirstName(updatedAccount.getFirstName());
-    if (updatedAccount.getLastName() != null)
+    }
+    if (updatedAccount.getLastName() != null) {
       previousAccount.setLastName(updatedAccount.getLastName());
-    if (updatedAccount.getPhone() != null) previousAccount.setPhone(updatedAccount.getPhone());
-    if (updatedAccount.getEmail() != null) previousAccount.setEmail(updatedAccount.getEmail());
+    }
+    if (updatedAccount.getPhone() != null) {
+      previousAccount.setPhone(updatedAccount.getPhone());
+    }
+    if (updatedAccount.getEmail() != null) {
+      previousAccount.setEmail(updatedAccount.getEmail());
+    }
 
     accountRepository.save(previousAccount);
   }
@@ -89,8 +101,7 @@ public class AccountService {
    * Updates the picture URL of an account.
    *
    * @param accountId ID of the account.
-   * @param url URL of the picture.
-   * @throws IOException
+   * @param file New profile picture of the account.
    */
   // TODO: clean-up unreferenced profile pictures from storage
   public void updateAccountPicture(Integer accountId, MultipartFile file)

@@ -16,7 +16,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 /*
  * TODO:
  *  - set file size limit
- *  - change file discriminant (support multiple files with same user-defined name "profile_picture.png")
+ *  - change file discriminant (support multiple files with same user-defined name
+ *    "profile_picture.png")
  */
 
 /** Service class for handling operations related to Blobs. */

@@ -46,7 +46,7 @@ public class AccountController {
   /**
    * Updates an accounts public-facing fields, except for the profile picture.
    *
-   * @param id ID of the account.
+   * @param accountId ID of the account.
    * @param body The updated fields of the account.
    * @return The status of the update, 204 No Content for successful updates and an error code
    *     otherwise.
