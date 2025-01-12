@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { MessageComponent } from "@/types/messaging";
-import directMessagingApi from "@/services/api/directMessagingApi";
+import { MessageComponent } from "@/types/messaging.ts";
+import directMessagingApi from "@/services/api/directMessagingApi.ts";
 
 function useChatMessages(channelId: number, read: boolean) {
   const [messages, setMessages] = useState<MessageComponent[]>([]);
@@ -31,7 +31,7 @@ function useChatMessages(channelId: number, read: boolean) {
     fetchMessages().then(() => {
       setLoading(false);
     });
-  }, [channelId]);
+  });
 
   return {
     messages,

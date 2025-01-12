@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, MoreHorizontal, Send, FolderOpen } from "lucide-react";
-import useChatMessages from "../apiCalls/useChatMessages.tsx";
+import useChatMessages from "../../../hooks/useChatMessages.tsx";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService.ts";
@@ -86,15 +87,12 @@ const ChatScreen = () => {
       textarea.style.height = `${textarea.scrollHeight}px`;
     };
 
-    // Adjust on value change
     adjustHeight();
 
-    // Optional: add resize listener to handle window resizing
     window.addEventListener("resize", adjustHeight);
     return () => window.removeEventListener("resize", adjustHeight);
   }, [newMessage]);
 
-  // Handle loading and error states
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -182,13 +180,6 @@ const ChatScreen = () => {
 
         {/* Send Button */}
         <div className="h-full flex items-end">
-          {/*<button*/}
-          {/*  className={`p-2 rounded-full ${*/}
-          {/*    newMessage.trim() === ""*/}
-          {/*      ? "bg-gray-400 cursor-not-allowed"*/}
-          {/*      : "bg-secondary-colour hover:opacity-75 transition-opacity"*/}
-          {/*  }`}*/}
-          {/*>*/}
           <Button
             variant="ghost"
             className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
@@ -203,7 +194,6 @@ const ChatScreen = () => {
               style={{ position: "relative", left: "-1.5px", top: "1.5px" }}
             />
           </Button>
-          {/*</button>*/}
         </div>
       </div>
     </div>

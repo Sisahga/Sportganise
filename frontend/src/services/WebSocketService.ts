@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Frame, Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { MessageComponent, SendMessageComponent } from "@/types/messaging.ts";
