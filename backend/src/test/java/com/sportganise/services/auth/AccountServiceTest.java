@@ -154,5 +154,4 @@ public class AccountServiceTest {
     verify(auth0ApiService, times(1))
         .changePasswordWithOldPassword(any(Auth0AccountDto.class), eq(newPassword));
   }
-
 }
