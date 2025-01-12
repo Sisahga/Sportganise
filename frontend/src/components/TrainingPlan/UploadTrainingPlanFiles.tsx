@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/file-upload";
 import { useToast } from "@/hooks/use-toast";
 
-import { CloudUpload, Paperclip } from "lucide-react";
+import { CloudUpload, Paperclip, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   trainingPlans: z.array(
@@ -35,7 +35,7 @@ const formSchema = z.object({
 export default function UploadTrainingPlanFiles() {
   const accountId = "";
   const { toast } = useToast();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>("");
 
   const dropZoneConfig = {
@@ -54,6 +54,9 @@ export default function UploadTrainingPlanFiles() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log(values);
+      console.log(JSON.stringify(values, null, 2));
+
+      setLoading(true);
       const response = await fetch(`/${accountId}/upload-trainingplans`, {
         method: "POST",
         headers: {
@@ -61,15 +64,19 @@ export default function UploadTrainingPlanFiles() {
         },
         body: JSON.stringify(values, null, 2),
       });
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
+      form.reset();
+      setLoading(false); //premature load to false just in case it would look weird with the toast
       toast({
         title: "File(s) uploaded successfully ✔",
         description: "File(s) were added to your Training Plan",
       });
     } catch (err) {
+      form.reset();
       console.log("UploadFile form error: ", err);
       setError("An error occured! The file(s) could not be uploaded.");
       toast({
@@ -140,9 +147,16 @@ export default function UploadTrainingPlanFiles() {
               </FormItem>
             )}
           />
-          <Button type="submit" className="w-full">
-            Submit
-          </Button>
+          {loading ? (
+            <Button disabled className="w-full">
+              <Loader2 className="animate-spin" />
+              Uploading
+            </Button>
+          ) : (
+            <Button type="submit" className="w-full">
+              Submit
+            </Button>
+          )}
         </form>
       </Form>
     </div>
