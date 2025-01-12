@@ -1,8 +1,10 @@
 package com.sportganise.services.auth;
 
+import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -46,6 +48,31 @@ public class AccountService {
     } catch (Exception e) {
       throw new RuntimeException("Failed to create account: " + e.getMessage(), e);
     }
+  }
+
+  /**
+   * Updates an account in the database.
+   *
+   * @param id ID of the account.
+   * @param updatedAccount The new account data.
+   * @throws ResourceNotFoundException
+   */
+  public void updateAccount(Integer id, UpdateAccountDto updatedAccount)
+      throws ResourceNotFoundException {
+    Account previousAccount =
+        accountRepository
+            .findById(id)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Failed to find account with id " + id));
+
+    if (updatedAccount.getFirstName() != null)
+      previousAccount.setFirstName(updatedAccount.getFirstName());
+    if (updatedAccount.getLastName() != null)
+      previousAccount.setLastName(updatedAccount.getLastName());
+    if (updatedAccount.getPhone() != null) previousAccount.setPhone(updatedAccount.getPhone());
+    if (updatedAccount.getEmail() != null) previousAccount.setEmail(updatedAccount.getEmail());
+
+    accountRepository.save(previousAccount);
   }
 
   /**
