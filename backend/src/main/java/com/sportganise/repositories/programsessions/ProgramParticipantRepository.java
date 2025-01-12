@@ -19,32 +19,6 @@ import org.springframework.stereotype.Repository;
 @Repository // Indicates that this is a Spring Data repository
 public interface ProgramParticipantRepository extends JpaRepository<ProgramParticipant, Integer> {
 
-        // @Modifying
-        // @Query("UPDATE ProgramParticipant pp SET pp.isConfirmed = :status " +
-        // "WHERE pp.programParticipantId.programId = :programId " +
-        // "AND pp.programParticipantId.accountId = :accountId")
-        // void updateConfirmationStatus(
-        // @Param("status") String status,W
-        // @Param("programId") Integer programId,
-        // @Param("accountId") Integer accountId);
-
-        // @Modifying
-        // @Transactional
-        // @Query("DELETE FROM ProgramParticipant pp WHERE pp.id.programId = :programId
-        // AND pp.id.accountId = :accountId")
-        // void deleteProgramParticipant(
-        // @Param("programId") Integer programId,
-        // @Param("accountId") Integer accountId
-        // );
-
-        // Maybe unneeded
-        // @Query("SELECT a FROM Account a "
-        // + "JOIN ProgramParticipant pp ON pp.account.accountId = a.accountId "
-        // + "JOIN Program p ON pp.program.programId = p.programId "
-        // + "WHERE p.programId = :sessionId AND pp.isConfirmed = FALSE")
-        // List<ProgramParticipant> findOptedInParticipants(@Param("sessionId") Integer
-        // sessionId);
-
         @Query("SELECT pp FROM ProgramParticipant pp " +
                         "JOIN LabelAccount la ON pp.programParticipantId.accountId = la.labelAccountsId.accountId " +
                         "WHERE pp.programParticipantId.programId = :programId " +
@@ -72,5 +46,12 @@ public interface ProgramParticipantRepository extends JpaRepository<ProgramParti
                         "               AND p.programParticipantId.accountId = :accountId)")
         void updateRanks(@Param("programId") Integer programId,
                         @Param("accountId") Integer accountId);
+
+        @Query("SELECT pp FROM ProgramParticipant pp " +
+                        "WHERE pp.programParticipantId.programId = :programId " +
+                        "AND pp.isConfirmed = FALSE " +
+                        "AND pp.rank >= 1")
+        List<ProgramParticipant> findOptedParticipants(
+                        @Param("programId") Integer programId);
 
 }

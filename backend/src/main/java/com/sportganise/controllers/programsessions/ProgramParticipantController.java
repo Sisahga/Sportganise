@@ -42,7 +42,7 @@ public class ProgramParticipantController {
     }
 
     @PatchMapping("/confirm-participant")
-    public ResponseEntity<ProgramParticipantDto> updateConfirmationStatus(
+    public ResponseEntity<ProgramParticipantDto> confirmParticipant(
             @RequestParam Integer programId,
             @RequestParam Integer accountId) {
 
@@ -51,20 +51,20 @@ public class ProgramParticipantController {
         return ResponseEntity.ok(confirmedParticipant);
     }
 
-    // @DeleteMapping("/delete-participant")
-    // public ResponseEntity<String> removeParticipant(
-    //         @RequestParam Integer accountId,
-    //         @RequestParam Integer programId) {
+    @PatchMapping("/out-participant")
+    public ResponseEntity<ProgramParticipantDto> optOutParticipant(
+            @RequestParam Integer accountId,
+            @RequestParam Integer programId) {
 
-    //     programService.removeParticipant(programId, accountId);
-    //     return ResponseEntity.ok("Success!");
-    // }
+        ProgramParticipantDto outParticipant = waitlistService.optOutParticipant(programId, accountId);
+        return ResponseEntity.ok(outParticipant);
+    }
 
-    // @GetMapping("/opted-participants")
-    // public ResponseEntity<List<ProgramParticipantDto>> getOptedParticipants(
-    //         @RequestParam Integer programId) {
+    @GetMapping("/queue")
+    public ResponseEntity<List<ProgramParticipantDto>> getOptedParticipants(
+            @RequestParam Integer programId) {
 
-    //     List<ProgramParticipantDto> optedInParticipants = programService.getOptedParticipants(programId);
-    //     return ResponseEntity.ok(optedInParticipants);
-    // }
+        List<ProgramParticipantDto> optedInParticipants = waitlistService.allOptedParticipants(programId);
+        return ResponseEntity.ok(optedInParticipants);
+    }
 }
