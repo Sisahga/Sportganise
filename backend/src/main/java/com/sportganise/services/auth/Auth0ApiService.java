@@ -2,7 +2,7 @@ package com.sportganise.services.auth;
 
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
-import com.sportganise.repositories.AccountRepository;
+import com.sportganise.exceptions.AccountNotFoundException;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,16 +22,16 @@ public class Auth0ApiService {
   @Value("${auth0.domain}")
   private String auth0Domain;
 
-  @Value("${auth0.clientid}")
+  @Value("${auth0.client-id}")
   private String auth0ClientId;
 
-  @Value("${auth0.clientsecret}")
+  @Value("${auth0.client-secret}")
   private String auth0ClientSecret;
 
   @Value("${auth0.audience}")
   private String auth0Audience;
 
-  @Autowired private AccountRepository accountRepository;
+  @Autowired private AccountService accountService;
 
   private final Auth0TokenService auth0TokenService;
   private final RestTemplate restTemplate = new RestTemplate();
@@ -146,17 +146,14 @@ public class Auth0ApiService {
    * @return response message
    */
   public Map<String, Object> changePasswordWithOldPassword(
-      Auth0AccountDto auth0AccountDto, String newPassword) {
+      Auth0AccountDto auth0AccountDto, String newPassword) throws AccountNotFoundException {
     boolean isOldPasswordCorrect = verifyPassword(auth0AccountDto);
 
     if (!isOldPasswordCorrect) {
       throw new RuntimeException("Old password is incorrect.");
     }
 
-    Account account =
-        accountRepository
-            .findByEmail(auth0AccountDto.getEmail())
-            .orElseThrow(() -> new RuntimeException("Account not found"));
+    Account account = accountService.getAccountByEmail(auth0AccountDto.getEmail());
 
     String auth0UserId = account.getAuth0Id();
 

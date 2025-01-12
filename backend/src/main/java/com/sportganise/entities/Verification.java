@@ -35,8 +35,8 @@ public class Verification {
   @Column(nullable = false)
   private int code;
 
-  @Column(name = "expiry_date", nullable = false)
-  private Timestamp expiryDate;
+  @Column(name = "expiry_date_time", nullable = false)
+  private Timestamp expiryDateTime;
 
   @Column(name = "created_at", nullable = false, updatable = false)
   private Timestamp createdAt;
@@ -53,11 +53,11 @@ public class Verification {
    *
    * @param account user account
    * @param code verification code
-   * @param expiryDate date of code expiry
+   * @param expiryDateTime date of code expiry
    */
-  public Verification(Account account, int code, Timestamp expiryDate) {
+  public Verification(Account account, int code, Timestamp expiryDateTime) {
     this.account = account;
     this.code = code;
-    this.expiryDate = expiryDate;
+    this.expiryDateTime = expiryDateTime;
   }
 }

@@ -60,7 +60,7 @@ public class VerificationService {
     Optional<Verification> verification =
         verificationRepository.findByAccount_AccountIdAndCode(accountId, code);
     if (verification.isPresent()
-        && verification.get().getExpiryDate().after(Timestamp.valueOf(LocalDateTime.now()))) {
+        && verification.get().getExpiryDateTime().after(Timestamp.valueOf(LocalDateTime.now()))) {
       return verification;
     }
     return Optional.empty();

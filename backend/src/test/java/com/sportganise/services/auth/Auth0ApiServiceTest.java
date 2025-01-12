@@ -7,7 +7,7 @@ import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
-import com.sportganise.repositories.AccountRepository;
+import com.sportganise.exceptions.AccountNotFoundException;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ public class Auth0ApiServiceTest {
 
   @Spy @InjectMocks private Auth0ApiService auth0ApiService;
 
-  @Mock private AccountRepository accountRepository;
+  @Mock private AccountService accountService;
   private Auth0AccountDto auth0AccountDto;
 
   @BeforeEach
@@ -80,12 +80,12 @@ public class Auth0ApiServiceTest {
   }
 
   @Test
-  public void changePasswordWithOldPassword_shouldCallChangePassword() {
+  public void changePasswordWithOldPassword_shouldCallChangePassword()
+      throws AccountNotFoundException {
     String newPassword = "newPassword!123";
     Account mockAccount = mock(Account.class);
 
-    when(accountRepository.findByEmail(auth0AccountDto.getEmail()))
-        .thenReturn(java.util.Optional.of(mockAccount));
+    when(accountService.getAccountByEmail(auth0AccountDto.getEmail())).thenReturn(mockAccount);
     when(mockAccount.getAuth0Id()).thenReturn("mockAuth0Id");
 
     doReturn(true).when(auth0ApiService).verifyPassword(eq(auth0AccountDto)); // Use eq() here

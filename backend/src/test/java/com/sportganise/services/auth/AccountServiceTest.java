@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,7 +98,7 @@ public class AccountServiceTest {
   }
 
   @Test
-  public void resetPassword_shouldReturnSuccessMessage() {
+  public void resetPassword_shouldReturnSuccessMessage() throws AccountNotFoundException {
     String email = "userx@example.com";
     String newPassword = "newPassword!123";
     Account mockAccount = new Account();
@@ -125,7 +126,7 @@ public class AccountServiceTest {
 
     Exception exception =
         assertThrows(
-            RuntimeException.class,
+            AccountNotFoundException.class,
             () -> {
               accountService.resetPassword(email, newPassword);
             });
@@ -136,7 +137,7 @@ public class AccountServiceTest {
   }
 
   @Test
-  public void modifyPassword_shouldReturnSuccessMessage() {
+  public void modifyPassword_shouldReturnSuccessMessage() throws AccountNotFoundException {
     String email = "userx@example.com";
     String oldPassword = "oldPassword!123";
     String newPassword = "newPassword!123";

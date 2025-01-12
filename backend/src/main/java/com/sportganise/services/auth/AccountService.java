@@ -3,6 +3,7 @@ package com.sportganise.services.auth;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
 import java.util.Optional;
@@ -80,11 +81,9 @@ public class AccountService {
    * @param newPassword new password to be set
    * @return Map containing the response
    */
-  public Map<String, Object> resetPassword(String email, String newPassword) {
-    Account account =
-        accountRepository
-            .findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Account not found"));
+  public Map<String, Object> resetPassword(String email, String newPassword)
+      throws AccountNotFoundException {
+    Account account = getAccountByEmail(email);
     String auth0Id = account.getAuth0Id();
     return auth0ApiService.changePassword(auth0Id, newPassword);
   }
@@ -97,7 +96,8 @@ public class AccountService {
    * @param newPassword new password
    * @return Map containing the response
    */
-  public Map<String, Object> modifyPassword(String email, String oldPassword, String newPassword) {
+  public Map<String, Object> modifyPassword(String email, String oldPassword, String newPassword)
+      throws AccountNotFoundException {
     Auth0AccountDto auth0Account = new Auth0AccountDto(email, oldPassword, null);
 
     return auth0ApiService.changePasswordWithOldPassword(auth0Account, newPassword);
@@ -109,9 +109,9 @@ public class AccountService {
    * @param email email of the account
    * @return Account object
    */
-  public Account getAccountByEmail(String email) {
+  public Account getAccountByEmail(String email) throws AccountNotFoundException {
     return accountRepository
         .findByEmail(email)
-        .orElseThrow(() -> new RuntimeException("Account not found"));
+        .orElseThrow(() -> new AccountNotFoundException("Account not found"));
   }
 }

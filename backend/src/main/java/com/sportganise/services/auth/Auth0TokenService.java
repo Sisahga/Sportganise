@@ -17,7 +17,7 @@ public class Auth0TokenService {
   @Value("${auth0.domain}")
   private String auth0Domain;
 
-  @Value("${auth0.clientid}")
+  @Value("${auth0.client-id}")
   private String auth0ClientId;
 
   @Value("${auth0.client-secret}")

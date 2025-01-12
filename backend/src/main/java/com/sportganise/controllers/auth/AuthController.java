@@ -5,6 +5,7 @@ import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Verification;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.auth.AccountService;
 import com.sportganise.services.auth.EmailService;
 import com.sportganise.services.auth.VerificationService;
@@ -114,8 +115,8 @@ public class AuthController {
    * @return ResponseEntity containing the response message.
    */
   @PostMapping("/send-code")
-  public ResponseEntity<ResponseDto<String>> sendCode(
-      @RequestBody Map<String, String> requestBody) {
+  public ResponseEntity<ResponseDto<String>> sendCode(@RequestBody Map<String, String> requestBody)
+      throws AccountNotFoundException {
     ResponseDto<String> responseDto = new ResponseDto<>();
     String email = requestBody.get("email");
     Account account = accountService.getAccountByEmail(email);
@@ -136,7 +137,7 @@ public class AuthController {
    */
   @PostMapping("/verify-code")
   public ResponseEntity<ResponseDto<String>> validateCode(
-      @RequestBody Map<String, String> requestBody) {
+      @RequestBody Map<String, String> requestBody) throws AccountNotFoundException {
     ResponseDto<String> responseDto = new ResponseDto<>();
     String email = requestBody.get("email");
     responseDto.setData(email);

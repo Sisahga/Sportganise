@@ -30,7 +30,7 @@ CREATE TABLE verification (
     verification_id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     code INTEGER NOT NULL,
-    expiry_date TIMESTAMP NOT NULL,
+    expiry_date_time TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
