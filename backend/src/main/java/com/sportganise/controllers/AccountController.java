@@ -4,10 +4,10 @@ import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.auth.AccountService;
-
 import jakarta.validation.Valid;
-
+import java.io.IOException;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +16,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
- * REST Controller for managing 'Account' Entities. Handles HTTP request and routes them to
- * appropriate services.
+ * REST Controller for managing 'Account' Entities.
+ *
+ * <p>Handles HTTP request and routes them to appropriate services.
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/account")
 public class AccountController {
@@ -41,10 +45,11 @@ public class AccountController {
 
   /**
    * Updates an accounts public-facing fields, except for the profile picture.
-   * 
+   *
    * @param id ID of the account.
    * @param body The updated fields of the account.
-   * @return The status of the update, 204 No Content for successful updates and an error code otherwise.
+   * @return The status of the update, 204 No Content for successful updates and an error code
+   *     otherwise.
    */
   @PutMapping("/{accountId}")
   public ResponseEntity<Void> updateAccount(
@@ -57,5 +62,28 @@ public class AccountController {
     }
 
     return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Updates the profile picture of an account.
+   *
+   * @param accountId ID of the account.
+   * @param file The picture blob.
+   * @return The URL of the updated picture if successful,
+   */
+  @PutMapping("/{accountId}/picture")
+  public ResponseEntity<String> updateAccountPicture(
+      @PathVariable Integer accountId, @RequestParam("file") MultipartFile file) {
+
+    try {
+      this.accountService.updateAccountPicture(accountId, file);
+    } catch (ResourceNotFoundException e) {
+      return new ResponseEntity<>("Failed to find user with ID " + accountId, HttpStatus.NOT_FOUND);
+    } catch (IOException e) {
+      return new ResponseEntity<>(
+          "Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return ResponseEntity.ok().build();
   }
 }

@@ -6,8 +6,12 @@ import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.services.BlobService;
+import java.io.IOException;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Implementation of AccountService. */
 @Service
@@ -15,10 +19,16 @@ public class AccountService {
 
   private final AccountRepository accountRepository;
   private final Auth0ApiService auth0ApiService;
+  private BlobService blobService;
 
-  public AccountService(AccountRepository accountRepository, Auth0ApiService auth0ApiService) {
+  @Autowired
+  public AccountService(
+      AccountRepository accountRepository,
+      Auth0ApiService auth0ApiService,
+      BlobService blobService) {
     this.accountRepository = accountRepository;
     this.auth0ApiService = auth0ApiService;
+    this.blobService = blobService;
   }
 
   /**
@@ -73,6 +83,32 @@ public class AccountService {
     if (updatedAccount.getEmail() != null) previousAccount.setEmail(updatedAccount.getEmail());
 
     accountRepository.save(previousAccount);
+  }
+
+  /**
+   * Updates the picture URL of an account.
+   *
+   * @param accountId ID of the account.
+   * @param url URL of the picture.
+   * @throws IOException
+   */
+  // TODO: clean-up unreferenced profile pictures from storage
+  public void updateAccountPicture(Integer accountId, MultipartFile file)
+      throws ResourceNotFoundException, IOException {
+
+    // Validate account exists
+    Account account =
+        accountRepository
+            .findById(accountId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Failed to find account with id " + accountId));
+
+    // Upload file to data store
+    String url = blobService.uploadFile(file);
+
+    // Update account entity with new picture URL
+    account.setPictureUrl(url);
+    accountRepository.save(account);
   }
 
   /**
