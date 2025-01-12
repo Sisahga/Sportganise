@@ -4,6 +4,9 @@ import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.auth.AccountService;
+
+import jakarta.validation.Valid;
+
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,9 +39,16 @@ public class AccountController {
     return new ResponseEntity<>(this.accountService.getAccount(id), HttpStatus.OK);
   }
 
+  /**
+   * Updates an accounts public-facing fields, except for the profile picture.
+   * 
+   * @param id ID of the account.
+   * @param body The updated fields of the account.
+   * @return The status of the update, 204 No Content for successful updates and an error code otherwise.
+   */
   @PutMapping("/{id}")
   public ResponseEntity<Void> updateAccount(
-      @PathVariable Integer id, @RequestBody UpdateAccountDto body) {
+      @PathVariable Integer id, @RequestBody @Valid UpdateAccountDto body) {
 
     try {
       this.accountService.updateAccount(id, body);
@@ -46,6 +56,6 @@ public class AccountController {
       return ResponseEntity.notFound().build();
     }
 
-    return ResponseEntity.ok().build();
+    return ResponseEntity.noContent().build();
   }
 }
