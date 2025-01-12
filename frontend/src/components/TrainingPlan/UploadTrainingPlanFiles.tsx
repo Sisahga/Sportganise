@@ -20,6 +20,7 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
+import { toast, useToast } from "@/hooks/use-toast";
 
 import { CloudUpload, Paperclip } from "lucide-react";
 
@@ -33,9 +34,11 @@ const formSchema = z.object({
 });
 
 export default function UploadTrainingPlanFiles() {
-  const [files, setFiles] = useState<File[] | null>([]);
+  const accountId = "";
+  const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>("");
+  const [files, setFiles] = useState<File[] | null>([]);
 
   const dropZoneConfig = {
     maxFiles: 5,
@@ -48,8 +51,21 @@ export default function UploadTrainingPlanFiles() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-    } catch (error) {
+      const response = await fetch(`/${accountId}/upload-trainingplans`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", //If sending JSON
+        },
+        body: JSON.stringify(values, null, 2), //stringify form values in JSON format and send through url
+      });
+    } catch (err) {
+      console.log("UploadFile form error: ", err);
       setError("An error occured! The files could not be uploaded.");
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong ✖",
+        description: error,
+      });
     } finally {
       setLoading(false);
     }
