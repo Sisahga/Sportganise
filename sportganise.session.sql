@@ -1,0 +1,1 @@
+SELECT * FROM program_participants

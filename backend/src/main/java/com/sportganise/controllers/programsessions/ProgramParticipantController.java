@@ -33,23 +33,23 @@ public class ProgramParticipantController {
     }
 
     @PatchMapping("/opt-participant")
-    public ResponseEntity<ProgramParticipantDto> optProgramParticipant(
+    public ResponseEntity<Integer> optProgramParticipant(
             @RequestParam Integer programId,
             @RequestParam Integer accountId) {
 
-        ProgramParticipantDto participant = waitlistService.optProgramParticipantDto(programId, accountId);
-        return ResponseEntity.ok(participant);
+        Integer rank = waitlistService.optProgramParticipantDto(programId, accountId);
+        return ResponseEntity.ok(rank);
     }
 
-    // @PatchMapping("/confirm-participant")
-    // public ResponseEntity<String> updateConfirmationStatus(
-    //         @RequestParam Integer programId,
-    //         @RequestParam Integer accountId) {
+    @PatchMapping("/confirm-participant")
+    public ResponseEntity<ProgramParticipantDto> updateConfirmationStatus(
+            @RequestParam Integer programId,
+            @RequestParam Integer accountId) {
 
-    //     // Update the participant's confirmation status
-    //     programService.confirmParticipant(programId, accountId);
-    //     return ResponseEntity.ok("Success!");
-    // }
+        // Update the participant's confirmation status
+        ProgramParticipantDto confirmedParticipant = waitlistService.confirmParticipant(programId, accountId);
+        return ResponseEntity.ok(confirmedParticipant);
+    }
 
     // @DeleteMapping("/delete-participant")
     // public ResponseEntity<String> removeParticipant(

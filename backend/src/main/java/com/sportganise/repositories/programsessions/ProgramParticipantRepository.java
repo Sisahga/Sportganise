@@ -20,27 +20,13 @@ import org.springframework.stereotype.Repository;
 public interface ProgramParticipantRepository extends JpaRepository<ProgramParticipant, Integer> {
 
         // @Modifying
-        // @Transactional
-        // @Query("INSERT INTO ProgramParticipant (program_id, account_id, type,
-        // is_confirmed, confirm_date) " +
-        // "VALUES (:programId, :accountId, :type, :isConfirmed, :confirmDate)")
-        // int addParticipant(
+        // @Query("UPDATE ProgramParticipant pp SET pp.isConfirmed = :status " +
+        // "WHERE pp.programParticipantId.programId = :programId " +
+        // "AND pp.programParticipantId.accountId = :accountId")
+        // void updateConfirmationStatus(
+        // @Param("status") String status,W
         // @Param("programId") Integer programId,
-        // @Param("accountId") Integer accountId,
-        // @Param("type") String type,
-        // @Param("isConfirmed") Boolean isConfirmed,
-        // @Param("confirmDate") LocalDateTime confirmDate);
-
-        // @Modifying
-        // @Transactional
-        // @Query("UPDATE ProgramParticipant pp SET pp.isConfirmed = :isConfirmed,
-        // pp.confirmedDate = :confirmedDate " +
-        // "WHERE pp.programId = :programId AND pp.accountId = :accountId")
-        // int updateConfirmationStatus(
-        // @Param("programId") Integer programId,
-        // @Param("accountId") Integer accountId,
-        // @Param("isConfirmed") Boolean isConfirmed,
-        // @Param("confirmedDate") LocalDateTime confirmedDate);
+        // @Param("accountId") Integer accountId);
 
         // @Modifying
         // @Transactional
@@ -73,5 +59,18 @@ public interface ProgramParticipantRepository extends JpaRepository<ProgramParti
                         "WHERE pp.programParticipantId.programId = :programId " +
                         "AND pp.isConfirmed = FALSE")
         Integer findMaxRank(@Param("programId") Integer programId);
+
+        @Modifying
+        @Transactional
+        @Query("UPDATE ProgramParticipant pp " +
+                        "SET pp.rank = pp.rank - 1 " +
+                        "WHERE pp.programParticipantId.programId = :programId " +
+                        "AND pp.isConfirmed = FALSE " +
+                        "AND pp.rank > (SELECT p.rank FROM ProgramParticipant p " +
+                        "               WHERE p.programParticipantId.programId = :programId " +
+                        "               AND p.isConfirmed = FALSE " +
+                        "               AND p.programParticipantId.accountId = :accountId)")
+        void updateRanks(@Param("programId") Integer programId,
+                        @Param("accountId") Integer accountId);
 
 }

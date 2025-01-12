@@ -10,7 +10,7 @@ INSERT INTO account (type, email, auth0_id, address, phone, first_name, last_nam
 ('coach', 'coach@example.com', 'auth0|6743f68ef0ab0e76ba3d7cea', '456 Boulevard Marino', '333-333-3333', 'Walter', 'White'),
 ('general', 'subscribed@example.com', 'auth0|6743f6ab1b370b4f20d286f0', '789 70e Papino', '444-444-4444', 'Jesse', 'Pinkman'),
 ('general', 'waitlist@example.com', 'auth0|6743f6b2f0ab0e76ba3d7cee', '79 Rue Marie', '555-555-5555', 'Saul', 'Goodman'),
-('general', 'general@example.com', 'auth0|6743f6b91b370b4f20d286f1', '780 Rue Totoz', '666-666-6666', 'Skylar', 'White');
+('general', 'waitlist-2@example.com', 'auth0|6743f6b91b370b4f20d286f1', '780 Rue Totoz', '666-666-6666', 'Skylar', 'White');
 
 INSERT INTO label (org_id,name) VALUES
 ( 1,'SundayGroup'),
@@ -32,7 +32,8 @@ INSERT INTO blocklist (account_id, blocked_id) VALUES
 INSERT INTO label_account (label_id, account_id, role) VALUES
 (1,3, 'Subscribed'),
 (1,2,'Coach'),
-(1,4,'Waitlisted');
+(1,4,'Waitlisted'),
+(1,5,'Waitlisted');
 
 INSERT INTO organization_sport (org_id, sport_id) VALUES
 (1, 2),
@@ -49,7 +50,8 @@ INSERT INTO account_organization (org_id, account_id) VALUES
 
 INSERT INTO program_participants (program_id, account_id, type, is_confirmed, confirm_date) VALUES
 (1, 3, 'Player', TRUE, '2024-06-20 10:30:00'),
-(1, 4, 'Player', FALSE, null);
+(1, 4, 'Player', FALSE, null),
+(1, 5, 'Player', FALSE, null);
 
 
 INSERT INTO label_program (label_id, program_id, type) VALUES

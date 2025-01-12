@@ -14,6 +14,7 @@ import lombok.Setter;
 public class ProgramParticipantDto {
   private Integer accountId;
   private Integer programId;
+  private Integer rank;
   private boolean isConfirmed;
   private LocalDateTime confirmedDate;
 }

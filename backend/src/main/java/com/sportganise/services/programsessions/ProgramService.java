@@ -76,6 +76,7 @@ public class ProgramService {
                     return new ProgramParticipantDto(
                             account.getAccountId(),
                             programId,
+                            participant.getRank(),
                             participant.isConfirmed(),
                             participant.getConfirmedDate());
                 })
