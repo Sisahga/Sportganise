@@ -4,7 +4,7 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
-import com.sportganise.entities.Verification;
+import com.sportganise.entities.account.Verification;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.account.auth.EmailService;
