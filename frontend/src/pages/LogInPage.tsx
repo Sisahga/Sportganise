@@ -1,9 +1,12 @@
-import { LogIn } from "@/components/LogIn";
+import React from "react";
+import { LogIn } from "../components/LogIn/index";
 
-export default function LogInPage() {
+const LogInPage: React.FC = () => {
   return (
-    <div className="">
+    <div className="flex flex-col min-h-screen">
       <LogIn />
     </div>
   );
-}
+};
+
+export default LogInPage;
