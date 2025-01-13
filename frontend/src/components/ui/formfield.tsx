@@ -27,7 +27,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
       inputProps,
       onChange,
     },
-    ref
+    ref,
   ) => (
     <div className={`flex flex-col space-y-1.5 ${className}`}>
       <Label htmlFor={id} className="text-sm font-medium">
@@ -45,7 +45,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
         {...inputProps}
       />
     </div>
-  )
+  ),
 );
 
 FormField.displayName = "FormField";
