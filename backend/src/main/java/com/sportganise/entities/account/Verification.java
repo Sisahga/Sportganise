@@ -1,4 +1,4 @@
-package com.sportganise.entities;
+package com.sportganise.entities.account;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -7,14 +7,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sportganise.dto.auth.AccountDto;
-import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.Account;
-import com.sportganise.entities.Address;
-import com.sportganise.entities.Verification;
-import com.sportganise.services.auth.AccountService;
-import com.sportganise.services.auth.EmailService;
-import com.sportganise.services.auth.VerificationService;
+import com.sportganise.controllers.account.auth.AuthController;
+import com.sportganise.dto.account.auth.AccountDto;
+import com.sportganise.dto.account.auth.Auth0AccountDto;
+import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.Address;
+import com.sportganise.entities.account.Verification;
+import com.sportganise.services.account.AccountService;
+import com.sportganise.services.account.auth.EmailService;
+import com.sportganise.services.account.auth.VerificationService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;

@@ -4,13 +4,13 @@
 //
 // import com.sportganise.dto.programsessions.ProgramDto;
 // import com.sportganise.dto.programsessions.ProgramParticipantDto;
-// import com.sportganise.entities.Account;
+// import com.sportganise.entities.account.Account;
 // import com.sportganise.entities.programsessions.Program;
 // import com.sportganise.entities.programsessions.ProgramParticipant;
 // import com.sportganise.entities.programsessions.ProgramParticipantCompositeKey;
 // import com.sportganise.repositories.AccountRepository;
 // import com.sportganise.repositories.programsessions.ProgramRepository;
-// import com.sportganise.services.auth.AccountService;
+// import com.sportganise.services.account.AccountService;
 // import jakarta.persistence.EntityNotFoundException;
 // import java.time.LocalDateTime;
 // import java.util.List;
