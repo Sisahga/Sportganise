@@ -520,6 +520,7 @@ export default function CreateTrainingSessionForm() {
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="Weekly">Weekly</SelectItem>
+                    <SelectItem value="nonRecurring">Does not recur</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormDescription>
