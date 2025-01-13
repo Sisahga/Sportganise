@@ -1,11 +1,64 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { FormField } from "@/components/ui/formfield";
 import logo from "../../assets/Logo.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast"; // Import the toast hook
+import { ToastAction } from "@radix-ui/react-toast";
 
 export default function LogIn() {
+  const navigate = useNavigate();
+  const { toast } = useToast(); // Access the toast function
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Handle login submission
+  const handleLogIn = async () => {
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.status === 200) {
+        // Redirect on successful login
+        navigate("/");
+      } else {
+        // Show error message on invalid credentials
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: result.message || "Email or password is incorrect.",
+          action: <ToastAction altText="Try again">Try again</ToastAction>,
+        });
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      // Show toast notification for unexpected errors
+      toast({
+        variant: "destructive",
+        title: "Something went wrong",
+        description: "An unexpected error occurred. Please try again.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+    }
+  };
   return (
-    <div className="flex flex-col items-center justify center min-h-screen bg-white pt-10">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-white pt-10">
       <img
         src={logo}
         alt="Logo"
@@ -17,22 +70,32 @@ export default function LogIn() {
       <Card className="mt-6 w-4/5 max-w-[400px] p-1">
         <CardContent>
           <form className="grid gap-4 mt-5">
-            <FormField id="Email" label="Email" placeholder="Email" />
+            <FormField
+              id="Email"
+              label="Email"
+              placeholder="Email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+            />
             <FormField
               id="Password"
               label="Password"
               placeholder="Password"
+              name="password"
               inputProps={{ type: "password" }}
+              value={formData.password}
+              onChange={handleInputChange}
             />
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-          <Link
+          <button
             className="w-full text-white bg-primaryColour py-2 md:py-3 rounded-lg flex items-center justify-center text-sm md:text-base"
-            to="/" 
+            onClick={handleLogIn}
           >
             Log In
-          </Link>
+          </button>
         </CardFooter>
         <p
           id="helper-text-explanation"
