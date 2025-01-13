@@ -1,4 +1,4 @@
-package com.sportganise.services.auth;
+package com.sportganise.services.account.auth;
 
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;

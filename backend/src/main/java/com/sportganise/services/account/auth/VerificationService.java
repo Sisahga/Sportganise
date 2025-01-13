@@ -1,4 +1,4 @@
-package com.sportganise.services.auth;
+package com.sportganise.services.account.auth;
 
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Verification;

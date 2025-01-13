@@ -7,7 +7,7 @@
 // import com.sportganise.entities.programsessions.ProgramParticipant;
 // import com.sportganise.repositories.AccountRepository;
 // import com.sportganise.repositories.programsessions.ProgramRepository;
-// import com.sportganise.services.auth.AccountService;
+// import com.sportganise.services.account.AccountService;
 // import jakarta.persistence.EntityNotFoundException;
 // import java.time.LocalDateTime;
 // import java.time.LocalTime;

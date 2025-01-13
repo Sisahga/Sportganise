@@ -14,7 +14,7 @@ import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
-import com.sportganise.services.auth.AccountService;
+import com.sportganise.services.account.AccountService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
