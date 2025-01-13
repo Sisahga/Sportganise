@@ -104,8 +104,7 @@ public class DirectMessageService {
             Collectors.toMap(
                 row -> (Integer) row[0], // Key is the member id.
                 row ->
-                    new MemberDetailsDto(
-                        (String) row[2], (String) row[1]) // firstName, pictureBlob.
+                    new MemberDetailsDto((String) row[2], (String) row[1]) // firstName, pictureUrl.
                 ));
   }
 
