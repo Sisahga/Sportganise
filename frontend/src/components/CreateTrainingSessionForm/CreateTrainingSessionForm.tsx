@@ -42,6 +42,13 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "../ui/select";
 
 import {
   MoveLeft,
@@ -57,7 +64,8 @@ const formSchema = z
   .object({
     title: z.string(),
     type: z.string(),
-    durationMins: z.number(),
+    //durationMins: z.number(),
+    frequency: z.string(),
     occurenceDate: z.coerce.date(),
     expiryDate: z.coerce.date(),
     recurring: z.boolean().default(false),
@@ -465,6 +473,61 @@ export default function CreateTrainingSessionForm() {
             />
           </div>
 
+          {/**Frequency */}
+          <FormField
+            control={form.control}
+            name="frequency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-semibold text-base">
+                  Frequency
+                </FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select recurrence " />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Weekly">Weekly</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormDescription>
+                  Select when these events will recur.{" "}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/** Recurring */}
+          <FormField
+            control={form.control}
+            name="recurring"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="font-semibold">
+                    Recurring event
+                  </FormLabel>
+                  <FormDescription>
+                    The event recurs on the start day and at the times entered.
+                  </FormDescription>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
           {/** Location */}
           <FormField
             control={form.control}
@@ -529,31 +592,6 @@ export default function CreateTrainingSessionForm() {
                   organization.
                 </FormDescription>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** Recurring */}
-          <FormField
-            control={form.control}
-            name="recurring"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="font-semibold">
-                    Recurring event
-                  </FormLabel>
-                  <FormDescription>
-                    The event recurs on the day and at the times entered.
-                  </FormDescription>
-                  <FormMessage />
-                </div>
               </FormItem>
             )}
           />
