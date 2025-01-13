@@ -1,4 +1,4 @@
-package com.sportganise.services.auth;
+package com.sportganise.services.account.auth;
 
 import java.util.HashMap;
 import java.util.Map;

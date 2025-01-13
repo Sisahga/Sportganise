@@ -1,6 +1,6 @@
-package com.sportganise.dto.auth;
+package com.sportganise.dto.account.auth;
 
-import com.sportganise.entities.Address;
+import com.sportganise.entities.account.Address;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

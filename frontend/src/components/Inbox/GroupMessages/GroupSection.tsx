@@ -1,4 +1,4 @@
-import ChannelItem from "../DirectMessagesDashboard/ChannelItem.tsx";
+import MessagingDashboardChannelItem from "../DirectMessagesDashboard/MessagingDashboardChannelItem.tsx";
 import { GroupSectionProps } from "@/types/dmchannels.ts";
 import { Dot } from "lucide-react";
 
@@ -12,7 +12,7 @@ function GroupSection({ groupChannels }: GroupSectionProps) {
           </div>
           <div className="flex mt-4 gap-2 overflow-x-scroll">
             {groupChannels.map((channel) => (
-              <ChannelItem
+              <MessagingDashboardChannelItem
                 key={channel.channelId}
                 channel={channel}
                 layout="vertical"
