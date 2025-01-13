@@ -109,12 +109,24 @@ const formSchema = z
     }
   )
   .refine(
-    (data) => !(data.frequency == "Weekly" && data.isRecurring == false),
+    (data) => !(data.frequency == "Weekly" && data.isRecurring === false),
     {
       message: "Event cannot be non-recurring if event is set to weekly.",
       path: ["isRecurring"],
     }
   );
+/*
+  .refine((data) => data.isRecurring == false && data.frequency == null, {
+    message: "If event is non recurring than there cannot be a frequency.",
+    path: ["isRecurring"],
+  });
+  */
+/*
+  .refine((data) => !(data.isRecurring === true && data.frequency === ""), {
+    message: "Specify frequency if event is recurring.",
+    path: ["frequency"],
+  })
+  */
 
 //PAGE CONTENT -----------------------------------------------------------------------------------------------------------
 export default function CreateTrainingSessionForm() {
@@ -127,22 +139,22 @@ export default function CreateTrainingSessionForm() {
   const types = [
     {
       label: "Training Session",
-      value: "training-session",
+      value: "Training",
     },
     {
       label: "Fundraisor",
-      value: "fundraisor",
+      value: "Fundraisor",
     },
   ] as const;
   //Options for visibility select
   const visibilities = [
     {
       label: "Public",
-      value: "public",
+      value: "Public",
     },
     {
       label: "Members only",
-      value: "members",
+      value: "Members",
     },
   ] as const;
   //Options for location select
@@ -154,6 +166,14 @@ export default function CreateTrainingSessionForm() {
     {
       label: "Collège de Maisonnneuve",
       value: "Collège-de-Maisonnneuve",
+    },
+    {
+      label: "123 test water rd.",
+      value: "123 test water rd.",
+    },
+    {
+      label: "123 Main St",
+      value: "123 Main St",
     },
   ] as const;
 
@@ -491,7 +511,7 @@ export default function CreateTrainingSessionForm() {
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  //defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
