@@ -1,7 +1,11 @@
 import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.tsx";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar.tsx";
 import { Search, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Player } from "@/types/player.ts";

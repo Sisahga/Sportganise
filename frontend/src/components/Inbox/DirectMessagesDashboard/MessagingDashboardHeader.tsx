@@ -25,8 +25,12 @@ const MessagingDashboardHeader = () => {
 
       {/* Add New Message Button */}
       <button className="p-2 rounded-full bg-secondaryColour shadow-md">
-         <Plus className="text-white" strokeWidth={4} size={20}
-              onClick={() => navigate("/pages/CreateFirstDmPage")} />
+        <Plus
+          className="text-white"
+          strokeWidth={4}
+          size={20}
+          onClick={() => navigate("/pages/CreateFirstDmPage")}
+        />
       </button>
     </header>
   );
