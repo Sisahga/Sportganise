@@ -63,6 +63,12 @@ export default function HeaderNav() {
               >
                 Log In
               </Link>
+              <Link
+                to="/forgotpassword"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+              >
+                Forgot Password
+              </Link>
             </nav>
           </DrawerContent>
         </Drawer>

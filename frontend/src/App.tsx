@@ -12,6 +12,7 @@ import CreateFirstDmPage from "./pages/CreateFirstDmPage";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
 import LogInPage from "./pages/LogInPage";
 import SignUpPage from "./pages/SignUpPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
 import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
@@ -59,6 +60,7 @@ function App() {
           <Route path="/login" element={<LogInPage />}></Route>
           <Route path="/signup" element={<SignUpPage />}></Route>
           <Route path="/verificationcode" element={<VerificationCodePage />} />
+          <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
           <Route
             path="/pages/ViewTrainingSessionPage"
             element={<ViewTrainingSessionPage />}
