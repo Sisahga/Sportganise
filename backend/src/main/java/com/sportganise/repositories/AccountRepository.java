@@ -1,5 +1,6 @@
 package com.sportganise.repositories;
 
+import com.sportganise.dto.DirectMessagingAccountDetails;
 import com.sportganise.entities.Account;
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +32,13 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
   @Query("SELECT firstName FROM Account WHERE accountId = :accountId")
   String getFirstNameByAccountId(int accountId);
+
+  @Query("""
+         SELECT a.accountId, a.firstName, a.lastName, a.pictureUrl
+         FROM Account a
+         JOIN AccountOrganization ao ON a.accountId = ao.compositeKey.accountId
+         WHERE ao.compositeKey.organizationId = :organizationId
+          AND a.type <> 'ADMIN'
+        """)
+  List<DirectMessagingAccountDetails> getAllNonAdminAccountsByOrganization(int organizationId);
 }

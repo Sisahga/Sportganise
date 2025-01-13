@@ -1,0 +1,20 @@
+package com.sportganise.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+/**
+ * DTO for Direct Messaging Account Details (used in search in create channel).
+ */
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class DirectMessagingAccountDetails {
+  private int accountId;
+  private String firstName;
+  private String lastName;
+  private String pictureUrl;
+}
