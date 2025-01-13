@@ -57,6 +57,7 @@ import {
   CloudUpload,
   Paperclip,
 } from "lucide-react";
+import { useEffect } from "react";
 
 //GLOBAL --------------------------------------------------------------------------------------------------------------
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
@@ -110,6 +111,16 @@ const formSchema = z
   )
   .refine(
     (data) => !(data.frequency == "Weekly" && data.isRecurring === false),
+    {
+      message: "Event cannot be non-recurring if event is set to weekly.",
+      path: ["isRecurring"],
+    }
+  )
+  .refine(
+    (data) =>
+      data.frequency === "nonRecurring" &&
+      data.isRecurring === false &&
+      data.occurenceDate.getDate() === data.expiryDate.getDate(),
     {
       message: "Event cannot be non-recurring if event is set to weekly.",
       path: ["isRecurring"],
@@ -754,8 +765,8 @@ export default function CreateTrainingSessionForm() {
                   <FileUploader
                     value={files}
                     onValueChange={(newFiles) => {
-                      setFiles(newFiles); // Update local state
-                      field.onChange(newFiles); // Sync with React Hook Form
+                      setFiles(newFiles); //update local state
+                      field.onChange(newFiles); //synch with React Hook Form
                     }}
                     dropzoneOptions={dropZoneConfig}
                     className="relative bg-background rounded-lg p-2"
