@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.Account;
+import com.sportganise.entities.Address;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
@@ -64,7 +65,14 @@ public class ProgramServiceTest {
             .firstName("John")
             .lastName("Doe")
             .email("john.doe@example.com")
-            .address("123 Main St")
+            .address(
+                Address.builder()
+                    .line("123 Main St")
+                    .city("Springfield")
+                    .province("IL")
+                    .country("USA")
+                    .postalCode("62704")
+                    .build())
             .phone("555-555-5555")
             .build();
 
@@ -75,7 +83,14 @@ public class ProgramServiceTest {
             .firstName("Jane")
             .lastName("Smith")
             .email("jane.smith@example.com")
-            .address("456 Random St")
+            .address(
+                Address.builder()
+                    .line("456 Random St")
+                    .city("Springfield")
+                    .province("IL")
+                    .country("USA")
+                    .postalCode("62704")
+                    .build())
             .phone("222-222-2222")
             .build();
 
