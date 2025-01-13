@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.entities.Address;
 import com.sportganise.entities.Verification;
 import com.sportganise.services.auth.AccountService;
 import com.sportganise.services.auth.EmailService;
@@ -52,7 +53,14 @@ public class AuthControllerTest {
     accountDto.setFirstName("John");
     accountDto.setLastName("Doe");
     accountDto.setPhone("555-555-5555");
-    accountDto.setAddress("maisonneuve");
+    accountDto.setAddress(
+        Address.builder()
+            .line("123 Something St")
+            .city("Montreal")
+            .province("Quebec")
+            .country("Canada")
+            .postalCode("H1I 2J3")
+            .build());
     accountDto.setType("general");
 
     auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
