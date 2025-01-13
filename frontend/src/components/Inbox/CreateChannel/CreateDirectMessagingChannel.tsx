@@ -1,17 +1,10 @@
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/Button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input.tsx";
+import { Button } from "@/components/ui/Button.tsx";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.tsx";
 import { Search, ArrowLeft } from "lucide-react";
 import { useState } from "react";
-
-//using mock players for now
-type Player = {
-  id: number;
-  name: string;
-  username: string;
-  avatar: string;
-};
+import { Player } from "@/types/player.ts";
 
 const mockPlayers: Player[] = [
   {
@@ -46,7 +39,7 @@ const mockPlayers: Player[] = [
   },
 ];
 
-export default function CreateFirstDmContent() {
+export default function CreateDirectMessagingChannel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
