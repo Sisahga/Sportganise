@@ -7,7 +7,7 @@ interface FormFieldProps {
   label: string;
   placeholder: string;
   className?: string;
-  name?: string; 
+  name?: string;
   value?: string;
   type?: string;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
@@ -15,7 +15,20 @@ interface FormFieldProps {
 }
 
 const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
-  ({ id, label, placeholder, className = "", name, value, type = "text", inputProps, onChange }, ref) => (
+  (
+    {
+      id,
+      label,
+      placeholder,
+      className = "",
+      name,
+      value,
+      type = "text",
+      inputProps,
+      onChange,
+    },
+    ref
+  ) => (
     <div className={`flex flex-col space-y-1.5 ${className}`}>
       <Label htmlFor={id} className="text-sm font-medium">
         {label}
@@ -32,7 +45,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
         {...inputProps}
       />
     </div>
-  ),
+  )
 );
 
 FormField.displayName = "FormField";
