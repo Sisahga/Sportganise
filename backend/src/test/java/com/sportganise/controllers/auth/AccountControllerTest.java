@@ -1,12 +1,19 @@
-package com.sportganise.controllers;
+package com.sportganise.controllers.auth;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.sportganise.controllers.AccountController;
+import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.entities.Address;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.auth.AccountService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,16 +42,22 @@ class AccountControllerTest {
   @BeforeEach
   public void setup() {
     account =
-        new Account(
-            1,
-            "PLAYER",
-            "test@example.com",
-            "auth0_id",
-            "124 test st.",
-            "5146662272",
-            "John",
-            "Doe",
-            null);
+        Account.builder()
+            .accountId(1)
+            .type("PLAYER")
+            .email("test@example.com")
+            .phone("5146662272")
+            .firstName("John")
+            .lastName("Doe")
+            .address(
+                Address.builder()
+                    .line("124 test st.")
+                    .city("Paris")
+                    .province("Idontknow")
+                    .country("France")
+                    .postalCode("12312334")
+                    .build())
+            .build();
   }
 
   @Test
@@ -68,9 +81,44 @@ class AccountControllerTest {
         .andExpect(jsonPath("$.type", is(account.getType())))
         .andExpect(jsonPath("$.email", is(account.getEmail())))
         .andExpect(jsonPath("$.auth0Id", is(account.getAuth0Id())))
-        .andExpect(jsonPath("$.address", is(account.getAddress())))
+        .andExpect(jsonPath("$.address.line", is(account.getAddress().getLine())))
+        .andExpect(jsonPath("$.address.city", is(account.getAddress().getCity())))
+        .andExpect(jsonPath("$.address.province", is(account.getAddress().getProvince())))
+        .andExpect(jsonPath("$.address.country", is(account.getAddress().getCountry())))
+        .andExpect(jsonPath("$.address.postalCode", is(account.getAddress().getPostalCode())))
         .andExpect(jsonPath("$.phone", is(account.getPhone())))
         .andExpect(jsonPath("$.firstName", is(account.getFirstName())))
         .andExpect(jsonPath("$.lastName", is(account.getLastName())));
+  }
+
+  @Test
+  public void updateAccountTest_NotFound() throws Exception {
+    int accountId = 2;
+    String requestBody = "{}";
+
+    doThrow(new AccountNotFoundException("Account not found"))
+        .when(accountService)
+        .updateAccount(anyInt(), any(UpdateAccountDto.class));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+        .andExpect((status().isNotFound()));
+  }
+
+  @Test
+  public void updateAccountTest_Success() throws Exception {
+
+    int accountId = 3;
+    String requestBody = "{}";
+
+    mockMvc
+        .perform(
+            (MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody)))
+        .andExpect((status().isNoContent()));
   }
 }

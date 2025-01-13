@@ -5,21 +5,30 @@ INSERT INTO organization (name, type, description) VALUES
 ('BasketTeam', 'Private', 'Team Basket');
 
 -- All passwords are password!123
-INSERT INTO account (type, email, auth0_id, address, phone, first_name, last_name, picture) VALUES
+INSERT INTO account (
+    type, email, auth0_id,
+    address_line, address_city, address_province, address_country, address_postal_code,
+    phone, first_name, last_name,
+    picture) VALUES
 ('admin', 'admin@example.com', 'auth0|6743f6a0f0ab0e76ba3d7ceb',
- '123 Rue Tarantino', '222-222-2222', 'Gustavo', 'Fring',
+ '123 Rue Tarantino', 'Montreal', 'Quebec', 'Canada', 'H1H 2H3',
+ '222-222-2222', 'Gustavo', 'Fring',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/gus_fring_avatar.png'),
 ('coach', 'coach@example.com', 'auth0|6743f68ef0ab0e76ba3d7cea',
- '456 Boulevard Marino', '333-333-3333', 'Walter', 'White',
+ '456 Boulevard Marino', 'Laval', 'Quebec', 'Canada', 'H1I 1J1',
+ '333-333-3333', 'Walter', 'White',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg'),
 ('general', 'subscribed@example.com', 'auth0|6743f6ab1b370b4f20d286f0',
- '789 70e Papino', '444-444-4444', 'Jesse', 'Pinkman',
+ '789 70e Papino', 'New York', 'New York', 'United States', '90210-1234',
+ '444-444-4444', 'Jesse', 'Pinkman',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/jesse_pinkman_avatar.jpg'),
 ('general', 'waitlist@example.com', 'auth0|6743f6b2f0ab0e76ba3d7cee',
- '79 Rue Marie', '555-555-5555', 'Saul', 'Goodman',
+ '79 Rue Marie', 'Paris', 'France', 'France', '123-12345',
+ '555-555-5555', 'Saul', 'Goodman',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/saul_goodman_avatar.png'),
 ('general', 'general@example.com', 'auth0|6743f6b91b370b4f20d286f1',
- '780 Rue Totoz', '666-666-6666', 'Skylar', 'White',
+ '780 Rue Totoz', 'Montréal', 'Québec', 'Canada', 'H0H 0H0',
+ '666-666-6666', 'Skylar', 'White',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/skylar_white_avatar.jpg');
 
 INSERT INTO label (org_id,name) VALUES
@@ -104,7 +113,11 @@ UPDATE channel SET last_message_id = 6 WHERE channel_id = 4;
 INSERT INTO post (account_id, title, description) VALUES
 (1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!'),
 (2, 'Sunday Training',
- 'This week we did usual intensive training. Please Let me know if you have questions.');
+ 'This week we did usual intensive training. Please Let me know if you have questions.'),(3, 'Hackathon Announcement', 'Sign up for the upcoming hackathon event, solve challenges, and win prizes.'),
+(1, 'Training Class for Beginners', 'We offer beginner-friendly sessions exlusive.'),
+(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.'),
+(2, 'Weekly Tennis Challenge', 'Participate in our tennis challenge and win a high-five.'),
+(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.');
 
 INSERT INTO feedback (post_id, account_id, content) VALUES
 (1, 2, 'Are cats aloud??'),

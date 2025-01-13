@@ -1,5 +1,6 @@
 package com.sportganise.dto.auth;
 
+import com.sportganise.entities.Address;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,8 @@ public class AccountDto {
   @NotNull private String password;
 
   private String phone;
-  private String address;
   private String firstName;
   private String lastName;
+
+  private Address address;
 }

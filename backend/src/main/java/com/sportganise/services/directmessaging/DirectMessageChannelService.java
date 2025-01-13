@@ -131,7 +131,7 @@ public class DirectMessageChannelService {
                 dmChannel.getChannelId(), accountId);
         log.info("Other member id: {}", otherMemberId);
         dmChannel.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
-        dmChannel.setChannelImageBlob(accountRepository.getPictureBlobByAccountId(otherMemberId));
+        dmChannel.setChannelImageBlob(accountRepository.getPictureUrlByAccountId(otherMemberId));
       }
     }
     return dmChannels;
