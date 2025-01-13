@@ -2,7 +2,7 @@ package com.sportganise.controllers.account;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.UpdateAccountDto;
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
 import jakarta.validation.Valid;
@@ -90,8 +90,9 @@ public class AccountController {
   }
 
   @GetMapping("/get-all-users/{organizationId}")
-  public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(@PathVariable int organizationId) {
-    return new ResponseEntity<>(this.accountService.
-            getAllNonAdminAccountsByOrganizationId(organizationId), HttpStatus.OK);
+  public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(
+      @PathVariable int organizationId) {
+    return new ResponseEntity<>(
+        this.accountService.getAllNonAdminAccountsByOrganizationId(organizationId), HttpStatus.OK);
   }
 }

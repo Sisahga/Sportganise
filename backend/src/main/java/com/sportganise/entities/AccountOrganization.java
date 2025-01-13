@@ -8,9 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entity Model for the relationship between accounts an organizations table.
- */
+/** Entity Model for the relationship between accounts an organizations table. */
 @Getter
 @Setter
 @AllArgsConstructor

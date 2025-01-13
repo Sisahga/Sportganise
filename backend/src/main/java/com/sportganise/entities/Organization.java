@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Entity class for 'Organization' table.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,6 +23,7 @@ public class Organization {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "org_id")
   private int orgId;
+
   private String name;
   private String type;
   private String description;

@@ -3,14 +3,12 @@ package com.sportganise.services.account.auth;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import com.sportganise.entities.Verification;
 import com.sportganise.repositories.VerificationRepository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import com.sportganise.services.account.auth.VerificationService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

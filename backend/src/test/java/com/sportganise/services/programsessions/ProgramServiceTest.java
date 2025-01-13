@@ -4,7 +4,7 @@
 //
 // import com.sportganise.dto.programsessions.ProgramDto;
 // import com.sportganise.dto.programsessions.ProgramParticipantDto;
-// import com.sportganise.entities.Account;
+// import com.sportganise.entities.account.Account;
 // import com.sportganise.entities.programsessions.Program;
 // import com.sportganise.entities.programsessions.ProgramParticipant;
 // import com.sportganise.entities.programsessions.ProgramParticipantCompositeKey;

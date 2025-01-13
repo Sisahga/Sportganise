@@ -1,7 +1,7 @@
 package com.sportganise.services.account.auth;
 
 import com.sportganise.dto.account.auth.Auth0AccountDto;
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Map;

@@ -13,16 +13,14 @@ import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
-import com.sportganise.entities.Account;
-import com.sportganise.entities.Address;
+import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
-
+import com.sportganise.services.account.auth.Auth0ApiService;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import com.sportganise.services.account.auth.Auth0ApiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -249,22 +247,26 @@ public class AccountServiceTest {
     int organizationId = 1;
 
     // Prepare mock data
-    List<AccountDetailsDirectMessaging> mockAccounts = List.of(
-            new AccountDetailsDirectMessaging(1, "John", "Doe", "user1@example.com", "555-5555", "PLAYER"),
-            new AccountDetailsDirectMessaging(2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER")
-    );
+    List<AccountDetailsDirectMessaging> mockAccounts =
+        List.of(
+            new AccountDetailsDirectMessaging(
+                1, "John", "Doe", "user1@example.com", "555-5555", "PLAYER"),
+            new AccountDetailsDirectMessaging(
+                2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER"));
 
     // Mock the repository call
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId)).willReturn(mockAccounts);
+    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+        .willReturn(mockAccounts);
 
     // Call the service method
-    List<AccountDetailsDirectMessaging> result = accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+    List<AccountDetailsDirectMessaging> result =
+        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
 
     // Assertions
     assertNotNull(result);
-    assertEquals(2, result.size());  // Verify that the returned list has the correct size
-    assertEquals("John", result.get(0).getFirstName());  // Check first account data
-    assertEquals("Jane", result.get(1).getFirstName());  // Check second account data
+    assertEquals(2, result.size()); // Verify that the returned list has the correct size
+    assertEquals("John", result.get(0).getFirstName()); // Check first account data
+    assertEquals("Jane", result.get(1).getFirstName()); // Check second account data
 
     // Verify that the repository was called exactly once
     verify(accountRepository, times(1)).getAllNonAdminAccountsByOrganization(organizationId);
@@ -275,10 +277,12 @@ public class AccountServiceTest {
     int organizationId = 1;
 
     // Mock the repository to return an empty list
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId)).willReturn(List.of());
+    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+        .willReturn(List.of());
 
     // Call the service method
-    List<AccountDetailsDirectMessaging> result = accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+    List<AccountDetailsDirectMessaging> result =
+        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
 
     // Assertions
     assertNotNull(result);

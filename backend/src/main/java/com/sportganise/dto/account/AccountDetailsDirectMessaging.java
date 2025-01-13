@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * DTO for Direct Messaging Account Details (used in search in create channel).
- */
+/** DTO for Direct Messaging Account Details (used in search in create channel). */
 @Getter
 @Setter
 @NoArgsConstructor

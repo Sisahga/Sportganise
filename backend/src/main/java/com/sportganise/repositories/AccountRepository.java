@@ -1,7 +1,7 @@
 package com.sportganise.repositories;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,8 +33,10 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
   @Query("SELECT firstName FROM Account WHERE accountId = :accountId")
   String getFirstNameByAccountId(int accountId);
 
-  @Query("""
-         SELECT a.accountId, a.firstName, a.lastName, a.pictureUrl, a.type, a.phone
+  @Query(
+      """
+         SELECT new com.sportganise.dto.account.AccountDetailsDirectMessaging(
+                 a.accountId, a.firstName, a.lastName, a.pictureUrl, a.type, a.phone)
          FROM Account a
          JOIN AccountOrganization ao ON a.accountId = ao.compositeKey.accountId
          WHERE ao.compositeKey.organizationId = :organizationId

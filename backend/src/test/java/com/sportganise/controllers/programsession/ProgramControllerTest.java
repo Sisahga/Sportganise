@@ -8,7 +8,7 @@
 // import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 // import com.sportganise.dto.programsessions.ProgramDto;
 // import com.sportganise.dto.programsessions.ProgramParticipantDto;
-// import com.sportganise.entities.Account;
+// import com.sportganise.entities.account.Account;
 // import com.sportganise.services.account.AccountService;
 // import com.sportganise.services.programsessions.ProgramService;
 // import java.time.LocalDateTime;
