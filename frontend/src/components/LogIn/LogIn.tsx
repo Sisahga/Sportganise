@@ -101,7 +101,7 @@ export default function LogIn() {
           id="helper-text-explanation"
           className="my-2 ml-6 text-xs md:text-sm text-black"
         >
-          Don't have an account?
+          Don&#39;t have an account?
           <Link
             className="ml-2 text-secondaryColour font-bold underline p-0 bg-white border-none hover:bg-transparent"
             to="/signup"
