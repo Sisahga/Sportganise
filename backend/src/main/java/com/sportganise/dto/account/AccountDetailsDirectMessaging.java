@@ -12,9 +12,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DirectMessagingAccountDetails {
+public class AccountDetailsDirectMessaging {
   private int accountId;
   private String firstName;
   private String lastName;
   private String pictureUrl;
+  private String type;
+  private String phone;
 }
