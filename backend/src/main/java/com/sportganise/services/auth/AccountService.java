@@ -21,7 +21,7 @@ public class AccountService {
 
   private final AccountRepository accountRepository;
   private final Auth0ApiService auth0ApiService;
-  private BlobService blobService;
+  private final BlobService blobService;
 
   /**
    * Constructor for account service.
