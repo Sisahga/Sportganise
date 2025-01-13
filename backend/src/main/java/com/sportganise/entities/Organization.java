@@ -21,6 +21,7 @@ import lombok.Setter;
 public class Organization {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "org_id")
   private Integer orgId;
 
