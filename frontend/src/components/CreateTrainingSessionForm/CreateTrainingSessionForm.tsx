@@ -68,7 +68,7 @@ const formSchema = z
     frequency: z.string(),
     occurenceDate: z.coerce.date(),
     expiryDate: z.coerce.date(),
-    recurring: z.boolean().default(false),
+    isRecurring: z.boolean().default(false),
     visibility: z.string(),
     description: z.string(),
     attachment: z
@@ -100,12 +100,19 @@ const formSchema = z
     (data) =>
       !(
         data.occurenceDate.getDate() === data.expiryDate.getDate() &&
-        data.recurring
+        data.isRecurring
       ),
     {
       message:
         "Event start and end dates are the same and therefore cannot reccur.",
-      path: ["recurring"],
+      path: ["isRecurring"],
+    }
+  )
+  .refine(
+    (data) => !(data.frequency == "Weekly" && data.isRecurring == false),
+    {
+      message: "Event cannot be non-recurring if event is set to weekly.",
+      path: ["isRecurring"],
     }
   );
 
@@ -506,7 +513,7 @@ export default function CreateTrainingSessionForm() {
           {/** Recurring */}
           <FormField
             control={form.control}
-            name="recurring"
+            name="isRecurring"
             render={({ field }) => (
               <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                 <FormControl>
