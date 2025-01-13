@@ -1,4 +1,4 @@
-package com.sportganise.controllers;
+package com.sportganise.controllers.account;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.UpdateAccountDto;

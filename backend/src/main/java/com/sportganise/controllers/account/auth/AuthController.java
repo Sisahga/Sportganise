@@ -1,4 +1,4 @@
-package com.sportganise.controllers.auth;
+package com.sportganise.controllers.account.auth;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.account.auth.AccountDto;

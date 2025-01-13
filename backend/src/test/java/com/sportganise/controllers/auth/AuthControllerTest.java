@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sportganise.controllers.account.auth.AuthController;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
