@@ -1,14 +1,16 @@
 package com.sportganise.services.account;
 
-import com.sportganise.dto.accounts.UpdateAccountDto;
-import com.sportganise.dto.auth.AccountDto;
-import com.sportganise.dto.auth.Auth0AccountDto;
+import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.UpdateAccountDto;
+import com.sportganise.dto.account.auth.AccountDto;
+import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -214,5 +216,10 @@ public class AccountService {
     return accountRepository
         .findByEmail(email)
         .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+  }
+
+  public List<AccountDetailsDirectMessaging> getAllNonAdminAccountsByOrganizationId(
+      int organizationId) {
+    return accountRepository.getAllNonAdminAccountsByOrganization(organizationId);
   }
 }

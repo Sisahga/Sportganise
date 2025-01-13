@@ -1,11 +1,13 @@
 package com.sportganise.controllers;
 
+import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,5 +87,11 @@ public class AccountController {
     }
 
     return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/get-all-users/{organizationId}")
+  public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(@PathVariable int organizationId) {
+    return new ResponseEntity<>(this.accountService.
+            getAllNonAdminAccountsByOrganizationId(organizationId), HttpStatus.OK);
   }
 }
