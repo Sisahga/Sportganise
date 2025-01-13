@@ -64,9 +64,9 @@ const formSchema = z
   .object({
     title: z.string(),
     type: z.string(),
-    //durationMins: z.number(),
+    durationMins: z.number().min(0),
     frequency: z.string(),
-    occurenceDate: z.coerce.date(),
+    occurenceDate: z.date(),
     expiryDate: z.coerce.date(),
     isRecurring: z.boolean().default(false),
     visibility: z.string(),
@@ -499,6 +499,34 @@ export default function CreateTrainingSessionForm() {
               )}
             />
           </div>
+
+          <FormField
+            control={form.control}
+            name="durationMins"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="font-semibold text-base">
+                  Event Duration
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Duration in minutes"
+                    type="number"
+                    {...field}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? Number(e.target.value) : undefined
+                      )
+                    }
+                  />
+                </FormControl>
+                <FormDescription>
+                  Duration of the event in minutes.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/**Frequency */}
           <FormField
