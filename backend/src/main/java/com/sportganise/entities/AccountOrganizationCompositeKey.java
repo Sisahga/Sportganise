@@ -9,9 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Composite key for the AccountOrganization entity, containg account id and org id.
- */
+/** Composite key for the AccountOrganization entity, containg account id and org id. */
 @Getter
 @Setter
 @NoArgsConstructor
