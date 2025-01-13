@@ -1,14 +1,17 @@
-package com.sportganise.services.auth;
+package com.sportganise.services.account;
 
-import com.sportganise.dto.accounts.UpdateAccountDto;
-import com.sportganise.dto.auth.AccountDto;
-import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.Account;
-import com.sportganise.entities.Address;
+import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.UpdateAccountDto;
+import com.sportganise.dto.account.auth.AccountDto;
+import com.sportganise.dto.account.auth.Auth0AccountDto;
+import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
+import com.sportganise.services.account.auth.Auth0ApiService;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,7 @@ public class AccountService {
 
   private final AccountRepository accountRepository;
   private final Auth0ApiService auth0ApiService;
-  private BlobService blobService;
+  private final BlobService blobService;
 
   /**
    * Constructor for account service.
@@ -212,5 +215,10 @@ public class AccountService {
     return accountRepository
         .findByEmail(email)
         .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+  }
+
+  public List<AccountDetailsDirectMessaging> getAllNonAdminAccountsByOrganizationId(
+      int organizationId) {
+    return accountRepository.getAllNonAdminAccountsByOrganization(organizationId);
   }
 }
