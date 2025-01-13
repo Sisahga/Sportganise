@@ -14,7 +14,7 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
 
   const formatSentAt = (
     sentAt: string,
-    timeZone: string = "America/New_York",
+    timeZone: string = "America/New_York"
   ) => {
     const date = parseISO(sentAt);
     const zonedDate = toZonedTime(date, timeZone);
@@ -36,10 +36,10 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
           index === 0 || // Always show the timestamp for the first message
           differenceInMinutes(
             parseISO(message.sentAt),
-            parseISO(messages[index - 1]?.sentAt),
+            parseISO(messages[index - 1]?.sentAt)
           ) > 15;
         return (
-          <div key={message.messageId} className="mb-4">
+          <div key={index} className="mb-4">
             {/* Timestamp */}
             {showTimestamp && (
               <div className="text-xs text-gray-500 text-center mb-2">
