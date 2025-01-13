@@ -1,4 +1,4 @@
-package com.sportganise.services.auth;
+package com.sportganise.services.account.auth;
 
 import static org.mockito.Mockito.*;
 

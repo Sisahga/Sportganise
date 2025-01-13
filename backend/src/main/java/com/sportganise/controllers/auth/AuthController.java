@@ -1,8 +1,8 @@
 package com.sportganise.controllers.auth;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.auth.AccountDto;
-import com.sportganise.dto.auth.Auth0AccountDto;
+import com.sportganise.dto.account.auth.AccountDto;
+import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Verification;
 import com.sportganise.exceptions.AccountNotFoundException;

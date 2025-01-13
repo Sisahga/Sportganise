@@ -1,4 +1,4 @@
-package com.sportganise.dto.auth;
+package com.sportganise.dto.account.auth;
 
 import com.sportganise.entities.Address;
 import jakarta.validation.constraints.Email;
