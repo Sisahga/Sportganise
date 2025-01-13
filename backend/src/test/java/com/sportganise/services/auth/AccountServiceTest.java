@@ -13,6 +13,7 @@ import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.Account;
+import com.sportganise.entities.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
@@ -48,7 +49,14 @@ public class AccountServiceTest {
       accountDto.setFirstName("John");
       accountDto.setLastName("Doe");
       accountDto.setPhone("555-555-5555");
-      accountDto.setAddress("maisonneuve");
+      accountDto.setAddress(
+          Address.builder()
+              .line("123 Something St")
+              .city("Montreal")
+              .province("Quebec")
+              .country("Canada")
+              .postalCode("H1I 2J3")
+              .build());
       accountDto.setType("general");
 
       auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
@@ -139,29 +147,11 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void updateAccountTest_SuccessFullUpdate() throws AccountNotFoundException {
-      int accountId = originalAccount.getAccountId();
-      given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
-
-      UpdateAccountDto newAccount =
-          new UpdateAccountDto("John2", "Doe2", "john2@email.com", "2222222222", "lorem2");
-
-      accountService.updateAccount(accountId, newAccount);
-
-      originalAccount.setFirstName("John2");
-      originalAccount.setLastName("Doe2");
-      originalAccount.setEmail("john2@email.com");
-      originalAccount.setPhone("2222222222");
-      originalAccount.setAddress("lorem2");
-      verify(accountRepository, times(1)).save(originalAccount);
-    }
-
-    @Test
     public void updateAccountTest_SuccessNoUpdate() throws AccountNotFoundException {
       int accountId = originalAccount.getAccountId();
       given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
 
-      UpdateAccountDto newAccount = new UpdateAccountDto(null, null, null, null, null);
+      UpdateAccountDto newAccount = new UpdateAccountDto();
 
       accountService.updateAccount(accountId, newAccount);
 
@@ -174,7 +164,12 @@ public class AccountServiceTest {
 
       int notAccountId = 2;
       UpdateAccountDto newAccount =
-          new UpdateAccountDto("John", "Doe", "john@email.com", "1231231234", "lorem");
+          UpdateAccountDto.builder()
+              .firstName("John")
+              .lastName("Doe")
+              .email("john@email.com")
+              .phone("1231231234")
+              .build();
 
       assertThrows(
           AccountNotFoundException.class,

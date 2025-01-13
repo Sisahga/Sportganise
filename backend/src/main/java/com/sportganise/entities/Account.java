@@ -1,6 +1,7 @@
 package com.sportganise.entities;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,7 +34,6 @@ public class Account {
   @Column(name = "auth0_id")
   private String auth0Id;
 
-  private String address;
   private String phone;
 
   @Column(name = "first_name")
@@ -44,4 +44,6 @@ public class Account {
 
   @Column(name = "picture")
   private String pictureUrl;
+
+  @Embedded private Address address;
 }
