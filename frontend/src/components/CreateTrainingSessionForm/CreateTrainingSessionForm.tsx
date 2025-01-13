@@ -57,6 +57,7 @@ const formSchema = z
   .object({
     title: z.string(),
     type: z.string(),
+    durationMins: z.number(),
     occurenceDate: z.coerce.date(),
     expiryDate: z.coerce.date(),
     recurring: z.boolean().default(false),
@@ -71,7 +72,6 @@ const formSchema = z
       )
       .optional(),
     capacity: z.number().min(0),
-    notify: z.boolean().default(false),
     startTime: z
       .string()
       .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
@@ -242,7 +242,7 @@ export default function CreateTrainingSessionForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto pt-10"
+          className="space-y-8 max-w-3xl mx-auto pt-10 pb-32"
         >
           {/*Form Title*/}
           <div>
@@ -725,38 +725,6 @@ export default function CreateTrainingSessionForm() {
               </FormItem>
             )}
           />
-
-          {/** Notify All Players */}
-          <div>
-            <FormField
-              control={form.control}
-              name="notify"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel className="font-semibold">
-                      Notify all players
-                    </FormLabel>
-                    <FormDescription>
-                      Notifies all subscribed members.
-                    </FormDescription>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <div className="mt-2">
-              <a href="../" className=" underline text-neutral-400">
-                Customize attendance list
-              </a>
-            </div>
-          </div>
 
           {/** Submit Button */}
           <Button type="submit" className="w-full font-semibold">
