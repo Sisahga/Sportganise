@@ -1,6 +1,6 @@
 package com.sportganise.controllers;
 
-import com.sportganise.dto.accounts.UpdateAccountDto;
+import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;

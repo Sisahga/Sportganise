@@ -10,7 +10,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.sportganise.controllers.AccountController;
-import com.sportganise.dto.accounts.UpdateAccountDto;
+import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.Account;
 import com.sportganise.entities.Address;
 import com.sportganise.exceptions.AccountNotFoundException;

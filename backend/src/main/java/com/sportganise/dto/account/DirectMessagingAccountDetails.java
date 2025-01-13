@@ -1,4 +1,4 @@
-package com.sportganise.dto;
+package com.sportganise.dto.account;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

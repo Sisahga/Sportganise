@@ -1,6 +1,6 @@
 package com.sportganise.repositories;
 
-import com.sportganise.dto.DirectMessagingAccountDetails;
+import com.sportganise.dto.account.DirectMessagingAccountDetails;
 import com.sportganise.entities.Account;
 import java.util.List;
 import java.util.Optional;
