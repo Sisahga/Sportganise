@@ -10,7 +10,7 @@ const MessagingDashboardHeader = () => {
       <Button
         variant="ghost"
         className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
       >
         <ArrowLeft
           className="text-gray-800"
