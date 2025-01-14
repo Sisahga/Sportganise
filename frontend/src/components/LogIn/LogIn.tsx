@@ -46,14 +46,14 @@ export default function LogIn() {
     }
 
     console.log("Calling loginUser with:", formData); // Debug
-  loginUser(formData).catch((err) => {
-    console.error("Login error:", err); // Debug: Log error
-    toast({
-      variant: "destructive",
-      title: "Login Failed",
-      description: err.message || "An unexpected error occurred.",
+    loginUser(formData).catch((err) => {
+      console.error("Login error:", err); // Debug: Log error
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: err.message || "An unexpected error occurred.",
+      });
     });
-  });
   };
 
   // Handle login success or error
@@ -113,10 +113,10 @@ export default function LogIn() {
             </button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
+        <CardFooter className="flex flex-col justify-center">
           <p
             id="helper-text-explanation"
-            className="my-2 ml-6 text-xs md:text-sm text-black"
+            className="my-2 text-xs md:text-sm text-black"
           >
             Don&#39;t have an account?
             <Link
@@ -126,12 +126,9 @@ export default function LogIn() {
               Sign Up
             </Link>
           </p>
-          <Link
-            className="ml-6 mb-6 text-primaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent"
-            to="/"
-          >
-            Forgot password?
-          </Link>
+          <p className="mt-2 mb-6 text-primaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent">
+            <Link to="/">Forgot password?</Link>
+          </p>
         </CardFooter>
       </Card>
     </div>
