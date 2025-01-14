@@ -1,3 +1,7 @@
+// for managing the login process :
+// provides state management for handling the login API call, including loading state,
+// error handling, and storing the response.
+
 import { useState } from "react";
 import { login } from "@/services/api/authService";
 import { LoginRequest, LoginResponse } from "@/types/auth";
@@ -15,7 +19,7 @@ export const useLogin = () => {
       const response = await login(requestData);
       setData(response);
     } catch (err) {
-      setError((err as Error).message);
+      setError((err as Error).message || "An unexpected error occurred.");
     } finally {
       setIsLoading(false);
     }
