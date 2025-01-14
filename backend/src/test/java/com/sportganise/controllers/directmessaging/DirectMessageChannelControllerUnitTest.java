@@ -47,32 +47,67 @@ class DirectMessageChannelControllerUnitTest {
   }
 
   @Test
-  public void createDirectMessageChannelTest() throws Exception {
+  public void createDirectMessageChannelTest_NewChannel() throws Exception {
+    // Set createdAt to simulate a new channel
+    createDmChannelDTO.setCreatedAt(String.valueOf(ZonedDateTime.now()));
+
     ResponseDto<CreateDirectMessageChannelDto> responseDto =
-        new ResponseDto<>(201, "Channel created successfully", createDmChannelDTO);
+            new ResponseDto<>(201, "Channel created successfully", createDmChannelDTO);
 
     given(
             dmChannelService.createDirectMessageChannel(
-                createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1))
-        .willReturn(createDmChannelDTO);
+                    createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1))
+            .willReturn(createDmChannelDTO);
 
     mockMvc
-        .perform(
-            MockMvcRequestBuilders.post("/api/messaging/channel/create-channel/1")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(createDmChannelDTO)))
-        .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
-        .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
-        .andExpect(jsonPath("$.data.channelName", is(createDmChannelDTO.getChannelName())))
-        .andExpect(jsonPath("$.data.channelType", is(createDmChannelDTO.getChannelType())))
-        .andExpect(jsonPath("$.data.memberIds", is(createDmChannelDTO.getMemberIds())))
-        .andExpect(jsonPath("$.data.memberIds.length()").value(2))
-        .andReturn();
+            .perform(
+                    MockMvcRequestBuilders.post("/api/messaging/channel/create-channel/1")
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsString(createDmChannelDTO)))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+            .andExpect(jsonPath("$.data.channelName", is(createDmChannelDTO.getChannelName())))
+            .andExpect(jsonPath("$.data.channelType", is(createDmChannelDTO.getChannelType())))
+            .andExpect(jsonPath("$.data.memberIds", is(createDmChannelDTO.getMemberIds())))
+            .andExpect(jsonPath("$.data.memberIds.length()").value(2))
+            .andReturn();
 
     verify(dmChannelService, times(1))
-        .createDirectMessageChannel(
-            createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1);
+            .createDirectMessageChannel(
+                    createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1);
+  }
+
+  @Test
+  public void createDirectMessageChannelTest_ExistingChannel() throws Exception {
+    // Set createdAt to null to simulate an existing channel
+    createDmChannelDTO.setCreatedAt(null);
+
+    ResponseDto<CreateDirectMessageChannelDto> responseDto =
+            new ResponseDto<>(302, "Channel with theses members already exists", createDmChannelDTO);
+
+    given(
+            dmChannelService.createDirectMessageChannel(
+                    createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1))
+            .willReturn(createDmChannelDTO);
+
+    mockMvc
+            .perform(
+                    MockMvcRequestBuilders.post("/api/messaging/channel/create-channel/1")
+                            .contentType("application/json")
+                            .content(objectMapper.writeValueAsString(createDmChannelDTO)))
+            .andExpect(status().isFound())
+            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+            .andExpect(jsonPath("$.data.channelName", is(createDmChannelDTO.getChannelName())))
+            .andExpect(jsonPath("$.data.channelType", is(createDmChannelDTO.getChannelType())))
+            .andExpect(jsonPath("$.data.memberIds", is(createDmChannelDTO.getMemberIds())))
+            .andExpect(jsonPath("$.data.memberIds.length()").value(2))
+            .andReturn();
+
+    verify(dmChannelService, times(1))
+            .createDirectMessageChannel(
+                    createDmChannelDTO.getMemberIds(), createDmChannelDTO.getChannelName(), 1);
   }
 
   @Test
