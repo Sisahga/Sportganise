@@ -18,10 +18,27 @@ export default function LogIn() {
 
   // Helper function to validate password constraints
   const validatePassword = (password: string): boolean => {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*])(?=.{8,})/;
-    const isValid = passwordRegex.test(password);
-    console.log("Password Validation:", isValid); // Debug: Check validation result
-    return isValid;
+    const hasMinLength = password.length >= 8; // Check if password has at least 8 characters
+    const hasUpperCase = /[A-Z]/.test(password); // Check if password has an uppercase letter
+    const hasLowerCase = /[a-z]/.test(password); // Check if password has a lowercase letter
+    const hasSpecialChar = /[!@#$%^&*]/.test(password); // Check if password has a special character
+
+    // Count how many conditions are met
+    const conditionsMet = [
+      hasMinLength,
+      hasUpperCase,
+      hasLowerCase,
+      hasSpecialChar,
+    ].filter(Boolean).length;
+
+    console.log("Password Validation Conditions:", {
+      hasMinLength,
+      hasUpperCase,
+      hasLowerCase,
+      hasSpecialChar,
+    }); // Debug: Log results
+
+    return conditionsMet >= 3; // Return true if at least 3 conditions are met
   };
 
   // Handle form input changes
@@ -51,12 +68,12 @@ export default function LogIn() {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: err.message || "An unexpected error occurred.",
+        description: "Invalid Credentials",
       });
     });
   };
 
-  // Handle login success or error
+  // Handle login success or error by listening to changes in data
   useEffect(() => {
     if (data?.statusCode === 200) {
       console.log("Login successful, redirecting..."); // Debug
@@ -69,7 +86,7 @@ export default function LogIn() {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: error,
+        description: "Invalid Credentials",
       });
     }
   }, [data, error, navigate, toast]);
