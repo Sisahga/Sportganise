@@ -6,101 +6,123 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar.tsx";
-import { Search, ArrowLeft } from "lucide-react";
+import {Search, ArrowLeft, Check} from "lucide-react";
 import { useState } from "react";
-import { Player } from "@/types/player.ts";
-
-const mockPlayers: Player[] = [
-  {
-    id: 1,
-    name: "test case1",
-    username: "@tc1",
-    avatar: "/placeholder.svg",
-  },
-  {
-    id: 2,
-    name: "test case2",
-    username: "@tc2",
-    avatar: "/placeholder.svg",
-  },
-  {
-    id: 3,
-    name: "test case3",
-    username: "@tc3",
-    avatar: "/placeholder.svg",
-  },
-  {
-    id: 4,
-    name: "john doe",
-    username: "@johndoe",
-    avatar: "/placeholder.svg",
-  },
-  {
-    id: 5,
-    name: "john smith",
-    username: "@johnsmith",
-    avatar: "/placeholder.svg",
-  },
-];
+import useAccountDetailsDirectMessaging from "@/hooks/useAccountDetailsDirectMessaging.tsx";
+import {AccountDetailsDirectMessaging} from "@/types/account.ts";
+import {useNavigate} from "react-router-dom";
+import useCreateChannel from "@/hooks/useCreateChannel.tsx";
+import {CreateChannelDto} from "@/types/dmchannels.ts";
 
 export default function CreateDirectMessagingChannel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  const navigate = useNavigate();
+  const organizationId = 1; // TODO: Replace with actual organization ID from cookies
+  const userId = 2; // TODO: Replace with actual user ID from cookies
+  const [selectedUsers, setSelectedUsers] = useState<AccountDetailsDirectMessaging[]>([]);
+  const currentUser = {
+    accountId: 2,
+    firstName: "Walter",
+    lastName: "White",
+    pictureUrl: "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+    type: "COACH",
+    phone: "333-333-3333",
+    selected: true
+  }
 
-  // fetch all users from the backend
-  // useEffect(() => {
-  //   const fetchPlayers = async () => {
-  //     try {
-  //       const response = await fetch("/api/..."); // Replace with your API endpoint
-  //       if (!response.ok) {
-  //         throw new Error("Failed to fetch players");
-  //       }
-  //       const data: Player[] = await response.json();
-  //       setPlayers(data);
-  //     } catch (error) {
-  //       console.error("Error fetching users:", error);
-  //     }
-  //   };
+  // Fetch all users from the backend
+  const { users } = useAccountDetailsDirectMessaging(organizationId);
 
-  //   fetchPlayers();
-  // }, []);
-  // will need to replace mock data with real data once API endpoint created.
+  // Use Create Channel hook
+  const { createChannel } = useCreateChannel();
 
-  //updates user search to be more specific by letter as they type player's name
-  const filteredPlayers = mockPlayers.filter((player: Player) =>
-    player.name.toLowerCase().startsWith(searchQuery.toLowerCase()),
-  );
+  // Updates user search to be more specific by letter as they type player's name
+  const filteredUsers = users.filter((user: AccountDetailsDirectMessaging) => {
+    if (searchQuery.length === 0) {
+      return false;
+    }
+    if (user.accountId === userId) {
+      return false;
+    }
+    return user.firstName.toLowerCase().startsWith(searchQuery.toLowerCase())
+        || user.lastName.toLowerCase().startsWith(searchQuery.toLowerCase());
+  });
 
-  //user can also select more than one user when creating a msg at first
-  const togglePlayerSelection = (player: Player) => {
-    setSelectedPlayers((prevSelected) => {
-      if (prevSelected.some((p) => p.id === player.id)) {
-        return prevSelected.filter((p) => p.id !== player.id);
+  // User can also select more than one user when creating a msg at first
+  const toggleUserSelection = (user: AccountDetailsDirectMessaging) => {
+    setSelectedUsers((prevSelected) => {
+      if (prevSelected.some((u) => u.accountId === user.accountId)) {
+        user.selected = false;
+        return prevSelected.filter((u) => u.accountId !== user.accountId);
       } else {
-        return [...prevSelected, player];
+        user.selected = true;
+        return [...prevSelected, user];
       }
     });
   };
 
+  const handleCreateChannel = async () => {
+    selectedUsers.push(currentUser);
+    const selectedUserIds = selectedUsers.map((user) => user.accountId);
+    const channelName = ""; // TODO: Add option for user to name the channel if more than 2 members.
+    const channelType = selectedUserIds.length > 2 ? "GROUP" : "SIMPLE";
+    const newChannelDetails: CreateChannelDto = {
+      channelId: null,
+      channelName: channelName,
+      channelType: channelType,
+      memberIds: selectedUserIds,
+      createdAt: new Date().toISOString(),
+      avatarUrl: null,
+    }
+    console.log("New Channel Details:", newChannelDetails);
+    const channelResponse = await createChannel(newChannelDetails, userId);
+    console.log("Channel Response:", channelResponse);
+    if (channelResponse?.statusCode === 201) {
+      navigate("/pages/DirectMessageChannelPage", {
+        state: {
+          channelId: channelResponse?.data?.channelId,
+          channelName: channelResponse.data?.channelName,
+          channelType: channelResponse.data?.channelType,
+          channelImageBlob: channelResponse.data?.avatarUrl,
+          read: true,
+        },
+      });
+    } else if (channelResponse?.statusCode === 302) {
+      navigate("/pages/DirectMessageChannelPage", {
+        state: {
+          channelId: channelResponse?.data?.channelId,
+          channelName: channelResponse.data?.channelName,
+          channelType: channelResponse.data?.channelType,
+          channelImageBlob: channelResponse.data?.avatarUrl,
+          read: false,
+        },
+      });
+    } else {
+      console.error("Error creating channel:", channelResponse);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* header for the messages page, different from main layout */}
-      <header className="flex items-center justify-between px-4 py-3 bg-white shadow">
-        <div className="flex-1 flex items-center">
-          <Button
+      <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-6">
+        {/* Back Button */}
+        <Button
             variant="ghost"
             className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-          >
-            <ArrowLeft className="text-gray-800" size={24} />
-          </Button>
-        </div>
-        <div className="flex-1 flex justify-center">
-          <h2 className="text-lg font-font font-medium text-textColour">
-            Messages
-          </h2>
-        </div>
-        <div className="flex-1" />
+            onClick={() => navigate(-1)}
+        >
+          <ArrowLeft
+              className="text-gray-800"
+              size={24}
+              style={{width: "1.25rem", height: "1.25rem"}}
+              strokeWidth={3}
+          />
+        </Button>
+
+        {/* Title */}
+        <h1 className="text-xl font-bold flex-grow text-gray-800">Messages</h1>
       </header>
       {/* user can search for any players to send his first message */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 relative">
@@ -110,11 +132,11 @@ export default function CreateDirectMessagingChannel() {
           </h1>
           <div className="relative w-full px-4 sm:px-0">
             {/* search bar for user's to search for players */}
-            <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500"/>
             <Input
-              type="text"
-              placeholder="Search for a player"
-              className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-full text-sm sm:text-base"
+                type="text"
+                placeholder="Search for a player"
+                className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
               value={searchQuery}
               onChange={(event) => {
                 setSearchQuery(event.target.value);
@@ -123,71 +145,87 @@ export default function CreateDirectMessagingChannel() {
             />
           </div>
           {/* once user searches for a player, results will start to show */}
-          {isSearching && (
+          {(isSearching || selectedUsers.length > 0) && (
             <ScrollArea className="flex-1 w-full max-h-[400px] rounded-md border overflow-y-auto">
               <div className="p-4 space-y-4">
                 {/* Render selected players at the top */}
-                {selectedPlayers.map((player) => (
+                {selectedUsers.map((user) => (
                   <div
-                    key={player.id}
-                    className="flex items-center justify-between p-2 bg-gray-100 rounded-md"
+                    key={user.accountId}
+                    className={`${user.accountId === userId ? "force-hide" : ""}
+                      flex items-center justify-between p-2 bg-gray-100 rounded-md`}
                   >
                     <div className="flex items-center space-x-4">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={player.avatar} alt={player.name} />
-                        <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.pictureUrl} alt={user.firstName + " " + user.lastName} />
+                        <AvatarFallback>{user.firstName.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <span className="font-medium font-font text-sm">
-                        {player.name}
+                        {user.firstName + " " + user.lastName}
                       </span>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => togglePlayerSelection(player)}
+                      onClick={() => toggleUserSelection(user)}
                     >
                       Remove
                     </Button>
                   </div>
                 ))}
 
-                {filteredPlayers.length > 0 ? (
-                  filteredPlayers.map((player) => (
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
                     <Button
-                      key={player.id}
+                      key={user.accountId}
                       variant="ghost"
-                      className="w-full flex items-center space-x-4 h-auto p-4 justify-start hover:bg-white"
-                      onClick={() => togglePlayerSelection(player)}
+                      className=
+                          {`
+                            ${user.selected ? "bg-white opacity-60" : "bg-placeholder-colour"}
+                            w-full flex items-center space-x-4 h-auto p-4 justify-start hover:bg-white
+                            ${user.accountId === userId ? "force-hide" : ""}`
+                          }
+                      onClick={() => toggleUserSelection(user)}
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={player.avatar} alt={player.name} />
-                        <AvatarFallback>{player.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.pictureUrl} alt={user.firstName + " " + user.lastName} />
+                        <AvatarFallback>{user.firstName.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <div className="flex flex-col items-start">
-                        <span className="font-medium font-font text-sm">
-                          {player.name}
-                        </span>
-                        <span className="text-sm font-font text-textColour">
-                          {player.username}
-                        </span>
+                      <div className="flex justify-between w-full">
+                        <div className="flex flex-col items-start gap-1">
+                          <span className="font-medium font-font text-sm">
+                            {user.firstName + " " + user.lastName}
+                          </span>
+                          <span className="text-xs font-font font-light primary-colour">
+                            {user.type.toUpperCase()}
+                          </span>
+                        </div>
+                        {user.selected &&
+                            <div className="flex flex-grow items-center justify-end">
+                              <Check className="text-green-800"></Check>
+                        </div>
+                        }
                       </div>
                     </Button>
                   ))
                 ) : (
-                  <p className="text-center font-light font-font text-textColour">
+                  <p className={`${searchQuery === "" ? "hidden" : ""} 
+                  text-center font-light font-font primary-colour`}>
                     No players found
                   </p>
                 )}
               </div>
             </ScrollArea>
           )}
-          {selectedPlayers.length > 0 && (
+          {selectedUsers.length > 0 && (
             <div className="mt-4">
               <Button
                 variant="secondary"
-                className="w-full font-font text-sm text-light text-textColour bg-secondaryColour rounded-lg"
+                className="w-full font-font text-sm text-light font-bold primary-colour
+                bg-secondaryColour rounded-lg"
+                onClick={handleCreateChannel}
               >
-                New Message
+                <b>New Message</b>
               </Button>
             </div>
           )}
