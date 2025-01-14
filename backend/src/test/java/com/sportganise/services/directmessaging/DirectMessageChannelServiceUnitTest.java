@@ -28,14 +28,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageChannelServiceUnitTest {
   @Mock private DirectMessageChannelRepository directMessageChannelRepository;
-
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
-
   @Mock private DirectMessageChannelMemberService directMessageChannelMemberService;
-
   @Mock private AccountRepository accountRepository;
-
   @InjectMocks private DirectMessageChannelService directMessageChannelService;
+  @Mock private DirectMessageService directMessageService;
 
   CreateDirectMessageChannelDto dmChannelDTO;
   DirectMessageChannel dmChannel;
