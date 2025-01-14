@@ -50,13 +50,22 @@ public class DirectMessageChannelController {
         this.directMessageChannelService.createDirectMessageChannel(
             memberIds, channelName, accountId);
 
-    ResponseDto<CreateDirectMessageChannelDto> response = new ResponseDto<>(
-      HttpStatus.CREATED.value(),
-      "Channel created successfully",
-      dmChannelDto
-    );
-
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
+    if (dmChannelDto.getCreatedAt() == null) { // Channel already exists, so no timestamp created.
+      ResponseDto<CreateDirectMessageChannelDto> response =
+          new ResponseDto<>(
+              HttpStatus.FOUND.value(),
+              "Channel with theses members already exists",
+              dmChannelDto
+          );
+      return new ResponseEntity<>(response, HttpStatus.FOUND);
+    } else {
+      ResponseDto<CreateDirectMessageChannelDto> response = new ResponseDto<>(
+              HttpStatus.CREATED.value(),
+              "Channel created successfully",
+              dmChannelDto
+      );
+      return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
   }
 
   /**
