@@ -32,3 +32,7 @@ export interface CreateChannelDto {
   createdAt: string | null;
   avatarUrl: string | null;
 }
+
+export interface ChannelSettingsDropdownProps {
+  channelType: string;
+}
