@@ -6,7 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +36,8 @@ public class DirectMessageChannel {
   private Integer lastMessageId;
 
   @Column(name = "created_at")
-  private LocalDateTime createdAt;
+  private ZonedDateTime createdAt;
+
+  @Column(name = "channel_hash")
+  private String channelHash;
 }
