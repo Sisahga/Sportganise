@@ -40,49 +40,67 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
           ) > 15;
         return (
           <div key={message.messageId} className="mb-4">
-            {/* Timestamp */}
-            {showTimestamp && (
-              <div className="text-xs text-gray-500 text-center mb-2">
-                {formatSentAt(message.sentAt)}
-              </div>
-            )}
-
-            <div
-              className={`flex items-end gap-2 ${message.senderId == userId ? "justify-end" : ""}`}
-            >
-              {/* Sender Avatar */}
-              {message.senderId !== userId && (
-                <div className="flex items-end">
-                  <img
-                    src={message.avatarUrl}
-                    alt={defaultAvatar}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
+            {/* Regular Chat Message */}
+            {message.type == "CHAT" && (
+            <>
+              {/* Timestamp */}
+              {showTimestamp && (
+                <div className="text-xs text-gray-500 text-center mb-2">
+                  {formatSentAt(message.sentAt)}
                 </div>
               )}
-              {/* Message Bubble */}
+
               <div
-                className={`flex flex-col ${message.senderId === userId ? "items-end" : "items-start"}`}
-                style={{ maxWidth: "80%" }}
+                className={`flex items-end gap-2 ${message.senderId == userId ? "justify-end" : ""}`}
               >
+                {/* Sender Avatar */}
                 {message.senderId !== userId && (
-                  <div className="px-3">
-                    <p className="text-xs font-extralight">
-                      {message.senderFirstName}
-                    </p>
+                  <div className="flex items-end">
+                    <img
+                      src={message.avatarUrl}
+                      alt={defaultAvatar}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
                   </div>
                 )}
-                {/* Message Content */}
+                {/* Message Bubble */}
                 <div
-                  className={`px-3 py-2 rounded-2xl ${
-                    message.senderId === userId
-                      ? "bg-secondaryColour text-gray-800"
-                      : "bg-gray-200 text-gray-800"
-                  }`}
+                  className={`flex flex-col ${message.senderId === userId ? "items-end" : "items-start"}`}
+                  style={{ maxWidth: "80%" }}
                 >
-                  <p className="text-sm">{message.messageContent}</p>
+                  {message.senderId !== userId && (
+                    <div className="px-3">
+                      <p className="text-xs font-extralight">
+                        {message.senderFirstName}
+                      </p>
+                    </div>
+                  )}
+                  {/* Message Content */}
+                  <div
+                    className={`px-3 py-2 rounded-2xl ${
+                      message.senderId === userId
+                        ? "bg-secondaryColour text-gray-800"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    <p className="text-sm">{message.messageContent}</p>
+                  </div>
                 </div>
               </div>
+            </>
+            )}
+            {/* JOIN Message (Create message, or player/coach joins after initial creation) */}
+            <div>
+              {message.type == "JOIN" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === userId && index === 0
+                    ? (
+                          <p>You {message.messageContent.split("*")[3]}</p>
+                      ): (
+                          <p>{message.messageContent.split("*")[2]} {message.messageContent.split("*")[3]}</p>
+                      )}
+                </div>
+              )}
             </div>
           </div>
         );
