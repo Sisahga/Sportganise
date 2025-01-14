@@ -159,11 +159,18 @@ public class DirectMessageService {
     return directMessageDto;
   }
 
+  /**
+   * Sends a first DM of type JOIN in channel just created.
+   * @param channelId The ID of the channel.
+   * @param creatorId The ID of the creator.
+   * @param creatorFirstName The first name of the creator.
+   */
   public void sendCreationDirectMessage(int channelId, int creatorId, String creatorFirstName) {
     DirectMessage directMessage = new DirectMessage();
     directMessage.setSenderId(creatorId);
     directMessage.setChannelId(channelId);
-    directMessage.setContent("INIT*" + creatorId + "*" + creatorFirstName + "* created the message channel.");
+    directMessage.setContent(
+        "INIT*" + creatorId + "*" + creatorFirstName + "* created the message channel.");
     directMessage.setSentAt(ZonedDateTime.now());
     directMessage.setType(DirectMessageType.JOIN);
     directMessageRepository.save(directMessage);

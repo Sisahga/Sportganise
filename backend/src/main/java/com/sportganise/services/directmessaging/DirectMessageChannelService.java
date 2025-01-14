@@ -7,7 +7,6 @@ import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
-
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -35,11 +34,11 @@ public class DirectMessageChannelService {
    */
   @Autowired
   public DirectMessageChannelService(
-          DirectMessageChannelRepository directMessageChannelRepository,
-          DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
-          AccountRepository accountRepository,
-          DirectMessageChannelMemberService directMessageChannelMemberService,
-          DirectMessageService directMessageService) {
+      DirectMessageChannelRepository directMessageChannelRepository,
+      DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
+      AccountRepository accountRepository,
+      DirectMessageChannelMemberService directMessageChannelMemberService,
+      DirectMessageService directMessageService) {
     this.directMessageChannelRepository = directMessageChannelRepository;
     this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
     this.accountRepository = accountRepository;
@@ -113,7 +112,8 @@ public class DirectMessageChannelService {
     CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
     dmChannelDto.setChannelId(createdDmChannelId);
     if (dmChannel.getType().equals("SIMPLE")) {
-      int otherMemberId = memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+      int otherMemberId =
+          memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
       dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
     } else {
       dmChannelDto.setChannelName(channelName);
@@ -122,14 +122,16 @@ public class DirectMessageChannelService {
     dmChannelDto.setMemberIds(memberIds);
     dmChannelDto.setCreatedAt(timestamp.toString());
     if (dmChannel.getType().equals("SIMPLE")) {
-      int otherMemberId = memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+      int otherMemberId =
+          memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
       dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
     } else {
       dmChannelDto.setAvatarUrl(null);
     }
 
     String creatorFirstName = accountRepository.getFirstNameByAccountId(creatorAccountId);
-    directMessageService.sendCreationDirectMessage(createdDmChannelId, creatorAccountId, creatorFirstName);
+    directMessageService.sendCreationDirectMessage(
+        createdDmChannelId, creatorAccountId, creatorFirstName);
     return dmChannelDto;
   }
 
