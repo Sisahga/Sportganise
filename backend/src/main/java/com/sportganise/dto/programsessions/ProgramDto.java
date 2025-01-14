@@ -1,7 +1,7 @@
 package com.sportganise.dto.programsessions;
 
 import com.sportganise.entities.programsessions.Program;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,10 +19,10 @@ public class ProgramDto {
   private String title;
   private String description;
   private Integer capacity;
-  private LocalDateTime occurrenceDate;
+  private ZonedDateTime occurrenceDate;
   private Integer durationMins; // Duration of the program in terms of minutes
   private boolean isRecurring;
-  private LocalDateTime expiryDate;
+  private ZonedDateTime expiryDate;
   private String frequency;
   private String location;
   private String visibility;

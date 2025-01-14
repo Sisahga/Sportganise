@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +37,7 @@ public class Program {
   private Integer capacity;
 
   @Column(name = "occurence_date")
-  private LocalDateTime occurrenceDate;
+  private ZonedDateTime occurrenceDate;
 
   // Duration of the program in terms of minutes
   @Column(name = "duration")
@@ -47,7 +47,7 @@ public class Program {
   private boolean isRecurring;
 
   @Column(name = "expiry_date")
-  private LocalDateTime expiryDate;
+  private ZonedDateTime expiryDate;
 
   private String frequency;
 
@@ -78,10 +78,10 @@ public class Program {
       String title,
       String description,
       Integer capacity,
-      LocalDateTime occurrenceDate,
+      ZonedDateTime occurrenceDate,
       Integer durationMins,
       Boolean isRecurring,
-      LocalDateTime expiryDate,
+      ZonedDateTime expiryDate,
       String frequency,
       String location,
       String visibility,

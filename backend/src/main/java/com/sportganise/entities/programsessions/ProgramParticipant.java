@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class ProgramParticipant {
   private boolean isConfirmed;
 
   @Column(name = "confirm_date")
-  private LocalDateTime confirmedDate;
+  private ZonedDateTime confirmedDate;
 
   public Integer getProgramId() {
     return programParticipantId.getProgramId();
