@@ -12,7 +12,7 @@ export interface FormValues {
   end_time: string;
   location: string;
 }
-
+/*
 export interface ResponseFormValues {
   title: string;
   type: string;
@@ -27,3 +27,4 @@ export interface ResponseFormValues {
   end_time: string;
   location: string;
 }
+*/
