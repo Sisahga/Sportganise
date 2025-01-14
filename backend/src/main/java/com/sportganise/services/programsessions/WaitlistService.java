@@ -3,7 +3,7 @@ package com.sportganise.services.programsessions;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -62,7 +62,7 @@ public class WaitlistService {
     participantRepository.updateRanks(programId, accountId);
 
     // Confirm participant
-    LocalDateTime ldt = LocalDateTime.now();
+    ZonedDateTime ldt = ZonedDateTime.now();
     optedParticipant.setConfirmedDate(ldt);
     optedParticipant.setConfirmed(true);
     // Remove from the waitlist

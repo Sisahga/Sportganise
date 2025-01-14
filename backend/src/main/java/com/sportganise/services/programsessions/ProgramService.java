@@ -9,8 +9,8 @@ import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -158,17 +158,17 @@ public class ProgramService {
     // Parse dates and times
     // occurrenceDate is the date, time and day of the week of the first occurrence
     // of the program
-    LocalDateTime occurrenceDate = LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
-    LocalDateTime endDateTime = LocalDateTime.parse(endDate).with(LocalTime.parse(endTime));
+    ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
+    ZonedDateTime endDateTime = ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime));
     int durationMins = (int) java.time.Duration.between(occurrenceDate, endDateTime).toMinutes();
 
-    LocalDateTime expiryDate = null;
+    ZonedDateTime expiryDate = null;
     String frequency = null;
 
     // If this new program is a recurring one then we need to check if each
     // occurence overlaps an already existing program
     if (isRecurring != null && isRecurring) {
-      LocalDateTime currentOccurrence = occurrenceDate;
+      ZonedDateTime currentOccurrence = occurrenceDate;
       frequency = "weekly";
       // The program recurs weekly on the same day of the week
       expiryDate = endDateTime.plusDays(7);
@@ -272,11 +272,11 @@ public class ProgramService {
     // Parse dates and times
     // occurrenceDate is the date, time and day of the week of the first occurrence
     // of the program
-    LocalDateTime occurrenceDate = LocalDateTime.parse(startDate).with(LocalTime.parse(startTime));
-    LocalDateTime endDateTime = LocalDateTime.parse(endDate).with(LocalTime.parse(endTime));
+    ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
+    ZonedDateTime endDateTime = ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime));
     int durationMins = (int) java.time.Duration.between(occurrenceDate, endDateTime).toMinutes();
 
-    LocalDateTime expiryDate = null;
+    ZonedDateTime expiryDate = null;
     String frequency = null;
 
     if (isRecurring != null && isRecurring) {
@@ -296,7 +296,7 @@ public class ProgramService {
       // need to check if each
       // occurence overlaps an already existing program
       if (isRecurring != null && isRecurring) {
-        LocalDateTime currentOccurrence = occurrenceDate;
+        ZonedDateTime currentOccurrence = occurrenceDate;
 
         // While currentOccurrence is before or on the day of the expiryDate
         while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
@@ -353,15 +353,15 @@ public class ProgramService {
    * @param durationMins the duration of a program in minutes.
    * @return a boolean for whether there is a scheduling conflict or not.
    */
-  private boolean checkForSchedulingConflicts(LocalDateTime occurrenceDate, Integer durationMins) {
-    LocalDateTime startDateTime = occurrenceDate;
-    LocalDateTime endDateTime = startDateTime.plusMinutes(durationMins);
+  private boolean checkForSchedulingConflicts(ZonedDateTime occurrenceDate, Integer durationMins) {
+    ZonedDateTime startDateTime = occurrenceDate;
+    ZonedDateTime endDateTime = startDateTime.plusMinutes(durationMins);
 
     // Get a list of all existing programs
     List<Program> programs = programRepository.findAll();
     for (Program program : programs) {
       // This is the existing program's end DateTime
-      LocalDateTime programEndDateTime =
+      ZonedDateTime programEndDateTime =
           program.getOccurrenceDate().plusMinutes(program.getDurationMins());
 
       // Check for overlapping times. If the program we want to create starts before
@@ -380,11 +380,11 @@ public class ProgramService {
   /**
    * Method to get the next occurrence in a recurring programs/sessions serie.
    *
-   * @param current LocalDateTime of current occurrence.
+   * @param current ZonedDateTime of current occurrence.
    * @param frequency String depicting the frequency of the programs/sessions.
-   * @return LocalDateTime of the next occurrence.
+   * @return ZonedDateTime of the next occurrence.
    */
-  private LocalDateTime getNextOccurrence(LocalDateTime current, String frequency) {
+  private ZonedDateTime getNextOccurrence(ZonedDateTime current, String frequency) {
     switch (frequency.toLowerCase()) {
       case "daily":
         return current.plusDays(1);

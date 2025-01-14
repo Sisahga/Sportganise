@@ -13,7 +13,10 @@ import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -44,7 +47,7 @@ public class ProgramServiceTest {
             // needed
             "Player",
             true,
-            LocalDateTime.now());
+            ZonedDateTime.now());
 
     ProgramParticipant participant2 =
         new ProgramParticipant(
@@ -53,7 +56,7 @@ public class ProgramServiceTest {
             // needed
             "Coach",
             false,
-            LocalDateTime.now().minusDays(1));
+            ZonedDateTime.now().minusDays(1));
 
     List<ProgramParticipant> mockParticipants = List.of(participant1, participant2);
 
@@ -137,10 +140,14 @@ public class ProgramServiceTest {
             .title("Training Program")
             .description("This is a training program.")
             .capacity(10)
-            .occurrenceDate(LocalDateTime.of(2025, 5, 15, 10, 0))
+            .occurrenceDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
             .durationMins(120)
             .isRecurring(false)
-            .expiryDate(LocalDateTime.of(2025, 5, 16, 0, 0))
+            .expiryDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
             .frequency("None")
             .location("111 Random Ave")
             .visibility("public")
@@ -164,10 +171,14 @@ public class ProgramServiceTest {
     assertEquals("Training Program", programDto.getTitle());
     assertEquals("This is a training program.", programDto.getDescription());
     assertEquals(10, programDto.getCapacity());
-    assertEquals(LocalDateTime.of(2025, 5, 15, 10, 0), programDto.getOccurrenceDate());
+    assertEquals(
+        ZonedDateTime.of(LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()),
+        programDto.getOccurrenceDate());
     assertEquals(120, programDto.getDurationMins());
     assertFalse(programDto.isRecurring());
-    assertEquals(LocalDateTime.of(2025, 5, 16, 0, 0), programDto.getExpiryDate());
+    assertEquals(
+        ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()),
+        programDto.getExpiryDate());
     assertEquals("None", programDto.getFrequency());
     assertEquals("111 Random Ave", programDto.getLocation());
     assertEquals("public", programDto.getVisibility());

@@ -11,7 +11,10 @@ import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -57,10 +60,12 @@ public class ProgramControllerTest {
     mockProgramDto.setTitle("Training Program");
     mockProgramDto.setDescription("This is a training program.");
     mockProgramDto.setCapacity(10);
-    mockProgramDto.setOccurrenceDate(LocalDateTime.of(2025, 5, 15, 10, 0));
+    mockProgramDto.setOccurrenceDate(
+        ZonedDateTime.of(LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()));
     mockProgramDto.setDurationMins(120);
     mockProgramDto.setRecurring(false);
-    mockProgramDto.setExpiryDate(LocalDateTime.of(2025, 5, 16, 0, 0));
+    mockProgramDto.setExpiryDate(
+        ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()));
     mockProgramDto.setFrequency("None");
     mockProgramDto.setLocation("999 Random Ave");
     mockProgramDto.setVisibility("public");
@@ -70,7 +75,7 @@ public class ProgramControllerTest {
     mockProgramParticipantDto.setProgramId(201);
     mockProgramParticipantDto.setAccountId(1);
     mockProgramParticipantDto.setConfirmed(true);
-    mockProgramParticipantDto.setConfirmedDate(LocalDateTime.now());
+    mockProgramParticipantDto.setConfirmedDate(ZonedDateTime.now());
 
     // Set the programDetailsParticipantsDto
     mockProgramDetailsParticipantsDto.setProgramDetails(mockProgramDto);
@@ -134,7 +139,7 @@ public class ProgramControllerTest {
     mockProgramParticipantDto.setProgramId(111);
     mockProgramParticipantDto.setAccountId(3); // Example account ID for a participant
     mockProgramParticipantDto.setConfirmed(true);
-    mockProgramParticipantDto.setConfirmedDate(LocalDateTime.now());
+    mockProgramParticipantDto.setConfirmedDate(ZonedDateTime.now());
 
     // Mock behaviour of the services using the mocked objects
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));

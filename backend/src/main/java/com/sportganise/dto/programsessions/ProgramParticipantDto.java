@@ -1,6 +1,6 @@
 package com.sportganise.dto.programsessions;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,5 +16,5 @@ public class ProgramParticipantDto {
   private Integer programId;
   private Integer rank;
   private boolean isConfirmed;
-  private LocalDateTime confirmedDate;
+  private ZonedDateTime confirmedDate;
 }
