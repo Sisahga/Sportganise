@@ -1,6 +1,4 @@
 import { FormValues } from "@/types/trainingSessionFormValues";
-import { ResponseFormValues } from "@/types/trainingSessionFormValues";
-import { useState } from "react";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api";
 
