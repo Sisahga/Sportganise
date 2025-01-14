@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * DuplicateChannelDto.
- */
+/** DuplicateChannelDto. */
 @Getter
 @Setter
 @NoArgsConstructor
