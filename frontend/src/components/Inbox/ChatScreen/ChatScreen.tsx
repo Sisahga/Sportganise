@@ -117,7 +117,7 @@ const ChatScreen = () => {
         <Button
           variant="ghost"
           className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate("/pages/DirectMessagesDashboard")}
         >
           <ArrowLeft className="text-gray-800" size={28} strokeWidth={3} />
         </Button>
