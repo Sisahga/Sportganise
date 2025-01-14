@@ -161,6 +161,7 @@ public class DirectMessageService {
 
   /**
    * Sends a first DM of type JOIN in channel just created.
+   *
    * @param channelId The ID of the channel.
    * @param creatorId The ID of the creator.
    * @param creatorFirstName The first name of the creator.
