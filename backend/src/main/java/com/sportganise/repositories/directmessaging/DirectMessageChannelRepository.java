@@ -1,5 +1,6 @@
 package com.sportganise.repositories.directmessaging;
 
+import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import jakarta.transaction.Transactional;
@@ -45,4 +46,18 @@ public interface DirectMessageChannelRepository
   @Modifying
   @Query("UPDATE DirectMessageChannel SET lastMessageId = :messageId WHERE channelId = :channelId")
   void updateLastMessageId(@Param(("channelId")) int channelId, @Param("messageId") int messageId);
+
+
+  /**
+   * Query that checks if a Direct Message Channel exists by its channel hash (prevent duplicate channels).
+   * @param channelHash Hash of the channel to check.
+   * @return DTO object for the Direct Message Channel.
+   */
+  @Query("""
+          SELECT new com.sportganise.dto.directmessaging.DuplicateChannelDto(
+                  ch.channelId, ch.name, ch.type, ch.imageBlob)
+          FROM DirectMessageChannel ch
+          WHERE ch.channelHash = :channelHash
+        """)
+  DuplicateChannelDto findChannelByChannelHash(@Param("channelHash") String channelHash);
 }
