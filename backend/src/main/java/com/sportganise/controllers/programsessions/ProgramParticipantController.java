@@ -1,10 +1,11 @@
 package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
-import com.sportganise.services.programsessions.ProgramService;
+import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.services.programsessions.WaitlistService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -17,19 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/program-participant")
 public class ProgramParticipantController {
 
-  private ProgramService programService;
   private WaitlistService waitlistService;
 
   /**
    * Constructor for ProgramParticipantController.
    *
-   * @param programService Service for managing programs.
    * @param waitlistService Service for managing the waitlist and participant operations.
    */
   @Autowired
-  public ProgramParticipantController(
-      ProgramService programService, WaitlistService waitlistService) {
-    this.programService = programService;
+  public ProgramParticipantController(WaitlistService waitlistService) {
     this.waitlistService = waitlistService;
   }
 
@@ -41,11 +38,16 @@ public class ProgramParticipantController {
    * @return The rank assigned to the participant.
    */
   @PatchMapping("/opt-participant")
-  public ResponseEntity<Integer> optProgramParticipant(
+  public ResponseEntity<?> optProgramParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
 
-    Integer rank = waitlistService.optProgramParticipantDto(programId, accountId);
-    return ResponseEntity.ok(rank);
+    Integer rank = null;
+    try {
+      rank = waitlistService.optProgramParticipantDto(programId, accountId);
+      return ResponseEntity.ok(rank);
+    } catch (ParticipantNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
   }
 
   /**
@@ -56,13 +58,17 @@ public class ProgramParticipantController {
    * @return A DTO representing the confirmed participant.
    */
   @PatchMapping("/confirm-participant")
-  public ResponseEntity<ProgramParticipantDto> confirmParticipant(
+  public ResponseEntity<?> confirmParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
 
     // Update the participant's confirmation status
-    ProgramParticipantDto confirmedParticipant =
-        waitlistService.confirmParticipant(programId, accountId);
-    return ResponseEntity.ok(confirmedParticipant);
+    ProgramParticipantDto confirmedParticipant = null;
+    try {
+      confirmedParticipant = waitlistService.confirmParticipant(programId, accountId);
+      return ResponseEntity.ok(confirmedParticipant);
+    } catch (ParticipantNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
   }
 
   /**
@@ -73,11 +79,16 @@ public class ProgramParticipantController {
    * @return A DTO representing the participant who opted out.
    */
   @PatchMapping("/out-participant")
-  public ResponseEntity<ProgramParticipantDto> optOutParticipant(
+  public ResponseEntity<?> optOutParticipant(
       @RequestParam Integer accountId, @RequestParam Integer programId) {
 
-    ProgramParticipantDto outParticipant = waitlistService.optOutParticipant(programId, accountId);
-    return ResponseEntity.ok(outParticipant);
+    ProgramParticipantDto outParticipant = null;
+    try {
+      outParticipant = waitlistService.optOutParticipant(programId, accountId);
+      return ResponseEntity.ok(outParticipant);
+    } catch (ParticipantNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
   }
 
   /**

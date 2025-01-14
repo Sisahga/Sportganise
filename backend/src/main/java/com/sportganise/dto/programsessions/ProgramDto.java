@@ -26,7 +26,7 @@ public class ProgramDto {
   private String frequency;
   private String location;
   private String visibility;
-  private List<String> attachment;
+  private List<String> attachments;
 
   /**
    * Constructor that converts a Program entity to ProgramDto.
@@ -46,6 +46,6 @@ public class ProgramDto {
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
     this.visibility = program.getVisibility();
-    this.attachment = program.getAttachment();
+    this.attachments = program.getAttachments();
   }
 }

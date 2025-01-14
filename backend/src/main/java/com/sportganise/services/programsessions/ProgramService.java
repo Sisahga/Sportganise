@@ -108,7 +108,7 @@ public class ProgramService {
         program.getFrequency(),
         program.getLocation(),
         program.getVisibility(),
-        program.getAttachment());
+        program.getAttachments());
   }
 
   /**

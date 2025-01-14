@@ -2,6 +2,7 @@ package com.sportganise.services.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -24,18 +25,31 @@ public class WaitlistService {
   }
 
   /**
-   * Adds a participant to the waitlist for a program and assigns them a rank.
+   * Ad ds a participant to the waitlist for a program and assigns them a rank.
    *
    * @param programId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return The rank assigned to the participant.
+   * @throws ParticipantNotFoundException whenever participant can't be found
    */
-  public Integer optProgramParticipantDto(Integer programId, Integer accountId) {
+  public Integer optProgramParticipantDto(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
     Integer maxRank = participantRepository.findMaxRank(programId);
     int newRank = (maxRank == null) ? 1 : maxRank + 1;
 
     ProgramParticipant optedParticipant =
         participantRepository.findWaitlistParticipant(programId, accountId);
+    if (optedParticipant == null) {
+      throw new ParticipantNotFoundException(
+          "Participant not found on waitlist for program: "
+              + programId
+              + ", account: "
+              + accountId);
+    }
+    if (optedParticipant.isConfirmed() == true || optedParticipant.getRank() != null) {
+      return null;
+    }
+
     optedParticipant.setRank(newRank);
 
     ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
@@ -51,31 +65,11 @@ public class WaitlistService {
    * @param programId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return A DTO representing the confirmed participant, or null if not found.
+   * @throws ParticipantNotFoundException whenever participant can't be found
    */
-  public ProgramParticipantDto confirmParticipant(Integer programId, Integer accountId) {
-    ProgramParticipant optedParticipant =
-        participantRepository.findWaitlistParticipant(programId, accountId);
-    if (optedParticipant == null) {
-      return null;
-    }
-    // Update ranks of others in queue
-    participantRepository.updateRanks(programId, accountId);
-
-    // Confirm participant
-    ZonedDateTime ldt = ZonedDateTime.now();
-    optedParticipant.setConfirmedDate(ldt);
-    optedParticipant.setConfirmed(true);
-    // Remove from the waitlist
-    optedParticipant.setRank(null);
-
-    ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
-
-    return new ProgramParticipantDto(
-        savedParticipant.getAccountId(),
-        savedParticipant.getProgramId(),
-        savedParticipant.getRank(),
-        savedParticipant.isConfirmed(),
-        savedParticipant.getConfirmedDate());
+  public ProgramParticipantDto confirmParticipant(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+    return removeParticipant(programId, accountId, true);
   }
 
   /**
@@ -84,16 +78,46 @@ public class WaitlistService {
    * @param programId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return A DTO representing the opted-out participant, or null if not found.
+   * @throws ParticipantNotFoundException whenever participant can't be found
    */
-  public ProgramParticipantDto optOutParticipant(Integer programId, Integer accountId) {
+  public ProgramParticipantDto optOutParticipant(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+    return removeParticipant(programId, accountId, false);
+  }
+
+  /**
+   * Function used by optOut and confirmParticipant to refactor and clean code.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @param confirmParticipant boolean if true confirms the participant and sends them into the
+   *     program, if false removes them from the waitlist
+   * @return A DTO representing the opted-out participant, or null if not found.
+   * @throws ParticipantNotFoundException whenever participant can't be found
+   */
+  public ProgramParticipantDto removeParticipant(
+      Integer programId, Integer accountId, boolean confirmParticipant)
+      throws ParticipantNotFoundException {
     ProgramParticipant optedParticipant =
         participantRepository.findWaitlistParticipant(programId, accountId);
+
     if (optedParticipant == null) {
-      return null;
+      throw new ParticipantNotFoundException(
+          "Participant not found on waitlist for program: "
+              + programId
+              + ", account: "
+              + accountId);
+    }
+
+    if (confirmParticipant == true) {
+      // Confirm participant
+      ZonedDateTime ldt = ZonedDateTime.now();
+      optedParticipant.setConfirmedDate(ldt);
+      optedParticipant.setConfirmed(true);
     }
 
     // Update the ranks of everyone
-    participantRepository.updateRanks(programId, accountId);
+    participantRepository.updateRanks(programId, optedParticipant.getRank());
     optedParticipant.setRank(null);
 
     ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);

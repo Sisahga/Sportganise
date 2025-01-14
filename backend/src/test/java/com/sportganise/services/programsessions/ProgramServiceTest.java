@@ -151,7 +151,7 @@ public class ProgramServiceTest {
             .frequency("None")
             .location("111 Random Ave")
             .visibility("public")
-            .attachment(List.of("/banner.pdf"))
+            .attachments(List.of("/banner.pdf"))
             .build();
 
     // Mock the repository behavior of findProgramById with mockProgram
@@ -182,7 +182,7 @@ public class ProgramServiceTest {
     assertEquals("None", programDto.getFrequency());
     assertEquals("111 Random Ave", programDto.getLocation());
     assertEquals("public", programDto.getVisibility());
-    assertEquals("/banner.pdf", programDto.getAttachment().get(0));
+    assertEquals("/banner.pdf", programDto.getAttachments().get(0));
   }
 
   @Test

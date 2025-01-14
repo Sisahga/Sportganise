@@ -69,7 +69,7 @@ public class ProgramControllerTest {
     mockProgramDto.setFrequency("None");
     mockProgramDto.setLocation("999 Random Ave");
     mockProgramDto.setVisibility("public");
-    mockProgramDto.setAttachment(List.of("/banner.pdf"));
+    mockProgramDto.setAttachments(List.of("/banner.pdf"));
 
     // Set the programParticipantDto
     mockProgramParticipantDto.setProgramId(201);

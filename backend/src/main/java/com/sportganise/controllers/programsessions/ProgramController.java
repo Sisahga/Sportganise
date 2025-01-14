@@ -37,6 +37,21 @@ public class ProgramController {
     this.accountService = accountService;
   }
 
+  /** Helper method to fetch and validate user account based on accountId. */
+  private Optional<Account> getAccount(Integer accountId) {
+    return accountService.getAccount(accountId);
+  }
+
+  /** Helper method to check user permissions. */
+  private boolean hasPermissions(Account user) {
+    return accountService.hasPermissions(user.getType());
+  }
+
+  /** Helper method to extract fields from payload. */
+  private Map<String, Object> extractPayloadFields(Map<String, Object> payload) {
+    return payload;
+  }
+
   /**
    * Get mapping for program session details.
    *
@@ -49,7 +64,7 @@ public class ProgramController {
       @PathVariable Integer accountId, @PathVariable Integer programId) {
 
     // Get account from accountId (this is a wrapper, not the actual)
-    Optional<Account> userOptional = accountService.getAccount(accountId);
+    Optional<Account> userOptional = getAccount(accountId);
 
     // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
@@ -86,7 +101,7 @@ public class ProgramController {
   }
 
   /**
-   * Get mapping for creating new program.
+   * Post mapping for creating new program.
    *
    * @param accountId Id of user who is making the request.
    * @param payload Json payload passed from frontend.
@@ -97,7 +112,7 @@ public class ProgramController {
       @PathVariable Integer accountId, @RequestBody Map<String, Object> payload) {
 
     // Get account from accountId (this is a wrapper, not the actual)
-    Optional<Account> userOptional = accountService.getAccount(accountId);
+    Optional<Account> userOptional = getAccount(accountId);
 
     // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
@@ -109,44 +124,27 @@ public class ProgramController {
 
     // If user is not a COACH or ADMIN then they will get an error
     // as they are not allowed to access this feature
-    if (!accountService.hasPermissions(user.getType())) {
+    if (!hasPermissions(user)) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    // Call the service createProgramDto method to handle program creation
     try {
-      String title = (String) payload.get("title");
-      String programType = (String) payload.get("type");
-      String startDate = (String) payload.get("start_date");
-      String endDate = (String) payload.get("end_date");
-      Boolean isRecurring = (Boolean) payload.get("recurring");
-      String visibility = (String) payload.get("visibility");
-      String description = (String) payload.get("description");
-      Integer capacity = (Integer) payload.get("capacity");
-      Boolean notify = (Boolean) payload.get("notify");
-      String startTime = (String) payload.get("start_time");
-      String endTime = (String) payload.get("end_time");
-      String location = (String) payload.get("location");
-
-      // Extract and process attachments
-      @SuppressWarnings("unchecked")
-      List<Map<String, String>> attachments = (List<Map<String, String>>) payload.get("attachment");
-
+      Map<String, Object> fields = extractPayloadFields(payload);
       ProgramDto programDto =
           programService.createProgramDto(
-              title,
-              programType,
-              startDate,
-              endDate,
-              isRecurring,
-              visibility,
-              description,
-              capacity,
-              notify,
-              startTime,
-              endTime,
-              location,
-              attachments);
+              (String) fields.get("title"),
+              (String) fields.get("type"),
+              (String) fields.get("start_date"),
+              (String) fields.get("end_date"),
+              (Boolean) fields.get("recurring"),
+              (String) fields.get("visibility"),
+              (String) fields.get("description"),
+              (Integer) fields.get("capacity"),
+              (Boolean) fields.get("notify"),
+              (String) fields.get("start_time"),
+              (String) fields.get("end_time"),
+              (String) fields.get("location"),
+              (List<Map<String, String>>) fields.get("attachment"));
       return new ResponseEntity<>(programDto, HttpStatus.CREATED);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -168,7 +166,7 @@ public class ProgramController {
       @RequestBody Map<String, Object> payload) {
 
     // Get account from accountId (this is a wrapper, not the actual)
-    Optional<Account> userOptional = accountService.getAccount(accountId);
+    Optional<Account> userOptional = getAccount(accountId);
 
     // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
@@ -180,7 +178,7 @@ public class ProgramController {
 
     // If user is not a COACH or ADMIN then they will get an error
     // as they are not allowed to access this feature
-    if (!accountService.hasPermissions(user.getType())) {
+    if (!hasPermissions(user)) {
       return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
@@ -192,42 +190,23 @@ public class ProgramController {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    // Extract the fields from the payload
     try {
-      String title = (String) payload.get("title");
-      String programType = (String) payload.get("type");
-      String startDate = (String) payload.get("start_date");
-      String endDate = (String) payload.get("end_date");
-      Boolean isRecurring = (Boolean) payload.get("recurring");
-      String visibility = (String) payload.get("visibility");
-      String description = (String) payload.get("description");
-      Integer capacity = (Integer) payload.get("capacity");
-      Boolean notify = (Boolean) payload.get("notify");
-      String startTime = (String) payload.get("start_time");
-      String endTime = (String) payload.get("end_time");
-      String location = (String) payload.get("location");
-
-      // Extract and process attachments
-      @SuppressWarnings("unchecked")
-      List<Map<String, String>> attachments = (List<Map<String, String>>) payload.get("attachment");
-
-      // Call the service modifyProgram method
+      Map<String, Object> fields = extractPayloadFields(payload);
       programService.modifyProgram(
           programDtoToModify,
-          title,
-          programType,
-          startDate,
-          endDate,
-          isRecurring,
-          visibility,
-          description,
-          capacity,
-          notify,
-          startTime,
-          endTime,
-          location,
-          attachments);
-
+          (String) fields.get("title"),
+          (String) fields.get("type"),
+          (String) fields.get("start_date"),
+          (String) fields.get("end_date"),
+          (Boolean) fields.get("recurring"),
+          (String) fields.get("visibility"),
+          (String) fields.get("description"),
+          (Integer) fields.get("capacity"),
+          (Boolean) fields.get("notify"),
+          (String) fields.get("start_time"),
+          (String) fields.get("end_time"),
+          (String) fields.get("location"),
+          (List<Map<String, String>>) fields.get("attachment"));
       return new ResponseEntity<>(HttpStatus.OK);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
