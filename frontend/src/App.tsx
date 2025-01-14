@@ -63,8 +63,6 @@ function App() {
             path="/pages/ViewTrainingSessionPage"
             element={<ViewTrainingSessionPage />}
           ></Route>
-          <Route path="/signup" element={<SignUpPage />}></Route>
-          <Route path="/verificationcode" element={<VerificationCodePage />} />
           <Route path="/pages/CalendarPage" element={<CalendarPage />}></Route>
           <Route
             path="/pages/ModifyTrainingSessionPage"
