@@ -77,13 +77,17 @@ INSERT INTO label_program (label_id, program_id, type) VALUES
 (1, 1, 'Private'),
 (1, 2, 'Public');
 
-INSERT INTO channel (name, type, image_blob) VALUES
+INSERT INTO channel (name, type, image_blob, channel_hash) VALUES
 ('Badmintinors', 'GROUP',
- 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png'),
+ 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png',
+ 'd3404059a01f4426ac8962d8a2d07f4b82824293477b5c929e4303678cbf0359'),
 ('Onibaddies', 'GROUP',
- 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/Layne+Staley+portrait.jpg'),
-(null, 'SIMPLE', null),
-(null, 'SIMPLE', null);
+ 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/Layne+Staley+portrait.jpg',
+ 'df8fbe4237c3e1f9363d6f103185c57a782ddd8b899d6484930cebbdb6f9ca7f'),
+(null, 'SIMPLE', null,
+ '3a316d6d3226f84c1e46e4447fa8d5fd800bff4a1bc6498152523cd4a602b69b'),
+(null, 'SIMPLE', null,
+ '5bf775530e2e5fcd9c6ae577c52cd57a20d13ebb5f7bc3e8a8a7920d3a7ce41e');
 
 
 INSERT INTO channel_member (channel_id, account_id, read) VALUES
@@ -92,6 +96,7 @@ INSERT INTO channel_member (channel_id, account_id, read) VALUES
 (1, 4, true),
 (2,1, true),
 (2,2, false),
+(2, 4, true),
 (3, 1, false),
 (3, 2, true),
 (4, 2, false),
