@@ -17,4 +17,5 @@ public class CreateDirectMessageChannelDto {
   private String channelType;
   private List<Integer> memberIds;
   private String createdAt;
+  private String avatarUrl; // This will be set on creation only if it is a 'SIMPLE' channel.
 }
