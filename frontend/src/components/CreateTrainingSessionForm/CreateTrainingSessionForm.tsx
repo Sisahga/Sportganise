@@ -1,9 +1,9 @@
-import { useState } from "react";
+//import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import useFormHandler from "@/hooks/useFormHandler";
+import { formSchema } from "@/types/trainingSessionZodFormSchema";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -51,55 +51,6 @@ import {
   Paperclip,
 } from "lucide-react";
 
-//GLOBAL --------------------------------------------------------------------------------------------------------------
-/** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
-const formSchema = z
-  .object({
-    title: z.string(),
-    type: z.string(),
-    start_date: z.coerce.date(),
-    end_date: z.coerce.date(),
-    recurring: z.boolean().default(false),
-    visibility: z.string(),
-    description: z.string(),
-    attachment: z
-      .array(
-        //array of files
-        z.custom<File>((file) => file instanceof File && file.size > 0, {
-          message: "Each file must be a valid file and not empty.",
-        })
-      )
-      .optional(),
-    capacity: z.number().min(0),
-    start_time: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
-    end_time: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
-    location: z.string(),
-  })
-  .refine((data) => data.end_date >= data.start_date, {
-    message: "End date cannot be earlier than the start date.",
-    path: ["end_date"], //points to the end_date field in the error message
-  })
-  .refine((data) => data.end_time >= data.start_time, {
-    message: "End time cannot be earlier than start time.",
-    path: ["end_time"],
-  })
-  .refine(
-    (data) =>
-      !(
-        data.start_date.getTime() === data.end_date.getTime() && data.recurring
-      ),
-    {
-      message:
-        "Event start and end dates are the same and therefore cannot reccur.",
-      path: ["recurring"],
-    }
-  );
-
-//PAGE CONTENT -----------------------------------------------------------------------------------------------------------
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -141,7 +92,7 @@ export default function CreateTrainingSessionForm() {
   ] as const;
 
   /** Handle files for file upload in form*/
-  const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
+  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
   const dropZoneConfig = {
     //File configurations
     maxFiles: 5,
@@ -153,17 +104,7 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
-  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      //default values that will considered for each state when page is loaded and also what is rendered when the page loads
-      //start_date: new Date(),
-      //end_date: new Date(),
-      //title: "", //controlled/uncontrolled component error
-    },
-  });
-
+  const { form } = useFormHandler();
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
@@ -171,7 +112,7 @@ export default function CreateTrainingSessionForm() {
       // Prepare data to send through API as necessary
       const json_payload = {
         ...values,
-        attachment: files ?? [], //ensure attachment: appears in json payload body
+        attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
       };
       console.log(json_payload);
       console.log(JSON.stringify(json_payload, null, 2));
@@ -669,9 +610,9 @@ export default function CreateTrainingSessionForm() {
                 </FormLabel>
                 <FormControl>
                   <FileUploader
-                    value={files}
+                    value={field.value || []}
                     onValueChange={(newFiles) => {
-                      setFiles(newFiles); // Update local state
+                      //setFiles(newFiles); // Update local state
                       field.onChange(newFiles); // Sync with React Hook Form
                     }}
                     dropzoneOptions={dropZoneConfig}
@@ -693,9 +634,9 @@ export default function CreateTrainingSessionForm() {
                       </div>
                     </FileInput>
                     <FileUploaderContent>
-                      {files &&
-                        files.length > 0 &&
-                        files.map((file, i) => (
+                      {field.value &&
+                        field.value.length > 0 &&
+                        field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
                             <span>{file.name}</span>
