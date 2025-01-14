@@ -1,4 +1,4 @@
-package com.sportganise.services.auth;
+package com.sportganise.services.account.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,1 +1,1 @@
-export { default as CreateFirstDmContent } from "./CreateFirstDmContent";
+export { default as CreateFirstDmContent } from "../Inbox/CreateChannel/CreateDirectMessagingChannel.tsx";
