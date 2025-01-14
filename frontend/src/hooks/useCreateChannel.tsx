@@ -1,15 +1,20 @@
-import {CreateChannelDto} from "@/types/dmchannels.ts";
+import { CreateChannelDto } from "@/types/dmchannels.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
-import {useState} from "react";
+import { useState } from "react";
 import ResponseDto from "@/types/response.ts";
 
 function useCreateChannel() {
-  const [channelResponse, setChannelResponse] = useState<ResponseDto<CreateChannelDto> | null>(null);
-  const createChannel =
-      async (newChannelDetails: CreateChannelDto, creatorId: number) => {
+  const [channelResponse, setChannelResponse] =
+    useState<ResponseDto<CreateChannelDto> | null>(null);
+  const createChannel = async (
+    newChannelDetails: CreateChannelDto,
+    creatorId: number,
+  ) => {
     try {
-      const response =
-          await directMessagingApi.createChannel(newChannelDetails, creatorId);
+      const response = await directMessagingApi.createChannel(
+        newChannelDetails,
+        creatorId,
+      );
       setChannelResponse(response);
       return response;
     } catch (err) {
@@ -19,8 +24,9 @@ function useCreateChannel() {
   };
 
   return {
-    channelResponse, createChannel
-  }
+    channelResponse,
+    createChannel,
+  };
 }
 
 export default useCreateChannel;

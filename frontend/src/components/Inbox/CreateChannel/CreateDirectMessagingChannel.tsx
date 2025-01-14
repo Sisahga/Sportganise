@@ -6,13 +6,13 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/ui/avatar.tsx";
-import {Search, ArrowLeft, Check} from "lucide-react";
+import { Search, ArrowLeft, Check } from "lucide-react";
 import { useState } from "react";
 import useAccountDetailsDirectMessaging from "@/hooks/useAccountDetailsDirectMessaging.tsx";
-import {AccountDetailsDirectMessaging} from "@/types/account.ts";
-import {useNavigate} from "react-router-dom";
+import { AccountDetailsDirectMessaging } from "@/types/account.ts";
+import { useNavigate } from "react-router-dom";
 import useCreateChannel from "@/hooks/useCreateChannel.tsx";
-import {CreateChannelDto} from "@/types/dmchannels.ts";
+import { CreateChannelDto } from "@/types/dmchannels.ts";
 
 export default function CreateDirectMessagingChannel() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,16 +20,19 @@ export default function CreateDirectMessagingChannel() {
   const navigate = useNavigate();
   const organizationId = 1; // TODO: Replace with actual organization ID from cookies
   const userId = 2; // TODO: Replace with actual user ID from cookies
-  const [selectedUsers, setSelectedUsers] = useState<AccountDetailsDirectMessaging[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<
+    AccountDetailsDirectMessaging[]
+  >([]);
   const currentUser = {
     accountId: 2,
     firstName: "Walter",
     lastName: "White",
-    pictureUrl: "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+    pictureUrl:
+      "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
     type: "COACH",
     phone: "333-333-3333",
-    selected: true
-  }
+    selected: true,
+  };
 
   // Fetch all users from the backend
   const { users } = useAccountDetailsDirectMessaging(organizationId);
@@ -45,8 +48,10 @@ export default function CreateDirectMessagingChannel() {
     if (user.accountId === userId) {
       return false;
     }
-    return user.firstName.toLowerCase().startsWith(searchQuery.toLowerCase())
-        || user.lastName.toLowerCase().startsWith(searchQuery.toLowerCase());
+    return (
+      user.firstName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
+      user.lastName.toLowerCase().startsWith(searchQuery.toLowerCase())
+    );
   });
 
   // User can also select more than one user when creating a msg at first
@@ -74,7 +79,7 @@ export default function CreateDirectMessagingChannel() {
       memberIds: selectedUserIds,
       createdAt: new Date().toISOString(),
       avatarUrl: null,
-    }
+    };
     console.log("New Channel Details:", newChannelDetails);
     const channelResponse = await createChannel(newChannelDetails, userId);
     console.log("Channel Response:", channelResponse);
@@ -101,7 +106,7 @@ export default function CreateDirectMessagingChannel() {
     } else {
       console.error("Error creating channel:", channelResponse);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -109,15 +114,15 @@ export default function CreateDirectMessagingChannel() {
       <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-6">
         {/* Back Button */}
         <Button
-            variant="ghost"
-            className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-            onClick={() => navigate(-1)}
+          variant="ghost"
+          className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
+          onClick={() => navigate(-1)}
         >
           <ArrowLeft
-              className="text-gray-800"
-              size={24}
-              style={{width: "1.25rem", height: "1.25rem"}}
-              strokeWidth={3}
+            className="text-gray-800"
+            size={24}
+            style={{ width: "1.25rem", height: "1.25rem" }}
+            strokeWidth={3}
           />
         </Button>
 
@@ -132,11 +137,11 @@ export default function CreateDirectMessagingChannel() {
           </h1>
           <div className="relative w-full px-4 sm:px-0">
             {/* search bar for user's to search for players */}
-            <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500"/>
+            <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
             <Input
-                type="text"
-                placeholder="Search for a player"
-                className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
+              type="text"
+              placeholder="Search for a player"
+              className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
               value={searchQuery}
               onChange={(event) => {
                 setSearchQuery(event.target.value);
@@ -157,8 +162,13 @@ export default function CreateDirectMessagingChannel() {
                   >
                     <div className="flex items-center space-x-4">
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={user.pictureUrl} alt={user.firstName + " " + user.lastName} />
-                        <AvatarFallback>{user.firstName.charAt(0)}</AvatarFallback>
+                        <AvatarImage
+                          src={user.pictureUrl}
+                          alt={user.firstName + " " + user.lastName}
+                        />
+                        <AvatarFallback>
+                          {user.firstName.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                       <span className="font-medium font-font text-sm">
                         {user.firstName + " " + user.lastName}
@@ -179,17 +189,20 @@ export default function CreateDirectMessagingChannel() {
                     <Button
                       key={user.accountId}
                       variant="ghost"
-                      className=
-                          {`
+                      className={`
                             ${user.selected ? "bg-white opacity-60" : "bg-placeholder-colour"}
                             w-full flex items-center space-x-4 h-auto p-4 justify-start hover:bg-white
-                            ${user.accountId === userId ? "force-hide" : ""}`
-                          }
+                            ${user.accountId === userId ? "force-hide" : ""}`}
                       onClick={() => toggleUserSelection(user)}
                     >
                       <Avatar className="h-10 w-10">
-                        <AvatarImage src={user.pictureUrl} alt={user.firstName + " " + user.lastName} />
-                        <AvatarFallback>{user.firstName.charAt(0)}</AvatarFallback>
+                        <AvatarImage
+                          src={user.pictureUrl}
+                          alt={user.firstName + " " + user.lastName}
+                        />
+                        <AvatarFallback>
+                          {user.firstName.charAt(0)}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="flex justify-between w-full">
                         <div className="flex flex-col items-start gap-1">
@@ -200,17 +213,19 @@ export default function CreateDirectMessagingChannel() {
                             {user.type.toUpperCase()}
                           </span>
                         </div>
-                        {user.selected &&
-                            <div className="flex flex-grow items-center justify-end">
-                              <Check className="text-green-800"></Check>
-                        </div>
-                        }
+                        {user.selected && (
+                          <div className="flex flex-grow items-center justify-end">
+                            <Check className="text-green-800"></Check>
+                          </div>
+                        )}
                       </div>
                     </Button>
                   ))
                 ) : (
-                  <p className={`${searchQuery === "" ? "hidden" : ""} 
-                  text-center font-light font-font primary-colour`}>
+                  <p
+                    className={`${searchQuery === "" ? "hidden" : ""} 
+                  text-center font-light font-font primary-colour`}
+                  >
                     No players found
                   </p>
                 )}

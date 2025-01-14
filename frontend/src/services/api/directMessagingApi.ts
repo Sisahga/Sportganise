@@ -1,18 +1,24 @@
-import {Channel, CreateChannelDto} from "@/types/dmchannels.ts";
-import {MessageComponent} from "@/types/messaging.ts";
+import { Channel, CreateChannelDto } from "@/types/dmchannels.ts";
+import { MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/messaging";
 
 const directMessagingApi = {
-  createChannel: async (channel: CreateChannelDto, creatorId: number): Promise<ResponseDto<CreateChannelDto>> => {
-    const response = await fetch(`${baseMappingUrl}/channel/create-channel/${creatorId}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+  createChannel: async (
+    channel: CreateChannelDto,
+    creatorId: number,
+  ): Promise<ResponseDto<CreateChannelDto>> => {
+    const response = await fetch(
+      `${baseMappingUrl}/channel/create-channel/${creatorId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(channel),
       },
-      body: JSON.stringify(channel),
-    });
+    );
     const data = await response.json();
     console.log("Create Channel Response:", data);
     return data;
@@ -26,7 +32,7 @@ const directMessagingApi = {
   },
   getDirectMessages: async (channelId: number | null) => {
     const response = await fetch(
-        `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
+      `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
     );
     const data: MessageComponent[] = await response.json();
     return data;

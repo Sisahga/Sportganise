@@ -7,9 +7,9 @@ const accountApi = {
     const response = await fetch(
       `${baseMappingUrl}/get-all-users/${organizationId}`,
     );
-    const data:AccountDetailsDirectMessaging[] = await response.json();
+    const data: AccountDetailsDirectMessaging[] = await response.json();
     return data;
-  }
-}
+  },
+};
 
 export default accountApi;

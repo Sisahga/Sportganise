@@ -57,9 +57,11 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
               </p>
             ) : (
               <p className="text-sm text-gray-500 mt-1 truncate">
-                {channel.lastMessage.includes("INIT*") && parseInt(channel.lastMessage.split("*")[1]) === userId
+                {channel.lastMessage.includes("INIT*") &&
+                parseInt(channel.lastMessage.split("*")[1]) === userId
                   ? "You " + channel.lastMessage.split("*")[3]
-                  : channel.lastMessage.split("*")[2] + channel.lastMessage.split("*")[3]}
+                  : channel.lastMessage.split("*")[2] +
+                    channel.lastMessage.split("*")[3]}
               </p>
             )}
           </div>
