@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
+import trainingSessionApi from "@/services/api/trainingSessionApi";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -54,7 +55,8 @@ import {
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const accountId = ""; //update with cookie
+  const accountId = 2; //update with cookie
+  const { form } = useFormHandler();
 
   /**All select element options */
   //Options for type select
@@ -104,72 +106,50 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
-  const { form } = useFormHandler();
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
     try {
       // Prepare data to send through API as necessary
-      const json_payload = {
+      const jsonPayload = {
         ...values,
         attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
       };
-      console.log(json_payload);
-      console.log(JSON.stringify(json_payload, null, 2));
+      console.log(jsonPayload);
+      console.log(JSON.stringify(jsonPayload, null, 2));
 
       // API submit form
-      const response = await fetch(`/${accountId}/create-program`, {
-        //response is what is returned by the backend, like 200 OK. Can return info as well.
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", //If sending JSON
-        },
-        body: JSON.stringify(json_payload, null, 2), //stringify form values in JSON format and send through url
+      const data = await trainingSessionApi.createTrainingSession(
+        `${accountId}/create-program`,
+        jsonPayload
+      );
+      console.log("response.json() data", data);
+
+      // Toast popup for user to say form submitted successfully
+      toast({
+        title: "Form submitted successfully ✔",
+        description: "Event was added to your calendar.",
       });
 
-      // Check for HTTP errors
-      if (response.status === 201) {
-        // Success handling
-        const data = await response.json(); //data sent back from backend response to url call
-        console.log("Event created successfully:", data);
+      // Reset form fields
+      form.reset();
+      form.setValue("title", "");
+      form.setValue("type", "");
+      form.setValue("start_date", new Date());
+      form.setValue("end_date", new Date());
+      form.setValue("recurring", false);
+      form.setValue("visibility", "");
+      form.setValue("description", "");
+      form.setValue("attachment", undefined);
+      form.setValue("capacity", 0);
+      form.setValue("start_time", "");
+      form.setValue("end_time", "");
+      form.setValue("location", "");
 
-        // Toast popup for user to say form submitted successfully
-        toast({
-          title: "Form submitted successfully ✔",
-          description: "Event was added to your calendar.",
-        });
-
-        // Reset form fields
-        form.reset();
-        form.setValue("title", "");
-        form.setValue("type", "");
-        form.setValue("start_date", new Date());
-        form.setValue("end_date", new Date());
-        form.setValue("recurring", false);
-        form.setValue("visibility", "");
-        form.setValue("description", "");
-        form.setValue("attachment", undefined);
-        form.setValue("capacity", 0);
-        form.setValue("start_time", "");
-        form.setValue("end_time", "");
-        form.setValue("location", "");
-        form.reset();
-
-        // Navigate to home page
-        navigate("/HomePage");
-      } else {
-        const errorData = await response
-          .json()
-          .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
-        const errorMessage =
-          errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
-        form.reset();
-        throw new Error(errorMessage);
-        //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
-      }
-    } catch (error) {
-      console.error("Form submission error (error)", error);
-      //console.error("Error submitting form (message):", error.message);
+      // Navigate to home page
+      navigate("/HomePage");
+    } catch (err) {
+      console.error("Form submission error (error)", err);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
@@ -180,7 +160,6 @@ export default function CreateTrainingSessionForm() {
   };
 
   return (
-    //RETURN ---------------------------------------------------------------------------------------------------------
     <>
       {/** Navigate to previous page */}
       <Button
