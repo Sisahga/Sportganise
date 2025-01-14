@@ -42,13 +42,6 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "../ui/select";
 
 import {
   MoveLeft,
@@ -57,7 +50,6 @@ import {
   CloudUpload,
   Paperclip,
 } from "lucide-react";
-import { useEffect } from "react";
 
 //GLOBAL --------------------------------------------------------------------------------------------------------------
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
@@ -65,11 +57,9 @@ const formSchema = z
   .object({
     title: z.string(),
     type: z.string(),
-    durationMins: z.number().min(0),
-    frequency: z.string(),
-    occurenceDate: z.date(),
-    expiryDate: z.coerce.date(),
-    isRecurring: z.boolean().default(false),
+    start_date: z.coerce.date(),
+    end_date: z.coerce.date(),
+    recurring: z.boolean().default(false),
     visibility: z.string(),
     description: z.string(),
     attachment: z
@@ -81,63 +71,34 @@ const formSchema = z
       )
       .optional(),
     capacity: z.number().min(0),
-    startTime: z
+    notify: z.boolean().default(false),
+    start_time: z
       .string()
       .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
-    endTime: z
+    end_time: z
       .string()
       .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
     location: z.string(),
   })
-  .refine((data) => data.expiryDate >= data.occurenceDate, {
+  .refine((data) => data.end_date >= data.start_date, {
     message: "End date cannot be earlier than the start date.",
-    path: ["expiryDate"], //points to the end_date field in the error message
+    path: ["end_date"], //points to the end_date field in the error message
   })
-  .refine((data) => data.endTime >= data.startTime, {
+  .refine((data) => data.end_time >= data.start_time, {
     message: "End time cannot be earlier than start time.",
-    path: ["endTime"],
+    path: ["end_time"],
   })
   .refine(
     (data) =>
       !(
-        data.occurenceDate.getDate() === data.expiryDate.getDate() &&
-        data.isRecurring
+        data.start_date.getTime() === data.end_date.getTime() && data.recurring
       ),
     {
       message:
         "Event start and end dates are the same and therefore cannot reccur.",
-      path: ["isRecurring"],
-    }
-  )
-  .refine(
-    (data) => !(data.frequency == "Weekly" && data.isRecurring === false),
-    {
-      message: "Event cannot be non-recurring if event is set to weekly.",
-      path: ["isRecurring"],
-    }
-  )
-  .refine(
-    (data) =>
-      data.frequency === "nonRecurring" &&
-      data.isRecurring === false &&
-      data.occurenceDate.getDate() === data.expiryDate.getDate(),
-    {
-      message: "Event cannot be non-recurring if event is set to weekly.",
-      path: ["isRecurring"],
+      path: ["recurring"],
     }
   );
-/*
-  .refine((data) => data.isRecurring == false && data.frequency == null, {
-    message: "If event is non recurring than there cannot be a frequency.",
-    path: ["isRecurring"],
-  });
-  */
-/*
-  .refine((data) => !(data.isRecurring === true && data.frequency === ""), {
-    message: "Specify frequency if event is recurring.",
-    path: ["frequency"],
-  })
-  */
 
 //PAGE CONTENT -----------------------------------------------------------------------------------------------------------
 export default function CreateTrainingSessionForm() {
@@ -150,22 +111,22 @@ export default function CreateTrainingSessionForm() {
   const types = [
     {
       label: "Training Session",
-      value: "Training",
+      value: "training-session",
     },
     {
       label: "Fundraisor",
-      value: "Fundraisor",
+      value: "fundraisor",
     },
   ] as const;
   //Options for visibility select
   const visibilities = [
     {
       label: "Public",
-      value: "Public",
+      value: "public",
     },
     {
       label: "Members only",
-      value: "Members",
+      value: "members",
     },
   ] as const;
   //Options for location select
@@ -177,14 +138,6 @@ export default function CreateTrainingSessionForm() {
     {
       label: "Collège de Maisonnneuve",
       value: "Collège-de-Maisonnneuve",
-    },
-    {
-      label: "123 test water rd.",
-      value: "123 test water rd.",
-    },
-    {
-      label: "123 Main St",
-      value: "123 Main St",
     },
   ] as const;
 
@@ -248,6 +201,20 @@ export default function CreateTrainingSessionForm() {
 
         // Reset form fields
         form.reset();
+        form.setValue("title", "");
+        form.setValue("type", "");
+        form.setValue("start_date", new Date());
+        form.setValue("end_date", new Date());
+        form.setValue("recurring", false);
+        form.setValue("visibility", "");
+        form.setValue("description", "");
+        form.setValue("attachment", undefined);
+        form.setValue("capacity", 0);
+        form.setValue("notify", false);
+        form.setValue("start_time", "");
+        form.setValue("end_time", "");
+        form.setValue("location", "");
+        form.reset();
 
         // Navigate to home page
         navigate("/HomePage");
@@ -288,7 +255,7 @@ export default function CreateTrainingSessionForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto pt-10 pb-32"
+          className="space-y-8 max-w-3xl mx-auto pt-10"
         >
           {/*Form Title*/}
           <div>
@@ -378,7 +345,7 @@ export default function CreateTrainingSessionForm() {
           {/** Start Date */}
           <FormField
             control={form.control}
-            name="occurenceDate"
+            name="start_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -425,7 +392,7 @@ export default function CreateTrainingSessionForm() {
           {/** End Date */}
           <FormField
             control={form.control}
-            name="expiryDate"
+            name="end_date"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -473,7 +440,7 @@ export default function CreateTrainingSessionForm() {
             {/**Start Time */}
             <FormField
               control={form.control}
-              name="startTime"
+              name="start_time"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -493,7 +460,7 @@ export default function CreateTrainingSessionForm() {
             {/**End Time */}
             <FormField
               control={form.control}
-              name="endTime"
+              name="end_time"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -510,90 +477,6 @@ export default function CreateTrainingSessionForm() {
               )}
             />
           </div>
-
-          <FormField
-            control={form.control}
-            name="durationMins"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold text-base">
-                  Event Duration
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Duration in minutes"
-                    type="number"
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined
-                      )
-                    }
-                  />
-                </FormControl>
-                <FormDescription>
-                  Duration of the event in minutes.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/**Frequency */}
-          <FormField
-            control={form.control}
-            name="frequency"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold text-base">
-                  Frequency
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  //defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select recurrence " />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Weekly">Weekly</SelectItem>
-                    <SelectItem value="nonRecurring">Does not recur</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormDescription>
-                  Select when these events will recur.{" "}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** Recurring */}
-          <FormField
-            control={form.control}
-            name="isRecurring"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="font-semibold">
-                    Recurring event
-                  </FormLabel>
-                  <FormDescription>
-                    The event recurs on the start day and at the times entered.
-                  </FormDescription>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
 
           {/** Location */}
           <FormField
@@ -659,6 +542,31 @@ export default function CreateTrainingSessionForm() {
                   organization.
                 </FormDescription>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/** Recurring */}
+          <FormField
+            control={form.control}
+            name="recurring"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="font-semibold">
+                    Recurring event
+                  </FormLabel>
+                  <FormDescription>
+                    The event recurs on the day and at the times entered.
+                  </FormDescription>
+                  <FormMessage />
+                </div>
               </FormItem>
             )}
           />
@@ -765,8 +673,8 @@ export default function CreateTrainingSessionForm() {
                   <FileUploader
                     value={files}
                     onValueChange={(newFiles) => {
-                      setFiles(newFiles); //update local state
-                      field.onChange(newFiles); //synch with React Hook Form
+                      setFiles(newFiles); // Update local state
+                      field.onChange(newFiles); // Sync with React Hook Form
                     }}
                     dropzoneOptions={dropZoneConfig}
                     className="relative bg-background rounded-lg p-2"
@@ -830,6 +738,38 @@ export default function CreateTrainingSessionForm() {
               </FormItem>
             )}
           />
+
+          {/** Notify All Players */}
+          <div>
+            <FormField
+              control={form.control}
+              name="notify"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="font-semibold">
+                      Notify all players
+                    </FormLabel>
+                    <FormDescription>
+                      Notifies all subscribed members.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+            <div className="mt-2">
+              <a href="../" className=" underline text-neutral-400">
+                Customize attendance list
+              </a>
+            </div>
+          </div>
 
           {/** Submit Button */}
           <Button type="submit" className="w-full font-semibold">
