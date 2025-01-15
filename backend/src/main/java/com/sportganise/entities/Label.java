@@ -2,8 +2,6 @@ package com.sportganise.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -12,27 +10,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Entity Model for Organization table. */
+/** Entity Model for Label table. */
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "organization")
-public class Organization {
+@Table(name = "label")
+public class Label {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "label_id")
+  private Integer labelId;
+
   @Column(name = "org_id")
   private Integer orgId;
 
   @Column(name = "name")
-  private String orgName;
-
-  @Column(name = "type")
-  private String orgType;
-
-  @Column(name = "description")
-  private String orgDescription;
+  private String labelName;
 }
