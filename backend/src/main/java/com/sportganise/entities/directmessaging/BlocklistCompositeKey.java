@@ -10,6 +10,9 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
+/**
+ * Composite key for the blocklist table.
+ */
 @Getter
 @Setter
 @NoArgsConstructor

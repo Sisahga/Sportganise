@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Represents a blocklist entity.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
