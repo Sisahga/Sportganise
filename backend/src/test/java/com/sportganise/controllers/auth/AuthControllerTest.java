@@ -9,9 +9,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.account.Account;
 import com.sportganise.entities.Address;
 import com.sportganise.entities.Verification;
+import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.account.auth.EmailService;
 import com.sportganise.services.account.auth.VerificationService;

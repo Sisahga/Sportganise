@@ -3,16 +3,15 @@ package com.sportganise.services.account;
 import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.account.Account;
 import com.sportganise.entities.Address;
+import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
+import com.sportganise.services.account.auth.Auth0ApiService;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-
-import com.sportganise.services.account.auth.Auth0ApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

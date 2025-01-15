@@ -12,15 +12,14 @@ import static org.mockito.Mockito.verify;
 import com.sportganise.dto.accounts.UpdateAccountDto;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.account.Account;
 import com.sportganise.entities.Address;
+import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
-import java.util.Map;
-import java.util.Optional;
-
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.account.auth.Auth0ApiService;
+import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
