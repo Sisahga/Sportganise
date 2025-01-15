@@ -1,4 +1,4 @@
-package com.sportganise.dto.account;
+package com.sportganise.dto.accounts;
 
 import com.sportganise.entities.account.Address;
 import lombok.AllArgsConstructor;
