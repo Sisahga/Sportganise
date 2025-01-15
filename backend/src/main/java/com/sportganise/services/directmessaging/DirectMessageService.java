@@ -160,6 +160,27 @@ public class DirectMessageService {
   }
 
   /**
+   * Sends a first DM of type JOIN in channel just created.
+   *
+   * @param channelId The ID of the channel.
+   * @param creatorId The ID of the creator.
+   * @param creatorFirstName The first name of the creator.
+   */
+  public void sendCreationDirectMessage(int channelId, int creatorId, String creatorFirstName) {
+    DirectMessage directMessage = new DirectMessage();
+    directMessage.setSenderId(creatorId);
+    directMessage.setChannelId(channelId);
+    directMessage.setContent(
+        "INIT*" + creatorId + "*" + creatorFirstName + "* created the message channel.");
+    directMessage.setSentAt(ZonedDateTime.now());
+    directMessage.setType(DirectMessageType.JOIN);
+    directMessageRepository.save(directMessage);
+
+    // Update Last Message in Channel Table.
+    directMessageChannelRepository.updateLastMessageId(channelId, directMessage.getMessageId());
+  }
+
+  /**
    * (WIP, next sprint) Notifies a channel that a new member has been added (acts a JOIN message).
    *
    * @param sendDirectMessageRequestDto DTO containing the channel's added member's ID in the
