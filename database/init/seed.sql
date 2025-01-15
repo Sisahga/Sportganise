@@ -29,7 +29,11 @@ INSERT INTO account (
 ('general', 'general@example.com', 'auth0|6743f6b91b370b4f20d286f1',
  '780 Rue Totoz', 'Montréal', 'Québec', 'Canada', 'H0H 0H0',
  '666-666-6666', 'Skylar', 'White',
- 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/skylar_white_avatar.jpg');
+ 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/skylar_white_avatar.jpg'),
+ ('general', 'mike@gmail.com', 'auth0|6743f6b91b370b4f20d286f2', '123 Rue Tarantino',
+  'Montreal', 'Quebec', 'Canada', 'H1H 2H3',
+  '222-222-2222', 'Mike', 'Ehrmantraut',
+  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/mike_avatar.png');
 
 INSERT INTO label (org_id,name) VALUES
 ( 1,'SundayGroup'),
@@ -46,7 +50,7 @@ INSERT INTO program (type, title, description, capacity, occurence_date, duratio
 
 -- Subscribed Blocked General (Jesse Blocked Skylar)
 INSERT INTO blocklist (account_id, blocked_id) VALUES
-    (3, 5);
+    (3, 6);
 
 INSERT INTO label_account (label_id, account_id, role) VALUES
 (1,3, 'Subscribed'),
@@ -62,7 +66,8 @@ INSERT INTO account_organization (org_id, account_id) VALUES
 (1, 2),
 (1, 3),
 (1, 4),
-(1, 5);
+(1, 5),
+(1, 6);
 
 -- Skipping account-settings
 
