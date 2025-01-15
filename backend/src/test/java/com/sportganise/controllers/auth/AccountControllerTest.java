@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sportganise.controllers.AccountController;
 import com.sportganise.dto.accounts.UpdateAccountDto;
-import com.sportganise.entities.Address;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
 import java.util.Optional;

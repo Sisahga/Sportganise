@@ -1,6 +1,5 @@
 package com.sportganise.entities.account;
 
-import com.sportganise.entities.Address;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
