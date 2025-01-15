@@ -108,7 +108,7 @@ public class ProgramControllerTest {
     // Mock the accountService to return Optional.empty() for accountId = 999
     Mockito.when(accountService.getAccount(999)).thenReturn(Optional.empty());
 
-    mockMvc.perform(get("/api/programs/999/111/details")).andExpect(status().isNotFound());
+    mockMvc.perform(get("/api/programs/999/111/programs")).andExpect(status().isNotFound());
   }
 
   // Test getProgramDetails for when program does not exist
@@ -122,7 +122,7 @@ public class ProgramControllerTest {
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
 
-    mockMvc.perform(get("/api/programs/2/999/details")).andExpect(status().isNotFound());
+    mockMvc.perform(get("/api/programs/2/999/programs")).andExpect(status().isNotFound());
   }
 
   // Test getProgramDetails for when user has permission eg. COACH or ADMIN
@@ -150,7 +150,7 @@ public class ProgramControllerTest {
 
     // Perform the request and assert the response
     mockMvc
-        .perform(get("/api/programs/2/111/details"))
+        .perform(get("/api/programs/2/111/programs"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.programDetails.programId").value(111))
         .andExpect(jsonPath("$.programDetails.title").value("Training Program"));
@@ -171,7 +171,7 @@ public class ProgramControllerTest {
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
     mockMvc
-        .perform(get("/api/programs/2/111/details"))
+        .perform(get("/api/programs/2/111/programs"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.programDetails.programId").value(111))
         .andExpect(jsonPath("$.programDetails.title").value("Training Program"))

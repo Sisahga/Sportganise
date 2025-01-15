@@ -2,10 +2,12 @@ package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
-import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +24,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and
+ * routes them to
  * appropriate services.
  */
 @RestController
 @RequestMapping("/api/programs")
+@Slf4j
 public class ProgramController {
   private final ProgramService programService;
   private final AccountService accountService;
@@ -56,12 +60,11 @@ public class ProgramController {
    * Get mapping for program session details.
    *
    * @param accountId Id of account
-   * @param programId Id of program
    * @return HTTP Response
    */
-  @GetMapping("/{accountId}/{programId}/details")
-  public ResponseEntity<ProgramDetailsParticipantsDto> getProgramDetails(
-      @PathVariable Integer accountId, @PathVariable Integer programId) {
+  @GetMapping("/{accountId}/details")
+  public ResponseEntity<List<ProgramDetailsParticipantsDto>> getProgramDetails(
+      @PathVariable Integer accountId) {
 
     // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = getAccount(accountId);
@@ -75,36 +78,34 @@ public class ProgramController {
     Account user = userOptional.get();
 
     // Fetch program details
-    ProgramDto programDto = programService.getProgramDetails(programId);
+    List<ProgramDto> programDtos = programService.getPrograms();
 
     // Check if the value of programDtoOptional is null
-    if (programDto == null) {
+    if (programDtos.isEmpty()) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    // Initialize a list of AccountDto as an empty/null arraylist
-    List<ProgramParticipantDto> participants = new ArrayList<>();
+    // Initialize a list of participants and a list of all programs as an empty/null
+    // arraylist
+    List<ProgramDetailsParticipantsDto> allPrograms = new ArrayList<>();
 
     // Check if this user has permissions to see training sessions attendees
     // (i.e. if the user is of type COACH or ADMIN)
     // If they have permission, then they can see the list of participants
-    if (accountService.hasPermissions(user.getType())) {
-      participants = programService.getParticipants(programId);
+    if (hasPermissions(user)) {
+      allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, true);
+    } else {
+      allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, false);
     }
 
-    // Wrap program details and participants into the ProgramDetailsParticipantsDto
-    // response DTO
-    ProgramDetailsParticipantsDto response =
-        new ProgramDetailsParticipantsDto(programDto, participants);
-
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(allPrograms);
   }
 
   /**
    * Post mapping for creating new program.
    *
    * @param accountId Id of user who is making the request.
-   * @param payload Json payload passed from frontend.
+   * @param payload   Json payload passed from frontend.
    * @return HTTP Response for newly created program.
    */
   @PostMapping("/{accountId}/create-program")
@@ -130,21 +131,20 @@ public class ProgramController {
 
     try {
       Map<String, Object> fields = extractPayloadFields(payload);
-      ProgramDto programDto =
-          programService.createProgramDto(
-              (String) fields.get("title"),
-              (String) fields.get("type"),
-              (String) fields.get("start_date"),
-              (String) fields.get("end_date"),
-              (Boolean) fields.get("recurring"),
-              (String) fields.get("visibility"),
-              (String) fields.get("description"),
-              (Integer) fields.get("capacity"),
-              (Boolean) fields.get("notify"),
-              (String) fields.get("start_time"),
-              (String) fields.get("end_time"),
-              (String) fields.get("location"),
-              (List<Map<String, String>>) fields.get("attachment"));
+      ProgramDto programDto = programService.createProgramDto(
+          (String) fields.get("title"),
+          (String) fields.get("type"),
+          (String) fields.get("start_date"),
+          (String) fields.get("end_date"),
+          (Boolean) fields.get("recurring"),
+          (String) fields.get("visibility"),
+          (String) fields.get("description"),
+          (Integer) fields.get("capacity"),
+          (Boolean) fields.get("notify"),
+          (String) fields.get("start_time"),
+          (String) fields.get("end_time"),
+          (String) fields.get("location"),
+          (List<Map<String, String>>) fields.get("attachment"));
       return new ResponseEntity<>(programDto, HttpStatus.CREATED);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -156,7 +156,7 @@ public class ProgramController {
    *
    * @param accountId Id of user who is making the request.
    * @param programId Id of the program that we wish to modify.
-   * @param payload Json payload passed from frontend.
+   * @param payload   Json payload passed from frontend.
    * @return HTTP Response for modified/updated data
    */
   @PutMapping("/{accountId}/{programId}/modify-program")

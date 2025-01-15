@@ -173,7 +173,7 @@ public class AccountService {
    * @return True if user is an ADMIN or COACH, false otherwise
    */
   public boolean hasPermissions(String roleType) {
-    return roleType.equals("ADMIN") || roleType.equals("COACH");
+    return roleType.toUpperCase().equals("ADMIN") || roleType.toUpperCase().equals("COACH");
   }
 
   /**

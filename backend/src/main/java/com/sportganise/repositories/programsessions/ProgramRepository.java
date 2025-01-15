@@ -19,6 +19,12 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
       """)
   Program findProgramById(@Param("programId") Integer programId);
 
+  @Query("""
+      SELECT p
+      FROM Program p
+      """)
+  List<Program> findPrograms();
+
   @Query(
       """
       SELECT p
