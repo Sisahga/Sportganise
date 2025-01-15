@@ -130,7 +130,7 @@ export default function UploadTrainingPlanFiles() {
                           &nbsp; or drag and drop
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          DOC
+                          DOC, DOCX, DOT, DOTX, DOCM, DOTM
                         </p>
                       </div>
                     </FileInput>
@@ -146,9 +146,7 @@ export default function UploadTrainingPlanFiles() {
                     </FileUploaderContent>
                   </FileUploader>
                 </FormControl>
-                <FormDescription>
-                  Select a file to upload. Only .doc accepted.
-                </FormDescription>
+                <FormDescription>Select a file to upload.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
