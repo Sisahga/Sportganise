@@ -85,14 +85,16 @@ public class ProgramController {
     // arraylist
     List<ProgramDetailsParticipantsDto> allPrograms = new ArrayList<>();
 
+    Boolean canDisplayAttendees = false;
+
     // Check if this user has permissions to see training sessions attendees
     // (i.e. if the user is of type COACH or ADMIN)
     // If they have permission, then they can see the list of participants
     if (hasPermissions(user)) {
-      allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, true);
-    } else {
-      allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, false);
+      canDisplayAttendees = true;
     }
+
+    allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, canDisplayAttendees);
 
     return ResponseEntity.ok(allPrograms);
   }
