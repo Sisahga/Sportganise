@@ -9,14 +9,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Composite key for the ProgramParticipant entity. */
+/** Composite Key Id for ProgramParticipant. */
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-@Embeddable
+@AllArgsConstructor
 @EqualsAndHashCode
-public class ProgramParticipantCompositeKey implements Serializable {
+@Embeddable
+public class ProgramParticipantId implements Serializable {
+
   @Column(name = "program_id")
   private Integer programId;
 
