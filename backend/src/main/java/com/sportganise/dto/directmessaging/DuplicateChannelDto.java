@@ -1,21 +1,20 @@
 package com.sportganise.dto.directmessaging;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** API DTO for creating a new direct message channel. */
+/** DuplicateChannelDto. */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateDirectMessageChannelDto {
+@Builder
+public class DuplicateChannelDto {
   private Integer channelId;
   private String channelName;
   private String channelType;
-  private List<Integer> memberIds;
-  private String createdAt;
-  private String avatarUrl; // This will be set on creation only if it is a 'SIMPLE' channel.
+  private String channelImageBlob;
 }

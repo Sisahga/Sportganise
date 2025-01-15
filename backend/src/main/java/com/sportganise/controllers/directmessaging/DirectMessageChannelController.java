@@ -1,5 +1,6 @@
 package com.sportganise.controllers.directmessaging;
 
+import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
@@ -41,7 +42,7 @@ public class DirectMessageChannelController {
    * @return HTTP Code 201 and Created DM Channel DTO.
    */
   @PostMapping("/create-channel/{accountId}")
-  public ResponseEntity<CreateDirectMessageChannelDto> createChannel(
+  public ResponseEntity<ResponseDto<CreateDirectMessageChannelDto>> createChannel(
       @RequestBody CreateDirectMessageChannelDto channelDto, @PathVariable int accountId) {
     String channelName = channelDto.getChannelName();
     List<Integer> memberIds = channelDto.getMemberIds();
@@ -49,7 +50,17 @@ public class DirectMessageChannelController {
         this.directMessageChannelService.createDirectMessageChannel(
             memberIds, channelName, accountId);
 
-    return new ResponseEntity<>(dmChannelDto, HttpStatus.CREATED);
+    if (dmChannelDto.getCreatedAt() == null) { // Channel already exists, so no timestamp created.
+      ResponseDto<CreateDirectMessageChannelDto> response =
+          new ResponseDto<>(
+              HttpStatus.FOUND.value(), "Channel with theses members already exists", dmChannelDto);
+      return new ResponseEntity<>(response, HttpStatus.FOUND);
+    } else {
+      ResponseDto<CreateDirectMessageChannelDto> response =
+          new ResponseDto<>(
+              HttpStatus.CREATED.value(), "Channel created successfully", dmChannelDto);
+      return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
   }
 
   /**

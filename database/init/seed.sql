@@ -39,9 +39,9 @@ INSERT INTO sport (name) VALUES
 ('Basketball'),
 ('Badminton');
 
-INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility, attachment) VALUES
-    ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01', 120, TRUE, '2024-08-01', 'Weekly', '123 test water rd.', 'Public', null),
-    ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15', 90, FALSE, NULL, NULL, '123 Main St', 'Public', './Lab4.pdf');
+INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility, attachments) VALUES
+    ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public', null),
+    ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public', '{"./Lab4.pdf"}');
 
 
 -- Subscribed Blocked General (Jesse Blocked Skylar)
@@ -51,7 +51,8 @@ INSERT INTO blocklist (account_id, blocked_id) VALUES
 INSERT INTO label_account (label_id, account_id, role) VALUES
 (1,3, 'Subscribed'),
 (1,2,'Coach'),
-(1,4,'Waitlisted');
+(1,4,'Waitlisted'),
+(1,5,'Waitlisted');
 
 INSERT INTO organization_sport (org_id, sport_id) VALUES
 (1, 2),
@@ -67,20 +68,26 @@ INSERT INTO account_organization (org_id, account_id) VALUES
 -- Skipping account-settings
 
 INSERT INTO program_participants (program_id, account_id, type, is_confirmed, confirm_date) VALUES
-(1, 3, 'Player', TRUE, '2024-06-20 10:30:00');
+(1, 3, 'Player', TRUE, '2024-06-20 10:30:00'),
+(1, 4, 'Player', FALSE, null),
+(1, 5, 'Player', FALSE, null);
 
 
 INSERT INTO label_program (label_id, program_id, type) VALUES
 (1, 1, 'Private'),
 (1, 2, 'Public');
 
-INSERT INTO channel (name, type, image_blob) VALUES
+INSERT INTO channel (name, type, image_blob, channel_hash) VALUES
 ('Badmintinors', 'GROUP',
- 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png'),
+ 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png',
+ 'd3404059a01f4426ac8962d8a2d07f4b82824293477b5c929e4303678cbf0359'),
 ('Onibaddies', 'GROUP',
- 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/Layne+Staley+portrait.jpg'),
-(null, 'SIMPLE', null),
-(null, 'SIMPLE', null);
+ 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/Layne+Staley+portrait.jpg',
+ 'df8fbe4237c3e1f9363d6f103185c57a782ddd8b899d6484930cebbdb6f9ca7f'),
+(null, 'SIMPLE', null,
+ '3a316d6d3226f84c1e46e4447fa8d5fd800bff4a1bc6498152523cd4a602b69b'),
+(null, 'SIMPLE', null,
+ '5bf775530e2e5fcd9c6ae577c52cd57a20d13ebb5f7bc3e8a8a7920d3a7ce41e');
 
 
 INSERT INTO channel_member (channel_id, account_id, read) VALUES
@@ -89,6 +96,7 @@ INSERT INTO channel_member (channel_id, account_id, read) VALUES
 (1, 4, true),
 (2,1, true),
 (2,2, false),
+(2, 4, true),
 (3, 1, false),
 (3, 2, true),
 (4, 2, false),

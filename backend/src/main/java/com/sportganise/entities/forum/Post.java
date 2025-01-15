@@ -5,9 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import java.sql.Date;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -39,8 +37,7 @@ public class Post {
   private String attachment;
 
   @Column(nullable = false, updatable = false)
-  @Temporal(TemporalType.DATE)
-  private Date creationDate;
+  private ZonedDateTime creationDate;
 
   /** Constructor for Post. */
   public Post(String title, String description) {
