@@ -218,7 +218,7 @@ public class AccountService {
   }
 
   public List<AccountDetailsDirectMessaging> getAllNonAdminAccountsByOrganizationId(
-      int organizationId) {
-    return accountRepository.getAllNonAdminAccountsByOrganization(organizationId);
+      int organizationId, int currentUserId) {
+    return accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, currentUserId);
   }
 }

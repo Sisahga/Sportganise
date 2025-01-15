@@ -250,26 +250,23 @@ public class AccountServiceTest {
     List<AccountDetailsDirectMessaging> mockAccounts =
         List.of(
             new AccountDetailsDirectMessaging(
-                1, "John", "Doe", "user1@example.com", "555-5555", "PLAYER"),
-            new AccountDetailsDirectMessaging(
                 2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER"));
 
     // Mock the repository call
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
         .willReturn(mockAccounts);
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+        accountService.getAllNonAdminAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
-    assertEquals(2, result.size()); // Verify that the returned list has the correct size
-    assertEquals("John", result.get(0).getFirstName()); // Check first account data
-    assertEquals("Jane", result.get(1).getFirstName()); // Check second account data
+    assertEquals(1, result.size()); // Verify that the returned list has the correct size
+    assertEquals("Jane", result.getFirst().getFirstName()); // Check second account data
 
     // Verify that the repository was called exactly once
-    verify(accountRepository, times(1)).getAllNonAdminAccountsByOrganization(organizationId);
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId,1);
   }
 
   @Test
@@ -277,18 +274,18 @@ public class AccountServiceTest {
     int organizationId = 1;
 
     // Mock the repository to return an empty list
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
         .willReturn(List.of());
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+        accountService.getAllNonAdminAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
     assertTrue(result.isEmpty(), "The result should be an empty list");
 
     // Verify that the repository was called exactly once
-    verify(accountRepository, times(1)).getAllNonAdminAccountsByOrganization(organizationId);
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
 }

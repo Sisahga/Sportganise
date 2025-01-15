@@ -89,10 +89,10 @@ public class AccountController {
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/get-all-users/{organizationId}")
+  @GetMapping("/get-all-users/{organizationId}/{accountId}")
   public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(
-      @PathVariable int organizationId) {
+      @PathVariable int organizationId, @PathVariable int accountId) {
     return new ResponseEntity<>(
-        this.accountService.getAllNonAdminAccountsByOrganizationId(organizationId), HttpStatus.OK);
+        this.accountService.getAllNonAdminAccountsByOrganizationId(organizationId, accountId), HttpStatus.OK);
   }
 }

@@ -102,28 +102,23 @@ class AccountControllerTest {
     List<AccountDetailsDirectMessaging> accounts =
         List.of(
             new AccountDetailsDirectMessaging(
-                1, "John", "Doe", "test@example.com", "5146662272", "PLAYER"),
-            new AccountDetailsDirectMessaging(
                 2, "Jane", "Smith", "jane@example.com", "5145551234", "PLAYER"));
 
     // Mock service behavior
-    given(accountService.getAllNonAdminAccountsByOrganizationId(organizationId))
+    given(accountService.getAllNonAdminAccountsByOrganizationId(organizationId, 1))
         .willReturn(accounts);
 
     // Perform GET request
     mockMvc
         .perform(
             MockMvcRequestBuilders.get(
-                    "/api/account/get-all-users/{organizationId}", organizationId)
+                    "/api/account/get-all-users/{organizationId}/1", organizationId)
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.size()", is(accounts.size())))
-        .andExpect(jsonPath("$[0].firstName", is(accounts.get(0).getFirstName())))
-        .andExpect(jsonPath("$[0].lastName", is(accounts.get(0).getLastName())))
-        .andExpect(jsonPath("$[0].phone", is(accounts.get(0).getPhone())))
-        .andExpect(jsonPath("$[1].firstName", is(accounts.get(1).getFirstName())))
-        .andExpect(jsonPath("$[1].lastName", is(accounts.get(1).getLastName())))
-        .andExpect(jsonPath("$[1].phone", is(accounts.get(1).getPhone())));
+        .andExpect(jsonPath("$[0].firstName", is(accounts.getFirst().getFirstName())))
+        .andExpect(jsonPath("$[0].lastName", is(accounts.getFirst().getLastName())))
+        .andExpect(jsonPath("$[0].phone", is(accounts.getFirst().getPhone())));
   }
 
   @Test

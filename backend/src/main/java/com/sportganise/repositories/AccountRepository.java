@@ -37,10 +37,20 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
       """
          SELECT new com.sportganise.dto.account.AccountDetailsDirectMessaging(
                  a.accountId, a.firstName, a.lastName, a.pictureUrl, a.type, a.phone)
-         FROM Account a
-         JOIN AccountOrganization ao ON a.accountId = ao.compositeKey.accountId
-         WHERE ao.compositeKey.organizationId = :organizationId
-          AND a.type <> 'ADMIN'
+             FROM Account a
+             JOIN AccountOrganization ao ON a.accountId = ao.compositeKey.accountId
+             LEFT JOIN Blocklist b1 ON a.accountId = b1.compositeBlocklistId.blockedId
+                 AND b1.compositeBlocklistId.accountId = :currentUserId
+             LEFT JOIN Blocklist b2 ON a.accountId = b2.compositeBlocklistId.accountId
+                 AND b2.compositeBlocklistId.blockedId = :currentUserId
+             WHERE ao.compositeKey.organizationId = :organizationId
+                 AND a.type <> 'ADMIN'
+                 AND b1.compositeBlocklistId IS NULL
+                 AND b2.compositeBlocklistId IS NULL
+                 AND a.accountId <> :currentUserId
         """)
-  List<AccountDetailsDirectMessaging> getAllNonAdminAccountsByOrganization(int organizationId);
+  List<AccountDetailsDirectMessaging> getAllNonBlockedAccountsByOrganization(
+    int organizationId,
+    int currentUserId
+  );
 }
