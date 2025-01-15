@@ -1,6 +1,6 @@
 package com.sportganise.services.account.auth;
 
-import com.sportganise.dto.account.auth.Auth0AccountDto;
+import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;

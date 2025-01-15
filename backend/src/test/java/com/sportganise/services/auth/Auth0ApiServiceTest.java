@@ -1,4 +1,4 @@
-package com.sportganise.services.account.auth;
+package com.sportganise.services.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -6,11 +6,12 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-import com.sportganise.dto.account.auth.Auth0AccountDto;
+import com.sportganise.dto.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.account.AccountService;
+import com.sportganise.services.account.auth.Auth0ApiService;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;

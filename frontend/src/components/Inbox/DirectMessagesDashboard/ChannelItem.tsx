@@ -2,12 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
 
-const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
+const ChannelItem: React.FC<ChannelItemProps> = ({
   channel,
   layout = "vertical",
   extraInfo,
 }) => {
   const navigate = useNavigate();
+  const userId = 2; // TODO: Take cookie user id.
 
   const handleClick = () => {
     navigate("/pages/DirectMessageChannelPage", {
@@ -50,9 +51,17 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
         <div className="ml-4 flex justify-between flex-1 min-w-0">
           <div className="flex flex-col overflow-hidden">
             <p className="text-md font-semibold">{channel.channelName}</p>
-            {channel.lastMessage && (
+            {!channel.lastMessage?.startsWith("INIT*") ? (
               <p className="text-sm text-gray-500 mt-1 truncate">
                 {channel.lastMessage}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-500 mt-1 truncate">
+                {channel.lastMessage.includes("INIT*") &&
+                parseInt(channel.lastMessage.split("*")[1]) === userId
+                  ? "You " + channel.lastMessage.split("*")[3]
+                  : channel.lastMessage.split("*")[2] +
+                    channel.lastMessage.split("*")[3]}
               </p>
             )}
           </div>
@@ -86,4 +95,4 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   );
 };
 
-export default MessagingDashboardChannelItem;
+export default ChannelItem;

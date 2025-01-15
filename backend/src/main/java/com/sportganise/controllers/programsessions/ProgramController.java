@@ -6,8 +6,6 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,13 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST Controller for managing 'Program' Entities. Handles HTTP request and
- * routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
  * appropriate services.
  */
 @RestController
 @RequestMapping("/api/programs")
-@Slf4j
 public class ProgramController {
   private final ProgramService programService;
   private final AccountService accountService;
@@ -131,20 +127,21 @@ public class ProgramController {
 
     try {
       Map<String, Object> fields = extractPayloadFields(payload);
-      ProgramDto programDto = programService.createProgramDto(
-          (String) fields.get("title"),
-          (String) fields.get("type"),
-          (String) fields.get("start_date"),
-          (String) fields.get("end_date"),
-          (Boolean) fields.get("recurring"),
-          (String) fields.get("visibility"),
-          (String) fields.get("description"),
-          (Integer) fields.get("capacity"),
-          (Boolean) fields.get("notify"),
-          (String) fields.get("start_time"),
-          (String) fields.get("end_time"),
-          (String) fields.get("location"),
-          (List<Map<String, String>>) fields.get("attachment"));
+      ProgramDto programDto =
+          programService.createProgramDto(
+              (String) fields.get("title"),
+              (String) fields.get("type"),
+              (String) fields.get("start_date"),
+              (String) fields.get("end_date"),
+              (Boolean) fields.get("recurring"),
+              (String) fields.get("visibility"),
+              (String) fields.get("description"),
+              (Integer) fields.get("capacity"),
+              (Boolean) fields.get("notify"),
+              (String) fields.get("start_time"),
+              (String) fields.get("end_time"),
+              (String) fields.get("location"),
+              (List<Map<String, String>>) fields.get("attachment"));
       return new ResponseEntity<>(programDto, HttpStatus.CREATED);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

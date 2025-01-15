@@ -60,6 +60,10 @@
   background-color: var(--primary-white);
 }
 
+.force-hide {
+  display: none !important;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

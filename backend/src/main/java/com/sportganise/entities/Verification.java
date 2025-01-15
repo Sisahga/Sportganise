@@ -1,5 +1,6 @@
-package com.sportganise.entities.account;
+package com.sportganise.entities;
 
+import com.sportganise.entities.account.Account;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
