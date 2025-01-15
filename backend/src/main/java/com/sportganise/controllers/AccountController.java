@@ -1,9 +1,9 @@
 package com.sportganise.controllers;
 
 import com.sportganise.dto.accounts.UpdateAccountDto;
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
-import com.sportganise.services.auth.AccountService;
+import com.sportganise.services.account.AccountService;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;

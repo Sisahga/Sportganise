@@ -9,12 +9,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.auth.AccountDto;
 import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import com.sportganise.entities.Address;
 import com.sportganise.entities.Verification;
-import com.sportganise.services.auth.AccountService;
-import com.sportganise.services.auth.EmailService;
-import com.sportganise.services.auth.VerificationService;
+import com.sportganise.services.account.AccountService;
+import com.sportganise.services.account.auth.EmailService;
+import com.sportganise.services.account.auth.VerificationService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;

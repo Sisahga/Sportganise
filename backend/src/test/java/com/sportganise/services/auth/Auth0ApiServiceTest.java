@@ -7,11 +7,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
 import java.util.Optional;
+
+import com.sportganise.services.account.AccountService;
+import com.sportganise.services.account.auth.Auth0ApiService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

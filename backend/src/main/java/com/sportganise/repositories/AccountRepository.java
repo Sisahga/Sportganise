@@ -1,6 +1,6 @@
 package com.sportganise.repositories;
 
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

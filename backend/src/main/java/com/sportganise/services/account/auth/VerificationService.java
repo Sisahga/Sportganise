@@ -1,6 +1,6 @@
-package com.sportganise.services.auth;
+package com.sportganise.services.account.auth;
 
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
 import com.sportganise.entities.Verification;
 import com.sportganise.repositories.VerificationRepository;
 import java.sql.Timestamp;
