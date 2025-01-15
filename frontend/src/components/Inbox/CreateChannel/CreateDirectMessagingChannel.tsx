@@ -35,7 +35,7 @@ export default function CreateDirectMessagingChannel() {
   };
 
   // Fetch all users from the backend
-  const { users } = useAccountDetailsDirectMessaging(organizationId);
+  const { users } = useAccountDetailsDirectMessaging(organizationId, userId);
 
   // Use Create Channel hook
   const { createChannel } = useCreateChannel();
