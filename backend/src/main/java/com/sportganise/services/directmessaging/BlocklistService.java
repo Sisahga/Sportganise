@@ -5,6 +5,7 @@ import com.sportganise.entities.directmessaging.BlocklistCompositeKey;
 import com.sportganise.repositories.directmessaging.BlocklistRepository;
 import org.springframework.stereotype.Service;
 
+/** Service for blocking users. */
 @Service
 public class BlocklistService {
   private final BlocklistRepository blocklistRepository;
@@ -13,6 +14,12 @@ public class BlocklistService {
     this.blocklistRepository = blocklistRepository;
   }
 
+  /**
+   * Blocks a user.
+   *
+   * @param accountId The account ID of the user blocking the other user
+   * @param blockedAccountId The account ID of the user being blocked
+   */
   public void blockUser(int accountId, int blockedAccountId) {
     BlocklistCompositeKey blocklistCompositeKey =
         new BlocklistCompositeKey(accountId, blockedAccountId);

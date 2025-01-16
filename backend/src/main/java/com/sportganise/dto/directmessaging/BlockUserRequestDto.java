@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Data Transfer Object for blocking a user. */
 @Getter
 @Setter
 @AllArgsConstructor
