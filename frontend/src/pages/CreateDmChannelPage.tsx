@@ -1,5 +1,4 @@
-import CreateDirectMessagingChannel
-  from "@/components/Inbox/CreateChannel/CreateDirectMessageChannel.tsx";
+import CreateDirectMessagingChannel from "@/components/Inbox/CreateChannel/CreateDirectMessageChannel.tsx";
 
 export default function CreateDmChannelPage() {
   return (
