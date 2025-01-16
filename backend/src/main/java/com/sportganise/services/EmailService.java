@@ -21,7 +21,7 @@ public class EmailService {
   }
 
   /**
-   * Send an email to an email.
+   * Send a verification code to an email.
    *
    * @param toEmail email to send to
    * @param code verification code
