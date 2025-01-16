@@ -1,8 +1,8 @@
 package com.sportganise.services.account;
 
-import com.sportganise.dto.accounts.UpdateAccountDto;
-import com.sportganise.dto.auth.AccountDto;
-import com.sportganise.dto.auth.Auth0AccountDto;
+import com.sportganise.dto.account.UpdateAccountDto;
+import com.sportganise.dto.account.auth.AccountDto;
+import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
