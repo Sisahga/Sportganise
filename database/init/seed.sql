@@ -49,7 +49,7 @@ INSERT INTO program (type, title, description, capacity, occurence_date, duratio
 
 
 INSERT INTO blocklist (account_id, blocked_id) VALUES
-    (3, 6);
+    (2, 6);
 
 INSERT INTO label_account (label_id, account_id, role) VALUES
 (1,3, 'Subscribed'),
