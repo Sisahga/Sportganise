@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 import useCreateChannel from "@/hooks/useCreateChannel.tsx";
 import { CreateChannelDto } from "@/types/dmchannels.ts";
 
-export default function CreateFirstDmContent() {
+export default function CreateDirectMessagingChannel() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ export default function CreateFirstDmContent() {
   };
 
   // Fetch all users from the backend
-  const { users } = useAccountDetailsDirectMessaging(organizationId);
+  const { users } = useAccountDetailsDirectMessaging(organizationId, userId);
 
   // Use Create Channel hook
   const { createChannel } = useCreateChannel();

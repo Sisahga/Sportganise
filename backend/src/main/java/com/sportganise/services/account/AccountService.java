@@ -1,5 +1,6 @@
 package com.sportganise.services.account;
 
+import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
@@ -10,6 +11,7 @@ import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.auth.Auth0ApiService;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ public class AccountService {
 
   private final AccountRepository accountRepository;
   private final Auth0ApiService auth0ApiService;
-  private BlobService blobService;
+  private final BlobService blobService;
 
   /**
    * Constructor for account service.
@@ -213,5 +215,10 @@ public class AccountService {
     return accountRepository
         .findByEmail(email)
         .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+  }
+
+  public List<AccountDetailsDirectMessaging> getAllNonBlockedAccountsByOrganizationId(
+      int organizationId, int currentUserId) {
+    return accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, currentUserId);
   }
 }
