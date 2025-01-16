@@ -3,8 +3,8 @@ package com.sportganise.services.account.auth;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.sportganise.entities.account.Verification;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.Verification;
 import com.sportganise.repositories.VerificationRepository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
