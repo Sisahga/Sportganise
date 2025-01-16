@@ -9,12 +9,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.sportganise.controllers.AccountController;
-import com.sportganise.dto.accounts.UpdateAccountDto;
+import com.sportganise.controllers.account.AccountController;
+import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -89,6 +91,34 @@ class AccountControllerTest {
         .andExpect(jsonPath("$.phone", is(account.getPhone())))
         .andExpect(jsonPath("$.firstName", is(account.getFirstName())))
         .andExpect(jsonPath("$.lastName", is(account.getLastName())));
+  }
+
+  @Test
+  @Order(3)
+  public void getAllUsersByOrganizationTest() throws Exception {
+    int organizationId = 1;
+
+    // Mock data
+    List<AccountDetailsDirectMessaging> accounts =
+        List.of(
+            new AccountDetailsDirectMessaging(
+                2, "Jane", "Smith", "jane@example.com", "5145551234", "PLAYER"));
+
+    // Mock service behavior
+    given(accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1))
+        .willReturn(accounts);
+
+    // Perform GET request
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get(
+                    "/api/account/get-all-users/{organizationId}/1", organizationId)
+                .accept(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.size()", is(accounts.size())))
+        .andExpect(jsonPath("$[0].firstName", is(accounts.getFirst().getFirstName())))
+        .andExpect(jsonPath("$[0].lastName", is(accounts.getFirst().getLastName())))
+        .andExpect(jsonPath("$[0].phone", is(accounts.getFirst().getPhone())));
   }
 
   @Test

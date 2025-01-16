@@ -10,7 +10,7 @@ const MessagingDashboardHeader = () => {
       <Button
         variant="ghost"
         className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
       >
         <ArrowLeft
           className="text-gray-800"
@@ -25,7 +25,14 @@ const MessagingDashboardHeader = () => {
 
       {/* Add New Message Button */}
       <button className="p-2 rounded-full bg-secondaryColour shadow-md">
-        <Plus className="text-white" strokeWidth={4} size={20} />
+        <Plus
+          className="text-white"
+          strokeWidth={4}
+          size={20}
+          onClick={() => {
+            navigate("/pages/CreateDmChannelPage");
+          }}
+        />
       </button>
     </header>
   );

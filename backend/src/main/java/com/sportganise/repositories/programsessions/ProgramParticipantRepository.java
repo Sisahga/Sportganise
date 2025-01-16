@@ -1,6 +1,7 @@
 package com.sportganise.repositories.programsessions;
 
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramParticipantId;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Repository;
 
 /** Repository for ProgramParticipant. */
 @Repository
-public interface ProgramParticipantRepository extends JpaRepository<ProgramParticipant, Integer> {
+public interface ProgramParticipantRepository
+    extends JpaRepository<ProgramParticipant, ProgramParticipantId> {
 
   /** Find a participant who is waitlisted for a specific program. */
   @Query(
