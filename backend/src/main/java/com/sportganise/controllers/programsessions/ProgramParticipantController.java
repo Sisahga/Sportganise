@@ -105,4 +105,23 @@ public class ProgramParticipantController {
         waitlistService.allOptedParticipants(programId);
     return ResponseEntity.ok(optedInParticipants);
   }
+
+  /**
+   * Marks a participant as absent for a program by setting isConfirmed to false.
+   *
+   * @param accountId The ID of the participant's account.
+   * @param programId The ID of the program.
+   * @return A DTO representing the participant who confirmed absent.
+   */
+  @PatchMapping("/mark-absent")
+  public ResponseEntity<?> markAbsent(
+      @RequestParam Integer programId, @RequestParam Integer accountId) {
+    ProgramParticipantDto programParticipant = null;
+    try {
+      programParticipant = waitlistService.markAbsent(programId, accountId);
+      return ResponseEntity.ok(programParticipant);
+    } catch (ParticipantNotFoundException e) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+  }
 }
