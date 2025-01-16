@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
 
-const ChannelItem: React.FC<ChannelItemProps> = ({
+const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   channel,
   layout = "vertical",
   extraInfo,
@@ -95,4 +95,4 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
   );
 };
 
-export default ChannelItem;
+export default MessagingDashboardChannelItem;

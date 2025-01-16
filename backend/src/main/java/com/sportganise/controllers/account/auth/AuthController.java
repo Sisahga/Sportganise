@@ -1,10 +1,10 @@
-package com.sportganise.controllers.auth;
+package com.sportganise.controllers.account.auth;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.auth.AccountDto;
-import com.sportganise.dto.auth.Auth0AccountDto;
-import com.sportganise.entities.Verification;
+import com.sportganise.dto.account.auth.AccountDto;
+import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.Verification;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.account.auth.EmailService;
