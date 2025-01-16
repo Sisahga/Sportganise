@@ -1,10 +1,16 @@
 package com.sportganise.services.account.auth;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /** Service for handling communication with Auth0 API. */
@@ -36,13 +43,16 @@ public class Auth0ApiService {
 
   private final Auth0TokenService auth0TokenService;
   private final RestTemplate restTemplate = new RestTemplate();
+  private final Logger log = LoggerFactory.getLogger(Auth0ApiService.class);
 
   public Auth0ApiService(Auth0TokenService auth0TokenService) {
     this.auth0TokenService = auth0TokenService;
   }
 
   /** Create a user in Auth0 and return the Auth0 ID. */
-  public String createUserInAuth0(Auth0AccountDto auth0AccountDto) {
+  public String createUserInAuth0(Auth0AccountDto auth0AccountDto)
+      throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
+    log.debug("Creating user in Auth0: {}", auth0AccountDto);
     String token = auth0TokenService.getManagementApiToken();
     String url = auth0Audience + "/users";
 
@@ -52,12 +62,34 @@ public class Auth0ApiService {
 
     HttpEntity<Auth0AccountDto> request = new HttpEntity<>(auth0AccountDto, headers);
 
-    ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+    try {
+      ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
-    if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-      return (String) response.getBody().get("user_id");
-    } else {
-      throw new RuntimeException("Failed to create user in Auth0:" + response.getBody());
+      if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+        return (String) response.getBody().get("user_id");
+      } else {
+        throw new RuntimeException("Unexpected response from Auth0: " + response.getBody());
+      }
+    } catch (HttpClientErrorException | HttpServerErrorException e) {
+      log.debug("Auth0 returned an error response: {}", e.getResponseBodyAsString());
+
+      String responseBody = e.getResponseBodyAsString();
+
+      try {
+        Map<String, Object> errorResponse = new ObjectMapper().readValue(responseBody, Map.class);
+        String message = (String) errorResponse.get("message");
+        if (message.contains("already exists")) {
+          throw new AccountAlreadyExistsInAuth0("User already exists in Auth0");
+        } else if (message.contains("PasswordStrengthError")) {
+          log.debug("Password does not meet Auth0's password requirements");
+          throw new PasswordTooWeakException("Password requirements not met");
+        } else {
+          throw new RuntimeException("Failed to create user in Auth0:" + message);
+        }
+      } catch (JsonProcessingException ex) {
+        log.error("Failed to parse Auth0 error response", ex);
+        throw new RuntimeException("Failed to create user in Auth0: " + e.getMessage());
+      }
     }
   }
 
@@ -87,10 +119,10 @@ public class Auth0ApiService {
 
     ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
 
-    if (response.getBody() == null || !response.getBody().containsKey("access_token")) {
-      throw new RuntimeException("Invalid response from Auth0" + response.getBody());
-    } else {
+    if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
       return response.getBody();
+    } else {
+      throw new RuntimeException("Invalid response from Auth0" + response.getBody());
     }
   }
 

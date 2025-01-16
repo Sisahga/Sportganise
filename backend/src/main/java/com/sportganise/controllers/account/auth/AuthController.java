@@ -1,17 +1,23 @@
 package com.sportganise.controllers.account.auth;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.account.CookiesDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Verification;
+import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.services.EmailService;
 import com.sportganise.services.account.AccountService;
+import com.sportganise.services.account.CookiesService;
 import com.sportganise.services.account.auth.VerificationService;
 import jakarta.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,9 +35,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/auth")
 public class AuthController {
 
+  private static final Logger log = LoggerFactory.getLogger(AuthController.class);
   private final AccountService accountService;
   private final EmailService emailService;
   private final VerificationService verificationService;
+  private final CookiesService cookiesService;
 
   /**
    * Constructor for the AuthController.
@@ -44,10 +52,12 @@ public class AuthController {
   public AuthController(
       AccountService accountService,
       EmailService emailService,
-      VerificationService verificationService) {
+      VerificationService verificationService,
+      CookiesService cookiesService) {
     this.accountService = accountService;
     this.emailService = emailService;
     this.verificationService = verificationService;
+    this.cookiesService = cookiesService;
   }
 
   /**
@@ -57,23 +67,37 @@ public class AuthController {
    * @return ResponseEntity containing the response message.
    */
   @PostMapping("/signup")
-  public ResponseEntity<ResponseDto<String>> signup(@Valid @RequestBody AccountDto accountDto) {
-    ResponseDto<String> responseDto = new ResponseDto<>();
+  public ResponseEntity<ResponseDto<CookiesDto>> signup(@Valid @RequestBody AccountDto accountDto) {
+    ResponseDto<CookiesDto> responseDto = new ResponseDto<>();
     try {
+      log.debug("Creating user with email: " + accountDto.getEmail());
       String auth0Id = accountService.createAccount(accountDto);
+      log.debug("User created in Auth0 with ID: " + auth0Id);
+      CookiesDto cookiesDto = cookiesService.createCookiesDto(accountDto.getEmail());
 
-      responseDto.setData(auth0Id);
-      responseDto.setMessage("User created with Auth0 ID: " + auth0Id);
+      responseDto.setData(cookiesDto);
+      responseDto.setMessage("User created");
+      log.debug("User created with Auth0 ID: " + auth0Id);
       responseDto.setStatusCode(HttpStatus.CREATED.value());
 
       return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    } catch (Exception e) {
+    } catch (AccountAlreadyExistsInAuth0 e) {
+      log.debug("Account already exists with email: " + accountDto.getEmail());
+      responseDto.setMessage("Account already exists");
+      responseDto.setStatusCode(HttpStatus.CONFLICT.value());
 
+      return ResponseEntity.status(HttpStatus.CONFLICT).body(responseDto);
+    } catch (PasswordTooWeakException e) {
+      log.debug("Password too weak for user with email: " + accountDto.getEmail());
+      responseDto.setMessage("Password too weak");
+      responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+
+    } catch (Exception e) {
+      log.debug("Unexpected error for user with email: " + accountDto.getEmail(), e);
       responseDto.setMessage("Error creating user:" + e.getMessage());
       responseDto.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
     }
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**
@@ -83,15 +107,18 @@ public class AuthController {
    * @return ResponseEntity containing the response message.
    */
   @PostMapping("/login")
-  public ResponseEntity<ResponseDto<String>> login(
+  public ResponseEntity<ResponseDto<CookiesDto>> login(
       @Valid @RequestBody Auth0AccountDto auth0AccountDto) {
-    ResponseDto<String> responseDto = new ResponseDto<>();
+    ResponseDto<CookiesDto> responseDto = new ResponseDto<>();
     try {
       boolean isValid = accountService.authenticateAccount(auth0AccountDto);
 
       if (isValid) {
+        log.debug("User logged in with email: " + auth0AccountDto.getEmail());
         responseDto.setMessage("Login successful");
         responseDto.setStatusCode(HttpStatus.OK.value());
+        log.debug("Cookies created for user: " + auth0AccountDto.getEmail());
+        responseDto.setData(cookiesService.createCookiesDto(auth0AccountDto.getEmail()));
 
         return ResponseEntity.ok(responseDto);
       } else {

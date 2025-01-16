@@ -6,14 +6,19 @@ import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Address;
+import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.organization.AccountOrganizationRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.auth.Auth0ApiService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +30,9 @@ public class AccountService {
   private final AccountRepository accountRepository;
   private final Auth0ApiService auth0ApiService;
   private final BlobService blobService;
+  private final AccountOrganizationRepository accountOrganizationRepository;
+
+  private final Logger log = LoggerFactory.getLogger(AccountService.class);
 
   /**
    * Constructor for account service.
@@ -37,10 +45,12 @@ public class AccountService {
   public AccountService(
       AccountRepository accountRepository,
       Auth0ApiService auth0ApiService,
-      BlobService blobService) {
+      BlobService blobService,
+      AccountOrganizationRepository accountOrganizationRepository) {
     this.accountRepository = accountRepository;
     this.auth0ApiService = auth0ApiService;
     this.blobService = blobService;
+    this.accountOrganizationRepository = accountOrganizationRepository;
   }
 
   /**
@@ -49,27 +59,26 @@ public class AccountService {
    * @param accountDto Account data.
    * @return Auth0 ID of the created account.
    */
-  public String createAccount(AccountDto accountDto) {
-    try {
-      Auth0AccountDto auth0AccountDto =
-          new Auth0AccountDto(
-              accountDto.getEmail(), accountDto.getPassword(), "Username-Password-Authentication");
-      String auth0Id = auth0ApiService.createUserInAuth0(auth0AccountDto);
+  public String createAccount(AccountDto accountDto)
+      throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
 
-      Account account = new Account();
-      account.setAuth0Id(auth0Id);
-      account.setEmail(accountDto.getEmail());
-      account.setFirstName(accountDto.getFirstName());
-      account.setLastName(accountDto.getLastName());
-      account.setPhone(accountDto.getPhone());
-      account.setAddress(accountDto.getAddress());
-      account.setType(accountDto.getType());
-      accountRepository.save(account);
+    log.debug("Creating account in AccountService with email: " + accountDto.getEmail());
+    Auth0AccountDto auth0AccountDto =
+        new Auth0AccountDto(
+            accountDto.getEmail(), accountDto.getPassword(), "Username-Password-Authentication");
+    String auth0Id = auth0ApiService.createUserInAuth0(auth0AccountDto);
 
-      return auth0Id;
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to create account: " + e.getMessage(), e);
-    }
+    Account account = new Account();
+    account.setAuth0Id(auth0Id);
+    account.setEmail(accountDto.getEmail());
+    account.setFirstName(accountDto.getFirstName());
+    account.setLastName(accountDto.getLastName());
+    account.setPhone(accountDto.getPhone());
+    account.setAddress(accountDto.getAddress());
+    account.setType(accountDto.getType());
+    accountRepository.save(account);
+
+    return auth0Id;
   }
 
   /**
@@ -220,5 +229,9 @@ public class AccountService {
   public List<AccountDetailsDirectMessaging> getAllNonBlockedAccountsByOrganizationId(
       int organizationId, int currentUserId) {
     return accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, currentUserId);
+  }
+
+  public List<Integer> getOrganizationIdsByAccountId(int accountId) {
+    return accountOrganizationRepository.getOrganizationIdsByAccountId(accountId);
   }
 }
