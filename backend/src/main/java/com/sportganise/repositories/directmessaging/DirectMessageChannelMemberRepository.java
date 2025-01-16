@@ -1,5 +1,6 @@
 package com.sportganise.repositories.directmessaging;
 
+import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import jakarta.transaction.Transactional;
@@ -72,4 +73,31 @@ public interface DirectMessageChannelMemberRepository
         """)
   int updateChannelMemberReadStatus(
       @Param("accountId") int accountId, @Param("channelId") int channelId);
+
+  @Query("""
+        SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
+            cm.compositeKey.accountId,
+            a.firstName,
+            a.lastName,
+            a.pictureUrl
+        )
+        FROM DirectMessageChannelMember cm
+        JOIN Account a ON cm.compositeKey.accountId = a.accountId
+        WHERE cm.compositeKey.channelId = :channelId
+        AND cm.compositeKey.accountId != :accountId
+        """)
+  List<ChannelMembersDto> getNonUserChannelMembers(int channelId, int accountId);
+
+  @Query("""
+        SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
+            cm.compositeKey.accountId,
+            a.firstName,
+            a.lastName,
+            a.pictureUrl
+        )
+        FROM DirectMessageChannelMember cm
+        JOIN Account a ON cm.compositeKey.accountId = a.accountId
+        WHERE cm.compositeKey.channelId = :channelId
+        """)
+  List<ChannelMembersDto> getAllChannelMembers(int channelId);
 }
