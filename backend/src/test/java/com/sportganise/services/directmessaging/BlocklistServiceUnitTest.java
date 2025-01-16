@@ -1,5 +1,9 @@
 package com.sportganise.services.directmessaging;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.sportganise.entities.directmessaging.Blocklist;
 import com.sportganise.entities.directmessaging.BlocklistCompositeKey;
 import com.sportganise.repositories.directmessaging.BlocklistRepository;
@@ -11,20 +15,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(MockitoExtension.class)
 public class BlocklistServiceUnitTest {
-  @Mock
-  private BlocklistRepository blocklistRepository;
+  @Mock private BlocklistRepository blocklistRepository;
 
-  @InjectMocks
-  private BlocklistService blocklistService;
+  @InjectMocks private BlocklistService blocklistService;
 
-  @Captor
-  private ArgumentCaptor<Blocklist> blocklistCaptor;
+  @Captor private ArgumentCaptor<Blocklist> blocklistCaptor;
 
   @Test
   public void blockUser_shouldSaveBlocklistEntry() {

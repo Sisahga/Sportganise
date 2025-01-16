@@ -50,7 +50,5 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                  AND a.accountId <> :currentUserId
         """)
   List<AccountDetailsDirectMessaging> getAllNonBlockedAccountsByOrganization(
-    int organizationId,
-    int currentUserId
-  );
+      int organizationId, int currentUserId);
 }

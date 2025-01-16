@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * REST Controller for handling HTTP requests related to Blocklist.
- */
+/** REST Controller for handling HTTP requests related to Blocklist. */
 @RestController
 @RequestMapping("/api/blocklist")
 public class BlocklistController {
   private final BlocklistService blocklistService;
+
   public BlocklistController(BlocklistService blocklistService) {
     this.blocklistService = blocklistService;
   }
@@ -29,10 +28,12 @@ public class BlocklistController {
    * @return HTTP Code 204 and No Content.
    */
   @PostMapping("/block")
-  public ResponseEntity<ResponseDto<Null>> blockUser(@RequestBody BlockUserRequestDto blockUserRequestDto) {
-    blocklistService.blockUser(blockUserRequestDto.getAccountId(), blockUserRequestDto.getBlockedId());
+  public ResponseEntity<ResponseDto<Null>> blockUser(
+      @RequestBody BlockUserRequestDto blockUserRequestDto) {
+    blocklistService.blockUser(
+        blockUserRequestDto.getAccountId(), blockUserRequestDto.getBlockedId());
     ResponseDto<Null> response =
-            new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User blocked successfully", null);
+        new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User blocked successfully", null);
     return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
   }
 }

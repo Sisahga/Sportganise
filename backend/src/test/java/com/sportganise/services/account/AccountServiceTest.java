@@ -266,7 +266,7 @@ public class AccountServiceTest {
     assertEquals("Jane", result.getFirst().getFirstName()); // Check second account data
 
     // Verify that the repository was called exactly once
-    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId,1);
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
 
   @Test

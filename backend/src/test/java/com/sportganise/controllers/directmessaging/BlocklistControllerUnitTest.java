@@ -1,5 +1,9 @@
 package com.sportganise.controllers.directmessaging;
 
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.directmessaging.BlockUserRequestDto;
 import com.sportganise.services.directmessaging.BlocklistService;
@@ -12,21 +16,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(controllers = BlocklistController.class)
 @AutoConfigureMockMvc
 public class BlocklistControllerUnitTest {
-  @Autowired
-  private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-  @MockBean
-  private BlocklistService blocklistService;
+  @MockBean private BlocklistService blocklistService;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+  @Autowired private ObjectMapper objectMapper;
 
   @Test
   public void blockUser_Success() throws Exception {
@@ -35,18 +32,22 @@ public class BlocklistControllerUnitTest {
     requestDto.setAccountId(1);
     requestDto.setBlockedId(2);
 
-    doNothing().when(blocklistService).blockUser(requestDto.getAccountId(), requestDto.getBlockedId());
+    doNothing()
+        .when(blocklistService)
+        .blockUser(requestDto.getAccountId(), requestDto.getBlockedId());
 
     // Act & Assert
-    mockMvc.perform(MockMvcRequestBuilders.post("/api/blocklist/block")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(requestDto)))
-            .andExpect(status().isNoContent())
-            .andExpect(jsonPath("$.statusCode").value(204))
-            .andExpect(jsonPath("$.message").value("User blocked successfully"))
-            .andExpect(jsonPath("$.data").isEmpty());
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/blocklist/block")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDto)))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$.statusCode").value(204))
+        .andExpect(jsonPath("$.message").value("User blocked successfully"))
+        .andExpect(jsonPath("$.data").isEmpty());
 
     verify(blocklistService, times(1))
-            .blockUser(requestDto.getAccountId(), requestDto.getBlockedId());
+        .blockUser(requestDto.getAccountId(), requestDto.getBlockedId());
   }
 }
