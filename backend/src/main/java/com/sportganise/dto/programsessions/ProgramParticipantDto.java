@@ -1,5 +1,6 @@
 package com.sportganise.dto.programsessions;
 
+import com.sportganise.entities.programsessions.ProgramParticipant;
 import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,4 +18,13 @@ public class ProgramParticipantDto {
   private Integer rank;
   private boolean isConfirmed;
   private ZonedDateTime confirmedDate;
+
+  /** Constructor for class that converts ProgramParticipant entity. */
+  public ProgramParticipantDto(ProgramParticipant programParticipant) {
+    this.accountId = programParticipant.getAccountId();
+    this.programId = programParticipant.getProgramId();
+    this.rank = programParticipant.getRank();
+    this.isConfirmed = programParticipant.isConfirmed();
+    this.confirmedDate = programParticipant.getConfirmedDate();
+  }
 }
