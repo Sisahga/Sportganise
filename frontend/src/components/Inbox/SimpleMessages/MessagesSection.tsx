@@ -1,4 +1,4 @@
-import ChannelItem from "../DirectMessagesDashboard/ChannelItem.tsx";
+import MessagingDashboardChannelItem from "../DirectMessagesDashboard/MessagingDashboardChannelItem.tsx";
 import { MessagesSectionProps } from "@/types/dmchannels.ts";
 import { Dot } from "lucide-react";
 
@@ -42,7 +42,7 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
           <div className="flex flex-col">
             {messageChannels.map((channel) => (
               <div className="flex items-center" key={channel.channelId}>
-                <ChannelItem
+                <MessagingDashboardChannelItem
                   channel={channel}
                   layout="horizontal"
                   extraInfo={
