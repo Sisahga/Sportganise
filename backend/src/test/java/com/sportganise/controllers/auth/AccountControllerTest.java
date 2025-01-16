@@ -105,7 +105,7 @@ class AccountControllerTest {
                 2, "Jane", "Smith", "jane@example.com", "5145551234", "PLAYER"));
 
     // Mock service behavior
-    given(accountService.getAllNonAdminAccountsByOrganizationId(organizationId, 1))
+    given(accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1))
         .willReturn(accounts);
 
     // Perform GET request

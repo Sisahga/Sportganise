@@ -258,7 +258,7 @@ public class AccountServiceTest {
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId, 1);
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
@@ -270,7 +270,7 @@ public class AccountServiceTest {
   }
 
   @Test
-  public void getAllNonAdminAccountsByOrganizationId_shouldReturnEmptyList_whenNoAccounts() {
+  public void getAllNonBlockedAccountsByOrganizationId_shouldReturnEmptyList_whenNoAccounts() {
     int organizationId = 1;
 
     // Mock the repository to return an empty list
@@ -279,7 +279,7 @@ public class AccountServiceTest {
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId, 1);
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
