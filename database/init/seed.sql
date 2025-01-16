@@ -48,7 +48,6 @@ INSERT INTO program (type, title, description, capacity, occurence_date, duratio
     ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public', '{"./Lab4.pdf"}');
 
 
--- Subscribed Blocked General (Jesse Blocked Skylar)
 INSERT INTO blocklist (account_id, blocked_id) VALUES
     (3, 6);
 
