@@ -61,18 +61,27 @@ public class Auth0ApiServiceTest {
   }
 
   @Test
-    public void createUserInAuth0_shouldThrowAccountAlreadyExistsInAuth0() throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
-        doThrow(AccountAlreadyExistsInAuth0.class).when(auth0ApiService).createUserInAuth0(any(Auth0AccountDto.class));
+  public void createUserInAuth0_shouldThrowAccountAlreadyExistsInAuth0()
+      throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
+    doThrow(AccountAlreadyExistsInAuth0.class)
+        .when(auth0ApiService)
+        .createUserInAuth0(any(Auth0AccountDto.class));
 
-        assertThrows(AccountAlreadyExistsInAuth0.class, () -> auth0ApiService.createUserInAuth0(auth0AccountDto));
-    }
+    assertThrows(
+        AccountAlreadyExistsInAuth0.class,
+        () -> auth0ApiService.createUserInAuth0(auth0AccountDto));
+  }
 
-    @Test
-    public void createUserInAuth0_shouldThrowPasswordTooWeakException() throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
-        doThrow(PasswordTooWeakException.class).when(auth0ApiService).createUserInAuth0(any(Auth0AccountDto.class));
+  @Test
+  public void createUserInAuth0_shouldThrowPasswordTooWeakException()
+      throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
+    doThrow(PasswordTooWeakException.class)
+        .when(auth0ApiService)
+        .createUserInAuth0(any(Auth0AccountDto.class));
 
-        assertThrows(PasswordTooWeakException.class, () -> auth0ApiService.createUserInAuth0(auth0AccountDto));
-    }
+    assertThrows(
+        PasswordTooWeakException.class, () -> auth0ApiService.createUserInAuth0(auth0AccountDto));
+  }
 
   @Test
   public void loginUserWithAuth0_shouldReturnAccessToken() {

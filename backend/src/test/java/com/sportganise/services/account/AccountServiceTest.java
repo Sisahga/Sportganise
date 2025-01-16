@@ -215,8 +215,7 @@ public class AccountServiceTest {
 
     Exception exception =
         assertThrows(
-            AccountNotFoundException.class,
-            () -> accountService.resetPassword(email, newPassword));
+            AccountNotFoundException.class, () -> accountService.resetPassword(email, newPassword));
 
     assertEquals("Account not found", exception.getMessage());
 
