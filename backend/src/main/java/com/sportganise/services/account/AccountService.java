@@ -217,8 +217,8 @@ public class AccountService {
         .orElseThrow(() -> new AccountNotFoundException("Account not found"));
   }
 
-  public List<AccountDetailsDirectMessaging> getAllNonAdminAccountsByOrganizationId(
-      int organizationId) {
-    return accountRepository.getAllNonAdminAccountsByOrganization(organizationId);
+  public List<AccountDetailsDirectMessaging> getAllNonBlockedAccountsByOrganizationId(
+      int organizationId, int currentUserId) {
+    return accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, currentUserId);
   }
 }

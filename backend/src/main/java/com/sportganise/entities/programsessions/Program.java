@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.ZonedDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,7 +31,9 @@ public class Program {
   private String programType;
 
   private String title;
+
   private String description;
+
   private Integer capacity;
 
   @Column(name = "occurence_date")
@@ -52,9 +55,8 @@ public class Program {
 
   private String visibility;
 
-  // TODO: Change Schema, create a table called program_attachments if there is more than 1
-  // attachment per program
-  private String attachment;
+  @Column(name = "attachments")
+  private List<String> attachments;
 
   /**
    * Constructor excluding programId since it's generated automatically.
@@ -70,7 +72,7 @@ public class Program {
    * @param frequency frequency of the program if it is recurring.
    * @param location location of the program.
    * @param visibility visibility type of the program to the members.
-   * @param attachment list of strings of attachment paths for upload.
+   * @param attachments list of strings of attachment paths for upload.
    */
   public Program(
       String programType,
@@ -84,7 +86,7 @@ public class Program {
       String frequency,
       String location,
       String visibility,
-      String attachment) {
+      List<String> attachments) {
     this.programType = programType;
     this.title = title;
     this.description = description;
@@ -96,6 +98,6 @@ public class Program {
     this.frequency = frequency;
     this.location = location;
     this.visibility = visibility;
-    this.attachment = attachment;
+    this.attachments = attachments;
   }
 }

@@ -2,6 +2,7 @@ package com.sportganise.dto.programsessions;
 
 import com.sportganise.entities.programsessions.Program;
 import java.time.ZonedDateTime;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,8 +26,7 @@ public class ProgramDto {
   private String frequency;
   private String location;
   private String visibility;
-  // TODO: Fix when doing the schema change for program attachments
-  private String attachment;
+  private List<String> attachments;
 
   /**
    * Constructor that converts a Program entity to ProgramDto.
@@ -46,7 +46,6 @@ public class ProgramDto {
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
     this.visibility = program.getVisibility();
-    this.attachment =
-        program.getAttachment(); // TODO: Refer to above todo in attachment attribute field.
+    this.attachments = program.getAttachments();
   }
 }

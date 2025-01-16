@@ -51,13 +51,13 @@
 }
 
 .bg-placeholder-colour {
-  background-color: var(--text-placheolder-colour);
+  background-color: var(--text-placheolder-colour) !important;
 }
 .bg-secondary-colour {
-  background-color: var(--secondary-colour);
+  background-color: var(--secondary-colour) !important;
 }
 .bg-primary-white {
-  background-color: var(--primary-white);
+  background-color: var(--primary-white) !important;
 }
 
 .force-hide {

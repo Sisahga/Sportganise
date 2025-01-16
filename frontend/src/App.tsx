@@ -8,8 +8,9 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
-import CreateFirstDmPage from "./pages/CreateFirstDmPage";
+import CreateDmChannelPage from "./pages/CreateDmChannelPage.tsx";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
+import LogInPage from "./pages/LogInPage";
 import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
@@ -23,8 +24,8 @@ function App() {
         {/*placed route here as it does not use original layout with Nav, bottom
         nav, ...*/}
         <Route
-          path="/pages/CreateFirstDmPage"
-          element={<CreateFirstDmPage />}
+          path="/pages/CreateDmChannelPage"
+          element={<CreateDmChannelPage />}
         ></Route>
         <Route path="/" element={<Layout />}>
           {" "}
@@ -55,14 +56,13 @@ function App() {
             element={<PersonalInformationPage />}
           ></Route>
           <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
+          <Route path="/login" element={<LogInPage />}></Route>
           <Route path="/signup" element={<SignUpPage />}></Route>
           <Route path="/verificationcode" element={<VerificationCodePage />} />
           <Route
             path="/pages/ViewTrainingSessionPage"
             element={<ViewTrainingSessionPage />}
           ></Route>
-          <Route path="/signup" element={<SignUpPage />}></Route>
-          <Route path="/verificationcode" element={<VerificationCodePage />} />
           <Route path="/pages/CalendarPage" element={<CalendarPage />}></Route>
           <Route
             path="/pages/ModifyTrainingSessionPage"
