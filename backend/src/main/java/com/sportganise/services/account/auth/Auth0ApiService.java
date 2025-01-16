@@ -9,8 +9,7 @@ import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -24,6 +23,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /** Service for handling communication with Auth0 API. */
+@Slf4j
 @Service
 public class Auth0ApiService {
 
@@ -43,7 +43,6 @@ public class Auth0ApiService {
 
   private final Auth0TokenService auth0TokenService;
   private final RestTemplate restTemplate = new RestTemplate();
-  private final Logger log = LoggerFactory.getLogger(Auth0ApiService.class);
 
   public Auth0ApiService(Auth0TokenService auth0TokenService) {
     this.auth0TokenService = auth0TokenService;
