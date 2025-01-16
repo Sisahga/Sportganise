@@ -1,4 +1,4 @@
-import { Channel, CreateChannelDto } from "@/types/dmchannels.ts";
+import {Channel, ChannelMember, CreateChannelDto} from "@/types/dmchannels.ts";
 import { MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 
@@ -28,6 +28,20 @@ const directMessagingApi = {
       `${baseMappingUrl}/channel/get-channels/${accountId}`,
     );
     const data: Channel[] = await response.json();
+    return data;
+  },
+  getNonUserChannelMembers: async (channelId: number, userId: number) => {
+    const response = await fetch(
+      `${baseMappingUrl}/channelmember/get-channel-members/${channelId}/${userId}`,
+    );
+    const data: ChannelMember[] = await response.json();
+    return data;
+  },
+  getAllChannelMembers: async (channelId: number) => {
+    const response = await fetch(
+      `${baseMappingUrl}/channelmember/get-channel-members/${channelId}`,
+    );
+    const data: ChannelMember[] = await response.json();
     return data;
   },
   getDirectMessages: async (channelId: number | null) => {

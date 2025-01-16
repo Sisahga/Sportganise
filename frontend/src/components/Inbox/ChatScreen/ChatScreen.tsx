@@ -17,11 +17,11 @@ const ChatScreen = () => {
 
   // Access chat data from location state
   const { state } = location || {};
-  const channelId = state?.channelId || null;
+  const channelId = state.channelId;
   const channelName = state?.channelName || null;
   const channelImageBlob = state?.channelImageBlob || defaultAvatar;
   const read = state?.read || false;
-  const channelType = state?.channelType || null; /* Maybe we'll use it later */
+  const channelType = state?.channelType || null;
 
   const [connected, setConnected] = useState(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
@@ -135,7 +135,7 @@ const ChatScreen = () => {
         </div>
 
         {/* Options Button */}
-        <ChannelSettingsDropdown channelType={channelType} />
+        <ChannelSettingsDropdown channelType={channelType} channelId={channelId} />
         {/*<button className="p-2 rounded-full bg-placeholder-colour hover:bg-gray-300">*/}
         {/*  <MoreHorizontal size={20} />*/}
         {/*</button>*/}

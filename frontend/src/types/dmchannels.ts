@@ -34,5 +34,13 @@ export interface CreateChannelDto {
 }
 
 export interface ChannelSettingsDropdownProps {
+  channelId: number;
   channelType: string;
+}
+
+export interface ChannelMember {
+  accountId: number;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string;
 }

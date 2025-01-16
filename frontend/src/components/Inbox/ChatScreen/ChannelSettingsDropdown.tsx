@@ -18,15 +18,35 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
 import { ChannelSettingsDropdownProps } from "@/types/dmchannels.ts";
+import useBlockUser from "@/hooks/useBlockUser.tsx";
+import {BlockUserRequestDto} from "@/types/blocklist.ts";
+import useChannelMembers from "@/hooks/useChannelMembers.tsx";
 
 const ChannelSettingsDropdown = ({
-  channelType,
+  channelType, channelId
 }: ChannelSettingsDropdownProps) => {
+  const currentUserId = 2 // TODO: Replace with actual user ID from cookies
   const [isBlockOpen, setIsBlockOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const { members } =
+      useChannelMembers(channelId, currentUserId, channelType);
+  const { blockUser } = useBlockUser();
 
-  const handleBlock = () => {
-    console.log("User blocked");
+  // Blocks user in simple channel.
+  const handleBlock = async () => {
+    console.log("Blocking user...");
+    const blockListRequestDto: BlockUserRequestDto = {
+      channelId: channelId,
+      userId: currentUserId,
+      blockedId: members[0].accountId,
+    };
+    const blockResponse = await blockUser(blockListRequestDto);
+    if (blockResponse?.statusCode === 201 ) {
+      // TODO: Show new block user follow up component Sana created.
+      console.log("User blocked successfully");
+    } else {
+      console.error("Error blocking user");
+    }
     setIsBlockOpen(false);
   };
 
