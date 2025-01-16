@@ -15,6 +15,7 @@ import SignUpPage from "./pages/SignUpPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
 import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
+import BlockedUsersListPage from "./pages/BlockedUserListPage";
 
 function App() {
   return (
@@ -67,6 +68,10 @@ function App() {
           <Route
             path="/pages/ModifyTrainingSessionPage"
             element={<ModifyTrainingSessionPage />}
+          ></Route>
+          <Route
+            path="/pages/BlockedUserListPage"
+            element={<BlockedUsersListPage />}
           ></Route>
         </Route>
       </Routes>

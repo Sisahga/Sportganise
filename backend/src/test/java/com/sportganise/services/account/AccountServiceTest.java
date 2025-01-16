@@ -15,7 +15,9 @@ import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Address;
+import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.account.auth.Auth0ApiService;
 import java.util.List;
@@ -97,13 +99,14 @@ public class AccountServiceTest {
                 accountService.createAccount(accountDto);
               });
 
-      assertEquals("Failed to create account: Internal server error", exception.getMessage());
+      assertEquals("Internal server error", exception.getMessage());
 
       verify(accountRepository, times(1)).save(any(Account.class));
     }
 
     @Test
-    public void createAccount_shouldReturnAuth0Id() {
+    public void createAccount_shouldReturnAuth0Id()
+        throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
       Account account = new Account();
       account.setAuth0Id("auth0Id");
       given(accountRepository.save(any(Account.class))).willReturn(account);
@@ -212,10 +215,7 @@ public class AccountServiceTest {
 
     Exception exception =
         assertThrows(
-            AccountNotFoundException.class,
-            () -> {
-              accountService.resetPassword(email, newPassword);
-            });
+            AccountNotFoundException.class, () -> accountService.resetPassword(email, newPassword));
 
     assertEquals("Account not found", exception.getMessage());
 
