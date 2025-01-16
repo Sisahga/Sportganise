@@ -1,4 +1,4 @@
-package com.sportganise.services.account.auth;
+package com.sportganise.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,11 +27,27 @@ public class EmailService {
    * @param code verification code
    */
   public void sendVerificationCode(String toEmail, int code) {
+    String text = "Your verification code is: " + code + " . It will expire in 10 minutes.";
+    String sender = "Sportganise";
+    sendEmail(sender, toEmail, "Your Sportganise Verification Code", text);
+  }
+
+  /**
+   * Send an email.
+   *
+   * @param toEmail email to send to
+   * @param subject email subject
+   * @param text email text
+   */
+  public void sendEmail(String sender, String toEmail, String subject, String text) {
+    String footer = "\n\n" + sender + ",\nSportganise\nwww.sportganise.com";
+    String messageText = text + footer;
+
     SimpleMailMessage message = new SimpleMailMessage();
     message.setFrom(senderEmail);
     message.setTo(toEmail);
-    message.setSubject("Your Sportganise Verification Code");
-    message.setText("Your verification code is: " + code + " . It will expire in 10 minutes.");
+    message.setSubject(subject);
+    message.setText(messageText);
     mailSender.send(message);
   }
 }

@@ -2,6 +2,7 @@ package com.sportganise.services.account.auth;
 
 import static org.mockito.Mockito.*;
 
+import com.sportganise.services.EmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
