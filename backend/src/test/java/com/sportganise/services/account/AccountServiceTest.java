@@ -9,6 +9,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
@@ -17,6 +18,7 @@ import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.account.auth.Auth0ApiService;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -238,5 +240,52 @@ public class AccountServiceTest {
 
     verify(auth0ApiService, times(1))
         .changePasswordWithOldPassword(any(Auth0AccountDto.class), eq(newPassword));
+  }
+
+  @Test
+  public void getAllNonAdminAccountsByOrganizationId_shouldReturnAccounts() {
+    int organizationId = 1;
+
+    // Prepare mock data
+    List<AccountDetailsDirectMessaging> mockAccounts =
+        List.of(
+            new AccountDetailsDirectMessaging(
+                2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER"));
+
+    // Mock the repository call
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
+        .willReturn(mockAccounts);
+
+    // Call the service method
+    List<AccountDetailsDirectMessaging> result =
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
+
+    // Assertions
+    assertNotNull(result);
+    assertEquals(1, result.size()); // Verify that the returned list has the correct size
+    assertEquals("Jane", result.getFirst().getFirstName()); // Check second account data
+
+    // Verify that the repository was called exactly once
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
+  }
+
+  @Test
+  public void getAllNonBlockedAccountsByOrganizationId_shouldReturnEmptyList_whenNoAccounts() {
+    int organizationId = 1;
+
+    // Mock the repository to return an empty list
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
+        .willReturn(List.of());
+
+    // Call the service method
+    List<AccountDetailsDirectMessaging> result =
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
+
+    // Assertions
+    assertNotNull(result);
+    assertTrue(result.isEmpty(), "The result should be an empty list");
+
+    // Verify that the repository was called exactly once
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
 }

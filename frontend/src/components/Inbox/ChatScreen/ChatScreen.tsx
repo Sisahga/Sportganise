@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, MoreHorizontal, Send, FolderOpen } from "lucide-react";
+import { ArrowLeft, Send, FolderOpen } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages.tsx";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import "./ChatScreen.css";
@@ -9,6 +9,7 @@ import WebSocketService from "@/services/WebSocketService.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
+import ChannelSettingsDropdown from "./ChannelSettingsDropdown.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const ChatScreen = () => {
   const channelName = state?.channelName || null;
   const channelImageBlob = state?.channelImageBlob || defaultAvatar;
   const read = state?.read || false;
-  // const channelType = state?.channelType || null; /* Maybe we'll use it later */
+  const channelType = state?.channelType || null; /* Maybe we'll use it later */
 
   const [connected, setConnected] = useState(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
@@ -134,9 +135,10 @@ const ChatScreen = () => {
         </div>
 
         {/* Options Button */}
-        <button className="p-2 rounded-full bg-placeholder-colour hover:bg-gray-300">
-          <MoreHorizontal size={20} />
-        </button>
+        <ChannelSettingsDropdown channelType={channelType} />
+        {/*<button className="p-2 rounded-full bg-placeholder-colour hover:bg-gray-300">*/}
+        {/*  <MoreHorizontal size={20} />*/}
+        {/*</button>*/}
       </header>
 
       {/* Display when failing to connect to web socket. */}
