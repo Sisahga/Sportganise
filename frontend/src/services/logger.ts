@@ -1,5 +1,5 @@
-import log from 'loglevel';
+import log from "loglevel";
 
-log.setLevel('debug');
+log.setLevel("debug");
 
 export default log;

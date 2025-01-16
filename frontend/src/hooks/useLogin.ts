@@ -8,7 +8,6 @@ import { login } from "@/services/api/authService";
 import { LoginRequest, LoginResponse } from "@/types/auth";
 import { isCookiesDto } from "@/services/cookiesService";
 
-
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +28,8 @@ export const useLogin = () => {
         log.warn("Login response does not include a valid CookiesDto.");
       }
     } catch (err) {
-      const errorMessage = (err as Error).message || "An unexpected error occurred.";
+      const errorMessage =
+        (err as Error).message || "An unexpected error occurred.";
       log.error(`Error during login: ${errorMessage}`);
       setError(errorMessage);
     } finally {

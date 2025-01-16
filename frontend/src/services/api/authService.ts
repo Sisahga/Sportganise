@@ -1,7 +1,6 @@
 import log from "loglevel";
 import { LoginRequest, LoginResponse } from "@/types/auth";
-import { setCookies , isCookiesDto} from "@/services/cookiesService";
-
+import { setCookies, isCookiesDto } from "@/services/cookiesService";
 
 const API_BASE_URL = "http://localhost:8080"; // API base URL
 
