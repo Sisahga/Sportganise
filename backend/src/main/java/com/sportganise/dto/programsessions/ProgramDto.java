@@ -3,6 +3,7 @@ package com.sportganise.dto.programsessions;
 import com.sportganise.entities.programsessions.Program;
 import java.time.ZonedDateTime;
 import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,14 +27,15 @@ public class ProgramDto {
   private String frequency;
   private String location;
   private String visibility;
-  private List<String> attachments;
+  private List<ProgramAttachmentDto> programAttachments;
 
   /**
    * Constructor that converts a Program entity to ProgramDto.
    *
    * @param program program object that is used for the conversion.
+   * @param programAttachments program attachments object uploaded for a specific program.
    */
-  public ProgramDto(Program program) {
+  public ProgramDto(Program program, List<ProgramAttachmentDto> programAttachments) {
     this.programId = program.getProgramId();
     this.programType = program.getProgramType();
     this.title = program.getTitle();
@@ -46,6 +48,6 @@ public class ProgramDto {
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
     this.visibility = program.getVisibility();
-    this.attachments = program.getAttachments();
+    this.programAttachments = programAttachments;
   }
 }

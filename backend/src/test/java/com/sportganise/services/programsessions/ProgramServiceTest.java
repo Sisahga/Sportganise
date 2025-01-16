@@ -151,7 +151,6 @@ public class ProgramServiceTest {
                 .frequency("None")
                 .location("111 Random Ave")
                 .visibility("public")
-                .attachments(List.of("/banner.pdf"))
                 .build();
 
         // Mock the repository behavior of findProgramById with mockProgram
@@ -205,7 +204,6 @@ public class ProgramServiceTest {
                 .frequency("None")
                 .location("111 Random Ave")
                 .visibility("public")
-                .attachments(List.of("/banner.pdf"))
                 .build();
 
         // Mock another Program object with the below attributes
@@ -226,7 +224,6 @@ public class ProgramServiceTest {
                 .frequency("None")
                 .location("111 Random Ave")
                 .visibility("public")
-                .attachments(List.of("/banner.pdf"))
                 .build();
 
         // Mock the repository behavior of findPrograms with mockProgram

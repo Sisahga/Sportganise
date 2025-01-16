@@ -67,6 +67,9 @@ INSERT INTO account_organization (org_id, account_id) VALUES
 
 -- Skipping account-settings
 
+INSERT INTO program_attachments (program_id, attachment_url) VALUES
+(1, 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png');
+
 INSERT INTO program_participants (program_id, account_id, type, is_confirmed, confirm_date) VALUES
 (1, 3, 'Player', TRUE, '2024-06-20 10:30:00'),
 (1, 4, 'Player', FALSE, null),

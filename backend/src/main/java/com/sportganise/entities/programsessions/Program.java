@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.ZonedDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,9 +54,6 @@ public class Program {
 
   private String visibility;
 
-  @Column(name = "attachments")
-  private List<String> attachments;
-
   /**
    * Constructor excluding programId since it's generated automatically.
    *
@@ -72,7 +68,6 @@ public class Program {
    * @param frequency frequency of the program if it is recurring.
    * @param location location of the program.
    * @param visibility visibility type of the program to the members.
-   * @param attachments list of strings of attachment paths for upload.
    */
   public Program(
       String programType,
@@ -85,8 +80,7 @@ public class Program {
       ZonedDateTime expiryDate,
       String frequency,
       String location,
-      String visibility,
-      List<String> attachments) {
+      String visibility) {
     this.programType = programType;
     this.title = title;
     this.description = description;
@@ -98,6 +92,5 @@ public class Program {
     this.frequency = frequency;
     this.location = location;
     this.visibility = visibility;
-    this.attachments = attachments;
   }
 }

@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and
+ * routes them to
  * appropriate services.
  */
 @RestController
@@ -129,22 +130,22 @@ public class ProgramController {
 
     try {
       Map<String, Object> fields = extractPayloadFields(payload);
-      ProgramDto programDto =
-          programService.createProgramDto(
-              (String) fields.get("title"),
-              (String) fields.get("type"),
-              (String) fields.get("start_date"),
-              (String) fields.get("end_date"),
-              (Boolean) fields.get("recurring"),
-              (String) fields.get("visibility"),
-              (String) fields.get("description"),
-              (Integer) fields.get("capacity"),
-              (Boolean) fields.get("notify"),
-              (String) fields.get("start_time"),
-              (String) fields.get("end_time"),
-              (String) fields.get("location"),
-              (List<Map<String, String>>) fields.get("attachment"));
-      return new ResponseEntity<>(programDto, HttpStatus.CREATED);
+      ProgramDto newProgramDto = programService.createProgramDto(
+          (String) fields.get("title"),
+          (String) fields.get("type"),
+          (String) fields.get("start_date"),
+          (String) fields.get("end_date"),
+          (Boolean) fields.get("recurring"),
+          (String) fields.get("visibility"),
+          (String) fields.get("description"),
+          (Integer) fields.get("capacity"),
+          (Boolean) fields.get("notify"),
+          (String) fields.get("start_time"),
+          (String) fields.get("end_time"),
+          (String) fields.get("location"),
+          (List<Map<String, String>>) fields.get("attachment"));
+
+      return new ResponseEntity<>(newProgramDto, HttpStatus.CREATED);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
@@ -191,7 +192,9 @@ public class ProgramController {
 
     try {
       Map<String, Object> fields = extractPayloadFields(payload);
-      programService.modifyProgram(
+      // We pass the programdto of the program to be modified along with the new
+      // values
+      ProgramDto updatedProgramDto = programService.modifyProgram(
           programDtoToModify,
           (String) fields.get("title"),
           (String) fields.get("type"),
@@ -206,7 +209,7 @@ public class ProgramController {
           (String) fields.get("end_time"),
           (String) fields.get("location"),
           (List<Map<String, String>>) fields.get("attachment"));
-      return new ResponseEntity<>(HttpStatus.OK);
+      return new ResponseEntity<>(updatedProgramDto, HttpStatus.OK);
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }

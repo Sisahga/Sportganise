@@ -49,15 +49,12 @@ public class ProgramControllerTest {
     // Initialize Dtos
     private ProgramDto mockProgramDto;
     private ProgramParticipantDto mockProgramParticipantDto;
-    private ProgramDetailsParticipantsDto mockProgramDetailsParticipantsDto;
     private String jsonPayload;
 
     @BeforeEach
     public void setup() {
         mockProgramDto = new ProgramDto();
         mockProgramParticipantDto = new ProgramParticipantDto();
-        mockProgramDetailsParticipantsDto = new ProgramDetailsParticipantsDto();
-
         // Set the programDto
         mockProgramDto.setProgramId(111);
         mockProgramDto.setProgramType("Training");
@@ -73,8 +70,6 @@ public class ProgramControllerTest {
         mockProgramDto.setFrequency("None");
         mockProgramDto.setLocation("999 Random Ave");
         mockProgramDto.setVisibility("public");
-        mockProgramDto.setAttachments(List.of("/banner.pdf"));
-
         // Set the programParticipantDto
         mockProgramParticipantDto.setProgramId(111);
         mockProgramParticipantDto.setAccountId(1);
