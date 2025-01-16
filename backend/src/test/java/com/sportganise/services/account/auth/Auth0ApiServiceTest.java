@@ -1,6 +1,7 @@
 package com.sportganise.services.account.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -8,7 +9,9 @@ import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.account.AccountService;
 import java.util.Map;
@@ -48,12 +51,36 @@ public class Auth0ApiServiceTest {
   }
 
   @Test
-  public void createUserInAuth0_shouldReturnAuth0Id() {
+  public void createUserInAuth0_shouldReturnAuth0Id()
+      throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
     String auth0Id = "mockAuth0Id";
     doReturn(auth0Id).when(auth0ApiService).createUserInAuth0(any(Auth0AccountDto.class));
 
     String result = auth0ApiService.createUserInAuth0(auth0AccountDto);
     assertEquals(auth0Id, result);
+  }
+
+  @Test
+  public void createUserInAuth0_shouldThrowAccountAlreadyExistsInAuth0()
+      throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
+    doThrow(AccountAlreadyExistsInAuth0.class)
+        .when(auth0ApiService)
+        .createUserInAuth0(any(Auth0AccountDto.class));
+
+    assertThrows(
+        AccountAlreadyExistsInAuth0.class,
+        () -> auth0ApiService.createUserInAuth0(auth0AccountDto));
+  }
+
+  @Test
+  public void createUserInAuth0_shouldThrowPasswordTooWeakException()
+      throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
+    doThrow(PasswordTooWeakException.class)
+        .when(auth0ApiService)
+        .createUserInAuth0(any(Auth0AccountDto.class));
+
+    assertThrows(
+        PasswordTooWeakException.class, () -> auth0ApiService.createUserInAuth0(auth0AccountDto));
   }
 
   @Test
