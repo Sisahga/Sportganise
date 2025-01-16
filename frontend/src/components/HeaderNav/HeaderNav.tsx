@@ -58,10 +58,10 @@ export default function HeaderNav() {
                 Setting
               </Link>
               <Link
-                to="/signup"
+                to="/login"
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
-                Sign Up
+                Log In
               </Link>
             </nav>
           </DrawerContent>
