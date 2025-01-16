@@ -24,7 +24,7 @@ public class CookiesService {
   /**
    * Creates a CookiesDto object.
    *
-   * @param accountID Account ID.
+   * @param accountId Account ID.
    * @param firstName First name.
    * @param lastName Last name.
    * @param email Email.
@@ -34,7 +34,7 @@ public class CookiesService {
    * @return CookiesDto object.
    */
   public CookiesDto createCookiesDto(
-      int accountID,
+      int accountId,
       String firstName,
       String lastName,
       String email,
@@ -42,10 +42,10 @@ public class CookiesService {
       String type,
       String phone) {
 
-    List<Integer> organizationIds = accountService.getOrganizationIdsByAccountId(accountID);
+    List<Integer> organizationIds = accountService.getOrganizationIdsByAccountId(accountId);
 
     return CookiesDto.builder()
-        .accountId(accountID)
+        .accountId(accountId)
         .firstName(firstName)
         .lastName(lastName)
         .email(email)
