@@ -1,6 +1,7 @@
 package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.programsessions.ProgramRequestDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.entities.account.Account;
@@ -9,7 +10,6 @@ import com.sportganise.services.programsessions.ProgramService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,11 +47,6 @@ public class ProgramController {
   /** Helper method to check user permissions. */
   private boolean hasPermissions(Account user) {
     return accountService.hasPermissions(user.getType());
-  }
-
-  /** Helper method to extract fields from payload. */
-  private Map<String, Object> extractPayloadFields(Map<String, Object> payload) {
-    return payload;
   }
 
   /**
@@ -119,7 +114,7 @@ public class ProgramController {
    */
   @PostMapping("/{accountId}/create-program")
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
-      @PathVariable Integer accountId, @RequestBody Map<String, Object> payload) {
+      @PathVariable Integer accountId, @RequestBody ProgramRequestDto programRequestDto) {
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
@@ -145,21 +140,21 @@ public class ProgramController {
     }
 
     try {
-      Map<String, Object> fields = extractPayloadFields(payload);
+      // Use the DTO fields to create a program
       ProgramDto newProgramDto = programService.createProgramDto(
-          (String) fields.get("title"),
-          (String) fields.get("type"),
-          (String) fields.get("start_date"),
-          (String) fields.get("end_date"),
-          (Boolean) fields.get("recurring"),
-          (String) fields.get("visibility"),
-          (String) fields.get("description"),
-          (Integer) fields.get("capacity"),
-          (Boolean) fields.get("notify"),
-          (String) fields.get("start_time"),
-          (String) fields.get("end_time"),
-          (String) fields.get("location"),
-          (List<Map<String, String>>) fields.get("attachment"));
+          programRequestDto.getTitle(),
+          programRequestDto.getType(),
+          programRequestDto.getStartDate(),
+          programRequestDto.getEndDate(),
+          programRequestDto.getRecurring(),
+          programRequestDto.getVisibility(),
+          programRequestDto.getDescription(),
+          programRequestDto.getCapacity(),
+          programRequestDto.getNotify(),
+          programRequestDto.getStartTime(),
+          programRequestDto.getEndTime(),
+          programRequestDto.getLocation(),
+          programRequestDto.getAttachments());
 
       responseDto.setStatusCode(HttpStatus.CREATED.value());
       responseDto.setMessage("Created a new program successfully.");
@@ -184,7 +179,7 @@ public class ProgramController {
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
-      @RequestBody Map<String, Object> payload) {
+      @RequestBody ProgramRequestDto programRequestDto) {
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
@@ -220,25 +215,24 @@ public class ProgramController {
     }
 
     try {
-      Map<String, Object> fields = extractPayloadFields(payload);
-      // We pass the programdto of the program to be modified along with the new
-      // values
+
+      // Modify the program using the DTO
       ProgramDto updatedProgramDto = programService.modifyProgram(
           programDtoToModify,
-          (String) fields.get("title"),
-          (String) fields.get("type"),
-          (String) fields.get("start_date"),
-          (String) fields.get("end_date"),
-          (Boolean) fields.get("recurring"),
-          (String) fields.get("visibility"),
-          (String) fields.get("description"),
-          (Integer) fields.get("capacity"),
-          (Boolean) fields.get("notify"),
-          (String) fields.get("start_time"),
-          (String) fields.get("end_time"),
-          (String) fields.get("location"),
-          (List<Map<String, String>>) fields.get("attachment"));
-      
+          programRequestDto.getTitle(),
+          programRequestDto.getType(),
+          programRequestDto.getStartDate(),
+          programRequestDto.getEndDate(),
+          programRequestDto.getRecurring(),
+          programRequestDto.getVisibility(),
+          programRequestDto.getDescription(),
+          programRequestDto.getCapacity(),
+          programRequestDto.getNotify(),
+          programRequestDto.getStartTime(),
+          programRequestDto.getEndTime(),
+          programRequestDto.getLocation(),
+          programRequestDto.getAttachments());
+
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");
       responseDto.setData(updatedProgramDto);
