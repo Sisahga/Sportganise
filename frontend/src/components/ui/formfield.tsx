@@ -40,7 +40,7 @@ const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
         value={value}
         type={type}
         placeholder={placeholder}
-        className="p-2 border rounded focus:outline-none focus:ring-0"
+        className="p-2 border rounded-lg focus:outline-none focus:ring-0"
         onChange={onChange}
         {...inputProps}
       />
