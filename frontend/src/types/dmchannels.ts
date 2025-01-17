@@ -1,4 +1,5 @@
 import React from "react";
+import WebSocketService from "@/services/WebSocketService.ts";
 
 export interface Channel {
   channelId: number;
@@ -36,6 +37,8 @@ export interface CreateChannelDto {
 export interface ChannelSettingsDropdownProps {
   channelId: number;
   channelType: string;
+  webSocketRef: WebSocketService | null;
+  isBlocked: boolean | false;
 }
 
 export interface ChannelMember {
