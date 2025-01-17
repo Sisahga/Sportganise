@@ -103,13 +103,13 @@ public class ProgramController {
     return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
-   /**
-    * Post mapping for creating new program. 
-    *
-    * @param accountId Id of user who is making the request.
-    * @param programRequestDto Dto for the request body.
-    * @return HTTP Response for newly created program.
-    */
+  /**
+   * Post mapping for creating new program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programRequestDto Dto for the request body.
+   * @return HTTP Response for newly created program.
+   */
   @PostMapping("/{accountId}/create-program")
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
       @PathVariable Integer accountId, @RequestBody ProgramRequestDto programRequestDto) {
@@ -166,14 +166,14 @@ public class ProgramController {
     }
   }
 
-   /**
-    * Put mapping for modifying/updating an existing program.
-    *
-    * @param accountId Id of user who is making the request.
-    * @param programId Id of the program that we wish to modify.
-    * @param programRequestDto Dto for the request body.
-    * @return HTTP Response for modified/updated data
-    */
+  /**
+   * Put mapping for modifying/updating an existing program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programId Id of the program that we wish to modify.
+   * @param programRequestDto Dto for the request body.
+   * @return HTTP Response for modified/updated data
+   */
   @PutMapping("/{accountId}/{programId}/modify-program")
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
       @PathVariable Integer accountId,
