@@ -46,6 +46,49 @@ import {
 } from "@/components/ui/file-upload";
 
 //GLOBAL ---------------------------------------------------------------------------------------------------------------------------
+/**All select element options */
+//Options for type select
+const types = [
+  {
+    label: "Training Session",
+    value: "Training",
+  },
+  {
+    label: "Fundraisor",
+    value: "Fundraisor",
+  },
+] as const;
+//Options for visibility select
+const visibilities = [
+  {
+    label: "Public",
+    value: "Public",
+  },
+  {
+    label: "Members only",
+    value: "Private",
+  },
+] as const;
+//Options for location select
+const locations = [
+  {
+    label: "Centre de loisirs St-Denis",
+    value: "Centre-de-loisirs-St-Denis",
+  },
+  {
+    label: "Collège de Maisonnneuve",
+    value: "Collège-de-Maisonnneuve",
+  },
+  {
+    label: "123 test water rd.",
+    value: "123 test water rd.",
+  },
+  {
+    label: "123 Main st",
+    value: "123 Main St",
+  },
+] as const;
+
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
 const formSchema = z
   .object({
@@ -61,8 +104,9 @@ const formSchema = z
         //array of files
         z.custom<File>((file) => file instanceof File && file.size > 0, {
           message: "Each file must be a valid file and not empty.",
-        }),
+        })
       )
+      .nullable()
       .optional(),
     capacity: z.number().min(0),
     notify: z.boolean().default(true),
@@ -91,25 +135,8 @@ const formSchema = z
       message:
         "Event start and end dates are the same and therefore cannot reccur.",
       path: ["recurring"],
-    },
+    }
   );
-
-// Define the form data structure
-interface FormData {
-  title: string;
-  type: string;
-  start_date: Date;
-  end_date: Date;
-  recurring: boolean;
-  visibility: string;
-  description: string;
-  attachment: File[]; //typed as an array of File objects
-  capacity: number;
-  notify: boolean;
-  start_time: string;
-  end_time: string;
-  location: string;
-}
 
 //PAGE CONTENT ---------------------------------------------------------------------------------------------------
 export default function ModifyTrainingSessionForm() {
@@ -117,25 +144,7 @@ export default function ModifyTrainingSessionForm() {
   const { programId } = useParams();
   const accountId = ""; //get from cookie
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState<FormData>({
-    //fact: "", //TO DELETE
-    //length: 0, //TO DELETE
-    //programId: 0,
-    title: "",
-    type: "",
-    start_date: new Date(),
-    end_date: new Date(),
-    recurring: false,
-    visibility: "",
-    description: "",
-    attachment: [], //values are set here as opposed to types, thus File[] does not work
-    capacity: 0,
-    notify: false,
-    start_time: "",
-    end_time: "",
-    location: "",
-  }); //assuming response is an object. Values will be overriden in fetch.
+  const [title, setTitle] = useState<string>(""); //assuming response is an object. Values will be overriden in fetch.
   const [notFound, setNotFound] = useState(false);
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
@@ -167,7 +176,35 @@ export default function ModifyTrainingSessionForm() {
           })
           .then((data) => {
             console.log("Fetched data: ", data);
-            setFormData(data); //grab the value/data in the response.json()
+            setTitle(data.title); //grab the value/data in the response.json()
+
+            /*
+            const MockProgramDetails = {
+              programId: 1,
+              programType: "Training",
+              title: "Advanced Group",
+              description: "Intensive training camp for badminton pros",
+              capacity: 1,
+              occurrenceDate: "2024-07-01T10:00:00Z",
+              durationMins: 120,
+              expiryDate: "2024-08-01T12:00:00Z",
+              frequency: null,
+              location: "123 test water rd.",
+              visibility: "Public",
+              attachments: [
+                {
+                  programId: 1,
+                  attachment_url:
+                    "https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png",
+                },
+                {
+                  programId: 2,
+                  attachment_url: "https://something.com/",
+                },
+              ],
+              recurring: true,
+            };
+            */
 
             /*
             const fields = Object.keys(data); // Array of field names
@@ -183,17 +220,34 @@ export default function ModifyTrainingSessionForm() {
             // Set form defaults and update field values
             form.setValue("title", data.title);
             form.setValue("capacity", data.capacity);
-            form.setValue("type", data.type);
-            form.setValue("start_date", data.start_date);
-            form.setValue("end_date", data.end_date);
+            form.setValue("type", data.programType);
+            form.setValue("start_date", new Date(data.occurrenceDate));
+            form.setValue("end_date", new Date(data.expiryDate));
             form.setValue("recurring", data.recurring);
             form.setValue("visibility", data.visibility);
             form.setValue("description", data.description);
-            form.setValue("attachment", data.attachment); //undefined
-            form.setValue("notify", data.notify);
-            form.setValue("start_time", data.start_time);
-            form.setValue("end_time", data.end_time);
+            /*
+            if (data.attachments === null) {
+              form.setValue("attachment", data.attachments);
+            } else {
+              console.log(
+                data.attachments.filter(
+                  (attachment : File) => attachment.attachment_url
+                )
+              );
+            }
+            */
+            //form.setValue("notify", data.notify);
+            form.setValue(
+              "start_time",
+              format(new Date(data.occurrenceDate), "HH:mm")
+            );
+            form.setValue(
+              "end_time",
+              format(new Date(data.expiryDate), "HH:mm")
+            );
             form.setValue("location", data.location);
+            setTitle(data.title);
           });
       } catch (error) {
         console.log(error);
@@ -206,41 +260,6 @@ export default function ModifyTrainingSessionForm() {
     };
     fetchSavedFormFields();
   }, [form, notFound, programId, toast]);
-
-  /**All select element options */
-  //Options for type select
-  const types = [
-    {
-      label: "Training Session",
-      value: "training-session",
-    },
-    {
-      label: "Fundraisor",
-      value: "fundraisor",
-    },
-  ] as const;
-  //Options for visibility select
-  const visibilities = [
-    {
-      label: "Public",
-      value: "public",
-    },
-    {
-      label: "Members only",
-      value: "members",
-    },
-  ] as const;
-  //Options for location select
-  const locations = [
-    {
-      label: "Centre de loisirs St-Denis",
-      value: "Centre-de-loisirs-St-Denis",
-    },
-    {
-      label: "Collège de Maisonnneuve",
-      value: "Collège-de-Maisonnneuve",
-    },
-  ] as const;
 
   /** Handle files for file upload in form*/
   const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
@@ -267,7 +286,7 @@ export default function ModifyTrainingSessionForm() {
       };
       console.log(json_payload);
       console.log(
-        "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2),
+        "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2)
       );
 
       // onSubmit API call
@@ -279,7 +298,7 @@ export default function ModifyTrainingSessionForm() {
             "Content-Type": "application/json", //If sending JSON
           },
           body: JSON.stringify(json_payload, null, 2),
-        },
+        }
       );
 
       // Check for HTTP errors
@@ -355,8 +374,7 @@ export default function ModifyTrainingSessionForm() {
           {/*Form Title*/}
           <div>
             <h2 className="text-2xl font-semibold">
-              Edit <span style={{ color: "#82DBD8" }}>{formData.title}</span>{" "}
-              Event
+              Edit <span style={{ color: "#82DBD8" }}>{title}</span> Event
             </h2>
             <h2>Edit fields and update the form</h2>
           </div>
@@ -393,7 +411,7 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
@@ -423,7 +441,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {type.label}
@@ -456,7 +474,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -503,7 +521,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -592,12 +610,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value,
+                              (location) => location.value === field.value
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -623,7 +641,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {location.label}
@@ -685,12 +703,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
+                              (visibility) => visibility.value === field.value
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -716,7 +734,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {visibility.label}
@@ -825,7 +843,7 @@ export default function ModifyTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        e.target.value ? Number(e.target.value) : undefined
                       )
                     }
                   />

@@ -9,12 +9,12 @@ const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api";
 const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
   createTrainingSession: async (url: string, jsonPayload: FormValues) => {
-    const response = await fetch(`${baseMappingUrl}/${url}`, {
+    const response = await fetch(`${baseMappingUrl}/programs/${url}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(jsonPayload, null, 2),
+      body: JSON.stringify(jsonPayload),
     });
 
     if (response.status === 201) {
