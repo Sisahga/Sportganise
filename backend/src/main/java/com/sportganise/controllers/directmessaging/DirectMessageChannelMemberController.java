@@ -34,12 +34,13 @@ public class DirectMessageChannelMemberController {
           @PathVariable int channelId, @PathVariable int accountId) {
     List<ChannelMembersDto> channelMembersDto =
         this.directMessageChannelMemberService.getNonUserChannelMembers(channelId, accountId);
+    log.debug("Channel members excluding current user retrieved successfully");
     ResponseDto<List<ChannelMembersDto>> response =
         new ResponseDto<>(
-                HttpStatus.CREATED.value(),
+                HttpStatus.OK.value(),
                 "Channel members retrieved successfully",
                 channelMembersDto);
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   /**
@@ -53,12 +54,13 @@ public class DirectMessageChannelMemberController {
           @PathVariable int channelId) {
     List<ChannelMembersDto> channelMembersDto =
         this.directMessageChannelMemberService.getAllChannelMembers(channelId);
+    log.debug("Channel members retrieved successfully");
     ResponseDto<List<ChannelMembersDto>> response =
         new ResponseDto<>(
-                HttpStatus.CREATED.value(),
+                HttpStatus.OK.value(),
                 "Channel members retrieved successfully",
                 channelMembersDto);
-    return new ResponseEntity<>(response, HttpStatus.CREATED);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   /**
