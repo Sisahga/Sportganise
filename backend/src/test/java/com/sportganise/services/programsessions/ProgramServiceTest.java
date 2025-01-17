@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
@@ -64,7 +65,7 @@ public class ProgramServiceTest {
     Account account1 =
         Account.builder()
             .accountId(101)
-            .type("Player")
+            .type(AccountType.PLAYER)
             .firstName("John")
             .lastName("Doe")
             .email("john.doe@example.com")
@@ -82,7 +83,7 @@ public class ProgramServiceTest {
     Account account2 =
         Account.builder()
             .accountId(102)
-            .type("Coach")
+            .type(AccountType.COACH)
             .firstName("Jane")
             .lastName("Smith")
             .email("jane.smith@example.com")

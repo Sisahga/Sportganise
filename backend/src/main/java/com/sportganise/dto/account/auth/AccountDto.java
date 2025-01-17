@@ -1,5 +1,6 @@
 package com.sportganise.dto.account.auth;
 
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -13,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountDto {
 
-  @NotNull private String type;
+  @NotNull private AccountType type;
 
   @NotNull
   @Email(message = "Invalid email format")

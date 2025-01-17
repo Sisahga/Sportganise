@@ -14,6 +14,7 @@ import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
@@ -47,7 +48,7 @@ class AccountControllerTest {
     account =
         Account.builder()
             .accountId(1)
-            .type("PLAYER")
+            .type(AccountType.PLAYER)
             .email("test@example.com")
             .phone("5146662272")
             .firstName("John")
@@ -81,7 +82,7 @@ class AccountControllerTest {
         .perform(MockMvcRequestBuilders.get("/api/account/{id}", 1))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.accountId", is(account.getAccountId())))
-        .andExpect(jsonPath("$.type", is(account.getType())))
+        .andExpect(jsonPath("$.type", is(account.getType().toString())))
         .andExpect(jsonPath("$.email", is(account.getEmail())))
         .andExpect(jsonPath("$.auth0Id", is(account.getAuth0Id())))
         .andExpect(jsonPath("$.address.line", is(account.getAddress().getLine())))
@@ -102,8 +103,14 @@ class AccountControllerTest {
     // Mock data
     List<AccountDetailsDirectMessaging> accounts =
         List.of(
-            new AccountDetailsDirectMessaging(
-                2, "Jane", "Smith", "jane@example.com", "5145551234", "PLAYER"));
+            AccountDetailsDirectMessaging.builder()
+                .accountId(2)
+                .firstName("Jane")
+                .lastName("Smith")
+                .pictureUrl("jane@example.com")
+                .phone("5145551234")
+                .type(AccountType.PLAYER)
+                .build());
 
     // Mock service behavior
     given(accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1))
@@ -173,7 +180,7 @@ class AccountControllerTest {
     Account account1 =
         Account.builder()
             .accountId(1)
-            .type("PLAYER")
+            .type(AccountType.PLAYER)
             .email("test1@example.com")
             .phone("5141234567")
             .firstName("John")
@@ -182,7 +189,7 @@ class AccountControllerTest {
     Account account2 =
         Account.builder()
             .accountId(2)
-            .type("COACH")
+            .type(AccountType.COACH)
             .email("test2@example.com")
             .phone("5141112222")
             .firstName("Jane")
@@ -203,12 +210,12 @@ class AccountControllerTest {
         .andExpectAll( // account 1
             jsonPath("$[0].accountId", is(account1.getAccountId())),
             jsonPath("$[0].email", is(account1.getEmail())),
-            jsonPath("$[0].type", is(account1.getType())),
+            jsonPath("$[0].type", is(account1.getType().toString())),
             jsonPath("$[0].pictureUrl").doesNotExist())
         .andExpectAll( // account 2
             jsonPath("$[1].accountId", is(account2.getAccountId())),
             jsonPath("$[1].email", is(account2.getEmail())),
-            jsonPath("$[1].type", is(account2.getType())),
+            jsonPath("$[1].type", is(account2.getType().toString())),
             jsonPath("$[1].pictureUrl", is(account2.getPictureUrl())));
   }
 }

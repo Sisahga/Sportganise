@@ -1,5 +1,6 @@
 package com.sportganise.dto.account;
 
+import com.sportganise.entities.account.AccountType;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class CookiesDto {
   private String lastName;
   private String email;
   private String pictureUrl;
-  private String type;
+  private AccountType type;
   private String phone;
   private List<Integer> organisationIds;
 }

@@ -6,6 +6,7 @@ import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
@@ -189,8 +190,8 @@ public class AccountService {
    * @param roleType string
    * @return True if user is an ADMIN or COACH, false otherwise
    */
-  public boolean hasPermissions(String roleType) {
-    return roleType.equals("ADMIN") || roleType.equals("COACH");
+  public boolean hasPermissions(AccountType roleType) {
+    return roleType.equals(AccountType.ADMIN) || roleType.equals(AccountType.COACH);
   }
 
   /**

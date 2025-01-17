@@ -4,6 +4,8 @@ import com.sportganise.dto.account.AccountPermissions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,14 +23,15 @@ import lombok.Setter;
 @Builder
 @Entity
 public class Account implements AccountPermissions {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "account_id")
   private Integer accountId;
 
-  // Type of user. i.e. is it a coach, admin or regular user.
   @Column(name = "type")
-  private String type;
+  @Enumerated(EnumType.STRING)
+  private AccountType type;
 
   private String email;
 

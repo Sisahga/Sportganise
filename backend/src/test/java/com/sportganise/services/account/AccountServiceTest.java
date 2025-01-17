@@ -15,6 +15,7 @@ import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
@@ -63,7 +64,7 @@ public class AccountServiceTest {
               .country("Canada")
               .postalCode("H1I 2J3")
               .build());
-      accountDto.setType("general");
+      accountDto.setType(AccountType.PLAYER);
 
       auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
     }
@@ -127,16 +128,15 @@ public class AccountServiceTest {
     @BeforeEach
     public void setup() {
       originalAccount =
-          new Account(
-              1,
-              "general",
-              "john@email.com",
-              "auth0|6743f6a0f0ab0e76ba3d7ceb",
-              "lorem",
-              "1231231234",
-              "John",
-              "Doe",
-              null);
+          Account.builder()
+              .accountId(1)
+              .type(AccountType.PLAYER)
+              .email("john@email.com")
+              .auth0Id("auth0|6743f6a0f0ab0e76ba3d7ceb")
+              .phone("1231231234")
+              .firstName("John")
+              .lastName("Doe")
+              .build();
     }
 
     @Test
@@ -250,8 +250,14 @@ public class AccountServiceTest {
     // Prepare mock data
     List<AccountDetailsDirectMessaging> mockAccounts =
         List.of(
-            new AccountDetailsDirectMessaging(
-                2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER"));
+            AccountDetailsDirectMessaging.builder()
+                .accountId(2)
+                .firstName("Jane")
+                .lastName("Smith")
+                .pictureUrl("user2@example.com")
+                .phone("555-5555")
+                .type(AccountType.PLAYER)
+                .build());
 
     // Mock the repository call
     given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
@@ -308,7 +314,7 @@ public class AccountServiceTest {
     Account account1 =
         Account.builder()
             .accountId(1)
-            .type("PLAYER")
+            .type(AccountType.PLAYER)
             .email("test1@example.com")
             .phone("5141234567")
             .firstName("John")
@@ -318,7 +324,7 @@ public class AccountServiceTest {
     Account account2 =
         Account.builder()
             .accountId(2)
-            .type("COACH")
+            .type(AccountType.COACH)
             .email("test2@example.com")
             .phone("5141112222")
             .firstName("Jane")

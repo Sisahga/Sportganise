@@ -2,6 +2,7 @@ package com.sportganise.services.account;
 
 import com.sportganise.dto.account.CookiesDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.exceptions.AccountNotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class CookiesService {
       String lastName,
       String email,
       String pictureUrl,
-      String type,
+      AccountType type,
       String phone) {
 
     List<Integer> organizationIds = accountService.getOrganizationIdsByAccountId(accountId);
