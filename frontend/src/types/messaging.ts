@@ -31,3 +31,8 @@ export interface LastMessageComponent {
   messageContent: string;
   type: string;
 }
+
+export interface UserBlockedComponentProps {
+  showBlockedMessage: boolean;
+  channelIsBlocked: boolean
+}

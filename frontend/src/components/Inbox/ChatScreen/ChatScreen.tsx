@@ -11,6 +11,7 @@ import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import ChannelSettingsDropdown from "./ChannelSettingsDropdown.tsx";
 import useSendMessage from "@/hooks/useSendMessage.tsx";
+import UserBlockedComponent from "@/components/Inbox/ChatScreen/UserBlockedComponent.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ const ChatScreen = () => {
   const read = state?.read || false;
   const channelType = state?.channelType || null;
   const isBlocked = state?.isBlocked || false;
+  console.log("Blocked status from chat screen: ", isBlocked);
 
   const [connected, setConnected] = useState(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
@@ -159,8 +161,11 @@ const ChatScreen = () => {
       {/* Chat Messages */}
       <ChatMessages messages={messages} />
 
+      <UserBlockedComponent showBlockedMessage={isBlocked} channelIsBlocked={isBlocked} />
       {/* Message Input Area */}
-      <div id="chatScreenInputArea" className="flex items-center gap-3 px-4 py-3 bg-white shadow">
+      <div id="chatScreenInputArea"
+           className={`${isBlocked ? "force-hide" : ""}
+           flex items-center gap-3 px-4 py-3 bg-white shadow`}>
         <div className="h-full flex items-end">
           <Button
             variant="ghost"
