@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
-import trainingSessionApi from "@/services/api/trainingSessionApi";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -51,12 +50,16 @@ import {
   CloudUpload,
   Paperclip,
 } from "lucide-react";
+import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
+
+import log from "loglevel";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const accountId = 2; //update with cookie
   const { form } = useFormHandler();
+  const { createTrainingSession, error, loading } = useCreateTrainingSession();
 
   /**All select element options */
   //Options for type select
@@ -115,15 +118,23 @@ export default function CreateTrainingSessionForm() {
         ...values,
         attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
       };
+      log.info(jsonPayload);
       console.log(jsonPayload);
+      log.info(JSON.stringify(jsonPayload, null, 2));
       console.log(JSON.stringify(jsonPayload, null, 2));
 
       // API submit form
-      const data = await trainingSessionApi.createTrainingSession(
-        `${accountId}/create-program`,
-        jsonPayload,
-      );
-      console.log("response.json() data", data);
+      const create = await createTrainingSession(accountId, jsonPayload);
+      console.log(error);
+      console.log("create", create);
+      log.info("create", create);
+      if (create === null) {
+        throw new Error(
+          "Error from useCreateTrainingSession.createTrainingSession!"
+        );
+      }
+      console.log("loading", loading);
+      log.info("createTrainingSession submit success ✔");
 
       // Toast popup for user to say form submitted successfully
       toast({
@@ -145,11 +156,16 @@ export default function CreateTrainingSessionForm() {
       form.setValue("start_time", "");
       form.setValue("end_time", "");
       form.setValue("location", "");
+      log.info("Create training session form reset");
 
       // Navigate to home page
-      navigate("/HomePage");
+      navigate("/");
     } catch (err) {
-      console.error("Form submission error (error)", err);
+      console.error(
+        "Create training session form submission error (error)",
+        err
+      );
+      log.error("Create training session form submission error (error)", err);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
@@ -213,7 +229,7 @@ export default function CreateTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
@@ -243,7 +259,7 @@ export default function CreateTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {type.label}
@@ -275,7 +291,7 @@ export default function CreateTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -322,7 +338,7 @@ export default function CreateTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -412,12 +428,12 @@ export default function CreateTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value,
+                              (location) => location.value === field.value
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -443,7 +459,7 @@ export default function CreateTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {location.label}
@@ -505,12 +521,12 @@ export default function CreateTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
+                              (visibility) => visibility.value === field.value
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -536,7 +552,7 @@ export default function CreateTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {visibility.label}
@@ -645,7 +661,7 @@ export default function CreateTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        e.target.value ? Number(e.target.value) : undefined
                       )
                     }
                   />
