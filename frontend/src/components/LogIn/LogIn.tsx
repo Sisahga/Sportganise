@@ -144,7 +144,7 @@ export default function LogIn() {
             </Link>
           </p>
           <p className="mt-2 mb-6 text-primaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent">
-            <Link to="/">Forgot password?</Link>
+            <Link to="/forgotpassword">Forgot password?</Link>
           </p>
         </CardFooter>
       </Card>
