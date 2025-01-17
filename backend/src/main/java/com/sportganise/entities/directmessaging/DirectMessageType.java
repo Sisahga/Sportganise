@@ -5,5 +5,6 @@ public enum DirectMessageType {
   CHAT,
   LEAVE,
   JOIN,
-  BLOCK
+  BLOCK,
+  UNBLOCK
 }
