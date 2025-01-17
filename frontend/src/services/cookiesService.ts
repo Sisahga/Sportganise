@@ -77,24 +77,26 @@ export const getPhoneCookie = (cookiesDto: CookiesDto): string | null => {
 };
 
 export const isCookiesDto = (
-  data: null | CookiesDto | { token: string },
+  data: null | string | object,
 ): data is CookiesDto => {
-  if (!data || typeof data !== "object") {
+  if (data === null || typeof data === "string") {
     return false;
   }
-  const obj = data as Partial<CookiesDto>;
+  if (typeof data === "object") {
+    return (
+      "accountId" in data &&
+      "firstName" in data &&
+      "lastName" in data &&
+      "email" in data &&
+      "phone" in data &&
+      "pictureUrl" in data &&
+      "type" in data &&
+      "organisationIds" in data
+    );
+  }
 
-  return (
-    (obj.accountId === null || true) &&
-    typeof obj.firstName === "string" &&
-    typeof obj.lastName === "string" &&
-    typeof obj.email === "string" &&
-    (obj.pictureUrl === null || typeof obj.pictureUrl === "string") &&
-    (obj.type === null || typeof obj.type === "string") &&
-    (obj.phone === null || typeof obj.phone === "string") &&
-    Array.isArray(obj.organisationIds) &&
-    obj.organisationIds.every((id: any) => typeof id === "number")
-  );
+  // If it's neither a string nor an object, we return false
+  return false;
 };
 
 export const clearCookies = () => {
