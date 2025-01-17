@@ -2,7 +2,7 @@ import log from "loglevel";
 import { LoginRequest, LoginResponse } from "@/types/auth";
 import { setCookies, isCookiesDto } from "@/services/cookiesService";
 
-const API_BASE_URL = "http://localhost:8080"; // API base URL
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
