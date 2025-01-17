@@ -10,6 +10,7 @@ import { SendMessageComponent } from "@/types/messaging.ts";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import ChannelSettingsDropdown from "./ChannelSettingsDropdown.tsx";
+import useSendMessage from "@/hooks/useSendMessage.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ const ChatScreen = () => {
   const channelImageBlob = state?.channelImageBlob || defaultAvatar;
   const read = state?.read || false;
   const channelType = state?.channelType || null;
+  const isBlocked = state?.isBlocked || false;
 
   const [connected, setConnected] = useState(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
@@ -30,6 +32,7 @@ const ChatScreen = () => {
     read,
   );
   const [newMessage, setNewMessage] = useState("");
+  const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {
     webSocketServiceRef.current = new WebSocketService(onMessageReceived);
@@ -57,8 +60,8 @@ const ChatScreen = () => {
         "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
       // TODO: Replace with actual avatar url from cookies
     };
-    webSocketServiceRef.current?.sendMessage(messagePayload);
 
+    sendDirectMessage(messagePayload, webSocketServiceRef.current);
     setNewMessage("");
   };
 
@@ -135,10 +138,12 @@ const ChatScreen = () => {
         </div>
 
         {/* Options Button */}
-        <ChannelSettingsDropdown channelType={channelType} channelId={channelId} />
-        {/*<button className="p-2 rounded-full bg-placeholder-colour hover:bg-gray-300">*/}
-        {/*  <MoreHorizontal size={20} />*/}
-        {/*</button>*/}
+        <ChannelSettingsDropdown
+            channelType={channelType}
+            channelId={channelId}
+            webSocketRef={webSocketServiceRef.current}
+            isBlocked={isBlocked}
+        />
       </header>
 
       {/* Display when failing to connect to web socket. */}
@@ -155,7 +160,7 @@ const ChatScreen = () => {
       <ChatMessages messages={messages} />
 
       {/* Message Input Area */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-white shadow">
+      <div id="chatScreenInputArea" className="flex items-center gap-3 px-4 py-3 bg-white shadow">
         <div className="h-full flex items-end">
           <Button
             variant="ghost"

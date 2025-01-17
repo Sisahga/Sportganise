@@ -2,9 +2,12 @@ package com.sportganise.controllers.directmessaging;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import java.util.List;
+
+import com.sportganise.services.directmessaging.DirectMessageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DirectMessageChannelController {
   private final DirectMessageChannelService directMessageChannelService;
+  private final DirectMessageService directMessageService;
 
   /**
    * Controller Constructor.
@@ -30,8 +34,11 @@ public class DirectMessageChannelController {
    * @param directMessageChannelService Direct Message Channel Service.
    */
   @Autowired
-  public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService) {
+  public DirectMessageChannelController(
+          DirectMessageChannelService directMessageChannelService,
+          DirectMessageService directMessageService) {
     this.directMessageChannelService = directMessageChannelService;
+    this.directMessageService = directMessageService;
   }
 
   /**
@@ -94,5 +101,19 @@ public class DirectMessageChannelController {
       log.info("Channels: {}", channels);
     }
     return new ResponseEntity<>(channels, HttpStatus.OK);
+  }
+
+  @GetMapping("/get-last-message/{channelId}")
+  public ResponseEntity<ResponseDto<LastMessageDto>> getLastMessage(@PathVariable int channelId) {
+    LastMessageDto lastMessage = directMessageService.getLastChannelMessage(channelId);
+    if (lastMessage != null) {
+      ResponseDto<LastMessageDto> response =
+              new ResponseDto<>(HttpStatus.OK.value(), "Last message retrieved successfully", lastMessage);
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } else {
+      ResponseDto<LastMessageDto> response =
+              new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "No messages found", null);
+      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
   }
 }

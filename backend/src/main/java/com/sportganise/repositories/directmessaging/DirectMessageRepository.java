@@ -1,5 +1,6 @@
 package com.sportganise.repositories.directmessaging;
 
+import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,20 @@ public interface DirectMessageRepository extends JpaRepository<DirectMessage, In
           WHERE dmb.messageId = :messageId
          """)
   List<String> getMessageAttachments(int messageId);
+
+  @Query("""
+        SELECT NEW com.sportganise.dto.directmessaging.LastMessageDto(
+            m.senderId,
+            m.channelId,
+            m.content,
+            m.type)
+        FROM DirectMessage m
+        WHERE m.messageId = (
+            SELECT c.lastMessageId
+            FROM DirectMessageChannel c
+            WHERE c.channelId = :channelId)
+        """)
+  LastMessageDto getLastMessageByChannelId(int channelId);
 
   // TODO: Query to fetch next set of messages based on the last sentAt of the last message in the
   // current list.

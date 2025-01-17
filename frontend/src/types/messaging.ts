@@ -24,3 +24,10 @@ export interface SendMessageComponent {
 export interface ChatMessageProps {
   messages: MessageComponent[];
 }
+
+export interface LastMessageComponent {
+  senderId: number;
+  channelId: number;
+  messageContent: string;
+  type: string;
+}
