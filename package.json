@@ -4,7 +4,6 @@
     "preinstall": "echo You should install from within the frontend folder && exit 1"
   },
   "dependencies": {
-    "@types/loglevel": "^1.6.3",
     "date-fns": "^2.28.0",
     "loglevel": "^1.9.2",
     "react-router-dom": "^7.0.1"
