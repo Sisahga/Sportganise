@@ -10,13 +10,13 @@ function useCreateTrainingSession() {
 
   const createTrainingSession = async (
     accountId: number,
-    jsonPayload: FormValues,
+    jsonPayload: FormValues
   ) => {
     try {
-      console.log("------- IN useCreateTrainingSession.tsx!");
+      log.info("------- IN useCreateTrainingSession.tsx!");
       const data = await trainingSessionApi.createTrainingSession(
         accountId,
-        jsonPayload,
+        jsonPayload
       );
       if (data.statusCode === 201) {
         console.log("Response data: ", data.message, data);
@@ -30,10 +30,10 @@ function useCreateTrainingSession() {
       console.error("useCreateTrainingSession (err)", err);
       log.error("useCreateTrainingSession (err)", err);
       setError(
-        "The training session encounterred an error and could not be created!",
+        "The training session encounterred an error and could not be created!"
       );
       log.info(
-        "error in useCreateTrainingSession.createTrainingSession so return null.",
+        "error in useCreateTrainingSession.createTrainingSession so return null."
       );
       log.info("------- END OF useCreateTrainingSession.createTrainingSession");
       return null;
