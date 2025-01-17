@@ -11,6 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BlockUserRequestDto {
+  private Integer channelId;
   private int accountId;
   private int blockedId;
 }

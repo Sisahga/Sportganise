@@ -1,8 +1,7 @@
 package com.sportganise.controllers.directmessaging;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.directmessaging.BlockUserRequestDto;
@@ -31,6 +30,7 @@ public class BlocklistControllerUnitTest {
     BlockUserRequestDto requestDto = new BlockUserRequestDto();
     requestDto.setAccountId(1);
     requestDto.setBlockedId(2);
+    requestDto.setChannelId(1);
 
     doNothing()
         .when(blocklistService)

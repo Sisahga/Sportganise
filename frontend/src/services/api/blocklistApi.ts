@@ -1,22 +1,21 @@
-import ResponseDto from "@/types/response.ts";
 import {BlockUserRequestDto} from "@/types/blocklist.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/blocklist";
 
 const blocklistApi = {
-  blockUser: async (blockUserRequestDto: BlockUserRequestDto ) => {
+  blockUser: async (blockUserRequestDto: BlockUserRequestDto) => {
+    console.log("Block user request object sending to api: ", blockUserRequestDto);
     const response = await fetch(
-        `${baseMappingUrl}`,
+        `${baseMappingUrl}/block`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({blockUserRequestDto})
+          body: JSON.stringify(blockUserRequestDto)
         },
     );
-    const data: ResponseDto<null> = await response.json();
-    return data;
+    return response.status;
   }
 }
 export default blocklistApi;
