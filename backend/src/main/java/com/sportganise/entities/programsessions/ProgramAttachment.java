@@ -2,6 +2,7 @@ package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ import lombok.Setter;
 @Table(name = "program_attachments")
 public class ProgramAttachment {
 
+  @Id
   @Column(name = "program_id")
   private Integer programId;
 

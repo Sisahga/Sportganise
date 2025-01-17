@@ -55,7 +55,8 @@ public class ProgramControllerTest {
     mockProgramParticipantDto = new ProgramParticipantDto();
 
     // Mock a program attachment
-    mockProgramAttachmentDto = new ProgramAttachmentDto(111, "http://example.com/program-guide.pdf");
+    mockProgramAttachmentDto =
+        new ProgramAttachmentDto(111, "http://example.com/program-guide.pdf");
 
     // Set the programDto
     mockProgramDto.setProgramId(111);
@@ -154,7 +155,9 @@ public class ProgramControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data[0].programDetails.programId").value(111))
         .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
-        .andExpect(jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl").value("http://example.com/program-guide.pdf"))
+        .andExpect(
+            jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl")
+                .value("http://example.com/program-guide.pdf"))
         .andExpect(jsonPath("$.data[0].attendees[0].accountId").value(1))
         .andExpect(jsonPath("$.statusCode").value(200))
         .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
@@ -179,8 +182,7 @@ public class ProgramControllerTest {
     Mockito.when(programService.getPrograms()).thenReturn(List.of(mockProgramDto));
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
     Mockito.when(programService.getProgramDetailsParticipantsDto(List.of(mockProgramDto), false))
-    .thenReturn(List.of(mockProgramDetailsParticipantsDtos)); // `canDisplayAttendees` is false
-
+        .thenReturn(List.of(mockProgramDetailsParticipantsDtos)); // `canDisplayAttendees` is false
 
     // Perform the GET request and verify the response
     mockMvc
@@ -188,7 +190,9 @@ public class ProgramControllerTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.data[0].programDetails.programId").value(111))
         .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
-        .andExpect(jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl").value("http://example.com/program-guide.pdf"))
+        .andExpect(
+            jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl")
+                .value("http://example.com/program-guide.pdf"))
         .andExpect(jsonPath("$.data[0].attendees.length()").value(0)) // No attendees
         .andExpect(jsonPath("$.statusCode").value(200))
         .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
@@ -232,8 +236,10 @@ public class ProgramControllerTest {
         .andExpect(jsonPath("$.data.title").value("Training Program")) // Verify title
         .andExpect(jsonPath("$.data.capacity").value(10)) // Verify capacity
         .andExpect(jsonPath("$.data.programType").value("Training")) // Verify programType
-        .andExpect(jsonPath("$.data.programAttachments[0].attachmentUrl").value("http://example.com/program-guide.pdf"));
-}
+        .andExpect(
+            jsonPath("$.data.programAttachments[0].attachmentUrl")
+                .value("http://example.com/program-guide.pdf"));
+  }
 
   @Test
   public void testCreateProgram_InsufficientPermissions() throws Exception {

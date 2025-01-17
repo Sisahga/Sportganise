@@ -95,7 +95,6 @@ public class ProgramController {
       canDisplayAttendees = true;
     }
 
-    
     allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, canDisplayAttendees);
 
     responseDto.setStatusCode(HttpStatus.OK.value());
@@ -215,7 +214,6 @@ public class ProgramController {
     }
 
     try {
-
       // Modify the program using the DTO
       ProgramDto updatedProgramDto =
           programService.modifyProgram(

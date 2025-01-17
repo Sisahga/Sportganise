@@ -43,9 +43,9 @@ INSERT INTO sport (name) VALUES
 ('Basketball'),
 ('Badminton');
 
-INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility, attachments) VALUES
-    ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public', null),
-    ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public', '{"./Lab4.pdf"}');
+INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility) VALUES
+    ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public'),
+    ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public');
 
 
 INSERT INTO blocklist (account_id, blocked_id) VALUES

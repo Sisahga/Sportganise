@@ -14,7 +14,7 @@ public interface ProgramAttachmentRepository extends JpaRepository<ProgramAttach
   @Query(
       """
             SELECT pa
-            FROM ProgramAttachments pa
+            FROM ProgramAttachment pa
             WHERE pa.programId = :programId
             """)
   List<ProgramAttachment> findAttachmentsByProgramId(@Param("programId") Integer programId);
