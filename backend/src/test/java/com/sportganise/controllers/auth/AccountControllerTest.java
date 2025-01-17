@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sportganise.controllers.account.AccountController;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Address;
@@ -150,5 +151,64 @@ class AccountControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)))
         .andExpect((status().isNoContent()));
+  }
+
+  @Test
+  public void listPermissionsTest_EmptyList() throws Exception {
+    // Mock data
+    List<AccountPermissions> accountPermissions = List.of();
+
+    given(this.accountService.getAccountPermissions()).willReturn(accountPermissions);
+
+    mockMvc
+        .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
+        .andExpect((status().isOk()))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(content().json("[]"));
+  }
+
+  @Test
+  public void listPermissionsTest_Success() throws Exception {
+    // Mock data
+    Account account1 =
+        Account.builder()
+            .accountId(1)
+            .type("PLAYER")
+            .email("test1@example.com")
+            .phone("5141234567")
+            .firstName("John")
+            .lastName("Doe")
+            .build();
+    Account account2 =
+        Account.builder()
+            .accountId(2)
+            .type("COACH")
+            .email("test2@example.com")
+            .phone("5141112222")
+            .firstName("Jane")
+            .lastName("Dane")
+            .pictureUrl("https://ui-avatars.com/api/?name=Jane+Dane")
+            .build();
+
+    List<AccountPermissions> accountPermissions = List.of(account1, account2);
+
+    given(this.accountService.getAccountPermissions()).willReturn(accountPermissions);
+
+    mockMvc
+        .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
+        .andDo(result -> System.out.println(result.toString()))
+        .andExpect((status().isOk()))
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpectAll( // account 1
+            jsonPath("$[0].accountId", is(account1.getAccountId())),
+            jsonPath("$[0].email", is(account1.getEmail())),
+            jsonPath("$[0].type", is(account1.getType())),
+            jsonPath("$[0].pictureUrl").doesNotExist())
+        .andExpectAll( // account 2
+            jsonPath("$[1].accountId", is(account2.getAccountId())),
+            jsonPath("$[1].email", is(account2.getEmail())),
+            jsonPath("$[1].type", is(account2.getType())),
+            jsonPath("$[1].pictureUrl", is(account2.getPictureUrl())));
   }
 }

@@ -1,5 +1,6 @@
 package com.sportganise.entities.account;
 
+import com.sportganise.dto.account.AccountPermissions;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -19,7 +20,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Account {
+public class Account implements AccountPermissions {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "account_id")

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
@@ -287,5 +288,58 @@ public class AccountServiceTest {
 
     // Verify that the repository was called exactly once
     verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
+  }
+
+  @Test
+  public void getAllAccountPermissions_NoAccount() {
+    given(accountRepository.findAccountPermissions()).willReturn(List.of());
+
+    // Call the service method
+    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+
+    // Assertions
+    assertTrue(result.isEmpty(), "The result should be an empty list");
+    verify(accountRepository, times(1)).findAccountPermissions();
+  }
+
+  @Test
+  public void getAllAccountPermissions_FewAccounts() {
+    // Mock data
+    Account account1 =
+        Account.builder()
+            .accountId(1)
+            .type("PLAYER")
+            .email("test1@example.com")
+            .phone("5141234567")
+            .firstName("John")
+            .lastName("Doe")
+            .pictureUrl("https://ui-avatars.com/api/?name=John+Doe")
+            .build();
+    Account account2 =
+        Account.builder()
+            .accountId(2)
+            .type("COACH")
+            .email("test2@example.com")
+            .phone("5141112222")
+            .firstName("Jane")
+            .lastName("Dane")
+            .pictureUrl("https://ui-avatars.com/api/?name=Jane+Dane")
+            .build();
+    List<AccountPermissions> accountPermissions = List.of(account1, account2);
+
+    given(accountRepository.findAccountPermissions()).willReturn(accountPermissions);
+
+    // Call the service method
+    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+
+    // Assertions
+    assertEquals(result.size(), 2);
+    assertEquals(result.get(0).getEmail(), account1.getEmail());
+    assertEquals(result.get(0).getPictureUrl(), account1.getPictureUrl());
+    assertEquals(result.get(0).getType(), account1.getType());
+    assertEquals(result.get(1).getEmail(), account2.getEmail());
+    assertEquals(result.get(1).getPictureUrl(), account2.getPictureUrl());
+    assertEquals(result.get(1).getType(), account2.getType());
+    verify(accountRepository, times(1)).findAccountPermissions();
   }
 }

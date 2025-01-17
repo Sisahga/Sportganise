@@ -1,6 +1,7 @@
 package com.sportganise.services.account;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
@@ -171,6 +172,15 @@ public class AccountService {
 
   public Optional<Account> getAccount(Integer id) {
     return accountRepository.findById(id);
+  }
+
+  /**
+   * Lists all account with their permissions.
+   *
+   * @return A list of all accounts with their permissions.
+   */
+  public List<AccountPermissions> getAccountPermissions() {
+    return accountRepository.findAccountPermissions();
   }
 
   /**
