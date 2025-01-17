@@ -1,5 +1,6 @@
 import Cookies from "js-cookie";
 import { CookiesDto } from "@/types/auth";
+import log from "loglevel";
 
 export const setCookies = (cookies: CookiesDto) => {
   Cookies.set("accountId", cookies.accountId?.toString() || "", {
@@ -21,42 +22,94 @@ export const setCookies = (cookies: CookiesDto) => {
   });
 };
 
-export const getCookie = (name: string): string | any => {
-  const cookieValue = Cookies.get(name);
-
-  if (name === "organisationIds" && cookieValue) {
-    try {
-      return JSON.parse(cookieValue);
-    } catch (e) {
-      console.error(`Failed to parse cookie ${name}:`, e);
-      return null;
-    }
+export const getCookies = (): CookiesDto | null => {
+  try {
+    return {
+      accountId: Cookies.get("accountId")
+        ? parseInt(Cookies.get("accountId")!, 10)
+        : null,
+      firstName: Cookies.get("firstName") || "",
+      lastName: Cookies.get("lastName") || "",
+      email: Cookies.get("email") || "",
+      pictureUrl: Cookies.get("pictureUrl") || null,
+      type: Cookies.get("type") || "",
+      phone: Cookies.get("phone") || "",
+      organisationIds: Cookies.get("organisationIds")
+        ? JSON.parse(Cookies.get("organisationIds")!)
+        : [],
+    };
+  } catch (e) {
+    log.error("Failed to parse cookies:", e);
+    return null;
   }
-
-  return cookieValue || null;
 };
 
-export const isCookiesDto = (data: any): data is CookiesDto => {
+export const getOrgCookie = (cookiesDto: CookiesDto): number[] => {
+  return cookiesDto.organisationIds || [];
+};
+
+export const getAccountIdCookie = (cookiesDto: CookiesDto): number | null => {
+  return cookiesDto.accountId || null;
+};
+
+export const getFirstNameCookie = (cookiesDto: CookiesDto): string => {
+  return cookiesDto.firstName;
+};
+
+export const getLastNameCookie = (cookiesDto: CookiesDto): string => {
+  return cookiesDto.lastName;
+};
+
+export const getEmailCookie = (cookiesDto: CookiesDto): string => {
+  return cookiesDto.email;
+};
+
+export const getPictureUrlCookie = (cookiesDto: CookiesDto): string | null => {
+  return cookiesDto.pictureUrl;
+};
+
+export const getTypeCookie = (cookiesDto: CookiesDto): string | null => {
+  return cookiesDto.type;
+};
+
+export const getPhoneCookie = (cookiesDto: CookiesDto): string | null => {
+  return cookiesDto.phone;
+};
+
+export const isCookiesDto = (
+  data: null | CookiesDto | { token: string },
+): data is CookiesDto => {
   if (!data || typeof data !== "object") {
     return false;
   }
+  const obj = data as Partial<CookiesDto>;
 
   return (
-    (data.accountId === null || typeof data.accountId === "number") &&
-    typeof data.firstName === "string" &&
-    typeof data.lastName === "string" &&
-    typeof data.email === "string" &&
-    (data.pictureUrl === null || typeof data.pictureUrl === "string") &&
-    (data.type === null || typeof data.type === "string") &&
-    (data.phone === null || typeof data.phone === "string") &&
-    Array.isArray(data.organisationIds) &&
-    data.organisationIds.every((id: any) => typeof id === "number")
+    (obj.accountId === null || true) &&
+    typeof obj.firstName === "string" &&
+    typeof obj.lastName === "string" &&
+    typeof obj.email === "string" &&
+    (obj.pictureUrl === null || typeof obj.pictureUrl === "string") &&
+    (obj.type === null || typeof obj.type === "string") &&
+    (obj.phone === null || typeof obj.phone === "string") &&
+    Array.isArray(obj.organisationIds) &&
+    obj.organisationIds.every((id: any) => typeof id === "number")
   );
 };
 
 export const clearCookies = () => {
-  document.cookie.split(";").forEach((cookie) => {
-    const name = cookie.split("=")[0].trim();
-    document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+  const cookieNames = [
+    "accountId",
+    "firstName",
+    "lastName",
+    "email",
+    "pictureUrl",
+    "type",
+    "phone",
+    "organisationIds",
+  ];
+
+  cookieNames.forEach((name) => {
+    Cookies.remove(name, { path: "/" });
   });
 };
