@@ -16,7 +16,7 @@ const ProfileContent: React.FC = () => {
   const navigate = useNavigate();
   return (
     <div className="bg-primaryColourz-40">
-      <div className="px-4 bg-white pb-16">
+      <div className="px-4 bg-white pb-16 md-10">
         <div className="py-1 min-h-screen">
           <Button
             className="rounded-full"

@@ -2,9 +2,11 @@
 // provides state management for handling the login API call, including loading state,
 // error handling, and storing the response.
 
+import log from "loglevel";
 import { useState } from "react";
 import { login } from "@/services/api/authService";
 import { LoginRequest, LoginResponse } from "@/types/auth";
+import { isCookiesDto } from "@/services/cookiesService";
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,12 +18,23 @@ export const useLogin = () => {
     setError(null);
 
     try {
+      log.info("Starting login process...");
       const response = await login(requestData);
       setData(response);
+
+      if (response.data && isCookiesDto(response.data)) {
+        log.info("CookiesDto successfully processed during login.");
+      } else {
+        log.warn("Login response does not include a valid CookiesDto.");
+      }
     } catch (err) {
-      setError((err as Error).message || "An unexpected error occurred.");
+      const errorMessage =
+        (err as Error).message || "An unexpected error occurred.";
+      log.error(`Error during login: ${errorMessage}`);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
+      log.info("Login process completed.");
     }
   };
 
