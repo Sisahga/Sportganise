@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/formfield";
-// import { useNavigate } from "react-router-dom";
 
 export default function ForgotPassword() {
   return (
@@ -18,14 +17,9 @@ export default function ForgotPassword() {
               label="Email"
               placeholder="Example@gmail.com"
               name="email"
-              // value={formData.email}
-              // onChange={handleInputChange}
             />
           </form>
-          <Button
-            className="w-full mt-8 text-white text-base bg-primaryColour"
-            // onClick={handleSignUp}
-          >
+          <Button className="w-full mt-8 text-white text-base bg-primaryColour">
             Recover Password
           </Button>
         </div>
