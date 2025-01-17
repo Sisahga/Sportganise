@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sportganise.controllers.programsessions.ProgramController;
+import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
@@ -45,12 +46,17 @@ public class ProgramControllerTest {
   // Initialize Dtos
   private ProgramDto mockProgramDto;
   private ProgramParticipantDto mockProgramParticipantDto;
+  private ProgramAttachmentDto mockProgramAttachmentDto;
   private String jsonPayload;
 
   @BeforeEach
   public void setup() {
     mockProgramDto = new ProgramDto();
     mockProgramParticipantDto = new ProgramParticipantDto();
+
+    // Mock a program attachment
+    mockProgramAttachmentDto = new ProgramAttachmentDto(111, "http://example.com/program-guide.pdf");
+
     // Set the programDto
     mockProgramDto.setProgramId(111);
     mockProgramDto.setProgramType("Training");
@@ -66,6 +72,8 @@ public class ProgramControllerTest {
     mockProgramDto.setFrequency("None");
     mockProgramDto.setLocation("999 Random Ave");
     mockProgramDto.setVisibility("public");
+    mockProgramDto.setProgramAttachments(List.of(mockProgramAttachmentDto)); // Add the attachment
+
     // Set the programParticipantDto
     mockProgramParticipantDto.setProgramId(111);
     mockProgramParticipantDto.setAccountId(1);
@@ -77,8 +85,8 @@ public class ProgramControllerTest {
         "{"
             + "\"title\": \"Title\","
             + "\"type\": \"Type\","
-            + "\"start_date\": \"2024-01-30T10:00:00Z\","
-            + "\"end_date\": \"2024-02-01T10:00:00Z\","
+            + "\"startDate\": \"2024-01-30T10:00:00Z\","
+            + "\"endDate\": \"2024-02-01T10:00:00Z\","
             + "\"recurring\": false,"
             + "\"visibility\": \"public\","
             + "\"description\": \"description\","
@@ -87,8 +95,8 @@ public class ProgramControllerTest {
             + "],"
             + "\"capacity\": 10,"
             + "\"notify\": true,"
-            + "\"start_time\": \"10:30\","
-            + "\"end_time\": \"12:30\","
+            + "\"startTime\": \"10:30\","
+            + "\"endTime\": \"12:30\","
             + "\"location\": \"Centre-de-loisirs-St-Denis\""
             + "}";
   }
@@ -144,12 +152,15 @@ public class ProgramControllerTest {
     mockMvc
         .perform(get("/api/programs/2/details"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].programDetails.programId").value(111))
-        .andExpect(jsonPath("$[0].programDetails.title").value("Training Program"))
-        .andExpect(jsonPath("$[0].attendees[0].accountId").value(1));
+        .andExpect(jsonPath("$.data[0].programDetails.programId").value(111))
+        .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
+        .andExpect(jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl").value("http://example.com/program-guide.pdf"))
+        .andExpect(jsonPath("$.data[0].attendees[0].accountId").value(1))
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
   }
 
-  // Test getProgramDetails for when user has permission eg. PLAYER
+  // Test getProgramDetails for when user has no permission eg. REGULAR
   @Test
   public void testGetPrograms_UserWithoutPermissions() throws Exception {
 
@@ -158,17 +169,29 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(2);
     mockAccount.setType("REGULAR");
 
+    // Mock ProgramDetailsParticipantsDto with no participants
+    ProgramDetailsParticipantsDto mockProgramDetailsParticipantsDtos =
+        new ProgramDetailsParticipantsDto(mockProgramDto, List.of());
+
     // Mock behaviour of the services using the mocked objects
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
     Mockito.when(programService.getPrograms()).thenReturn(List.of(mockProgramDto));
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
+    Mockito.when(programService.getProgramDetailsParticipantsDto(List.of(mockProgramDto), false))
+    .thenReturn(List.of(mockProgramDetailsParticipantsDtos)); // `canDisplayAttendees` is false
+
 
     // Perform the GET request and verify the response
     mockMvc
         .perform(get("/api/programs/2/details"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(0)); // No participants expected
+        .andExpect(jsonPath("$.data[0].programDetails.programId").value(111))
+        .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
+        .andExpect(jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl").value("http://example.com/program-guide.pdf"))
+        .andExpect(jsonPath("$.data[0].attendees.length()").value(0)) // No attendees
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
   }
 
   // Tests for createProgram() method
@@ -199,16 +222,18 @@ public class ProgramControllerTest {
                 Mockito.<List<Map<String, String>>>any()))
         .thenReturn(mockProgramDto);
 
-    // Perform request with the dummy JSON payload from above
+    // Perform request and verify the response
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/programs/2/create-program") // Use POST for creation
-                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-                .content(jsonPayload)) // Pass the JSON payload
-        .andExpect(status().isCreated()) // Expect status 201 Created
-        .andExpect(jsonPath("$.capacity").value(10)) // Check that capacity is returned
-        .andExpect(jsonPath("$.title").value("Training Program")); // Check the title
-  }
+            MockMvcRequestBuilders.post("/api/programs/2/create-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
+        .andExpect(status().isCreated()) // Expect 201 Created
+        .andExpect(jsonPath("$.data.title").value("Training Program")) // Verify title
+        .andExpect(jsonPath("$.data.capacity").value(10)) // Verify capacity
+        .andExpect(jsonPath("$.data.programType").value("Training")) // Verify programType
+        .andExpect(jsonPath("$.data.programAttachments[0].attachmentUrl").value("http://example.com/program-guide.pdf"));
+}
 
   @Test
   public void testCreateProgram_InsufficientPermissions() throws Exception {
