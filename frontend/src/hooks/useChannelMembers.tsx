@@ -9,10 +9,10 @@ const useChannelMembers = (channelId: number, userId: number, channelType: strin
     try {
       if (channelType === "SIMPLE") {
         const response = await directMessagingApi.getNonUserChannelMembers(channelId, userId);
-        setMembers(response);
+        setMembers(response.data ?? []);
       } else {
         const response = await directMessagingApi.getAllChannelMembers(channelId);
-        setMembers(response);
+        setMembers(response.data ?? []);
       }
     } catch (error) {
       console.error("Error fetching channel members: ", error);
