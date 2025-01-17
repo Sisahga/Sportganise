@@ -110,7 +110,7 @@ public class AccountController {
 
   /**
    * Gets all users and their role.
-   * 
+   *
    * @return The list of all users.
    */
   @GetMapping("/permissions")
