@@ -1,13 +1,12 @@
 package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.programsessions.ProgramRequestDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
+import com.sportganise.dto.programsessions.ProgramRequestDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST Controller for managing 'Program' Entities. Handles HTTP request and
- * routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
  * appropriate services.
  */
 @RestController
@@ -109,7 +107,7 @@ public class ProgramController {
    * Post mapping for creating new program.
    *
    * @param accountId Id of user who is making the request.
-   * @param payload   Json payload passed from frontend.
+   * @param payload Json payload passed from frontend.
    * @return HTTP Response for newly created program.
    */
   @PostMapping("/{accountId}/create-program")
@@ -141,20 +139,21 @@ public class ProgramController {
 
     try {
       // Use the DTO fields to create a program
-      ProgramDto newProgramDto = programService.createProgramDto(
-          programRequestDto.getTitle(),
-          programRequestDto.getType(),
-          programRequestDto.getStartDate(),
-          programRequestDto.getEndDate(),
-          programRequestDto.getRecurring(),
-          programRequestDto.getVisibility(),
-          programRequestDto.getDescription(),
-          programRequestDto.getCapacity(),
-          programRequestDto.getNotify(),
-          programRequestDto.getStartTime(),
-          programRequestDto.getEndTime(),
-          programRequestDto.getLocation(),
-          programRequestDto.getAttachments());
+      ProgramDto newProgramDto =
+          programService.createProgramDto(
+              programRequestDto.getTitle(),
+              programRequestDto.getType(),
+              programRequestDto.getStartDate(),
+              programRequestDto.getEndDate(),
+              programRequestDto.getRecurring(),
+              programRequestDto.getVisibility(),
+              programRequestDto.getDescription(),
+              programRequestDto.getCapacity(),
+              programRequestDto.getNotify(),
+              programRequestDto.getStartTime(),
+              programRequestDto.getEndTime(),
+              programRequestDto.getLocation(),
+              programRequestDto.getAttachments());
 
       responseDto.setStatusCode(HttpStatus.CREATED.value());
       responseDto.setMessage("Created a new program successfully.");
@@ -172,7 +171,7 @@ public class ProgramController {
    *
    * @param accountId Id of user who is making the request.
    * @param programId Id of the program that we wish to modify.
-   * @param payload   Json payload passed from frontend.
+   * @param payload Json payload passed from frontend.
    * @return HTTP Response for modified/updated data
    */
   @PutMapping("/{accountId}/{programId}/modify-program")
@@ -217,21 +216,22 @@ public class ProgramController {
     try {
 
       // Modify the program using the DTO
-      ProgramDto updatedProgramDto = programService.modifyProgram(
-          programDtoToModify,
-          programRequestDto.getTitle(),
-          programRequestDto.getType(),
-          programRequestDto.getStartDate(),
-          programRequestDto.getEndDate(),
-          programRequestDto.getRecurring(),
-          programRequestDto.getVisibility(),
-          programRequestDto.getDescription(),
-          programRequestDto.getCapacity(),
-          programRequestDto.getNotify(),
-          programRequestDto.getStartTime(),
-          programRequestDto.getEndTime(),
-          programRequestDto.getLocation(),
-          programRequestDto.getAttachments());
+      ProgramDto updatedProgramDto =
+          programService.modifyProgram(
+              programDtoToModify,
+              programRequestDto.getTitle(),
+              programRequestDto.getType(),
+              programRequestDto.getStartDate(),
+              programRequestDto.getEndDate(),
+              programRequestDto.getRecurring(),
+              programRequestDto.getVisibility(),
+              programRequestDto.getDescription(),
+              programRequestDto.getCapacity(),
+              programRequestDto.getNotify(),
+              programRequestDto.getStartTime(),
+              programRequestDto.getEndTime(),
+              programRequestDto.getLocation(),
+              programRequestDto.getAttachments());
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");

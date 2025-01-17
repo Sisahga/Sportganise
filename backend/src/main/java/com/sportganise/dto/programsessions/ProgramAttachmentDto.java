@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProgramAttachmentDto {
-    private Integer programId;
-    private String attachmentUrl;
+  private Integer programId;
+  private String attachmentUrl;
 }

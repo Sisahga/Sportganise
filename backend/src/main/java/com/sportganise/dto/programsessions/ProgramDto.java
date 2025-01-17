@@ -3,7 +3,6 @@ package com.sportganise.dto.programsessions;
 import com.sportganise.entities.programsessions.Program;
 import java.time.ZonedDateTime;
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

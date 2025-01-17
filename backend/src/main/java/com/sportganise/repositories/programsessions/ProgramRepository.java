@@ -25,7 +25,8 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
       """)
   List<Program> findPrograms();
 
-  @Query("""
+  @Query(
+      """
       SELECT p
       FROM ProgramParticipant p
       WHERE p.programParticipantId.programId = :programId

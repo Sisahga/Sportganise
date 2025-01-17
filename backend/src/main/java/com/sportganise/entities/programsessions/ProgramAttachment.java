@@ -19,9 +19,9 @@ import lombok.Setter;
 @Table(name = "program_attachments")
 public class ProgramAttachment {
 
-    @Column(name = "program_id")
-    private Integer programId;
+  @Column(name = "program_id")
+  private Integer programId;
 
-    @Column(name = "attachment_url")
-    private String attachmentUrl;
+  @Column(name = "attachment_url")
+  private String attachmentUrl;
 }
