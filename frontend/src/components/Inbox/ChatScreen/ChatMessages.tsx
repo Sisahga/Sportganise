@@ -125,6 +125,20 @@ const ChatMessages = ({messages}: ChatMessageProps) => {
                   )
                   }
                 </div>
+                <div>
+                  {message.type == "UNBLOCK" && (
+                      <div className="text-center faded-primary-colour font-light text-sm">
+                        {message.senderId === userId ? (
+                            <p>{message.messageContent.split("*")[2]}</p>
+                        ) : (
+                            <p>
+                              {message.messageContent.split("*")[3]}
+                            </p>
+                        )}
+                      </div>
+                  )
+                  }
+                </div>
               </div>
           );
         })}

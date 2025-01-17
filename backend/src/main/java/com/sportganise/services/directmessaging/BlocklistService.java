@@ -31,4 +31,11 @@ public class BlocklistService {
     blocklistRepository.save(blocklist);
     log.info("User with account ID {} has blocked user with account ID {}", accountId, blockedAccountId);
   }
+
+  public void unblockUser(int accountId, int blockedAccountId) {
+    BlocklistCompositeKey blocklistCompositeKey =
+            new BlocklistCompositeKey(accountId, blockedAccountId);
+    blocklistRepository.deleteById(blocklistCompositeKey);
+    log.info("User with account ID {} has unblocked user with account ID {}", accountId, blockedAccountId);
+  }
 }

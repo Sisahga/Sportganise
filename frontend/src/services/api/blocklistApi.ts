@@ -16,6 +16,19 @@ const blocklistApi = {
         },
     );
     return response.status;
+  },
+  unblockUser: async (blockUserRequestDto: BlockUserRequestDto) => {
+    console.log("Unblock user request object sending to api: ", blockUserRequestDto);
+    const response = await fetch(
+        `${baseMappingUrl}/unblock/${blockUserRequestDto.accountId}/${blockUserRequestDto.blockedId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          }
+        },
+    );
+    return response.status;
   }
 }
 export default blocklistApi;

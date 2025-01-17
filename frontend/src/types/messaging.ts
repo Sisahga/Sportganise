@@ -1,3 +1,5 @@
+import WebSocketService from "@/services/WebSocketService.ts";
+
 export interface MessageComponent {
   messageId: number;
   senderId: number;
@@ -34,5 +36,8 @@ export interface LastMessageComponent {
 
 export interface UserBlockedComponentProps {
   showBlockedMessage: boolean;
-  channelIsBlocked: boolean
+  channelIsBlocked: boolean;
+  webSocketRef: WebSocketService | null;
+  channelId: number;
+  channelType: string;
 }

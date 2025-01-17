@@ -26,7 +26,7 @@ import {SendMessageComponent} from "@/types/messaging.ts";
 import log from "loglevel";
 
 const ChannelSettingsDropdown = ({
-  channelType, channelId, webSocketRef, isBlocked
+  channelType, channelId, webSocketRef, isBlocked,
 }: ChannelSettingsDropdownProps) => {
   const currentUserId = 2 // TODO: Replace with actual user ID from cookies
   const [isBlockOpen, setIsBlockOpen] = useState(false);
@@ -35,7 +35,7 @@ const ChannelSettingsDropdown = ({
       useChannelMembers(channelId, currentUserId, channelType);
   const { blockUser } = useBlockUser();
   const { sendDirectMessage } = useSendMessage();
-  const [userBlocked, setUserBlocked] = useState(false);
+  const [userBlocked, setUserBlocked] = useState(isBlocked);
 
   console.log("Blocked status in dropdown settings: ", isBlocked);
 

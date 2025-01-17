@@ -8,19 +8,54 @@ import {
   DrawerTitle, DrawerTrigger,
 } from "@/components/ui/drawer.tsx";
 import {Button} from "@/components/ui/Button.tsx";
-import {UserBlockedComponentProps} from "@/types/messaging.ts";
+import {SendMessageComponent, UserBlockedComponentProps} from "@/types/messaging.ts";
 import {LockIcon as UserUnlock} from "lucide-react";
 import {useState} from "react";
+import useUnblockUser from "@/hooks/useUnblockUser.tsx";
+import {BlockUserRequestDto} from "@/types/blocklist.ts";
+import useChannelMembers from "@/hooks/useChannelMembers.tsx";
+import useSendMessage from "@/hooks/useSendMessage.tsx";
 
 const UserBlockedComponent =
-    ({showBlockedMessage, channelIsBlocked}: UserBlockedComponentProps) => {
-  const handleUnblock = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("User unblocked");
-  };
+    ({
+       showBlockedMessage,
+       channelIsBlocked,
+       webSocketRef,
+       channelId,
+       channelType
+    }: UserBlockedComponentProps) => {
+  const currentUserId = 2; // TODO: Replace with actual user ID from cookies
+  const { members } = useChannelMembers(channelId, currentUserId, channelType);
+  const { unblockUser } = useUnblockUser();
+  const { sendDirectMessage } = useSendMessage();
   const [showComponent, setShowComponent] = useState(showBlockedMessage);
-  console.log("showBlockedMessage: ", showBlockedMessage);
-  console.log("channelIsBlocked: ", channelIsBlocked);
+
+  const handleUnblock = async () => {
+    console.log("Unblocking user...");
+    if (channelType === "SIMPLE") {
+      const unblockListRequestDto: BlockUserRequestDto = {
+        accountId: currentUserId,
+        blockedId: members[0].accountId,
+      };
+      const unblockResponse = await unblockUser(unblockListRequestDto);
+      if (unblockResponse === 204) {
+        console.log("User unblocked successfully.");
+        // Sends unblock message through web socket.
+        const messagePayload: SendMessageComponent = {
+          senderId: currentUserId,
+          channelId: channelId,
+          messageContent: `UNBLOCK*${currentUserId}*You unblocked this user*You have been unblocked by this user`,
+          attachments: [],
+          sentAt: new Date().toISOString(),
+          type: "UNBLOCK",
+          senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+          avatarUrl: "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+        };
+        sendDirectMessage(messagePayload, webSocketRef);
+        setShowComponent(false);
+      }
+    }
+  };
 
   return (
         <Drawer direction="bottom" open={showComponent} onOpenChange={setShowComponent}>

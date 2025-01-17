@@ -7,10 +7,7 @@ import jakarta.validation.constraints.Null;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /** REST Controller for handling HTTP requests related to Blocklist. */
 @RestController
@@ -36,6 +33,15 @@ public class BlocklistController {
         blockUserRequestDto.getAccountId(), blockUserRequestDto.getBlockedId());
     ResponseDto<Null> response =
         new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User blocked successfully", null);
+    return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+  }
+
+  @DeleteMapping("/unblock/{accountId}/{blockedId}")
+  public ResponseEntity<ResponseDto<Null>> unblockUser(
+      @PathVariable Integer accountId, @PathVariable Integer blockedId) {
+    blocklistService.unblockUser(accountId, blockedId);
+    ResponseDto<Null> response =
+        new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User unblocked successfully", null);
     return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
   }
 }

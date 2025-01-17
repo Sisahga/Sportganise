@@ -34,6 +34,7 @@ const ChatScreen = () => {
     read,
   );
   const [newMessage, setNewMessage] = useState("");
+  const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
   const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {
@@ -44,6 +45,11 @@ const ChatScreen = () => {
 
   const onMessageReceived = (message: any) => {
     setMessages((prevMessages) => [...prevMessages, message]);
+    if (message.type === "BLOCK") {
+      setChannelIsBlocked(true);
+    } else if (message.type === "UNBLOCK") {
+      setChannelIsBlocked(false);
+    }
   };
 
   const handleSend = () => {
@@ -144,7 +150,7 @@ const ChatScreen = () => {
             channelType={channelType}
             channelId={channelId}
             webSocketRef={webSocketServiceRef.current}
-            isBlocked={isBlocked}
+            isBlocked={channelIsBlocked}
         />
       </header>
 
@@ -161,10 +167,16 @@ const ChatScreen = () => {
       {/* Chat Messages */}
       <ChatMessages messages={messages} />
 
-      <UserBlockedComponent showBlockedMessage={isBlocked} channelIsBlocked={isBlocked} />
+      <UserBlockedComponent
+          showBlockedMessage={channelIsBlocked}
+          channelIsBlocked={channelIsBlocked}
+          webSocketRef={webSocketServiceRef.current}
+          channelId={channelId}
+          channelType={channelType}
+      />
       {/* Message Input Area */}
       <div id="chatScreenInputArea"
-           className={`${isBlocked ? "force-hide" : ""}
+           className={`${channelIsBlocked ? "force-hide" : ""}
            flex items-center gap-3 px-4 py-3 bg-white shadow`}>
         <div className="h-full flex items-end">
           <Button
