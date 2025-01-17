@@ -8,7 +8,7 @@ import ProfilePage from "./pages/ProfilePage";
 import EditProfilePage from "./pages/EditProfilePage";
 import PersonalInformationPage from "./pages/PersonalInformationPage";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
-import CreateFirstDmPage from "./pages/CreateFirstDmPage";
+import CreateDmChannelPage from "./pages/CreateDmChannelPage.tsx";
 import ViewTrainingSessionPage from "./pages/ViewTrainingSessionPage";
 import LogInPage from "./pages/LogInPage";
 import SignUpPage from "./pages/SignUpPage";
@@ -16,6 +16,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
 import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
+import BlockedUsersListPage from "./pages/BlockedUserListPage";
 
 function App() {
   return (
@@ -25,8 +26,8 @@ function App() {
         {/*placed route here as it does not use original layout with Nav, bottom
         nav, ...*/}
         <Route
-          path="/pages/CreateFirstDmPage"
-          element={<CreateFirstDmPage />}
+          path="/pages/CreateDmChannelPage"
+          element={<CreateDmChannelPage />}
         ></Route>
         <Route path="/" element={<Layout />}>
           {" "}
@@ -69,6 +70,10 @@ function App() {
           <Route
             path="/pages/ModifyTrainingSessionPage"
             element={<ModifyTrainingSessionPage />}
+          ></Route>
+          <Route
+            path="/pages/BlockedUserListPage"
+            element={<BlockedUsersListPage />}
           ></Route>
         </Route>
       </Routes>
