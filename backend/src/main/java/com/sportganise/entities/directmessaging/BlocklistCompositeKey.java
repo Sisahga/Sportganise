@@ -1,4 +1,4 @@
-package com.sportganise.entities;
+package com.sportganise.entities.directmessaging;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -9,17 +9,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Composite key for the AccountOrganization entity, containg account id and org id. */
+/** Composite key for the blocklist table. */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Embeddable
 @EqualsAndHashCode
-public class AccountOrganizationCompositeKey implements Serializable {
+public class BlocklistCompositeKey implements Serializable {
   @Column(name = "account_id")
   private Integer accountId;
 
-  @Column(name = "org_id")
-  private Integer organizationId;
+  @Column(name = "blocked_id")
+  private Integer blockedId;
 }

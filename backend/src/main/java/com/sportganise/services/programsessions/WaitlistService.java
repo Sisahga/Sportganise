@@ -2,6 +2,7 @@ package com.sportganise.services.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import java.time.ZonedDateTime;
@@ -25,7 +26,7 @@ public class WaitlistService {
   }
 
   /**
-   * Ad ds a participant to the waitlist for a program and assigns them a rank.
+   * Adds a participant to the waitlist for a program and assigns them a rank.
    *
    * @param programId The ID of the program.
    * @param accountId The ID of the participant's account.
@@ -122,12 +123,7 @@ public class WaitlistService {
 
     ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
 
-    return new ProgramParticipantDto(
-        savedParticipant.getAccountId(),
-        savedParticipant.getProgramId(),
-        savedParticipant.getRank(),
-        savedParticipant.isConfirmed(),
-        savedParticipant.getConfirmedDate());
+    return new ProgramParticipantDto(savedParticipant);
   }
 
   /**
@@ -140,17 +136,42 @@ public class WaitlistService {
     List<ProgramParticipant> queue = participantRepository.findOptedParticipants(programId);
 
     List<ProgramParticipantDto> queueDto =
-        queue.stream()
-            .map(
-                pp ->
-                    new ProgramParticipantDto(
-                        pp.getAccountId(),
-                        pp.getProgramId(),
-                        pp.getRank(),
-                        pp.isConfirmed(),
-                        pp.getConfirmedDate()))
-            .collect(Collectors.toList());
+        queue.stream().map(pp -> new ProgramParticipantDto(pp)).collect(Collectors.toList());
 
     return queueDto;
+  }
+
+  /**
+   * Function used by optOut and confirmParticipant to refactor and clean code.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the marked absent participant, or null if participant is already not
+   *     confirmed for a program.
+   * @throws ParticipantNotFoundException whenever participant can't be found.
+   */
+  public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+
+    ProgramParticipant programParticipant =
+        participantRepository
+            .findById(new ProgramParticipantId(programId, accountId))
+            .orElseThrow(
+                () ->
+                    new ParticipantNotFoundException(
+                        "Participant not found on waitlist for program: "
+                            + programId
+                            + ", account: "
+                            + accountId));
+
+    if (programParticipant.isConfirmed() == false) {
+      return null;
+    }
+
+    programParticipant.setConfirmed(false);
+    programParticipant.setConfirmedDate(null);
+
+    ProgramParticipant savedParticipant = participantRepository.save(programParticipant);
+    return new ProgramParticipantDto(savedParticipant);
   }
 }

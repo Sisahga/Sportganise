@@ -15,7 +15,9 @@ import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Address;
+import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.account.auth.Auth0ApiService;
 import java.util.List;
@@ -97,13 +99,14 @@ public class AccountServiceTest {
                 accountService.createAccount(accountDto);
               });
 
-      assertEquals("Failed to create account: Internal server error", exception.getMessage());
+      assertEquals("Internal server error", exception.getMessage());
 
       verify(accountRepository, times(1)).save(any(Account.class));
     }
 
     @Test
-    public void createAccount_shouldReturnAuth0Id() {
+    public void createAccount_shouldReturnAuth0Id()
+        throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
       Account account = new Account();
       account.setAuth0Id("auth0Id");
       given(accountRepository.save(any(Account.class))).willReturn(account);
@@ -212,10 +215,7 @@ public class AccountServiceTest {
 
     Exception exception =
         assertThrows(
-            AccountNotFoundException.class,
-            () -> {
-              accountService.resetPassword(email, newPassword);
-            });
+            AccountNotFoundException.class, () -> accountService.resetPassword(email, newPassword));
 
     assertEquals("Account not found", exception.getMessage());
 
@@ -250,45 +250,42 @@ public class AccountServiceTest {
     List<AccountDetailsDirectMessaging> mockAccounts =
         List.of(
             new AccountDetailsDirectMessaging(
-                1, "John", "Doe", "user1@example.com", "555-5555", "PLAYER"),
-            new AccountDetailsDirectMessaging(
                 2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER"));
 
     // Mock the repository call
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
         .willReturn(mockAccounts);
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
-    assertEquals(2, result.size()); // Verify that the returned list has the correct size
-    assertEquals("John", result.get(0).getFirstName()); // Check first account data
-    assertEquals("Jane", result.get(1).getFirstName()); // Check second account data
+    assertEquals(1, result.size()); // Verify that the returned list has the correct size
+    assertEquals("Jane", result.getFirst().getFirstName()); // Check second account data
 
     // Verify that the repository was called exactly once
-    verify(accountRepository, times(1)).getAllNonAdminAccountsByOrganization(organizationId);
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
 
   @Test
-  public void getAllNonAdminAccountsByOrganizationId_shouldReturnEmptyList_whenNoAccounts() {
+  public void getAllNonBlockedAccountsByOrganizationId_shouldReturnEmptyList_whenNoAccounts() {
     int organizationId = 1;
 
     // Mock the repository to return an empty list
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
         .willReturn(List.of());
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
     assertTrue(result.isEmpty(), "The result should be an empty list");
 
     // Verify that the repository was called exactly once
-    verify(accountRepository, times(1)).getAllNonAdminAccountsByOrganization(organizationId);
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
 }

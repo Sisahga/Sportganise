@@ -360,7 +360,7 @@ export default function ModifyTrainingSessionForm() {
       <Button
         className="rounded-full"
         variant="outline"
-        onClick={() => navigate("/HomePage")}
+        onClick={() => navigate("/")}
       >
         <MoveLeft />
       </Button>

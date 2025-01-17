@@ -8,6 +8,7 @@ import {
   CircleUserRound,
   Settings,
   KeyRound,
+  UserX,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -15,12 +16,12 @@ const ProfileContent: React.FC = () => {
   const navigate = useNavigate();
   return (
     <div className="bg-primaryColourz-40">
-      <div className="px-4 bg-white pb-16">
+      <div className="px-4 bg-white pb-16 md-10">
         <div className="py-1 min-h-screen">
           <Button
             className="rounded-full"
             variant="outline"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
           >
             <MoveLeft />
           </Button>
@@ -49,10 +50,10 @@ const ProfileContent: React.FC = () => {
             </Button>
           </div>
 
-          <div className="flex flex-col mt-12">
+          <div className="space-y-8 max-w-3xl mx-auto pt-10 border-none shadow-none">
             {/* Personal Information */}
             <div
-              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full border-2 border-grey mb-4 cursor-pointer hover:bg-gray-100"
+              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full border-2 border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
               onClick={() => navigate("/pages/PersonalInformationPage")}
             >
               <span className="flex">
@@ -64,7 +65,7 @@ const ProfileContent: React.FC = () => {
 
             {/* Settings */}
             <div
-              className="w-full  px-4  py-3 text-left flex justify-between items-center rounded-full border-2 border-grey mb-4 cursor-pointer hover:bg-gray-100"
+              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full mb-2 border-2 border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
               onClick={() => navigate("/settings")}
             >
               <span className="flex">
@@ -77,12 +78,23 @@ const ProfileContent: React.FC = () => {
 
             {/* Change Password*/}
             <div
-              className="w-full  px-4 py-3  text-left flex justify-between items-center rounded-full border-2 border-grey cursor-pointer hover:bg-gray-100"
+              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
               onClick={() => navigate("/pages/ChangePasswordPage")}
             >
               <span className="flex">
                 <KeyRound className="mr-2" />
                 Change Password
+              </span>
+              <ChevronRight />
+            </div>
+            {/* Blocked Users*/}
+            <div
+              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
+              onClick={() => navigate("/pages/BlockedUserListPage")}
+            >
+              <span className="flex">
+                <UserX className="mr-2" />
+                Blocked Users
               </span>
               <ChevronRight />
             </div>

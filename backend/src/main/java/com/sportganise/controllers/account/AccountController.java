@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +31,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/account")
 public class AccountController {
 
-  @Autowired private AccountService accountService;
+  private final AccountService accountService;
+
+  public AccountController(AccountService accountService) {
+    this.accountService = accountService;
+  }
 
   @GetMapping("/")
   public String index() {
@@ -89,10 +92,18 @@ public class AccountController {
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/get-all-users/{organizationId}")
+  /**
+   * Gets all users in an organization that aren't blocked by the user or vice-versa.
+   *
+   * @param organizationId The ID of the organization.
+   * @param accountId The ID of the account.
+   * @return A list of all users in the organization that aren't blocked by the user or vice-versa.
+   */
+  @GetMapping("/get-all-users/{organizationId}/{accountId}")
   public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(
-      @PathVariable int organizationId) {
+      @PathVariable int organizationId, @PathVariable int accountId) {
     return new ResponseEntity<>(
-        this.accountService.getAllNonAdminAccountsByOrganizationId(organizationId), HttpStatus.OK);
+        this.accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, accountId),
+        HttpStatus.OK);
   }
 }

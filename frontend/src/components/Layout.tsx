@@ -7,10 +7,18 @@ import { Toaster } from "@/components/ui/toaster";
 const hideHeaderPaths = [
   "/pages/DirectMessagesDashboard",
   "/pages/DirectMessageChannelPage",
-]; // Header hidden on both
+  "/login",
+  "/signup",
+  "/forgotpassword",
+]; // Header hidden on all these pages
 
 // Paths where the footer should be hidden
-const hideFooterPaths = ["/pages/DirectMessageChannelPage"]; // Footer hidden only on /chat
+const hideFooterPaths = [
+  "/pages/DirectMessageChannelPage",
+  "/login",
+  "/signup",
+  "/forgotpassword",
+]; // Footer hidden on /chat, login and signup pages
 
 // Define paths where you don't want horizontal margins (like full-width pages)
 const fullWidthPaths = [

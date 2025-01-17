@@ -20,7 +20,7 @@ export default function HeaderNav() {
           <DrawerTrigger className="bg-primaryColour hover:outline-none">
             <Menu className="h-10 w-10" />
           </DrawerTrigger>
-          <DrawerContent className="w-[80%]">
+          <DrawerContent className="w-[50%]">
             <DrawerHeader>
               <div className="flex justify-center items-center py-10 gap-2">
                 <img src={logo} alt="Logo" className="h-24 rounded-lg" />
@@ -58,10 +58,10 @@ export default function HeaderNav() {
                 Setting
               </Link>
               <Link
-                to="/signup"
+                to="/login"
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
-                Sign Up
+                Log In
               </Link>
             </nav>
           </DrawerContent>
