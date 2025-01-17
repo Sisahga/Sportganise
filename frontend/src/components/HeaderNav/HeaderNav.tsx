@@ -20,7 +20,7 @@ export default function HeaderNav() {
           <DrawerTrigger className="bg-primaryColour hover:outline-none">
             <Menu className="h-10 w-10" />
           </DrawerTrigger>
-          <DrawerContent className="w-[80%]">
+          <DrawerContent className="w-[50%]">
             <DrawerHeader>
               <div className="flex justify-center items-center py-10 gap-2">
                 <img src={logo} alt="Logo" className="h-24 rounded-lg" />
