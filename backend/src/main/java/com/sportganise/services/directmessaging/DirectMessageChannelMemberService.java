@@ -1,5 +1,6 @@
 package com.sportganise.services.directmessaging;
 
+import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
@@ -57,5 +58,26 @@ public class DirectMessageChannelMemberService {
   public int markChannelAsRead(int channelId, int accountId) {
     return this.directMessageChannelMemberRepository.updateChannelMemberReadStatus(
         accountId, channelId);
+  }
+
+  /**
+   * Gets all members of a channel besides the user.
+   *
+   * @param channelId The channel id.
+   * @param accountId The account id.
+   * @return A list of ChannelMembersDto.
+   */
+  public List<ChannelMembersDto> getNonUserChannelMembers(int channelId, int accountId) {
+    return this.directMessageChannelMemberRepository.getNonUserChannelMembers(channelId, accountId);
+  }
+
+  /**
+   * Gets all members of a channel.
+   *
+   * @param channelId The channel id.
+   * @return A list of ChannelMembersDto.
+   */
+  public List<ChannelMembersDto> getAllChannelMembers(int channelId) {
+    return this.directMessageChannelMemberRepository.getAllChannelMembers(channelId);
   }
 }

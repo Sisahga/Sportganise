@@ -10,6 +10,8 @@ import { SendMessageComponent } from "@/types/messaging.ts";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import ChannelSettingsDropdown from "./ChannelSettingsDropdown.tsx";
+import useSendMessage from "@/hooks/useSendMessage.tsx";
+import UserBlockedComponent from "@/components/Inbox/ChatScreen/UserBlockedComponent.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -17,11 +19,13 @@ const ChatScreen = () => {
 
   // Access chat data from location state
   const { state } = location || {};
-  const channelId = state?.channelId || null;
+  const channelId = state.channelId;
   const channelName = state?.channelName || null;
   const channelImageBlob = state?.channelImageBlob || defaultAvatar;
   const read = state?.read || false;
-  const channelType = state?.channelType || null; /* Maybe we'll use it later */
+  const channelType = state?.channelType || null;
+  const isBlocked = state?.isBlocked || false;
+  console.log("Blocked status from chat screen: ", isBlocked);
 
   const [connected, setConnected] = useState(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
@@ -30,6 +34,8 @@ const ChatScreen = () => {
     read,
   );
   const [newMessage, setNewMessage] = useState("");
+  const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
+  const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {
     webSocketServiceRef.current = new WebSocketService(onMessageReceived);
@@ -39,6 +45,11 @@ const ChatScreen = () => {
 
   const onMessageReceived = (message: any) => {
     setMessages((prevMessages) => [...prevMessages, message]);
+    if (message.type === "BLOCK") {
+      setChannelIsBlocked(true);
+    } else if (message.type === "UNBLOCK") {
+      setChannelIsBlocked(false);
+    }
   };
 
   const handleSend = () => {
@@ -57,8 +68,8 @@ const ChatScreen = () => {
         "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
       // TODO: Replace with actual avatar url from cookies
     };
-    webSocketServiceRef.current?.sendMessage(messagePayload);
 
+    sendDirectMessage(messagePayload, webSocketServiceRef.current);
     setNewMessage("");
   };
 
@@ -135,10 +146,12 @@ const ChatScreen = () => {
         </div>
 
         {/* Options Button */}
-        <ChannelSettingsDropdown channelType={channelType} />
-        {/*<button className="p-2 rounded-full bg-placeholder-colour hover:bg-gray-300">*/}
-        {/*  <MoreHorizontal size={20} />*/}
-        {/*</button>*/}
+        <ChannelSettingsDropdown
+          channelType={channelType}
+          channelId={channelId}
+          webSocketRef={webSocketServiceRef.current}
+          isBlocked={channelIsBlocked}
+        />
       </header>
 
       {/* Display when failing to connect to web socket. */}
@@ -154,8 +167,19 @@ const ChatScreen = () => {
       {/* Chat Messages */}
       <ChatMessages messages={messages} />
 
+      <UserBlockedComponent
+        showBlockedMessage={channelIsBlocked}
+        channelIsBlocked={channelIsBlocked}
+        webSocketRef={webSocketServiceRef.current}
+        channelId={channelId}
+        channelType={channelType}
+      />
       {/* Message Input Area */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-white shadow">
+      <div
+        id="chatScreenInputArea"
+        className={`${channelIsBlocked ? "force-hide" : ""}
+           flex items-center gap-3 px-4 py-3 bg-white shadow`}
+      >
         <div className="h-full flex items-end">
           <Button
             variant="ghost"

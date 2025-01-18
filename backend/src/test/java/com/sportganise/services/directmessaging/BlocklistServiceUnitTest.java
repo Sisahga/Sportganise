@@ -38,4 +38,16 @@ public class BlocklistServiceUnitTest {
     assertEquals(accountId, savedKey.getAccountId());
     assertEquals(blockedAccountId, savedKey.getBlockedId());
   }
+
+  @Test
+  public void unblockUser_shouldDeleteBlocklistEntry() {
+    int accountId = 1;
+    int blockedAccountId = 2;
+
+    BlocklistCompositeKey expectedKey = new BlocklistCompositeKey(accountId, blockedAccountId);
+
+    blocklistService.unblockUser(accountId, blockedAccountId);
+
+    verify(blocklistRepository, times(1)).deleteById(expectedKey);
+  }
 }

@@ -66,7 +66,7 @@ public class DirectMessageServiceUnitTest {
 
     verify(directMessageRepository, times(1)).save(any(DirectMessage.class));
     verify(directMessageChannelRepository, times(1)).updateLastMessageId(1, 1);
-    verify(directMessageChannelMemberRepository, times(1)).updateReadStatus(1, 2);
+    verify(directMessageChannelMemberRepository, times(1)).updateChannelMemberReadStatus(2, 1);
     verify(blobService, times(0)).uploadFile(any(MultipartFile.class), eq(true), anyString());
   }
 
@@ -93,7 +93,7 @@ public class DirectMessageServiceUnitTest {
 
     verify(directMessageRepository, times(1)).save(any(DirectMessage.class));
     verify(directMessageChannelRepository, times(1)).updateLastMessageId(1, 1);
-    verify(directMessageChannelMemberRepository, times(1)).updateReadStatus(1, 2);
+    verify(directMessageChannelMemberRepository, times(1)).updateChannelMemberReadStatus(2, 1);
     verify(blobService, times(2)).uploadFile(any(MultipartFile.class), eq(true), eq("1"));
   }
 }

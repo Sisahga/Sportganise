@@ -38,6 +38,15 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
             parseISO(message.sentAt),
             parseISO(messages[index - 1]?.sentAt),
           ) > 15;
+        if (index === messages.length - 1 && message.type === "BLOCK") {
+          const chatScreenInputArea = document.getElementById(
+            "chatScreenInputArea",
+          );
+          if (chatScreenInputArea) {
+            chatScreenInputArea.classList.add("pointer-events-none");
+            chatScreenInputArea.classList.add("opacity-70");
+          }
+        }
         return (
           <div key={message.messageId} className="mb-4">
             {/* Regular Chat Message */}
@@ -100,6 +109,28 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
                       {message.messageContent.split("*")[2]}{" "}
                       {message.messageContent.split("*")[3]}
                     </p>
+                  )}
+                </div>
+              )}
+            </div>
+            <div>
+              {message.type == "BLOCK" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === userId ? (
+                    <p>{message.messageContent.split("*")[2]}</p>
+                  ) : (
+                    <p>{message.messageContent.split("*")[3]}</p>
+                  )}
+                </div>
+              )}
+            </div>
+            <div>
+              {message.type == "UNBLOCK" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === userId ? (
+                    <p>{message.messageContent.split("*")[2]}</p>
+                  ) : (
+                    <p>{message.messageContent.split("*")[3]}</p>
                   )}
                 </div>
               )}
