@@ -18,7 +18,7 @@ public class ChannelMembersDto {
   private String firstName;
   private String lastName;
   private String avatarUrl;
-  
+
   @Enumerated(EnumType.STRING)
   private ChannelMemberRoleType role;
 }
