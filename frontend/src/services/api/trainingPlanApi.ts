@@ -2,23 +2,20 @@ import log from "loglevel";
 import ResponseDto from "@/types/response";
 import { UploadTrainingPlansDto } from "@/types/trainingplans"; //trainingPlans: string[]
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api/training-plans";
 
 const trainingPlanApi = {
   uploadTrainingPlans: async (
     accountId: number,
-    trainingPlans: File[],
+    trainingPlans: File[]
   ): Promise<ResponseDto<UploadTrainingPlansDto>> => {
-    const response = await fetch(
-      `${API_BASE_URL}/training-plans/${accountId}/upload`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(trainingPlans),
+    const response = await fetch(`${API_BASE_URL}/${accountId}/upload`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
+      body: JSON.stringify(trainingPlans),
+    });
 
     if (!response.ok) {
       throw new Error("Error thrown in trainingPlanApi.uploadTrainingPlans.");
