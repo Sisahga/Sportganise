@@ -13,7 +13,7 @@ export default function SecondaryHeader() {
 
   return (
     <div>
-      <header className="fixed top-0 left-0 right-0 z-40 p-4 flex items-center justify-between bg-white shadow-md md:p-6">
+      <header className="fixed top-0 left-0 right-0 z-40 p-4 flex items-center justify-between bg-white md:p-6">
         <Button
           className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full bg-white text-black border-black hover:bg-secondaryColour"
           onClick={handleGoBack}
