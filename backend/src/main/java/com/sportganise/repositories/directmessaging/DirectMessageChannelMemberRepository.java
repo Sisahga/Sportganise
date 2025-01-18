@@ -80,4 +80,13 @@ public interface DirectMessageChannelMemberRepository
               WHERE cm.compositeKey.channelId = :channelId
               """)
   List<ChannelMembersDto> getAllChannelMembers(int channelId);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+        DELETE FROM DirectMessageChannelMember cm
+        WHERE cm.compositeKey.channelId = :channelId AND cm.compositeKey.accountId = :accountId
+        """)
+  void deleteByChannelIdAndAccountId(int channelId, int accountId);
 }
