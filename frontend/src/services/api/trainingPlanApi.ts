@@ -7,7 +7,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api";
 const trainingPlanApi = {
   uploadTrainingPlans: async (
     accountId: number,
-    trainingPlans: File[]
+    trainingPlans: File[],
   ): Promise<ResponseDto<UploadTrainingPlansDto>> => {
     const response = await fetch(
       `${API_BASE_URL}/training-plans/${accountId}/upload`,
@@ -17,7 +17,7 @@ const trainingPlanApi = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(trainingPlans),
-      }
+      },
     );
 
     if (!response.ok) {

@@ -9,12 +9,12 @@ function useUploadTrainingPlan() {
     useState<ResponseDto<UploadTrainingPlansDto> | null>(null);
   const uploadTrainingPlans = async (
     accountId: number,
-    trainingPlans: File[]
+    trainingPlans: File[],
   ) => {
     try {
       const data = await trainingPlanApi.uploadTrainingPlans(
         accountId,
-        trainingPlans
+        trainingPlans,
       );
       setUploadingTrainingPlanResponse(data);
       return data;
