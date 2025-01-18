@@ -19,4 +19,5 @@ public class DirectMessageChannelMember {
   @EmbeddedId DirectMessageChannelMemberCompositeKey compositeKey;
 
   private Boolean read;
+  private ChannelMemberRoleType role;
 }
