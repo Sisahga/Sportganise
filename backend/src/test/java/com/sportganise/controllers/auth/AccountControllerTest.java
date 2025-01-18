@@ -5,8 +5,12 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.sportganise.controllers.account.AccountController;
@@ -17,6 +21,7 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.services.account.AccountService;
 import java.util.List;
 import java.util.Optional;
@@ -148,6 +153,8 @@ class AccountControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
         .andExpect((status().isNotFound()));
+
+    verify(accountService, times(1)).updateAccount(eq(accountId), any(UpdateAccountDto.class));
   }
 
   @Test
@@ -158,10 +165,62 @@ class AccountControllerTest {
 
     mockMvc
         .perform(
-            (MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
+            MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody)))
-        .andExpect((status().isNoContent()));
+                .content(requestBody))
+        .andExpect(status().isNoContent());
+
+    verify(accountService, times(1)).updateAccount(eq(accountId), any(UpdateAccountDto.class));
+  }
+
+  @Test
+  public void updateAccountPermissionTest_NotFound() throws Exception {
+    int accountId = 2;
+    String requestBody = "ADMIN";
+
+    doThrow(new AccountNotFoundException("Account not found"))
+        .when(accountService)
+        .updateAccountRole(anyInt(), any());
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                .content(requestBody))
+        .andExpect(status().isNotFound());
+
+    verify(accountService, times(1)).updateAccountRole(accountId, requestBody);
+  }
+
+  @Test
+  public void updateAccountPermissionTest_InvalidAccountType() throws Exception {
+    int accountId = 1;
+    String requestBody = "NOT_ADMIN";
+
+    doThrow(new InvalidAccountTypeException("Invalid account type"))
+        .when(accountService)
+        .updateAccountRole(anyInt(), anyString());
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                .content(requestBody))
+        .andExpect(status().isBadRequest());
+
+    verify(accountService, times(1)).updateAccountRole(accountId, requestBody);
+  }
+
+  @Test
+  public void updateAccountPermissionTest_Success() throws Exception {
+    int accountId = 1;
+    String requestBody = "ADMIN";
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                .content(requestBody))
+        .andExpect(status().isNoContent());
+
+    verify(accountService, times(1)).updateAccountRole(accountId, requestBody);
   }
 
   @Test

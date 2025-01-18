@@ -9,11 +9,9 @@ CREATE TABLE organization(
 	description VARCHAR(100)
 );
 
-CREATE TYPE account_type AS ENUM ('ADMIN', 'COACH', 'PLAYER');
-
 CREATE TABLE account (
 	account_id SERIAL PRIMARY KEY,
-	type account_type NOT NULL,
+	type VARCHAR NOT NULL CHECK (type IN ('ADMIN', 'COACH', 'PLAYER')),
 	email VARCHAR(254) UNIQUE NOT NULL,
 	auth0_id VARCHAR(255) UNIQUE NOT NULL,
 	address_line VARCHAR(100),

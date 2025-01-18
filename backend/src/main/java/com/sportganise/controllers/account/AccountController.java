@@ -5,6 +5,7 @@ import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.services.account.AccountService;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -84,10 +85,32 @@ public class AccountController {
     try {
       this.accountService.updateAccountPicture(accountId, file);
     } catch (AccountNotFoundException e) {
-      return new ResponseEntity<>("Failed to find user with ID " + accountId, HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     } catch (IOException e) {
       return new ResponseEntity<>(
           "Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return ResponseEntity.noContent().build();
+  }
+
+  /**
+   * Updates the permissions of an account.
+   *
+   * @param accountId ID of the account.
+   * @param accountType The new type.
+   * @return The URL of the updated picture if successful,
+   */
+  @PutMapping("/{accountId}/type")
+  public ResponseEntity<String> updateAccountPicture(
+      @PathVariable Integer accountId, @RequestBody String accountType) {
+    // TODO: only admin users should be authorized to this endpoint
+    try {
+      this.accountService.updateAccountRole(accountId, accountType);
+    } catch (AccountNotFoundException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    } catch (InvalidAccountTypeException e) {
+      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     return ResponseEntity.noContent().build();
