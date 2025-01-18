@@ -21,8 +21,9 @@ interface Columns {
   date: Date;
 }
 
-export default function FileTable() {
+export default function TrainingPlanTable() {
   const [data, setData] = useState<Columns[]>(MockData);
 
   //const table = useReactTable();
+  return <div>hello</div>;
 }
