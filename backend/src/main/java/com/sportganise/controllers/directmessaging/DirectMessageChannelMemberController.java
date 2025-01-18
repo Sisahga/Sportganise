@@ -3,12 +3,15 @@ package com.sportganise.controllers.directmessaging;
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelMemberService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for Direct Message Channel Members. */
 @RestController
@@ -31,15 +34,13 @@ public class DirectMessageChannelMemberController {
    */
   @GetMapping("/get-channel-members/{channelId}/{accountId}")
   public ResponseEntity<ResponseDto<List<ChannelMembersDto>>> getChannelMembers(
-          @PathVariable int channelId, @PathVariable int accountId) {
+      @PathVariable int channelId, @PathVariable int accountId) {
     List<ChannelMembersDto> channelMembersDto =
         this.directMessageChannelMemberService.getNonUserChannelMembers(channelId, accountId);
     log.debug("Channel members excluding current user retrieved successfully");
     ResponseDto<List<ChannelMembersDto>> response =
         new ResponseDto<>(
-                HttpStatus.OK.value(),
-                "Channel members retrieved successfully",
-                channelMembersDto);
+            HttpStatus.OK.value(), "Channel members retrieved successfully", channelMembersDto);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
@@ -51,15 +52,13 @@ public class DirectMessageChannelMemberController {
    */
   @GetMapping("/get-channel-members/{channelId}")
   public ResponseEntity<ResponseDto<List<ChannelMembersDto>>> getAllChannelMembers(
-          @PathVariable int channelId) {
+      @PathVariable int channelId) {
     List<ChannelMembersDto> channelMembersDto =
         this.directMessageChannelMemberService.getAllChannelMembers(channelId);
     log.debug("Channel members retrieved successfully");
     ResponseDto<List<ChannelMembersDto>> response =
         new ResponseDto<>(
-                HttpStatus.OK.value(),
-                "Channel members retrieved successfully",
-                channelMembersDto);
+            HttpStatus.OK.value(), "Channel members retrieved successfully", channelMembersDto);
     return new ResponseEntity<>(response, HttpStatus.OK);
   }
 

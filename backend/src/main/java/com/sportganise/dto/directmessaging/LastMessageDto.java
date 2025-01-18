@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** API DTO for retrieving the last message in a channel. */
 @Getter
 @Setter
 @AllArgsConstructor

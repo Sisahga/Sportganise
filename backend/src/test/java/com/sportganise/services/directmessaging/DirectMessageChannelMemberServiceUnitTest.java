@@ -1,9 +1,14 @@
 package com.sportganise.services.directmessaging;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -12,16 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageChannelMemberServiceUnitTest {
-  @Mock
-  private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
+  @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
   @InjectMocks private DirectMessageChannelMemberService directMessageChannelMemberService;
   @Captor private ArgumentCaptor<List<DirectMessageChannelMember>> membersCaptor;
 
@@ -30,41 +28,35 @@ public class DirectMessageChannelMemberServiceUnitTest {
     int channelId = 1;
     int accountId = 100;
 
-    List<ChannelMembersDto> expectedMembers = Arrays.asList(
-            new ChannelMembersDto(),
-            new ChannelMembersDto()
-    );
+    List<ChannelMembersDto> expectedMembers =
+        Arrays.asList(new ChannelMembersDto(), new ChannelMembersDto());
 
     when(directMessageChannelMemberRepository.getNonUserChannelMembers(channelId, accountId))
-            .thenReturn(expectedMembers);
+        .thenReturn(expectedMembers);
 
     List<ChannelMembersDto> actualMembers =
-            directMessageChannelMemberService.getNonUserChannelMembers(channelId, accountId);
+        directMessageChannelMemberService.getNonUserChannelMembers(channelId, accountId);
 
     assertEquals(expectedMembers, actualMembers);
     verify(directMessageChannelMemberRepository, times(1))
-            .getNonUserChannelMembers(channelId, accountId);
+        .getNonUserChannelMembers(channelId, accountId);
   }
 
   @Test
   public void getAllChannelMembers_shouldReturnAllMembers() {
     int channelId = 1;
 
-    List<ChannelMembersDto> expectedMembers = Arrays.asList(
-            new ChannelMembersDto(),
-            new ChannelMembersDto(),
-            new ChannelMembersDto()
-    );
+    List<ChannelMembersDto> expectedMembers =
+        Arrays.asList(new ChannelMembersDto(), new ChannelMembersDto(), new ChannelMembersDto());
 
     when(directMessageChannelMemberRepository.getAllChannelMembers(channelId))
-            .thenReturn(expectedMembers);
+        .thenReturn(expectedMembers);
 
     List<ChannelMembersDto> actualMembers =
-            directMessageChannelMemberService.getAllChannelMembers(channelId);
+        directMessageChannelMemberService.getAllChannelMembers(channelId);
 
     assertEquals(expectedMembers, actualMembers);
-    verify(directMessageChannelMemberRepository, times(1))
-            .getAllChannelMembers(channelId);
+    verify(directMessageChannelMemberRepository, times(1)).getAllChannelMembers(channelId);
   }
 
   @Test
@@ -97,12 +89,13 @@ public class DirectMessageChannelMemberServiceUnitTest {
     int expectedAffectedRows = 1;
 
     when(directMessageChannelMemberRepository.updateChannelMemberReadStatus(accountId, channelId))
-            .thenReturn(expectedAffectedRows);
+        .thenReturn(expectedAffectedRows);
 
-    int actualAffectedRows = directMessageChannelMemberService.markChannelAsRead(channelId, accountId);
+    int actualAffectedRows =
+        directMessageChannelMemberService.markChannelAsRead(channelId, accountId);
 
     assertEquals(expectedAffectedRows, actualAffectedRows);
     verify(directMessageChannelMemberRepository, times(1))
-            .updateChannelMemberReadStatus(accountId, channelId);
+        .updateChannelMemberReadStatus(accountId, channelId);
   }
 }

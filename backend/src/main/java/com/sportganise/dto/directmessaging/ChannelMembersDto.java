@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** API DTO for ChannelMembers. */
 @Getter
 @Setter
 @AllArgsConstructor

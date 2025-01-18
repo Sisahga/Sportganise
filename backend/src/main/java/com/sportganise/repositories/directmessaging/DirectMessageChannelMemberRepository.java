@@ -30,30 +30,6 @@ public interface DirectMessageChannelMemberRepository
   int getOtherMemberIdInSimpleChannel(
       @Param("channelId") int channelId, @Param("accountId") int accountId);
 
-  /**
-   * Sets the read status for a channel's member to true when it is the sender id, false when it is
-   * not.
-   *
-   * @param channelId Channel ID to update read status for.
-   * @param senderId Sender ID of the message.
-   */
-  @Transactional
-  @Modifying
-  @Query(
-      """
-            UPDATE DirectMessageChannelMember
-            SET read = CASE
-                WHEN compositeKey.accountId = :senderId THEN true
-                ELSE false
-            END
-            WHERE compositeKey.accountId IN (
-                SELECT compositeKey.accountId
-                FROM DirectMessageChannelMember
-                WHERE compositeKey.channelId = :channelId
-            )
-        """)
-  void updateReadStatus(@Param("channelId") int channelId, @Param("senderId") int senderId);
-
   @Query(
       """
       SELECT cm.compositeKey.accountId, a.firstName, a.pictureUrl
@@ -74,7 +50,8 @@ public interface DirectMessageChannelMemberRepository
   int updateChannelMemberReadStatus(
       @Param("accountId") int accountId, @Param("channelId") int channelId);
 
-  @Query("""
+  @Query(
+      """
         SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
             cm.compositeKey.accountId,
             a.firstName,
@@ -88,7 +65,8 @@ public interface DirectMessageChannelMemberRepository
         """)
   List<ChannelMembersDto> getNonUserChannelMembers(int channelId, int accountId);
 
-  @Query("""
+  @Query(
+      """
         SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
             cm.compositeKey.accountId,
             a.firstName,

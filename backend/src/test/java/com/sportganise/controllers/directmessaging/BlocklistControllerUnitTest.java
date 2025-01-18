@@ -54,21 +54,18 @@ public class BlocklistControllerUnitTest {
     int accountId = 1;
     int blockedId = 2;
 
-    doNothing()
-            .when(blocklistService)
-            .unblockUser(accountId, blockedId);
+    doNothing().when(blocklistService).unblockUser(accountId, blockedId);
 
     mockMvc
-            .perform(
-                    MockMvcRequestBuilders.delete("/api/blocklist/unblock/{accountId}/{blockedId}",
-                                    accountId, blockedId)
-                            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent())
-            .andExpect(jsonPath("$.statusCode").value(204))
-            .andExpect(jsonPath("$.message").value("User unblocked successfully"))
-            .andExpect(jsonPath("$.data").isEmpty());
+        .perform(
+            MockMvcRequestBuilders.delete(
+                    "/api/blocklist/unblock/{accountId}/{blockedId}", accountId, blockedId)
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$.statusCode").value(204))
+        .andExpect(jsonPath("$.message").value("User unblocked successfully"))
+        .andExpect(jsonPath("$.data").isEmpty());
 
-    verify(blocklistService, times(1))
-            .unblockUser(accountId, blockedId);
+    verify(blocklistService, times(1)).unblockUser(accountId, blockedId);
   }
 }

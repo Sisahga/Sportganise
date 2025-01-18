@@ -28,7 +28,8 @@ public interface DirectMessageRepository extends JpaRepository<DirectMessage, In
          """)
   List<String> getMessageAttachments(int messageId);
 
-  @Query("""
+  @Query(
+      """
         SELECT NEW com.sportganise.dto.directmessaging.LastMessageDto(
             m.senderId,
             m.channelId,
