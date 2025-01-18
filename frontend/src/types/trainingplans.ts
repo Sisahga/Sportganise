@@ -1,3 +1,3 @@
 export interface UploadTrainingPlansDto {
-  trainingPlans: File[];
+  trainingPlans: string[];
 }

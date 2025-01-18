@@ -1,6 +1,6 @@
 import log from "loglevel";
 import ResponseDto from "@/types/response";
-import { UploadTrainingPlansDto } from "@/types/trainingplans"; //trainingPlans: File[]
+import { UploadTrainingPlansDto } from "@/types/trainingplans"; //trainingPlans: string[]
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api";
 
@@ -25,3 +25,5 @@ const trainingPlanApi = {
     return data;
   },
 };
+
+export default trainingPlanApi;
