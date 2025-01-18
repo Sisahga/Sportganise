@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +17,10 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import { UserPlus, UserMinus } from "lucide-react";
-import {ChannelMember, MembersSettingsDialogProps} from "@/types/dmchannels.ts";
+import {
+  ChannelMember,
+  MembersSettingsDialogProps,
+} from "@/types/dmchannels.ts";
 
 export function MembersSettingsDialog({
   isOpen,
@@ -26,7 +29,9 @@ export function MembersSettingsDialog({
 }: MembersSettingsDialogProps) {
   const [members, setMembers] = useState<ChannelMember[]>(channelMembers);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState<ChannelMember | null>(null);
+  const [selectedMember, setSelectedMember] = useState<ChannelMember | null>(
+    null,
+  );
   console.log("Members from member settings dialog: ", members);
 
   useEffect(() => {
@@ -40,7 +45,9 @@ export function MembersSettingsDialog({
 
   const handleRemoveConfirm = () => {
     if (selectedMember) {
-      setMembers(members.filter((m) => m.accountId !== selectedMember.accountId));
+      setMembers(
+        members.filter((m) => m.accountId !== selectedMember.accountId),
+      );
       setAlertDialogOpen(false);
       setSelectedMember(null);
     }
@@ -49,8 +56,10 @@ export function MembersSettingsDialog({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
-                       style={{ maxWidth: "90vw" }}>
+        <DialogContent
+          className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+          style={{ maxWidth: "90vw" }}
+        >
           <DialogHeader>
             <DialogTitle className="text-2xl text-primaryColour font-font font-bold">
               Members Settings
@@ -62,7 +71,9 @@ export function MembersSettingsDialog({
                 key={member.accountId}
                 className="flex items-center justify-between py-2 font-font text-primaryColour"
               >
-                <span>{member.firstName} {member.lastName}</span>
+                <span>
+                  {member.firstName} {member.lastName}
+                </span>
                 <div>
                   <Button
                     variant="ghost"
@@ -70,7 +81,9 @@ export function MembersSettingsDialog({
                     onClick={() => handleAction(member)}
                   >
                     <UserMinus className="h-4 w-4" />
-                    <span className="sr-only">Remove {member.firstName} {member.lastName}</span>
+                    <span className="sr-only">
+                      Remove {member.firstName} {member.lastName}
+                    </span>
                   </Button>
                 </div>
               </div>
@@ -87,19 +100,24 @@ export function MembersSettingsDialog({
       </Dialog>
 
       <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
-        <AlertDialogContent className="bg-white text-primaryColour font-font rounded-lg"
-                            style={{ maxWidth: "85vw" }}>
+        <AlertDialogContent
+          className="bg-white text-primaryColour font-font rounded-lg"
+          style={{ maxWidth: "85vw" }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold">
               Are you sure?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will remove {selectedMember?.firstName} {selectedMember?.lastName} from the group.
+              This will remove {selectedMember?.firstName}{" "}
+              {selectedMember?.lastName} from the group.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="text-primaryColour
-            bg-white hover:bg-textPlaceholderColour">
+            <AlertDialogCancel
+              className="text-primaryColour
+            bg-white hover:bg-textPlaceholderColour"
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
