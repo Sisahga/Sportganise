@@ -47,3 +47,9 @@ export interface ChannelMember {
   lastName: string;
   avatarUrl: string;
 }
+
+export interface MembersSettingsDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  channelMembers: ChannelMember[];
+}
