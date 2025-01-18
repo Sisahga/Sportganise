@@ -28,7 +28,7 @@ const formSchema = z.object({
     //array of files
     z.custom<File>((file) => file instanceof File && file.size > 0, {
       message: "Each file must be a valid file and not empty.",
-    })
+    }),
   ),
 });
 
