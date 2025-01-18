@@ -1,11 +1,11 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuItem, DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx";
 import { Button } from "@/components/ui/Button.tsx";
-import { Ban, MoreHorizontal, Trash2 } from "lucide-react";
+import {Ban, Edit, Image, MoreHorizontal, Trash2, Users} from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -24,6 +24,9 @@ import useChannelMembers from "@/hooks/useChannelMembers.tsx";
 import useSendMessage from "@/hooks/useSendMessage.tsx";
 import { SendMessageComponent } from "@/types/messaging.ts";
 import log from "loglevel";
+import {MembersSettingsDialog} from "@/components/Inbox/ChatScreen/Settings/MembersSettings.tsx";
+import {RenameGroupDialog} from "@/components/GroupChatSettingContent/RenameGroupChat.tsx";
+import {ChangePictureDialog} from "@/components/GroupChatSettingContent/ChangeGroupPicture.tsx";
 
 const ChannelSettingsDropdown = ({
   channelType,
@@ -32,12 +35,19 @@ const ChannelSettingsDropdown = ({
   isBlocked,
 }: ChannelSettingsDropdownProps) => {
   const currentUserId = 2; // TODO: Replace with actual user ID from cookies
+
+  // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
+  const [userBlocked, setUserBlocked] = useState(isBlocked);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isMembersSettingsOpen, setIsMembersSettingsOpen] = useState(false);
+  const [isRenameGroupOpen, setIsRenameGroupOpen] = useState(false);
+  const [isChangePictureOpen, setIsChangePictureOpen] = useState(false);
+
+  // Hooks.
   const { members } = useChannelMembers(channelId, currentUserId, channelType);
   const { blockUser } = useBlockUser();
   const { sendDirectMessage } = useSendMessage();
-  const [userBlocked, setUserBlocked] = useState(isBlocked);
 
   console.log("Blocked status in dropdown settings: ", isBlocked);
 
@@ -113,18 +123,60 @@ const ChannelSettingsDropdown = ({
               </DropdownMenuItem>
               <DropdownMenuItem
                 onSelect={() => setIsDeleteOpen(true)}
-                className="text-red hover:text-white hover:bg-red cursor-pointer flex justify-between items-center"
+                className="text-red hover:text-white hover:bg-red cursor-pointer flex
+                justify-between items-center"
               >
                 <span>Delete</span>
                 <Trash2 className="h-4 w-4 ml-2" />
               </DropdownMenuItem>
             </>
           ) : (
-            <></>
+            <>
+              {/* GROUP Settings */}
+              <DropdownMenuItem
+                  className="flex items-center justify-between py-3 font-font text-primaryColour
+                  bg-white hover:bg-secondaryColour/20"
+                  onSelect={() => setIsMembersSettingsOpen(true)}
+              >
+                <span>Members Settings</span>
+                <Users className="h-4 w-4 ml-2" />
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-primaryColour/20" />
+              <DropdownMenuItem
+                  className="flex items-center justify-between py-3 font-font text-primaryColour
+                  bg-white hover:bg-secondaryColour/20"
+                  onSelect={() => setIsRenameGroupOpen(true)}
+              >
+                <span>Rename Group</span>
+                <Edit className="h-4 w-4 ml-2" />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                  className="flex items-center justify-between py-3 font-font text-primaryColour
+                  bg-white hover:bg-secondaryColour/20"
+                  onSelect={() => setIsChangePictureOpen(true)}
+              >
+                <span>Change Picture</span>
+                <Image className="h-4 w-4 ml-2" />
+              </DropdownMenuItem>
+            </>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Dialogs for Channel Settings */}
+      <MembersSettingsDialog
+          isOpen={isMembersSettingsOpen}
+          onClose={() => setIsMembersSettingsOpen(false)}
+          channelMembers={members}
+      />
+      <RenameGroupDialog
+          isOpen={isRenameGroupOpen}
+          onClose={() => setIsRenameGroupOpen(false)}
+      />
+      <ChangePictureDialog
+          isOpen={isChangePictureOpen}
+          onClose={() => setIsChangePictureOpen(false)}
+      />
       <AlertDialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
         <AlertDialogContent className="font-font" style={{ maxWidth: "90vw" }}>
           <AlertDialogHeader>
@@ -137,7 +189,9 @@ const ChannelSettingsDropdown = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white text-primaryColour hover:bg-fadedPrimaryColour hover:text-white font-font">
+            <AlertDialogCancel
+                className="bg-white text-primaryColour hover:bg-fadedPrimaryColour
+                hover:text-white font-font">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -162,7 +216,9 @@ const ChannelSettingsDropdown = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white text-primaryColour hover:bg-fadedPrimaryColour hover:text-white font-font">
+            <AlertDialogCancel
+                className="bg-white text-primaryColour hover:bg-fadedPrimaryColour
+                hover:text-white font-font">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
