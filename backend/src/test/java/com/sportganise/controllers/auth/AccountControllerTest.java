@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,7 +43,9 @@ class AccountControllerTest {
 
   @MockBean private AccountService accountService;
 
-  Account account;
+  private ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
+
+  private Account account;
 
   @BeforeEach
   public void setup() {
@@ -176,26 +180,22 @@ class AccountControllerTest {
 
   @Test
   public void listPermissionsTest_Success() throws Exception {
+
     // Mock data
-    Account account1 =
-        Account.builder()
-            .accountId(1)
-            .type(AccountType.PLAYER)
-            .email("test1@example.com")
-            .phone("5141234567")
-            .firstName("John")
-            .lastName("Doe")
-            .build();
-    Account account2 =
-        Account.builder()
-            .accountId(2)
-            .type(AccountType.COACH)
-            .email("test2@example.com")
-            .phone("5141112222")
-            .firstName("Jane")
-            .lastName("Dane")
-            .pictureUrl("https://ui-avatars.com/api/?name=Jane+Dane")
-            .build();
+    AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
+    account1.setAccountId(1);
+    account1.setType(AccountType.PLAYER);
+    account1.setEmail("test1@example.com");
+    account1.setFirstName("John");
+    account1.setLastName("Doe");
+
+    AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
+    account2.setAccountId(2);
+    account2.setType(AccountType.COACH);
+    account2.setEmail("test2@example.com");
+    account2.setFirstName("Jane");
+    account2.setLastName("Dane");
+    account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
 
     List<AccountPermissions> accountPermissions = List.of(account1, account2);
 
@@ -203,7 +203,6 @@ class AccountControllerTest {
 
     mockMvc
         .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
-        .andDo(result -> System.out.println(result.toString()))
         .andExpect((status().isOk()))
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.length()").value(2))
@@ -218,4 +217,19 @@ class AccountControllerTest {
             jsonPath("$[1].type", is(account2.getType().toString())),
             jsonPath("$[1].pictureUrl", is(account2.getPictureUrl())));
   }
+}
+
+interface AccountPermissionsTest extends AccountPermissions {
+
+  void setAccountId(Integer acountId);
+
+  void setFirstName(String firstName);
+
+  void setLastName(String lastName);
+
+  void setEmail(String email);
+
+  void setPictureUrl(String pictureUrl);
+
+  void setType(AccountType type);
 }

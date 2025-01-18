@@ -32,6 +32,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
@@ -41,6 +43,8 @@ public class AccountServiceTest {
   @Mock private Auth0ApiService auth0ApiService;
 
   @InjectMocks private AccountService accountService;
+
+  private ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
 
   private AccountDto accountDto;
   private Auth0AccountDto auth0AccountDto;
@@ -311,26 +315,21 @@ public class AccountServiceTest {
   @Test
   public void getAllAccountPermissions_FewAccounts() {
     // Mock data
-    Account account1 =
-        Account.builder()
-            .accountId(1)
-            .type(AccountType.PLAYER)
-            .email("test1@example.com")
-            .phone("5141234567")
-            .firstName("John")
-            .lastName("Doe")
-            .pictureUrl("https://ui-avatars.com/api/?name=John+Doe")
-            .build();
-    Account account2 =
-        Account.builder()
-            .accountId(2)
-            .type(AccountType.COACH)
-            .email("test2@example.com")
-            .phone("5141112222")
-            .firstName("Jane")
-            .lastName("Dane")
-            .pictureUrl("https://ui-avatars.com/api/?name=Jane+Dane")
-            .build();
+    AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
+    account1.setAccountId(1);
+    account1.setType(AccountType.PLAYER);
+    account1.setEmail("test1@example.com");
+    account1.setFirstName("John");
+    account1.setLastName("Doe");
+
+    AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
+    account2.setAccountId(2);
+    account2.setType(AccountType.COACH);
+    account2.setEmail("test2@example.com");
+    account2.setFirstName("Jane");
+    account2.setLastName("Dane");
+    account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
+
     List<AccountPermissions> accountPermissions = List.of(account1, account2);
 
     given(accountRepository.findAccountPermissions()).willReturn(accountPermissions);
@@ -348,4 +347,19 @@ public class AccountServiceTest {
     assertEquals(result.get(1).getType(), account2.getType());
     verify(accountRepository, times(1)).findAccountPermissions();
   }
+}
+
+interface AccountPermissionsTest extends AccountPermissions {
+
+  void setAccountId(Integer acountId);
+
+  void setFirstName(String firstName);
+
+  void setLastName(String lastName);
+
+  void setEmail(String email);
+
+  void setPictureUrl(String pictureUrl);
+
+  void setType(AccountType type);
 }
