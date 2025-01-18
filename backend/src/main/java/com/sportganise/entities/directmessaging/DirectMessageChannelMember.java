@@ -1,8 +1,6 @@
 package com.sportganise.entities.directmessaging;
 
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,5 +17,7 @@ public class DirectMessageChannelMember {
   @EmbeddedId DirectMessageChannelMemberCompositeKey compositeKey;
 
   private Boolean read;
+  
+  @Enumerated(EnumType.STRING)
   private ChannelMemberRoleType role;
 }

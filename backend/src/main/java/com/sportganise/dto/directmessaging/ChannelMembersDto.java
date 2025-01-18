@@ -1,5 +1,8 @@
 package com.sportganise.dto.directmessaging;
 
+import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,4 +18,7 @@ public class ChannelMembersDto {
   private String firstName;
   private String lastName;
   private String avatarUrl;
+  
+  @Enumerated(EnumType.STRING)
+  private ChannelMemberRoleType role;
 }
