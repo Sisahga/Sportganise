@@ -2,6 +2,7 @@ import { useState } from "react";
 import ResponseDto from "@/types/response";
 import { UploadTrainingPlansDto } from "@/types/trainingplans";
 import trainingPlanApi from "@/services/api/trainingPlanApi";
+import log from "loglevel";
 
 function useUploadTrainingPlan() {
   const [uploadingTrainingPlanResponse, setUploadingTrainingPlanResponse] =
@@ -19,6 +20,7 @@ function useUploadTrainingPlan() {
       return data;
     } catch (err) {
       console.error("Error uploading training plan(s)", err);
+      log.error("Error uploading training plan(s)", err);
       return null;
     }
   };

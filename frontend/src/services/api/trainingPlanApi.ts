@@ -19,6 +19,11 @@ const trainingPlanApi = {
         body: JSON.stringify(trainingPlans),
       }
     );
+
+    if (!response.ok) {
+      throw new Error("Error thrown in trainingPlanApi.uploadTrainingPlans.");
+    }
+
     const data = await response.json();
     console.log("Upload training plan(s) response:", data);
     log.info("Upload training plan(s) response:", data);
