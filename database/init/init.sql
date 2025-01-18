@@ -14,7 +14,11 @@ CREATE TABLE account (
 	type VARCHAR(30) NOT NULL,
 	email VARCHAR(254) UNIQUE NOT NULL,
 	auth0_id VARCHAR(255) UNIQUE NOT NULL,
-	address VARCHAR(100),
+	address_line VARCHAR(100),
+	address_city VARCHAR(20),
+	address_province VARCHAR(20),
+	address_country VARCHAR(20),
+	address_postal_code VARCHAR(15),
 	phone VARCHAR(20) NOT NULL,
 	first_name VARCHAR(50) NOT NULL,
 	last_name VARCHAR(50) NOT NULL,
@@ -24,6 +28,14 @@ CREATE TABLE account (
 CREATE TABLE blob (
     blob_id SERIAL PRIMARY KEY,
     blob_url VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE verification (
+    verification_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    code INTEGER NOT NULL,
+    expiry_date_time TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE blocklist(
@@ -72,16 +84,16 @@ CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
 	type VARCHAR(20),
 	title VARCHAR(30) NOT NULL,
-	description VARCHAR (100),
+	description VARCHAR(100),
 	capacity INTEGER,
-	occurence_date DATE,
+	occurence_date TIMESTAMPTZ,
 	duration INTEGER,
 	is_recurring BOOLEAN DEFAULT FALSE,
-	expiry_date DATE,
+	expiry_date TIMESTAMPTZ,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10)
-	filePath VARCHAR(100)
+	visibility VARCHAR(10),
+	attachments TEXT[]
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
@@ -92,8 +104,9 @@ CREATE TABLE program_participants (
 	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	type VARCHAR(20),
+	rank INTEGER, 
 	is_confirmed BOOLEAN DEFAULT FALSE,
-	confirm_date TIMESTAMP,
+	confirm_date TIMESTAMPTZ,
 	PRIMARY KEY (program_id, account_id),
 	CONSTRAINT check_confirmation
 CHECK (( is_confirmed = TRUE AND confirm_date IS NOT NULL) OR (is_confirmed = FALSE AND confirm_date IS NULL))
@@ -111,7 +124,8 @@ CREATE TABLE channel (
 	name VARCHAR(50),
     type VARCHAR(10) NOT NULL,
     image_blob VARCHAR(512),
-	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    channel_hash VARCHAR(64) UNIQUE NOT NULL
 );
 
 CREATE TABLE channel_member (
@@ -126,7 +140,7 @@ CREATE TABLE message (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	content VARCHAR(512) NOT NULL,
-	sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     type VARCHAR(10) NOT NULL
 );
 
@@ -145,13 +159,15 @@ CREATE TABLE post(
 	title VARCHAR(100) NOT NULL,
 	description TEXT NOT NULL,
 	attachment VARCHAR(255),
-	creation_date DATE DEFAULT CURRENT_DATE NOT NULL
+	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TABLE feedback(
 	post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	content TEXT NOT NULL,
-	creation_date DATE DEFAULT CURRENT_DATE NOT NULL,
+	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	PRIMARY KEY (post_id,account_id)
 );
+
+SET TIME ZONE 'America/New_York';

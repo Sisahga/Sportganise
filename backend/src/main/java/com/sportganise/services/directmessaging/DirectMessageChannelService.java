@@ -1,23 +1,29 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /** Service Class related to Direct Message Channel. */
 @Service
+@Slf4j
 public class DirectMessageChannelService {
   private final DirectMessageChannelRepository directMessageChannelRepository;
   private final DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
   private final AccountRepository accountRepository;
   private final DirectMessageChannelMemberService directMessageChannelMemberService;
+  private final DirectMessageService directMessageService;
 
   /**
    * Service Constructor.
@@ -31,11 +37,13 @@ public class DirectMessageChannelService {
       DirectMessageChannelRepository directMessageChannelRepository,
       DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
       AccountRepository accountRepository,
-      DirectMessageChannelMemberService directMessageChannelMemberService) {
+      DirectMessageChannelMemberService directMessageChannelMemberService,
+      DirectMessageService directMessageService) {
     this.directMessageChannelRepository = directMessageChannelRepository;
     this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
     this.accountRepository = accountRepository;
     this.directMessageChannelMemberService = directMessageChannelMemberService;
+    this.directMessageService = directMessageService;
   }
 
   /**
@@ -48,11 +56,37 @@ public class DirectMessageChannelService {
    */
   public CreateDirectMessageChannelDto createDirectMessageChannel(
       List<Integer> memberIds, String channelName, int creatorAccountId) {
+    Collections.sort(memberIds);
+    String stringRepresentation = memberIds.toString();
+    String sha256hex = DigestUtils.sha256Hex(stringRepresentation);
+    DuplicateChannelDto duplicateChannel =
+        directMessageChannelRepository.findChannelByChannelHash(sha256hex);
+    if (!(duplicateChannel == null)) {
+      log.info("DUPLICATE CHANNEL HANDLED.");
+      CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
+      dmChannelDto.setChannelId(duplicateChannel.getChannelId());
+      dmChannelDto.setChannelType(duplicateChannel.getChannelType());
+      dmChannelDto.setMemberIds(memberIds);
+      if (duplicateChannel.getChannelType().equals("SIMPLE")) {
+        int otherMemberId =
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                duplicateChannel.getChannelId(), creatorAccountId);
+        dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
+        dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
+      } else {
+        dmChannelDto.setChannelName(duplicateChannel.getChannelName());
+        dmChannelDto.setAvatarUrl(null);
+      }
+      return dmChannelDto;
+    } else {
+      log.info("NO DUPLICATE CHANNEL FOUND.");
+    }
+
     /*
     Set the Channel Name to be the first names of members
     in the channel if it is null or empty.
     */
-    if (channelName == null || channelName.isBlank()) {
+    if (channelName == null || channelName.isBlank() && memberIds.size() > 2) {
       StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
       channelName = channelNameBuilder.toString();
     }
@@ -64,8 +98,9 @@ public class DirectMessageChannelService {
       dmChannel.setType("SIMPLE");
     }
 
-    LocalDateTime timestamp = LocalDateTime.now();
+    ZonedDateTime timestamp = ZonedDateTime.now();
     dmChannel.setCreatedAt(timestamp);
+    dmChannel.setChannelHash(sha256hex);
 
     DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
     int createdDmChannelId = createdDmChannel.getChannelId();
@@ -76,11 +111,27 @@ public class DirectMessageChannelService {
     // Return the DM Channel DTO
     CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
     dmChannelDto.setChannelId(createdDmChannelId);
-    dmChannelDto.setChannelName(createdDmChannel.getName());
+    if (dmChannel.getType().equals("SIMPLE")) {
+      int otherMemberId =
+          memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+      dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
+    } else {
+      dmChannelDto.setChannelName(channelName);
+    }
     dmChannelDto.setChannelType(createdDmChannel.getType());
     dmChannelDto.setMemberIds(memberIds);
     dmChannelDto.setCreatedAt(timestamp.toString());
+    if (dmChannel.getType().equals("SIMPLE")) {
+      int otherMemberId =
+          memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+      dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
+    } else {
+      dmChannelDto.setAvatarUrl(null);
+    }
 
+    String creatorFirstName = accountRepository.getFirstNameByAccountId(creatorAccountId);
+    directMessageService.sendCreationDirectMessage(
+        createdDmChannelId, creatorAccountId, creatorFirstName);
     return dmChannelDto;
   }
 
@@ -111,13 +162,17 @@ public class DirectMessageChannelService {
     List<ListDirectMessageChannelDto> dmChannels =
         directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
     for (ListDirectMessageChannelDto dmChannel : dmChannels) {
+      log.info("Channel read: {}", dmChannel.getRead());
+    }
+    for (ListDirectMessageChannelDto dmChannel : dmChannels) {
       // Set image blob of channel to be the image blob of the other member of the channel if it is
-      // SIMPLE.
       if (dmChannel.getChannelType().equals("SIMPLE")) {
         int otherMemberId =
             directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
                 dmChannel.getChannelId(), accountId);
-        dmChannel.setChannelImageBlob(accountRepository.getPictureBlobByAccountId(otherMemberId));
+        log.info("Other member id: {}", otherMemberId);
+        dmChannel.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
+        dmChannel.setChannelImageBlob(accountRepository.getPictureUrlByAccountId(otherMemberId));
       }
     }
     return dmChannels;

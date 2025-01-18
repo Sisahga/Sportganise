@@ -1,8 +1,10 @@
 package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import java.time.LocalDateTime;
+import jakarta.persistence.Table;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,12 +18,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "program_participants")
 public class ProgramParticipant {
-  @Column(name = "program_id")
-  private Integer programId;
 
-  @Column(name = "account_id")
-  private Integer accountId;
+  @EmbeddedId private ProgramParticipantId programParticipantId;
+
+  @Column(name = "rank")
+  private Integer rank;
 
   // Could be an admin, coach or player
   @Column(name = "type")
@@ -31,5 +34,21 @@ public class ProgramParticipant {
   private boolean isConfirmed;
 
   @Column(name = "confirm_date")
-  private LocalDateTime confirmedDate;
+  private ZonedDateTime confirmedDate;
+
+  public Integer getProgramId() {
+    return programParticipantId.getProgramId();
+  }
+
+  public Integer getAccountId() {
+    return programParticipantId.getAccountId();
+  }
+
+  public void setAccountId(Integer accountId) {
+    this.programParticipantId.setAccountId(accountId);
+  }
+
+  public void setProgramId(Integer programId) {
+    this.programParticipantId.setProgramId(programId);
+  }
 }

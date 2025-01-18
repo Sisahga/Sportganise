@@ -1,8 +1,7 @@
 package com.sportganise.dto.programsessions;
 
 import com.sportganise.entities.programsessions.Program;
-import jakarta.persistence.Entity;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,21 +13,20 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class ProgramDto {
   private Integer programId;
   private String programType; // Could be an event of some sort, tournament or training sessions
   private String title;
   private String description;
   private Integer capacity;
-  private LocalDateTime occurrenceDate;
+  private ZonedDateTime occurrenceDate;
   private Integer durationMins; // Duration of the program in terms of minutes
   private boolean isRecurring;
-  private LocalDateTime expiryDate;
+  private ZonedDateTime expiryDate;
   private String frequency;
   private String location;
   private String visibility;
-  private List<String> attachment;
+  private List<String> attachments;
 
   /**
    * Constructor that converts a Program entity to ProgramDto.
@@ -48,6 +46,6 @@ public class ProgramDto {
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
     this.visibility = program.getVisibility();
-    this.attachment = program.getAttachment();
+    this.attachments = program.getAttachments();
   }
 }

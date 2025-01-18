@@ -217,7 +217,7 @@ export default function CreateTrainingSessionForm() {
         form.reset();
 
         // Navigate to home page
-        navigate("/HomePage");
+        navigate("/");
       } else {
         const errorData = await response
           .json()
@@ -247,7 +247,7 @@ export default function CreateTrainingSessionForm() {
       <Button
         className="rounded-full"
         variant="outline"
-        onClick={() => navigate("/HomePage")}
+        onClick={() => navigate("/")}
       >
         <MoveLeft />
       </Button>
@@ -776,7 +776,7 @@ export default function CreateTrainingSessionForm() {
             Create new Event
           </Button>
           <div className="text-center self-center">
-            <a href="../" className="underline text-neutral-400">
+            <a href="../" className="underline text-neutral-400 pb-20">
               Cancel
             </a>
           </div>

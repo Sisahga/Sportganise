@@ -1,68 +1,113 @@
-// ChatMessages.tsx
-import React from "react";
+import { ChatMessageProps } from "@/types/messaging.ts";
+import defaultAvatar from "../../../assets/defaultAvatar.png";
+import {
+  format,
+  isToday,
+  parseISO,
+  differenceInMinutes,
+  differenceInDays,
+} from "date-fns";
+import { toZonedTime } from "date-fns-tz";
 
-// 1) Define the structure of each message
-export interface Message {
-  id: number;
-  sender: string;
-  text: string;
-  time: string;
-  senderAvatar?: string;
-}
+const ChatMessages = ({ messages }: ChatMessageProps) => {
+  const userId = 2; // TODO: Take cookie user id.
 
-// 2) Define the props that ChatMessages expects
-interface ChatMessagesProps {
-  messages: Message[];
-  chatAvatar: string;
-  chatType?: string; // "individual" | "group" etc.
-}
+  const formatSentAt = (
+    sentAt: string,
+    timeZone: string = "America/New_York",
+  ) => {
+    const date = parseISO(sentAt);
+    const zonedDate = toZonedTime(date, timeZone);
 
-// 3) Define the component with React.FC<ChatMessagesProps>
-const ChatMessages: React.FC<ChatMessagesProps> = ({
-  messages,
-  chatAvatar,
-  chatType = "individual",
-}) => {
+    if (isToday(zonedDate)) {
+      return format(zonedDate, "h:mm a"); // Just show the time
+    }
+
+    if (differenceInDays(new Date(), zonedDate) < 7) {
+      return `${format(zonedDate, "eee").toUpperCase()} ${format(zonedDate, "h:mm a")}`; // Format: SAT 12:00 PM
+    }
+    return format(zonedDate, "MM/dd/yyyy 'at' h:mm a");
+  };
+
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-3">
-      {/* Render messages */}
-      {messages.map((message) => (
-        <div key={message.id} className="mb-4">
-          {/* Example layout code */}
-          <div className="text-xs text-gray-500 text-center mb-2">
-            {message.time}
-          </div>
+    <div className="flex flex-col justify-end flex-1 overflow-y-scroll px-4 py-4">
+      {messages.map((message, index) => {
+        const showTimestamp =
+          index === 0 || // Always show the timestamp for the first message
+          differenceInMinutes(
+            parseISO(message.sentAt),
+            parseISO(messages[index - 1]?.sentAt),
+          ) > 15;
+        return (
+          <div key={message.messageId} className="mb-4">
+            {/* Regular Chat Message */}
+            {message.type == "CHAT" && (
+              <>
+                {/* Timestamp */}
+                {showTimestamp && (
+                  <div className="text-xs text-gray-500 text-center mb-2">
+                    {formatSentAt(message.sentAt)}
+                  </div>
+                )}
 
-          <div
-            className={`flex ${
-              message.sender === "You" ? "justify-end" : "justify-start"
-            } items-center gap-3`}
-          >
-            {message.sender !== "You" && (
-              <img
-                src={message.senderAvatar || chatAvatar}
-                alt={message.sender}
-                className="w-8 h-8 rounded-full object-cover"
-              />
+                <div
+                  className={`flex items-end gap-2 ${message.senderId == userId ? "justify-end" : ""}`}
+                >
+                  {/* Sender Avatar */}
+                  {message.senderId !== userId && (
+                    <div className="flex items-end">
+                      <img
+                        src={message.avatarUrl}
+                        alt={defaultAvatar}
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    </div>
+                  )}
+                  {/* Message Bubble */}
+                  <div
+                    className={`flex flex-col ${message.senderId === userId ? "items-end" : "items-start"}`}
+                    style={{ maxWidth: "80%" }}
+                  >
+                    {message.senderId !== userId && (
+                      <div className="px-3">
+                        <p className="text-xs font-extralight">
+                          {message.senderFirstName}
+                        </p>
+                      </div>
+                    )}
+                    {/* Message Content */}
+                    <div
+                      className={`px-3 py-2 rounded-2xl ${
+                        message.senderId === userId
+                          ? "bg-secondaryColour text-gray-800"
+                          : "bg-gray-200 text-gray-800"
+                      }`}
+                    >
+                      <p className="text-sm">{message.messageContent}</p>
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
-            <div
-              className={`px-4 py-2 rounded-lg ${
-                message.sender === "You"
-                  ? "bg-secondaryColour text-white"
-                  : "bg-gray-200 text-gray-800"
-              }`}
-            >
-              {chatType === "group" && message.sender !== "You" && (
-                <p className="text-xs font-bold">{message.sender}</p>
+            {/* JOIN Message (Create message, or player/coach joins after initial creation) */}
+            <div>
+              {message.type == "JOIN" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === userId && index === 0 ? (
+                    <p>You {message.messageContent.split("*")[3]}</p>
+                  ) : (
+                    <p>
+                      {message.messageContent.split("*")[2]}{" "}
+                      {message.messageContent.split("*")[3]}
+                    </p>
+                  )}
+                </div>
               )}
-              <p className="text-sm">{message.text}</p>
             </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
-
-// 4) Export the component as default
 export default ChatMessages;

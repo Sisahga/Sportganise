@@ -5,18 +5,16 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
+import com.sportganise.dto.directmessaging.DirectMessageDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
-import com.sportganise.dto.directmessaging.SendDirectMessageResponseDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
-import com.sportganise.entities.directmessaging.DirectMessageType;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageRepository;
 import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,13 +26,9 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageServiceUnitTest {
   @Mock private DirectMessageRepository directMessageRepository;
-
   @Mock private DirectMessageChannelRepository directMessageChannelRepository;
-
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
-
   @Mock private BlobService blobService;
-
   @InjectMocks private DirectMessageService directMessageService;
 
   private SendDirectMessageRequestDto sendDirectMessageRequestDto;
@@ -49,27 +43,20 @@ public class DirectMessageServiceUnitTest {
     sendDirectMessageRequestDto.setAttachments(Collections.emptyList());
     sendDirectMessageRequestDto.setType("CHAT");
 
-    DirectMessage directMessage = new DirectMessage();
-    directMessage.setMessageId(1);
-    directMessage.setChannelId(1);
-    directMessage.setSenderId(2);
-    directMessage.setContent("Hello, World!");
-    directMessage.setSentAt(ZonedDateTime.now());
-    directMessage.setType(DirectMessageType.CHAT);
-  }
-
-  @Test
-  public void sendDirectMessageTest_WithoutAttachments() throws IOException {
+    // Mock DirectMessageRepository save method
     given(directMessageRepository.save(any(DirectMessage.class)))
         .willAnswer(
             invocation -> {
               DirectMessage message = invocation.getArgument(0);
-              message.setMessageId(1); // Manually assign ID for message as if it were postgres.
+              message.setMessageId(
+                  1); // Manually assign ID for message as if it were from Postgres.
               return message;
             });
+  }
 
-    SendDirectMessageResponseDto response =
-        directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
+  @Test
+  public void sendDirectMessageTest_WithoutAttachments() throws IOException {
+    DirectMessageDto response = directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());
@@ -90,20 +77,11 @@ public class DirectMessageServiceUnitTest {
 
     sendDirectMessageRequestDto.setAttachments(List.of(mockFile1, mockFile2));
 
-    given(directMessageRepository.save(any(DirectMessage.class)))
-        .willAnswer(
-            invocation -> {
-              DirectMessage message = invocation.getArgument(0);
-              message.setMessageId(1);
-              return message;
-            });
-
     given(blobService.uploadFile(any(MultipartFile.class), eq(true), anyString()))
         .willReturn("https://mockblobstorage.com/file1.jpg")
         .willReturn("https://mockblobstorage.com/file2.jpg");
 
-    SendDirectMessageResponseDto response =
-        directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
+    DirectMessageDto response = directMessageService.sendDirectMessage(sendDirectMessageRequestDto);
 
     assertNotNull(response);
     assertEquals(1, response.getChannelId());

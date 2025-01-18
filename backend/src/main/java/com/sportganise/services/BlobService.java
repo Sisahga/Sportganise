@@ -13,6 +13,13 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+/*
+ * TODO:
+ *  - set file size limit
+ *  - change file discriminant (support multiple files with same user-defined name
+ *    "profile_picture.png")
+ */
+
 /** Service class for handling operations related to Blobs. */
 @Slf4j
 @Service
@@ -47,9 +54,20 @@ public class BlobService {
    * Uploads a file to the AWS S3 Bucket.
    *
    * @param file File to be uploaded.
+   * @return String indicating the status of the upload.
+   * @throws IOException If an error occurs while uploading the file.
+   */
+  public String uploadFile(MultipartFile file) throws IOException {
+    return uploadFile(file, false, null);
+  }
+
+  /**
+   * Uploads a file to the AWS S3 Bucket.
+   *
+   * @param file File to be uploaded.
    * @param isMessageFile Boolean indicating if the file is part of a direct message.
    * @param messageId Id of the direct message, if the file is part of a direct message.
-   * @return String indicating the status of the upload.
+   * @return The URL of the newly uploaded file.
    * @throws IOException If an error occurs while uploading the file.
    */
   public String uploadFile(MultipartFile file, boolean isMessageFile, String messageId)
@@ -61,9 +79,7 @@ public class BlobService {
       PutObjectRequest objectRequest =
           PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
       s3Client.putObject(objectRequest, RequestBody.fromBytes(file.getBytes()));
-      String s3Url =
-          String.format(
-              "https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName.replace(" ", "+"));
+      String s3Url = this.computeS3Url(fileName);
 
       // ** Save the URL in the Database.
       // Case where it is not a message file.
@@ -82,5 +98,18 @@ public class BlobService {
       log.error("Error uploading file: {}", e.getMessage());
       throw new IOException("Error uploading file: " + e.getMessage());
     }
+  }
+
+  /**
+   * Computes the S3 URL of a file.
+   *
+   * @param fileName Name of the file to upload.
+   * @return The URL of the file to upload on S3
+   */
+  private String computeS3Url(String fileName) {
+    String normalizedFileName = fileName.replace(" ", "+");
+
+    return String.format(
+        "https://%s.s3.%s.amazonaws.com/%s", this.bucketName, this.region, normalizedFileName);
   }
 }

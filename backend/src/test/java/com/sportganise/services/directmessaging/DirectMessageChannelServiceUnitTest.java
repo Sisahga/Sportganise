@@ -28,14 +28,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageChannelServiceUnitTest {
   @Mock private DirectMessageChannelRepository directMessageChannelRepository;
-
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
-
   @Mock private DirectMessageChannelMemberService directMessageChannelMemberService;
-
   @Mock private AccountRepository accountRepository;
-
   @InjectMocks private DirectMessageChannelService directMessageChannelService;
+  @Mock private DirectMessageService directMessageService;
 
   CreateDirectMessageChannelDto dmChannelDTO;
   DirectMessageChannel dmChannel;
@@ -64,7 +61,7 @@ public class DirectMessageChannelServiceUnitTest {
 
     assertNotNull(result);
     assertEquals(1, dmChannel.getChannelId());
-    assertEquals(dmChannelDTO.getChannelName(), result.getChannelName());
+    assertNull(result.getChannelName());
     assertEquals(dmChannelDTO.getMemberIds(), result.getMemberIds());
 
     verify(directMessageChannelRepository, times(1)).save(any(DirectMessageChannel.class));
@@ -73,7 +70,7 @@ public class DirectMessageChannelServiceUnitTest {
 
   @Test
   public void createDirectMessageChannelTest_WithoutChannelNameShort() {
-    dmChannel.setName("Brett and Aaron");
+    dmChannel.setName(null);
     dmChannel.setType("SIMPLE");
     dmChannelDTO.setChannelName(null);
     given(accountRepository.findFirstNamesByAccountId(dmChannelDTO.getMemberIds()))

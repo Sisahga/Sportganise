@@ -4,14 +4,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
-import com.sportganise.entities.Account;
+import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.Address;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
-import com.sportganise.services.auth.AccountService;
+import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -36,20 +41,22 @@ public class ProgramServiceTest {
   public void testGetParticipants() {
     // Mock a Program object with the below attributes
     ProgramParticipant participant1 =
-        ProgramParticipant.builder()
-            .programId(1)
-            .accountId(101)
-            .isConfirmed(true)
-            .confirmedDate(LocalDateTime.now())
-            .build();
+        new ProgramParticipant(
+            new ProgramParticipantId(1, 101),
+            null, // rank is not provided, so set it to null or provide an appropriate value if
+            // needed
+            "Player",
+            true,
+            ZonedDateTime.now());
 
     ProgramParticipant participant2 =
-        ProgramParticipant.builder()
-            .programId(1)
-            .accountId(102)
-            .isConfirmed(false)
-            .confirmedDate(LocalDateTime.now().minusDays(1))
-            .build();
+        new ProgramParticipant(
+            new ProgramParticipantId(2, 102),
+            null, // rank is not provided, so set it to null or provide an appropriate value if
+            // needed
+            "Coach",
+            false,
+            ZonedDateTime.now().minusDays(1));
 
     List<ProgramParticipant> mockParticipants = List.of(participant1, participant2);
 
@@ -61,7 +68,14 @@ public class ProgramServiceTest {
             .firstName("John")
             .lastName("Doe")
             .email("john.doe@example.com")
-            .address("123 Main St")
+            .address(
+                Address.builder()
+                    .line("123 Main St")
+                    .city("Springfield")
+                    .province("IL")
+                    .country("USA")
+                    .postalCode("62704")
+                    .build())
             .phone("555-555-5555")
             .build();
 
@@ -72,7 +86,14 @@ public class ProgramServiceTest {
             .firstName("Jane")
             .lastName("Smith")
             .email("jane.smith@example.com")
-            .address("456 Random St")
+            .address(
+                Address.builder()
+                    .line("456 Random St")
+                    .city("Springfield")
+                    .province("IL")
+                    .country("USA")
+                    .postalCode("62704")
+                    .build())
             .phone("222-222-2222")
             .build();
 
@@ -119,14 +140,18 @@ public class ProgramServiceTest {
             .title("Training Program")
             .description("This is a training program.")
             .capacity(10)
-            .occurrenceDate(LocalDateTime.of(2025, 5, 15, 10, 0))
+            .occurrenceDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
             .durationMins(120)
             .isRecurring(false)
-            .expiryDate(LocalDateTime.of(2025, 5, 16, 0, 0))
+            .expiryDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
             .frequency("None")
             .location("111 Random Ave")
             .visibility("public")
-            .attachment(List.of("/banner.pdf"))
+            .attachments(List.of("/banner.pdf"))
             .build();
 
     // Mock the repository behavior of findProgramById with mockProgram
@@ -146,14 +171,18 @@ public class ProgramServiceTest {
     assertEquals("Training Program", programDto.getTitle());
     assertEquals("This is a training program.", programDto.getDescription());
     assertEquals(10, programDto.getCapacity());
-    assertEquals(LocalDateTime.of(2025, 5, 15, 10, 0), programDto.getOccurrenceDate());
+    assertEquals(
+        ZonedDateTime.of(LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()),
+        programDto.getOccurrenceDate());
     assertEquals(120, programDto.getDurationMins());
     assertFalse(programDto.isRecurring());
-    assertEquals(LocalDateTime.of(2025, 5, 16, 0, 0), programDto.getExpiryDate());
+    assertEquals(
+        ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()),
+        programDto.getExpiryDate());
     assertEquals("None", programDto.getFrequency());
     assertEquals("111 Random Ave", programDto.getLocation());
     assertEquals("public", programDto.getVisibility());
-    assertEquals("/banner.pdf", programDto.getAttachment().get(0));
+    assertEquals("/banner.pdf", programDto.getAttachments().get(0));
   }
 
   @Test

@@ -1,88 +1,107 @@
-// ChatScreen.tsx
-import React, { useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import useChatMessages from "../apiCalls/useChatMessages";
-import useDeleteChannel from "../apiCalls/useDeleteChannel";
-import useBlockUser from "../apiCalls/useBlockUser";
-import ChatHeader from "./ChatHeader";
-import ChatMessages from "./ChatMessages";
-import ChatInput from "./ChatInput";
+import { ArrowLeft, Send, FolderOpen } from "lucide-react";
+import useChatMessages from "../../../hooks/useChatMessages.tsx";
+import defaultAvatar from "../../../assets/defaultAvatar.png";
+import "./ChatScreen.css";
+import WebSocketService from "@/services/WebSocketService.ts";
+import { SendMessageComponent } from "@/types/messaging.ts";
+import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
+import { Button } from "@/components/ui/Button.tsx";
+import ChannelSettingsDropdown from "./ChannelSettingsDropdown.tsx";
 
-const ChatScreen: React.FC = () => {
+const ChatScreen = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Access chat data from location state
   const { state } = location || {};
-  const chatName = state?.chatName || "Chat";
-  const chatAvatar = state?.chatAvatar; // optional
-  const chatType = state?.chatType || "individual";
-  const channelId = state?.channelId || 1; // fallback ID for testing
+  const channelId = state?.channelId || null;
+  const channelName = state?.channelName || null;
+  const channelImageBlob = state?.channelImageBlob || defaultAvatar;
+  const read = state?.read || false;
+  const channelType = state?.channelType || null; /* Maybe we'll use it later */
 
-  // 1) Fetch messages
-  const { messages, setMessages, loading, error } = useChatMessages(channelId);
+  const [connected, setConnected] = useState(false);
+  const webSocketServiceRef = useRef<WebSocketService | null>(null);
+  const { messages, setMessages, loading, error } = useChatMessages(
+    channelId,
+    read,
+  );
+  const [newMessage, setNewMessage] = useState("");
 
-  // 2) Delete channel
-  const { deleteChannel } = useDeleteChannel();
+  const connectWebSocket = async () => {
+    webSocketServiceRef.current = new WebSocketService(onMessageReceived);
+    const connSuccess = await webSocketServiceRef.current.connect();
+    setConnected(connSuccess);
+  };
 
-  // 3) Block user
-  const { blockUser } = useBlockUser();
+  const onMessageReceived = (message: any) => {
+    setMessages((prevMessages) => [...prevMessages, message]);
+  };
 
-  // For debug:
+  const handleSend = () => {
+    if (newMessage.trim() === "") return;
+
+    // Send the new message to the server
+    const messagePayload: SendMessageComponent = {
+      senderId: 2, // TODO: Replace with actual sender ID from cookies
+      channelId: channelId,
+      messageContent: newMessage,
+      attachments: [],
+      sentAt: new Date().toISOString(),
+      type: "CHAT",
+      senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+      avatarUrl:
+        "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+      // TODO: Replace with actual avatar url from cookies
+    };
+    webSocketServiceRef.current?.sendMessage(messagePayload);
+
+    setNewMessage("");
+  };
+
   useEffect(() => {
-    console.log("ChatScreen state:", state);
-    console.log("messages:", messages);
-    console.log("loading:", loading, "error:", error);
-  }, [state, messages, loading, error]);
-
-  // Handlers
-  const handleSendMessage = (messageText: string) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        sender: "You",
-        text: messageText,
-        time: "Just now",
-      },
-    ]);
-  };
-
-  const handleDeleteChat = async (chanId: number) => {
-    if (!window.confirm("Are you sure you want to delete this chat?")) return;
-    try {
-      await deleteChannel(chanId);
-      navigate(-1);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        alert(err.message || "Could not delete channel");
-      } else {
-        alert("An unknown error occurred");
-      }
+    if (!connected) {
+      connectWebSocket().then(() => {
+        if (!connected) {
+          document
+            .getElementById("wsResponseFailAlertCtn")
+            ?.classList.remove("hidden");
+        }
+      });
     }
-  };
+  }, []);
 
-  const handleBlockUser = async () => {
-    if (!window.confirm("Block this user?")) return;
-    try {
-      await blockUser(9999);
-      alert("User blocked!");
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        alert(err.message || "Could not block user");
-      } else {
-        alert("An unknown error occurred");
-      }
-    }
-  };
+  useEffect(() => {
+    console.log("Messages fetched:", messages);
+  }, [messages]);
 
-  // If loading or error
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const adjustHeight = () => {
+      textarea.style.height = "auto";
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    };
+
+    adjustHeight();
+
+    window.addEventListener("resize", adjustHeight);
+    return () => window.removeEventListener("resize", adjustHeight);
+  }, [newMessage]);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Loading chat...</p>
+        <p>Loading...</p>
       </div>
     );
   }
+
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -91,25 +110,94 @@ const ChatScreen: React.FC = () => {
     );
   }
 
-  // Render the screen if not loading/error
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <ChatHeader
-        chatName={chatName}
-        chatAvatar={chatAvatar || ""}
-        channelId={channelId}
-        chatType={chatType}
-        onDeleteChat={handleDeleteChat}
-        onBlockUser={handleBlockUser}
-      />
+    <div id="chatScreenMainCtn" className="flex flex-col h-screen bg-gray-100">
+      {/* Header */}
+      <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-4">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
+          onClick={() => navigate("/pages/DirectMessagesDashboard")}
+        >
+          <ArrowLeft className="text-gray-800" size={28} strokeWidth={3} />
+        </Button>
 
-      <ChatMessages
-        messages={messages}
-        chatAvatar={chatAvatar || ""}
-        chatType={chatType}
-      />
+        {/* Chat Information */}
+        <div className="flex flex-grow items-center gap-3">
+          <img
+            src={channelImageBlob}
+            alt={channelName}
+            style={{ width: "40px", height: "40px" }}
+            className="rounded-full object-cover"
+          />
+          <h1 className="text-lg font-bold text-gray-800">{channelName}</h1>
+        </div>
 
-      <ChatInput onSend={handleSendMessage} />
+        {/* Options Button */}
+        <ChannelSettingsDropdown channelType={channelType} />
+        {/*<button className="p-2 rounded-full bg-placeholder-colour hover:bg-gray-300">*/}
+        {/*  <MoreHorizontal size={20} />*/}
+        {/*</button>*/}
+      </header>
+
+      {/* Display when failing to connect to web socket. */}
+      <div id="wsResponseFailAlertCtn" className="hidden w-full">
+        <div
+          id="wsResponseFailAlert"
+          className="hidden p-4 w-full text-white bg-red-500"
+        >
+          <p>Web socket connection failed.</p>
+        </div>
+      </div>
+
+      {/* Chat Messages */}
+      <ChatMessages messages={messages} />
+
+      {/* Message Input Area */}
+      <div className="flex items-center gap-3 px-4 py-3 bg-white shadow">
+        <div className="h-full flex items-end">
+          <Button
+            variant="ghost"
+            className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
+          >
+            <FolderOpen
+              className="text-gray-800 folder-size"
+              size={24}
+              strokeWidth={1.5}
+            />
+          </Button>
+        </div>
+
+        {/* Text Input */}
+        <textarea
+          ref={textareaRef}
+          placeholder="Send a message..."
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
+          className="flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none"
+          style={{ scrollbarWidth: "none" }}
+          rows={1}
+        />
+
+        {/* Send Button */}
+        <div className="h-full flex items-end">
+          <Button
+            variant="ghost"
+            className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
+            style={{ transform: "rotate(45deg)" }}
+            onClick={handleSend}
+            disabled={newMessage.trim() === ""}
+          >
+            <Send
+              className={`folder-size ${newMessage.trim() === "" ? "faded-primary-colour" : "secondary-colour"}`}
+              size={20}
+              strokeWidth={2}
+              style={{ position: "relative", left: "-1.5px", top: "1.5px" }}
+            />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

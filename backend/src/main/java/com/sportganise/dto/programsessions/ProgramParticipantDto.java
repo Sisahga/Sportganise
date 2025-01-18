@@ -1,7 +1,7 @@
 package com.sportganise.dto.programsessions;
 
-import jakarta.persistence.Entity;
-import java.time.LocalDateTime;
+import com.sportganise.entities.programsessions.ProgramParticipant;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,14 +12,19 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class ProgramParticipantDto {
-  private Integer programId;
   private Integer accountId;
-
-  private String firstName;
-  private String lastName;
-
+  private Integer programId;
+  private Integer rank;
   private boolean isConfirmed;
-  private LocalDateTime confirmedDate;
+  private ZonedDateTime confirmedDate;
+
+  /** Constructor for class that converts ProgramParticipant entity. */
+  public ProgramParticipantDto(ProgramParticipant programParticipant) {
+    this.accountId = programParticipant.getAccountId();
+    this.programId = programParticipant.getProgramId();
+    this.rank = programParticipant.getRank();
+    this.isConfirmed = programParticipant.isConfirmed();
+    this.confirmedDate = programParticipant.getConfirmedDate();
+  }
 }
