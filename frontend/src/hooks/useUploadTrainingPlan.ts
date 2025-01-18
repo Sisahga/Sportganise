@@ -1,6 +1,6 @@
 import { useState } from "react";
 import ResponseDto from "@/types/response";
-import { UploadTrainingPlansDto } from "@/types/trainingplans";
+import { UploadTrainingPlansDto } from "@/types/trainingplans"; //trainingPlans: string[]
 import trainingPlanApi from "@/services/api/trainingPlanApi";
 import log from "loglevel";
 
@@ -29,3 +29,5 @@ function useUploadTrainingPlan() {
     uploadingTrainingPlanResponse,
   };
 }
+
+export default useUploadTrainingPlan;

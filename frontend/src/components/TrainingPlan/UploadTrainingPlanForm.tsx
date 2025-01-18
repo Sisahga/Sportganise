@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import useUploadTrainingPlan from "@/hooks/useUploadTrainingPlan";
+import log from "loglevel";
 
 import { Button } from "@/components/ui/Button";
 import {
@@ -20,7 +22,6 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 import { useToast } from "@/hooks/use-toast";
-
 import { CloudUpload, Paperclip, Loader2 } from "lucide-react";
 
 const formSchema = z.object({
@@ -37,6 +38,7 @@ export default function UploadTrainingPlanFiles() {
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>("");
+  const { uploadTrainingPlans } = useUploadTrainingPlan();
 
   const dropZoneConfig = {
     maxFiles: 5,
@@ -60,36 +62,37 @@ export default function UploadTrainingPlanFiles() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log(values);
+      log.info(values);
 
       setLoading(true);
-      const response = await fetch(`/${accountId}/upload-trainingplans`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values, null, 2),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      const uploadingTrainingPlanResponse = await uploadTrainingPlans(
+        accountId,
+        values.trainingPlans //this way File[] is sent and not { trainingPlans: File[] } (object)
+      );
+      if (uploadingTrainingPlanResponse?.statusCode === 201) {
+        // Successfully uploaded files
+        setLoading(false); //premature load to false just in case it would look weird with the toast
+        toast({
+          title: "File(s) uploaded successfully ✔",
+          description: "File(s) were added to your Training Plan",
+        });
+      } else {
+        throw new Error(
+          "Error thrown from UploadTrainingPlanForm. File(s) could not be uploaded."
+        );
       }
-
-      form.reset();
-      setLoading(false); //premature load to false just in case it would look weird with the toast
-      toast({
-        title: "File(s) uploaded successfully ✔",
-        description: "File(s) were added to your Training Plan",
-      });
     } catch (err) {
-      form.reset();
       console.log("UploadFile form error: ", err);
+      log.error("UploadFile form error: ", err);
       setError("An error occured! The file(s) could not be uploaded.");
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
-        description: error,
+        description: "An error occured! The file(s) could not be uploaded.",
       });
+      log.error(error);
     } finally {
+      form.reset();
       setLoading(false);
     }
   };
