@@ -5,13 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Data Transfer Object for blocking a user. */
+/** API DTO for ChannelMembers. */
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BlockUserRequestDto {
-  private Integer channelId;
+public class ChannelMembersDto {
   private int accountId;
-  private int blockedId;
+  private String firstName;
+  private String lastName;
+  private String avatarUrl;
 }

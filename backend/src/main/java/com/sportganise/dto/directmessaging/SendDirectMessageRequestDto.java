@@ -2,6 +2,7 @@ package com.sportganise.dto.directmessaging;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class SendDirectMessageRequestDto {
   private Integer senderId;
   private Integer channelId;

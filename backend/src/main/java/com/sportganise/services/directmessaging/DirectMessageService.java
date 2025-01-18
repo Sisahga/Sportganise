@@ -1,6 +1,7 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.DirectMessageDto;
+import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.MemberDetailsDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
@@ -124,14 +125,16 @@ public class DirectMessageService {
     directMessage.setChannelId(channelId);
     directMessage.setContent(sendDirectMessageRequestDto.getMessageContent());
     directMessage.setSentAt(ZonedDateTime.parse(sendDirectMessageRequestDto.getSentAt()));
-    directMessage.setType(DirectMessageType.CHAT);
+    directMessage.setType(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()));
     directMessageRepository.save(directMessage);
 
     // Update Last Message in Channel Table.
     directMessageChannelRepository.updateLastMessageId(channelId, directMessage.getMessageId());
+    log.debug("Last message updated for channel {}", channelId);
 
     // Update Read Status in Channel Member Table.
-    directMessageChannelMemberRepository.updateReadStatus(channelId, senderId);
+    directMessageChannelMemberRepository.updateChannelMemberReadStatus(senderId, channelId);
+    log.debug("Read status updated for channel {} and member {}", channelId, senderId);
 
     DirectMessageDto directMessageDto = new DirectMessageDto();
     directMessageDto.setMessageId(directMessage.getMessageId());
@@ -140,7 +143,7 @@ public class DirectMessageService {
     directMessageDto.setChannelId(channelId);
     directMessageDto.setMessageContent(sendDirectMessageRequestDto.getMessageContent());
     directMessageDto.setSentAt(sendDirectMessageRequestDto.getSentAt());
-    directMessageDto.setType(DirectMessageType.CHAT);
+    directMessageDto.setType(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()));
     directMessageDto.setAvatarUrl(sendDirectMessageRequestDto.getAvatarUrl());
 
     // Upload Attachments to Blob Storage and Persist Message-Attachment relationship in DB.
@@ -202,7 +205,7 @@ public class DirectMessageService {
     directMessageChannelRepository.updateLastMessageId(channelId, directMessage.getMessageId());
 
     // Update Read Status in Channel Member Table.
-    directMessageChannelMemberRepository.updateReadStatus(channelId, senderId);
+    directMessageChannelMemberRepository.updateChannelMemberReadStatus(senderId, channelId);
 
     Map<Integer, MemberDetailsDto> memberDetails = getChannelMembersDetails(channelId);
 
@@ -217,5 +220,9 @@ public class DirectMessageService {
     directMessageDto.setAvatarUrl(memberDetails.get(senderId).getAvatarUrl());
 
     return directMessageDto;
+  }
+
+  public LastMessageDto getLastChannelMessage(int channelId) {
+    return directMessageRepository.getLastMessageByChannelId(channelId);
   }
 }
