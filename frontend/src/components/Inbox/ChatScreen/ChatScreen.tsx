@@ -9,9 +9,9 @@ import WebSocketService from "@/services/WebSocketService.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
-import ChannelSettingsDropdown from "./ChannelSettingsDropdown.tsx";
+import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
 import useSendMessage from "@/hooks/useSendMessage.tsx";
-import UserBlockedComponent from "@/components/Inbox/ChatScreen/UserBlockedComponent.tsx";
+import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent.tsx";
 
 const ChatScreen = () => {
   const navigate = useNavigate();

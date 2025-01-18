@@ -41,9 +41,27 @@ export interface ChannelSettingsDropdownProps {
   isBlocked: boolean | false;
 }
 
+export enum GroupChannelMemberRole {
+  ADMIN = "ADMIN",
+  REGULAR = "REGULAR",
+}
+
 export interface ChannelMember {
   accountId: number;
   firstName: string;
   lastName: string;
   avatarUrl: string;
+  role: GroupChannelMemberRole | null;
+}
+
+export interface MembersSettingsDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  channelMembers: ChannelMember[];
+}
+
+export interface LeaveGroupDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onLeave: () => void;
 }

@@ -3,10 +3,12 @@ package com.sportganise.controllers.directmessaging;
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelMemberService;
+import jakarta.validation.constraints.Null;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -86,5 +88,22 @@ public class DirectMessageChannelMemberController {
         channelId,
         accountId);
     return ResponseEntity.ok().build();
+  }
+
+  /**
+   * Remove a user from a channel.
+   *
+   * @param channelId The channel id.
+   * @param accountId The account id.
+   * @return ResponseEntity with status 200 if successful.
+   */
+  @DeleteMapping("/{channelId}/{accountId}")
+  public ResponseEntity<ResponseDto<Null>> removeChannelMember(
+      @PathVariable int channelId, @PathVariable int accountId) {
+    this.directMessageChannelMemberService.removeMemberFromChannel(channelId, accountId);
+    log.info("Successfully deleted channel member by channel id: {}", channelId);
+    ResponseDto<Null> response =
+        new ResponseDto<>(HttpStatus.OK.value(), "Channel member deleted successfully", null);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }

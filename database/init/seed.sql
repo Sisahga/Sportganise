@@ -94,17 +94,17 @@ INSERT INTO channel (name, type, image_blob, channel_hash) VALUES
  '5bf775530e2e5fcd9c6ae577c52cd57a20d13ebb5f7bc3e8a8a7920d3a7ce41e');
 
 
-INSERT INTO channel_member (channel_id, account_id, read) VALUES
-(1, 2, false),
-(1, 3, false),
-(1, 4, true),
-(2,1, true),
-(2,2, false),
-(2, 4, true),
-(3, 1, false),
-(3, 2, true),
-(4, 2, false),
-(4, 3, true);
+INSERT INTO channel_member (channel_id, account_id, read, role) VALUES
+(1, 2, false, 'ADMIN'),
+(1, 3, false, 'REGULAR'),
+(1, 4, true, 'REGULAR'),
+(2,1, true, 'ADMIN'),
+(2,2, false, 'REGULAR'),
+(2, 4, true, 'REGULAR'),
+(3, 1, false, null),
+(3, 2, true, null),
+(4, 2, false, null),
+(4, 3, true, null);
 
 INSERT INTO message (channel_id, sender_id, content, type) VALUES
 (1, 2, 'Welcome to Badmintinors guys!!!', 'CHAT'),
