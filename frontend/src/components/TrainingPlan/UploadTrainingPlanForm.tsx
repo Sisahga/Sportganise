@@ -28,12 +28,12 @@ const formSchema = z.object({
     //array of files
     z.custom<File>((file) => file instanceof File && file.size > 0, {
       message: "Each file must be a valid file and not empty.",
-    }),
+    })
   ),
 });
 
 export default function UploadTrainingPlanFiles() {
-  const accountId = "";
+  const accountId = 2; //replace with cookies
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>("");
@@ -60,7 +60,6 @@ export default function UploadTrainingPlanFiles() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       console.log(values);
-      console.log(JSON.stringify(values, null, 2));
 
       setLoading(true);
       const response = await fetch(`/${accountId}/upload-trainingplans`, {
