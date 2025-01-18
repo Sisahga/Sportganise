@@ -1,9 +1,8 @@
 import blocklistApi from "@/services/api/blocklistApi.ts";
-import {BlockUserRequestDto} from "@/types/blocklist.ts";
+import { BlockUserRequestDto } from "@/types/blocklist.ts";
 
 function useUnblockUser() {
-  const unblockUser
-      = async (blockListRequestDto: BlockUserRequestDto) => {
+  const unblockUser = async (blockListRequestDto: BlockUserRequestDto) => {
     try {
       return await blocklistApi.unblockUser(blockListRequestDto);
     } catch (error) {
@@ -13,7 +12,7 @@ function useUnblockUser() {
   };
 
   return {
-    unblockUser
+    unblockUser,
   };
 }
 

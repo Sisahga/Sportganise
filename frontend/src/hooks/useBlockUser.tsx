@@ -1,9 +1,8 @@
 import blocklistApi from "@/services/api/blocklistApi.ts";
-import {BlockUserRequestDto} from "@/types/blocklist.ts";
+import { BlockUserRequestDto } from "@/types/blocklist.ts";
 
 function useBlockUser() {
-  const blockUser
-      = async (blockListRequestDto: BlockUserRequestDto) => {
+  const blockUser = async (blockListRequestDto: BlockUserRequestDto) => {
     try {
       return await blocklistApi.blockUser(blockListRequestDto);
     } catch (error) {
@@ -13,7 +12,7 @@ function useBlockUser() {
   };
 
   return {
-    blockUser
+    blockUser,
   };
 }
 

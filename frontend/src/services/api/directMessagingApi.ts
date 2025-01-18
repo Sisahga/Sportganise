@@ -1,5 +1,9 @@
-import {Channel, ChannelMember, CreateChannelDto} from "@/types/dmchannels.ts";
-import {LastMessageComponent, MessageComponent} from "@/types/messaging.ts";
+import {
+  Channel,
+  ChannelMember,
+  CreateChannelDto,
+} from "@/types/dmchannels.ts";
+import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
 
@@ -70,7 +74,7 @@ const directMessagingApi = {
     );
     const data: ResponseDto<LastMessageComponent> = await response.json();
     return data;
-  }
+  },
 };
 
 export default directMessagingApi;

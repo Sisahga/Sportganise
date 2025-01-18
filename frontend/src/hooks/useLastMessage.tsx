@@ -1,9 +1,11 @@
-import {useEffect, useState} from "react";
-import {LastMessageComponent} from "@/types/messaging.ts";
+import { useEffect, useState } from "react";
+import { LastMessageComponent } from "@/types/messaging.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 
 const useLastMessage = (channelId: number) => {
-  const [lastMessage, setLastMessage] = useState<LastMessageComponent | null>(null);
+  const [lastMessage, setLastMessage] = useState<LastMessageComponent | null>(
+    null,
+  );
   useEffect(() => {
     const fetchLastMessage = async () => {
       try {
@@ -13,16 +15,16 @@ const useLastMessage = (channelId: number) => {
       } catch (err) {
         console.error("Error fetching last message:", err);
       }
-    }
+    };
 
-    fetchLastMessage().then(r => r);
+    fetchLastMessage().then((r) => r);
   }, [channelId]);
 
   useEffect(() => {
     console.log("Last message: ", lastMessage);
   }, [lastMessage]);
   return {
-    lastMessage
-  }
-}
+    lastMessage,
+  };
+};
 export default useLastMessage;

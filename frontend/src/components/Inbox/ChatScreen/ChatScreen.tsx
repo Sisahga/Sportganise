@@ -147,10 +147,10 @@ const ChatScreen = () => {
 
         {/* Options Button */}
         <ChannelSettingsDropdown
-            channelType={channelType}
-            channelId={channelId}
-            webSocketRef={webSocketServiceRef.current}
-            isBlocked={channelIsBlocked}
+          channelType={channelType}
+          channelId={channelId}
+          webSocketRef={webSocketServiceRef.current}
+          isBlocked={channelIsBlocked}
         />
       </header>
 
@@ -168,16 +168,18 @@ const ChatScreen = () => {
       <ChatMessages messages={messages} />
 
       <UserBlockedComponent
-          showBlockedMessage={channelIsBlocked}
-          channelIsBlocked={channelIsBlocked}
-          webSocketRef={webSocketServiceRef.current}
-          channelId={channelId}
-          channelType={channelType}
+        showBlockedMessage={channelIsBlocked}
+        channelIsBlocked={channelIsBlocked}
+        webSocketRef={webSocketServiceRef.current}
+        channelId={channelId}
+        channelType={channelType}
       />
       {/* Message Input Area */}
-      <div id="chatScreenInputArea"
-           className={`${channelIsBlocked ? "force-hide" : ""}
-           flex items-center gap-3 px-4 py-3 bg-white shadow`}>
+      <div
+        id="chatScreenInputArea"
+        className={`${channelIsBlocked ? "force-hide" : ""}
+           flex items-center gap-3 px-4 py-3 bg-white shadow`}
+      >
         <div className="h-full flex items-end">
           <Button
             variant="ghost"

@@ -19,20 +19,22 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { ChannelSettingsDropdownProps } from "@/types/dmchannels.ts";
 import useBlockUser from "@/hooks/useBlockUser.tsx";
-import {BlockUserRequestDto} from "@/types/blocklist.ts";
+import { BlockUserRequestDto } from "@/types/blocklist.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.tsx";
 import useSendMessage from "@/hooks/useSendMessage.tsx";
-import {SendMessageComponent} from "@/types/messaging.ts";
+import { SendMessageComponent } from "@/types/messaging.ts";
 import log from "loglevel";
 
 const ChannelSettingsDropdown = ({
-  channelType, channelId, webSocketRef, isBlocked,
+  channelType,
+  channelId,
+  webSocketRef,
+  isBlocked,
 }: ChannelSettingsDropdownProps) => {
-  const currentUserId = 2 // TODO: Replace with actual user ID from cookies
+  const currentUserId = 2; // TODO: Replace with actual user ID from cookies
   const [isBlockOpen, setIsBlockOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const { members } =
-      useChannelMembers(channelId, currentUserId, channelType);
+  const { members } = useChannelMembers(channelId, currentUserId, channelType);
   const { blockUser } = useBlockUser();
   const { sendDirectMessage } = useSendMessage();
   const [userBlocked, setUserBlocked] = useState(isBlocked);
@@ -61,11 +63,14 @@ const ChannelSettingsDropdown = ({
         sentAt: new Date().toISOString(),
         type: "BLOCK",
         senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
-        avatarUrl: "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+        avatarUrl:
+          "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
       };
       sendDirectMessage(messagePayload, webSocketRef);
 
-      const chatScreenInputArea = document.getElementById("chatScreenInputArea");
+      const chatScreenInputArea = document.getElementById(
+        "chatScreenInputArea",
+      );
       if (chatScreenInputArea) {
         chatScreenInputArea.classList.add("pointer-events-none");
         chatScreenInputArea.classList.add("opacity-70");
