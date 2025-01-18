@@ -1,10 +1,12 @@
 package com.sportganise.services.account;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
@@ -174,13 +176,22 @@ public class AccountService {
   }
 
   /**
+   * Lists all account with their permissions.
+   *
+   * @return A list of all accounts with their permissions.
+   */
+  public List<AccountPermissions> getAccountPermissions() {
+    return accountRepository.findAccountPermissions();
+  }
+
+  /**
    * Method to check if user has role with permissions.
    *
    * @param roleType string
    * @return True if user is an ADMIN or COACH, false otherwise
    */
-  public boolean hasPermissions(String roleType) {
-    return roleType.equals("ADMIN") || roleType.equals("COACH");
+  public boolean hasPermissions(AccountType roleType) {
+    return roleType.equals(AccountType.ADMIN) || roleType.equals(AccountType.COACH);
   }
 
   /**
