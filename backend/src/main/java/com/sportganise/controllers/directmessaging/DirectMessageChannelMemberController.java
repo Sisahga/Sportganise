@@ -3,6 +3,7 @@ package com.sportganise.controllers.directmessaging;
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelMemberService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.Null;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -97,13 +98,35 @@ public class DirectMessageChannelMemberController {
    * @param accountId The account id.
    * @return ResponseEntity with status 200 if successful.
    */
-  @DeleteMapping("/{channelId}/{accountId}")
+  @DeleteMapping("/remove/{channelId}/{accountId}")
   public ResponseEntity<ResponseDto<Null>> removeChannelMember(
       @PathVariable int channelId, @PathVariable int accountId) {
-    this.directMessageChannelMemberService.removeMemberFromChannel(channelId, accountId);
-    log.info("Successfully deleted channel member by channel id: {}", channelId);
-    ResponseDto<Null> response =
-        new ResponseDto<>(HttpStatus.OK.value(), "Channel member deleted successfully", null);
-    return new ResponseEntity<>(response, HttpStatus.OK);
+    try {
+      this.directMessageChannelMemberService.removeMemberFromChannel(channelId, accountId);
+      log.info("Successfully deleted channel member by channel id: {}", channelId);
+      ResponseDto<Null> response =
+              new ResponseDto<>(HttpStatus.OK.value(), "Channel member deleted successfully", null);
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (EntityNotFoundException e) {
+      log.error("Failed to remove member: {} from channel: {}. Entity not found: {}",
+              accountId, channelId, e.getMessage());
+
+      ResponseDto<Null> response = new ResponseDto<>(
+              HttpStatus.NOT_FOUND.value(),
+              e.getMessage(),
+              null
+      );
+      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      log.error("Unexpected error removing member: {} from channel: {}: {}",
+              accountId, channelId, e.getMessage());
+
+      ResponseDto<Null> response = new ResponseDto<>(
+              HttpStatus.INTERNAL_SERVER_ERROR.value(),
+              "An unexpected error occurred while removing the channel member",
+              null
+      );
+      return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
