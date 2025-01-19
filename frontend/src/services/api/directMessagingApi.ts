@@ -1,9 +1,5 @@
-import {
-  Channel,
-  ChannelMember,
-  CreateChannelDto,
-} from "@/types/dmchannels.ts";
-import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
+import {Channel, ChannelMember, CreateChannelDto,} from "@/types/dmchannels.ts";
+import {LastMessageComponent, MessageComponent} from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
 
@@ -76,14 +72,12 @@ const directMessagingApi = {
     return data;
   },
   removeChannelMember: async (channelId: number, accountId: number) => {
-    const response = await fetch(
-      `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
-      {
-        method: "DELETE",
-      },
+    return await fetch(
+        `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
+        {
+          method: "DELETE",
+        },
     );
-    log.info(`Member ${accountId} removed from channel ${channelId}`);
-    return response.status;
   }
 };
 
