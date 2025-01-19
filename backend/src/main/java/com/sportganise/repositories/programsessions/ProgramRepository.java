@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /** Repository for Program. */
-@Repository // Indicates that this is a Spring Data repository
+@Repository
 public interface ProgramRepository extends JpaRepository<Program, Integer> {
 
   @Query("""
@@ -18,6 +18,12 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
       WHERE p.programId = :programId
       """)
   Program findProgramById(@Param("programId") Integer programId);
+
+  @Query("""
+      SELECT p
+      FROM Program p
+      """)
+  List<Program> findPrograms();
 
   @Query(
       """

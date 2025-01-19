@@ -94,12 +94,17 @@ CREATE TABLE program (
 	expiry_date TIMESTAMPTZ,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10),
-	attachments TEXT[]
+	visibility VARCHAR(10)
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
     )
+);
+
+CREATE TABLE program_attachments (
+	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
+	attachment_url VARCHAR(100),
+	PRIMARY KEY (program_id)
 );
 
 CREATE TABLE program_participants (

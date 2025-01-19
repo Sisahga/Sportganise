@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.sportganise.controllers.programsessions.ProgramController;
+import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,19 +45,19 @@ public class ProgramControllerTest {
 
   @InjectMocks private ProgramController programController;
 
-  // Initialize Dtos
   private ProgramDto mockProgramDto;
   private ProgramParticipantDto mockProgramParticipantDto;
-  private ProgramDetailsParticipantsDto mockProgramDetailsParticipantsDto;
+  private ProgramAttachmentDto mockProgramAttachmentDto;
   private String jsonPayload;
 
   @BeforeEach
   public void setup() {
     mockProgramDto = new ProgramDto();
     mockProgramParticipantDto = new ProgramParticipantDto();
-    mockProgramDetailsParticipantsDto = new ProgramDetailsParticipantsDto();
 
-    // Set the programDto
+    mockProgramAttachmentDto =
+        new ProgramAttachmentDto(111, "http://example.com/program-guide.pdf");
+
     mockProgramDto.setProgramId(111);
     mockProgramDto.setProgramType("Training");
     mockProgramDto.setTitle("Training Program");
@@ -70,25 +72,19 @@ public class ProgramControllerTest {
     mockProgramDto.setFrequency("None");
     mockProgramDto.setLocation("999 Random Ave");
     mockProgramDto.setVisibility("public");
-    mockProgramDto.setAttachments(List.of("/banner.pdf"));
+    mockProgramDto.setProgramAttachments(List.of(mockProgramAttachmentDto)); // Add the attachment
 
-    // Set the programParticipantDto
-    mockProgramParticipantDto.setProgramId(201);
+    mockProgramParticipantDto.setProgramId(111);
     mockProgramParticipantDto.setAccountId(1);
     mockProgramParticipantDto.setConfirmed(true);
     mockProgramParticipantDto.setConfirmedDate(ZonedDateTime.now());
 
-    // Set the programDetailsParticipantsDto
-    mockProgramDetailsParticipantsDto.setProgramDetails(mockProgramDto);
-    mockProgramDetailsParticipantsDto.setAttendees(List.of(mockProgramParticipantDto));
-
-    // Prepare a dummy JSON payload
     jsonPayload =
         "{"
             + "\"title\": \"Title\","
             + "\"type\": \"Type\","
-            + "\"start_date\": \"2024-01-30T10:00:00Z\","
-            + "\"end_date\": \"2024-02-01T10:00:00Z\","
+            + "\"startDate\": \"2024-01-30T10:00:00Z\","
+            + "\"endDate\": \"2024-02-01T10:00:00Z\","
             + "\"recurring\": false,"
             + "\"visibility\": \"public\","
             + "\"description\": \"description\","
@@ -97,22 +93,19 @@ public class ProgramControllerTest {
             + "],"
             + "\"capacity\": 10,"
             + "\"notify\": true,"
-            + "\"start_time\": \"10:30\","
-            + "\"end_time\": \"12:30\","
+            + "\"startTime\": \"10:30\","
+            + "\"endTime\": \"12:30\","
             + "\"location\": \"Centre-de-loisirs-St-Denis\""
             + "}";
   }
 
-  // Test getProgramDetails for when user account does not exist
   @Test
   public void testGetProgramDetails_AccountNotFound() throws Exception {
-    // Mock the accountService to return Optional.empty() for accountId = 999
     Mockito.when(accountService.getAccount(999)).thenReturn(Optional.empty());
 
-    mockMvc.perform(get("/api/programs/999/111/details")).andExpect(status().isNotFound());
+    mockMvc.perform(get("/api/programs/999/details")).andExpect(status().isNotFound());
   }
 
-  // Test getProgramDetails for when program does not exist
   @Test
   public void testGetProgramDetails_ProgramNotFound() throws Exception {
 
@@ -123,71 +116,78 @@ public class ProgramControllerTest {
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
 
-    mockMvc.perform(get("/api/programs/2/999/details")).andExpect(status().isNotFound());
+    mockMvc.perform(get("/api/programs/2/details")).andExpect(status().isNotFound());
   }
 
-  // Test getProgramDetails for when user has permission eg. COACH or ADMIN
   @Test
-  public void testGetProgramDetails_UserWithPermissions() throws Exception {
+  public void testGetPrograms_UserWithPermissions() throws Exception {
 
-    // Mock the user/account that is accessing the programs details
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    // Mock the program participant and corresponding account details
-    ProgramParticipantDto mockProgramParticipantDto = new ProgramParticipantDto();
-    mockProgramParticipantDto.setProgramId(111);
-    mockProgramParticipantDto.setAccountId(3); // Example account ID for a participant
-    mockProgramParticipantDto.setConfirmed(true);
-    mockProgramParticipantDto.setConfirmedDate(ZonedDateTime.now());
-
-    // Mock behaviour of the services using the mocked objects
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
+    Mockito.when(programService.getPrograms()).thenReturn(List.of(mockProgramDto));
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
     Mockito.when(programService.getParticipants(111))
         .thenReturn(List.of(mockProgramParticipantDto));
 
-    // Perform the request and assert the response
+    ProgramDetailsParticipantsDto mockProgramDetails =
+        new ProgramDetailsParticipantsDto(mockProgramDto, List.of(mockProgramParticipantDto));
+
+    Mockito.when(programService.getProgramDetailsParticipantsDto(List.of(mockProgramDto), true))
+        .thenReturn(List.of(mockProgramDetails));
+
     mockMvc
-        .perform(get("/api/programs/2/111/details"))
+        .perform(get("/api/programs/2/details"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.programDetails.programId").value(111))
-        .andExpect(jsonPath("$.programDetails.title").value("Training Program"));
+        .andExpect(jsonPath("$.data[0].programDetails.programId").value(111))
+        .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
+        .andExpect(
+            jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl")
+                .value("http://example.com/program-guide.pdf"))
+        .andExpect(jsonPath("$.data[0].attendees[0].accountId").value(1))
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
   }
 
-  // Test getProgramDetails for when user has permission eg. PLAYER
   @Test
-  public void testGetProgramDetails_UserWithoutPermissions() throws Exception {
+  public void testGetPrograms_UserWithoutPermissions() throws Exception {
 
-    // Mock the user/account that is accessing the programs details
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.PLAYER);
 
-    // Mock behaviour of the services using the mocked objects
+    ProgramDetailsParticipantsDto mockProgramDetailsParticipantsDtos =
+        new ProgramDetailsParticipantsDto(mockProgramDto, new ArrayList<>());
+
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
-    Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
+    Mockito.when(programService.getPrograms()).thenReturn(List.of(mockProgramDto));
+    Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
+    Mockito.when(programService.getProgramDetailsParticipantsDto(List.of(mockProgramDto), false))
+        .thenReturn(List.of(mockProgramDetailsParticipantsDtos));
 
     mockMvc
-        .perform(get("/api/programs/2/111/details"))
+        .perform(get("/api/programs/2/details"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.programDetails.programId").value(111))
-        .andExpect(jsonPath("$.programDetails.title").value("Training Program"))
-        .andExpect(jsonPath("$.participants").doesNotExist());
+        .andExpect(jsonPath("$.data[0].programDetails.programId").value(111))
+        .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
+        .andExpect(
+            jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl")
+                .value("http://example.com/program-guide.pdf"))
+        .andExpect(jsonPath("$.data[0].attendees").isEmpty())
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
   }
 
-  // Tests for createProgram() method
   @Test
   public void testCreateProgram_Success() throws Exception {
-    // Mock data of a user with permissions i.e. COACH or ADMIN
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    // Mocking service calls
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(
@@ -207,59 +207,54 @@ public class ProgramControllerTest {
                 Mockito.<List<Map<String, String>>>any()))
         .thenReturn(mockProgramDto);
 
-    // Perform request with the dummy JSON payload from above
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/programs/2/create-program") // Use POST for creation
-                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-                .content(jsonPayload)) // Pass the JSON payload
-        .andExpect(status().isCreated()) // Expect status 201 Created
-        .andExpect(jsonPath("$.capacity").value(10)) // Check that capacity is returned
-        .andExpect(jsonPath("$.title").value("Training Program")); // Check the title
+            MockMvcRequestBuilders.post("/api/programs/2/create-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.data.title").value("Training Program"))
+        .andExpect(jsonPath("$.data.capacity").value(10))
+        .andExpect(jsonPath("$.data.programType").value("Training"))
+        .andExpect(
+            jsonPath("$.data.programAttachments[0].attachmentUrl")
+                .value("http://example.com/program-guide.pdf"));
   }
 
   @Test
   public void testCreateProgram_InsufficientPermissions() throws Exception {
-    // Mock account without permissions like a PLAYER
     Account mockAccount = new Account();
     mockAccount.setAccountId(3);
     mockAccount.setType(AccountType.PLAYER);
 
-    // Mock behavior
     Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
-    // Perform request with the dummy JSON payload from above
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/programs/3/create-program") // Use POST for creation
-                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-                .content(jsonPayload)) // Pass the JSON payload
+            MockMvcRequestBuilders.post("/api/programs/3/create-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
         .andExpect(status().isForbidden());
   }
 
   @Test
   public void testModifyProgram_Success() throws Exception {
-    // Mock data
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    // Mock behavior
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
 
-    // Perform request with the dummy JSON payload from above
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put(
-                    "/api/programs/2/111/modify-program") // Use POST for creation
-                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-                .content(jsonPayload)) // Pass the JSON payload
+            MockMvcRequestBuilders.put("/api/programs/2/111/modify-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
         .andExpect(status().isOk());
 
-    // Verify that the modifyProgram method was called
     Mockito.verify(programService)
         .modifyProgram(
             Mockito.eq(mockProgramDto),
@@ -281,59 +276,48 @@ public class ProgramControllerTest {
   @Test
   public void testModifyProgram_UserNotFound() throws Exception {
 
-    // Mock behavior for accountService to return Optional.empty()
     Mockito.when(accountService.getAccount(123)).thenReturn(Optional.empty());
 
-    // Perform request with the dummy JSON payload from above
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put(
-                    "/api/programs/123/111/modify-program") // Use POST for creation
-                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-                .content(jsonPayload)) // Pass the JSON payload
-        .andExpect(status().isNotFound()); // Expect 404 when user is not found
+            MockMvcRequestBuilders.put("/api/programs/123/111/modify-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
+        .andExpect(status().isNotFound());
   }
 
   @Test
   public void testModifyProgram_InsufficientPermissions() throws Exception {
-    // Mock an account without permissions
     Account mockAccount = new Account();
     mockAccount.setAccountId(3);
     mockAccount.setType(AccountType.PLAYER);
 
-    // Mock behavior
     Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
-    // Perform request with the dummy JSON payload from above
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put(
-                    "/api/programs/3/111/modify-program") // Use POST for creation
-                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-                .content(jsonPayload)) // Pass the JSON payload
+            MockMvcRequestBuilders.put("/api/programs/3/111/modify-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
         .andExpect(status().isForbidden());
   }
 
   @Test
   public void testModifyProgram_ProgramNotFound() throws Exception {
-    // Mock account with sufficient permissions
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    // Mock behavior
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
 
-    // Perform request with the dummy JSON payload from above
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put(
-                    "/api/programs/2/111/modify-program") // Use POST for creation
-                .contentType(MediaType.APPLICATION_JSON) // Set the content type to JSON
-                .content(jsonPayload)) // Pass the JSON payload
+            MockMvcRequestBuilders.put("/api/programs/2/111/modify-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonPayload))
         .andExpect(status().isNotFound());
   }
 }
