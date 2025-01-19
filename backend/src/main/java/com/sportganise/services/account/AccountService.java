@@ -91,8 +91,7 @@ public class AccountService {
   public Account getAccountById(Integer accountId) throws AccountNotFoundException {
     return accountRepository
         .findById(accountId)
-        .orElseThrow(
-            () -> new AccountNotFoundException("Failed to find account with id " + accountId));
+        .orElseThrow(() -> new AccountNotFoundException("Failed to find account."));
   }
 
   /**

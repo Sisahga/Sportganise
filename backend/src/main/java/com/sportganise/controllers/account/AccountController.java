@@ -62,10 +62,12 @@ public class AccountController {
   @PutMapping("/{accountId}")
   public ResponseEntity<Void> updateAccount(
       @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountDto body) {
+    log.info("Received request to get account.");
 
     try {
       this.accountService.updateAccount(accountId, body);
     } catch (AccountNotFoundException e) {
+      log.warn("Request failed: " + e.getMessage());
       return ResponseEntity.notFound().build();
     }
 
@@ -82,14 +84,16 @@ public class AccountController {
   @PutMapping("/{accountId}/picture")
   public ResponseEntity<String> updateAccountPicture(
       @PathVariable Integer accountId, @RequestParam("file") MultipartFile file) {
+    log.info("Received request to update account picture.");
 
     try {
       this.accountService.updateAccountPicture(accountId, file);
     } catch (AccountNotFoundException e) {
+      log.warn("Request failed: " + e.getMessage());
       return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     } catch (IOException e) {
-      return new ResponseEntity<>(
-          "Failed to upload file: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+      log.warn("Request failed: " + e.getMessage());
+      return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     return ResponseEntity.noContent().build();
@@ -106,17 +110,21 @@ public class AccountController {
   public ResponseEntity<String> updateAccountType(
       @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountTypeDto body) {
     // TODO: only admin users should be authorized to this endpoint
+    log.info("Received request to update account type.");
 
     String newType = body.getType();
     if (newType == null) {
+      log.warn("Request failed: Missing 'type' to update account type.");
       return new ResponseEntity<>("Missing 'type' to update account type.", HttpStatus.BAD_REQUEST);
     }
 
     try {
       this.accountService.updateAccountRole(accountId, newType);
     } catch (AccountNotFoundException e) {
+      log.warn("Request failed: " + e.getMessage());
       return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     } catch (InvalidAccountTypeException e) {
+      log.warn("Request failed: " + e.getMessage());
       return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
