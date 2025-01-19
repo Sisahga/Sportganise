@@ -132,53 +132,54 @@ class DirectMessageChannelMemberControllerUnitTest {
     addChannelMemberDto.setMemberIds(Arrays.asList(200, 201, 202));
 
     mockMvc
-            .perform(
-                    MockMvcRequestBuilders.post("/api/messaging/channelmember/add-members")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(addChannelMemberDto)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.statusCode", is(201)))
-            .andExpect(jsonPath("$.message", is("Members added successfully")))
-            .andExpect(jsonPath("$.data").doesNotExist());
+        .perform(
+            MockMvcRequestBuilders.post("/api/messaging/channelmember/add-members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addChannelMemberDto)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.statusCode", is(201)))
+        .andExpect(jsonPath("$.message", is("Members added successfully")))
+        .andExpect(jsonPath("$.data").doesNotExist());
 
     verify(directMessageChannelMemberService, times(1))
-            .saveMembers(
-                    addChannelMemberDto.getMemberIds(),
-                    addChannelMemberDto.getChannelId(),
-                    addChannelMemberDto.getAdminId());
+        .saveMembers(
+            addChannelMemberDto.getMemberIds(),
+            addChannelMemberDto.getChannelId(),
+            addChannelMemberDto.getAdminId());
   }
 
   @Test
-  public void addMembersToChannel_WhenExceptionThrown_ShouldReturnInternalServerError() throws Exception {
+  public void addMembersToChannel_WhenExceptionThrown_ShouldReturnInternalServerError()
+      throws Exception {
     AddChannelMemberDto addChannelMemberDto = new AddChannelMemberDto();
     addChannelMemberDto.setChannelId(1);
     addChannelMemberDto.setAdminId(100);
     addChannelMemberDto.setMemberIds(Arrays.asList(200, 201, 202));
 
     doThrow(new RuntimeException("Database error"))
-            .when(directMessageChannelMemberService)
-            .saveMembers(
-                    addChannelMemberDto.getMemberIds(),
-                    addChannelMemberDto.getChannelId(),
-                    addChannelMemberDto.getAdminId());
+        .when(directMessageChannelMemberService)
+        .saveMembers(
+            addChannelMemberDto.getMemberIds(),
+            addChannelMemberDto.getChannelId(),
+            addChannelMemberDto.getAdminId());
 
     mockMvc
-            .perform(
-                    MockMvcRequestBuilders.post("/api/messaging/channelmember/add-members")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(addChannelMemberDto)))
-            .andExpect(status().isInternalServerError())
-            .andExpect(jsonPath("$.statusCode", is(500)))
-            .andExpect(
-                    jsonPath(
-                            "$.message",
-                            is("An unexpected error occurred while adding members to the channel")))
-            .andExpect(jsonPath("$.data").doesNotExist());
+        .perform(
+            MockMvcRequestBuilders.post("/api/messaging/channelmember/add-members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addChannelMemberDto)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.statusCode", is(500)))
+        .andExpect(
+            jsonPath(
+                "$.message",
+                is("An unexpected error occurred while adding members to the channel")))
+        .andExpect(jsonPath("$.data").doesNotExist());
 
     verify(directMessageChannelMemberService, times(1))
-            .saveMembers(
-                    addChannelMemberDto.getMemberIds(),
-                    addChannelMemberDto.getChannelId(),
-                    addChannelMemberDto.getAdminId());
+        .saveMembers(
+            addChannelMemberDto.getMemberIds(),
+            addChannelMemberDto.getChannelId(),
+            addChannelMemberDto.getAdminId());
   }
 }
