@@ -13,6 +13,7 @@ import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -72,6 +73,23 @@ public class DirectMessageService {
     DirectMessageDto messageDto;
     for (DirectMessage message : messagesNoAttachments) {
       log.info("Sender ID: {}", message.getSenderId());
+      // Case where member that sent the message isn't in the channel anymore.
+      if (!memberDetails.containsKey(message.getSenderId())) {
+        log.info("Sender no longer in message channel.");
+        messageDto = DirectMessageDto.builder()
+                .messageId(message.getMessageId())
+                .senderId(message.getSenderId())
+                .senderFirstName("Removed User")
+                .channelId(message.getChannelId())
+                .messageContent(message.getContent())
+                .attachments(Collections.emptyList())
+                .sentAt(message.getSentAt().toString())
+                .type(message.getType())
+                .avatarUrl(null)
+                .build();
+        messages.add(messageDto);
+        continue;
+      }
       attachments = directMessageRepository.getMessageAttachments(message.getMessageId());
       messageDto =
           DirectMessageDto.builder()
