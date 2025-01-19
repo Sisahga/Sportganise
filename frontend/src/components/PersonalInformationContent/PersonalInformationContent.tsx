@@ -4,7 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { MoveLeft, SquarePen } from "lucide-react";
 import { useForm } from "react-hook-form";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
@@ -42,7 +48,11 @@ const PersonalInformationContent: React.FC = () => {
 
   return (
     <div className="pb-8 min-h-screen">
-      <Button className="rounded-full w-2" variant="outline" onClick={() => navigate("/pages/ProfilePage")}>
+      <Button
+        className="rounded-full w-2"
+        variant="outline"
+        onClick={() => navigate("/pages/ProfilePage")}
+      >
         <MoveLeft />
       </Button>
 
@@ -70,102 +80,183 @@ const PersonalInformationContent: React.FC = () => {
         <Form {...form}>
           <form className="p-4 space-y-4 mt-1">
             {/* First Name */}
-            <FormField name="firstName" control={form.control} render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="firstName">First Name</Label>
-                <FormControl>
-                  <Input {...field} id="firstName" placeholder={data?.firstName ?? ""} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              name="firstName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="firstName"
+                      placeholder={data?.firstName ?? ""}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Last Name */}
-            <FormField name="lastName" control={form.control} render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="lastName">Last Name</Label>
-                <FormControl>
-                  <Input {...field} id="lastName" placeholder={data?.lastName ?? ""} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              name="lastName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="lastName"
+                      placeholder={data?.lastName ?? ""}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Email */}
-            <FormField name="email" control={form.control} render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="email">Email</Label>
-                <FormControl>
-                  <Input {...field} id="email" placeholder={data?.email ?? ""} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="email">Email</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="email"
+                      placeholder={data?.email ?? ""}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Phone */}
-            <FormField name="phone" control={form.control} render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="phone">Phone</Label>
-                <FormControl>
-                  <Input {...field} id="phone" placeholder={data?.phone ?? ""} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              name="phone"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="phone">Phone</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="phone"
+                      placeholder={data?.phone ?? ""}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Address */}
-            <FormField name="address" control={form.control} render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="address">Address</Label>
-                <FormControl>
-                  <Input {...field} id="address" placeholder={data?.address?.line ?? ""} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              name="address"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="address">Address</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="address"
+                      placeholder={data?.address?.line ?? ""}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* Postal Code */}
-            <FormField name="postalCode" control={form.control} render={({ field }) => (
-              <FormItem>
-                <Label htmlFor="postalCode">Postal Code</Label>
-                <FormControl>
-                  <Input {...field} id="postalCode" placeholder={data?.address?.postalCode ?? ""} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
+            <FormField
+              name="postalCode"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <Label htmlFor="postalCode">Postal Code</Label>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      id="postalCode"
+                      placeholder={data?.address?.postalCode ?? ""}
+                      disabled
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             {/* City, Province, Country - grouped */}
             <div className="flex pb-20 space-x-2">
-              <FormField name="city" control={form.control} render={({ field }) => (
-                <FormItem className="flex-1">
-                  <Label htmlFor="city">City</Label>
-                  <FormControl>
-                    <Input {...field} id="city" placeholder={data?.address?.city ?? ""} disabled />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                name="city"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <Label htmlFor="city">City</Label>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="city"
+                        placeholder={data?.address?.city ?? ""}
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <FormField name="province" control={form.control} render={({ field }) => (
-                <FormItem className="flex-1">
-                  <Label htmlFor="province">Province</Label>
-                  <FormControl>
-                    <Input {...field} id="province" placeholder={data?.address?.province ?? ""} disabled />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                name="province"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <Label htmlFor="province">Province</Label>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="province"
+                        placeholder={data?.address?.province ?? ""}
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              <FormField name="country" control={form.control} render={({ field }) => (
-                <FormItem className="flex-1">
-                  <Label htmlFor="country">Country</Label>
-                  <FormControl>
-                    <Input {...field} id="country" placeholder={data?.address?.country ?? ""} disabled />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
+              <FormField
+                name="country"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <Label htmlFor="country">Country</Label>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="country"
+                        placeholder={data?.address?.country ?? ""}
+                        disabled
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </form>
         </Form>

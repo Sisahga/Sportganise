@@ -1,4 +1,8 @@
-import { AccountDetailsDirectMessaging, Account, UpdateAccountPayload } from "@/types/account.ts";
+import {
+  AccountDetailsDirectMessaging,
+  Account,
+  UpdateAccountPayload,
+} from "@/types/account.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/account";
 
@@ -11,7 +15,6 @@ const accountApi = {
     return data;
   },
 
-  
   //Function to get account by id
   getAccountById: async (accountId: number): Promise<Account> => {
     const response = await fetch(`${baseMappingUrl}/${accountId}`);
@@ -22,9 +25,11 @@ const accountApi = {
     return data;
   },
 
-
   //Function to update account information
-  updateAccount: async (accountId: number, data: UpdateAccountPayload): Promise<void> => {
+  updateAccount: async (
+    accountId: number,
+    data: UpdateAccountPayload,
+  ): Promise<void> => {
     const response = await fetch(`${baseMappingUrl}/${accountId}`, {
       method: "PUT",
       headers: {
@@ -41,11 +46,10 @@ const accountApi = {
     }
   },
 
-
-   // Function to update profile picture
-   updateProfilePicture: async (
+  // Function to update profile picture
+  updateProfilePicture: async (
     accountId: number,
-    file: File
+    file: File,
   ): Promise<{ success: boolean; message: string }> => {
     const formData = new FormData();
     formData.append("file", file);
@@ -61,13 +65,19 @@ const accountApi = {
       } else if (response.status === 500) {
         return { success: false, message: "Failed to upload the file" };
       } else {
-        return { success: false, message: "Unexpected error occurred while updating the profile picture" };
+        return {
+          success: false,
+          message:
+            "Unexpected error occurred while updating the profile picture",
+        };
       }
     }
 
-    return { success: true, message: "Your profile picture has been successfully updated." };
+    return {
+      success: true,
+      message: "Your profile picture has been successfully updated.",
+    };
   },
-
 };
 
 export default accountApi;

@@ -6,9 +6,12 @@ function useUpdateAccount() {
   const [success, setSuccess] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
 
-  const updateAccount = async (accountId:number, data: UpdateAccountPayload) => {
-    setSuccess(false);  
-    setMessage(null);  
+  const updateAccount = async (
+    accountId: number,
+    data: UpdateAccountPayload,
+  ) => {
+    setSuccess(false);
+    setMessage(null);
 
     try {
       await accountApi.updateAccount(accountId, data);
@@ -17,7 +20,7 @@ function useUpdateAccount() {
     } catch (err) {
       console.error("Error updating account:", err);
       if (err instanceof Error) {
-        setMessage(err.message);  
+        setMessage(err.message);
       } else {
         setMessage("Failed to update account. Please try again.");
       }
@@ -32,6 +35,3 @@ function useUpdateAccount() {
 }
 
 export default useUpdateAccount;
-
-
-

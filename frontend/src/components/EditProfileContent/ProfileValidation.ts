@@ -16,7 +16,7 @@ export const profileSchema = z.object({
     .min(10, "Phone number must be 10 digits")
     .regex(
       /^\d{3}-\d{3}-\d{4}$/,
-      "Phone number must be in the format 222-222-2222"
+      "Phone number must be in the format 222-222-2222",
     ),
   address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
@@ -24,12 +24,14 @@ export const profileSchema = z.object({
   postalCode: z
     .string()
     .min(1, "Postal code is required")
-    .regex(/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/, "Invalid postal code: X1X 1X1."),
+    .regex(
+      /^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/,
+      "Invalid postal code: X1X 1X1.",
+    ),
   country: z.string().min(1, "Country is required"),
 });
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
-
 
 //Image Validation
 export const allowedImageTypes = ["image/jpeg", "image/png", "image/jpg"];

@@ -6,7 +6,13 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { MoveLeft, CirclePlus, Save } from "lucide-react";
 import {
   AlertDialog,
@@ -21,10 +27,14 @@ import {
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import useUpdateAccount from "@/hooks/useUpdateAccount";
 import useUpdateProfilePicture from "@/hooks/useUpdateProfilePicture";
-import { profileSchema, ProfileFormValues, allowedImageTypes, maxFileSizeInBytes } from "./ProfileValidation";
+import {
+  profileSchema,
+  ProfileFormValues,
+  allowedImageTypes,
+  maxFileSizeInBytes,
+} from "./ProfileValidation";
 
 import { useToast } from "@/hooks/use-toast";
-
 
 const EditProfileContent: React.FC = () => {
   const accountId = 1;
@@ -36,9 +46,9 @@ const EditProfileContent: React.FC = () => {
   const [newImage, setNewImage] = useState<File | null>(null);
   const { data, loading, error } = usePersonalInformation(accountId);
   const { updateAccount, success, message } = useUpdateAccount();
-  const { updateProfilePicture} = useUpdateProfilePicture();
+  const { updateProfilePicture } = useUpdateProfilePicture();
 
-  const { toast } = useToast(); 
+  const { toast } = useToast();
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -54,15 +64,12 @@ const EditProfileContent: React.FC = () => {
     },
   });
 
-
   useEffect(() => {
     if (data) {
       console.log("Fetched Personal Information:", data);
       setImage(data.pictureUrl || "https://via.placeholder.com/150");
     }
   }, [data]);
-
-
 
   useEffect(() => {
     if (success) {
@@ -82,59 +89,70 @@ const EditProfileContent: React.FC = () => {
   }, [success, message, toast]);
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div className="text-red">{error}</div>; 
+    return <div className="text-red">{error}</div>;
   }
 
- // Handle image upload
- const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const file = event.target.files?.[0];
+  // Handle image upload
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
 
-  if (file && !allowedImageTypes.includes(file.type)) {
-    toast({
-      title: "Invalid File Type",
-      description: "Please upload a JPEG or PNG image.",
-      variant: "destructive",
-    });
-    return;
-  }
+    if (file && !allowedImageTypes.includes(file.type)) {
+      toast({
+        title: "Invalid File Type",
+        description: "Please upload a JPEG or PNG image.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  if (file && file.size > maxFileSizeInBytes) {
-    toast({
-      title: "File Too Large",
-      description: "File size exceeds 2 MB. Please upload a smaller image.",
-      variant: "destructive",
-    });
-    return;
-  }
+    if (file && file.size > maxFileSizeInBytes) {
+      toast({
+        title: "File Too Large",
+        description: "File size exceeds 2 MB. Please upload a smaller image.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  if (file) {
-    setNewImage(file);
-    setIsImageChangeDialogOpen(true);
-  }
-};
+    if (file) {
+      setNewImage(file);
+      setIsImageChangeDialogOpen(true);
+    }
+  };
 
   // Function to confirm the image change
   const confirmImageChange = async () => {
     if (newImage) {
       //Hook for update profile picture API
-      const { success, message } = await updateProfilePicture(accountId, newImage); 
+      const { success, message } = await updateProfilePicture(
+        accountId,
+        newImage,
+      );
 
       if (success) {
-         // Set the image preview
+        // Set the image preview
         setImage(URL.createObjectURL(newImage));
-        toast({ title: "Profile Picture Updated", description: message, variant: "default" }); 
+        toast({
+          title: "Profile Picture Updated",
+          description: message,
+          variant: "default",
+        });
       } else {
-        toast({ title: "Upload Failed", description: message, variant: "destructive" });
+        toast({
+          title: "Upload Failed",
+          description: message,
+          variant: "destructive",
+        });
       }
 
-      setIsImageChangeDialogOpen(false); 
+      setIsImageChangeDialogOpen(false);
     }
   };
-  
+
   const cancelImageChange = () => {
     setIsImageChangeDialogOpen(false);
     setNewImage(null);
@@ -143,7 +161,6 @@ const EditProfileContent: React.FC = () => {
   const handleSavePersonalInfo = () => {
     setIsInfoDialogOpen(true);
   };
-
 
   const confirmSavePersonalInfo = async (data: ProfileFormValues) => {
     const payload = {
@@ -158,11 +175,10 @@ const EditProfileContent: React.FC = () => {
         postalCode: data.postalCode,
       },
     };
-    
+
     console.log("Data to be sent for update:", payload);
     await updateAccount(accountId, payload);
   };
-  
 
   const cancelSavePersonalInfo = () => {
     setIsInfoDialogOpen(false);
@@ -216,7 +232,11 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="firstName">First Name</Label>
                   <FormControl>
-                    <Input {...field} id="firstName" placeholder={data?.firstName || "First Name"} />
+                    <Input
+                      {...field}
+                      id="firstName"
+                      placeholder={data?.firstName || "First Name"}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -231,7 +251,11 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="lastName">Last Name</Label>
                   <FormControl>
-                    <Input {...field} id="lastName" placeholder={data?.lastName || "Last Name"} />
+                    <Input
+                      {...field}
+                      id="lastName"
+                      placeholder={data?.lastName || "Last Name"}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -246,7 +270,11 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="email">Email</Label>
                   <FormControl>
-                    <Input {...field} id="email" placeholder={data?.email || "Email"} />
+                    <Input
+                      {...field}
+                      id="email"
+                      placeholder={data?.email || "Email"}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -261,7 +289,11 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="phone">Phone</Label>
                   <FormControl>
-                    <Input {...field} id="phone" placeholder={data?.phone || "Phone"} />
+                    <Input
+                      {...field}
+                      id="phone"
+                      placeholder={data?.phone || "Phone"}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -276,7 +308,11 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="address">Address</Label>
                   <FormControl>
-                    <Input {...field} id="address" placeholder={data?.address?.line || "Address"} />
+                    <Input
+                      {...field}
+                      id="address"
+                      placeholder={data?.address?.line || "Address"}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -291,7 +327,11 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="postalCode">Postal Code</Label>
                   <FormControl>
-                    <Input {...field} id="postalCode" placeholder={data?.address?.postalCode || "Postal Code"} />
+                    <Input
+                      {...field}
+                      id="postalCode"
+                      placeholder={data?.address?.postalCode || "Postal Code"}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -307,7 +347,11 @@ const EditProfileContent: React.FC = () => {
                   <FormItem className="flex-1">
                     <Label htmlFor="city">City</Label>
                     <FormControl>
-                      <Input {...field} id="city" placeholder={data?.address?.city || "City"} />
+                      <Input
+                        {...field}
+                        id="city"
+                        placeholder={data?.address?.city || "City"}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -320,7 +364,11 @@ const EditProfileContent: React.FC = () => {
                   <FormItem className="flex-1">
                     <Label htmlFor="province">Province</Label>
                     <FormControl>
-                      <Input {...field} id="province" placeholder={data?.address?.province || "Province"} />
+                      <Input
+                        {...field}
+                        id="province"
+                        placeholder={data?.address?.province || "Province"}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -334,13 +382,16 @@ const EditProfileContent: React.FC = () => {
                   <FormItem className="flex-1">
                     <Label htmlFor="country">Country</Label>
                     <FormControl>
-                      <Input {...field} id="country" placeholder={data?.address?.country || "Country"} />
+                      <Input
+                        {...field}
+                        id="country"
+                        placeholder={data?.address?.country || "Country"}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
             </div>
 
             {/* Save Personal Info Button */}
@@ -356,10 +407,8 @@ const EditProfileContent: React.FC = () => {
             </div>
           </form>
         </Form>
-
       </div>
 
-     
       <AlertDialog
         open={isImageChangeDialogOpen}
         onOpenChange={setIsImageChangeDialogOpen}
@@ -371,7 +420,9 @@ const EditProfileContent: React.FC = () => {
               Do you want to change your profile picture?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogAction onClick={confirmImageChange}>Yes</AlertDialogAction>
+          <AlertDialogAction onClick={confirmImageChange}>
+            Yes
+          </AlertDialogAction>
           <AlertDialogCancel onClick={cancelImageChange}>No</AlertDialogCancel>
         </AlertDialogContent>
       </AlertDialog>
@@ -399,4 +450,3 @@ const EditProfileContent: React.FC = () => {
 };
 
 export default EditProfileContent;
-

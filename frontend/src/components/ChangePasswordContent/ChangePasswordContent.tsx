@@ -5,7 +5,13 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { MoveLeft } from "lucide-react";
 import PasswordChecklist from "react-password-checklist";
 import { Progress } from "@/components/ui/progress";
@@ -29,7 +35,12 @@ const ChangePasswordContent: React.FC = () => {
     },
   });
 
-  const { handleSubmit, control, watch, formState: { errors } } = form;
+  const {
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors },
+  } = form;
   const [progress, setProgress] = useState(0);
   const [isChecklistValid, setIsChecklistValid] = useState(false);
   const password = watch("password");
@@ -65,7 +76,10 @@ const ChangePasswordContent: React.FC = () => {
       return;
     }
 
-    if (data.oldPassword === "0987aaaAA." && data.password === data.passwordAgain) {
+    if (
+      data.oldPassword === "0987aaaAA." &&
+      data.password === data.passwordAgain
+    ) {
       console.log("Old Password:", data.oldPassword);
       console.log("New Password:", data.password);
       console.log("Confirm New Password:", data.passwordAgain);
@@ -166,7 +180,13 @@ const ChangePasswordContent: React.FC = () => {
             {/* Password Checklist */}
             <div className="m-4 mb-2">
               <PasswordChecklist
-                rules={["minLength", "specialChar", "number", "capital", "match"]}
+                rules={[
+                  "minLength",
+                  "specialChar",
+                  "number",
+                  "capital",
+                  "match",
+                ]}
                 minLength={8}
                 value={password}
                 valueAgain={passwordAgain}
