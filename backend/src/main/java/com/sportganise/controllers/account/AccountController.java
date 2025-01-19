@@ -3,6 +3,7 @@ package com.sportganise.controllers.account;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
+import com.sportganise.dto.account.UpdateAccountTypeDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.InvalidAccountTypeException;
@@ -98,15 +99,21 @@ public class AccountController {
    * Updates the permissions of an account.
    *
    * @param accountId ID of the account.
-   * @param accountType The new type.
+   * @param body Contains the new role of the account.
    * @return The URL of the updated picture if successful,
    */
   @PutMapping("/{accountId}/type")
-  public ResponseEntity<String> updateAccountPicture(
-      @PathVariable Integer accountId, @RequestBody String accountType) {
+  public ResponseEntity<String> updateAccountType(
+      @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountTypeDto body) {
     // TODO: only admin users should be authorized to this endpoint
+
+    String newType = body.getType();
+    if (newType == null) {
+      return new ResponseEntity<>("Missing 'type' to update account type.", HttpStatus.BAD_REQUEST);
+    }
+
     try {
-      this.accountService.updateAccountRole(accountId, accountType);
+      this.accountService.updateAccountRole(accountId, newType);
     } catch (AccountNotFoundException e) {
       return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     } catch (InvalidAccountTypeException e) {

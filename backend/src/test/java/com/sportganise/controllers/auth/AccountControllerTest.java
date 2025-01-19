@@ -13,10 +13,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.controllers.account.AccountController;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
+import com.sportganise.dto.account.UpdateAccountTypeDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
@@ -45,6 +47,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 class AccountControllerTest {
 
   @Autowired private MockMvc mockMvc;
+
+  @Autowired private ObjectMapper objectMapper;
 
   @MockBean private AccountService accountService;
 
@@ -176,7 +180,7 @@ class AccountControllerTest {
   @Test
   public void updateAccountPermissionTest_NotFound() throws Exception {
     int accountId = 2;
-    String requestBody = "ADMIN";
+    UpdateAccountTypeDto dto = new UpdateAccountTypeDto("ADMIN");
 
     doThrow(new AccountNotFoundException("Account not found"))
         .when(accountService)
@@ -185,16 +189,16 @@ class AccountControllerTest {
     mockMvc
         .perform(
             MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
-                .content(requestBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isNotFound());
 
-    verify(accountService, times(1)).updateAccountRole(accountId, requestBody);
+    verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
   }
 
   @Test
-  public void updateAccountPermissionTest_InvalidAccountType() throws Exception {
+  public void updateAccountPermissionTest_InvalidRequest() throws Exception {
     int accountId = 1;
-    String requestBody = "NOT_ADMIN";
 
     doThrow(new InvalidAccountTypeException("Invalid account type"))
         .when(accountService)
@@ -203,24 +207,45 @@ class AccountControllerTest {
     mockMvc
         .perform(
             MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
-                .content(requestBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
         .andExpect(status().isBadRequest());
 
-    verify(accountService, times(1)).updateAccountRole(accountId, requestBody);
+    verify(accountService, times(0)).updateAccountRole(any(), any());
+  }
+
+  @Test
+  public void updateAccountPermissionTest_InvalidAccountType() throws Exception {
+    int accountId = 1;
+    UpdateAccountTypeDto dto = new UpdateAccountTypeDto("NOT_ADMIN");
+
+    doThrow(new InvalidAccountTypeException("Invalid account type"))
+        .when(accountService)
+        .updateAccountRole(anyInt(), anyString());
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+        .andExpect(status().isBadRequest());
+
+    verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
   }
 
   @Test
   public void updateAccountPermissionTest_Success() throws Exception {
     int accountId = 1;
-    String requestBody = "ADMIN";
+    UpdateAccountTypeDto dto = new UpdateAccountTypeDto("ADMIN");
 
     mockMvc
         .perform(
             MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
-                .content(requestBody))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
         .andExpect(status().isNoContent());
 
-    verify(accountService, times(1)).updateAccountRole(accountId, requestBody);
+    verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
   }
 
   @Test
