@@ -1,5 +1,6 @@
 package com.sportganise.controllers.account;
 
+import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
@@ -79,10 +80,10 @@ public class AccountController {
    *
    * @param accountId ID of the account.
    * @param file The picture blob.
-   * @return The URL of the updated picture if successful,
+   * @return The status of the update.
    */
   @PutMapping("/{accountId}/picture")
-  public ResponseEntity<String> updateAccountPicture(
+  public ResponseEntity<ResponseDto<Void>> updateAccountPicture(
       @PathVariable Integer accountId, @RequestParam("file") MultipartFile file) {
     log.info("Received request to update account picture.");
 
@@ -90,10 +91,10 @@ public class AccountController {
       this.accountService.updateAccountPicture(accountId, file);
     } catch (AccountNotFoundException e) {
       log.warn("Request failed: " + e.getMessage());
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+      return ResponseDto.notFound(null, e.getMessage());
     } catch (IOException e) {
       log.warn("Request failed: " + e.getMessage());
-      return new ResponseEntity<>("Failed to upload file.", HttpStatus.INTERNAL_SERVER_ERROR);
+      return ResponseDto.internalServerError(null, "Failed to upload file.");
     }
 
     return ResponseEntity.noContent().build();
@@ -104,10 +105,10 @@ public class AccountController {
    *
    * @param accountId ID of the account.
    * @param body Contains the new role of the account.
-   * @return The URL of the updated picture if successful,
+   * @return The status of the update.
    */
   @PutMapping("/{accountId}/type")
-  public ResponseEntity<String> updateAccountType(
+  public ResponseEntity<ResponseDto<Void>> updateAccountType(
       @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountTypeDto body) {
     // TODO: only admin users should be authorized to this endpoint
     log.info("Received request to update account type.");
@@ -115,17 +116,17 @@ public class AccountController {
     String newType = body.getType();
     if (newType == null) {
       log.warn("Request failed: Missing 'type' to update account type.");
-      return new ResponseEntity<>("Missing 'type' to update account type.", HttpStatus.BAD_REQUEST);
+      return ResponseDto.badRequest(null, "Missing 'type' to update account type.");
     }
 
     try {
       this.accountService.updateAccountRole(accountId, newType);
     } catch (AccountNotFoundException e) {
       log.warn("Request failed: " + e.getMessage());
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+      return ResponseDto.notFound(null, e.getMessage());
     } catch (InvalidAccountTypeException e) {
       log.warn("Request failed: " + e.getMessage());
-      return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+      return ResponseDto.badRequest(null, e.getMessage());
     }
 
     return ResponseEntity.noContent().build();
