@@ -85,17 +85,14 @@ const directMessagingApi = {
     );
   },
   addChannelMembers: async (channelMembersDto: AddChannelMemberDto) => {
-    return await fetch(
-      `${baseMappingUrl}/channelmember/add-members`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(channelMembersDto),
+    return await fetch(`${baseMappingUrl}/channelmember/add-members`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-    );
-  }
+      body: JSON.stringify(channelMembersDto),
+    });
+  },
 };
 
 export default directMessagingApi;

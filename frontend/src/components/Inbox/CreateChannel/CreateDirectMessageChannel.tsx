@@ -1,16 +1,18 @@
 import { Button } from "@/components/ui/Button.tsx";
 import { ArrowLeft } from "lucide-react";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AddMembers from "../AddMembers.tsx";
-import {useState} from "react";
-import {AccountDetailsDirectMessaging} from "@/types/account.ts";
+import { useState } from "react";
+import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import useCreateChannel from "@/hooks/useCreateChannel.ts";
-import {CreateChannelDto} from "@/types/dmchannels.ts";
+import { CreateChannelDto } from "@/types/dmchannels.ts";
 
 export default function CreateDirectMessagingChannel() {
   const userId = 2; // TODO: Replace with actual user ID from cookies
   const navigate = useNavigate();
-  const [selectedUsers, setSelectedUsers] = useState<AccountDetailsDirectMessaging[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<
+    AccountDetailsDirectMessaging[]
+  >([]);
   const { createChannel } = useCreateChannel();
 
   const currentUser = {
@@ -18,7 +20,7 @@ export default function CreateDirectMessagingChannel() {
     firstName: "Walter",
     lastName: "White",
     pictureUrl:
-        "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+      "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
     type: "COACH",
     phone: "333-333-3333",
     selected: true,
@@ -93,12 +95,12 @@ export default function CreateDirectMessagingChannel() {
             Chat with other players and coaches!
           </h1>
           <AddMembers
-              selectedUsers={selectedUsers}
-              setSelectedUsers={setSelectedUsers}
-              submitButtonLabel={"Create Channel"}
-              createFunction={handleCreateChannel}
-              currentUserId={userId}
-              excludedMembers={null}
+            selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
+            submitButtonLabel={"Create Channel"}
+            createFunction={handleCreateChannel}
+            currentUserId={userId}
+            excludedMembers={null}
           />
         </div>
       </div>

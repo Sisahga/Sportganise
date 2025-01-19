@@ -1,6 +1,6 @@
 import React from "react";
 import WebSocketService from "@/services/WebSocketService.ts";
-import {AccountDetailsDirectMessaging} from "@/types/account.ts";
+import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 
 export interface Channel {
   channelId: number;
@@ -79,7 +79,9 @@ export interface AddChannelMemberDto {
 
 export interface AddMembersDialogProps {
   selectedUsers: AccountDetailsDirectMessaging[];
-  setSelectedUsers: React.Dispatch<React.SetStateAction<AccountDetailsDirectMessaging[]>>;
+  setSelectedUsers: React.Dispatch<
+    React.SetStateAction<AccountDetailsDirectMessaging[]>
+  >;
   submitButtonLabel: string;
   createFunction: () => void;
   currentUserId: number;

@@ -27,7 +27,7 @@ import log from "loglevel";
 import { SendMessageComponent } from "@/types/messaging.ts";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import AddMembers from "@/components/Inbox/AddMembers.tsx";
-import {AccountDetailsDirectMessaging} from "@/types/account.ts";
+import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 
 export function MembersSettingsDialog({
@@ -44,7 +44,9 @@ export function MembersSettingsDialog({
   const [selectedMember, setSelectedMember] = useState<ChannelMember | null>(
     null,
   );
-  const [selectedUsers, setSelectedUsers] = useState<AccountDetailsDirectMessaging[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<
+    AccountDetailsDirectMessaging[]
+  >([]);
   const { removeChannelMember } = useRemoveChannelMember();
   const { sendDirectMessage } = useSendMessage();
 
@@ -104,14 +106,16 @@ export function MembersSettingsDialog({
       channelId: channelId,
       memberIds: memberIds,
       adminId: currentUserId,
-    }
-    const response = await directMessagingApi.addChannelMembers(addChannelMembersDto);
+    };
+    const response =
+      await directMessagingApi.addChannelMembers(addChannelMembersDto);
     if (response?.status === 201) {
       log.info(`${memberIds.length} new members added to channel ${channelId}`);
       let newMemberNames = "";
       let counter = 0;
       selectedUsers.forEach((user) => {
-        newMemberNames += counter == selectedUsers.length - 1 && selectedUsers.length > 1
+        newMemberNames +=
+          counter == selectedUsers.length - 1 && selectedUsers.length > 1
             ? ` and ${user.firstName} ${user.lastName}`
             : `${user.firstName} ${user.lastName}${selectedUsers.length > 2 ? "," : ""}`;
         counter++;
@@ -130,22 +134,25 @@ export function MembersSettingsDialog({
       };
       sendDirectMessage(messagePayload, websocketRef);
 
-      setMembers([...members, ...selectedUsers.map((user) => {
-        return {
-          accountId: user.accountId,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          avatarUrl: undefined,
-          role: GroupChannelMemberRole.REGULAR,
-        }
-      })]);
+      setMembers([
+        ...members,
+        ...selectedUsers.map((user) => {
+          return {
+            accountId: user.accountId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            avatarUrl: undefined,
+            role: GroupChannelMemberRole.REGULAR,
+          };
+        }),
+      ]);
 
       setAddMembersIsOpen(false);
       onClose();
     } else {
       log.info(`Error adding members to channel ${channelId}`);
     }
-  }
+  };
 
   return (
     <>
@@ -198,7 +205,9 @@ export function MembersSettingsDialog({
           <Button
             className="mt-4 bg-secondaryColour text-primaryColour font-bold
             py-2 px-4 rounded hover:bg-textPlaceholderColour"
-            onClick={() => {setAddMembersIsOpen(true)}}
+            onClick={() => {
+              setAddMembersIsOpen(true);
+            }}
           >
             Add Members
             <UserPlus className="h-4 w-4 mr-2" />
@@ -207,22 +216,23 @@ export function MembersSettingsDialog({
       </Dialog>
 
       <Dialog open={addMembersIsOpen} onOpenChange={setAddMembersIsOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
-                       style={{ maxWidth: "95vw" }}>
+        <DialogContent
+          className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+          style={{ maxWidth: "95vw" }}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl text-primaryColour font-font font-bold">
               Select Members to Add
             </DialogTitle>
           </DialogHeader>
           <AddMembers
-              selectedUsers={selectedUsers}
-              setSelectedUsers={setSelectedUsers}
-              submitButtonLabel={"Confirm"}
-              createFunction={handleAddMembers}
-              currentUserId={currentUserId}
-              excludedMembers={members}
-          >
-          </AddMembers>
+            selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
+            submitButtonLabel={"Confirm"}
+            createFunction={handleAddMembers}
+            currentUserId={currentUserId}
+            excludedMembers={members}
+          ></AddMembers>
         </DialogContent>
       </Dialog>
 
