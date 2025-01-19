@@ -59,6 +59,9 @@ export interface MembersSettingsDialogProps {
   isOpen: boolean;
   onClose: () => void;
   channelMembers: ChannelMember[];
+  channelId: number;
+  websocketRef: WebSocketService | null;
+  currentUserId: number;
 }
 
 export interface LeaveGroupDialogProps {
