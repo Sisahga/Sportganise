@@ -1,5 +1,10 @@
-import {useEffect, useState} from "react";
-import {Dialog, DialogContent, DialogHeader, DialogTitle,} from "@/components/ui/dialog.tsx";
+import { useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog.tsx";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,12 +15,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
-import {Button} from "@/components/ui/Button.tsx";
-import {UserMinus, UserPlus} from "lucide-react";
-import {ChannelMember, GroupChannelMemberRole, MembersSettingsDialogProps,} from "@/types/dmchannels.ts";
+import { Button } from "@/components/ui/Button.tsx";
+import { UserMinus, UserPlus } from "lucide-react";
+import {
+  ChannelMember,
+  GroupChannelMemberRole,
+  MembersSettingsDialogProps,
+} from "@/types/dmchannels.ts";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
 import log from "loglevel";
-import {SendMessageComponent} from "@/types/messaging.ts";
+import { SendMessageComponent } from "@/types/messaging.ts";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 
 export function MembersSettingsDialog({
@@ -24,7 +33,7 @@ export function MembersSettingsDialog({
   channelMembers,
   channelId,
   websocketRef,
-  currentUserId
+  currentUserId,
 }: MembersSettingsDialogProps) {
   const [members, setMembers] = useState<ChannelMember[]>(channelMembers);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -49,14 +58,17 @@ export function MembersSettingsDialog({
         members.filter((m) => m.accountId !== selectedMember.accountId),
       );
       // Call API to remove member from group
-      const response = await removeChannelMember(channelId, selectedMember.accountId);
+      const response = await removeChannelMember(
+        channelId,
+        selectedMember.accountId,
+      );
       if (response?.status === 200) {
-        log.info(`Member ${selectedMember.accountId} removed from channel ${channelId}`);
-        const leaveMessageRemoverViewContent
-            = `You removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
+        log.info(
+          `Member ${selectedMember.accountId} removed from channel ${channelId}`,
+        );
+        const leaveMessageRemoverViewContent = `You removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
         // TODO: Replace with actual first name from cookies
-        const leaveMessageContent
-            = `Walter removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
+        const leaveMessageContent = `Walter removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
         const messagePayload: SendMessageComponent = {
           senderId: currentUserId, // TODO: Replace with actual sender ID from cookies
           channelId: channelId,
@@ -66,14 +78,17 @@ export function MembersSettingsDialog({
           type: "LEAVE",
           senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
           // TODO: Replace with actual avatar url from cookies
-          avatarUrl: "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+          avatarUrl:
+            "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
         };
         sendDirectMessage(messagePayload, websocketRef);
         setAlertDialogOpen(false);
         setSelectedMember(null);
         onClose();
       } else {
-        log.info(`Error removing member ${selectedMember.accountId} from channel ${channelId}`);
+        log.info(
+          `Error removing member ${selectedMember.accountId} from channel ${channelId}`,
+        );
       }
     }
   };
@@ -97,7 +112,9 @@ export function MembersSettingsDialog({
                 className="flex items-center justify-between py-2 font-font text-primaryColour gap-4"
               >
                 <div className="flex w-full justify-between items-center">
-                  <span>{member.firstName} {member.lastName}</span>
+                  <span>
+                    {member.firstName} {member.lastName}
+                  </span>
                   <span className="font-light text-sm faded-primary-colour italic">
                     {member.role == GroupChannelMemberRole.ADMIN && "ADMIN"}
                   </span>

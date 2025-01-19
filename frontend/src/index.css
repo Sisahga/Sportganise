@@ -60,7 +60,7 @@
   background-color: var(--primary-white) !important;
 }
 .bg-primary-red {
-    background-color: var(--primary-red) !important;
+  background-color: var(--primary-red) !important;
 }
 
 .force-hide {
@@ -68,7 +68,7 @@
 }
 .mx-force-none {
   margin-left: 0 !important;
-    margin-right: 0 !important;
+  margin-right: 0 !important;
 }
 a {
   font-weight: 500;

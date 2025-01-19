@@ -34,7 +34,10 @@ const ChatScreen = () => {
   const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
 
   // Hooks
-  const { messages, setMessages, loading, error } = useChatMessages(channelId, read);
+  const { messages, setMessages, loading, error } = useChatMessages(
+    channelId,
+    read,
+  );
   const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {

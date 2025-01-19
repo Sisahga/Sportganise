@@ -105,27 +105,30 @@ public class DirectMessageChannelMemberController {
       this.directMessageChannelMemberService.removeMemberFromChannel(channelId, accountId);
       log.info("Successfully deleted channel member by channel id: {}", channelId);
       ResponseDto<Null> response =
-              new ResponseDto<>(HttpStatus.OK.value(), "Channel member deleted successfully", null);
+          new ResponseDto<>(HttpStatus.OK.value(), "Channel member deleted successfully", null);
       return new ResponseEntity<>(response, HttpStatus.OK);
     } catch (EntityNotFoundException e) {
-      log.error("Failed to remove member: {} from channel: {}. Entity not found: {}",
-              accountId, channelId, e.getMessage());
+      log.error(
+          "Failed to remove member: {} from channel: {}. Entity not found: {}",
+          accountId,
+          channelId,
+          e.getMessage());
 
-      ResponseDto<Null> response = new ResponseDto<>(
-              HttpStatus.NOT_FOUND.value(),
-              e.getMessage(),
-              null
-      );
+      ResponseDto<Null> response =
+          new ResponseDto<>(HttpStatus.NOT_FOUND.value(), e.getMessage(), null);
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     } catch (Exception e) {
-      log.error("Unexpected error removing member: {} from channel: {}: {}",
-              accountId, channelId, e.getMessage());
+      log.error(
+          "Unexpected error removing member: {} from channel: {}: {}",
+          accountId,
+          channelId,
+          e.getMessage());
 
-      ResponseDto<Null> response = new ResponseDto<>(
+      ResponseDto<Null> response =
+          new ResponseDto<>(
               HttpStatus.INTERNAL_SERVER_ERROR.value(),
               "An unexpected error occurred while removing the channel member",
-              null
-      );
+              null);
       return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

@@ -76,7 +76,8 @@ public class DirectMessageService {
       // Case where member that sent the message isn't in the channel anymore.
       if (!memberDetails.containsKey(message.getSenderId())) {
         log.info("Sender no longer in message channel.");
-        messageDto = DirectMessageDto.builder()
+        messageDto =
+            DirectMessageDto.builder()
                 .messageId(message.getMessageId())
                 .senderId(message.getSenderId())
                 .senderFirstName("Removed User")

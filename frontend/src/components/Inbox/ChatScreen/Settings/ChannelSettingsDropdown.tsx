@@ -41,14 +41,14 @@ import { RenameGroupDialog } from "@/components/GroupChatSettingContent/RenameGr
 import { ChangePictureDialog } from "@/components/GroupChatSettingContent/ChangeGroupPicture.tsx";
 import { LeaveGroupDialog } from "@/components/GroupChatSettingContent/LeaveGroup.tsx";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const ChannelSettingsDropdown = ({
   channelType,
   channelId,
   webSocketRef,
   isBlocked,
-  currentUserId
+  currentUserId,
 }: ChannelSettingsDropdownProps) => {
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
