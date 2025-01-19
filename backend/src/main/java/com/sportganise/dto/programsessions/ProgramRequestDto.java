@@ -21,7 +21,6 @@ public class ProgramRequestDto {
   private String visibility;
   private String description;
   private Integer capacity;
-  private Boolean notify;
   private String startTime;
   private String endTime;
   private String location;
