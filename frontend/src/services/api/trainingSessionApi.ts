@@ -18,8 +18,8 @@ const trainingSessionApi = {
     );
     console.log("In trainingSessionApi.createTrainingSession");
     log.info("------ In trainingSessionApi.createTrainingSession");
-    console.log("response:", response);
-    log.info("response:", response);
+    console.log("response in trainingSessionApi:", response);
+    log.info("response in trainingSessionApi:", response);
 
     if (!response.ok) {
       const errorText = await response.text(); //read response as text
@@ -27,7 +27,7 @@ const trainingSessionApi = {
       log.error(`Error: ${response.status}`, errorText);
       throw new Error(`HTTP error ${response.status}: ${errorText}`);
     }
-    log.info(response.json());
+    log.info(response);
     log.info("------- END OF 'trainingSessionApi.createTrainingSession'");
     return response.json();
   },
