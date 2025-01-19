@@ -13,18 +13,26 @@ import {
 import {Button} from "@/components/ui/Button.tsx";
 import {UserMinus, UserPlus} from "lucide-react";
 import {ChannelMember, GroupChannelMemberRole, MembersSettingsDialogProps,} from "@/types/dmchannels.ts";
+import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
+import log from "loglevel";
+import {SendMessageComponent} from "@/types/messaging.ts";
+import useSendMessage from "@/hooks/useSendMessage.ts";
 
 export function MembersSettingsDialog({
   isOpen,
   onClose,
   channelMembers,
+  channelId,
+  websocketRef,
+  currentUserId
 }: MembersSettingsDialogProps) {
   const [members, setMembers] = useState<ChannelMember[]>(channelMembers);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<ChannelMember | null>(
     null,
   );
-  console.log("Members from member settings dialog: ", members);
+  const { removeChannelMember } = useRemoveChannelMember();
+  const { sendDirectMessage } = useSendMessage();
 
   useEffect(() => {
     setMembers(channelMembers);
@@ -35,15 +43,38 @@ export function MembersSettingsDialog({
     setAlertDialogOpen(true);
   };
 
-  const handleRemoveConfirm = () => {
+  const handleRemoveConfirm = async () => {
     if (selectedMember) {
       setMembers(
         members.filter((m) => m.accountId !== selectedMember.accountId),
       );
       // Call API to remove member from group
-
-      setAlertDialogOpen(false);
-      setSelectedMember(null);
+      const response = await removeChannelMember(channelId, selectedMember.accountId);
+      if (response?.status === 200) {
+        log.info(`Member ${selectedMember.accountId} removed from channel ${channelId}`);
+        const leaveMessageRemoverViewContent
+            = `You removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
+        // TODO: Replace with actual first name from cookies
+        const leaveMessageContent
+            = `Walter removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
+        const messagePayload: SendMessageComponent = {
+          senderId: currentUserId, // TODO: Replace with actual sender ID from cookies
+          channelId: channelId,
+          messageContent: `LEAVE*${currentUserId}*${leaveMessageRemoverViewContent}*${leaveMessageContent}`,
+          attachments: [],
+          sentAt: new Date().toISOString(),
+          type: "LEAVE",
+          senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+          // TODO: Replace with actual avatar url from cookies
+          avatarUrl: "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+        };
+        sendDirectMessage(messagePayload, websocketRef);
+        setAlertDialogOpen(false);
+        setSelectedMember(null);
+        onClose();
+      } else {
+        log.info(`Error removing member ${selectedMember.accountId} from channel ${channelId}`);
+      }
     }
   };
 
@@ -71,17 +102,24 @@ export function MembersSettingsDialog({
                     {member.role == GroupChannelMemberRole.ADMIN && "ADMIN"}
                   </span>
                 </div>
-                <div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRemove(member)}
-                  >
-                    <UserMinus className="h-4 w-4" />
-                    <span className="sr-only">
-                      Remove {member.firstName} {member.lastName}
+                <div className="flex items-center">
+                  {/* Do not show remove option if member is current user */}
+                  {member.accountId !== currentUserId ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemove(member)}
+                    >
+                      <UserMinus className="h-4 w-4" />
+                      <span className="sr-only">
+                        Remove {member.firstName} {member.lastName}
+                      </span>
+                    </Button>
+                  ) : (
+                    <span className="text-sm primary-colour font-light italic">
+                      (You)
                     </span>
-                  </Button>
+                  )}
                 </div>
               </div>
             ))}
