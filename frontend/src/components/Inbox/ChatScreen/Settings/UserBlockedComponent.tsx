@@ -15,10 +15,10 @@ import {
 } from "@/types/messaging.ts";
 import { LockIcon as UserUnlock } from "lucide-react";
 import { useState } from "react";
-import useUnblockUser from "@/hooks/useUnblockUser.tsx";
+import useUnblockUser from "@/hooks/useUnblockUser.ts";
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
-import useChannelMembers from "@/hooks/useChannelMembers.tsx";
-import useSendMessage from "@/hooks/useSendMessage.tsx";
+import useChannelMembers from "@/hooks/useChannelMembers.ts";
+import useSendMessage from "@/hooks/useSendMessage.ts";
 
 const UserBlockedComponent = ({
   showBlockedMessage,
