@@ -14,7 +14,7 @@ const trainingSessionApi = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(jsonPayload),
-      }
+      },
     );
     console.log("In trainingSessionApi.createTrainingSession");
     log.info("------ In trainingSessionApi.createTrainingSession");
