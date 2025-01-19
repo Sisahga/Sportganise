@@ -39,6 +39,7 @@ export interface ChannelSettingsDropdownProps {
   channelType: string;
   webSocketRef: WebSocketService | null;
   isBlocked: boolean | false;
+  currentUserId: number;
 }
 
 export enum GroupChannelMemberRole {
@@ -58,6 +59,9 @@ export interface MembersSettingsDialogProps {
   isOpen: boolean;
   onClose: () => void;
   channelMembers: ChannelMember[];
+  channelId: number;
+  websocketRef: WebSocketService | null;
+  currentUserId: number;
 }
 
 export interface LeaveGroupDialogProps {

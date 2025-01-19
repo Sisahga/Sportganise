@@ -75,6 +75,14 @@ const directMessagingApi = {
     const data: ResponseDto<LastMessageComponent> = await response.json();
     return data;
   },
+  removeChannelMember: async (channelId: number, accountId: number) => {
+    return await fetch(
+      `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
+      {
+        method: "DELETE",
+      },
+    );
+  },
 };
 
 export default directMessagingApi;

@@ -97,7 +97,7 @@ INSERT INTO channel (name, type, image_blob, channel_hash) VALUES
 INSERT INTO channel_member (channel_id, account_id, read, role) VALUES
 (1, 2, false, 'ADMIN'),
 (1, 3, false, 'REGULAR'),
-(1, 4, true, 'REGULAR'),
+(1, 4, true, 'ADMIN'),
 (2,1, true, 'ADMIN'),
 (2,2, false, 'REGULAR'),
 (2, 4, true, 'REGULAR'),

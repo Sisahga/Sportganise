@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, FolderOpen } from "lucide-react";
-import useChatMessages from "../../../hooks/useChatMessages.tsx";
+import useChatMessages from "../../../hooks/useChatMessages.ts";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService.ts";
@@ -10,7 +10,7 @@ import { SendMessageComponent } from "@/types/messaging.ts";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
-import useSendMessage from "@/hooks/useSendMessage.tsx";
+import useSendMessage from "@/hooks/useSendMessage.ts";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent.tsx";
 
 const ChatScreen = () => {
@@ -25,16 +25,19 @@ const ChatScreen = () => {
   const read = state?.read || false;
   const channelType = state?.channelType || null;
   const isBlocked = state?.isBlocked || false;
-  console.log("Blocked status from chat screen: ", isBlocked);
+  const currentUserId = 2; // TODO: Replace with actual user ID from cookies
 
+  // States
   const [connected, setConnected] = useState(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
+
+  // Hooks
   const { messages, setMessages, loading, error } = useChatMessages(
     channelId,
     read,
   );
-  const [newMessage, setNewMessage] = useState("");
-  const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
   const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {
@@ -57,7 +60,7 @@ const ChatScreen = () => {
 
     // Send the new message to the server
     const messagePayload: SendMessageComponent = {
-      senderId: 2, // TODO: Replace with actual sender ID from cookies
+      senderId: currentUserId, // TODO: Replace with actual sender ID from cookies
       channelId: channelId,
       messageContent: newMessage,
       attachments: [],
@@ -151,6 +154,7 @@ const ChatScreen = () => {
           channelId={channelId}
           webSocketRef={webSocketServiceRef.current}
           isBlocked={channelIsBlocked}
+          currentUserId={currentUserId}
         />
       </header>
 
@@ -165,7 +169,7 @@ const ChatScreen = () => {
       </div>
 
       {/* Chat Messages */}
-      <ChatMessages messages={messages} />
+      <ChatMessages messages={messages} currentUserId={currentUserId} />
 
       <UserBlockedComponent
         showBlockedMessage={channelIsBlocked}

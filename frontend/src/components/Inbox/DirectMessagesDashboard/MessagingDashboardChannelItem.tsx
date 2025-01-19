@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
-import useLastMessage from "@/hooks/useLastMessage.tsx";
+import useLastMessage from "@/hooks/useLastMessage.ts";
 
 const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   channel,

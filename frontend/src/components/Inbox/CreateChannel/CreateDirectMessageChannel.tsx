@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/avatar.tsx";
 import { Search, ArrowLeft, Check } from "lucide-react";
 import { useState } from "react";
-import useAccountDetailsDirectMessaging from "@/hooks/useAccountDetailsDirectMessaging.tsx";
+import useAccountDetailsDirectMessaging from "@/hooks/useAccountDetailsDirectMessaging.ts";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import { useNavigate } from "react-router-dom";
-import useCreateChannel from "@/hooks/useCreateChannel.tsx";
+import useCreateChannel from "@/hooks/useCreateChannel.ts";
 import { CreateChannelDto } from "@/types/dmchannels.ts";
 
 export default function CreateDirectMessagingChannel() {

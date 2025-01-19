@@ -30,25 +30,26 @@ import {
   ChannelSettingsDropdownProps,
   GroupChannelMemberRole,
 } from "@/types/dmchannels.ts";
-import useBlockUser from "@/hooks/useBlockUser.tsx";
+import useBlockUser from "@/hooks/useBlockUser.ts";
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
-import useChannelMembers from "@/hooks/useChannelMembers.tsx";
-import useSendMessage from "@/hooks/useSendMessage.tsx";
+import useChannelMembers from "@/hooks/useChannelMembers.ts";
+import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
 import log from "loglevel";
 import { MembersSettingsDialog } from "@/components/Inbox/ChatScreen/Settings/MembersSettings.tsx";
 import { RenameGroupDialog } from "@/components/GroupChatSettingContent/RenameGroupChat.tsx";
 import { ChangePictureDialog } from "@/components/GroupChatSettingContent/ChangeGroupPicture.tsx";
 import { LeaveGroupDialog } from "@/components/GroupChatSettingContent/LeaveGroup.tsx";
+import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
+import { useNavigate } from "react-router-dom";
 
 const ChannelSettingsDropdown = ({
   channelType,
   channelId,
   webSocketRef,
   isBlocked,
+  currentUserId,
 }: ChannelSettingsDropdownProps) => {
-  const currentUserId = 2; // TODO: Replace with actual user ID from cookies
-
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
   const [userBlocked, setUserBlocked] = useState(isBlocked);
@@ -63,9 +64,10 @@ const ChannelSettingsDropdown = ({
   // Hooks.
   const { members } = useChannelMembers(channelId, currentUserId, channelType);
   const { blockUser } = useBlockUser();
+  const { removeChannelMember } = useRemoveChannelMember();
   const { sendDirectMessage } = useSendMessage();
 
-  console.log("Blocked status in dropdown settings: ", isBlocked);
+  const navigate = useNavigate();
 
   // Blocks user in simple channel.
   const handleBlock = async () => {
@@ -114,9 +116,30 @@ const ChannelSettingsDropdown = ({
     setIsDeleteOpen(false);
   };
 
-  const handleLeaveGroup = () => {
-    console.log("Leaving group...");
-    setIsLeaveGroupOpen(false);
+  const handleLeaveGroup = async () => {
+    const response = await removeChannelMember(channelId, currentUserId);
+    if (response?.status === 200) {
+      log.info(`User ${currentUserId} left group ${channelId}`);
+      const leaveMessageRemoverViewContent = "You left the group.";
+      const leaveMessageContent = `Walter left the group.`; // TODO: Replace with actual first name from cookies.
+      const messagePayload: SendMessageComponent = {
+        senderId: currentUserId,
+        channelId: channelId,
+        messageContent: `LEAVE*${currentUserId}*${leaveMessageRemoverViewContent}*${leaveMessageContent}`,
+        attachments: [],
+        sentAt: new Date().toISOString(),
+        type: "LEAVE",
+        senderFirstName: "Walter", // TODO: Replace with actual first name from cookies.
+        // TODO: Replace with actual avatar url from cookies.
+        avatarUrl:
+          "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+      };
+      sendDirectMessage(messagePayload, webSocketRef);
+      setIsLeaveGroupOpen(false);
+      navigate("/pages/DirectMessagesDashboard");
+    } else {
+      log.error(`Error leaving group ${channelId}`);
+    }
   };
 
   useEffect(() => {
@@ -194,17 +217,17 @@ const ChannelSettingsDropdown = ({
                   </DropdownMenuItem>
                 </>
               )}
-              {/* GROUP Settings for REGULAR Members */}
-              {currentMemberRole === GroupChannelMemberRole.REGULAR && (
-                <DropdownMenuItem
-                  className="flex items-center justify-between py-3 font-font text-primaryColour
-                      bg-white hover:bg-secondaryColour/20 primary-red"
-                  onSelect={() => setIsLeaveGroupOpen(true)}
-                >
-                  <span>Leave Group</span>
-                  <LogOutIcon className="h-4 w-4 ml-2" />
-                </DropdownMenuItem>
+              {currentMemberRole == GroupChannelMemberRole.ADMIN && (
+                <DropdownMenuSeparator className="bg-primaryColour/20" />
               )}
+              <DropdownMenuItem
+                className="flex items-center justify-between py-3 font-font text-primaryColour
+                    bg-white hover:bg-secondaryColour/20 primary-red"
+                onSelect={() => setIsLeaveGroupOpen(true)}
+              >
+                <span>Leave Group</span>
+                <LogOutIcon className="h-4 w-4 ml-2" />
+              </DropdownMenuItem>
             </>
           )}
         </DropdownMenuContent>
@@ -215,6 +238,9 @@ const ChannelSettingsDropdown = ({
         isOpen={isMembersSettingsOpen}
         onClose={() => setIsMembersSettingsOpen(false)}
         channelMembers={members}
+        channelId={channelId}
+        websocketRef={webSocketRef}
+        currentUserId={currentUserId}
       />
       <RenameGroupDialog
         isOpen={isRenameGroupOpen}
