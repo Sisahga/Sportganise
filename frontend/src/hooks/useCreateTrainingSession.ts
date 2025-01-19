@@ -18,6 +18,7 @@ function useCreateTrainingSession() {
         accountId,
         jsonPayload,
       );
+      console.log("DATA IN USECREATE:", data);
       if (data.statusCode === 201) {
         console.log("Response data: ", data.message, data);
         log.info("Response data: ", data.message, data);
