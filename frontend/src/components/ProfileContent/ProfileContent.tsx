@@ -1,59 +1,71 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- TODO: fix a11y issues*/
-import React from "react";
+/**TODO: Remove hardcoded accounID, needs to be fetched */
 import { Button } from "@/components/ui/Button";
 import {
   MoveLeft,
   ChevronRight,
-  SquarePen,
   CircleUserRound,
   Settings,
   KeyRound,
   UserX,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import usePersonalInformation from "@/hooks/usePersonalInfromation";
 
 const ProfileContent: React.FC = () => {
   const navigate = useNavigate();
+  const accountId = 1; 
+
+  // Use the custom hook to fetch account data
+  const { data, loading, error } = usePersonalInformation(accountId);
+
+  // Log the fetched data for debugging purposes
+  // useEffect(() => {
+  //   if (data) {
+  //     console.log("Fetched Profile Information:", data);
+  //   }
+  // }, [data]);
+
+  if (loading) {
+    return <div>Loading...</div>; 
+  }
+
+  if (error) {
+    return <div className="text-red">{error}</div>; 
+  }
+
   return (
-    <div className="bg-primaryColourz-40">
-      <div className="px-4 bg-white pb-16 md-10">
-        <div className="py-1 min-h-screen">
+   
+        <div className="min-h-screen">
           <Button
-            className="rounded-full"
+            className="rounded-full w-2"
             variant="outline"
-            onClick={() => navigate("/")}
+            onClick={() => navigate(-1)}
           >
             <MoveLeft />
           </Button>
           <div className="flex flex-col items-center justify-center my-4">
-            <h1>Profile</h1>
+          <h1 className="text-5xl font-light">Profile</h1>
 
             {/* Profile image */}
             <img
-              className="h-48 w-48 rounded-full border-2 border-white dark:border-gray-800 mx-auto my-2"
-              src="https://via.placeholder.com/150"
+              className="h-48 w-48 rounded-full border-2 border-gray dark:border-gray-800 mx-auto my-2"
+              src={data?.pictureUrl || "https://via.placeholder.com/150"} // Use fetched picture or fallback
               alt="Profile"
             />
 
-            <p className="text-3xl font-medium">Jane Doe</p>
-            <p className="text-lg font-semibold">Player</p>
+            <p className="text-3xl font-medium">{data?.firstName} {data?.lastName}</p>
+            <p className="text-lg font-semibold">
+              {data?.type ? data?.type.charAt(0).toUpperCase() + data?.type.slice(1) : ""}
+            </p>
 
-            {/* Edit Profile Button */}
-            <Button
-              className="mt-4 px-6 py-2 bg-secondaryColour rounded-full"
-              variant="default"
-              onClick={() => navigate("/pages/EditProfilePage")}
-            >
-              {" "}
-              <SquarePen />
-              Edit Profile
-            </Button>
           </div>
 
-          <div className="space-y-8 max-w-3xl mx-auto pt-10 border-none shadow-none">
+          <div className="flex flex-col mt-4">
             {/* Personal Information */}
-            <div
-              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full border-2 border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
+            <Button
+              className="w-full  px-4 py-3  mb-4 text-left flex justify-between items-center rounded-full"
+              variant="outline"
               onClick={() => navigate("/pages/PersonalInformationPage")}
             >
               <span className="flex">
@@ -61,12 +73,13 @@ const ProfileContent: React.FC = () => {
                 Personal Information
               </span>
               <ChevronRight />
-            </div>
+            </Button>
 
             {/* Settings */}
-            <div
-              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full mb-2 border-2 border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
-              onClick={() => navigate("/settings")}
+            <Button
+              className="w-full  px-4 py-3  mb-4 text-left flex justify-between items-center rounded-full"
+              variant="outline"
+              onClick={() => navigate("/pages/ChangePasswordPage")}
             >
               <span className="flex">
                 <Settings className="mr-2" />
@@ -74,11 +87,12 @@ const ProfileContent: React.FC = () => {
               </span>
 
               <ChevronRight />
-            </div>
+            </Button>
 
             {/* Change Password*/}
-            <div
-              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
+            <Button
+              className="w-full  px-4 py-3  mb-4 text-left flex justify-between items-center rounded-full"
+              variant="outline"
               onClick={() => navigate("/pages/ChangePasswordPage")}
             >
               <span className="flex">
@@ -86,10 +100,12 @@ const ProfileContent: React.FC = () => {
                 Change Password
               </span>
               <ChevronRight />
-            </div>
+            </Button>
+
             {/* Blocked Users*/}
-            <div
-              className="w-full px-4 py-3 text-left flex justify-between items-center rounded-full border-2 border-textPlaceholderColour cursor-pointer hover:bg-textPlaceholderColour/50"
+            <Button
+              className="w-full  px-4 py-3  mb-4 text-left flex justify-between items-center rounded-full"
+              variant="outline"
               onClick={() => navigate("/pages/BlockedUserListPage")}
             >
               <span className="flex">
@@ -97,11 +113,11 @@ const ProfileContent: React.FC = () => {
                 Blocked Users
               </span>
               <ChevronRight />
-            </div>
+            </Button>
+          
           </div>
         </div>
-      </div>
-    </div>
+    
   );
 };
 
