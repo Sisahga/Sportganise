@@ -39,6 +39,7 @@ export interface ChannelSettingsDropdownProps {
   channelType: string;
   webSocketRef: WebSocketService | null;
   isBlocked: boolean | false;
+  currentUserId: number;
 }
 
 export enum GroupChannelMemberRole {
