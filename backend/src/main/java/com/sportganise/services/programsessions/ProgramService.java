@@ -200,7 +200,6 @@ public class ProgramService {
    *     all members.
    * @param description Description of the program.
    * @param capacity Participants capacity.
-   * @param notify Boolean for whether or not to notify all participants.
    * @param startTime Start time of each occurrence of the program.
    * @param endTime End time of each occurrence of the program.
    * @param location Location of the program/session.
@@ -216,7 +215,6 @@ public class ProgramService {
       String visibility,
       String description,
       Integer capacity,
-      Boolean notify,
       String startTime,
       String endTime,
       String location,
@@ -275,8 +273,6 @@ public class ProgramService {
       programAttachmentRepository.saveAll(programAttachments);
     }
 
-    notifyAllMembers(newProgram);
-
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
 
@@ -294,7 +290,6 @@ public class ProgramService {
    *     all members.
    * @param description Description of the program.
    * @param capacity Capacity of the program.
-   * @param notify Boolean for whether or not to notify all participants/members.
    * @param startTime Start time of each occurrence of the program.
    * @param endTime End time of each occurrence of the program.
    * @param location Location of the program/session.
@@ -311,7 +306,6 @@ public class ProgramService {
       String visibility,
       String description,
       Integer capacity,
-      Boolean notify,
       String startTime,
       String endTime,
       String location,
@@ -411,17 +405,6 @@ public class ProgramService {
       }
     }
 
-    notifyAllMembers(updatedProgram);
-
     return new ProgramDto(updatedProgram, programAttachmentDtos);
-  }
-
-  /** Method to notify all the members of a newly create/posted program. */
-  private void notifyAllMembers(Program programToBeNotifiedAbout) {
-    List<Account> accounts = accountRepository.findAll();
-    for (Account account : accounts) {
-      // TODO: Implement logic to notify all members when new program is
-      // created/posted.
-    }
   }
 }
