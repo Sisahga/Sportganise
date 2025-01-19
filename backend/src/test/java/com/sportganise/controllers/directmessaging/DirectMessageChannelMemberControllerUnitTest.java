@@ -110,7 +110,7 @@ class DirectMessageChannelMemberControllerUnitTest {
     mockMvc
         .perform(
             MockMvcRequestBuilders.delete(
-                "/api/messaging/channelmember/" + channelId + "/" + accountId))
+                "/api/messaging/channelmember/remove/" + channelId + "/" + accountId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.statusCode", is(200)))
         .andExpect(jsonPath("$.message", is("Channel member deleted successfully")))
