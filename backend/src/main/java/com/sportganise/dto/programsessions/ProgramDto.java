@@ -15,12 +15,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProgramDto {
   private Integer programId;
-  private String programType; // Could be an event of some sort, tournament or training sessions
+  private String programType;
   private String title;
   private String description;
   private Integer capacity;
   private ZonedDateTime occurrenceDate;
-  private Integer durationMins; // Duration of the program in terms of minutes
+  private Integer durationMins;
   private boolean isRecurring;
   private ZonedDateTime expiryDate;
   private String frequency;

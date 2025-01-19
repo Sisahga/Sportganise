@@ -44,31 +44,22 @@ public class ProgramServiceTest {
 
   @InjectMocks private ProgramService programService;
 
-  // Test for getParticipants() method
   @Test
   public void testGetParticipants() {
-    // Mock a Program object with the below attributes
     ProgramParticipant participant1 =
         new ProgramParticipant(
-            new ProgramParticipantId(1, 101),
-            null, // rank is not provided, so set it to null or provide an appropriate value if
-            // needed
-            "Player",
-            true,
-            ZonedDateTime.now());
+            new ProgramParticipantId(1, 101), null, "Player", true, ZonedDateTime.now());
 
     ProgramParticipant participant2 =
         new ProgramParticipant(
             new ProgramParticipantId(2, 102),
-            null, // rank is not provided, so set it to null or provide an appropriate value if
-            // needed
+            null,
             "Coach",
             false,
             ZonedDateTime.now().minusDays(1));
 
     List<ProgramParticipant> mockParticipants = List.of(participant1, participant2);
 
-    // Mock account objects with the below attributes
     Account account1 =
         Account.builder()
             .accountId(101)
@@ -105,31 +96,22 @@ public class ProgramServiceTest {
             .phone("222-222-2222")
             .build();
 
-    // Mock the repository and service behavior with mockParticipants, account1 and
-    // account2
     Mockito.when(programRepository.findParticipantsByProgramId(1)).thenReturn(mockParticipants);
     Mockito.when(accountService.getAccount(101)).thenReturn(Optional.of(account1));
     Mockito.when(accountService.getAccount(102)).thenReturn(Optional.of(account2));
 
-    // Call the getParticipants method with programId = 1 to retrieve the list of
-    // participantDtos
     List<ProgramParticipantDto> participantDtos = programService.getParticipants(1);
 
-    // Verify that participantDtos is not empty/null
     assertNotNull(participantDtos);
 
-    // Verify that there are correctly 2 participants in participantDtos
     assertEquals(2, participantDtos.size());
 
-    // Verify that participant1 is correctly retrieved along with its attributes
     ProgramParticipantDto participantDto1 = participantDtos.get(0);
     assertEquals(1, participantDto1.getProgramId());
     assertEquals(101, participantDto1.getAccountId());
     assertTrue(participantDto1.isConfirmed());
     assertEquals(participant1.getConfirmedDate(), participantDto1.getConfirmedDate());
 
-    // Verify that participant2 is correctly retrieved along with the correct
-    // attributes
     ProgramParticipantDto participantDto2 = participantDtos.get(1);
     assertEquals(1, participantDto2.getProgramId());
     assertEquals(102, participantDto2.getAccountId());
@@ -137,10 +119,8 @@ public class ProgramServiceTest {
     assertEquals(participant2.getConfirmedDate(), participantDto2.getConfirmedDate());
   }
 
-  // Test for getProgramDetails() method
   @Test
   public void testGetProgramDetails() {
-    // Mock a Program object with the below attributes
     Program mockProgram =
         Program.builder()
             .programId(1)
@@ -161,10 +141,8 @@ public class ProgramServiceTest {
             .visibility("public")
             .build();
 
-    // Mock the repository behavior of findProgramById with mockProgram
     Mockito.when(programRepository.findProgramById(1)).thenReturn(mockProgram);
 
-    // Mock attachments
     List<ProgramAttachment> mockAttachments =
         List.of(
             new ProgramAttachment(1, "attachment1.url"),
@@ -172,14 +150,10 @@ public class ProgramServiceTest {
     Mockito.when(programAttachmentRepository.findAttachmentsByProgramId(1))
         .thenReturn(mockAttachments);
 
-    // Call the getProgramDetails method
     ProgramDto programDto = programService.getProgramDetails(1);
 
-    // Verify that the returned ProgramDto is not empty/null
     assertNotNull(programDto);
 
-    // Verify that we have retrieved the correct programDto along with the correct
-    // details/attributes
     assertEquals(1, programDto.getProgramId());
     assertEquals("Training", programDto.getProgramType());
     assertEquals("Training Program", programDto.getTitle());
@@ -202,7 +176,6 @@ public class ProgramServiceTest {
 
   @Test
   void testGetProgramAttachments() {
-    // Setup: Mock the program attachments
     Integer programId = 1;
 
     ProgramAttachment attachment1 = new ProgramAttachment();
@@ -213,27 +186,21 @@ public class ProgramServiceTest {
     attachment2.setProgramId(programId);
     attachment2.setAttachmentUrl("/file2.pdf");
 
-    // Mock the repository call
     when(programAttachmentRepository.findAttachmentsByProgramId(programId))
         .thenReturn(Arrays.asList(attachment1, attachment2));
 
-    // Call the method to test
     List<ProgramAttachmentDto> result = programService.getProgramAttachments(programId);
 
-    // Verify the results
-    assertNotNull(result); // Ensure the result is not null
-    assertEquals(2, result.size()); // Ensure we have two attachments
-    assertEquals("/file1.pdf", result.get(0).getAttachmentUrl()); // First attachment URL
-    assertEquals("/file2.pdf", result.get(1).getAttachmentUrl()); // Second attachment URL
-    assertEquals(
-        programId, result.get(0).getProgramId()); // Check Program ID for the first attachment
-    assertEquals(
-        programId, result.get(1).getProgramId()); // Check Program ID for the second attachment
+    assertNotNull(result);
+    assertEquals(2, result.size());
+    assertEquals("/file1.pdf", result.get(0).getAttachmentUrl());
+    assertEquals("/file2.pdf", result.get(1).getAttachmentUrl());
+    assertEquals(programId, result.get(0).getProgramId());
+    assertEquals(programId, result.get(1).getProgramId());
   }
 
   @Test
   void testGetPrograms() {
-    // Mock a list of 2 Program objects
     List<Program> mockPrograms =
         List.of(
             Program.builder()
@@ -273,10 +240,8 @@ public class ProgramServiceTest {
                 .visibility("private")
                 .build());
 
-    // Mock the repository behavior of findPrograms with mockProgram
     Mockito.when(programRepository.findPrograms()).thenReturn(mockPrograms);
 
-    // Mock attachments
     List<ProgramAttachment> mockAttachments1 =
         List.of(
             new ProgramAttachment(1, "attachment1.url"),
@@ -284,18 +249,14 @@ public class ProgramServiceTest {
     Mockito.when(programAttachmentRepository.findAttachmentsByProgramId(1))
         .thenReturn(mockAttachments1);
 
-    // Mock attachments
     List<ProgramAttachment> mockAttachments2 = List.of(new ProgramAttachment(1, "attachment3.url"));
     Mockito.when(programAttachmentRepository.findAttachmentsByProgramId(2))
         .thenReturn(mockAttachments2);
 
-    // Call getPrograms to retrieve a list of programDtos
     List<ProgramDto> programDtos = programService.getPrograms();
 
-    // Verify that the returned ProgramDto is not empty/null
     assertNotNull(programDtos);
 
-    // Verify details of the first program
     ProgramDto programDto1 = programDtos.get(0);
     assertEquals(1, programDto1.getProgramId());
     assertEquals("Training", programDto1.getProgramType());
@@ -304,7 +265,6 @@ public class ProgramServiceTest {
     assertEquals("attachment1.url", programDto1.getProgramAttachments().get(0).getAttachmentUrl());
     assertEquals("attachment2.url", programDto1.getProgramAttachments().get(1).getAttachmentUrl());
 
-    // Verify details of the second program
     ProgramDto programDto2 = programDtos.get(1);
     assertEquals(2, programDto2.getProgramId());
     assertEquals("Training", programDto2.getProgramType());
@@ -315,13 +275,11 @@ public class ProgramServiceTest {
 
   @Test
   void testModifyProgram_ProgramNotFound() {
-    // Arrange an empty program. i.e. a program that does not exist in the database
     ProgramDto programDtoToModify = new ProgramDto();
     programDtoToModify.setProgramId(1);
 
     Mockito.when(programRepository.findById(1)).thenReturn(Optional.empty());
 
-    // Act & Assert
     EntityNotFoundException exception =
         assertThrows(
             EntityNotFoundException.class,

@@ -26,7 +26,6 @@ public class ProgramParticipant {
   @Column(name = "rank")
   private Integer rank;
 
-  // Could be an admin, coach or player
   @Column(name = "type")
   private String participantType;
 

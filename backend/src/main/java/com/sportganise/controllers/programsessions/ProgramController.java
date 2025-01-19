@@ -37,16 +37,6 @@ public class ProgramController {
     this.accountService = accountService;
   }
 
-  /** Helper method to fetch and validate user account based on accountId. */
-  private Optional<Account> getAccount(Integer accountId) {
-    return accountService.getAccount(accountId);
-  }
-
-  /** Helper method to check user permissions. */
-  private boolean hasPermissions(Account user) {
-    return accountService.hasPermissions(user.getType());
-  }
-
   /**
    * Get mapping for program session details.
    *
@@ -59,38 +49,28 @@ public class ProgramController {
 
     ResponseDto<List<ProgramDetailsParticipantsDto>> responseDto = new ResponseDto<>();
 
-    // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = getAccount(accountId);
 
-    // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
       responseDto.setMessage("User not found.");
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // If not empty, then we go fetch the actual user value
     Account user = userOptional.get();
 
-    // Fetch program details
     List<ProgramDto> programDtos = programService.getPrograms();
 
-    // Check if the value of programDtoOptional is null
     if (programDtos.isEmpty()) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
       responseDto.setMessage("No program found.");
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // Initialize a list of participants and a list of all programs as an empty/null
-    // arraylist
     List<ProgramDetailsParticipantsDto> allPrograms = new ArrayList<>();
 
     Boolean canDisplayAttendees = false;
 
-    // Check if this user has permissions to see training sessions attendees
-    // (i.e. if the user is of type COACH or ADMIN)
-    // If they have permission, then they can see the list of participants
     if (hasPermissions(user)) {
       canDisplayAttendees = true;
     }
@@ -116,21 +96,16 @@ public class ProgramController {
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
-    // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = getAccount(accountId);
 
-    // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
       responseDto.setMessage("User not found.");
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // If not empty, then we go fetch the actual user value
     Account user = userOptional.get();
 
-    // If user is not a COACH or ADMIN then they will get an error
-    // as they are not allowed to access this feature
     if (!hasPermissions(user)) {
       responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
       responseDto.setMessage("User does not have permission.");
@@ -138,7 +113,6 @@ public class ProgramController {
     }
 
     try {
-      // Use the DTO fields to create a program
       ProgramDto newProgramDto =
           programService.createProgramDto(
               programRequestDto.getTitle(),
@@ -182,31 +156,24 @@ public class ProgramController {
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
-    // Get account from accountId (this is a wrapper, not the actual)
     Optional<Account> userOptional = getAccount(accountId);
 
-    // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
       responseDto.setMessage("User not found.");
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // If not empty, then we go fetch the actual user value
     Account user = userOptional.get();
 
-    // If user is not a COACH or ADMIN then they will get an error
-    // as they are not allowed to access this feature
     if (!hasPermissions(user)) {
       responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
       responseDto.setMessage("User does not have permission.");
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // Fetch program details
     ProgramDto programDtoToModify = programService.getProgramDetails(programId);
 
-    // Check if the value of programDtoOptional is null
     if (programDtoToModify == null) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
       responseDto.setMessage("Program not found.");
@@ -214,7 +181,6 @@ public class ProgramController {
     }
 
     try {
-      // Modify the program using the DTO
       ProgramDto updatedProgramDto =
           programService.modifyProgram(
               programDtoToModify,
@@ -241,5 +207,15 @@ public class ProgramController {
       responseDto.setMessage("Could not modify the program successfully.");
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
+  }
+
+  /** Helper method to fetch and validate user account based on accountId. */
+  private Optional<Account> getAccount(Integer accountId) {
+    return accountService.getAccount(accountId);
+  }
+
+  /** Helper method to check user permissions. */
+  private boolean hasPermissions(Account user) {
+    return accountService.hasPermissions(user.getType());
   }
 }

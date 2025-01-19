@@ -25,7 +25,6 @@ public class Program {
   @Column(name = "program_id")
   private Integer programId;
 
-  // Could be a tournament, an event of some sort or a training session
   @Column(name = "type")
   private String programType;
 
@@ -38,7 +37,6 @@ public class Program {
   @Column(name = "occurence_date")
   private ZonedDateTime occurrenceDate;
 
-  // Duration of the program in terms of minutes
   @Column(name = "duration")
   private Integer durationMins;
 

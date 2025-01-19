@@ -61,30 +61,22 @@ public class ProgramService {
    * @return List of participants of a program
    */
   public List<ProgramParticipantDto> getParticipants(Integer programId) {
-    // Get the list of participants for the program
     List<ProgramParticipant> participants =
         programRepository.findParticipantsByProgramId(programId);
 
-    // Map each Account to a ProgramParticipantDto
     return participants.stream()
         .map(
             participant -> {
-
-              // Get account from accountId (this is a wrapper, not the actual)
               Optional<Account> accountOptional =
                   accountService.getAccount(participant.getAccountId());
 
-              // Check if the value of accountOptional is empty
               if (!accountOptional.isPresent()) {
                 throw new IllegalArgumentException(
                     "Account not found for id: " + participant.getAccountId());
               }
 
-              // If not empty, then we go fetch the actual user value
               Account account = accountOptional.get();
 
-              // map account information and participant information into a list of
-              // ProgramParticipantDto
               return new ProgramParticipantDto(
                   account.getAccountId(),
                   programId,
@@ -102,13 +94,10 @@ public class ProgramService {
    * @return a single programDto for the program that we fetched.
    */
   public ProgramDto getProgramDetails(Integer programId) {
-    // Get all the programs and their details
     Program program = programRepository.findProgramById(programId);
 
-    // Fetch all the program attachments related to this programId
     List<ProgramAttachmentDto> programAttachments = getProgramAttachments(programId);
 
-    // return a Dto of the program fetched from the database
     return new ProgramDto(
         program.getProgramId(),
         program.getProgramType(),
@@ -150,14 +139,12 @@ public class ProgramService {
    * @return ProgramDto with details of the program we are looking for.
    */
   public List<ProgramDto> getPrograms() {
-    // Get all the programs and their details
     List<Program> programs = programRepository.findPrograms();
 
     List<ProgramDto> programDtos = new ArrayList<>();
 
     for (Program program : programs) {
 
-      // Fetch all the program attachments related to this program
       List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
 
       programDtos.add(
@@ -194,9 +181,6 @@ public class ProgramService {
     return programDtos.stream()
         .map(
             programDto -> {
-
-              // Fetch all the participants of this program depending on whether they have
-              // permission or not
               List<ProgramParticipantDto> participants =
                   hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
               return new ProgramDetailsParticipantsDto(programDto, participants);
@@ -238,9 +222,6 @@ public class ProgramService {
       String location,
       List<Map<String, String>> attachments) {
 
-    // Parse dates and times
-    // occurrenceDate is the date, time and day of the week of the first occurrence
-    // of the program
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     int durationMins =
         (int)
@@ -255,15 +236,12 @@ public class ProgramService {
       frequency = "weekly";
       expiryDate = ZonedDateTime.parse(endDate);
 
-      // While currentOccurrence is before or on the day of the expiryDate
       while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
 
-        // Calculate the next occurrence
         currentOccurrence = currentOccurrence.plusDays(7);
       }
     }
 
-    // Save program details in the database
     Program newProgram =
         new Program(
             programType,
@@ -286,12 +264,10 @@ public class ProgramService {
       for (Map<String, String> attachment : attachments) {
         String attachmentPath = attachment.get("path");
         if (attachmentPath != null) {
-          // Create new ProgramAttachmentDto. This list of programAttachmentsDto will be
-          // used to create the new programDto
+
           programAttachmentsDto.add(
               new ProgramAttachmentDto(savedProgram.getProgramId(), attachmentPath));
 
-          // Create new ProgramAttachment entity to be saved into the database
           programAttachments.add(
               new ProgramAttachment(savedProgram.getProgramId(), attachmentPath));
         }
@@ -301,12 +277,12 @@ public class ProgramService {
 
     notifyAllMembers(newProgram);
 
-    // Return ProgramDto to send back to the client
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
 
   /**
-   * Method to modify an existing program.
+   * Method to modify an existing program. Any attachment not already in the database will be added.
+   * Any attachment in the database but not included in the payload will be removed.
    *
    * @param programDtoToModify programDto of the program to be modified.
    * @param title Title of the program.
@@ -341,7 +317,6 @@ public class ProgramService {
       String location,
       List<Map<String, String>> attachments) {
 
-    // Make sure that the program exists in database
     Program existingProgram =
         programRepository
             .findById(programDtoToModify.getProgramId())
@@ -350,9 +325,6 @@ public class ProgramService {
                     new EntityNotFoundException(
                         "Program not found with ID: " + programDtoToModify.getProgramId()));
 
-    // Parse dates and times
-    // occurrenceDate is the date, time and day of the week of the first occurrence
-    // of the program
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     int durationMins =
         (int)
@@ -363,7 +335,6 @@ public class ProgramService {
     String frequency = null;
 
     if (isRecurring != null && isRecurring) {
-      // The program recurs weekly on the same day of the week
       frequency = "weekly";
       expiryDate = ZonedDateTime.parse(endDate);
     }
@@ -373,15 +344,12 @@ public class ProgramService {
       frequency = "weekly";
       expiryDate = ZonedDateTime.parse(endDate);
 
-      // While currentOccurrence is before or on the day of the expiryDate
       while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
 
-        // Calculate the next occurrence
         currentOccurrence = currentOccurrence.plusDays(7);
       }
     }
 
-    // Create a new Program object with updated fields
     Program updatedProgram =
         new Program(
             programType,
@@ -396,75 +364,55 @@ public class ProgramService {
             location,
             visibility);
 
-    // Set the same ID as the existing program (to update the same record in the
-    // database)
     updatedProgram.setProgramId(existingProgram.getProgramId());
 
-    // Save the updated program
     programRepository.save(updatedProgram);
 
     List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
 
-    // Any attachment not already in the database will be added.
-    // Any attachment in the database but not included in the payload will be
-    // removed.
     if (attachments != null) {
-      // Fetch the current attachments from the database for the program
       List<ProgramAttachment> existingAttachments =
           programAttachmentRepository.findAttachmentsByProgramId(programDtoToModify.getProgramId());
 
-      // Create new lists for additions and deletions
       List<ProgramAttachment> attachmentsToAdd = new ArrayList<>();
       List<ProgramAttachment> attachmentsToRemove = new ArrayList<>(existingAttachments);
 
-      // Iterate over the provided attachments
       for (Map<String, String> attachment : attachments) {
         String attachmentPath = attachment.get("path");
         if (attachmentPath != null) {
-          // Check if the attachment is already in the existing attachments
           boolean exists = false;
-          // Iterate over the attachments already in database
           for (ProgramAttachment existingAttachment : existingAttachments) {
-            // Check if the attachment provided is already in the database
             if (existingAttachment.getAttachmentUrl().equals(attachmentPath)) {
               exists = true;
-              // Remove the attachment from the list of attachments to remove from database
               attachmentsToRemove.remove(existingAttachment);
-              // Add the url to the Dto that will be used for the programdto returned at the
-              // end.
+
               programAttachmentDtos.add(
                   new ProgramAttachmentDto(programDtoToModify.getProgramId(), attachmentPath));
               break;
             }
           }
 
-          // If the attachment does not exist, add it to the list to be added
           if (!exists) {
             attachmentsToAdd.add(
                 new ProgramAttachment(programDtoToModify.getProgramId(), attachmentPath));
-            // Add the url to the Dto that will be used for the programdto returned at the
-            // end.
+
             programAttachmentDtos.add(
                 new ProgramAttachmentDto(programDtoToModify.getProgramId(), attachmentPath));
           }
         }
       }
 
-      // Remove attachments that are not in the provided list
       if (!attachmentsToRemove.isEmpty()) {
         programAttachmentRepository.deleteAll(attachmentsToRemove);
       }
 
-      // Save new attachments to the database
       if (!attachmentsToAdd.isEmpty()) {
         programAttachmentRepository.saveAll(attachmentsToAdd);
       }
     }
 
-    // Notify players about changes to the program
     notifyAllMembers(updatedProgram);
 
-    // Return ProgramDto to send back to the client
     return new ProgramDto(updatedProgram, programAttachmentDtos);
   }
 
