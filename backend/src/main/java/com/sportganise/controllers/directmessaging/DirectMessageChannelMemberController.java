@@ -10,7 +10,14 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /** Controller for Direct Message Channel Members. */
 @RestController
@@ -32,24 +39,26 @@ public class DirectMessageChannelMemberController {
    */
   @PostMapping("/add-members")
   public ResponseEntity<ResponseDto<Null>> addMembersToChannel(
-          @RequestBody AddChannelMemberDto addChannelMemberDto) {
+      @RequestBody AddChannelMemberDto addChannelMemberDto) {
     try {
       this.directMessageChannelMemberService.saveMembers(
-              addChannelMemberDto.getMemberIds(),
-              addChannelMemberDto.getChannelId(),
-              addChannelMemberDto.getAdminId());
+          addChannelMemberDto.getMemberIds(),
+          addChannelMemberDto.getChannelId(),
+          addChannelMemberDto.getAdminId());
       log.info("Successfully added members to channel: {}", addChannelMemberDto.getChannelId());
       ResponseDto<Null> response =
-              new ResponseDto<>(HttpStatus.CREATED.value(), "Members added successfully", null);
+          new ResponseDto<>(HttpStatus.CREATED.value(), "Members added successfully", null);
       return new ResponseEntity<>(response, HttpStatus.CREATED);
     } catch (Exception e) {
       log.error(
-              "Failed to add members to channel: {}. Error: {}", addChannelMemberDto.getChannelId(), e.getMessage());
+          "Failed to add members to channel: {}. Error: {}",
+          addChannelMemberDto.getChannelId(),
+          e.getMessage());
       ResponseDto<Null> response =
-              new ResponseDto<>(
-                      HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                      "An unexpected error occurred while adding members to the channel",
-                      null);
+          new ResponseDto<>(
+              HttpStatus.INTERNAL_SERVER_ERROR.value(),
+              "An unexpected error occurred while adding members to the channel",
+              null);
       return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
