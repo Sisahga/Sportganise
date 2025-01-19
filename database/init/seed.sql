@@ -43,9 +43,9 @@ INSERT INTO sport (name) VALUES
 ('Basketball'),
 ('Badminton');
 
-INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility, attachments) VALUES
-    ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public', null),
-    ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public', '{"./Lab4.pdf"}');
+INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility) VALUES
+    ('Training', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public'),
+    ('Fundraiser', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public');
 
 
 INSERT INTO blocklist (account_id, blocked_id) VALUES
@@ -70,6 +70,9 @@ INSERT INTO account_organization (org_id, account_id) VALUES
 (1, 6);
 
 -- Skipping account-settings
+
+INSERT INTO program_attachments (program_id, attachment_url) VALUES
+(1, 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png');
 
 INSERT INTO program_participants (program_id, account_id, type, is_confirmed, confirm_date) VALUES
 (1, 3, 'Player', TRUE, '2024-06-20 10:30:00'),
