@@ -1,8 +1,7 @@
 package com.sportganise.controllers.directmessaging;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.dto.directmessaging.BlockUserRequestDto;
@@ -27,16 +26,15 @@ public class BlocklistControllerUnitTest {
 
   @Test
   public void blockUser_Success() throws Exception {
-    // Arrange
     BlockUserRequestDto requestDto = new BlockUserRequestDto();
     requestDto.setAccountId(1);
     requestDto.setBlockedId(2);
+    requestDto.setChannelId(1);
 
     doNothing()
         .when(blocklistService)
         .blockUser(requestDto.getAccountId(), requestDto.getBlockedId());
 
-    // Act & Assert
     mockMvc
         .perform(
             MockMvcRequestBuilders.post("/api/blocklist/block")
@@ -49,5 +47,25 @@ public class BlocklistControllerUnitTest {
 
     verify(blocklistService, times(1))
         .blockUser(requestDto.getAccountId(), requestDto.getBlockedId());
+  }
+
+  @Test
+  public void unblockUser_Success() throws Exception {
+    int accountId = 1;
+    int blockedId = 2;
+
+    doNothing().when(blocklistService).unblockUser(accountId, blockedId);
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.delete(
+                    "/api/blocklist/unblock/{accountId}/{blockedId}", accountId, blockedId)
+                .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$.statusCode").value(204))
+        .andExpect(jsonPath("$.message").value("User unblocked successfully"))
+        .andExpect(jsonPath("$.data").isEmpty());
+
+    verify(blocklistService, times(1)).unblockUser(accountId, blockedId);
   }
 }

@@ -1,6 +1,7 @@
 package com.sportganise.controllers.account;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.AccountNotFoundException;
@@ -105,5 +106,16 @@ public class AccountController {
     return new ResponseEntity<>(
         this.accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, accountId),
         HttpStatus.OK);
+  }
+
+  /**
+   * Gets all users and their role.
+   *
+   * @return The list of all users.
+   */
+  @GetMapping("/permissions")
+  public ResponseEntity<List<AccountPermissions>> getAccountPermissions() {
+    log.debug("Listing all accounts with permissions.");
+    return ResponseEntity.ok(this.accountService.getAccountPermissions());
   }
 }

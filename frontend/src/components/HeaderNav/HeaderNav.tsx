@@ -46,7 +46,7 @@ export default function HeaderNav() {
                 Training Session
               </Link>
               <Link
-                to="/" //add actual redirect once training plan page is set up
+                to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Training Plan

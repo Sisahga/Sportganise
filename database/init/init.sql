@@ -9,9 +9,11 @@ CREATE TABLE organization(
 	description VARCHAR(100)
 );
 
+CREATE TYPE account_type AS ENUM ('ADMIN', 'COACH', 'PLAYER');
+
 CREATE TABLE account (
 	account_id SERIAL PRIMARY KEY,
-	type VARCHAR(30) NOT NULL,
+	type account_type NOT NULL,
 	email VARCHAR(254) UNIQUE NOT NULL,
 	auth0_id VARCHAR(255) UNIQUE NOT NULL,
 	address_line VARCHAR(100),
@@ -130,14 +132,17 @@ CREATE TABLE channel (
     type VARCHAR(10) NOT NULL,
     image_blob VARCHAR(512),
 	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    channel_hash VARCHAR(64) UNIQUE NOT NULL
+    channel_hash VARCHAR(64) UNIQUE NOT NULL,
+    CONSTRAINT valid_channel CHECK (type IN ('SIMPLE', 'GROUP'))
 );
 
 CREATE TABLE channel_member (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
     read BOOLEAN NOT NULL,
-	PRIMARY KEY(channel_id, account_id)
+    role VARCHAR(10), -- Can be NULL, as there are no roles for SIMPLE channels
+	PRIMARY KEY(channel_id, account_id),
+    CONSTRAINT valid_role CHECK (role IN ('ADMIN', 'REGULAR') OR role IS NULL)
 );
 
 CREATE TABLE message (
@@ -146,7 +151,8 @@ CREATE TABLE message (
 	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	content VARCHAR(512) NOT NULL,
     sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    type VARCHAR(10) NOT NULL
+    type VARCHAR(10) NOT NULL,
+    CONSTRAINT valid_message CHECK (type IN ('CHAT', 'JOIN', 'LEAVE', 'BLOCK', 'UNBLOCK'))
 );
 
 CREATE TABLE message_blob (

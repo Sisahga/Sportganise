@@ -1,4 +1,5 @@
 import React from "react";
+import WebSocketService from "@/services/WebSocketService.ts";
 
 export interface Channel {
   channelId: number;
@@ -34,5 +35,37 @@ export interface CreateChannelDto {
 }
 
 export interface ChannelSettingsDropdownProps {
+  channelId: number;
   channelType: string;
+  webSocketRef: WebSocketService | null;
+  isBlocked: boolean | false;
+  currentUserId: number;
+}
+
+export enum GroupChannelMemberRole {
+  ADMIN = "ADMIN",
+  REGULAR = "REGULAR",
+}
+
+export interface ChannelMember {
+  accountId: number;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string;
+  role: GroupChannelMemberRole | null;
+}
+
+export interface MembersSettingsDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  channelMembers: ChannelMember[];
+  channelId: number;
+  websocketRef: WebSocketService | null;
+  currentUserId: number;
+}
+
+export interface LeaveGroupDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onLeave: () => void;
 }

@@ -78,7 +78,7 @@ export function RenameGroupDialog({ isOpen, onClose }: RenameGroupDialogProps) {
           <Button
             onClick={handleSave}
             disabled={!newName.trim()}
-            className="bg-secondaryColour text-primaryColour font-bold py-2 px-4 rounded font-bold hover:bg-textPlaceholderColour disabled:bg-fadedPrimaryColour disabled:text-white"
+            className="bg-secondaryColour text-primaryColour py-2 px-4 rounded font-bold hover:bg-textPlaceholderColour disabled:bg-fadedPrimaryColour disabled:text-white"
           >
             Save
           </Button>

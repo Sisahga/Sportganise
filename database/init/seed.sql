@@ -10,27 +10,27 @@ INSERT INTO account (
     address_line, address_city, address_province, address_country, address_postal_code,
     phone, first_name, last_name,
     picture) VALUES
-('admin', 'admin@example.com', 'auth0|6743f6a0f0ab0e76ba3d7ceb',
+('ADMIN', 'admin@example.com', 'auth0|6743f6a0f0ab0e76ba3d7ceb',
  '123 Rue Tarantino', 'Montreal', 'Quebec', 'Canada', 'H1H 2H3',
  '222-222-2222', 'Gustavo', 'Fring',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/gus_fring_avatar.png'),
-('coach', 'coach@example.com', 'auth0|6743f68ef0ab0e76ba3d7cea',
+('COACH', 'coach@example.com', 'auth0|6743f68ef0ab0e76ba3d7cea',
  '456 Boulevard Marino', 'Laval', 'Quebec', 'Canada', 'H1I 1J1',
  '333-333-3333', 'Walter', 'White',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg'),
-('general', 'subscribed@example.com', 'auth0|6743f6ab1b370b4f20d286f0',
+('PLAYER', 'subscribed@example.com', 'auth0|6743f6ab1b370b4f20d286f0',
  '789 70e Papino', 'New York', 'New York', 'United States', '90210-1234',
  '444-444-4444', 'Jesse', 'Pinkman',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/jesse_pinkman_avatar.jpg'),
-('general', 'waitlist@example.com', 'auth0|6743f6b2f0ab0e76ba3d7cee',
+('PLAYER', 'waitlist@example.com', 'auth0|6743f6b2f0ab0e76ba3d7cee',
  '79 Rue Marie', 'Paris', 'France', 'France', '123-12345',
  '555-555-5555', 'Saul', 'Goodman',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/saul_goodman_avatar.png'),
-('general', 'general@example.com', 'auth0|6743f6b91b370b4f20d286f1',
+('PLAYER', 'general@example.com', 'auth0|6743f6b91b370b4f20d286f1',
  '780 Rue Totoz', 'Montréal', 'Québec', 'Canada', 'H0H 0H0',
  '666-666-6666', 'Skylar', 'White',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/skylar_white_avatar.jpg'),
- ('general', 'mike@gmail.com', 'auth0|6743f6b91b370b4f20d286f2', '123 Rue Tarantino',
+ ('PLAYER', 'mike@gmail.com', 'auth0|6743f6b91b370b4f20d286f2', '123 Rue Tarantino',
   'Montreal', 'Quebec', 'Canada', 'H1H 2H3',
   '222-222-2222', 'Mike', 'Ehrmantraut',
   'https://sportganise-bucket.s3.us-east-2.amazonaws.com/mike_avatar.png');
@@ -97,17 +97,17 @@ INSERT INTO channel (name, type, image_blob, channel_hash) VALUES
  '5bf775530e2e5fcd9c6ae577c52cd57a20d13ebb5f7bc3e8a8a7920d3a7ce41e');
 
 
-INSERT INTO channel_member (channel_id, account_id, read) VALUES
-(1, 2, false),
-(1, 3, false),
-(1, 4, true),
-(2,1, true),
-(2,2, false),
-(2, 4, true),
-(3, 1, false),
-(3, 2, true),
-(4, 2, false),
-(4, 3, true);
+INSERT INTO channel_member (channel_id, account_id, read, role) VALUES
+(1, 2, false, 'ADMIN'),
+(1, 3, false, 'REGULAR'),
+(1, 4, true, 'ADMIN'),
+(2,1, true, 'ADMIN'),
+(2,2, false, 'REGULAR'),
+(2, 4, true, 'REGULAR'),
+(3, 1, false, null),
+(3, 2, true, null),
+(4, 2, false, null),
+(4, 3, true, null);
 
 INSERT INTO message (channel_id, sender_id, content, type) VALUES
 (1, 2, 'Welcome to Badmintinors guys!!!', 'CHAT'),

@@ -10,6 +10,7 @@ import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 import java.time.LocalDate;
@@ -117,7 +118,7 @@ public class ProgramControllerTest {
 
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
-    mockAccount.setType("USER");
+    mockAccount.setType(AccountType.PLAYER);
 
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
@@ -132,7 +133,7 @@ public class ProgramControllerTest {
     // Mock the user/account that is accessing the programs details
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
-    mockAccount.setType("COACH");
+    mockAccount.setType(AccountType.COACH);
 
     // Mock behaviour of the services using the mocked objects
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
@@ -170,11 +171,7 @@ public class ProgramControllerTest {
     // Mock the user/account that is accessing the programs details
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
-    mockAccount.setType("REGULAR");
-
-    // Mock ProgramDetailsParticipantsDto with no participants
-    ProgramDetailsParticipantsDto mockProgramDetailsParticipantsDtos =
-        new ProgramDetailsParticipantsDto(mockProgramDto, List.of());
+    mockAccount.setType(AccountType.PLAYER);
 
     // Mock behaviour of the services using the mocked objects
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
@@ -204,7 +201,7 @@ public class ProgramControllerTest {
     // Mock data of a user with permissions i.e. COACH or ADMIN
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
-    mockAccount.setType("COACH");
+    mockAccount.setType(AccountType.COACH);
 
     // Mocking service calls
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
@@ -246,7 +243,7 @@ public class ProgramControllerTest {
     // Mock account without permissions like a PLAYER
     Account mockAccount = new Account();
     mockAccount.setAccountId(3);
-    mockAccount.setType("PLAYER");
+    mockAccount.setType(AccountType.PLAYER);
 
     // Mock behavior
     Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
@@ -266,7 +263,7 @@ public class ProgramControllerTest {
     // Mock data
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
-    mockAccount.setType("COACH");
+    mockAccount.setType(AccountType.COACH);
 
     // Mock behavior
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
@@ -322,7 +319,7 @@ public class ProgramControllerTest {
     // Mock an account without permissions
     Account mockAccount = new Account();
     mockAccount.setAccountId(3);
-    mockAccount.setType("PLAYER");
+    mockAccount.setType(AccountType.PLAYER);
 
     // Mock behavior
     Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
@@ -343,7 +340,7 @@ public class ProgramControllerTest {
     // Mock account with sufficient permissions
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
-    mockAccount.setType("COACH");
+    mockAccount.setType(AccountType.COACH);
 
     // Mock behavior
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));

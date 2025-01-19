@@ -10,10 +10,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
@@ -30,6 +32,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
@@ -39,6 +43,8 @@ public class AccountServiceTest {
   @Mock private Auth0ApiService auth0ApiService;
 
   @InjectMocks private AccountService accountService;
+
+  private ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
 
   private AccountDto accountDto;
   private Auth0AccountDto auth0AccountDto;
@@ -62,7 +68,7 @@ public class AccountServiceTest {
               .country("Canada")
               .postalCode("H1I 2J3")
               .build());
-      accountDto.setType("general");
+      accountDto.setType(AccountType.PLAYER);
 
       auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
     }
@@ -126,16 +132,15 @@ public class AccountServiceTest {
     @BeforeEach
     public void setup() {
       originalAccount =
-          new Account(
-              1,
-              "general",
-              "john@email.com",
-              "auth0|6743f6a0f0ab0e76ba3d7ceb",
-              "lorem",
-              "1231231234",
-              "John",
-              "Doe",
-              null);
+          Account.builder()
+              .accountId(1)
+              .type(AccountType.PLAYER)
+              .email("john@email.com")
+              .auth0Id("auth0|6743f6a0f0ab0e76ba3d7ceb")
+              .phone("1231231234")
+              .firstName("John")
+              .lastName("Doe")
+              .build();
     }
 
     @Test
@@ -249,8 +254,14 @@ public class AccountServiceTest {
     // Prepare mock data
     List<AccountDetailsDirectMessaging> mockAccounts =
         List.of(
-            new AccountDetailsDirectMessaging(
-                2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER"));
+            AccountDetailsDirectMessaging.builder()
+                .accountId(2)
+                .firstName("Jane")
+                .lastName("Smith")
+                .pictureUrl("user2@example.com")
+                .phone("555-5555")
+                .type(AccountType.PLAYER)
+                .build());
 
     // Mock the repository call
     given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
@@ -288,4 +299,67 @@ public class AccountServiceTest {
     // Verify that the repository was called exactly once
     verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
+
+  @Test
+  public void getAllAccountPermissions_NoAccount() {
+    given(accountRepository.findAccountPermissions()).willReturn(List.of());
+
+    // Call the service method
+    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+
+    // Assertions
+    assertTrue(result.isEmpty(), "The result should be an empty list");
+    verify(accountRepository, times(1)).findAccountPermissions();
+  }
+
+  @Test
+  public void getAllAccountPermissions_FewAccounts() {
+    // Mock data
+    AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
+    account1.setAccountId(1);
+    account1.setType(AccountType.PLAYER);
+    account1.setEmail("test1@example.com");
+    account1.setFirstName("John");
+    account1.setLastName("Doe");
+
+    AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
+    account2.setAccountId(2);
+    account2.setType(AccountType.COACH);
+    account2.setEmail("test2@example.com");
+    account2.setFirstName("Jane");
+    account2.setLastName("Dane");
+    account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
+
+    List<AccountPermissions> accountPermissions = List.of(account1, account2);
+
+    given(accountRepository.findAccountPermissions()).willReturn(accountPermissions);
+
+    // Call the service method
+    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+
+    // Assertions
+    assertEquals(result.size(), 2);
+    assertEquals(result.get(0).getEmail(), account1.getEmail());
+    assertEquals(result.get(0).getPictureUrl(), account1.getPictureUrl());
+    assertEquals(result.get(0).getType(), account1.getType());
+    assertEquals(result.get(1).getEmail(), account2.getEmail());
+    assertEquals(result.get(1).getPictureUrl(), account2.getPictureUrl());
+    assertEquals(result.get(1).getType(), account2.getType());
+    verify(accountRepository, times(1)).findAccountPermissions();
+  }
+}
+
+interface AccountPermissionsTest extends AccountPermissions {
+
+  void setAccountId(Integer acountId);
+
+  void setFirstName(String firstName);
+
+  void setLastName(String lastName);
+
+  void setEmail(String email);
+
+  void setPictureUrl(String pictureUrl);
+
+  void setType(AccountType type);
 }

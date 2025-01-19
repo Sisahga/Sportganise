@@ -1,6 +1,7 @@
 package com.sportganise.repositories;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.entities.account.Account;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,18 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
 
   @Query("SELECT firstName FROM Account WHERE accountId = :accountId")
   String getFirstNameByAccountId(int accountId);
+
+  @Query(
+      """
+      SELECT a.accountId  AS accountId,
+             a.firstName  AS firstName,
+             a.lastName   AS lastName,
+             a.email      AS email,
+             a.pictureUrl AS pictureUrl,
+             a.type       AS type
+      FROM Account a
+      """)
+  List<AccountPermissions> findAccountPermissions();
 
   @Query(
       """

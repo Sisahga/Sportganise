@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
+import useLastMessage from "@/hooks/useLastMessage.ts";
 
 const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   channel,
@@ -10,7 +11,10 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   const navigate = useNavigate();
   const userId = 2; // TODO: Take cookie user id.
 
+  const { lastMessage } = useLastMessage(channel.channelId);
+
   const handleClick = () => {
+    console.log("Blocked status: ", lastMessage?.type);
     navigate("/pages/DirectMessageChannelPage", {
       state: {
         channelId: channel.channelId,
@@ -18,6 +22,7 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
         channelImageBlob: channel.channelImageBlob,
         channelType: channel.channelType,
         read: channel.read,
+        isBlocked: lastMessage?.type === "BLOCK",
       },
     });
   };
@@ -51,17 +56,34 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
         <div className="ml-4 flex justify-between flex-1 min-w-0">
           <div className="flex flex-col overflow-hidden">
             <p className="text-md font-semibold">{channel.channelName}</p>
-            {!channel.lastMessage?.startsWith("INIT*") ? (
+            {!channel.lastMessage?.startsWith("INIT*") &&
+              !channel.lastMessage?.startsWith("BLOCK*") &&
+              !channel.lastMessage?.startsWith("UNBLOCK*") && (
+                <p className="text-sm text-gray-500 mt-1 truncate">
+                  {channel.lastMessage}
+                </p>
+              )}
+            {channel.lastMessage?.split("*")[0].startsWith("INIT*") && (
               <p className="text-sm text-gray-500 mt-1 truncate">
-                {channel.lastMessage}
-              </p>
-            ) : (
-              <p className="text-sm text-gray-500 mt-1 truncate">
-                {channel.lastMessage.includes("INIT*") &&
+                {channel.lastMessage.startsWith("INIT*") &&
                 parseInt(channel.lastMessage.split("*")[1]) === userId
                   ? "You " + channel.lastMessage.split("*")[3]
                   : channel.lastMessage.split("*")[2] +
                     channel.lastMessage.split("*")[3]}
+              </p>
+            )}
+            {channel.lastMessage?.split("*")[0].startsWith("BLOCK") && (
+              <p className="text-sm text-gray-500 mt-1 truncate italic">
+                {parseInt(channel.lastMessage.split("*")[1]) === userId
+                  ? channel.lastMessage.split("*")[2]
+                  : channel.lastMessage.split("*")[3]}
+              </p>
+            )}
+            {channel.lastMessage?.split("*")[0].startsWith("UNBLOCK") && (
+              <p className="text-sm text-gray-500 mt-1 truncate italic">
+                {parseInt(channel.lastMessage.split("*")[1]) === userId
+                  ? channel.lastMessage.split("*")[2]
+                  : channel.lastMessage.split("*")[3]}
               </p>
             )}
           </div>
