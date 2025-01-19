@@ -63,13 +63,12 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
                   {channel.lastMessage}
                 </p>
               )}
-            {channel.lastMessage?.split("*")[0].startsWith("INIT*") && (
+            {lastMessage?.type == "JOIN" && (
               <p className="text-sm text-gray-500 mt-1 truncate">
-                {channel.lastMessage.startsWith("INIT*") &&
-                parseInt(channel.lastMessage.split("*")[1]) === userId
-                  ? "You " + channel.lastMessage.split("*")[3]
-                  : channel.lastMessage.split("*")[2] +
-                    channel.lastMessage.split("*")[3]}
+                {parseInt(lastMessage.messageContent.split("*")[1]) === userId
+                  ? lastMessage.messageContent.split("*")[2]
+                  : lastMessage.messageContent.split("*")[3]
+                }
               </p>
             )}
             {channel.lastMessage?.split("*")[0].startsWith("BLOCK") && (
