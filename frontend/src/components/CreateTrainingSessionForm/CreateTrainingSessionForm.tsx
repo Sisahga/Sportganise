@@ -66,11 +66,11 @@ export default function CreateTrainingSessionForm() {
   const types = [
     {
       label: "Training Session",
-      value: "training-session",
+      value: "Training",
     },
     {
       label: "Fundraisor",
-      value: "fundraisor",
+      value: "Fundraisor",
     },
   ] as const;
   //Options for visibility select
@@ -82,6 +82,10 @@ export default function CreateTrainingSessionForm() {
     {
       label: "Members only",
       value: "members",
+    },
+    {
+      label: "Private",
+      value: "private",
     },
   ] as const;
   //Options for location select
@@ -130,7 +134,7 @@ export default function CreateTrainingSessionForm() {
       log.info("create", create);
       if (create === null) {
         throw new Error(
-          "Error from useCreateTrainingSession.createTrainingSession!",
+          "Error from useCreateTrainingSession.createTrainingSession!"
         );
       }
       console.log("loading", loading);
@@ -142,20 +146,6 @@ export default function CreateTrainingSessionForm() {
         description: "Event was added to your calendar.",
       });
 
-      // Reset form fields
-      form.reset();
-      form.setValue("title", "");
-      form.setValue("type", "");
-      form.setValue("start_date", new Date());
-      form.setValue("end_date", new Date());
-      form.setValue("recurring", false);
-      form.setValue("visibility", "");
-      form.setValue("description", "");
-      form.setValue("attachment", undefined);
-      form.setValue("capacity", 0);
-      form.setValue("start_time", "");
-      form.setValue("end_time", "");
-      form.setValue("location", "");
       log.info("Create training session form reset");
 
       // Navigate to home page
@@ -163,7 +153,7 @@ export default function CreateTrainingSessionForm() {
     } catch (err) {
       console.error(
         "Create training session form submission error (error)",
-        err,
+        err
       );
       log.error("Create training session form submission error (error)", err);
       toast({
@@ -172,6 +162,9 @@ export default function CreateTrainingSessionForm() {
         description:
           "There was a problem with your request. Event was not created.",
       });
+    } finally {
+      // Reset form fields
+      form.reset();
     }
   };
 
@@ -229,7 +222,7 @@ export default function CreateTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
@@ -259,7 +252,7 @@ export default function CreateTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {type.label}
@@ -278,7 +271,7 @@ export default function CreateTrainingSessionForm() {
           {/** Start Date */}
           <FormField
             control={form.control}
-            name="start_date"
+            name="startDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -291,7 +284,7 @@ export default function CreateTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -325,7 +318,7 @@ export default function CreateTrainingSessionForm() {
           {/** End Date */}
           <FormField
             control={form.control}
-            name="end_date"
+            name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -338,7 +331,7 @@ export default function CreateTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -373,7 +366,7 @@ export default function CreateTrainingSessionForm() {
             {/**Start Time */}
             <FormField
               control={form.control}
-              name="start_time"
+              name="startTime"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -393,7 +386,7 @@ export default function CreateTrainingSessionForm() {
             {/**End Time */}
             <FormField
               control={form.control}
-              name="end_time"
+              name="endTime"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -428,12 +421,12 @@ export default function CreateTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value,
+                              (location) => location.value === field.value
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -459,7 +452,7 @@ export default function CreateTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {location.label}
@@ -521,12 +514,12 @@ export default function CreateTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
+                              (visibility) => visibility.value === field.value
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -552,7 +545,7 @@ export default function CreateTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {visibility.label}
@@ -661,16 +654,47 @@ export default function CreateTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        e.target.value ? Number(e.target.value) : undefined
                       )
                     }
                   />
                 </FormControl>
-
                 <FormMessage />
               </FormItem>
             )}
           />
+
+          {/** Notify All Players */}
+          <div>
+            <FormField
+              control={form.control}
+              name="notify"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="font-semibold">
+                      Notify all players
+                    </FormLabel>
+                    <FormDescription>
+                      Notifies all subscribed members.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+            <div className="mt-2">
+              <a href="../" className=" underline text-neutral-400">
+                Customize attendance list
+              </a>
+            </div>
+          </div>
 
           {/** Submit Button */}
           <Button type="submit" className="w-full font-semibold">
