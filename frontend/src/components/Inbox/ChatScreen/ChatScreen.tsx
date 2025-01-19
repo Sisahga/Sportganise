@@ -26,16 +26,15 @@ const ChatScreen = () => {
   const channelType = state?.channelType || null;
   const isBlocked = state?.isBlocked || false;
   const currentUserId = 2; // TODO: Replace with actual user ID from cookies
-  console.log("Blocked status from chat screen: ", isBlocked);
 
+  // States
   const [connected, setConnected] = useState(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
-  const { messages, setMessages, loading, error } = useChatMessages(
-    channelId,
-    read,
-  );
   const [newMessage, setNewMessage] = useState("");
   const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
+
+  // Hooks
+  const { messages, setMessages, loading, error } = useChatMessages(channelId, read);
   const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {
@@ -167,7 +166,7 @@ const ChatScreen = () => {
       </div>
 
       {/* Chat Messages */}
-      <ChatMessages messages={messages} />
+      <ChatMessages messages={messages} currentUserId={currentUserId} />
 
       <UserBlockedComponent
         showBlockedMessage={channelIsBlocked}
