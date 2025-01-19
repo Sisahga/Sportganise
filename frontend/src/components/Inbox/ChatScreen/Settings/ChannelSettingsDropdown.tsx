@@ -30,10 +30,10 @@ import {
   ChannelSettingsDropdownProps,
   GroupChannelMemberRole,
 } from "@/types/dmchannels.ts";
-import useBlockUser from "@/hooks/useBlockUser.tsx";
+import useBlockUser from "@/hooks/useBlockUser.ts";
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
-import useChannelMembers from "@/hooks/useChannelMembers.tsx";
-import useSendMessage from "@/hooks/useSendMessage.tsx";
+import useChannelMembers from "@/hooks/useChannelMembers.ts";
+import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
 import log from "loglevel";
 import { MembersSettingsDialog } from "@/components/Inbox/ChatScreen/Settings/MembersSettings.tsx";
@@ -46,9 +46,8 @@ const ChannelSettingsDropdown = ({
   channelId,
   webSocketRef,
   isBlocked,
+  currentUserId
 }: ChannelSettingsDropdownProps) => {
-  const currentUserId = 2; // TODO: Replace with actual user ID from cookies
-
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
   const [userBlocked, setUserBlocked] = useState(isBlocked);

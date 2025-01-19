@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog.tsx";
+import {useEffect, useState} from "react";
+import {Dialog, DialogContent, DialogHeader, DialogTitle,} from "@/components/ui/dialog.tsx";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,12 +10,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
-import { Button } from "@/components/ui/Button.tsx";
-import { UserPlus, UserMinus } from "lucide-react";
-import {
-  ChannelMember,
-  MembersSettingsDialogProps,
-} from "@/types/dmchannels.ts";
+import {Button} from "@/components/ui/Button.tsx";
+import {UserMinus, UserPlus} from "lucide-react";
+import {ChannelMember, GroupChannelMemberRole, MembersSettingsDialogProps,} from "@/types/dmchannels.ts";
 
 export function MembersSettingsDialog({
   isOpen,
@@ -38,7 +30,7 @@ export function MembersSettingsDialog({
     setMembers(channelMembers);
   }, [channelMembers]);
 
-  const handleAction = (member: ChannelMember) => {
+  const handleRemove = (member: ChannelMember) => {
     setSelectedMember(member);
     setAlertDialogOpen(true);
   };
@@ -48,6 +40,8 @@ export function MembersSettingsDialog({
       setMembers(
         members.filter((m) => m.accountId !== selectedMember.accountId),
       );
+      // Call API to remove member from group
+
       setAlertDialogOpen(false);
       setSelectedMember(null);
     }
@@ -69,16 +63,19 @@ export function MembersSettingsDialog({
             {members.map((member) => (
               <div
                 key={member.accountId}
-                className="flex items-center justify-between py-2 font-font text-primaryColour"
+                className="flex items-center justify-between py-2 font-font text-primaryColour gap-4"
               >
-                <span>
-                  {member.firstName} {member.lastName}
-                </span>
+                <div className="flex w-full justify-between items-center">
+                  <span>{member.firstName} {member.lastName}</span>
+                  <span className="font-light text-sm faded-primary-colour italic">
+                    {member.role == GroupChannelMemberRole.ADMIN && "ADMIN"}
+                  </span>
+                </div>
                 <div>
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleAction(member)}
+                    onClick={() => handleRemove(member)}
                   >
                     <UserMinus className="h-4 w-4" />
                     <span className="sr-only">
