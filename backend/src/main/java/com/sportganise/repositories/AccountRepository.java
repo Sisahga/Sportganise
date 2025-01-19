@@ -57,7 +57,6 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
              LEFT JOIN Blocklist b2 ON a.accountId = b2.compositeBlocklistId.accountId
                  AND b2.compositeBlocklistId.blockedId = :currentUserId
              WHERE ao.compositeKey.organizationId = :organizationId
-                 AND a.type <> 'ADMIN'
                  AND b1.compositeBlocklistId IS NULL
                  AND b2.compositeBlocklistId IS NULL
                  AND a.accountId <> :currentUserId

@@ -1,5 +1,6 @@
 import React from "react";
 import WebSocketService from "@/services/WebSocketService.ts";
+import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 
 export interface Channel {
   channelId: number;
@@ -51,7 +52,7 @@ export interface ChannelMember {
   accountId: number;
   firstName: string;
   lastName: string;
-  avatarUrl: string;
+  avatarUrl: string | undefined;
   role: GroupChannelMemberRole | null;
 }
 
@@ -68,4 +69,21 @@ export interface LeaveGroupDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onLeave: () => void;
+}
+
+export interface AddChannelMemberDto {
+  channelId: number;
+  memberIds: number[];
+  adminId: number;
+}
+
+export interface AddMembersDialogProps {
+  selectedUsers: AccountDetailsDirectMessaging[];
+  setSelectedUsers: React.Dispatch<
+    React.SetStateAction<AccountDetailsDirectMessaging[]>
+  >;
+  submitButtonLabel: string;
+  createFunction: () => void;
+  currentUserId: number;
+  excludedMembers: ChannelMember[] | null;
 }

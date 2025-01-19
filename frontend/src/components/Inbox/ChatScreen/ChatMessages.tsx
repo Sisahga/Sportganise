@@ -101,12 +101,9 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
               {message.type == "JOIN" && (
                 <div className="text-center faded-primary-colour font-light text-sm">
                   {message.senderId === currentUserId && index === 0 ? (
-                    <p>You {message.messageContent.split("*")[3]}</p>
+                    <p>{message.messageContent.split("*")[2]}</p>
                   ) : (
-                    <p>
-                      {message.messageContent.split("*")[2]}{" "}
-                      {message.messageContent.split("*")[3]}
-                    </p>
+                    <p>{message.messageContent.split("*")[3]}</p>
                   )}
                 </div>
               )}
