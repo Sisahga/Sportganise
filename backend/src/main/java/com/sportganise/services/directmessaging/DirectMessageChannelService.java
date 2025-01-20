@@ -8,13 +8,18 @@ import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
+
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+
+import com.sportganise.services.BlobService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Service Class related to Direct Message Channel. */
 @Service
@@ -25,6 +30,7 @@ public class DirectMessageChannelService {
   private final AccountRepository accountRepository;
   private final DirectMessageChannelMemberService directMessageChannelMemberService;
   private final DirectMessageService directMessageService;
+  private final BlobService blobService;
 
   /**
    * Service Constructor.
@@ -39,12 +45,14 @@ public class DirectMessageChannelService {
       DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
       AccountRepository accountRepository,
       DirectMessageChannelMemberService directMessageChannelMemberService,
-      DirectMessageService directMessageService) {
+      DirectMessageService directMessageService,
+      BlobService blobService) {
     this.directMessageChannelRepository = directMessageChannelRepository;
     this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
     this.accountRepository = accountRepository;
     this.directMessageChannelMemberService = directMessageChannelMemberService;
     this.directMessageService = directMessageService;
+    this.blobService = blobService;
   }
 
   /**
@@ -193,6 +201,11 @@ public class DirectMessageChannelService {
     } else {
       log.info("Successfully renamed channel with id: {}", channelId);
     }
+  }
+
+  public void updateGroupChannelPicture(int channelId, MultipartFile image)
+          throws IOException, ChannelNotFoundException {
+    this.blobService.uploadFile(image, false, null);
   }
 
   /**
