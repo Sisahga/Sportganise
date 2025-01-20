@@ -150,7 +150,7 @@ CREATE TABLE message (
 	content VARCHAR(512) NOT NULL,
     sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     type VARCHAR(10) NOT NULL,
-    CONSTRAINT valid_message CHECK (type IN ('CHAT', 'JOIN', 'LEAVE', 'BLOCK', 'UNBLOCK'))
+    CONSTRAINT valid_message CHECK (type IN ('CHAT', 'JOIN', 'LEAVE', 'BLOCK', 'UNBLOCK', 'UPDATE', 'DELETE'))
 );
 
 CREATE TABLE message_blob (
