@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 // Created components imports
 import ViewRegisteredPlayersContent from "./ViewRegisteredPlayersContent";
 import DropDownMenuButton from "./DropDownMenuButton";
+import BadgeType from "./BadgeType";
 
 // Components imports
 import {
@@ -84,15 +85,7 @@ const TrainingSessionContent = () => {
           <h2 className="text-xl font-semibold text-secondaryColour">
             {programDetails.title}
           </h2>
-          <Badge
-            variant={
-              programDetails.programType.toLowerCase() === "training"
-                ? "default"
-                : "secondary"
-            }
-          >
-            {programDetails.programType.toLowerCase()}
-          </Badge>
+          {BadgeType(programDetails.programType)}
         </div>
       </div>
 
@@ -107,6 +100,10 @@ const TrainingSessionContent = () => {
             />
             <p className="text-sm text-gray-500">
               {new Date(programDetails.occurrenceDate).toDateString()}
+            </p>
+            <hr className="w-1 h-px border-0 bg-gray-500 " />
+            <p className="text-sm text-gray-500">
+              {new Date(programDetails.expiryDate).toDateString()}
             </p>
           </div>
           <div className="flex items-center gap-2">

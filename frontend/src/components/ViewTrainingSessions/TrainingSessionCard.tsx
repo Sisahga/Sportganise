@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 // Component imports
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
+import BadgeType from "./BadgeType";
 
 // Data structure for data received from API call
 import { Program } from "@/types/trainingSessionDetails";
@@ -89,15 +89,7 @@ const TrainingSessionCard: React.FC<Program> = ({
           {programDetails.description}
         </span>
         <div className="flex">
-          <Badge
-            variant={
-              programDetails.programType.toLowerCase() === "training"
-                ? "default"
-                : "secondary"
-            }
-          >
-            {programDetails.programType.toLowerCase()}
-          </Badge>
+          {BadgeType(programDetails.programType)}
 
           {/*Click to view details */}
           <button
