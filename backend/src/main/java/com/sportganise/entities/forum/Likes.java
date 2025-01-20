@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-public class Like {
+public class Likes {
 
-  @EmbeddedId private LikeCompositeKey likeCompositeKey;
+  @EmbeddedId private LikesCompositeKey likeCompositeKey;
 }
