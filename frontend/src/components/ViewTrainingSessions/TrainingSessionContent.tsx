@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 // Created components imports
 import ViewRegisteredPlayersContent from "./ViewRegisteredPlayersContent";
 import DropDownMenuButton from "./DropDownMenuButton";
-import BadgeType from "./BadgeType";
+import EventBadgeType from "./EventBadgeType";
 
 // Components imports
 import {
@@ -29,7 +29,7 @@ import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
 
 const TrainingSessionContent = () => {
-  const [accountType /*, setAccountType*/] = useState<string>("admin"); // Handle account type. Only coach or admin can view list of attendees.
+  const [accountType /*, setAccountType*/] = useState<string>("coach"); // Handle account type. Only coach or admin can view list of attendees.
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
 
@@ -84,7 +84,7 @@ const TrainingSessionContent = () => {
           <h2 className="text-xl font-semibold text-secondaryColour">
             {programDetails.title}
           </h2>
-          {BadgeType(programDetails.programType)}
+          {EventBadgeType(programDetails.programType)}
         </div>
       </div>
 

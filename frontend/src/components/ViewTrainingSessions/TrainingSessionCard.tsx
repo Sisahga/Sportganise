@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
-import BadgeType from "./BadgeType";
+import EventBadgeType from "./EventBadgeType";
 
 // Data structure for data received from API call
 import { Program } from "@/types/trainingSessionDetails";
@@ -89,7 +89,7 @@ const TrainingSessionCard: React.FC<Program> = ({
           {programDetails.description}
         </span>
         <div className="flex">
-          {BadgeType(programDetails.programType)}
+          {EventBadgeType(programDetails.programType)}
 
           {/*Click to view details */}
           <button

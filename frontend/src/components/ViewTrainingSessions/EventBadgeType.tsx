@@ -1,7 +1,7 @@
 import { Badge } from "../ui/badge";
 
 // Badge component for all types of events
-export default function BadgeType(programType: string) {
+export default function EventBadgeType(programType: string) {
   if (programType.toLowerCase() === "training") {
     return <Badge>{programType.toLowerCase()}</Badge>;
   } else if (
