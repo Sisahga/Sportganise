@@ -4,8 +4,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/Button";
+} from "@/components/ui/dialog.tsx";
+import { Button } from "@/components/ui/Button.tsx";
 import { LeaveGroupDialogProps } from "@/types/dmchannels.ts";
 
 export function LeaveGroupDialog({

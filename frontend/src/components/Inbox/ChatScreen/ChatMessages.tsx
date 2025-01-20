@@ -139,10 +139,19 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
                   {message.senderId === currentUserId ? (
                     <p>{message.messageContent.split("*")[2]}</p>
                   ) : (
-                    <p>
-                      {message.messageContent.split("*")[2]}{" "}
-                      {message.messageContent.split("*")[3]}
-                    </p>
+                    <p>{message.messageContent.split("*")[3]}</p>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* LEAVE Message (Player/coach leaves from channel or gets removed) */}
+            <div>
+              {message.type == "UPDATE" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === currentUserId ? (
+                    <p>{message.messageContent.split("*")[2]}</p>
+                  ) : (
+                    <p>{message.messageContent.split("*")[3]}</p>
                   )}
                 </div>
               )}

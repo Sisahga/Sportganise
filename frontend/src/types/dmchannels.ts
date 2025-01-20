@@ -41,6 +41,8 @@ export interface ChannelSettingsDropdownProps {
   webSocketRef: WebSocketService | null;
   isBlocked: boolean | false;
   currentUserId: number;
+  channelName: string;
+  setCurrentChannelName: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export enum GroupChannelMemberRole {
@@ -86,4 +88,19 @@ export interface AddMembersDialogProps {
   createFunction: () => void;
   currentUserId: number;
   excludedMembers: ChannelMember[] | null;
+}
+
+export interface RenameGroupDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  channelName: string;
+  channelId: number;
+  setCurrentChannelName: React.Dispatch<React.SetStateAction<string>>;
+  currentUserId: number;
+  webSocketRef: WebSocketService | null;
+}
+
+export interface RenameChannelDto {
+  channelId: number;
+  channelName: string;
 }
