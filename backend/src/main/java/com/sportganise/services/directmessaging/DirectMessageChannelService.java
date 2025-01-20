@@ -78,8 +78,6 @@ public class DirectMessageChannelService {
         dmChannelDto.setAvatarUrl(null);
       }
       return dmChannelDto;
-    } else {
-      log.info("NO DUPLICATE CHANNEL FOUND.");
     }
 
     /*

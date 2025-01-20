@@ -92,7 +92,6 @@ public class ProgramControllerTest {
             + "   {\"path\": \"./Lab4.pdf\", \"relativePath\": \"./Lab4.pdf\"}"
             + "],"
             + "\"capacity\": 10,"
-            + "\"notify\": true,"
             + "\"startTime\": \"10:30\","
             + "\"endTime\": \"12:30\","
             + "\"location\": \"Centre-de-loisirs-St-Denis\""
@@ -200,7 +199,6 @@ public class ProgramControllerTest {
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyInt(),
-                Mockito.anyBoolean(),
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyString(),
@@ -266,7 +264,6 @@ public class ProgramControllerTest {
             Mockito.eq("public"),
             Mockito.eq("description"),
             Mockito.eq(10),
-            Mockito.eq(true),
             Mockito.eq("10:30"),
             Mockito.eq("12:30"),
             Mockito.eq("Centre-de-loisirs-St-Denis"),
