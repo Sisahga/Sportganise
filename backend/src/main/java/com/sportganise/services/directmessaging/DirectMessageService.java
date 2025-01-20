@@ -193,7 +193,11 @@ public class DirectMessageService {
     directMessage.setSenderId(creatorId);
     directMessage.setChannelId(channelId);
     directMessage.setContent(
-        "INIT*" + creatorId + "*" + creatorFirstName + "* created the message channel.");
+        "INIT*"
+            + creatorId
+            + "*You created the message channel*"
+            + creatorFirstName
+            + " created the message channel.");
     directMessage.setSentAt(ZonedDateTime.now());
     directMessage.setType(DirectMessageType.JOIN);
     directMessageRepository.save(directMessage);

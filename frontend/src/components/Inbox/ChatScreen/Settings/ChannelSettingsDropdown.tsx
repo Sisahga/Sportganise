@@ -37,9 +37,9 @@ import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
 import log from "loglevel";
 import { MembersSettingsDialog } from "@/components/Inbox/ChatScreen/Settings/MembersSettings.tsx";
-import { RenameGroupDialog } from "@/components/GroupChatSettingContent/RenameGroupChat.tsx";
-import { ChangePictureDialog } from "@/components/GroupChatSettingContent/ChangeGroupPicture.tsx";
-import { LeaveGroupDialog } from "@/components/GroupChatSettingContent/LeaveGroup.tsx";
+import { RenameGroupDialog } from "@/components/Inbox/ChatScreen/Settings/RenameGroupChat.tsx";
+import { ChangePictureDialog } from "@/components/Inbox/ChatScreen/Settings/ChangeGroupPicture.tsx";
+import { LeaveGroupDialog } from "@/components/Inbox/ChatScreen/Settings/LeaveGroup.tsx";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
 import { useNavigate } from "react-router-dom";
 
@@ -49,6 +49,8 @@ const ChannelSettingsDropdown = ({
   webSocketRef,
   isBlocked,
   currentUserId,
+  channelName,
+  setCurrentChannelName,
 }: ChannelSettingsDropdownProps) => {
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
@@ -245,6 +247,11 @@ const ChannelSettingsDropdown = ({
       <RenameGroupDialog
         isOpen={isRenameGroupOpen}
         onClose={() => setIsRenameGroupOpen(false)}
+        channelName={channelName}
+        channelId={channelId}
+        setCurrentChannelName={setCurrentChannelName}
+        currentUserId={currentUserId}
+        webSocketRef={webSocketRef}
       />
       <ChangePictureDialog
         isOpen={isChangePictureOpen}

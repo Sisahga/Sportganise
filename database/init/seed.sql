@@ -122,14 +122,36 @@ UPDATE channel SET last_message_id = 4 WHERE channel_id = 2;
 UPDATE channel SET last_message_id = 5 WHERE channel_id = 3;
 UPDATE channel SET last_message_id = 6 WHERE channel_id = 4;
 
-INSERT INTO post (account_id, title, description) VALUES
-(1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!'),
-(2, 'Sunday Training',
- 'This week we did usual intensive training. Please Let me know if you have questions.'),(3, 'Hackathon Announcement', 'Sign up for the upcoming hackathon event, solve challenges, and win prizes.'),
-(1, 'Training Class for Beginners', 'We offer beginner-friendly sessions exlusive.'),
-(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.'),
-(2, 'Weekly Tennis Challenge', 'Participate in our tennis challenge and win a high-five.'),
-(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.');
+INSERT INTO post (account_id, title, description, type) VALUES
+(1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!','EVENT'),
+(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.','EVENT'),
+(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.','EVENT');
+
+INSERT INTO post (account_id, title, description, type, metadata) VALUES
+(1, 'Training Class for Beginners', 'We offer beginner-friendly sessions exclusive.','TRAINING','{"programID":1}'),
+(2, 'Weekly Tennis Challenge', 'Participate in our tennis challenge and win a high-five.','TRAINING','{"programID":1}'),
+(2, 'Sunday Training','This week we did usual intensive training. Please Let me know if you have questions.','TRAINING','{"programID":1}');
+
+INSERT INTO post_label(post_id, label_id) VALUES
+(1, 2),
+(2, 2),
+(3, 2),
+(4, 1),
+(4, 2),
+(5, 1),
+(5, 2),
+(6, 1),
+(6, 2);
+
+INSERT INTO likes(post_id, account_id) VALUES
+(1, 3),
+(1, 2),
+(2, 3),
+(3, 3),
+(4, 3),
+(5, 3),
+(6, 3);
+
 
 INSERT INTO feedback (post_id, account_id, content) VALUES
 (1, 2, 'Are cats aloud??'),

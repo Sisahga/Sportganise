@@ -1,7 +1,9 @@
 import {
+  AddChannelMemberDto,
   Channel,
   ChannelMember,
   CreateChannelDto,
+  RenameChannelDto,
 } from "@/types/dmchannels.ts";
 import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
@@ -82,6 +84,24 @@ const directMessagingApi = {
         method: "DELETE",
       },
     );
+  },
+  addChannelMembers: async (channelMembersDto: AddChannelMemberDto) => {
+    return await fetch(`${baseMappingUrl}/channelmember/add-members`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(channelMembersDto),
+    });
+  },
+  renameChannel: async (renameChannelDto: RenameChannelDto) => {
+    return await fetch(`${baseMappingUrl}/channel/rename-channel`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(renameChannelDto),
+    });
   },
 };
 

@@ -9,11 +9,9 @@ CREATE TABLE organization(
 	description VARCHAR(100)
 );
 
-CREATE TYPE account_type AS ENUM ('ADMIN', 'COACH', 'PLAYER');
-
 CREATE TABLE account (
 	account_id SERIAL PRIMARY KEY,
-	type account_type NOT NULL,
+	type VARCHAR NOT NULL CHECK (type IN ('ADMIN', 'COACH', 'PLAYER')),
 	email VARCHAR(254) UNIQUE NOT NULL,
 	auth0_id VARCHAR(255) UNIQUE NOT NULL,
 	address_line VARCHAR(100),
@@ -152,7 +150,7 @@ CREATE TABLE message (
 	content VARCHAR(512) NOT NULL,
     sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
     type VARCHAR(10) NOT NULL,
-    CONSTRAINT valid_message CHECK (type IN ('CHAT', 'JOIN', 'LEAVE', 'BLOCK', 'UNBLOCK'))
+    CONSTRAINT valid_message CHECK (type IN ('CHAT', 'JOIN', 'LEAVE', 'BLOCK', 'UNBLOCK', 'UPDATE', 'DELETE'))
 );
 
 CREATE TABLE message_blob (
@@ -165,12 +163,33 @@ ALTER TABLE channel
 ADD last_message_id INTEGER REFERENCES message(message_id);
 
 CREATE TABLE post(
-	post_id SERIAL PRIMARY KEY,
-	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-	title VARCHAR(100) NOT NULL,
-	description TEXT NOT NULL,
-	attachment VARCHAR(255),
-	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+    post_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    attachment VARCHAR(255),
+    metadata JSON ,
+    type VARCHAR(20) CHECK (type IN ('EVENT', 'TRAINING')),
+    occurence_date TIMESTAMPTZ,
+    creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE post_label(
+    post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
+    label_id INTEGER NOT NULL REFERENCES label(label_id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, label_id)
+);
+
+CREATE TABLE like(
+    post_id    INTEGER NOT NULL REFERENCES post (post_id) ON DELETE CASCADE,
+    account_id INTEGER NOT NULL REFERENCES account (account_id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, account_id)
+);
+
+CREATE TABLE post_attachment(
+    post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
+    attachment_url VARCHAR(255) NOT NULL,
+    PRIMARY KEY (post_id, attachment_url)
 );
 
 CREATE TABLE feedback(

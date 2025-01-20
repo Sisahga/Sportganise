@@ -294,7 +294,6 @@ public class ProgramServiceTest {
                     "private",
                     "Updated Description",
                     30,
-                    true,
                     "10:30",
                     "12:30",
                     "Updated Location",
