@@ -27,7 +27,6 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
-import { Badge } from "../ui/badge";
 
 const TrainingSessionContent = () => {
   const [accountType /*, setAccountType*/] = useState<string>("admin"); // Handle account type. Only coach or admin can view list of attendees.
@@ -101,10 +100,17 @@ const TrainingSessionContent = () => {
             <p className="text-sm text-gray-500">
               {new Date(programDetails.occurrenceDate).toDateString()}
             </p>
-            <hr className="w-1 h-px border-0 bg-gray-500 " />
-            <p className="text-sm text-gray-500">
-              {new Date(programDetails.expiryDate).toDateString()}
-            </p>
+            {programDetails.expiryDate ? (
+              <div className="flex items-center gap-2">
+                <hr className="w-1 h-px border-0 bg-gray-500 " />
+
+                <p className="text-sm text-gray-500">
+                  {new Date(programDetails.expiryDate).toDateString()}
+                </p>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Clock
@@ -142,7 +148,10 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails.frequency || "one time"}
+              {programDetails.frequency || "one time"} on{" "}
+              {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
+                new Date(programDetails.occurrenceDate)
+              )}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -168,26 +177,28 @@ const TrainingSessionContent = () => {
             <p className="text-sm my-2 text-gray-500">
               {programDetails.description}
             </p>
-            <div className="flex gap-3 items-center">
-              <FileText
-                size={15}
-                color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-              />
-              <p className="text-sm text-gray-500">TODO: File blob array</p>
-            </div>
-            <div className="flex gap-3 items-center">
-              <FileText
-                size={15}
-                color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-              />
-              <p className="text-sm text-gray-500">TODO: File blob array</p>
-            </div>
-            <div className="flex gap-3 items-center">
-              <FileText
-                size={15}
-                color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-              />
-              <p className="text-sm text-gray-500">TODO: File blob array</p>
+            <div className="grid gap-2">
+              {programDetails.programAttachments.map((attachment, index) => (
+                <div
+                  key={index}
+                  className="flex items-center border-[1px] rounded-md p-2"
+                >
+                  <FileText
+                    size={15}
+                    color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                    className="w-8"
+                  />
+                  <a
+                    className="text-sm text-gray-500 hover:text-cyan-300"
+                    href={attachment.attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                  >
+                    {attachment.attachmentUrl.split("/").pop()}
+                  </a>
+                </div>
+              ))}
             </div>
           </div>
         </div>
