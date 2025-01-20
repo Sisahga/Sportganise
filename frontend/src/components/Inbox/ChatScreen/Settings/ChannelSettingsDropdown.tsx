@@ -39,7 +39,7 @@ import log from "loglevel";
 import { MembersSettingsDialog } from "@/components/Inbox/ChatScreen/Settings/MembersSettings.tsx";
 import { RenameGroupDialog } from "@/components/GroupChatSettingContent/RenameGroupChat.tsx";
 import { ChangePictureDialog } from "@/components/GroupChatSettingContent/ChangeGroupPicture.tsx";
-import { LeaveGroupDialog } from "@/components/GroupChatSettingContent/LeaveGroup.tsx";
+import { LeaveGroupDialog } from "@/components/Inbox/ChatScreen/Settings/LeaveGroup.tsx";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
 import { useNavigate } from "react-router-dom";
 
