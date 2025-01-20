@@ -180,7 +180,7 @@ CREATE TABLE post_label(
     PRIMARY KEY (post_id, label_id)
 );
 
-CREATE TABLE like(
+CREATE TABLE likes(
     post_id    INTEGER NOT NULL REFERENCES post (post_id) ON DELETE CASCADE,
     account_id INTEGER NOT NULL REFERENCES account (account_id) ON DELETE CASCADE,
     PRIMARY KEY (post_id, account_id)
