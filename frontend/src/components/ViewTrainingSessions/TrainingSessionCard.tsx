@@ -50,7 +50,7 @@ const TrainingSessionCard: React.FC<Program> = ({
               <p className="text-gray-500 whitespace-break-spaces text-xs">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { hour: "2-digit", minute: "2-digit" }
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />

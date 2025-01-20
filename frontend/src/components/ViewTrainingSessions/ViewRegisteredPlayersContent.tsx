@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+//import { useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Attendees } from "@/types/trainingSessionDetails";
 import AttendeeBadgeType from "./AttendeeBadgeType";
 import { User2Icon } from "lucide-react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
-import { Account } from "@/types/account";
+//import { Account } from "@/types/account";
 
 interface ViewRegisteredPlayersContentProps {
   capacity: number;
