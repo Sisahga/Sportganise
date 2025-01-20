@@ -207,7 +207,10 @@ const TrainingSessionContent = () => {
         {(accountType.toLowerCase() === "coach" ||
           accountType.toLowerCase() === "admin") && (
           <div>
-            <ViewRegisteredPlayersContent programId={2} /> {/**FIX THIS */}
+            <ViewRegisteredPlayersContent
+              capacity={programDetails.capacity}
+              attendees={attendees}
+            />{" "}
           </div>
         )}
 
