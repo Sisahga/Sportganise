@@ -18,7 +18,7 @@ import lombok.Setter;
 @Builder
 @EqualsAndHashCode
 @Embeddable
-public class LikeCompositeKey implements Serializable {
+public class LikesCompositeKey implements Serializable {
 
   @Column(name = "account_id")
   private Integer accountId;

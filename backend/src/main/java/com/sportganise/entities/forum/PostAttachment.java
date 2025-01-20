@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "post_attachments")
+@Table(name = "post_attachment")
 public class PostAttachment {
 
   @EmbeddedId private PostAttachmentCompositeKey postAttachmentsCompositeKey;
