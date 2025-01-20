@@ -49,7 +49,8 @@ const ChannelSettingsDropdown = ({
   webSocketRef,
   isBlocked,
   currentUserId,
-  channelName
+  channelName,
+  setCurrentChannelName
 }: ChannelSettingsDropdownProps) => {
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
@@ -247,6 +248,10 @@ const ChannelSettingsDropdown = ({
         isOpen={isRenameGroupOpen}
         onClose={() => setIsRenameGroupOpen(false)}
         channelName={channelName}
+        channelId={channelId}
+        setCurrentChannelName={setCurrentChannelName}
+        currentUserId={currentUserId}
+        webSocketRef={webSocketRef}
       />
       <ChangePictureDialog
         isOpen={isChangePictureOpen}

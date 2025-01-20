@@ -2,7 +2,7 @@ import {
   AddChannelMemberDto,
   Channel,
   ChannelMember,
-  CreateChannelDto,
+  CreateChannelDto, RenameChannelDto,
 } from "@/types/dmchannels.ts";
 import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
@@ -93,6 +93,15 @@ const directMessagingApi = {
       body: JSON.stringify(channelMembersDto),
     });
   },
+  renameChannel: async (renameChannelDto: RenameChannelDto) => {
+    return await fetch(`${baseMappingUrl}/channel/rename-channel`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(renameChannelDto),
+    });
+  }
 };
 
 export default directMessagingApi;

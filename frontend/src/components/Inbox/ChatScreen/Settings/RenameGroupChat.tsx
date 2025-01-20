@@ -11,22 +11,61 @@ import {
 import { Button } from "@/components/ui/Button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import {RenameGroupDialogProps} from "@/types/dmchannels.ts";
+import {RenameChannelDto, RenameGroupDialogProps} from "@/types/dmchannels.ts";
+import useRenameChannel from "@/hooks/useRenameChannel.ts";
+import log from "loglevel";
+import useSendMessage from "@/hooks/useSendMessage.ts";
+import {SendMessageComponent} from "@/types/messaging.ts";
 
 export function RenameGroupDialog(
     {
       isOpen,
       onClose,
-      channelName
+      channelName,
+      channelId,
+      setCurrentChannelName,
+      currentUserId,
+      webSocketRef
     }: RenameGroupDialogProps) {
   const [currentName, setCurrentName] = useState(channelName);
   const [newName, setNewName] = useState("");
 
-  const handleSave = () => {
+  const {renameChannel} = useRenameChannel();
+  const {sendDirectMessage} = useSendMessage();
+
+  const handleSave = async () => {
     if (newName.trim()) {
-      setCurrentName(newName);
-      setNewName("");
-      onClose();
+      const renameChannelDto: RenameChannelDto = {
+        channelId: channelId,
+        channelName: newName,
+      }
+      const response = await renameChannel(renameChannelDto);
+      if (response?.status === 200) {
+        log.info("Channel renamed successfully");
+        const updaterMessageView = "You changed the group name to " + newName;
+        // TODO: Change to actual first name from cookies or smt
+        const otherMessageView = "Walter group name was changed to " + newName;
+        const messagePayload: SendMessageComponent = {
+          senderId: currentUserId,
+          channelId: channelId,
+          messageContent: `UPDATE*${currentUserId}*${updaterMessageView}*${otherMessageView}`,
+          attachments: [],
+          sentAt: new Date().toISOString(),
+          type: "UPDATE",
+          senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+          avatarUrl:
+              "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+        };
+        sendDirectMessage(messagePayload, webSocketRef);
+        setCurrentName(newName);
+        setNewName("");
+        setCurrentChannelName(newName);
+        onClose();
+      } else if (response?.status === 404) {
+        log.error("Channel not found");
+      } else {
+        log.error("Error renaming channel");
+      }
     }
   };
 

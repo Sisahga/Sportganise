@@ -32,6 +32,7 @@ const ChatScreen = () => {
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
+  const [currentChannelName, setCurrentChannelName] = useState(channelName);
 
   // Hooks
   const { messages, setMessages, loading, error } = useChatMessages(
@@ -145,7 +146,7 @@ const ChatScreen = () => {
             style={{ width: "40px", height: "40px" }}
             className="rounded-full object-cover"
           />
-          <h1 className="text-lg font-bold text-gray-800">{channelName}</h1>
+          <h1 className="text-lg font-bold text-gray-800">{currentChannelName}</h1>
         </div>
 
         {/* Options Button */}
@@ -156,6 +157,7 @@ const ChatScreen = () => {
           isBlocked={channelIsBlocked}
           currentUserId={currentUserId}
           channelName={channelName}
+          setCurrentChannelName={setCurrentChannelName}
         />
       </header>
 
