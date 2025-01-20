@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-//import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Component imports
@@ -7,50 +6,21 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { User2Icon, Hourglass } from "lucide-react";
 
 // Data structure for data received from API call
-interface Attendees {
-  accountId: number;
-  participantType: "COACH" | "ADMIN" | "PLAYER";
-  email: string;
-  address: string;
-  phone: string;
-  firstName: string;
-  lastName: string;
-}
+import { Program } from "@/types/trainingSessionDetails";
 
-interface ProgramDetails {
-  programId: number;
-  title: string;
-  type: string;
-  description: string;
-  capacity: number;
-  occurenceDate: Date;
-  duration: number;
-  recurring: boolean;
-  expiryDate: Date;
-  coach: string;
-  location: string;
-  attachment: File[] | null;
-}
+// Helper function imports
+import { calculateEndTime } from "@/utils/calculateEndTime";
 
-interface Event {
-  programId: number;
-  programDetails: ProgramDetails;
-  attendees: Attendees[];
-}
-
-const TrainingSessionCard: React.FC<Event> = ({
-  programId,
+const TrainingSessionCard: React.FC<Program> = ({
   programDetails,
   attendees,
 }) => {
-  //const [progamDetails, setProgramDetails] = useState<ProgramDetails>();
-  //setProgramDetails(programDetails);
-
   // Handle navigation to training session detail page
   const navigate = useNavigate();
-  const handleNavigation = (path: string, data: Event) => {
+  const handleNavigation = (path: string, data: Program) => {
     navigate(path, { state: data });
   };
 
@@ -59,11 +29,13 @@ const TrainingSessionCard: React.FC<Event> = ({
       <div className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
         <div className="flex w-full items-center gap-2">
           <Avatar>
-            <AvatarFallback>A</AvatarFallback>
+            <AvatarFallback>
+              <User2Icon color="#a1a1aa" />
+            </AvatarFallback>
           </Avatar>
-          <span>{programDetails.coach}</span>{" "}
+          <span>Coach Benjamin Luijan</span>{" "}
           <span className="ml-auto text-xs">
-            {programDetails.occurenceDate.toDateString()}
+            {new Date(programDetails.occurrenceDate).toDateString()}
           </span>
         </div>
         <span className="font-semibold">{programDetails.title}</span>
@@ -74,9 +46,33 @@ const TrainingSessionCard: React.FC<Event> = ({
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
               className="mb-1 mr-1"
             />
-            <p className="text-gray-500 whitespace-break-spaces text-xs">
-              {programDetails.duration}
-            </p>
+            <span className="flex items-center">
+              <p className="text-gray-500 whitespace-break-spaces text-xs">
+                {new Date(programDetails.occurrenceDate).toLocaleTimeString(
+                  "en-CA",
+                  { hour: "2-digit", minute: "2-digit" }
+                )}
+              </p>
+              <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
+              <p className="text-gray-500 whitespace-break-spaces text-xs">
+                {calculateEndTime(
+                  new Date(programDetails.occurrenceDate),
+                  programDetails.durationMins
+                )}
+              </p>
+            </span>
+          </span>
+          <span className="flex items-center">
+            <Hourglass
+              size={15}
+              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+              className="mb-1 mr-1"
+            />
+            <span className="flex items-center">
+              <p className="text-gray-500 whitespace-break-spaces text-xs">
+                {programDetails.durationMins} min
+              </p>
+            </span>
           </span>
           <span className="flex items-center">
             <MapPin
@@ -95,19 +91,18 @@ const TrainingSessionCard: React.FC<Event> = ({
         <div className="flex">
           <Badge
             variant={
-              programDetails.type.toLowerCase() == "training"
+              programDetails.programType.toLowerCase() === "training"
                 ? "default"
                 : "secondary"
             }
           >
-            {programDetails.type}
+            {programDetails.programType.toLowerCase()}
           </Badge>
 
           {/*Click to view details */}
           <button
             onClick={() =>
               handleNavigation("/pages/ViewTrainingSessionPage", {
-                programId,
                 programDetails,
                 attendees,
               })
