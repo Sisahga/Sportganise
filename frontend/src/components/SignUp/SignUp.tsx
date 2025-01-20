@@ -47,6 +47,7 @@ export default function SignUp() {
                 placeholder="Street #, Name"
               />
               <div className="grid grid-cols-2 gap-4">
+                <FormField id="Postal Code" label="Postal Code" placeholder="Postal Code" />
                 <FormField id="City" label="City" placeholder="City" />
                 <FormField id="Province" label="Province" placeholder="Prov" />
                 <FormField id="Country" label="Country" placeholder="Country" />
