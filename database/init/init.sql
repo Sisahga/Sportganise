@@ -165,12 +165,33 @@ ALTER TABLE channel
 ADD last_message_id INTEGER REFERENCES message(message_id);
 
 CREATE TABLE post(
-	post_id SERIAL PRIMARY KEY,
-	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-	title VARCHAR(100) NOT NULL,
-	description TEXT NOT NULL,
-	attachment VARCHAR(255),
-	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+    post_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    attachment VARCHAR(255),
+    metadata JSON ,
+    type VARCHAR(20) CHECK (type IN ('EVENT', 'TRAINING')),
+    occurence_date TIMESTAMPTZ,
+    creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE post_label(
+    post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
+    label_id INTEGER NOT NULL REFERENCES label(label_id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, label_id)
+);
+
+CREATE TABLE like(
+    post_id    INTEGER NOT NULL REFERENCES post (post_id) ON DELETE CASCADE,
+    account_id INTEGER NOT NULL REFERENCES account (account_id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, account_id)
+);
+
+CREATE TABLE post_attachment(
+    post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
+    attachment_url VARCHAR(255) NOT NULL,
+    PRIMARY KEY (post_id, attachment_url)
 );
 
 CREATE TABLE feedback(

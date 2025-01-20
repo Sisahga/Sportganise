@@ -2,6 +2,8 @@ package com.sportganise.entities.forum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -34,10 +36,18 @@ public class Post {
   @Column(nullable = false, columnDefinition = "TEXT")
   private String description;
 
-  private String attachment;
+  @Column(columnDefinition = "JSON")
+  private String metadata;
+
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20)
+  private PostType type;
+
+  @Column private ZonedDateTime occurenceDate;
 
   @Column(nullable = false, updatable = false)
-  private ZonedDateTime creationDate;
+  @Builder.Default
+  private ZonedDateTime creationDate = ZonedDateTime.now();
 
   /** Constructor for Post. */
   public Post(String title, String description) {
