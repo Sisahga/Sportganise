@@ -7,18 +7,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+} from "@/components/ui/dialog.tsx";
+import { Button } from "@/components/ui/Button.tsx";
+import { Input } from "@/components/ui/input.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import {RenameGroupDialogProps} from "@/types/dmchannels.ts";
 
-interface RenameGroupDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export function RenameGroupDialog({ isOpen, onClose }: RenameGroupDialogProps) {
-  const [currentName, setCurrentName] = useState("Current Group Name");
+export function RenameGroupDialog(
+    {
+      isOpen,
+      onClose,
+      channelName
+    }: RenameGroupDialogProps) {
+  const [currentName, setCurrentName] = useState(channelName);
   const [newName, setNewName] = useState("");
 
   const handleSave = () => {
@@ -31,31 +32,32 @@ export function RenameGroupDialog({ isOpen, onClose }: RenameGroupDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white text-primaryColour font-font">
+      <DialogContent className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+      style={{maxWidth: "90vw"}}>
         <DialogHeader>
           <DialogTitle className="text-2xl font-font font-bold">
             Rename Group
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
+        <div className="flex flex-col gap-4 py-4">
+          <div className="flex justify-between items-center gap-2">
             <Label
               htmlFor="current-name"
-              className="w-1/4 text-right font-font font-medium whitespace-nowrap"
+              className="w-2/5 text-left font-font font-medium whitespace-nowrap"
             >
               Current Name
             </Label>
             <Input
               id="current-name"
               value={currentName}
-              className="col-span-3 font-font bg-textPlaceholderColour text-primaryColour"
+              className="w-3/5 font-font bg-textPlaceholderColour text-primaryColour"
               disabled
             />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="flex justify-between items-center gap-2">
             <Label
               htmlFor="new-name"
-              className="text-right font-font font-medium whitespace-nonwrap"
+              className="w-2/5 text-left font-font font-medium whitespace-nonwrap"
             >
               New Name
             </Label>
@@ -63,7 +65,8 @@ export function RenameGroupDialog({ isOpen, onClose }: RenameGroupDialogProps) {
               id="new-name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="col-span-3 border-primaryColour focus:ring-secondaryColour focus:border-secondaryColour"
+              className="w-3/5 border-primaryColour focus:ring-secondaryColour focus:border-secondaryColour"
+              maxLength={50}
             />
           </div>
         </div>
@@ -71,14 +74,15 @@ export function RenameGroupDialog({ isOpen, onClose }: RenameGroupDialogProps) {
           <Button
             variant="outline"
             onClick={onClose}
-            className="border-primaryColour text-primaryColour bg-white hover:bg-textPlaceholderColour"
+            className="text-primaryColour bg-white hover:bg-textPlaceholderColour"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={!newName.trim()}
-            className="bg-secondaryColour text-primaryColour py-2 px-4 rounded font-bold hover:bg-textPlaceholderColour disabled:bg-fadedPrimaryColour disabled:text-white"
+            className="bg-secondaryColour text-primaryColour py-2 px-4 mx-force-none
+            rounded font-bold hover:bg-textPlaceholderColour disabled:bg-fadedPrimaryColour disabled:text-white"
           >
             Save
           </Button>
