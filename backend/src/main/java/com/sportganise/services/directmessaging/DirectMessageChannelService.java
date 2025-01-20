@@ -4,6 +4,7 @@ import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
+import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
@@ -174,6 +175,16 @@ public class DirectMessageChannelService {
       }
     }
     return dmChannels;
+  }
+
+  public void renameGroupChannel(int channelId, String channelName) throws ChannelNotFoundException {
+    int rowsAffected = this.directMessageChannelRepository.renameChannel(channelId, channelName);
+    if (rowsAffected == 0) {
+      log.error("Failed to rename channel with id: {}", channelId);
+      throw new ChannelNotFoundException("Channel not found");
+    } else {
+      log.info("Successfully renamed channel with id: {}", channelId);
+    }
   }
 
   /**

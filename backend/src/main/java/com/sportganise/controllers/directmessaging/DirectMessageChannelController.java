@@ -4,20 +4,18 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.RenameChannelDto;
+import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import com.sportganise.services.directmessaging.DirectMessageService;
 import java.util.List;
+
+import jakarta.validation.constraints.Null;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /** REST Controller for handling HTTP requests related to Direct Message Channels. */
 @RestController
@@ -121,6 +119,29 @@ public class DirectMessageChannelController {
       ResponseDto<LastMessageDto> response =
           new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "No messages found", null);
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  /**
+   * Endpoint /api/messaging/channel/rename-channel: Put Mapping for Renaming a Direct Message Channel.
+   *
+   * @param renameChannelDto DTO object for renaming a channel.
+   * @return HTTP Code 200 if successful, 404 if channel not found, 500 otherwise.
+   */
+  @PutMapping("/rename-channel")
+  public ResponseEntity<ResponseDto<Null>> renameChannel(
+          @RequestBody RenameChannelDto renameChannelDto) {
+    try {
+      directMessageChannelService.renameGroupChannel
+              (renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+      return new ResponseEntity<>(new ResponseDto<>
+              (HttpStatus.OK.value(), "Channel renamed successfully", null), HttpStatus.OK);
+    } catch (ChannelNotFoundException e) {
+      return new ResponseEntity<>(new ResponseDto<>
+              (HttpStatus.NOT_FOUND.value(), "Channel not found", null), HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(new ResponseDto<>
+              (HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

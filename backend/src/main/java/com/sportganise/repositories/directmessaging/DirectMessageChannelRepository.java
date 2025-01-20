@@ -66,5 +66,5 @@ public interface DirectMessageChannelRepository
   @Transactional
   @Modifying
   @Query("UPDATE DirectMessageChannel dmc SET dmc.name = :channelName WHERE dmc.channelId = :channelId")
-  void renameChannel(int channelId, String channelName);
+  int renameChannel(int channelId, String channelName);
 }

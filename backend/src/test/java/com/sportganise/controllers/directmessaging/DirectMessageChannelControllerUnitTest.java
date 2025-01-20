@@ -1,25 +1,31 @@
 package com.sportganise.controllers.directmessaging;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.RequestEntity.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.RenameChannelDto;
+import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import com.sportganise.services.directmessaging.DirectMessageService;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+
+import jakarta.validation.constraints.Null;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -171,5 +177,79 @@ class DirectMessageChannelControllerUnitTest {
         .andExpect(status().isOk())
         .andExpect(content().string(""));
     verify(dmChannelService, times(1)).getDirectMessageChannels(accountId);
+  }
+
+  @Test
+  public void renameChannel_Success() throws Exception {
+    RenameChannelDto renameChannelDto = new RenameChannelDto();
+    renameChannelDto.setChannelId(1);
+    renameChannelDto.setChannelName("New Channel Name");
+
+    ResponseDto<Null> responseDto =
+            new ResponseDto<>(200, "Channel renamed successfully", null);
+
+    doNothing().when(dmChannelService)
+            .renameGroupChannel(renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/api/messaging/channel/rename-channel")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(renameChannelDto)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+            .andExpect(jsonPath("$.data", nullValue()));
+
+    verify(dmChannelService, times(1))
+            .renameGroupChannel(renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+  }
+
+  @Test
+  public void renameChannel_NotFound() throws Exception {
+    RenameChannelDto renameChannelDto = new RenameChannelDto();
+    renameChannelDto.setChannelId(1);
+    renameChannelDto.setChannelName("New Channel Name");
+
+    ResponseDto<Null> responseDto =
+            new ResponseDto<>(404, "Channel not found", null);
+
+    doThrow(new ChannelNotFoundException("Channel not found"))
+            .when(dmChannelService)
+            .renameGroupChannel(renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/api/messaging/channel/rename-channel")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(renameChannelDto)))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+            .andExpect(jsonPath("$.data", nullValue()));
+
+    verify(dmChannelService, times(1))
+            .renameGroupChannel(renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+  }
+
+  @Test
+  public void renameChannel_InternalServerError() throws Exception {
+    RenameChannelDto renameChannelDto = new RenameChannelDto();
+    renameChannelDto.setChannelId(1);
+    renameChannelDto.setChannelName("New Channel Name");
+
+    ResponseDto<Null> responseDto =
+            new ResponseDto<>(500, "Unexpected error", null);
+
+    doThrow(new RuntimeException("Unexpected error"))
+            .when(dmChannelService)
+            .renameGroupChannel(renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+
+    mockMvc.perform(MockMvcRequestBuilders.put("/api/messaging/channel/rename-channel")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(renameChannelDto)))
+            .andExpect(status().isInternalServerError())
+            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+            .andExpect(jsonPath("$.data", nullValue()));
+
+    verify(dmChannelService, times(1))
+            .renameGroupChannel(renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
   }
 }
