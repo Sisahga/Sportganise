@@ -41,6 +41,7 @@ export interface ChannelSettingsDropdownProps {
   webSocketRef: WebSocketService | null;
   isBlocked: boolean | false;
   currentUserId: number;
+  channelName: string;
 }
 
 export enum GroupChannelMemberRole {
@@ -86,4 +87,10 @@ export interface AddMembersDialogProps {
   createFunction: () => void;
   currentUserId: number;
   excludedMembers: ChannelMember[] | null;
+}
+
+export interface RenameGroupDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  channelName: string;
 }

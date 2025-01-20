@@ -155,6 +155,7 @@ const ChatScreen = () => {
           webSocketRef={webSocketServiceRef.current}
           isBlocked={channelIsBlocked}
           currentUserId={currentUserId}
+          channelName={channelName}
         />
       </header>
 
