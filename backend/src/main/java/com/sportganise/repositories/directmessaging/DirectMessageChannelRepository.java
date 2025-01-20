@@ -62,4 +62,9 @@ public interface DirectMessageChannelRepository
           WHERE ch.channelHash = :channelHash
         """)
   DuplicateChannelDto findChannelByChannelHash(@Param("channelHash") String channelHash);
+
+  @Transactional
+  @Modifying
+  @Query("UPDATE DirectMessageChannel dmc SET dmc.name = :channelName WHERE dmc.channelId = :channelId")
+  void renameChannel(int channelId, String channelName);
 }
