@@ -103,14 +103,15 @@ interface Event {
 
 export default function TrainingSessionsList() {
   const [loading, setLoading] = useState<boolean>(true);
-  //const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
-  //const accountId = ""; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
+  const accountId = 2; // TODO : FIGURE OUT HOW TO GET ACCOUNTID FOR USER CLICKING ON THE TRAINING SESSION CARD
 
   // Fetch data on component mount
   useEffect(() => {
     const fetchEvents = async () => {
       try {
+        /*
         const mockEvents: Event[] = [
           {
             programId: 1000,
@@ -129,16 +130,17 @@ export default function TrainingSessionsList() {
           },
         ];
         setEvents(mockEvents);
+        */
 
-        /*
-        const response = await fetch(
-          `/api/${accountId}/${trainingSessionId}/details`
-          //"https://catfact.ninja/facts?limit=4" //a testing api
-        );
+        const baseMappingUrl =
+          import.meta.env.VITE_API_BASE_URL + "/api/programs";
+        const response = await fetch(`${baseMappingUrl}/${accountId}/details`);
+        console.log("RESPONSE:", response);
 
         if (response.ok) {
           const data = await response.json();
-          setAttendees(data.attendees);
+          console.log(data);
+          //setAttendees(data.attendees);
         } else {
           console.log(
             "Error fetching registered players content: ",
@@ -151,11 +153,10 @@ export default function TrainingSessionsList() {
             `Fetching registered players content: HTTP error! status: ${response.status}`
           ); // re-throw for the catch block below
         }
-        */
       } catch (error) {
         console.error(
           "Error fetching registered players content HTTP error:",
-          error,
+          error
         );
       } finally {
         setLoading(false);
@@ -167,20 +168,24 @@ export default function TrainingSessionsList() {
   return (
     <div className="mb-32">
       {/**Title */}
-      <h2 className="font-semibold text-2xl text-center">Schedule</h2>
+      <h2 className="font-semibold text-2xl text-secondaryColour text-center">
+        Schedule
+      </h2>
 
       {/**Tabs content */}
-      <div className="my-5">
+      <div className="my-5 grid-row-3 justify-items-center">
         <Tabs defaultValue="month" className="w-[400px]">
-          <TabsList>
-            <TabsTrigger value="day">Day</TabsTrigger>
-            <TabsTrigger value="week">Week</TabsTrigger>
-            <TabsTrigger value="month">Month</TabsTrigger>
-          </TabsList>
+          <div className="flex justify-center">
+            <TabsList>
+              <TabsTrigger value="month">Month</TabsTrigger>
+              <TabsTrigger value="week">Week</TabsTrigger>
+              <TabsTrigger value="day">Day</TabsTrigger>
+            </TabsList>
+          </div>
           <TabsContent value="day">Day view here...</TabsContent>
           <TabsContent value="week">Week view here...</TabsContent>
           <TabsContent value="month">
-            <div>
+            <div className="w-[250px] justify-self-center my-5">
               <Calendar />
             </div>
           </TabsContent>
