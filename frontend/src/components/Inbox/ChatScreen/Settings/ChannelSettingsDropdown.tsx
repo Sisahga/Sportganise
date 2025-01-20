@@ -50,7 +50,7 @@ const ChannelSettingsDropdown = ({
   isBlocked,
   currentUserId,
   channelName,
-  setCurrentChannelName
+  setCurrentChannelName,
 }: ChannelSettingsDropdownProps) => {
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);

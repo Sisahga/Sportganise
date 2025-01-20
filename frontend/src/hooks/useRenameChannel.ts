@@ -1,4 +1,4 @@
-import {RenameChannelDto} from "@/types/dmchannels.ts";
+import { RenameChannelDto } from "@/types/dmchannels.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 
 function useRenameChannel() {
@@ -9,7 +9,7 @@ function useRenameChannel() {
       console.error("Error renaming channel:", error);
       return null;
     }
-  }
+  };
   return {
     renameChannel,
   };

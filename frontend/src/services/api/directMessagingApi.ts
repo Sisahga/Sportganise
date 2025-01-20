@@ -2,7 +2,8 @@ import {
   AddChannelMemberDto,
   Channel,
   ChannelMember,
-  CreateChannelDto, RenameChannelDto,
+  CreateChannelDto,
+  RenameChannelDto,
 } from "@/types/dmchannels.ts";
 import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
@@ -101,7 +102,7 @@ const directMessagingApi = {
       },
       body: JSON.stringify(renameChannelDto),
     });
-  }
+  },
 };
 
 export default directMessagingApi;

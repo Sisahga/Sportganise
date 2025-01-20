@@ -11,34 +11,36 @@ import {
 import { Button } from "@/components/ui/Button.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import {RenameChannelDto, RenameGroupDialogProps} from "@/types/dmchannels.ts";
+import {
+  RenameChannelDto,
+  RenameGroupDialogProps,
+} from "@/types/dmchannels.ts";
 import useRenameChannel from "@/hooks/useRenameChannel.ts";
 import log from "loglevel";
 import useSendMessage from "@/hooks/useSendMessage.ts";
-import {SendMessageComponent} from "@/types/messaging.ts";
+import { SendMessageComponent } from "@/types/messaging.ts";
 
-export function RenameGroupDialog(
-    {
-      isOpen,
-      onClose,
-      channelName,
-      channelId,
-      setCurrentChannelName,
-      currentUserId,
-      webSocketRef
-    }: RenameGroupDialogProps) {
+export function RenameGroupDialog({
+  isOpen,
+  onClose,
+  channelName,
+  channelId,
+  setCurrentChannelName,
+  currentUserId,
+  webSocketRef,
+}: RenameGroupDialogProps) {
   const [currentName, setCurrentName] = useState(channelName);
   const [newName, setNewName] = useState("");
 
-  const {renameChannel} = useRenameChannel();
-  const {sendDirectMessage} = useSendMessage();
+  const { renameChannel } = useRenameChannel();
+  const { sendDirectMessage } = useSendMessage();
 
   const handleSave = async () => {
     if (newName.trim()) {
       const renameChannelDto: RenameChannelDto = {
         channelId: channelId,
         channelName: newName,
-      }
+      };
       const response = await renameChannel(renameChannelDto);
       if (response?.status === 200) {
         log.info("Channel renamed successfully");
@@ -54,7 +56,7 @@ export function RenameGroupDialog(
           type: "UPDATE",
           senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
           avatarUrl:
-              "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+            "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
         };
         sendDirectMessage(messagePayload, webSocketRef);
         setCurrentName(newName);
@@ -71,8 +73,10 @@ export function RenameGroupDialog(
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
-      style={{maxWidth: "90vw"}}>
+      <DialogContent
+        className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+        style={{ maxWidth: "90vw" }}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-font font-bold">
             Rename Group

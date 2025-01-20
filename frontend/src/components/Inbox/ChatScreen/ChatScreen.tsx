@@ -146,7 +146,9 @@ const ChatScreen = () => {
             style={{ width: "40px", height: "40px" }}
             className="rounded-full object-cover"
           />
-          <h1 className="text-lg font-bold text-gray-800">{currentChannelName}</h1>
+          <h1 className="text-lg font-bold text-gray-800">
+            {currentChannelName}
+          </h1>
         </div>
 
         {/* Options Button */}
