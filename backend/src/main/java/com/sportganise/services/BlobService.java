@@ -5,13 +5,17 @@ import com.sportganise.entities.directmessaging.DirectMessageBlob;
 import com.sportganise.repositories.BlobRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageBlobRepository;
 import java.io.IOException;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 /*
  * TODO:
@@ -97,6 +101,39 @@ public class BlobService {
     } catch (IOException e) {
       log.error("Error uploading file: {}", e.getMessage());
       throw new IOException("Error uploading file: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Deletes a file from the AWS S3 Bucket using its URL.
+   *
+   * @param s3Url The URL of the file to be deleted.
+   * @return Boolean indicating if the deletion was successful.
+   * @throws IOException If an error occurs while deleting the file.
+   * @throws S3Exception If an error occurs while deleting the file from S3.
+   */
+  public boolean deleteFile(String s3Url)
+          throws IOException, S3Exception {
+    try {
+      // Extract the key (filename) from the S3 URL
+      String key = s3Url.substring(s3Url.lastIndexOf("/") + 1);
+      log.debug("Deleting file with key: {}", key);
+
+      DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+              .bucket(bucketName)
+              .key(key)
+              .build();
+
+      // Delete the object from S3
+      s3Client.deleteObject(deleteRequest);
+      log.debug("Successfully deleted file in S3 bucket: {}", key);
+      return true;
+    } catch (S3Exception e) {
+      log.error("Error deleting file from S3: {}", e.getMessage());
+      throw new IOException("Error deleting file from S3: " + e.getMessage());
+    } catch (Exception e) {
+      log.error("Unexpected error while deleting file: {}", e.getMessage());
+      throw new IOException("Unexpected error while deleting file: " + e.getMessage());
     }
   }
 
