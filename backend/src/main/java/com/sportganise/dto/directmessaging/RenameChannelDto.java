@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * DTO for renaming a Direct Message Channel.
- */
+/** DTO for renaming a Direct Message Channel. */
 @Getter
 @Setter
 @NoArgsConstructor

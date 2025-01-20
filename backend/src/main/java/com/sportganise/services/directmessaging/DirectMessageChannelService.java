@@ -177,7 +177,15 @@ public class DirectMessageChannelService {
     return dmChannels;
   }
 
-  public void renameGroupChannel(int channelId, String channelName) throws ChannelNotFoundException {
+  /**
+   * Renames a group channel.
+   *
+   * @param channelId The ID of the channel to rename.
+   * @param channelName The new name of the channel.
+   * @throws ChannelNotFoundException If the channel is not found.
+   */
+  public void renameGroupChannel(int channelId, String channelName)
+      throws ChannelNotFoundException {
     int rowsAffected = this.directMessageChannelRepository.renameChannel(channelId, channelName);
     if (rowsAffected == 0) {
       log.error("Failed to rename channel with id: {}", channelId);

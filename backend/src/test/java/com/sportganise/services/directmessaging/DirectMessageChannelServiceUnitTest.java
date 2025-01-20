@@ -215,9 +215,7 @@ public class DirectMessageChannelServiceUnitTest {
     String newName = "New Channel Name";
     when(directMessageChannelRepository.renameChannel(channelId, newName)).thenReturn(1);
 
-    assertDoesNotThrow(() ->
-            directMessageChannelService.renameGroupChannel(channelId, newName)
-    );
+    assertDoesNotThrow(() -> directMessageChannelService.renameGroupChannel(channelId, newName));
 
     verify(directMessageChannelRepository).renameChannel(channelId, newName);
   }
@@ -228,10 +226,10 @@ public class DirectMessageChannelServiceUnitTest {
     String newName = "New Channel Name";
     when(directMessageChannelRepository.renameChannel(channelId, newName)).thenReturn(0);
 
-    ChannelNotFoundException exception = assertThrows(
+    ChannelNotFoundException exception =
+        assertThrows(
             ChannelNotFoundException.class,
-            () -> directMessageChannelService.renameGroupChannel(channelId, newName)
-    );
+            () -> directMessageChannelService.renameGroupChannel(channelId, newName));
 
     assertEquals("Channel not found", exception.getMessage());
   }
