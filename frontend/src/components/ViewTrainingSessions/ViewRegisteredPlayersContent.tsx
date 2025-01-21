@@ -1,3 +1,7 @@
+/**
+ * DON'T NEED THIS FILE ANYMORE
+ */
+
 //import { useEffect } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Attendees } from "@/types/trainingSessionDetails";
