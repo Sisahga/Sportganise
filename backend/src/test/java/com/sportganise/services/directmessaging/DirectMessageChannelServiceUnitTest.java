@@ -13,14 +13,12 @@ import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
-
+import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
-import com.sportganise.services.BlobService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -249,15 +247,12 @@ public class DirectMessageChannelServiceUnitTest {
     String newImageBlob = "new-image-blob";
 
     given(directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId))
-            .willReturn(oldImageBlob);
-    given(blobService.uploadFile(image, false, null, userId))
-            .willReturn(newImageBlob);
-    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob))
-            .willReturn(1);
+        .willReturn(oldImageBlob);
+    given(blobService.uploadFile(image, false, null, userId)).willReturn(newImageBlob);
+    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob)).willReturn(1);
 
-    assertDoesNotThrow(() ->
-            directMessageChannelService.updateChannelPicture(channelId, image, userId)
-    );
+    assertDoesNotThrow(
+        () -> directMessageChannelService.updateChannelPicture(channelId, image, userId));
 
     verify(directMessageChannelRepository).getDirectMessageChannelImageBlob(channelId);
     verify(blobService).uploadFile(image, false, null, userId);
@@ -274,15 +269,13 @@ public class DirectMessageChannelServiceUnitTest {
     String newImageBlob = "new-image-blob";
 
     given(directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId))
-            .willReturn(oldImageBlob);
-    given(blobService.uploadFile(image, false, null, userId))
-            .willReturn(newImageBlob);
-    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob))
-            .willReturn(0);
+        .willReturn(oldImageBlob);
+    given(blobService.uploadFile(image, false, null, userId)).willReturn(newImageBlob);
+    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob)).willReturn(0);
 
-    assertThrows(ChannelNotFoundException.class, () ->
-            directMessageChannelService.updateChannelPicture(channelId, image, userId)
-    );
+    assertThrows(
+        ChannelNotFoundException.class,
+        () -> directMessageChannelService.updateChannelPicture(channelId, image, userId));
 
     verify(directMessageChannelRepository).getDirectMessageChannelImageBlob(channelId);
     verify(blobService).uploadFile(image, false, null, userId);

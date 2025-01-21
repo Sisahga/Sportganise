@@ -4,12 +4,10 @@ import com.sportganise.entities.Blob;
 import com.sportganise.entities.directmessaging.DirectMessageBlob;
 import com.sportganise.repositories.BlobRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageBlobRepository;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -27,9 +25,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
  *    "profile_picture.png")
  */
 
-/**
- * Service class for handling operations related to Blobs.
- */
+/** Service class for handling operations related to Blobs. */
 @Slf4j
 @Service
 public class BlobService {
@@ -40,14 +36,14 @@ public class BlobService {
   /**
    * Constructor for the BlobService class.
    *
-   * @param blobRepository              Repository for the Blob entity.
+   * @param blobRepository Repository for the Blob entity.
    * @param directMessageBlobRepository Repository for the DirectMessageBlob entity.
-   * @param s3Client                    S3Client object for interacting with the AWS S3 Bucket.
+   * @param s3Client S3Client object for interacting with the AWS S3 Bucket.
    */
   public BlobService(
-          BlobRepository blobRepository,
-          DirectMessageBlobRepository directMessageBlobRepository,
-          S3Client s3Client) {
+      BlobRepository blobRepository,
+      DirectMessageBlobRepository directMessageBlobRepository,
+      S3Client s3Client) {
     this.blobRepository = blobRepository;
     this.directMessageBlobRepository = directMessageBlobRepository;
     this.s3Client = s3Client;
@@ -62,7 +58,7 @@ public class BlobService {
   /**
    * Uploads a file to the AWS S3 Bucket.
    *
-   * @param file      File to be uploaded.
+   * @param file File to be uploaded.
    * @param accountId Id of the account uploading the file.
    * @return String indicating the status of the upload.
    * @throws IOException If an error occurs while uploading the file.
@@ -74,15 +70,16 @@ public class BlobService {
   /**
    * Uploads a file to the AWS S3 Bucket.
    *
-   * @param file          File to be uploaded.
+   * @param file File to be uploaded.
    * @param isMessageFile Boolean indicating if the file is part of a direct message.
-   * @param messageId     Id of the direct message, if the file is part of a direct message.
-   * @param accountId     Id of the account uploading the file.
+   * @param messageId Id of the direct message, if the file is part of a direct message.
+   * @param accountId Id of the account uploading the file.
    * @return The URL of the newly uploaded file.
    * @throws IOException If an error occurs while uploading the file.
    */
-  public String uploadFile(MultipartFile file, boolean isMessageFile, String messageId, Integer accountId)
-          throws RuntimeException, IOException {
+  public String uploadFile(
+      MultipartFile file, boolean isMessageFile, String messageId, Integer accountId)
+      throws RuntimeException, IOException {
     String fileName = file.getOriginalFilename();
     // TODO: set proper key for file (accountId/uuid+filename)
     String uniqueFileName = UUID.randomUUID() + "_" + fileName;
@@ -92,7 +89,7 @@ public class BlobService {
     try {
       assert fileName != null;
       PutObjectRequest objectRequest =
-              PutObjectRequest.builder().bucket(bucketName).key(S3Key).build();
+          PutObjectRequest.builder().bucket(bucketName).key(S3Key).build();
       s3Client.putObject(objectRequest, RequestBody.fromBytes(file.getBytes()));
       String s3Url = this.computeS3Url(S3Key);
 
@@ -128,18 +125,15 @@ public class BlobService {
    * @throws IOException If an error occurs while deleting the file.
    * @throws S3Exception If an error occurs while deleting the file from S3.
    */
-  public void deleteFile(String s3Url)
-          throws IllegalArgumentException, IOException, S3Exception {
+  public void deleteFile(String s3Url) throws IllegalArgumentException, IOException, S3Exception {
     try {
       // Extract the key from the S3 URL
       URI s3Uri = new URI(s3Url);
       String s3Key = s3Uri.getPath().substring(1);
       log.debug("Deleting file with key: {}", s3Key);
 
-      DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
-              .bucket(bucketName)
-              .key(s3Key)
-              .build();
+      DeleteObjectRequest deleteRequest =
+          DeleteObjectRequest.builder().bucket(bucketName).key(s3Key).build();
 
       s3Client.deleteObject(deleteRequest);
       log.debug("Successfully deleted file in S3 bucket: {}", s3Key);
@@ -165,6 +159,6 @@ public class BlobService {
     String normalizedFileName = fileName.replace(" ", "+");
 
     return String.format(
-            "https://%s.s3.%s.amazonaws.com/%s", this.bucketName, this.region, normalizedFileName);
+        "https://%s.s3.%s.amazonaws.com/%s", this.bucketName, this.region, normalizedFileName);
   }
 }

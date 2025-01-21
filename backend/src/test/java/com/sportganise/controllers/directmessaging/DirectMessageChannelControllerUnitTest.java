@@ -17,7 +17,6 @@ import jakarta.validation.constraints.Null;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -263,94 +262,89 @@ class DirectMessageChannelControllerUnitTest {
   public void updateChannelPicture_Success() throws Exception {
     int channelId = 1;
     int accountId = 1;
-    MockMultipartFile image = new MockMultipartFile(
+    MockMultipartFile image =
+        new MockMultipartFile(
             "image",
             "test.jpg",
             MediaType.MULTIPART_FORM_DATA_VALUE,
-            "test image content".getBytes()
-    );
+            "test image content".getBytes());
 
-    ResponseDto<Null> responseDto = new ResponseDto<>(
-            200, "Channel picture updated successfully", null);
+    ResponseDto<Null> responseDto =
+        new ResponseDto<>(200, "Channel picture updated successfully", null);
 
-    doNothing()
-            .when(dmChannelService)
-            .updateChannelPicture(channelId, image, accountId);
+    doNothing().when(dmChannelService).updateChannelPicture(channelId, image, accountId);
 
-    mockMvc.perform(MockMvcRequestBuilders
-                    .multipart("/api/messaging/channel/update-image")
-                    .file(image)
-                    .param("channelId", String.valueOf(channelId))
-                    .param("accountId", String.valueOf(accountId)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
-            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
-            .andExpect(jsonPath("$.data", nullValue()));
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.multipart("/api/messaging/channel/update-image")
+                .file(image)
+                .param("channelId", String.valueOf(channelId))
+                .param("accountId", String.valueOf(accountId)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+        .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+        .andExpect(jsonPath("$.data", nullValue()));
 
-    verify(dmChannelService, times(1))
-            .updateChannelPicture(channelId, image, accountId);
+    verify(dmChannelService, times(1)).updateChannelPicture(channelId, image, accountId);
   }
 
   @Test
   public void updateChannelPicture_ChannelNotFound() throws Exception {
     int channelId = 1;
     int accountId = 1;
-    MockMultipartFile image = new MockMultipartFile(
+    MockMultipartFile image =
+        new MockMultipartFile(
             "image",
             "test.jpg",
             MediaType.MULTIPART_FORM_DATA_VALUE,
-            "test image content".getBytes()
-    );
+            "test image content".getBytes());
 
     ResponseDto<Null> responseDto = new ResponseDto<>(404, "Channel not found", null);
 
     doThrow(new ChannelNotFoundException("Channel not found"))
-            .when(dmChannelService)
-            .updateChannelPicture(channelId, image, accountId);
+        .when(dmChannelService)
+        .updateChannelPicture(channelId, image, accountId);
 
-    mockMvc.perform(MockMvcRequestBuilders
-                    .multipart("/api/messaging/channel/update-image")
-                    .file(image)
-                    .param("channelId", String.valueOf(channelId))
-                    .param("accountId", String.valueOf(accountId)))
-            .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
-            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
-            .andExpect(jsonPath("$.data", nullValue()));
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.multipart("/api/messaging/channel/update-image")
+                .file(image)
+                .param("channelId", String.valueOf(channelId))
+                .param("accountId", String.valueOf(accountId)))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+        .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+        .andExpect(jsonPath("$.data", nullValue()));
 
-    verify(dmChannelService, times(1))
-            .updateChannelPicture(channelId, image, accountId);
+    verify(dmChannelService, times(1)).updateChannelPicture(channelId, image, accountId);
   }
 
   @Test
   public void updateChannelPicture_InternalServerError() throws Exception {
     int channelId = 1;
     int accountId = 1;
-    MockMultipartFile image = new MockMultipartFile(
-            "image",
-            "test.jpg",
-            MediaType.IMAGE_JPEG_VALUE,
-            "test image content".getBytes()
-    );
+    MockMultipartFile image =
+        new MockMultipartFile(
+            "image", "test.jpg", MediaType.IMAGE_JPEG_VALUE, "test image content".getBytes());
 
     String errorMessage = "Unexpected error";
     ResponseDto<Null> responseDto = new ResponseDto<>(500, errorMessage, null);
 
     doThrow(new RuntimeException(errorMessage))
-            .when(dmChannelService)
-            .updateChannelPicture(channelId, image, accountId);
+        .when(dmChannelService)
+        .updateChannelPicture(channelId, image, accountId);
 
-    mockMvc.perform(MockMvcRequestBuilders
-                    .multipart("/api/messaging/channel/update-image")
-                    .file(image)
-                    .param("channelId", String.valueOf(channelId))
-                    .param("accountId", String.valueOf(accountId)))
-            .andExpect(status().isInternalServerError())
-            .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
-            .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
-            .andExpect(jsonPath("$.data", nullValue()));
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.multipart("/api/messaging/channel/update-image")
+                .file(image)
+                .param("channelId", String.valueOf(channelId))
+                .param("accountId", String.valueOf(accountId)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.statusCode", is(responseDto.getStatusCode())))
+        .andExpect(jsonPath("$.message", is(responseDto.getMessage())))
+        .andExpect(jsonPath("$.data", nullValue()));
 
-    verify(dmChannelService, times(1))
-            .updateChannelPicture(channelId, image, accountId);
+    verify(dmChannelService, times(1)).updateChannelPicture(channelId, image, accountId);
   }
 }

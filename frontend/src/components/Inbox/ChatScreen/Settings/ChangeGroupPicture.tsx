@@ -8,15 +8,18 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import {ImageIcon, Loader} from "lucide-react";
-import {ChangePictureDialogProps} from "@/types/dmchannels.ts";
+import { ImageIcon, Loader } from "lucide-react";
+import { ChangePictureDialogProps } from "@/types/dmchannels.ts";
 import defaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 import log from "loglevel";
 import useSendMessage from "@/hooks/useSendMessage.ts";
-import {SendMessageComponent} from "@/types/messaging.ts";
-import {MAX_SINGLE_FILE_SIZE, MAX_SINGLE_FILE_SIZE_TEXT} from "@/constants/file.constants.ts";
-import {useToast} from "@/hooks/use-toast.ts";
+import { SendMessageComponent } from "@/types/messaging.ts";
+import {
+  MAX_SINGLE_FILE_SIZE,
+  MAX_SINGLE_FILE_SIZE_TEXT,
+} from "@/constants/file.constants.ts";
+import { useToast } from "@/hooks/use-toast.ts";
 
 export function ChangePictureDialog({
   isOpen,
@@ -24,15 +27,17 @@ export function ChangePictureDialog({
   currentChannelId,
   currentChannelPictureUrl,
   setCurrentChannelPictureUrl,
-  webSocketRef
+  webSocketRef,
 }: ChangePictureDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [popupChannelPicture, setPopupChannelPicture] = useState<string | undefined>(currentChannelPictureUrl);
+  const [popupChannelPicture, setPopupChannelPicture] = useState<
+    string | undefined
+  >(currentChannelPictureUrl);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const {sendDirectMessage} = useSendMessage();
-  const {toast} = useToast();
+  const { sendDirectMessage } = useSendMessage();
+  const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -41,7 +46,7 @@ export function ChangePictureDialog({
     }
   };
 
-  const handleSave = async() => {
+  const handleSave = async () => {
     if (selectedFile) {
       if (selectedFile.size > MAX_SINGLE_FILE_SIZE) {
         log.error("File size exceeds the limit.");
@@ -49,7 +54,7 @@ export function ChangePictureDialog({
           title: "File size exceeds the limit",
           description: `Please upload a file that is less than ${MAX_SINGLE_FILE_SIZE_TEXT}.`,
           variant: "destructive",
-        })
+        });
         return;
       }
       const formData = new FormData();
@@ -59,8 +64,7 @@ export function ChangePictureDialog({
 
       setUploading(true);
       document.body.classList.add("pointer-events-none");
-      const response =
-          await directMessagingApi.updateChannelPicture(formData);
+      const response = await directMessagingApi.updateChannelPicture(formData);
       if (response.statusCode === 200) {
         log.info("Channel picture updated successfully.");
         setCurrentChannelPictureUrl(response.data?.channelImageUrl || "");
@@ -77,7 +81,7 @@ export function ChangePictureDialog({
           type: "UPDATE",
           senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
           avatarUrl:
-              "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+            "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
         };
         sendDirectMessage(messagePayload, webSocketRef);
 
@@ -98,8 +102,10 @@ export function ChangePictureDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
-      style={{maxWidth: "90vw"}}>
+      <DialogContent
+        className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+        style={{ maxWidth: "90vw" }}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-font font-bold">
             Change Group Picture
@@ -109,9 +115,9 @@ export function ChangePictureDialog({
           <div className="w-full max-w-sm space-y-2 flex flex-col gap-4">
             <div className="w-full">
               <img
-                  src={popupChannelPicture}
-                  alt={defaultGroupAvatar}
-                  className="w-36 h-36 object-cover mx-auto rounded-full"
+                src={popupChannelPicture}
+                alt={defaultGroupAvatar}
+                className="w-36 h-36 object-cover mx-auto rounded-full"
               />
             </div>
             <div className="relative">

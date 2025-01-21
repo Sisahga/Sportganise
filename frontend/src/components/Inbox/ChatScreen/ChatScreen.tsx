@@ -34,7 +34,8 @@ const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState("");
   const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
   const [currentChannelName, setCurrentChannelName] = useState(channelName);
-  const [currentChannelImageUrl, setCurrentChannelImageUrl] = useState(channelImageBlob);
+  const [currentChannelImageUrl, setCurrentChannelImageUrl] =
+    useState(channelImageBlob);
 
   // Hooks
   const { messages, setMessages, loading, error } = useChatMessages(

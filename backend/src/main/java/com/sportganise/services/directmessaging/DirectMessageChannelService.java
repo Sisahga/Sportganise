@@ -9,23 +9,19 @@ import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
-
+import com.sportganise.services.BlobService;
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
-
-import com.sportganise.services.BlobService;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Service Class related to Direct Message Channel.
- */
+/** Service Class related to Direct Message Channel. */
 @Service
 @Slf4j
 public class DirectMessageChannelService {
@@ -39,18 +35,18 @@ public class DirectMessageChannelService {
   /**
    * Service Constructor.
    *
-   * @param directMessageChannelRepository    Direct Message Channel Repository.
-   * @param accountRepository                 Account Repository.
+   * @param directMessageChannelRepository Direct Message Channel Repository.
+   * @param accountRepository Account Repository.
    * @param directMessageChannelMemberService Direct Message Channel Member Repository.
    */
   @Autowired
   public DirectMessageChannelService(
-          DirectMessageChannelRepository directMessageChannelRepository,
-          DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
-          AccountRepository accountRepository,
-          DirectMessageChannelMemberService directMessageChannelMemberService,
-          DirectMessageService directMessageService,
-          BlobService blobService) {
+      DirectMessageChannelRepository directMessageChannelRepository,
+      DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
+      AccountRepository accountRepository,
+      DirectMessageChannelMemberService directMessageChannelMemberService,
+      DirectMessageService directMessageService,
+      BlobService blobService) {
     this.directMessageChannelRepository = directMessageChannelRepository;
     this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
     this.accountRepository = accountRepository;
@@ -62,18 +58,18 @@ public class DirectMessageChannelService {
   /**
    * Creates a new DM Channel and stores it in the Database.
    *
-   * @param memberIds        String of member ids, separated by a ',' (min. 2 members)
-   * @param channelName      Name of the message channel. Can be null.
+   * @param memberIds String of member ids, separated by a ',' (min. 2 members)
+   * @param channelName Name of the message channel. Can be null.
    * @param creatorAccountId Id of the account who created the channel.
    * @return DM Channel created.
    */
   public CreateDirectMessageChannelDto createDirectMessageChannel(
-          List<Integer> memberIds, String channelName, int creatorAccountId) {
+      List<Integer> memberIds, String channelName, int creatorAccountId) {
     Collections.sort(memberIds);
     String stringRepresentation = memberIds.toString();
     String sha256hex = DigestUtils.sha256Hex(stringRepresentation);
     DuplicateChannelDto duplicateChannel =
-            directMessageChannelRepository.findChannelByChannelHash(sha256hex);
+        directMessageChannelRepository.findChannelByChannelHash(sha256hex);
     if (!(duplicateChannel == null)) {
       log.info("DUPLICATE CHANNEL HANDLED.");
       CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
@@ -82,8 +78,8 @@ public class DirectMessageChannelService {
       dmChannelDto.setMemberIds(memberIds);
       if (duplicateChannel.getChannelType().equals("SIMPLE")) {
         int otherMemberId =
-                directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
-                        duplicateChannel.getChannelId(), creatorAccountId);
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                duplicateChannel.getChannelId(), creatorAccountId);
         dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
         dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
       } else {
@@ -117,14 +113,14 @@ public class DirectMessageChannelService {
     int createdDmChannelId = createdDmChannel.getChannelId();
     // Create Channel Members
     this.directMessageChannelMemberService.saveMembers(
-            memberIds, createdDmChannelId, creatorAccountId);
+        memberIds, createdDmChannelId, creatorAccountId);
 
     // Return the DM Channel DTO
     CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
     dmChannelDto.setChannelId(createdDmChannelId);
     if (dmChannel.getType().equals("SIMPLE")) {
       int otherMemberId =
-              memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+          memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
       dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
     } else {
       dmChannelDto.setChannelName(channelName);
@@ -134,7 +130,7 @@ public class DirectMessageChannelService {
     dmChannelDto.setCreatedAt(timestamp.toString());
     if (dmChannel.getType().equals("SIMPLE")) {
       int otherMemberId =
-              memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+          memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
       dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
     } else {
       dmChannelDto.setAvatarUrl(null);
@@ -142,7 +138,7 @@ public class DirectMessageChannelService {
 
     String creatorFirstName = accountRepository.getFirstNameByAccountId(creatorAccountId);
     directMessageService.sendCreationDirectMessage(
-            createdDmChannelId, creatorAccountId, creatorFirstName);
+        createdDmChannelId, creatorAccountId, creatorFirstName);
     return dmChannelDto;
   }
 
@@ -171,7 +167,7 @@ public class DirectMessageChannelService {
    */
   public List<ListDirectMessageChannelDto> getDirectMessageChannels(int accountId) {
     List<ListDirectMessageChannelDto> dmChannels =
-            directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
+        directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
     for (ListDirectMessageChannelDto dmChannel : dmChannels) {
       log.info("Channel read: {}", dmChannel.getRead());
     }
@@ -179,8 +175,8 @@ public class DirectMessageChannelService {
       // Set image blob of channel to be the image blob of the other member of the channel if it is
       if (dmChannel.getChannelType().equals("SIMPLE")) {
         int otherMemberId =
-                directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
-                        dmChannel.getChannelId(), accountId);
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                dmChannel.getChannelId(), accountId);
         log.info("Other member id: {}", otherMemberId);
         dmChannel.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
         dmChannel.setChannelImageBlob(accountRepository.getPictureUrlByAccountId(otherMemberId));
@@ -192,12 +188,12 @@ public class DirectMessageChannelService {
   /**
    * Renames a group channel.
    *
-   * @param channelId   The ID of the channel to rename.
+   * @param channelId The ID of the channel to rename.
    * @param channelName The new name of the channel.
    * @throws ChannelNotFoundException If the channel is not found.
    */
   public void renameGroupChannel(int channelId, String channelName)
-          throws ChannelNotFoundException {
+      throws ChannelNotFoundException {
     int rowsAffected = this.directMessageChannelRepository.renameChannel(channelId, channelName);
     if (rowsAffected == 0) {
       log.error("Failed to rename channel with id: {}", channelId);
@@ -211,20 +207,22 @@ public class DirectMessageChannelService {
    * Updates the image of a channel.
    *
    * @param channelId The ID of the channel to update.
-   * @param image     The new image of the channel.
-   * @param userId    The ID of the user updating the channel.
+   * @param image The new image of the channel.
+   * @param userId The ID of the user updating the channel.
    * @throws ChannelNotFoundException If the channel is not found.
    */
   @Transactional
-  public UpdateChannelImageResponseDto updateChannelPicture(int channelId, MultipartFile image, Integer userId)
-          throws ChannelNotFoundException {
+  public UpdateChannelImageResponseDto updateChannelPicture(
+      int channelId, MultipartFile image, Integer userId) throws ChannelNotFoundException {
     try {
-      String oldImageBlobUrl = this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
+      String oldImageBlobUrl =
+          this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
       String newImageBlobUrl = this.blobService.uploadFile(image, false, null, userId);
       UpdateChannelImageResponseDto response = new UpdateChannelImageResponseDto();
       response.setChannelImageUrl(newImageBlobUrl);
 
-      int rowsAffected = this.directMessageChannelRepository.updateChannelImage(channelId, newImageBlobUrl);
+      int rowsAffected =
+          this.directMessageChannelRepository.updateChannelImage(channelId, newImageBlobUrl);
       if (rowsAffected == 0) {
         log.error("Failed to update channel picture with id: {}", channelId);
         throw new ChannelNotFoundException("Channel not found.");
@@ -252,9 +250,9 @@ public class DirectMessageChannelService {
     for (int i = 0; i < firstNames.size(); i++) {
       // Can't have channel name longer than 50 chars.
       if (i != firstNames.size() - 1
-              && channelNameBuilder.length()
-              + firstNames.get(i).length()
-              + firstNames.get(i + 1).length()
+          && channelNameBuilder.length()
+                  + firstNames.get(i).length()
+                  + firstNames.get(i + 1).length()
               > 44) {
         channelNameBuilder.append("and ");
         channelNameBuilder.append(firstNames.get(i));
