@@ -84,7 +84,7 @@ const TrainingSessionContent = () => {
           <h2 className="text-xl font-semibold text-secondaryColour">
             {programDetails.title}
           </h2>
-          {EventBadgeType(programDetails.programType)}
+          <EventBadgeType programType={programDetails.programType} />
         </div>
       </div>
 

@@ -2,9 +2,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User2Icon } from "lucide-react";
 import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
-import { useEffect, useState } from "react";
-import { Account } from "@/types/account";
-import log from "loglevel";
 
 interface RegisteredPlayerProps {
   accountId: number;
@@ -13,15 +10,12 @@ interface RegisteredPlayerProps {
 const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
   accountId,
 }: RegisteredPlayerProps) => {
-  const { data, loading, error } = usePersonalInformation(accountId);
-  const [accountDetails, setAccountDetails] = useState<Account>();
-  useEffect(() => {
-    setAccountDetails(data ?? undefined);
-    log.info(
-      "RegisteredPlayer.tsx : usepersonalInformation(accountId) = ",
-      data,
-    );
-  }, [data]);
+  const {
+    data: accountDetails,
+    loading,
+    error,
+  } = usePersonalInformation(accountId);
+
   return (
     <div>
       <div className="flex my-2">
@@ -45,7 +39,7 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
               {accountDetails?.firstName} {accountDetails?.lastName}
             </h4>
           )}
-          {AttendeeBadgeType(accountDetails?.type ?? "")}
+          <AttendeeBadgeType accountType={accountDetails?.type} />
         </div>
       </div>
       <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />

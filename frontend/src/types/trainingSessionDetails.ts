@@ -2,7 +2,6 @@
 export interface Attendees {
   accountId: number;
   programId: number;
-  rank: string; // "COACH" | "ADMIN" | "PLAYER"
   confirmedDate: Date;
   confirmed: boolean;
 }
