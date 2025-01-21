@@ -1,17 +1,18 @@
 package com.sportganise.dto.programsessions;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** API DTO for creating a new program. */
+/**
+ * API DTO for creating a new program.
+*/
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProgramRequestDto {
+public class ProgramCreateRequestDto {
   private String title;
   private String type;
   private String startDate;
@@ -23,5 +24,4 @@ public class ProgramRequestDto {
   private String startTime;
   private String endTime;
   private String location;
-  private List<String> attachmentsToRemove;
 }
