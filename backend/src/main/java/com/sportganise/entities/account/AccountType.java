@@ -8,5 +8,6 @@ package com.sportganise.entities.account;
 public enum AccountType {
   ADMIN,
   COACH,
-  PLAYER
+  PLAYER,
+  GENERAL
 }
