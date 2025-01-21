@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 // Created components imports
-import ViewRegisteredPlayersContent from "./ViewRegisteredPlayersContent";
 import DropDownMenuButton from "./DropDownMenuButton";
 import EventBadgeType from "./EventBadgeType";
 
@@ -27,6 +26,7 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
+import RegisteredPlayer from "./RegisteredPlayer";
 
 const TrainingSessionContent = () => {
   const [accountType /*, setAccountType*/] = useState<string>("coach"); // Handle account type. Only coach or admin can view list of attendees.
@@ -206,12 +206,27 @@ const TrainingSessionContent = () => {
         {/**Conditionally render subscribed players only to Admin or Coach */}
         {(accountType.toLowerCase() === "coach" ||
           accountType.toLowerCase() === "admin") && (
-          <div>
-            <ViewRegisteredPlayersContent
-              capacity={programDetails.capacity}
-              attendees={attendees}
-            />{" "}
-          </div>
+          <>
+            <div className="flex items-center">
+              <h2 className="text-lg font-semibold">Attendees</h2>
+              <p className="text-sm font-medium text-gray-500 ml-3">
+                {attendees.length}/{programDetails.capacity}
+              </p>
+            </div>
+            <div className="mx-2">
+              {attendees.length > 0 ? (
+                attendees.map((attendee, index) => (
+                  <div key={index}>
+                    <RegisteredPlayer accountId={attendee.accountId} />
+                  </div>
+                ))
+              ) : (
+                <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                  There are no attendees
+                </p>
+              )}
+            </div>
+          </>
         )}
 
         {/**Conditionally render different menu options based on account type */}

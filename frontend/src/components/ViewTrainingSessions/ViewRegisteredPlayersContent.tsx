@@ -45,7 +45,7 @@ export default function ViewRegisteredPlayersContent({
                   </div>
                   <div>
                     {loading ? (
-                      <p className="text-cyan-300 text-sm font-normal mb-1">
+                      <p className="text-cyan-300 text-sm font-normal m-5">
                         Loading...
                       </p>
                     ) : error ? (
@@ -53,7 +53,7 @@ export default function ViewRegisteredPlayersContent({
                         Failed to load account details
                       </p>
                     ) : (
-                      <h4 className="text-sm font-normal mb-1">
+                      <h4 className="text-sm font-normal m-5">
                         {data?.firstName} {data?.lastName}
                       </h4>
                     )}

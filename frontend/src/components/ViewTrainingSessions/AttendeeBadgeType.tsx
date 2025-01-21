@@ -7,13 +7,15 @@ export default function AttendeeBadgeType(attendeeType: string) {
     return <Badge variant="destructive">no type</Badge>;
   } else {
     if (attendeeType.toLowerCase() == "coach") {
-      return <Badge variant="secondary">{attendeeType}</Badge>;
+      return <Badge variant="secondary">{attendeeType.toLowerCase()}</Badge>;
     } else if (attendeeType.toLowerCase() == "admin") {
-      return <Badge variant="outline">{attendeeType}</Badge>;
+      return <Badge variant="outline">{attendeeType.toLowerCase()}</Badge>;
     } else if (attendeeType.toLowerCase() == "player") {
-      return <Badge variant="default">{attendeeType}</Badge>;
+      return <Badge variant="default">{attendeeType.toLowerCase()}</Badge>;
     } else {
-      return <Badge className="bg-amber-300">{attendeeType}</Badge>;
+      return (
+        <Badge className="bg-amber-300">{attendeeType.toLowerCase()}</Badge>
+      );
     }
   }
 }
