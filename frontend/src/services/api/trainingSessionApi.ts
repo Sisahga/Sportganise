@@ -7,17 +7,15 @@ const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/programs";
 
 const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
-  createTrainingSession: async (accountId: number, jsonPayload: FormValues) => {
+  createTrainingSession: async (accountId: number, jsonPayload: FormData) => {
     const response = await fetch(
-      `${baseMappingUrl}/${accountId}/create-program`,
-      {
+      "http://httpbin.org/post",
+      /*`${baseMappingUrl}/${accountId}/create-program`*/ {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonPayload),
-      },
+        body: jsonPayload,
+      }
     );
+    console.log("RESPONSE!!!!!!!", response);
     console.log("In trainingSessionApi.createTrainingSession");
     log.info("------ In trainingSessionApi.createTrainingSession");
     console.log("response in trainingSessionApi:", response);

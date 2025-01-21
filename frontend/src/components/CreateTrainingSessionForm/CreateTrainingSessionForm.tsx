@@ -121,8 +121,27 @@ export default function CreateTrainingSessionForm() {
       log.info(JSON.stringify(jsonPayload, null, 2));
       console.log(JSON.stringify(jsonPayload, null, 2));
 
+      //FORMDATA
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("type", values.type);
+      formData.append("startDate", values.startDate.toISOString());
+      formData.append("endDate", values.endDate.toISOString());
+      formData.append("recurring", values.recurring.toString());
+      formData.append("visibility", values.visibility);
+      formData.append("description", values.description);
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file, index) => {
+          formData.append(`attachment[${index}]`, file); //append each file
+        });
+      }
+      formData.append("capacity", values.capacity.toString());
+      formData.append("startTime", values.startTime);
+      formData.append("endTime", values.endTime);
+      formData.append("location", values.location);
+
       // API submit form
-      const create = await createTrainingSession(accountId, jsonPayload);
+      const create = await createTrainingSession(accountId, formData); //JSON PAYLOAD CHANGED TO FORMDATA
       console.log(error);
       console.log("create", create);
       log.info("create", create);
