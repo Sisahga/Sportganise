@@ -29,7 +29,7 @@ const formSchema = z.object({
     //array of files
     z.custom<File>((file) => file instanceof File && file.size > 0, {
       message: "Each file must be a valid file and not empty.",
-    }),
+    })
   ),
 });
 
@@ -67,7 +67,7 @@ export default function UploadTrainingPlanFiles() {
       setLoading(true);
       const uploadingTrainingPlanResponse = await uploadTrainingPlans(
         accountId,
-        values.trainingPlans, //this way File[] is sent and not { trainingPlans: File[] } (object)
+        values.trainingPlans //this way File[] is sent and not { trainingPlans: File[] } (object)
       );
       if (uploadingTrainingPlanResponse?.statusCode === 201) {
         // Successfully uploaded files
@@ -78,7 +78,7 @@ export default function UploadTrainingPlanFiles() {
         });
       } else {
         throw new Error(
-          "Error thrown from UploadTrainingPlanForm. File(s) could not be uploaded.",
+          "Error thrown from UploadTrainingPlanForm. File(s) could not be uploaded."
         );
       }
     } catch (err) {
