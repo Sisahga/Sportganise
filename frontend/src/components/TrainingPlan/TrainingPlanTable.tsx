@@ -100,7 +100,15 @@ export const columns = [
       );
     },
     cell: (props: any) => (
-      <div className="capitalize">{props.getValue("trainingPlan")}</div>
+      <a
+        className="miniscule underline text-gray-600"
+        href={props.getValue("trainingPlan")}
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+      >
+        {props.getValue("trainingPlan")}
+      </a>
     ),
   },
   {
