@@ -1,7 +1,6 @@
 export interface FormValues {
   title: string;
   type: string;
-  notify: boolean;
   startDate: Date;
   endDate: Date;
   recurring: boolean;
@@ -17,7 +16,6 @@ export interface FormValues {
 export interface ResponseFormValues {
   title: string;
   type: string;
-  notify: boolean;
   startDate: Date;
   endDate: Date;
   recurring: boolean;

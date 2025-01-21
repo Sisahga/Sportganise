@@ -4,7 +4,6 @@ export const formSchema = z
   .object({
     title: z.string(),
     type: z.string(),
-    notify: z.boolean().default(false),
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
     recurring: z.boolean().default(false),
@@ -15,7 +14,7 @@ export const formSchema = z
         //array of files
         z.custom<File>((file) => file instanceof File && file.size > 0, {
           message: "Each file must be a valid file and not empty.",
-        }),
+        })
       )
       .optional(),
     capacity: z.number().min(0),
@@ -42,7 +41,7 @@ export const formSchema = z
       message:
         "Event start and end dates are the same and therefore cannot reccur.",
       path: ["recurring"],
-    },
+    }
   );
 /* .refine(
     (data) =>
