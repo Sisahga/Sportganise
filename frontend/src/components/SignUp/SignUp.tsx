@@ -19,9 +19,14 @@ export default function SignUp() {
   const { toast } = useToast(); // Toast function
 
   // Hooks
-  const { isLoading: signUpLoading, error: signUpError, emailForVerification, signUpUser } = useSignUp();
-  const { isLoading: sendCodeLoading, error: sendCodeError } = useSendCode(emailForVerification);
-
+  const {
+    isLoading: signUpLoading,
+    error: signUpError,
+    emailForVerification,
+    signUpUser,
+  } = useSignUp();
+  const { isLoading: sendCodeLoading, error: sendCodeError } =
+    useSendCode(emailForVerification);
 
   const [formData, setFormData] = useState<SignUpRequest>({
     type: "PLAYER",
@@ -110,8 +115,8 @@ export default function SignUp() {
   };
 
   useEffect(() => {
-    if(emailForVerification && !sendCodeError){
-    // if (data?.statusCode === 201) {
+    if (emailForVerification && !sendCodeError) {
+      // if (data?.statusCode === 201) {
       toast({
         variant: "success",
         title: "Account Created",
@@ -142,14 +147,13 @@ export default function SignUp() {
     }
   }, [emailForVerification, signUpError, sendCodeError, navigate, toast]);
 
-
-    // if (error) {
-    //   if (error.includes("Account already exists")) {
-    //     toast({
-    //       variant: "destructive",
-    //       title: "Sign Up Failed",
-    //       description: "Account already exists.",
-    //     });
+  // if (error) {
+  //   if (error.includes("Account already exists")) {
+  //     toast({
+  //       variant: "destructive",
+  //       title: "Sign Up Failed",
+  //       description: "Account already exists.",
+  //     });
   //     } else if (error.includes("Password too weak")) {
   //       toast({
   //         variant: "destructive",
@@ -286,10 +290,10 @@ export default function SignUp() {
               <Button
                 type="submit"
                 className="w-full text-white bg-primaryColour mt-4"
-                disabled = {signUpLoading || sendCodeLoading}
+                disabled={signUpLoading || sendCodeLoading}
                 // disabled={isLoading} // To disable the button while the API call is being made
               >
-               {signUpLoading ? "Creating Account..." : "Sign Up"}
+                {signUpLoading ? "Creating Account..." : "Sign Up"}
               </Button>
             </form>
           </CardContent>

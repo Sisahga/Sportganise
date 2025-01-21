@@ -57,7 +57,9 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
   return await response.json();
 };
 
-export const sendCode = async (data: SendCodeRequest): Promise<SendCodeResponse> => {
+export const sendCode = async (
+  data: SendCodeRequest,
+): Promise<SendCodeResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/auth/send-code`, {
     method: "POST",
     headers: {
@@ -74,7 +76,7 @@ export const sendCode = async (data: SendCodeRequest): Promise<SendCodeResponse>
 };
 
 export const verifyCode = async (
-  data: VerifyCodeRequest
+  data: VerifyCodeRequest,
 ): Promise<VerifyCodeResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/auth/verify-code`, {
     method: "POST",
