@@ -34,9 +34,10 @@ public class BlobController {
   public ResponseEntity<String> uploadFile(
       @RequestParam("file") MultipartFile file,
       @RequestParam("isMessageFile") boolean isMessageFile,
-      @RequestParam("messageId") String messageId) {
+      @RequestParam("messageId") String messageId,
+      @RequestParam("accountId") Integer accountId) {
     try {
-      String url = blobService.uploadFile(file, isMessageFile, messageId);
+      String url = blobService.uploadFile(file, isMessageFile, messageId, accountId);
       return new ResponseEntity<>(url, HttpStatus.OK);
     } catch (IOException e) {
       log.error("Error uploading file: {}", e.getMessage());
