@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @Builder
 public class UpdateChannelPictureDto {
-    private int channelId;
+    private Integer channelId;
     private MultipartFile image;
+    private Integer accountId;
 }
