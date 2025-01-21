@@ -1,4 +1,4 @@
-import { Badge } from "../ui/badge";
+import { Badge } from "../../ui/badge";
 
 // Badge component for all types of events
 export default function EventBadgeType(programType: string) {

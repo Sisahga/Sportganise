@@ -1,4 +1,4 @@
-import { Badge } from "../ui/badge";
+import { Badge } from "../../ui/badge";
 
 // Handle badge variants based on attendee account type
 export default function AttendeeBadgeType(attendeeType: string) {

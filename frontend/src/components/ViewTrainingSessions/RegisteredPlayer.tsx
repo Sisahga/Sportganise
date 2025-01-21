@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User2Icon } from "lucide-react";
-import AttendeeBadgeType from "./AttendeeBadgeType";
+import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import { useEffect, useState } from "react";
 import { Account } from "@/types/account";
@@ -19,7 +19,7 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
     setAccountDetails(data ?? undefined);
     log.info(
       "RegisteredPlayer.tsx : usepersonalInformation(accountId) = ",
-      data,
+      data
     );
   }, [data]);
   return (

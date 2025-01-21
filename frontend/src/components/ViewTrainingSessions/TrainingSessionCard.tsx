@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
-import EventBadgeType from "./EventBadgeType";
+import EventBadgeType from "./BadgeTypes/EventBadgeType";
 
 // Data structure for data received from API call
 import { Program } from "@/types/trainingSessionDetails";
@@ -50,14 +50,14 @@ const TrainingSessionCard: React.FC<Program> = ({
               <p className="text-gray-500 whitespace-break-spaces text-xs">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-gray-500 whitespace-break-spaces text-xs">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
+                  programDetails.durationMins
                 )}
               </p>
             </span>
