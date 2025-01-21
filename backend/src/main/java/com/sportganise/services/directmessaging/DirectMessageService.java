@@ -13,6 +13,7 @@ import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -72,6 +73,24 @@ public class DirectMessageService {
     DirectMessageDto messageDto;
     for (DirectMessage message : messagesNoAttachments) {
       log.info("Sender ID: {}", message.getSenderId());
+      // Case where member that sent the message isn't in the channel anymore.
+      if (!memberDetails.containsKey(message.getSenderId())) {
+        log.info("Sender no longer in message channel.");
+        messageDto =
+            DirectMessageDto.builder()
+                .messageId(message.getMessageId())
+                .senderId(message.getSenderId())
+                .senderFirstName("Removed User")
+                .channelId(message.getChannelId())
+                .messageContent(message.getContent())
+                .attachments(Collections.emptyList())
+                .sentAt(message.getSentAt().toString())
+                .type(message.getType())
+                .avatarUrl(null)
+                .build();
+        messages.add(messageDto);
+        continue;
+      }
       attachments = directMessageRepository.getMessageAttachments(message.getMessageId());
       messageDto =
           DirectMessageDto.builder()
@@ -150,7 +169,8 @@ public class DirectMessageService {
     List<String> attachments = new ArrayList<>();
     for (int i = 0; i < sendDirectMessageRequestDto.getAttachments().size(); i++) {
       MultipartFile file = sendDirectMessageRequestDto.getAttachments().get(i);
-      String blobUrl = blobService.uploadFile(file, true, directMessage.getMessageId().toString());
+      String blobUrl =
+          blobService.uploadFile(file, true, directMessage.getMessageId().toString(), senderId);
       attachments.add(blobUrl);
     }
     directMessageDto.setAttachments(attachments);
@@ -174,7 +194,11 @@ public class DirectMessageService {
     directMessage.setSenderId(creatorId);
     directMessage.setChannelId(channelId);
     directMessage.setContent(
-        "INIT*" + creatorId + "*" + creatorFirstName + "* created the message channel.");
+        "INIT*"
+            + creatorId
+            + "*You created the message channel*"
+            + creatorFirstName
+            + " created the message channel.");
     directMessage.setSentAt(ZonedDateTime.now());
     directMessage.setType(DirectMessageType.JOIN);
     directMessageRepository.save(directMessage);

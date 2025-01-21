@@ -1,5 +1,6 @@
 package com.sportganise.services.account;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -19,6 +20,7 @@ import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.account.auth.Auth0ApiService;
@@ -127,10 +129,12 @@ public class AccountServiceTest {
 
   @Nested
   class UpdateAccount {
+    int notAccountId;
     Account originalAccount;
 
     @BeforeEach
     public void setup() {
+      notAccountId = 2;
       originalAccount =
           Account.builder()
               .accountId(1)
@@ -173,7 +177,6 @@ public class AccountServiceTest {
     public void updateAccountTest_NotFound() {
       given(accountRepository.findById(anyInt())).willReturn(Optional.empty());
 
-      int notAccountId = 2;
       UpdateAccountDto newAccount =
           UpdateAccountDto.builder()
               .firstName("John")
@@ -188,6 +191,47 @@ public class AccountServiceTest {
 
       verify(accountRepository, times(1)).findById(notAccountId);
       verify(accountRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void updateAccountTypeTest_NotFound() {
+      given(accountRepository.findById(anyInt())).willReturn(Optional.empty());
+
+      String newType = "PLAYER";
+
+      assertThrows(
+          AccountNotFoundException.class,
+          () -> accountService.updateAccountRole(notAccountId, newType));
+
+      verify(accountRepository, times(1)).findById(notAccountId);
+      verify(accountRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void updateAccountTypeTest_InvalidType() {
+      int accountId = originalAccount.getAccountId();
+      String invalidType = "NOT_ADMIN";
+
+      assertThrows(
+          InvalidAccountTypeException.class,
+          () -> accountService.updateAccountRole(accountId, invalidType));
+
+      verify(accountRepository, times(0)).findById(any());
+      verify(accountRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void updateAccountTypeTest_Success()
+        throws AccountNotFoundException, InvalidAccountTypeException {
+      int accountId = originalAccount.getAccountId();
+      AccountType newType = AccountType.ADMIN;
+      given(accountRepository.findById(anyInt())).willReturn(Optional.of(originalAccount));
+
+      originalAccount.setType(newType);
+      accountService.updateAccountRole(accountId, newType.toString());
+
+      verify(accountRepository, times(1)).findById(accountId);
+      verify(accountRepository, times(1)).save(originalAccount);
     }
   }
 

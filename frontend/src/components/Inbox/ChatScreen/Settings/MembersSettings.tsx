@@ -16,40 +16,141 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
 import { Button } from "@/components/ui/Button.tsx";
-import { UserPlus, UserMinus } from "lucide-react";
+import { UserMinus, UserPlus } from "lucide-react";
 import {
   ChannelMember,
+  GroupChannelMemberRole,
   MembersSettingsDialogProps,
 } from "@/types/dmchannels.ts";
+import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
+import log from "loglevel";
+import { SendMessageComponent } from "@/types/messaging.ts";
+import useSendMessage from "@/hooks/useSendMessage.ts";
+import AddMembers from "@/components/Inbox/AddMembers.tsx";
+import { AccountDetailsDirectMessaging } from "@/types/account.ts";
+import directMessagingApi from "@/services/api/directMessagingApi.ts";
 
 export function MembersSettingsDialog({
   isOpen,
   onClose,
   channelMembers,
+  channelId,
+  websocketRef,
+  currentUserId,
 }: MembersSettingsDialogProps) {
   const [members, setMembers] = useState<ChannelMember[]>(channelMembers);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [addMembersIsOpen, setAddMembersIsOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<ChannelMember | null>(
     null,
   );
-  console.log("Members from member settings dialog: ", members);
+  const [selectedUsers, setSelectedUsers] = useState<
+    AccountDetailsDirectMessaging[]
+  >([]);
+  const { removeChannelMember } = useRemoveChannelMember();
+  const { sendDirectMessage } = useSendMessage();
 
   useEffect(() => {
     setMembers(channelMembers);
   }, [channelMembers]);
 
-  const handleAction = (member: ChannelMember) => {
+  const handleRemove = (member: ChannelMember) => {
     setSelectedMember(member);
     setAlertDialogOpen(true);
   };
 
-  const handleRemoveConfirm = () => {
+  const handleRemoveConfirm = async () => {
     if (selectedMember) {
       setMembers(
         members.filter((m) => m.accountId !== selectedMember.accountId),
       );
-      setAlertDialogOpen(false);
-      setSelectedMember(null);
+      // Call API to remove member from group
+      const response = await removeChannelMember(
+        channelId,
+        selectedMember.accountId,
+      );
+      if (response?.status === 200) {
+        log.info(
+          `Member ${selectedMember.accountId} removed from channel ${channelId}`,
+        );
+        const leaveMessageRemoverViewContent = `You removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
+        // TODO: Replace with actual first name from cookies
+        const leaveMessageContent = `Walter removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
+        const messagePayload: SendMessageComponent = {
+          senderId: currentUserId, // TODO: Replace with actual sender ID from cookies
+          channelId: channelId,
+          messageContent: `LEAVE*${currentUserId}*${leaveMessageRemoverViewContent}*${leaveMessageContent}`,
+          attachments: [],
+          sentAt: new Date().toISOString(),
+          type: "LEAVE",
+          senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+          // TODO: Replace with actual avatar url from cookies
+          avatarUrl:
+            "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+        };
+        sendDirectMessage(messagePayload, websocketRef);
+        setAlertDialogOpen(false);
+        setSelectedMember(null);
+        onClose();
+      } else {
+        log.info(
+          `Error removing member ${selectedMember.accountId} from channel ${channelId}`,
+        );
+      }
+    }
+  };
+
+  const handleAddMembers = async () => {
+    const memberIds = selectedUsers.map((user) => user.accountId);
+    const addChannelMembersDto = {
+      channelId: channelId,
+      memberIds: memberIds,
+      adminId: currentUserId,
+    };
+    const response =
+      await directMessagingApi.addChannelMembers(addChannelMembersDto);
+    if (response?.status === 201) {
+      log.info(`${memberIds.length} new members added to channel ${channelId}`);
+      let newMemberNames = "";
+      let counter = 0;
+      selectedUsers.forEach((user) => {
+        newMemberNames +=
+          counter == selectedUsers.length - 1 && selectedUsers.length > 1
+            ? ` and ${user.firstName} ${user.lastName}`
+            : `${user.firstName} ${user.lastName}${selectedUsers.length > 2 ? "," : ""}`;
+        counter++;
+      });
+      const messagePayload: SendMessageComponent = {
+        senderId: currentUserId,
+        channelId: channelId,
+        // TODO: Replace with actual name from cookies.
+        messageContent: `JOIN*${currentUserId}*You added ${newMemberNames} to the group.*Walter added ${newMemberNames} to the group.`,
+        attachments: [],
+        sentAt: new Date().toISOString(),
+        type: "JOIN",
+        senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+        avatarUrl:
+          "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+      };
+      sendDirectMessage(messagePayload, websocketRef);
+
+      setMembers([
+        ...members,
+        ...selectedUsers.map((user) => {
+          return {
+            accountId: user.accountId,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            avatarUrl: undefined,
+            role: GroupChannelMemberRole.REGULAR,
+          };
+        }),
+      ]);
+
+      setAddMembersIsOpen(false);
+      onClose();
+    } else {
+      log.info(`Error adding members to channel ${channelId}`);
     }
   };
 
@@ -69,22 +170,34 @@ export function MembersSettingsDialog({
             {members.map((member) => (
               <div
                 key={member.accountId}
-                className="flex items-center justify-between py-2 font-font text-primaryColour"
+                className="flex items-center justify-between py-2 font-font text-primaryColour gap-4"
               >
-                <span>
-                  {member.firstName} {member.lastName}
-                </span>
-                <div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleAction(member)}
-                  >
-                    <UserMinus className="h-4 w-4" />
-                    <span className="sr-only">
-                      Remove {member.firstName} {member.lastName}
+                <div className="flex w-full justify-between items-center">
+                  <span>
+                    {member.firstName} {member.lastName}
+                  </span>
+                  <span className="font-light text-sm faded-primary-colour italic">
+                    {member.role == GroupChannelMemberRole.ADMIN && "ADMIN"}
+                  </span>
+                </div>
+                <div className="flex items-center">
+                  {/* Do not show remove option if member is current user */}
+                  {member.accountId !== currentUserId ? (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemove(member)}
+                    >
+                      <UserMinus className="h-4 w-4" />
+                      <span className="sr-only">
+                        Remove {member.firstName} {member.lastName}
+                      </span>
+                    </Button>
+                  ) : (
+                    <span className="text-sm primary-colour font-light italic">
+                      (You)
                     </span>
-                  </Button>
+                  )}
                 </div>
               </div>
             ))}
@@ -92,10 +205,34 @@ export function MembersSettingsDialog({
           <Button
             className="mt-4 bg-secondaryColour text-primaryColour font-bold
             py-2 px-4 rounded hover:bg-textPlaceholderColour"
+            onClick={() => {
+              setAddMembersIsOpen(true);
+            }}
           >
             Add Members
             <UserPlus className="h-4 w-4 mr-2" />
           </Button>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={addMembersIsOpen} onOpenChange={setAddMembersIsOpen}>
+        <DialogContent
+          className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+          style={{ maxWidth: "95vw" }}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-xl text-primaryColour font-font font-bold">
+              Select Members to Add
+            </DialogTitle>
+          </DialogHeader>
+          <AddMembers
+            selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
+            submitButtonLabel={"Confirm"}
+            createFunction={handleAddMembers}
+            currentUserId={currentUserId}
+            excludedMembers={members}
+          ></AddMembers>
         </DialogContent>
       </Dialog>
 

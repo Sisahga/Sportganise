@@ -1,4 +1,8 @@
-import { AccountDetailsDirectMessaging } from "@/types/account.ts";
+import {
+  AccountDetailsDirectMessaging,
+  Account,
+  UpdateAccountPayload,
+} from "@/types/account.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/account";
 
@@ -9,6 +13,70 @@ const accountApi = {
     );
     const data: AccountDetailsDirectMessaging[] = await response.json();
     return data;
+  },
+
+  //Function to get account by id
+  getAccountById: async (accountId: number): Promise<Account> => {
+    const response = await fetch(`${baseMappingUrl}/${accountId}`);
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+    const data: Account = await response.json();
+    return data;
+  },
+
+  //Function to update account information
+  updateAccount: async (
+    accountId: number,
+    data: UpdateAccountPayload,
+  ): Promise<void> => {
+    const response = await fetch(`${baseMappingUrl}/${accountId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error("Account not found");
+      }
+      throw new Error("Failed to update account");
+    }
+  },
+
+  // Function to update profile picture
+  updateProfilePicture: async (
+    accountId: number,
+    file: File,
+  ): Promise<{ success: boolean; message: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch(`${baseMappingUrl}/${accountId}/picture`, {
+      method: "PUT",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        return { success: false, message: "Account not found" };
+      } else if (response.status === 500) {
+        return { success: false, message: "Failed to upload the file" };
+      } else {
+        return {
+          success: false,
+          message:
+            "Unexpected error occurred while updating the profile picture",
+        };
+      }
+    }
+
+    return {
+      success: true,
+      message: "Your profile picture has been successfully updated.",
+    };
   },
 };
 

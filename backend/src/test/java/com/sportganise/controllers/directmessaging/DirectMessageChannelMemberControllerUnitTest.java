@@ -2,11 +2,12 @@ package com.sportganise.controllers.directmessaging;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sportganise.dto.directmessaging.AddChannelMemberDto;
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.services.directmessaging.DirectMessageChannelMemberService;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -25,6 +27,8 @@ class DirectMessageChannelMemberControllerUnitTest {
   @Autowired private MockMvc mockMvc;
 
   @MockBean private DirectMessageChannelMemberService directMessageChannelMemberService;
+
+  @Autowired private ObjectMapper objectMapper;
 
   @Test
   public void getChannelMembers_ShouldReturnMembersExcludingUser() throws Exception {
@@ -110,7 +114,7 @@ class DirectMessageChannelMemberControllerUnitTest {
     mockMvc
         .perform(
             MockMvcRequestBuilders.delete(
-                "/api/messaging/channelmember/" + channelId + "/" + accountId))
+                "/api/messaging/channelmember/remove/" + channelId + "/" + accountId))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.statusCode", is(200)))
         .andExpect(jsonPath("$.message", is("Channel member deleted successfully")))
@@ -118,5 +122,64 @@ class DirectMessageChannelMemberControllerUnitTest {
 
     verify(directMessageChannelMemberService, times(1))
         .removeMemberFromChannel(channelId, accountId);
+  }
+
+  @Test
+  public void addMembersToChannel_ShouldReturnCreatedStatus() throws Exception {
+    AddChannelMemberDto addChannelMemberDto = new AddChannelMemberDto();
+    addChannelMemberDto.setChannelId(1);
+    addChannelMemberDto.setAdminId(100);
+    addChannelMemberDto.setMemberIds(Arrays.asList(200, 201, 202));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/messaging/channelmember/add-members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addChannelMemberDto)))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.statusCode", is(201)))
+        .andExpect(jsonPath("$.message", is("Members added successfully")))
+        .andExpect(jsonPath("$.data").doesNotExist());
+
+    verify(directMessageChannelMemberService, times(1))
+        .saveMembers(
+            addChannelMemberDto.getMemberIds(),
+            addChannelMemberDto.getChannelId(),
+            addChannelMemberDto.getAdminId());
+  }
+
+  @Test
+  public void addMembersToChannel_WhenExceptionThrown_ShouldReturnInternalServerError()
+      throws Exception {
+    AddChannelMemberDto addChannelMemberDto = new AddChannelMemberDto();
+    addChannelMemberDto.setChannelId(1);
+    addChannelMemberDto.setAdminId(100);
+    addChannelMemberDto.setMemberIds(Arrays.asList(200, 201, 202));
+
+    doThrow(new RuntimeException("Database error"))
+        .when(directMessageChannelMemberService)
+        .saveMembers(
+            addChannelMemberDto.getMemberIds(),
+            addChannelMemberDto.getChannelId(),
+            addChannelMemberDto.getAdminId());
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/messaging/channelmember/add-members")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(addChannelMemberDto)))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.statusCode", is(500)))
+        .andExpect(
+            jsonPath(
+                "$.message",
+                is("An unexpected error occurred while adding members to the channel")))
+        .andExpect(jsonPath("$.data").doesNotExist());
+
+    verify(directMessageChannelMemberService, times(1))
+        .saveMembers(
+            addChannelMemberDto.getMemberIds(),
+            addChannelMemberDto.getChannelId(),
+            addChannelMemberDto.getAdminId());
   }
 }

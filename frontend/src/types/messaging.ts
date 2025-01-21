@@ -9,7 +9,7 @@ export interface MessageComponent {
   attachments: string[];
   sentAt: string;
   type: string;
-  avatarUrl: string;
+  avatarUrl: string | undefined;
 }
 
 export interface SendMessageComponent {
@@ -25,6 +25,7 @@ export interface SendMessageComponent {
 
 export interface ChatMessageProps {
   messages: MessageComponent[];
+  currentUserId: number;
 }
 
 export interface LastMessageComponent {

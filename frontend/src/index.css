@@ -59,11 +59,17 @@
 .bg-primary-white {
   background-color: var(--primary-white) !important;
 }
+.bg-primary-red {
+  background-color: var(--primary-red) !important;
+}
 
 .force-hide {
   display: none !important;
 }
-
+.mx-force-none {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
 a {
   font-weight: 500;
   color: #646cff;

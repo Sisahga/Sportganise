@@ -63,7 +63,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         <DropdownMenuTrigger asChild>
           <button
             aria-label="Add new item"
-            className="fixed bottom-20 right-5 bg-secondaryColour text-white p-4 rounded-full shadow-lg hover:bg-cyan-500 focus:outline-none flex items-center justify-center"
+            className="fixed bottom-24 right-5 bg-secondaryColour text-white p-4 rounded-full shadow-lg hover:bg-cyan-500 focus:outline-none flex items-center justify-center"
           >
             <EllipsisVertical />
           </button>

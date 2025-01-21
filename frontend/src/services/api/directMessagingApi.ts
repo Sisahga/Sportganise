@@ -1,7 +1,10 @@
 import {
+  AddChannelMemberDto,
   Channel,
   ChannelMember,
   CreateChannelDto,
+  RenameChannelDto,
+  UpdateChannelPictureResponse,
 } from "@/types/dmchannels.ts";
 import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
@@ -73,6 +76,41 @@ const directMessagingApi = {
       `${baseMappingUrl}/channel/get-last-message/${channelId}`,
     );
     const data: ResponseDto<LastMessageComponent> = await response.json();
+    return data;
+  },
+  removeChannelMember: async (channelId: number, accountId: number) => {
+    return await fetch(
+      `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
+      {
+        method: "DELETE",
+      },
+    );
+  },
+  addChannelMembers: async (channelMembersDto: AddChannelMemberDto) => {
+    return await fetch(`${baseMappingUrl}/channelmember/add-members`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(channelMembersDto),
+    });
+  },
+  renameChannel: async (renameChannelDto: RenameChannelDto) => {
+    return await fetch(`${baseMappingUrl}/channel/rename-channel`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(renameChannelDto),
+    });
+  },
+  updateChannelPicture: async (requestData: FormData) => {
+    const response = await fetch(`${baseMappingUrl}/channel/update-image`, {
+      method: "POST", // Its a more complex backend, so we need to use POST here.
+      body: requestData,
+    });
+    const data: ResponseDto<UpdateChannelPictureResponse> =
+      await response.json();
     return data;
   },
 };
