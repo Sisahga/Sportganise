@@ -101,7 +101,7 @@ export const columns = [
     },
     cell: (props: any) => (
       <a
-        className="miniscule underline text-gray-600"
+        className="miniscule underline text-gray-600 hover:text-cyan-300"
         href={props.getValue("trainingPlan")}
         target="_blank"
         rel="noopener noreferrer"
