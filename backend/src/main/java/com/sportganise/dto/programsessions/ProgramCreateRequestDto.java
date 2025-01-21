@@ -5,9 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * API DTO for creating a new program.
-*/
+/** API DTO for creating a new program. */
 @Getter
 @Setter
 @NoArgsConstructor
