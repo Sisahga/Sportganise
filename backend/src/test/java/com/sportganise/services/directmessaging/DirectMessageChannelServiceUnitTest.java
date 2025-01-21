@@ -13,6 +13,8 @@ import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
+import com.sportganise.services.BlobService;
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageChannelServiceUnitTest {
@@ -30,8 +33,9 @@ public class DirectMessageChannelServiceUnitTest {
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
   @Mock private DirectMessageChannelMemberService directMessageChannelMemberService;
   @Mock private AccountRepository accountRepository;
-  @InjectMocks private DirectMessageChannelService directMessageChannelService;
   @Mock private DirectMessageService directMessageService;
+  @Mock private BlobService blobService;
+  @InjectMocks private DirectMessageChannelService directMessageChannelService;
 
   CreateDirectMessageChannelDto dmChannelDTO;
   DirectMessageChannel dmChannel;
@@ -232,5 +236,50 @@ public class DirectMessageChannelServiceUnitTest {
             () -> directMessageChannelService.renameGroupChannel(channelId, newName));
 
     assertEquals("Channel not found", exception.getMessage());
+  }
+
+  @Test
+  public void updateChannelPicture_Success() throws IOException {
+    int channelId = 1;
+    int userId = 1;
+    MultipartFile image = mock(MultipartFile.class);
+    String oldImageBlob = "old-image-blob";
+    String newImageBlob = "new-image-blob";
+
+    given(directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId))
+        .willReturn(oldImageBlob);
+    given(blobService.uploadFile(image, false, null, userId)).willReturn(newImageBlob);
+    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob)).willReturn(1);
+
+    assertDoesNotThrow(
+        () -> directMessageChannelService.updateChannelPicture(channelId, image, userId));
+
+    verify(directMessageChannelRepository).getDirectMessageChannelImageBlob(channelId);
+    verify(blobService).uploadFile(image, false, null, userId);
+    verify(directMessageChannelRepository).updateChannelImage(channelId, newImageBlob);
+    verify(blobService).deleteFile(oldImageBlob);
+  }
+
+  @Test
+  public void updateChannelPicture_ChannelNotFound() throws IOException {
+    int channelId = 1;
+    int userId = 1;
+    MultipartFile image = mock(MultipartFile.class);
+    String oldImageBlob = "old-image-blob";
+    String newImageBlob = "new-image-blob";
+
+    given(directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId))
+        .willReturn(oldImageBlob);
+    given(blobService.uploadFile(image, false, null, userId)).willReturn(newImageBlob);
+    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob)).willReturn(0);
+
+    assertThrows(
+        ChannelNotFoundException.class,
+        () -> directMessageChannelService.updateChannelPicture(channelId, image, userId));
+
+    verify(directMessageChannelRepository).getDirectMessageChannelImageBlob(channelId);
+    verify(blobService).uploadFile(image, false, null, userId);
+    verify(directMessageChannelRepository).updateChannelImage(channelId, newImageBlob);
+    verify(blobService, never()).deleteFile(anyString());
   }
 }

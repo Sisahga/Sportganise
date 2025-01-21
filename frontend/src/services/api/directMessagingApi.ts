@@ -4,6 +4,7 @@ import {
   ChannelMember,
   CreateChannelDto,
   RenameChannelDto,
+  UpdateChannelPictureResponse,
 } from "@/types/dmchannels.ts";
 import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
@@ -102,6 +103,15 @@ const directMessagingApi = {
       },
       body: JSON.stringify(renameChannelDto),
     });
+  },
+  updateChannelPicture: async (requestData: FormData) => {
+    const response = await fetch(`${baseMappingUrl}/channel/update-image`, {
+      method: "POST", // Its a more complex backend, so we need to use POST here.
+      body: requestData,
+    });
+    const data: ResponseDto<UpdateChannelPictureResponse> =
+      await response.json();
+    return data;
   },
 };
 

@@ -72,4 +72,22 @@ public interface DirectMessageChannelRepository
           WHERE dmc.channelId = :channelId
           """)
   int renameChannel(int channelId, String channelName);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+        UPDATE DirectMessageChannel dmc
+        SET dmc.imageBlob = :imageObjectUrl
+        WHERE dmc.channelId = :channelId
+      """)
+  int updateChannelImage(int channelId, String imageObjectUrl);
+
+  @Query(
+      """
+        SELECT dmc.imageBlob
+        FROM DirectMessageChannel dmc
+        WHERE dmc.channelId = :channelId
+      """)
+  String getDirectMessageChannelImageBlob(int channelId);
 }
