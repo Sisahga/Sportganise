@@ -5,6 +5,7 @@ import {
   SignUpRequest,
   SignUpResponse,
   SendCodeRequest,
+  SendCodeResponse,
   VerifyCodeRequest,
   VerifyCodeResponse,
 } from "@/types/auth";
@@ -46,6 +47,8 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
     body: JSON.stringify(data),
   });
 
+  console.log("Raw response:", response);
+
   if (!response.ok) {
     const errorResponse = await response.text();
     throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
@@ -54,7 +57,7 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
   return await response.json();
 };
 
-export const sendCode = async (data: SendCodeRequest): Promise<void> => {
+export const sendCode = async (data: SendCodeRequest): Promise<SendCodeResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/auth/send-code`, {
     method: "POST",
     headers: {
@@ -67,6 +70,7 @@ export const sendCode = async (data: SendCodeRequest): Promise<void> => {
     const errorResponse = await response.text();
     throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
   }
+  return await response.json();
 };
 
 export const verifyCode = async (

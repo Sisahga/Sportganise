@@ -5,13 +5,25 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast"; // Toast hook
 import { useSignUp } from "@/hooks/useSignUp";
+import { useSendCode } from "@/hooks/useSendCode";
+import { SignUpRequest } from "@/types/auth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function SignUp() {
   const navigate = useNavigate();
   const { toast } = useToast(); // Toast function
-  const { isLoading, error, data, signUpUser } = useSignUp();
 
-  const [formData, setFormData] = useState({
+  // Hooks
+  const { isLoading: signUpLoading, error: signUpError, emailForVerification, signUpUser } = useSignUp();
+  const { isLoading: sendCodeLoading, error: sendCodeError } = useSendCode(emailForVerification);
+
+
+  const [formData, setFormData] = useState<SignUpRequest>({
     type: "PLAYER",
     email: "",
     password: "",
@@ -64,6 +76,13 @@ export default function SignUp() {
     }
   };
 
+  const handleAccountTypeChange = (type: "PLAYER" | "COACH" | "ADMIN") => {
+    setFormData((prev) => ({
+      ...prev,
+      type,
+    }));
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -77,11 +96,22 @@ export default function SignUp() {
       return;
     }
 
+    const validAccountTypes = ["PLAYER", "COACH", "ADMIN"];
+    if (!validAccountTypes.includes(formData.type)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Account Type",
+        description: "Please select a valid account type.",
+      });
+      return;
+    }
+
     signUpUser(formData);
   };
 
   useEffect(() => {
-    if (data?.statusCode === 201) {
+    if(emailForVerification && !sendCodeError){
+    // if (data?.statusCode === 201) {
       toast({
         variant: "success",
         title: "Account Created",
@@ -93,35 +123,55 @@ export default function SignUp() {
       navigate("/verificationcode");
     }
 
-    if (error) {
-      if (error.includes("Account already exists")) {
-        toast({
-          variant: "destructive",
-          title: "Sign Up Failed",
-          description: "Account already exists.",
-        });
-      } else if (error.includes("Password too weak")) {
-        toast({
-          variant: "destructive",
-          title: "Sign Up Failed",
-          description: "Password too weak.",
-        });
-      } else {
-        toast({
-          variant: "destructive",
-          title: "Sign Up Failed",
-          description: "An unexpected error occurred.",
-        });
-      }
+    if (signUpError) {
+      toast({
+        variant: "destructive",
+        title: "Sign Up Failed",
+        description: signUpError.includes("Account already exists")
+          ? "Account already exists."
+          : "An unexpected error occurred.",
+      });
     }
-  }, [data, error, navigate, toast]);
+
+    if (sendCodeError) {
+      toast({
+        variant: "destructive",
+        title: "Verification Code Failed",
+        description: "Failed to send verification code. Please try again.",
+      });
+    }
+  }, [emailForVerification, signUpError, sendCodeError, navigate, toast]);
+
+
+    // if (error) {
+    //   if (error.includes("Account already exists")) {
+    //     toast({
+    //       variant: "destructive",
+    //       title: "Sign Up Failed",
+    //       description: "Account already exists.",
+    //     });
+  //     } else if (error.includes("Password too weak")) {
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Sign Up Failed",
+  //         description: "Password too weak.",
+  //       });
+  //     } else {
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Sign Up Failed",
+  //         description: "An unexpected error occurred.",
+  //       });
+  //     }
+  //   }
+  // }, [data, error, navigate, toast]);
 
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center justify-center">
-      <div className="w-[350px]">
-        <h1 className="text-4xl text-left">
+    <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20 px-4 sm:px-6 lg:px-8">
+      <div className="w-[350px] max-w-lg">
+        <h1 className="text-3xl md:text-4xl text-left whitespace-normal">
           Welcome!
-          <p className="mt-4 text-lg text-primaryColour-600">
+          <p className="mt-4 text-lg text-primaryColour-600 whitespace-normal">
             Create a new account
           </p>
         </h1>
@@ -205,15 +255,42 @@ export default function SignUp() {
                 />
               </div>
 
-              {/* <CardFooter className="flex justify-center"> */}
+              <div>
+                <label className="text-sm font-medium">Account Type</label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full mt-2">
+                      {formData.type}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem
+                      onClick={() => handleAccountTypeChange("PLAYER")}
+                    >
+                      Player
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleAccountTypeChange("COACH")}
+                    >
+                      Coach
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => handleAccountTypeChange("ADMIN")}
+                    >
+                      Admin
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
               <Button
                 type="submit"
-                className="w-full text-white bg-primaryColour"
-                disabled={isLoading} // To disable the button while the API call is being made
+                className="w-full text-white bg-primaryColour mt-4"
+                disabled = {signUpLoading || sendCodeLoading}
+                // disabled={isLoading} // To disable the button while the API call is being made
               >
-                {isLoading ? "Creating Account..." : "Sign Up"}
+               {signUpLoading ? "Creating Account..." : "Sign Up"}
               </Button>
-              {/* </CardFooter> */}
             </form>
           </CardContent>
         </Card>

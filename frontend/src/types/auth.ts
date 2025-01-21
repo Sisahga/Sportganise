@@ -21,7 +21,7 @@ export interface CookiesDto {
 }
 
 export interface SignUpRequest {
-  type: string;
+  type: "PLAYER" | "COACH" | "ADMIN"; //ENUM type
   email: string;
   password: string;
   phone: string;
@@ -53,6 +53,12 @@ export interface SignUpResponse {
 
 export interface SendCodeRequest {
   email: string;
+}
+
+export interface SendCodeResponse {
+  statusCode: number;
+  message: string;
+  data: string; // Email to which the code was sent
 }
 
 export interface VerifyCodeRequest {
