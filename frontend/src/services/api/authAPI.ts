@@ -1,5 +1,13 @@
 import log from "loglevel";
-import { LoginRequest, LoginResponse } from "@/types/auth";
+import {
+  LoginRequest,
+  LoginResponse,
+  SignUpRequest,
+  SignUpResponse,
+  SendCodeRequest,
+  VerifyCodeRequest,
+  VerifyCodeResponse,
+} from "@/types/auth";
 import { setCookies, isCookiesDto } from "@/services/cookiesService";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -27,4 +35,55 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   }
 
   return loginResponse; // Parse response as JSON
+};
+
+export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.text();
+    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
+export const sendCode = async (data: SendCodeRequest): Promise<void> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/send-code`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.text();
+    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+  }
+};
+
+export const verifyCode = async (
+  data: VerifyCodeRequest
+): Promise<VerifyCodeResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/verify-code`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.text();
+    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
 };
