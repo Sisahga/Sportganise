@@ -274,7 +274,8 @@ public class ProgramServiceTest {
     assertEquals("Training", programDto2.getProgramType());
     assertEquals("Training Program 2", programDto2.getTitle());
     assertEquals(1, programDto2.getProgramAttachments().size());
-    assertEquals("attachment3.url", programDto2.getProgramAttachments().getFirst().getAttachmentUrl());
+    assertEquals(
+        "attachment3.url", programDto2.getProgramAttachments().getFirst().getAttachmentUrl());
   }
 
   @Test
@@ -285,25 +286,25 @@ public class ProgramServiceTest {
     Mockito.when(programRepository.findById(1)).thenReturn(Optional.empty());
 
     EntityNotFoundException exception =
-            assertThrows(
-                    EntityNotFoundException.class,
-                    () ->
-                            programService.modifyProgram(
-                                    programDtoToModify,
-                                    "Updated Title",
-                                    "Updated Type",
-                                    "2024-01-30T10:00:00Z",
-                                    "2024-01-30T10:00:00Z",
-                                    false,
-                                    "private",
-                                    "Updated Description",
-                                    30,
-                                    "10:30",
-                                    "12:30",
-                                    "Updated Location",
-                                    Collections.emptyList(),  // Empty list for attachments to add
-                                    Collections.emptyList(),  // Empty list for attachments to remove
-                                    2));  // Mock account ID
+        assertThrows(
+            EntityNotFoundException.class,
+            () ->
+                programService.modifyProgram(
+                    programDtoToModify,
+                    "Updated Title",
+                    "Updated Type",
+                    "2024-01-30T10:00:00Z",
+                    "2024-01-30T10:00:00Z",
+                    false,
+                    "private",
+                    "Updated Description",
+                    30,
+                    "10:30",
+                    "12:30",
+                    "Updated Location",
+                    Collections.emptyList(), // Empty list for attachments to add
+                    Collections.emptyList(), // Empty list for attachments to remove
+                    2)); // Mock account ID
 
     assertEquals("Program not found with ID: 1", exception.getMessage());
     Mockito.verify(programRepository).findById(1);

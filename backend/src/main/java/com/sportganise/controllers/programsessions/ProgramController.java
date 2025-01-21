@@ -7,16 +7,21 @@ import com.sportganise.dto.programsessions.ProgramRequestDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -89,11 +94,13 @@ public class ProgramController {
    * @param attachments List of attachments.
    * @return HTTP Response for newly created program.
    */
-  @PostMapping(value = "/{accountId}/create-program", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(
+      value = "/{accountId}/create-program",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
-          @PathVariable Integer accountId,
-          @RequestPart("programData") ProgramRequestDto programRequestDto,
-          @RequestParam("attachments")List<MultipartFile> attachments) {
+      @PathVariable Integer accountId,
+      @RequestPart("programData") ProgramRequestDto programRequestDto,
+      @RequestParam("attachments") List<MultipartFile> attachments) {
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
@@ -151,7 +158,9 @@ public class ProgramController {
    * @param attachments List of attachments.
    * @return HTTP Response for modified/updated data
    */
-  @PostMapping(value = "/{accountId}/{programId}/modify-program", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(
+      value = "/{accountId}/{programId}/modify-program",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
       @PathVariable Integer accountId,
       @PathVariable Integer programId,

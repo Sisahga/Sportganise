@@ -14,7 +14,7 @@ import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
-
+import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -216,19 +214,20 @@ public class ProgramService {
    * @return A newly created programDto.
    */
   public ProgramDto createProgramDto(
-          String title,
-          String programType,
-          String startDate,
-          String endDate,
-          Boolean isRecurring,
-          String visibility,
-          String description,
-          Integer capacity,
-          String startTime,
-          String endTime,
-          String location,
-          List<MultipartFile> attachments,
-          Integer accountId) throws IOException {
+      String title,
+      String programType,
+      String startDate,
+      String endDate,
+      Boolean isRecurring,
+      String visibility,
+      String description,
+      Integer capacity,
+      String startTime,
+      String endTime,
+      String location,
+      List<MultipartFile> attachments,
+      Integer accountId)
+      throws IOException {
 
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     int durationMins =
@@ -323,7 +322,8 @@ public class ProgramService {
       String location,
       List<MultipartFile> attachmentsToAdd,
       List<String> attachmentsToRemove,
-      Integer accountId) throws IOException {
+      Integer accountId)
+      throws IOException {
 
     Program existingProgram =
         programRepository
@@ -372,13 +372,14 @@ public class ProgramService {
 
     if (!attachmentsToRemove.isEmpty()) {
       // Delete from repo.
-      int rowsAffected = programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
-          programDtoToModify.getProgramId(), attachmentsToRemove);
+      int rowsAffected =
+          programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+              programDtoToModify.getProgramId(), attachmentsToRemove);
       if (rowsAffected != attachmentsToRemove.size()) {
         throw new RuntimeException("Could not delete all attachments.");
       }
       // Delete from S3 bucket.
-      for (String attachment: attachmentsToRemove) {
+      for (String attachment : attachmentsToRemove) {
         this.blobService.deleteFile(attachment);
       }
     }
