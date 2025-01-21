@@ -1,21 +1,32 @@
-import { Badge } from "../../ui/badge";
+import { AccountType } from "@/types/account";
+import { Badge, BadgeProps } from "../../ui/badge";
 
-// Handle badge variants based on attendee account type
-export default function AttendeeBadgeType(attendeeType: string) {
-  // attendee can have null rank
-  if (attendeeType === null || attendeeType === "") {
-    return <Badge variant="destructive">no type</Badge>;
-  } else {
-    if (attendeeType.toLowerCase() == "coach") {
-      return <Badge variant="secondary">{attendeeType.toLowerCase()}</Badge>;
-    } else if (attendeeType.toLowerCase() == "admin") {
-      return <Badge variant="outline">{attendeeType.toLowerCase()}</Badge>;
-    } else if (attendeeType.toLowerCase() == "player") {
-      return <Badge variant="default">{attendeeType.toLowerCase()}</Badge>;
-    } else {
-      return (
-        <Badge className="bg-amber-400">{attendeeType.toLowerCase()}</Badge>
-      );
-    }
+const getBadgeProps = (accountType: AccountType): BadgeProps => {
+  switch (accountType) {
+    case "ADMIN":
+      return { variant: "outline" };
+    case "COACH":
+      return { variant: "secondary" };
+    case "PLAYER":
+    case "GENERAL":
+      return { variant: "default" };
+    default:
+      return { className: "bg-amber-400" };
   }
+};
+
+interface AttendeeBadgeTypeProps {
+  accountType?: AccountType;
+}
+// Handle badge variants based on attendee account type
+export default function AttendeeBadgeType({
+  accountType,
+}: AttendeeBadgeTypeProps) {
+  // attendee can have null rank
+  if (accountType === undefined) {
+    return <Badge variant="destructive">no type</Badge>;
+  }
+  const badgeProps = getBadgeProps(accountType);
+
+  return <Badge {...badgeProps}>{accountType.toLowerCase()}</Badge>;
 }

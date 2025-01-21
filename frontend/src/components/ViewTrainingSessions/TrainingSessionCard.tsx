@@ -89,7 +89,7 @@ const TrainingSessionCard: React.FC<Program> = ({
           {programDetails.description}
         </span>
         <div className="flex">
-          {EventBadgeType(programDetails.programType)}
+          <EventBadgeType programType={programDetails.programType} />
 
           {/*Click to view details */}
           <button
