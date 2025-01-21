@@ -4,13 +4,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.times;
 import static org.mockito.BDDMockito.verify;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
-import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
+import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
@@ -208,5 +207,30 @@ public class DirectMessageChannelServiceUnitTest {
     assertNull(actualChannels.getFirst().getLastMessage());
     assertNull(actualChannels.getFirst().getLastEvent());
     verify(directMessageChannelRepository, times(1)).getDirectMessageChannelsByAccountId(accountId);
+  }
+
+  @Test
+  void renameGroupChannel_Success() {
+    int channelId = 1;
+    String newName = "New Channel Name";
+    when(directMessageChannelRepository.renameChannel(channelId, newName)).thenReturn(1);
+
+    assertDoesNotThrow(() -> directMessageChannelService.renameGroupChannel(channelId, newName));
+
+    verify(directMessageChannelRepository).renameChannel(channelId, newName);
+  }
+
+  @Test
+  void renameGroupChannel_ChannelNotFound() {
+    int channelId = 1;
+    String newName = "New Channel Name";
+    when(directMessageChannelRepository.renameChannel(channelId, newName)).thenReturn(0);
+
+    ChannelNotFoundException exception =
+        assertThrows(
+            ChannelNotFoundException.class,
+            () -> directMessageChannelService.renameGroupChannel(channelId, newName));
+
+    assertEquals("Channel not found", exception.getMessage());
   }
 }

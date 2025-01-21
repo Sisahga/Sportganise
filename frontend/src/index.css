@@ -51,19 +51,25 @@
 }
 
 .bg-placeholder-colour {
-  background-color: var(--text-placheolder-colour);
+  background-color: var(--text-placheolder-colour) !important;
 }
 .bg-secondary-colour {
-  background-color: var(--secondary-colour);
+  background-color: var(--secondary-colour) !important;
 }
 .bg-primary-white {
-  background-color: var(--primary-white);
+  background-color: var(--primary-white) !important;
+}
+.bg-primary-red {
+  background-color: var(--primary-red) !important;
 }
 
 .force-hide {
   display: none !important;
 }
-
+.mx-force-none {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
 a {
   font-weight: 500;
   color: #646cff;
@@ -85,7 +91,7 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--text-placheolder-colour);
   cursor: pointer;
   transition: border-color 0.25s;
 }

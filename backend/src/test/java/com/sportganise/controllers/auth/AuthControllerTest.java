@@ -11,10 +11,12 @@ import com.sportganise.controllers.account.auth.AuthController;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.entities.account.Verification;
+import com.sportganise.services.EmailService;
 import com.sportganise.services.account.AccountService;
-import com.sportganise.services.account.auth.EmailService;
+import com.sportganise.services.account.CookiesService;
 import com.sportganise.services.account.auth.VerificationService;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +43,8 @@ public class AuthControllerTest {
 
   @MockBean private VerificationService verificationService;
 
+  @MockBean private CookiesService cookiesService;
+
   private ObjectMapper objectMapper;
   private AccountDto accountDto;
   private Auth0AccountDto auth0AccountDto;
@@ -62,7 +66,7 @@ public class AuthControllerTest {
             .country("Canada")
             .postalCode("H1I 2J3")
             .build());
-    accountDto.setType("general");
+    accountDto.setType(AccountType.PLAYER);
 
     auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
   }

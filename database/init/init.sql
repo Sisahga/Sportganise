@@ -11,7 +11,7 @@ CREATE TABLE organization(
 
 CREATE TABLE account (
 	account_id SERIAL PRIMARY KEY,
-	type VARCHAR(30) NOT NULL,
+	type VARCHAR NOT NULL CHECK (type IN ('ADMIN', 'COACH', 'PLAYER')),
 	email VARCHAR(254) UNIQUE NOT NULL,
 	auth0_id VARCHAR(255) UNIQUE NOT NULL,
 	address_line VARCHAR(100),
@@ -84,7 +84,7 @@ CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
 	type VARCHAR(20),
 	title VARCHAR(30) NOT NULL,
-	description VARCHAR (100),
+	description VARCHAR(100),
 	capacity INTEGER,
 	occurence_date TIMESTAMPTZ,
 	duration INTEGER,
@@ -92,18 +92,24 @@ CREATE TABLE program (
 	expiry_date TIMESTAMPTZ,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10),
-	attachment VARCHAR(100)
+	visibility VARCHAR(10)
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
     )
 );
 
+CREATE TABLE program_attachments (
+	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
+	attachment_url VARCHAR(100),
+	PRIMARY KEY (program_id)
+);
+
 CREATE TABLE program_participants (
 	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	type VARCHAR(20),
+	rank INTEGER, 
 	is_confirmed BOOLEAN DEFAULT FALSE,
 	confirm_date TIMESTAMPTZ,
 	PRIMARY KEY (program_id, account_id),
@@ -124,14 +130,17 @@ CREATE TABLE channel (
     type VARCHAR(10) NOT NULL,
     image_blob VARCHAR(512),
 	created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    channel_hash VARCHAR(64) UNIQUE NOT NULL
+    channel_hash VARCHAR(64) UNIQUE NOT NULL,
+    CONSTRAINT valid_channel CHECK (type IN ('SIMPLE', 'GROUP'))
 );
 
 CREATE TABLE channel_member (
 	channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
     read BOOLEAN NOT NULL,
-	PRIMARY KEY(channel_id, account_id)
+    role VARCHAR(10), -- Can be NULL, as there are no roles for SIMPLE channels
+	PRIMARY KEY(channel_id, account_id),
+    CONSTRAINT valid_role CHECK (role IN ('ADMIN', 'REGULAR') OR role IS NULL)
 );
 
 CREATE TABLE message (
@@ -140,7 +149,8 @@ CREATE TABLE message (
 	sender_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE SET NULL,
 	content VARCHAR(512) NOT NULL,
     sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    type VARCHAR(10) NOT NULL
+    type VARCHAR(10) NOT NULL,
+    CONSTRAINT valid_message CHECK (type IN ('CHAT', 'JOIN', 'LEAVE', 'BLOCK', 'UNBLOCK', 'UPDATE', 'DELETE'))
 );
 
 CREATE TABLE message_blob (
@@ -153,12 +163,33 @@ ALTER TABLE channel
 ADD last_message_id INTEGER REFERENCES message(message_id);
 
 CREATE TABLE post(
-	post_id SERIAL PRIMARY KEY,
-	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-	title VARCHAR(100) NOT NULL,
-	description TEXT NOT NULL,
-	attachment VARCHAR(255),
-	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+    post_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    attachment VARCHAR(255),
+    metadata JSON ,
+    type VARCHAR(20) CHECK (type IN ('EVENT', 'TRAINING')),
+    occurence_date TIMESTAMPTZ,
+    creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE post_label(
+    post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
+    label_id INTEGER NOT NULL REFERENCES label(label_id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, label_id)
+);
+
+CREATE TABLE likes(
+    post_id    INTEGER NOT NULL REFERENCES post (post_id) ON DELETE CASCADE,
+    account_id INTEGER NOT NULL REFERENCES account (account_id) ON DELETE CASCADE,
+    PRIMARY KEY (post_id, account_id)
+);
+
+CREATE TABLE post_attachment(
+    post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
+    attachment_url VARCHAR(255) NOT NULL,
+    PRIMARY KEY (post_id, attachment_url)
 );
 
 CREATE TABLE feedback(

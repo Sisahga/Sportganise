@@ -9,16 +9,27 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /** Repository for Program. */
-@Repository // Indicates that this is a Spring Data repository
+@Repository
 public interface ProgramRepository extends JpaRepository<Program, Integer> {
 
-  @Query("SELECT p FROM Program p " + "WHERE p.programId = :programId")
+  @Query("""
+      SELECT p
+      FROM Program p
+      WHERE p.programId = :programId
+      """)
   Program findProgramById(@Param("programId") Integer programId);
 
+  @Query("""
+      SELECT p
+      FROM Program p
+      """)
+  List<Program> findPrograms();
+
   @Query(
-      "SELECT a FROM Account a "
-          + "JOIN ProgramParticipant pp ON pp.compositeKey.accountId = a.accountId "
-          + "JOIN Program p ON pp.compositeKey.programId = p.programId "
-          + "WHERE p.programId = :sessionId")
-  List<ProgramParticipant> findParticipantsByProgramId(@Param("sessionId") Integer sessionId);
+      """
+      SELECT p
+      FROM ProgramParticipant p
+      WHERE p.programParticipantId.programId = :programId
+      """)
+  List<ProgramParticipant> findParticipantsByProgramId(@Param("programId") Integer programId);
 }

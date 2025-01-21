@@ -25,18 +25,18 @@ public class Program {
   @Column(name = "program_id")
   private Integer programId;
 
-  // Could be a tournament, an event of some sort or a training session
   @Column(name = "type")
   private String programType;
 
   private String title;
+
   private String description;
+
   private Integer capacity;
 
   @Column(name = "occurence_date")
   private ZonedDateTime occurrenceDate;
 
-  // Duration of the program in terms of minutes
   @Column(name = "duration")
   private Integer durationMins;
 
@@ -52,10 +52,6 @@ public class Program {
 
   private String visibility;
 
-  // TODO: Change Schema, create a table called program_attachments if there is more than 1
-  // attachment per program
-  private String attachment;
-
   /**
    * Constructor excluding programId since it's generated automatically.
    *
@@ -70,7 +66,6 @@ public class Program {
    * @param frequency frequency of the program if it is recurring.
    * @param location location of the program.
    * @param visibility visibility type of the program to the members.
-   * @param attachment list of strings of attachment paths for upload.
    */
   public Program(
       String programType,
@@ -83,8 +78,7 @@ public class Program {
       ZonedDateTime expiryDate,
       String frequency,
       String location,
-      String visibility,
-      String attachment) {
+      String visibility) {
     this.programType = programType;
     this.title = title;
     this.description = description;
@@ -96,6 +90,5 @@ public class Program {
     this.frequency = frequency;
     this.location = location;
     this.visibility = visibility;
-    this.attachment = attachment;
   }
 }

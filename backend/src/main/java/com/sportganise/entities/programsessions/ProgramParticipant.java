@@ -20,9 +20,12 @@ import lombok.Setter;
 @Entity
 @Table(name = "program_participants")
 public class ProgramParticipant {
-  @EmbeddedId ProgramParticipantCompositeKey compositeKey;
 
-  // Could be an admin, coach or player
+  @EmbeddedId private ProgramParticipantId programParticipantId;
+
+  @Column(name = "rank")
+  private Integer rank;
+
   @Column(name = "type")
   private String participantType;
 
@@ -31,4 +34,20 @@ public class ProgramParticipant {
 
   @Column(name = "confirm_date")
   private ZonedDateTime confirmedDate;
+
+  public Integer getProgramId() {
+    return programParticipantId.getProgramId();
+  }
+
+  public Integer getAccountId() {
+    return programParticipantId.getAccountId();
+  }
+
+  public void setAccountId(Integer accountId) {
+    this.programParticipantId.setAccountId(accountId);
+  }
+
+  public void setProgramId(Integer programId) {
+    this.programParticipantId.setProgramId(programId);
+  }
 }

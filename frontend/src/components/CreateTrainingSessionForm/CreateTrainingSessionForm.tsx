@@ -1,9 +1,9 @@
-import { useState } from "react";
+//import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import useFormHandler from "@/hooks/useFormHandler";
+import { formSchema } from "@/types/trainingSessionZodFormSchema";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -50,72 +50,27 @@ import {
   CloudUpload,
   Paperclip,
 } from "lucide-react";
+import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
 
-//GLOBAL --------------------------------------------------------------------------------------------------------------
-/** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
-const formSchema = z
-  .object({
-    title: z.string(),
-    type: z.string(),
-    start_date: z.coerce.date(),
-    end_date: z.coerce.date(),
-    recurring: z.boolean().default(false),
-    visibility: z.string(),
-    description: z.string(),
-    attachment: z
-      .array(
-        //array of files
-        z.custom<File>((file) => file instanceof File && file.size > 0, {
-          message: "Each file must be a valid file and not empty.",
-        }),
-      )
-      .optional(),
-    capacity: z.number().min(0),
-    notify: z.boolean().default(false),
-    start_time: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
-    end_time: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
-    location: z.string(),
-  })
-  .refine((data) => data.end_date >= data.start_date, {
-    message: "End date cannot be earlier than the start date.",
-    path: ["end_date"], //points to the end_date field in the error message
-  })
-  .refine((data) => data.end_time >= data.start_time, {
-    message: "End time cannot be earlier than start time.",
-    path: ["end_time"],
-  })
-  .refine(
-    (data) =>
-      !(
-        data.start_date.getTime() === data.end_date.getTime() && data.recurring
-      ),
-    {
-      message:
-        "Event start and end dates are the same and therefore cannot reccur.",
-      path: ["recurring"],
-    },
-  );
+import log from "loglevel";
 
-//PAGE CONTENT -----------------------------------------------------------------------------------------------------------
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const accountId = ""; //update with cookie
+  const accountId = 2; //update with cookie
+  const { form } = useFormHandler();
+  const { createTrainingSession, error, loading } = useCreateTrainingSession();
 
   /**All select element options */
   //Options for type select
   const types = [
     {
       label: "Training Session",
-      value: "training-session",
+      value: "Training",
     },
     {
       label: "Fundraisor",
-      value: "fundraisor",
+      value: "Fundraisor",
     },
   ] as const;
   //Options for visibility select
@@ -127,6 +82,10 @@ export default function CreateTrainingSessionForm() {
     {
       label: "Members only",
       value: "members",
+    },
+    {
+      label: "Private",
+      value: "private",
     },
   ] as const;
   //Options for location select
@@ -142,7 +101,7 @@ export default function CreateTrainingSessionForm() {
   ] as const;
 
   /** Handle files for file upload in form*/
-  const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
+  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
   const dropZoneConfig = {
     //File configurations
     maxFiles: 5,
@@ -154,100 +113,68 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
-  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      //default values that will considered for each state when page is loaded and also what is rendered when the page loads
-      //start_date: new Date(),
-      //end_date: new Date(),
-      //title: "", //controlled/uncontrolled component error
-    },
-  });
-
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     //async request which may result error
     try {
       // Prepare data to send through API as necessary
-      const json_payload = {
+      const jsonPayload = {
         ...values,
-        attachment: files ?? [], //ensure attachment: appears in json payload body
+        attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
       };
-      console.log(json_payload);
-      console.log(JSON.stringify(json_payload, null, 2));
+      log.info(jsonPayload);
+      console.log(jsonPayload);
+      log.info(JSON.stringify(jsonPayload, null, 2));
+      console.log(JSON.stringify(jsonPayload, null, 2));
 
       // API submit form
-      const response = await fetch(`/${accountId}/create-program`, {
-        //response is what is returned by the backend, like 200 OK. Can return info as well.
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json", //If sending JSON
-        },
-        body: JSON.stringify(json_payload, null, 2), //stringify form values in JSON format and send through url
+      const create = await createTrainingSession(accountId, jsonPayload);
+      console.log(error);
+      console.log("create", create);
+      log.info("create", create);
+      if (create === null) {
+        throw new Error(
+          "Error from useCreateTrainingSession.createTrainingSession!",
+        );
+      }
+      console.log("loading", loading);
+      log.info("createTrainingSession submit success ✔");
+
+      // Toast popup for user to say form submitted successfully
+      toast({
+        title: "Form submitted successfully ✔",
+        description: "Event was added to your calendar.",
       });
 
-      // Check for HTTP errors
-      if (response.status === 201) {
-        // Success handling
-        const data = await response.json(); //data sent back from backend response to url call
-        console.log("Event created successfully:", data);
+      log.info("Create training session form reset");
 
-        // Toast popup for user to say form submitted successfully
-        toast({
-          title: "Form submitted successfully ✔",
-          description: "Event was added to your calendar.",
-        });
-
-        // Reset form fields
-        form.reset();
-        form.setValue("title", "");
-        form.setValue("type", "");
-        form.setValue("start_date", new Date());
-        form.setValue("end_date", new Date());
-        form.setValue("recurring", false);
-        form.setValue("visibility", "");
-        form.setValue("description", "");
-        form.setValue("attachment", undefined);
-        form.setValue("capacity", 0);
-        form.setValue("notify", false);
-        form.setValue("start_time", "");
-        form.setValue("end_time", "");
-        form.setValue("location", "");
-        form.reset();
-
-        // Navigate to home page
-        navigate("/HomePage");
-      } else {
-        const errorData = await response
-          .json()
-          .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
-        const errorMessage =
-          errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
-        form.reset();
-        throw new Error(errorMessage);
-        //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
-      }
-    } catch (error) {
-      console.error("Form submission error (error)", error);
-      //console.error("Error submitting form (message):", error.message);
+      // Navigate to home page
+      navigate("/");
+    } catch (err) {
+      console.error(
+        "Create training session form submission error (error)",
+        err,
+      );
+      log.error("Create training session form submission error (error)", err);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description:
           "There was a problem with your request. Event was not created.",
       });
+    } finally {
+      // Reset form fields
+      form.reset();
     }
   };
 
   return (
-    //RETURN ---------------------------------------------------------------------------------------------------------
     <>
       {/** Navigate to previous page */}
       <Button
         className="rounded-full"
         variant="outline"
-        onClick={() => navigate("/HomePage")}
+        onClick={() => navigate("/")}
       >
         <MoveLeft />
       </Button>
@@ -255,7 +182,7 @@ export default function CreateTrainingSessionForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto pt-10"
+          className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
         >
           {/*Form Title*/}
           <div>
@@ -336,7 +263,6 @@ export default function CreateTrainingSessionForm() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-
                 <FormMessage />
               </FormItem>
             )}
@@ -345,7 +271,7 @@ export default function CreateTrainingSessionForm() {
           {/** Start Date */}
           <FormField
             control={form.control}
-            name="start_date"
+            name="startDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -392,7 +318,7 @@ export default function CreateTrainingSessionForm() {
           {/** End Date */}
           <FormField
             control={form.control}
-            name="end_date"
+            name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -440,7 +366,7 @@ export default function CreateTrainingSessionForm() {
             {/**Start Time */}
             <FormField
               control={form.control}
-              name="start_time"
+              name="startTime"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -460,7 +386,7 @@ export default function CreateTrainingSessionForm() {
             {/**End Time */}
             <FormField
               control={form.control}
-              name="end_time"
+              name="endTime"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -671,9 +597,9 @@ export default function CreateTrainingSessionForm() {
                 </FormLabel>
                 <FormControl>
                   <FileUploader
-                    value={files}
+                    value={field.value || []}
                     onValueChange={(newFiles) => {
-                      setFiles(newFiles); // Update local state
+                      //setFiles(newFiles); // Update local state
                       field.onChange(newFiles); // Sync with React Hook Form
                     }}
                     dropzoneOptions={dropZoneConfig}
@@ -695,9 +621,9 @@ export default function CreateTrainingSessionForm() {
                       </div>
                     </FileInput>
                     <FileUploaderContent>
-                      {files &&
-                        files.length > 0 &&
-                        files.map((file, i) => (
+                      {field.value &&
+                        field.value.length > 0 &&
+                        field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
                             <span>{file.name}</span>
@@ -733,7 +659,6 @@ export default function CreateTrainingSessionForm() {
                     }
                   />
                 </FormControl>
-
                 <FormMessage />
               </FormItem>
             )}
@@ -776,7 +701,7 @@ export default function CreateTrainingSessionForm() {
             Create new Event
           </Button>
           <div className="text-center self-center">
-            <a href="../" className="underline text-neutral-400">
+            <a href="../" className="underline text-neutral-400 pb-20">
               Cancel
             </a>
           </div>

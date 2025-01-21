@@ -1,3 +1,5 @@
+import WebSocketService from "@/services/WebSocketService.ts";
+
 export interface MessageComponent {
   messageId: number;
   senderId: number;
@@ -7,7 +9,7 @@ export interface MessageComponent {
   attachments: string[];
   sentAt: string;
   type: string;
-  avatarUrl: string;
+  avatarUrl: string | undefined;
 }
 
 export interface SendMessageComponent {
@@ -23,4 +25,20 @@ export interface SendMessageComponent {
 
 export interface ChatMessageProps {
   messages: MessageComponent[];
+  currentUserId: number;
+}
+
+export interface LastMessageComponent {
+  senderId: number;
+  channelId: number;
+  messageContent: string;
+  type: string;
+}
+
+export interface UserBlockedComponentProps {
+  showBlockedMessage: boolean;
+  channelIsBlocked: boolean;
+  webSocketRef: WebSocketService | null;
+  channelId: number;
+  channelType: string;
 }

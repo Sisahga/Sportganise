@@ -46,6 +46,49 @@ import {
 } from "@/components/ui/file-upload";
 
 //GLOBAL ---------------------------------------------------------------------------------------------------------------------------
+/**All select element options */
+//Options for type select
+const types = [
+  {
+    label: "Training Session",
+    value: "Training",
+  },
+  {
+    label: "Fundraisor",
+    value: "Fundraisor",
+  },
+] as const;
+//Options for visibility select
+const visibilities = [
+  {
+    label: "Public",
+    value: "Public",
+  },
+  {
+    label: "Members only",
+    value: "Private",
+  },
+] as const;
+//Options for location select
+const locations = [
+  {
+    label: "Centre de loisirs St-Denis",
+    value: "Centre-de-loisirs-St-Denis",
+  },
+  {
+    label: "Collège de Maisonnneuve",
+    value: "Collège-de-Maisonnneuve",
+  },
+  {
+    label: "123 test water rd.",
+    value: "123 test water rd.",
+  },
+  {
+    label: "123 Main st",
+    value: "123 Main St",
+  },
+] as const;
+
 /** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
 const formSchema = z
   .object({
@@ -63,6 +106,7 @@ const formSchema = z
           message: "Each file must be a valid file and not empty.",
         }),
       )
+      .nullable()
       .optional(),
     capacity: z.number().min(0),
     notify: z.boolean().default(true),
@@ -94,48 +138,13 @@ const formSchema = z
     },
   );
 
-// Define the form data structure
-interface FormData {
-  title: string;
-  type: string;
-  start_date: Date;
-  end_date: Date;
-  recurring: boolean;
-  visibility: string;
-  description: string;
-  attachment: File[]; //typed as an array of File objects
-  capacity: number;
-  notify: boolean;
-  start_time: string;
-  end_time: string;
-  location: string;
-}
-
 //PAGE CONTENT ---------------------------------------------------------------------------------------------------
 export default function ModifyTrainingSessionForm() {
   const { toast } = useToast();
   const { programId } = useParams();
   const accountId = ""; //get from cookie
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState<FormData>({
-    //fact: "", //TO DELETE
-    //length: 0, //TO DELETE
-    //programId: 0,
-    title: "",
-    type: "",
-    start_date: new Date(),
-    end_date: new Date(),
-    recurring: false,
-    visibility: "",
-    description: "",
-    attachment: [], //values are set here as opposed to types, thus File[] does not work
-    capacity: 0,
-    notify: false,
-    start_time: "",
-    end_time: "",
-    location: "",
-  }); //assuming response is an object. Values will be overriden in fetch.
+  const [title, setTitle] = useState<string>(""); //assuming response is an object. Values will be overriden in fetch.
   const [notFound, setNotFound] = useState(false);
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
@@ -167,7 +176,35 @@ export default function ModifyTrainingSessionForm() {
           })
           .then((data) => {
             console.log("Fetched data: ", data);
-            setFormData(data); //grab the value/data in the response.json()
+            setTitle(data.title); //grab the value/data in the response.json()
+
+            /*
+            const MockProgramDetails = {
+              programId: 1,
+              programType: "Training",
+              title: "Advanced Group",
+              description: "Intensive training camp for badminton pros",
+              capacity: 1,
+              occurrenceDate: "2024-07-01T10:00:00Z",
+              durationMins: 120,
+              expiryDate: "2024-08-01T12:00:00Z",
+              frequency: null,
+              location: "123 test water rd.",
+              visibility: "Public",
+              attachments: [
+                {
+                  programId: 1,
+                  attachment_url:
+                    "https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png",
+                },
+                {
+                  programId: 2,
+                  attachment_url: "https://something.com/",
+                },
+              ],
+              recurring: true,
+            };
+            */
 
             /*
             const fields = Object.keys(data); // Array of field names
@@ -183,17 +220,34 @@ export default function ModifyTrainingSessionForm() {
             // Set form defaults and update field values
             form.setValue("title", data.title);
             form.setValue("capacity", data.capacity);
-            form.setValue("type", data.type);
-            form.setValue("start_date", data.start_date);
-            form.setValue("end_date", data.end_date);
+            form.setValue("type", data.programType);
+            form.setValue("start_date", new Date(data.occurrenceDate));
+            form.setValue("end_date", new Date(data.expiryDate));
             form.setValue("recurring", data.recurring);
             form.setValue("visibility", data.visibility);
             form.setValue("description", data.description);
-            form.setValue("attachment", data.attachment); //undefined
-            form.setValue("notify", data.notify);
-            form.setValue("start_time", data.start_time);
-            form.setValue("end_time", data.end_time);
+            /*
+            if (data.attachments === null) {
+              form.setValue("attachment", data.attachments);
+            } else {
+              console.log(
+                data.attachments.filter(
+                  (attachment : File) => attachment.attachment_url
+                )
+              );
+            }
+            */
+            //form.setValue("notify", data.notify);
+            form.setValue(
+              "start_time",
+              format(new Date(data.occurrenceDate), "HH:mm"),
+            );
+            form.setValue(
+              "end_time",
+              format(new Date(data.expiryDate), "HH:mm"),
+            );
             form.setValue("location", data.location);
+            setTitle(data.title);
           });
       } catch (error) {
         console.log(error);
@@ -206,41 +260,6 @@ export default function ModifyTrainingSessionForm() {
     };
     fetchSavedFormFields();
   }, [form, notFound, programId, toast]);
-
-  /**All select element options */
-  //Options for type select
-  const types = [
-    {
-      label: "Training Session",
-      value: "training-session",
-    },
-    {
-      label: "Fundraisor",
-      value: "fundraisor",
-    },
-  ] as const;
-  //Options for visibility select
-  const visibilities = [
-    {
-      label: "Public",
-      value: "public",
-    },
-    {
-      label: "Members only",
-      value: "members",
-    },
-  ] as const;
-  //Options for location select
-  const locations = [
-    {
-      label: "Centre de loisirs St-Denis",
-      value: "Centre-de-loisirs-St-Denis",
-    },
-    {
-      label: "Collège de Maisonnneuve",
-      value: "Collège-de-Maisonnneuve",
-    },
-  ] as const;
 
   /** Handle files for file upload in form*/
   const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
@@ -341,7 +360,7 @@ export default function ModifyTrainingSessionForm() {
       <Button
         className="rounded-full"
         variant="outline"
-        onClick={() => navigate("/HomePage")}
+        onClick={() => navigate("/")}
       >
         <MoveLeft />
       </Button>
@@ -355,8 +374,7 @@ export default function ModifyTrainingSessionForm() {
           {/*Form Title*/}
           <div>
             <h2 className="text-2xl font-semibold">
-              Edit <span style={{ color: "#82DBD8" }}>{formData.title}</span>{" "}
-              Event
+              Edit <span style={{ color: "#82DBD8" }}>{title}</span> Event
             </h2>
             <h2>Edit fields and update the form</h2>
           </div>

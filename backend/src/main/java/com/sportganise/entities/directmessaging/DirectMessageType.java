@@ -4,5 +4,8 @@ package com.sportganise.entities.directmessaging;
 public enum DirectMessageType {
   CHAT,
   LEAVE,
-  JOIN
+  JOIN,
+  BLOCK,
+  UNBLOCK,
+  UPDATE
 }

@@ -1,5 +1,6 @@
 package com.sportganise.services.account;
 
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -10,12 +11,17 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
+import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
+import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.InvalidAccountTypeException;
+import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.account.auth.Auth0ApiService;
 import java.util.List;
@@ -28,6 +34,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
@@ -37,6 +45,8 @@ public class AccountServiceTest {
   @Mock private Auth0ApiService auth0ApiService;
 
   @InjectMocks private AccountService accountService;
+
+  private ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
 
   private AccountDto accountDto;
   private Auth0AccountDto auth0AccountDto;
@@ -60,7 +70,7 @@ public class AccountServiceTest {
               .country("Canada")
               .postalCode("H1I 2J3")
               .build());
-      accountDto.setType("general");
+      accountDto.setType(AccountType.PLAYER);
 
       auth0AccountDto = new Auth0AccountDto("userx@example.com", "password!123", null);
     }
@@ -97,13 +107,14 @@ public class AccountServiceTest {
                 accountService.createAccount(accountDto);
               });
 
-      assertEquals("Failed to create account: Internal server error", exception.getMessage());
+      assertEquals("Internal server error", exception.getMessage());
 
       verify(accountRepository, times(1)).save(any(Account.class));
     }
 
     @Test
-    public void createAccount_shouldReturnAuth0Id() {
+    public void createAccount_shouldReturnAuth0Id()
+        throws AccountAlreadyExistsInAuth0, PasswordTooWeakException {
       Account account = new Account();
       account.setAuth0Id("auth0Id");
       given(accountRepository.save(any(Account.class))).willReturn(account);
@@ -118,21 +129,22 @@ public class AccountServiceTest {
 
   @Nested
   class UpdateAccount {
+    int notAccountId;
     Account originalAccount;
 
     @BeforeEach
     public void setup() {
+      notAccountId = 2;
       originalAccount =
-          new Account(
-              1,
-              "general",
-              "john@email.com",
-              "auth0|6743f6a0f0ab0e76ba3d7ceb",
-              "lorem",
-              "1231231234",
-              "John",
-              "Doe",
-              null);
+          Account.builder()
+              .accountId(1)
+              .type(AccountType.PLAYER)
+              .email("john@email.com")
+              .auth0Id("auth0|6743f6a0f0ab0e76ba3d7ceb")
+              .phone("1231231234")
+              .firstName("John")
+              .lastName("Doe")
+              .build();
     }
 
     @Test
@@ -165,7 +177,6 @@ public class AccountServiceTest {
     public void updateAccountTest_NotFound() {
       given(accountRepository.findById(anyInt())).willReturn(Optional.empty());
 
-      int notAccountId = 2;
       UpdateAccountDto newAccount =
           UpdateAccountDto.builder()
               .firstName("John")
@@ -180,6 +191,47 @@ public class AccountServiceTest {
 
       verify(accountRepository, times(1)).findById(notAccountId);
       verify(accountRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void updateAccountTypeTest_NotFound() {
+      given(accountRepository.findById(anyInt())).willReturn(Optional.empty());
+
+      String newType = "PLAYER";
+
+      assertThrows(
+          AccountNotFoundException.class,
+          () -> accountService.updateAccountRole(notAccountId, newType));
+
+      verify(accountRepository, times(1)).findById(notAccountId);
+      verify(accountRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void updateAccountTypeTest_InvalidType() {
+      int accountId = originalAccount.getAccountId();
+      String invalidType = "NOT_ADMIN";
+
+      assertThrows(
+          InvalidAccountTypeException.class,
+          () -> accountService.updateAccountRole(accountId, invalidType));
+
+      verify(accountRepository, times(0)).findById(any());
+      verify(accountRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void updateAccountTypeTest_Success()
+        throws AccountNotFoundException, InvalidAccountTypeException {
+      int accountId = originalAccount.getAccountId();
+      AccountType newType = AccountType.ADMIN;
+      given(accountRepository.findById(anyInt())).willReturn(Optional.of(originalAccount));
+
+      originalAccount.setType(newType);
+      accountService.updateAccountRole(accountId, newType.toString());
+
+      verify(accountRepository, times(1)).findById(accountId);
+      verify(accountRepository, times(1)).save(originalAccount);
     }
   }
 
@@ -212,10 +264,7 @@ public class AccountServiceTest {
 
     Exception exception =
         assertThrows(
-            AccountNotFoundException.class,
-            () -> {
-              accountService.resetPassword(email, newPassword);
-            });
+            AccountNotFoundException.class, () -> accountService.resetPassword(email, newPassword));
 
     assertEquals("Account not found", exception.getMessage());
 
@@ -249,46 +298,112 @@ public class AccountServiceTest {
     // Prepare mock data
     List<AccountDetailsDirectMessaging> mockAccounts =
         List.of(
-            new AccountDetailsDirectMessaging(
-                1, "John", "Doe", "user1@example.com", "555-5555", "PLAYER"),
-            new AccountDetailsDirectMessaging(
-                2, "Jane", "Smith", "user2@example.com", "555-5555", "PLAYER"));
+            AccountDetailsDirectMessaging.builder()
+                .accountId(2)
+                .firstName("Jane")
+                .lastName("Smith")
+                .pictureUrl("user2@example.com")
+                .phone("555-5555")
+                .type(AccountType.PLAYER)
+                .build());
 
     // Mock the repository call
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
         .willReturn(mockAccounts);
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
-    assertEquals(2, result.size()); // Verify that the returned list has the correct size
-    assertEquals("John", result.get(0).getFirstName()); // Check first account data
-    assertEquals("Jane", result.get(1).getFirstName()); // Check second account data
+    assertEquals(1, result.size()); // Verify that the returned list has the correct size
+    assertEquals("Jane", result.getFirst().getFirstName()); // Check second account data
 
     // Verify that the repository was called exactly once
-    verify(accountRepository, times(1)).getAllNonAdminAccountsByOrganization(organizationId);
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
 
   @Test
-  public void getAllNonAdminAccountsByOrganizationId_shouldReturnEmptyList_whenNoAccounts() {
+  public void getAllNonBlockedAccountsByOrganizationId_shouldReturnEmptyList_whenNoAccounts() {
     int organizationId = 1;
 
     // Mock the repository to return an empty list
-    given(accountRepository.getAllNonAdminAccountsByOrganization(organizationId))
+    given(accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, 1))
         .willReturn(List.of());
 
     // Call the service method
     List<AccountDetailsDirectMessaging> result =
-        accountService.getAllNonAdminAccountsByOrganizationId(organizationId);
+        accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, 1);
 
     // Assertions
     assertNotNull(result);
     assertTrue(result.isEmpty(), "The result should be an empty list");
 
     // Verify that the repository was called exactly once
-    verify(accountRepository, times(1)).getAllNonAdminAccountsByOrganization(organizationId);
+    verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
+
+  @Test
+  public void getAllAccountPermissions_NoAccount() {
+    given(accountRepository.findAccountPermissions()).willReturn(List.of());
+
+    // Call the service method
+    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+
+    // Assertions
+    assertTrue(result.isEmpty(), "The result should be an empty list");
+    verify(accountRepository, times(1)).findAccountPermissions();
+  }
+
+  @Test
+  public void getAllAccountPermissions_FewAccounts() {
+    // Mock data
+    AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
+    account1.setAccountId(1);
+    account1.setType(AccountType.PLAYER);
+    account1.setEmail("test1@example.com");
+    account1.setFirstName("John");
+    account1.setLastName("Doe");
+
+    AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
+    account2.setAccountId(2);
+    account2.setType(AccountType.COACH);
+    account2.setEmail("test2@example.com");
+    account2.setFirstName("Jane");
+    account2.setLastName("Dane");
+    account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
+
+    List<AccountPermissions> accountPermissions = List.of(account1, account2);
+
+    given(accountRepository.findAccountPermissions()).willReturn(accountPermissions);
+
+    // Call the service method
+    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+
+    // Assertions
+    assertEquals(result.size(), 2);
+    assertEquals(result.get(0).getEmail(), account1.getEmail());
+    assertEquals(result.get(0).getPictureUrl(), account1.getPictureUrl());
+    assertEquals(result.get(0).getType(), account1.getType());
+    assertEquals(result.get(1).getEmail(), account2.getEmail());
+    assertEquals(result.get(1).getPictureUrl(), account2.getPictureUrl());
+    assertEquals(result.get(1).getType(), account2.getType());
+    verify(accountRepository, times(1)).findAccountPermissions();
+  }
+}
+
+interface AccountPermissionsTest extends AccountPermissions {
+
+  void setAccountId(Integer acountId);
+
+  void setFirstName(String firstName);
+
+  void setLastName(String lastName);
+
+  void setEmail(String email);
+
+  void setPictureUrl(String pictureUrl);
+
+  void setType(AccountType type);
 }

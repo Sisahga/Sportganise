@@ -1,5 +1,6 @@
 package com.sportganise.repositories.directmessaging;
 
+import com.sportganise.dto.directmessaging.ChannelMembersDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import jakarta.transaction.Transactional;
@@ -29,30 +30,6 @@ public interface DirectMessageChannelMemberRepository
   int getOtherMemberIdInSimpleChannel(
       @Param("channelId") int channelId, @Param("accountId") int accountId);
 
-  /**
-   * Sets the read status for a channel's member to true when it is the sender id, false when it is
-   * not.
-   *
-   * @param channelId Channel ID to update read status for.
-   * @param senderId Sender ID of the message.
-   */
-  @Transactional
-  @Modifying
-  @Query(
-      """
-            UPDATE DirectMessageChannelMember
-            SET read = CASE
-                WHEN compositeKey.accountId = :senderId THEN true
-                ELSE false
-            END
-            WHERE compositeKey.accountId IN (
-                SELECT compositeKey.accountId
-                FROM DirectMessageChannelMember
-                WHERE compositeKey.channelId = :channelId
-            )
-        """)
-  void updateReadStatus(@Param("channelId") int channelId, @Param("senderId") int senderId);
-
   @Query(
       """
       SELECT cm.compositeKey.accountId, a.firstName, a.pictureUrl
@@ -72,4 +49,44 @@ public interface DirectMessageChannelMemberRepository
         """)
   int updateChannelMemberReadStatus(
       @Param("accountId") int accountId, @Param("channelId") int channelId);
+
+  @Query(
+      """
+        SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
+            cm.compositeKey.accountId,
+            a.firstName,
+            a.lastName,
+            a.pictureUrl,
+            cm.role
+        )
+        FROM DirectMessageChannelMember cm
+        JOIN Account a ON cm.compositeKey.accountId = a.accountId
+        WHERE cm.compositeKey.channelId = :channelId
+        AND cm.compositeKey.accountId != :accountId
+        """)
+  List<ChannelMembersDto> getNonUserChannelMembers(int channelId, int accountId);
+
+  @Query(
+      """
+              SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
+                  cm.compositeKey.accountId,
+                  a.firstName,
+                  a.lastName,
+                  a.pictureUrl,
+                  cm.role
+              )
+              FROM DirectMessageChannelMember cm
+              JOIN Account a ON cm.compositeKey.accountId = a.accountId
+              WHERE cm.compositeKey.channelId = :channelId
+              """)
+  List<ChannelMembersDto> getAllChannelMembers(int channelId);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+        DELETE FROM DirectMessageChannelMember cm
+        WHERE cm.compositeKey.channelId = :channelId AND cm.compositeKey.accountId = :accountId
+        """)
+  void deleteByChannelIdAndAccountId(int channelId, int accountId);
 }

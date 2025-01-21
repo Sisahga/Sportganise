@@ -2,8 +2,13 @@ package com.sportganise.controllers.directmessaging;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.RenameChannelDto;
+import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
+import com.sportganise.services.directmessaging.DirectMessageService;
+import jakarta.validation.constraints.Null;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class DirectMessageChannelController {
   private final DirectMessageChannelService directMessageChannelService;
+  private final DirectMessageService directMessageService;
 
   /**
    * Controller Constructor.
@@ -30,8 +37,11 @@ public class DirectMessageChannelController {
    * @param directMessageChannelService Direct Message Channel Service.
    */
   @Autowired
-  public DirectMessageChannelController(DirectMessageChannelService directMessageChannelService) {
+  public DirectMessageChannelController(
+      DirectMessageChannelService directMessageChannelService,
+      DirectMessageService directMessageService) {
     this.directMessageChannelService = directMessageChannelService;
+    this.directMessageService = directMessageService;
   }
 
   /**
@@ -94,5 +104,54 @@ public class DirectMessageChannelController {
       log.info("Channels: {}", channels);
     }
     return new ResponseEntity<>(channels, HttpStatus.OK);
+  }
+
+  /**
+   * Endpoint /api/messaging/get-last-message/{channelId}: Get Mapping for Retrieving the last
+   * message in a Direct Message Channel.
+   *
+   * @param channelId The ID of the channel to get the last message for.
+   * @return HTTP Code 200 and Last Message DTO.
+   */
+  @GetMapping("/get-last-message/{channelId}")
+  public ResponseEntity<ResponseDto<LastMessageDto>> getLastMessage(@PathVariable int channelId) {
+    LastMessageDto lastMessage = directMessageService.getLastChannelMessage(channelId);
+    if (lastMessage != null) {
+      ResponseDto<LastMessageDto> response =
+          new ResponseDto<>(
+              HttpStatus.OK.value(), "Last message retrieved successfully", lastMessage);
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } else {
+      ResponseDto<LastMessageDto> response =
+          new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "No messages found", null);
+      return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  /**
+   * Endpoint /api/messaging/channel/rename-channel: Put Mapping for Renaming a Direct Message
+   * Channel.
+   *
+   * @param renameChannelDto DTO object for renaming a channel.
+   * @return HTTP Code 200 if successful, 404 if channel not found, 500 otherwise.
+   */
+  @PutMapping("/rename-channel")
+  public ResponseEntity<ResponseDto<Null>> renameChannel(
+      @RequestBody RenameChannelDto renameChannelDto) {
+    try {
+      directMessageChannelService.renameGroupChannel(
+          renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.OK.value(), "Channel renamed successfully", null),
+          HttpStatus.OK);
+    } catch (ChannelNotFoundException e) {
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "Channel not found", null),
+          HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null),
+          HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
