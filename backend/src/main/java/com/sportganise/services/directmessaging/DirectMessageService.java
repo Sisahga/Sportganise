@@ -169,7 +169,7 @@ public class DirectMessageService {
     List<String> attachments = new ArrayList<>();
     for (int i = 0; i < sendDirectMessageRequestDto.getAttachments().size(); i++) {
       MultipartFile file = sendDirectMessageRequestDto.getAttachments().get(i);
-      String blobUrl = blobService.uploadFile(file, true, directMessage.getMessageId().toString());
+      String blobUrl = blobService.uploadFile(file, true, directMessage.getMessageId().toString(), senderId);
       attachments.add(blobUrl);
     }
     directMessageDto.setAttachments(attachments);
