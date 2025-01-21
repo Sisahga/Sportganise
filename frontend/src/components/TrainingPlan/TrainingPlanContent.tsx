@@ -4,11 +4,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function TrainingPlanContent() {
   return (
-    <div>
-      <p className="text-2xl font-semibold text-center text-secondaryColour">
+    <div className="mt-5 mb-32">
+      <p className="text-3xl font-semibold text-center text-secondaryColour">
         Training Plan
       </p>
-      <div className="mb-32">
+      <div>
         <Tabs defaultValue="mine">
           <div className="flex justify-center">
             <TabsList className="my-5">
