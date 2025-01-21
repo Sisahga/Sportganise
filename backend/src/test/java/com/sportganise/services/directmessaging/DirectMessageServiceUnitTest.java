@@ -67,7 +67,7 @@ public class DirectMessageServiceUnitTest {
     verify(directMessageRepository, times(1)).save(any(DirectMessage.class));
     verify(directMessageChannelRepository, times(1)).updateLastMessageId(1, 1);
     verify(directMessageChannelMemberRepository, times(1)).updateChannelMemberReadStatus(2, 1);
-    verify(blobService, times(0)).uploadFile(any(MultipartFile.class), eq(true), anyString());
+    verify(blobService, times(0)).uploadFile(any(MultipartFile.class), eq(true), anyString(), anyInt());
   }
 
   @Test
@@ -77,7 +77,7 @@ public class DirectMessageServiceUnitTest {
 
     sendDirectMessageRequestDto.setAttachments(List.of(mockFile1, mockFile2));
 
-    given(blobService.uploadFile(any(MultipartFile.class), eq(true), anyString()))
+    given(blobService.uploadFile(any(MultipartFile.class), eq(true), anyString(), anyInt()))
         .willReturn("https://mockblobstorage.com/file1.jpg")
         .willReturn("https://mockblobstorage.com/file2.jpg");
 
@@ -94,6 +94,6 @@ public class DirectMessageServiceUnitTest {
     verify(directMessageRepository, times(1)).save(any(DirectMessage.class));
     verify(directMessageChannelRepository, times(1)).updateLastMessageId(1, 1);
     verify(directMessageChannelMemberRepository, times(1)).updateChannelMemberReadStatus(2, 1);
-    verify(blobService, times(2)).uploadFile(any(MultipartFile.class), eq(true), eq("1"));
+    verify(blobService, times(2)).uploadFile(any(MultipartFile.class), eq(true), eq("1"), eq(2));
   }
 }
