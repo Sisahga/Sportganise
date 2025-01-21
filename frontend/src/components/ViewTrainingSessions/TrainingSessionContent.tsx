@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 // Created components imports
-import ViewRegisteredPlayersContent from "./ViewRegisteredPlayersContent";
-import DropDownMenuButton from "./DropDownMenuButton";
+import DropDownMenuButton from "./DropDownMenu/DropDownMenuButton";
+import EventBadgeType from "./BadgeTypes/EventBadgeType";
 
 // Components imports
 import {
@@ -13,157 +13,220 @@ import {
   CircleUserRound,
   FileText,
   MoveLeft,
+  User2Icon,
+  Hourglass,
+  Repeat,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/Button";
 
+// Helper function imports
+import { calculateEndTime } from "@/utils/calculateEndTime";
+
 // Data structure for data received from API call
-/*
-interface Attendees {
-  accountId: number;
-  participantType: "COACH" | "ADMIN" | "PLAYER";
-  email: string;
-  address: string;
-  phone: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface Event {
-  programId: number;
-  programDetails: ProgramDetails;
-  attendees: Attendees[];
-}
-*/
-
-interface ProgramDetails {
-  programId: number;
-  title: string;
-  type: string;
-  description: string;
-  capacity: number;
-  occurenceDate: Date;
-  duration: number;
-  recurring: boolean;
-  expiryDate: Date;
-  coach: string;
-  location: string;
-  attachment: File[] | null;
-}
+import { ProgramDetails } from "@/types/trainingSessionDetails";
+import { Attendees } from "@/types/trainingSessionDetails";
+import RegisteredPlayer from "./RegisteredPlayer";
 
 const TrainingSessionContent = () => {
+  const [accountType /*, setAccountType*/] = useState<string>("coach"); // Handle account type. Only coach or admin can view list of attendees.
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
     title: "",
-    type: "",
+    programType: "",
     description: "",
     capacity: 0,
-    occurenceDate: new Date(),
-    duration: 0,
+    occurrenceDate: new Date(),
+    durationMins: 0,
     recurring: false,
     expiryDate: new Date(),
-    coach: "",
     location: "",
-    attachment: null,
+    programAttachments: [],
+    frequency: "",
+    visibility: "",
   });
-  // Update state safely using useEffect
   useEffect(() => {
+    // Update state safely using useEffect
     if (location.state && location.state.programDetails) {
       setProgramDetails(location.state.programDetails);
     }
   }, [location.state]);
 
-  const [programId, setProgramId] = useState<number>(0);
+  const [attendees, setAttendees] = useState<Attendees[]>([]);
   useEffect(() => {
-    if (location.state && location.state.programId) {
-      setProgramId(location.state.programId);
+    if (location.state && location.state.attendees) {
+      setAttendees(location.state.attendees);
     }
   }, [location.state]);
 
-  // Handle account type. Only coach or admin can view list of attendees.
-  const [accountType /*, setAccountType*/] = useState<string>("admin");
-
   return (
-    <div className="mb-32">
+    <div className="mb-32 mt-5">
       {/**Return to previous page */}
       <Button
         className="rounded-full mb-3"
         variant="outline"
-        onClick={() => navigate("/pages/CalendarPage")}
+        onClick={() => navigate(-1)}
       >
         <MoveLeft />
       </Button>
 
       {/**Event title */}
-      <div className="flex items-center gap-3 my-2">
-        <Avatar>
-          <AvatarFallback>A</AvatarFallback>
+      <div className="flex items-center gap-3 my-5">
+        <Avatar className="w-16 h-16">
+          <AvatarFallback>
+            <User2Icon color="#a1a1aa" />
+          </AvatarFallback>
         </Avatar>
-        <h2 className="text-xl font-semibold text-secondaryColour">
-          {programDetails.title}
-        </h2>
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold text-secondaryColour">
+            {programDetails.title}
+          </h2>
+          {EventBadgeType(programDetails.programType)}
+        </div>
       </div>
 
       {/**Session details */}
       <div>
-        <div className="flex items-center gap-2 my-1">
-          <Calendar
-            size={15}
-            color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-          />
-          <p className="text-sm text-gray-500">
-            {programDetails.occurenceDate.toDateString()}
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Clock
-            size={15}
-            color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-          />
-          <p className="text-sm text-gray-500">{programDetails.duration}</p>
-        </div>
-        <div className="flex items-center gap-2 my-1">
-          <CircleUserRound
-            size={15}
-            color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-          />
-          <p className="text-sm text-gray-500">{programDetails.coach}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <MapPin
-            size={15}
-            color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-          />
-          <p className="text-sm text-gray-500">{programDetails.location}</p>
-        </div>
-
-        {/**Information */}
-        <div className="my-7">
-          <h2 className="text-l font-semibold my-2">Information</h2>
-          <p className="text-sm my-2 text-gray-500">
-            {programDetails.description}
-          </p>
-          <div
-            className="flex gap-3 items-center
-          "
-          >
-            <FileText
+        {/**Session Info */}
+        <div className="grid gap-2 mx-2">
+          <div className="flex items-center gap-2">
+            <Calendar
               size={15}
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
-            <p className="text-sm text-gray-500">TODO: File blob array</p>
+            <p className="text-sm text-gray-500">
+              {new Date(programDetails.occurrenceDate).toDateString()}
+            </p>
+            {programDetails.expiryDate ? (
+              <div className="flex items-center gap-2">
+                <hr className="w-1 h-px border-0 bg-gray-500 " />
+
+                <p className="text-sm text-gray-500">
+                  {new Date(programDetails.expiryDate).toDateString()}
+                </p>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <Clock
+              size={15}
+              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+            />
+            <span className="flex items-center">
+              <p className="text-sm text-gray-500">
+                {new Date(programDetails.occurrenceDate).toLocaleTimeString(
+                  "en-CA",
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                )}
+              </p>
+              <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
+              <p className="text-sm text-gray-500">
+                {calculateEndTime(
+                  new Date(programDetails.occurrenceDate),
+                  programDetails.durationMins,
+                )}
+              </p>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Hourglass
+              size={15}
+              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+            />
+            <p className="text-sm text-gray-500">
+              {programDetails.durationMins} min
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Repeat
+              size={15}
+              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+            />
+            <p className="text-sm text-gray-500">
+              {programDetails.frequency || "one time"} on{" "}
+              {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
+                new Date(programDetails.occurrenceDate),
+              )}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <CircleUserRound
+              size={15}
+              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+            />
+            <p className="text-sm text-gray-500">Coach Benjamin Luijin</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <MapPin
+              size={15}
+              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+            />
+            <p className="text-sm text-gray-500">{programDetails.location}</p>
+          </div>
+        </div>
+
+        {/**Information */}
+        <div className="my-10">
+          <h2 className="text-lg font-semibold my-2">Information</h2>
+          <div className="mx-2">
+            <p className="text-sm my-2 text-gray-500">
+              {programDetails.description}
+            </p>
+            <div className="grid gap-2">
+              {programDetails.programAttachments.map((attachment, index) => (
+                <div
+                  key={index}
+                  className="flex items-center border-[1px] rounded-md p-2"
+                >
+                  <FileText
+                    size={15}
+                    color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                    className="w-8"
+                  />
+                  <a
+                    className="text-sm text-gray-500 hover:text-cyan-300"
+                    href={attachment.attachmentUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                  >
+                    {attachment.attachmentUrl.split("/").pop()}
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
         {(accountType.toLowerCase() === "coach" ||
           accountType.toLowerCase() === "admin") && (
-          <div>
-            <ViewRegisteredPlayersContent programId={programId} />
-          </div>
+          <>
+            <div className="flex items-center">
+              <h2 className="text-lg font-semibold">Attendees</h2>
+              <p className="text-sm font-medium text-gray-500 ml-3">
+                {attendees.length}/{programDetails.capacity}
+              </p>
+            </div>
+            <div className="mx-2">
+              {attendees.length > 0 ? (
+                attendees.map((attendee, index) => (
+                  <div key={index}>
+                    <RegisteredPlayer accountId={attendee.accountId} />
+                  </div>
+                ))
+              ) : (
+                <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                  There are no attendees
+                </p>
+              )}
+            </div>
+          </>
         )}
 
         {/**Conditionally render different menu options based on account type */}

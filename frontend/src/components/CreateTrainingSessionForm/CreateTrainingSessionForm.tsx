@@ -43,13 +43,7 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
-import {
-  MoveLeft,
-  Check,
-  ChevronsUpDown,
-  CloudUpload,
-  Paperclip,
-} from "lucide-react";
+import { Check, ChevronsUpDown, CloudUpload, Paperclip } from "lucide-react";
 import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
 
 import log from "loglevel";
@@ -170,14 +164,6 @@ export default function CreateTrainingSessionForm() {
 
   return (
     <>
-      {/** Navigate to previous page */}
-      <Button
-        className="rounded-full"
-        variant="outline"
-        onClick={() => navigate("/")}
-      >
-        <MoveLeft />
-      </Button>
       {/** Create Training Session Form */}
       <Form {...form}>
         <form
