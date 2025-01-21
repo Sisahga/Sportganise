@@ -23,69 +23,69 @@ const MockData = [
   {
     trainingPlan: "Document1.doc",
     author: "Coach Steven",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "ShuttleCock_techniques.doc",
     author: "Coach Micheal",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "TrainingSessionNotes.dox",
     author: "Benjamin",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "Document1.doc",
     author: "Coach Steven",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "ShuttleCock_techniques.doc",
     author: "Coach Micheal",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "TrainingSessionNotes.dox",
     author: "Benjamin",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "Document1.doc",
     author: "Coach Steven",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
-    trainingPlan: "ShuttleCock_techniques.doc",
+    trainingPlan: "badminton_pro.doc",
     author: "Coach Micheal",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "TrainingSessionNotes.dox",
     author: "Benjamin",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
-    trainingPlan: "Document1.doc",
+    trainingPlan: "paymentPlan.doc",
     author: "Coach Steven",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "ShuttleCock_techniques.doc",
     author: "Coach Micheal",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
   {
     trainingPlan: "TrainingSessionNotes.dox",
     author: "Benjamin",
-    date: new Date().toDateString(),
+    date: new Date(),
   },
 ];
 
-interface ColumnsTypes {
+interface ColumnTypes {
   trainingPlan: string; //change to File
   author: string;
-  date: string;
+  date: Date;
 }
 
 export const columns = [
@@ -136,13 +136,13 @@ export const columns = [
       );
     },
     cell: (props: any) => (
-      <div className="capitalize">{props.getValue("date")}</div>
+      <div className="capitalize">{props.getValue("date").toDateString()}</div>
     ),
   },
 ];
 
 export default function TrainingPlanTable() {
-  const [data /*setData*/] = useState<ColumnsTypes[]>(MockData);
+  const [data /*setData*/] = useState<ColumnTypes[]>(MockData);
 
   const table = useReactTable({
     data, //needs to be date
