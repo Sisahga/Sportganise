@@ -11,16 +11,21 @@ import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
+
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Service layer for Programs. */
 @Service
@@ -30,6 +35,7 @@ public class ProgramService {
   private final AccountService accountService;
   private final AccountRepository accountRepository;
   private final ProgramAttachmentRepository programAttachmentRepository;
+  private final BlobService blobService;
 
   /**
    * Constructor for ProgramService.
@@ -43,11 +49,13 @@ public class ProgramService {
       ProgramRepository programRepository,
       AccountService accountService,
       AccountRepository accountRepository,
-      ProgramAttachmentRepository programAttachmentRepository) {
+      ProgramAttachmentRepository programAttachmentRepository,
+      BlobService blobService) {
     this.programRepository = programRepository;
     this.accountRepository = accountRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
+    this.blobService = blobService;
   }
 
   public Optional<Program> getSessionById(Integer id) {
@@ -204,21 +212,23 @@ public class ProgramService {
    * @param endTime End time of each occurrence of the program.
    * @param location Location of the program/session.
    * @param attachments String paths of files attached to this program/session.
+   * @param accountId The account id of the user making the request.
    * @return A newly created programDto.
    */
   public ProgramDto createProgramDto(
-      String title,
-      String programType,
-      String startDate,
-      String endDate,
-      Boolean isRecurring,
-      String visibility,
-      String description,
-      Integer capacity,
-      String startTime,
-      String endTime,
-      String location,
-      List<Map<String, String>> attachments) {
+          String title,
+          String programType,
+          String startDate,
+          String endDate,
+          Boolean isRecurring,
+          String visibility,
+          String description,
+          Integer capacity,
+          String startTime,
+          String endTime,
+          String location,
+          List<MultipartFile> attachments,
+          Integer accountId) throws IOException {
 
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     int durationMins =
@@ -259,15 +269,14 @@ public class ProgramService {
     List<ProgramAttachment> programAttachments = new ArrayList<>();
 
     if (attachments != null && !attachments.isEmpty()) {
-      for (Map<String, String> attachment : attachments) {
-        String attachmentPath = attachment.get("path");
-        if (attachmentPath != null) {
-
+      for (MultipartFile attachment : attachments) {
+        String s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+        if (s3AttachmentUrl != null) {
           programAttachmentsDto.add(
-              new ProgramAttachmentDto(savedProgram.getProgramId(), attachmentPath));
+              new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
 
           programAttachments.add(
-              new ProgramAttachment(savedProgram.getProgramId(), attachmentPath));
+              new ProgramAttachment(savedProgram.getProgramId(), s3AttachmentUrl));
         }
       }
       programAttachmentRepository.saveAll(programAttachments);
@@ -293,9 +302,12 @@ public class ProgramService {
    * @param startTime Start time of each occurrence of the program.
    * @param endTime End time of each occurrence of the program.
    * @param location Location of the program/session.
-   * @param attachments List of Strings of paths uploaded, if any.
+   * @param attachmentsToAdd Attachments to add to the program.
+   * @param attachmentsToRemove Attachments to remove from the program.
+   * @param accountId Id of the user making the request.
    * @return An updated programDto.
    */
+  @Transactional
   public ProgramDto modifyProgram(
       ProgramDto programDtoToModify,
       String title,
@@ -309,7 +321,9 @@ public class ProgramService {
       String startTime,
       String endTime,
       String location,
-      List<Map<String, String>> attachments) {
+      List<MultipartFile> attachmentsToAdd,
+      List<String> attachmentsToRemove,
+      Integer accountId) throws IOException {
 
     Program existingProgram =
         programRepository
@@ -327,11 +341,6 @@ public class ProgramService {
 
     ZonedDateTime expiryDate = null;
     String frequency = null;
-
-    if (isRecurring != null && isRecurring) {
-      frequency = "weekly";
-      expiryDate = ZonedDateTime.parse(endDate);
-    }
 
     if (isRecurring != null && isRecurring) {
       ZonedDateTime currentOccurrence = occurrenceDate;
@@ -359,52 +368,34 @@ public class ProgramService {
             visibility);
 
     updatedProgram.setProgramId(existingProgram.getProgramId());
-
     programRepository.save(updatedProgram);
 
-    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
-
-    if (attachments != null) {
-      List<ProgramAttachment> existingAttachments =
-          programAttachmentRepository.findAttachmentsByProgramId(programDtoToModify.getProgramId());
-
-      List<ProgramAttachment> attachmentsToAdd = new ArrayList<>();
-      List<ProgramAttachment> attachmentsToRemove = new ArrayList<>(existingAttachments);
-
-      for (Map<String, String> attachment : attachments) {
-        String attachmentPath = attachment.get("path");
-        if (attachmentPath != null) {
-          boolean exists = false;
-          for (ProgramAttachment existingAttachment : existingAttachments) {
-            if (existingAttachment.getAttachmentUrl().equals(attachmentPath)) {
-              exists = true;
-              attachmentsToRemove.remove(existingAttachment);
-
-              programAttachmentDtos.add(
-                  new ProgramAttachmentDto(programDtoToModify.getProgramId(), attachmentPath));
-              break;
-            }
-          }
-
-          if (!exists) {
-            attachmentsToAdd.add(
-                new ProgramAttachment(programDtoToModify.getProgramId(), attachmentPath));
-
-            programAttachmentDtos.add(
-                new ProgramAttachmentDto(programDtoToModify.getProgramId(), attachmentPath));
-          }
-        }
+    if (!attachmentsToRemove.isEmpty()) {
+      // Delete from repo.
+      int rowsAffected = programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+          programDtoToModify.getProgramId(), attachmentsToRemove);
+      if (rowsAffected != attachmentsToRemove.size()) {
+        throw new RuntimeException("Could not delete all attachments.");
       }
-
-      if (!attachmentsToRemove.isEmpty()) {
-        programAttachmentRepository.deleteAll(attachmentsToRemove);
-      }
-
-      if (!attachmentsToAdd.isEmpty()) {
-        programAttachmentRepository.saveAll(attachmentsToAdd);
+      // Delete from S3 bucket.
+      for (String attachment: attachmentsToRemove) {
+        this.blobService.deleteFile(attachment);
       }
     }
 
+    List<ProgramAttachment> programAttachments = new ArrayList<>();
+    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
+    String s3AttachmentUrl;
+    if (!attachmentsToAdd.isEmpty()) {
+      for (MultipartFile attachment : attachmentsToAdd) {
+        s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+        programAttachments.add(
+            new ProgramAttachment(programDtoToModify.getProgramId(), s3AttachmentUrl));
+        programAttachmentDtos.add(
+            new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+      }
+      programAttachmentRepository.saveAll(programAttachments);
+    }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
   }
 }

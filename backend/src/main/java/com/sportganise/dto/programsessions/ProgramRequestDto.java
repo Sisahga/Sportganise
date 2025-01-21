@@ -1,7 +1,6 @@
 package com.sportganise.dto.programsessions;
 
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +23,5 @@ public class ProgramRequestDto {
   private String startTime;
   private String endTime;
   private String location;
-  private List<Map<String, String>> attachments;
+  private List<String> attachmentsToRemove;
 }
