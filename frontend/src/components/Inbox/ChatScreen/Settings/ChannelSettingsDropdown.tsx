@@ -51,6 +51,8 @@ const ChannelSettingsDropdown = ({
   currentUserId,
   channelName,
   setCurrentChannelName,
+  currentChannelPictureUrl,
+  setCurrentChannelPictureUrl,
 }: ChannelSettingsDropdownProps) => {
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
@@ -256,6 +258,10 @@ const ChannelSettingsDropdown = ({
       <ChangePictureDialog
         isOpen={isChangePictureOpen}
         onClose={() => setIsChangePictureOpen(false)}
+        currentChannelId={channelId}
+        currentChannelPictureUrl={currentChannelPictureUrl}
+        setCurrentChannelPictureUrl={setCurrentChannelPictureUrl}
+        webSocketRef={webSocketRef}
       />
       <LeaveGroupDialog
         isOpen={isLeaveGroupOpen}

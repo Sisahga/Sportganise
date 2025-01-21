@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, FolderOpen } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages.ts";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
+import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
@@ -33,6 +34,7 @@ const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState("");
   const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
   const [currentChannelName, setCurrentChannelName] = useState(channelName);
+  const [currentChannelImageUrl, setCurrentChannelImageUrl] = useState(channelImageBlob);
 
   // Hooks
   const { messages, setMessages, loading, error } = useChatMessages(
@@ -141,8 +143,8 @@ const ChatScreen = () => {
         {/* Chat Information */}
         <div className="flex flex-grow items-center gap-3">
           <img
-            src={channelImageBlob}
-            alt={channelName}
+            src={currentChannelImageUrl}
+            alt={defaultGroupAvatar}
             style={{ width: "40px", height: "40px" }}
             className="rounded-full object-cover"
           />
@@ -160,6 +162,8 @@ const ChatScreen = () => {
           currentUserId={currentUserId}
           channelName={channelName}
           setCurrentChannelName={setCurrentChannelName}
+          currentChannelPictureUrl={currentChannelImageUrl}
+          setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
         />
       </header>
 

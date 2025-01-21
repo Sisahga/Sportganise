@@ -43,6 +43,8 @@ export interface ChannelSettingsDropdownProps {
   currentUserId: number;
   channelName: string;
   setCurrentChannelName: React.Dispatch<React.SetStateAction<string>>;
+  currentChannelPictureUrl: string;
+  setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export enum GroupChannelMemberRole {
@@ -103,4 +105,17 @@ export interface RenameGroupDialogProps {
 export interface RenameChannelDto {
   channelId: number;
   channelName: string;
+}
+
+export interface ChangePictureDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  currentChannelId: number;
+  currentChannelPictureUrl: string;
+  setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
+  webSocketRef: WebSocketService | null;
+}
+
+export interface UpdateChannelPictureResponse {
+  channelImageUrl: string;
 }

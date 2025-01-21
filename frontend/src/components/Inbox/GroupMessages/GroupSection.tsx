@@ -10,7 +10,7 @@ function GroupSection({ groupChannels }: GroupSectionProps) {
           <div>
             <h2 className="text-lg primary-colour font-bold">Groups</h2>
           </div>
-          <div className="flex flex-row-reverse justify-end mt-4 gap-2 overflow-x-scroll">
+          <div className="flex justify-start mt-4 gap-2 overflow-x-scroll">
             {groupChannels.map((channel) => (
               <MessagingDashboardChannelItem
                 key={channel.channelId}
