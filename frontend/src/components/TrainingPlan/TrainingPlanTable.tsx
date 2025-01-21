@@ -91,7 +91,7 @@ interface ColumnsTypes {
 export const columns = [
   {
     accessorKey: "trainingPlan",
-    header: (props: any) => {
+    header: () => {
       return (
         <div className="flex items-center">
           Attachment
@@ -113,7 +113,7 @@ export const columns = [
   },
   {
     accessorKey: "author",
-    header: (props: any) => {
+    header: () => {
       return (
         <div className="flex items-center">
           Author
@@ -130,7 +130,7 @@ export const columns = [
     header: (props: any) => {
       return (
         <div className="flex items-center">
-          Date
+          {props.getContext}
           <Calendar size={15} className="mx-2" />
         </div>
       );
@@ -142,7 +142,7 @@ export const columns = [
 ];
 
 export default function TrainingPlanTable() {
-  const [data, setData] = useState<ColumnsTypes[]>(MockData);
+  const [data /*setData*/] = useState<ColumnsTypes[]>(MockData);
 
   const table = useReactTable({
     data, //needs to be date
