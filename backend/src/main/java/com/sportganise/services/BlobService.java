@@ -83,15 +83,15 @@ public class BlobService {
     String fileName = file.getOriginalFilename();
     // TODO: set proper key for file (accountId/uuid+filename)
     String uniqueFileName = UUID.randomUUID() + "_" + fileName;
-    String S3Key = accountId + "/" + uniqueFileName;
+    String s3Key = accountId + "/" + uniqueFileName;
 
-    log.debug("Uploading file: {}", S3Key);
+    log.debug("Uploading file: {}", s3Key);
     try {
       assert fileName != null;
       PutObjectRequest objectRequest =
-          PutObjectRequest.builder().bucket(bucketName).key(S3Key).build();
+          PutObjectRequest.builder().bucket(bucketName).key(s3Key).build();
       s3Client.putObject(objectRequest, RequestBody.fromBytes(file.getBytes()));
-      String s3Url = this.computeS3Url(S3Key);
+      String s3Url = this.computeS3Url(s3Key);
 
       // ** Save the S3 Object URL in the Database.
       // Case where it is not a message file.
