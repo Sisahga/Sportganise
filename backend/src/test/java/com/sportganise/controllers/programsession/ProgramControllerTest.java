@@ -4,22 +4,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.controllers.programsessions.ProgramController;
-import com.sportganise.dto.programsessions.ProgramAttachmentDto;
-import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
-import com.sportganise.dto.programsessions.ProgramDto;
-import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.dto.programsessions.*;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -47,7 +47,6 @@ public class ProgramControllerTest {
 
   private ProgramDto mockProgramDto;
   private ProgramParticipantDto mockProgramParticipantDto;
-  private ProgramAttachmentDto mockProgramAttachmentDto;
   private String jsonPayload;
 
   @BeforeEach
@@ -55,8 +54,8 @@ public class ProgramControllerTest {
     mockProgramDto = new ProgramDto();
     mockProgramParticipantDto = new ProgramParticipantDto();
 
-    mockProgramAttachmentDto =
-        new ProgramAttachmentDto(111, "http://example.com/program-guide.pdf");
+    ProgramAttachmentDto mockProgramAttachmentDto =
+        new ProgramAttachmentDto(111, "https://example.com/program-guide.pdf");
 
     mockProgramDto.setProgramId(111);
     mockProgramDto.setProgramType("Training");
@@ -145,7 +144,7 @@ public class ProgramControllerTest {
         .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
         .andExpect(
             jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl")
-                .value("http://example.com/program-guide.pdf"))
+                .value("https://example.com/program-guide.pdf"))
         .andExpect(jsonPath("$.data[0].attendees[0].accountId").value(1))
         .andExpect(jsonPath("$.statusCode").value(200))
         .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
@@ -175,7 +174,7 @@ public class ProgramControllerTest {
         .andExpect(jsonPath("$.data[0].programDetails.title").value("Training Program"))
         .andExpect(
             jsonPath("$.data[0].programDetails.programAttachments[0].attachmentUrl")
-                .value("http://example.com/program-guide.pdf"))
+                .value("https://example.com/program-guide.pdf"))
         .andExpect(jsonPath("$.data[0].attendees").isEmpty())
         .andExpect(jsonPath("$.statusCode").value(200))
         .andExpect(jsonPath("$.message").value("Programs successfully fetched."));
@@ -186,6 +185,33 @@ public class ProgramControllerTest {
     Account mockAccount = new Account();
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
+
+    ProgramModifyRequestDto mockProgramModifyRequestDto = new ProgramModifyRequestDto();
+    mockProgramModifyRequestDto.setTitle("Updated Training Program");
+    mockProgramModifyRequestDto.setType("Training");
+    mockProgramModifyRequestDto.setStartDate("2024-02-01");
+    mockProgramModifyRequestDto.setEndDate("2024-02-10");
+    mockProgramModifyRequestDto.setRecurring(false);
+    mockProgramModifyRequestDto.setVisibility("private");
+    mockProgramModifyRequestDto.setDescription("Updated Description");
+    mockProgramModifyRequestDto.setCapacity(20);
+    mockProgramModifyRequestDto.setStartTime("09:00");
+    mockProgramModifyRequestDto.setEndTime("11:00");
+    mockProgramModifyRequestDto.setLocation("Updated Location");
+
+    MockMultipartFile programData =
+        new MockMultipartFile(
+            "programData",
+            "",
+            MediaType.APPLICATION_JSON_VALUE,
+            new ObjectMapper().writeValueAsBytes(mockProgramModifyRequestDto));
+
+    MockMultipartFile attachment =
+        new MockMultipartFile(
+            "attachments",
+            "program-guide.pdf",
+            MediaType.APPLICATION_PDF_VALUE,
+            "PDF content".getBytes());
 
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
@@ -202,21 +228,24 @@ public class ProgramControllerTest {
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyString(),
-                Mockito.<List<Map<String, String>>>any()))
+                Mockito.anyList(),
+                Mockito.anyInt()))
         .thenReturn(mockProgramDto);
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/programs/2/create-program")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
+            MockMvcRequestBuilders.multipart("/api/programs/2/create-program")
+                .file(programData)
+                .file(attachment)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.message").value("Created a new program successfully."))
         .andExpect(jsonPath("$.data.title").value("Training Program"))
         .andExpect(jsonPath("$.data.capacity").value(10))
         .andExpect(jsonPath("$.data.programType").value("Training"))
         .andExpect(
             jsonPath("$.data.programAttachments[0].attachmentUrl")
-                .value("http://example.com/program-guide.pdf"));
+                .value("https://example.com/program-guide.pdf"));
   }
 
   @Test
@@ -228,11 +257,25 @@ public class ProgramControllerTest {
     Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
+    // Ensure the JSON payload is valid and formatted correctly
+    MockMultipartFile programData =
+        new MockMultipartFile(
+            "programData",
+            "program.json",
+            MediaType.APPLICATION_JSON_VALUE,
+            jsonPayload.getBytes(StandardCharsets.UTF_8));
+
+    // Add an empty file to match the controller's expected attachments
+    MockMultipartFile emptyAttachments =
+        new MockMultipartFile(
+            "attachments", "", MediaType.APPLICATION_OCTET_STREAM_VALUE, new byte[0]);
+
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/programs/3/create-program")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
+            MockMvcRequestBuilders.multipart("/api/programs/3/create-program")
+                .file(programData)
+                .file(emptyAttachments) // Include empty attachment to avoid 400
+                .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isForbidden());
   }
 
@@ -242,44 +285,98 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
+    ProgramModifyRequestDto mockProgramModifyRequestDto = new ProgramModifyRequestDto();
+    mockProgramModifyRequestDto.setTitle("Title");
+    mockProgramModifyRequestDto.setType("Type");
+    mockProgramModifyRequestDto.setStartDate("2024-01-30T10:00:00Z");
+    mockProgramModifyRequestDto.setEndDate("2024-02-01T10:00:00Z");
+    mockProgramModifyRequestDto.setRecurring(false);
+    mockProgramModifyRequestDto.setVisibility("public");
+    mockProgramModifyRequestDto.setDescription("description");
+    mockProgramModifyRequestDto.setCapacity(10);
+    mockProgramModifyRequestDto.setStartTime("10:30");
+    mockProgramModifyRequestDto.setEndTime("12:30");
+    mockProgramModifyRequestDto.setLocation("Centre-de-loisirs-St-Denis");
+    mockProgramModifyRequestDto.setAttachmentsToRemove(List.of("file1.pdf", "file2.pdf"));
+
+    MockMultipartFile programData =
+        new MockMultipartFile(
+            "programData",
+            "",
+            MediaType.APPLICATION_JSON_VALUE,
+            new ObjectMapper().writeValueAsBytes(mockProgramModifyRequestDto));
+
+    MockMultipartFile attachment1 =
+        new MockMultipartFile(
+            "attachments",
+            "file1.pdf",
+            MediaType.APPLICATION_PDF_VALUE,
+            "Sample PDF Content".getBytes());
+
+    MockMultipartFile attachment2 =
+        new MockMultipartFile(
+            "attachments",
+            "file2.pdf",
+            MediaType.APPLICATION_PDF_VALUE,
+            "Sample PDF Content".getBytes());
+
     Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put("/api/programs/2/111/modify-program")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
+            MockMvcRequestBuilders.multipart("/api/programs/2/111/modify-program")
+                .file(programData)
+                .file(attachment1)
+                .file(attachment2)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isOk());
 
     Mockito.verify(programService)
         .modifyProgram(
             Mockito.eq(mockProgramDto),
-            Mockito.eq("Title"),
-            Mockito.eq("Type"),
-            Mockito.eq("2024-01-30T10:00:00Z"),
-            Mockito.eq("2024-02-01T10:00:00Z"),
-            Mockito.eq(false),
-            Mockito.eq("public"),
-            Mockito.eq("description"),
-            Mockito.eq(10),
-            Mockito.eq("10:30"),
-            Mockito.eq("12:30"),
-            Mockito.eq("Centre-de-loisirs-St-Denis"),
-            Mockito.<List<Map<String, String>>>any());
+            Mockito.eq(mockProgramModifyRequestDto.getTitle()),
+            Mockito.eq(mockProgramModifyRequestDto.getType()),
+            Mockito.eq(mockProgramModifyRequestDto.getStartDate()),
+            Mockito.eq(mockProgramModifyRequestDto.getEndDate()),
+            Mockito.eq(mockProgramModifyRequestDto.getRecurring()),
+            Mockito.eq(mockProgramModifyRequestDto.getVisibility()),
+            Mockito.eq(mockProgramModifyRequestDto.getDescription()),
+            Mockito.eq(mockProgramModifyRequestDto.getCapacity()),
+            Mockito.eq(mockProgramModifyRequestDto.getStartTime()),
+            Mockito.eq(mockProgramModifyRequestDto.getEndTime()),
+            Mockito.eq(mockProgramModifyRequestDto.getLocation()),
+            Mockito.argThat(list -> list.size() == 2), // Assert 2 attachments were passed
+            Mockito.eq(mockProgramModifyRequestDto.getAttachmentsToRemove()),
+            Mockito.eq(2));
   }
 
   @Test
   public void testModifyProgram_UserNotFound() throws Exception {
-
     Mockito.when(accountService.getAccount(123)).thenReturn(Optional.empty());
+
+    MockMultipartFile programData =
+        new MockMultipartFile(
+            "programData",
+            "",
+            MediaType.APPLICATION_JSON_VALUE,
+            jsonPayload.getBytes(StandardCharsets.UTF_8));
+
+    MockMultipartFile attachment =
+        new MockMultipartFile(
+            "attachments",
+            "dummy.txt",
+            MediaType.TEXT_PLAIN_VALUE,
+            "Sample content".getBytes(StandardCharsets.UTF_8));
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put("/api/programs/123/111/modify-program")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
+            MockMvcRequestBuilders.multipart(
+                    HttpMethod.POST, "/api/programs/123/111/modify-program")
+                .file(programData)
+                .file(attachment)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isNotFound());
   }
 
@@ -292,11 +389,26 @@ public class ProgramControllerTest {
     Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
+    MockMultipartFile programData =
+        new MockMultipartFile(
+            "programData",
+            "",
+            MediaType.APPLICATION_JSON_VALUE,
+            jsonPayload.getBytes(StandardCharsets.UTF_8));
+
+    MockMultipartFile attachment =
+        new MockMultipartFile(
+            "attachments",
+            "testfile.txt",
+            MediaType.TEXT_PLAIN_VALUE,
+            "Sample file content".getBytes(StandardCharsets.UTF_8));
+
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put("/api/programs/3/111/modify-program")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
+            MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/programs/3/111/modify-program")
+                .file(programData)
+                .file(attachment)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isForbidden());
   }
 
@@ -310,11 +422,26 @@ public class ProgramControllerTest {
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
 
+    MockMultipartFile programData =
+        new MockMultipartFile(
+            "programData",
+            "",
+            MediaType.APPLICATION_JSON_VALUE,
+            jsonPayload.getBytes(StandardCharsets.UTF_8));
+
+    MockMultipartFile attachment =
+        new MockMultipartFile(
+            "attachments",
+            "dummy.txt",
+            MediaType.TEXT_PLAIN_VALUE,
+            "Sample content".getBytes(StandardCharsets.UTF_8));
+
     mockMvc
         .perform(
-            MockMvcRequestBuilders.put("/api/programs/2/111/modify-program")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonPayload))
+            MockMvcRequestBuilders.multipart(HttpMethod.POST, "/api/programs/2/111/modify-program")
+                .file(programData)
+                .file(attachment)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isNotFound());
   }
 }
