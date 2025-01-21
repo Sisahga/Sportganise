@@ -101,7 +101,7 @@ CREATE TABLE program (
 
 CREATE TABLE program_attachments (
 	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
-	attachment_url VARCHAR(100),
+	attachment_url VARCHAR(100) UNIQUE NOT NULL,
 	PRIMARY KEY (program_id)
 );
 
