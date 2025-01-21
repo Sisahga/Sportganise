@@ -1,3 +1,5 @@
+/* eslint-disable  no-explicit-any */
+
 import {
   getCoreRowModel,
   useReactTable,
