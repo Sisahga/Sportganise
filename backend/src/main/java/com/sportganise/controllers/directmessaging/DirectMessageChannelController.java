@@ -12,6 +12,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -159,15 +160,18 @@ public class DirectMessageChannelController {
    * @param accountId The ID of the account updating the channel picture.
    * @return HTTP Code 200 if successful, 404 if channel not found, 500 otherwise.
    */
-  @PostMapping("/update-image")
-  public ResponseEntity<ResponseDto<Null>> updateChannelPicture(
+  @PostMapping(value = "/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<ResponseDto<UpdateChannelImageResponseDto>> updateChannelPicture(
           @RequestParam("channelId") int channelId,
           @RequestParam("image") MultipartFile image,
           @RequestParam("accountId") int accountId) {
     try {
-      directMessageChannelService.updateChannelPicture(channelId, image, accountId);
+      UpdateChannelImageResponseDto responseDataDto =
+              directMessageChannelService.updateChannelPicture(channelId, image, accountId);
+      log.debug("New image URL: {}", responseDataDto.getChannelImageUrl());
       return new ResponseEntity<>(
-              new ResponseDto<>(HttpStatus.OK.value(), "Channel picture updated successfully", null),
+              new ResponseDto<>(HttpStatus.OK.value(), "Channel picture updated successfully",
+                      responseDataDto),
               HttpStatus.OK);
     } catch (ChannelNotFoundException e) {
       return new ResponseEntity<>(

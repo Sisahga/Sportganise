@@ -3,6 +3,7 @@ package com.sportganise.services.directmessaging;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
@@ -215,21 +216,25 @@ public class DirectMessageChannelService {
    * @throws ChannelNotFoundException If the channel is not found.
    */
   @Transactional
-  public void updateChannelPicture(int channelId, MultipartFile image, Integer userId)
+  public UpdateChannelImageResponseDto updateChannelPicture(int channelId, MultipartFile image, Integer userId)
           throws ChannelNotFoundException {
     try {
-      String oldImageBlob = this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
-      String newImageBlob = this.blobService.uploadFile(image, false, null, userId);
+      String oldImageBlobUrl = this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
+      String newImageBlobUrl = this.blobService.uploadFile(image, false, null, userId);
+      UpdateChannelImageResponseDto response = new UpdateChannelImageResponseDto();
+      response.setChannelImageUrl(newImageBlobUrl);
 
-      int rowsAffected = this.directMessageChannelRepository.updateChannelImage(channelId, newImageBlob);
+      int rowsAffected = this.directMessageChannelRepository.updateChannelImage(channelId, newImageBlobUrl);
       if (rowsAffected == 0) {
         log.error("Failed to update channel picture with id: {}", channelId);
         throw new ChannelNotFoundException("Channel not found.");
       }
-      deleteOldImageBlob(oldImageBlob);
+      deleteOldImageBlob(oldImageBlobUrl);
       log.info("Successfully updated channel picture with id: {}", channelId);
+      return response;
     } catch (IOException e) {
       log.error("Failed to update channel picture: {}", e.getMessage());
+      return null;
     }
   }
 
