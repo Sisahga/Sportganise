@@ -14,7 +14,7 @@ export default function AttendeeBadgeType(attendeeType: string) {
       return <Badge variant="default">{attendeeType.toLowerCase()}</Badge>;
     } else {
       return (
-        <Badge className="bg-amber-300">{attendeeType.toLowerCase()}</Badge>
+        <Badge className="bg-amber-400">{attendeeType.toLowerCase()}</Badge>
       );
     }
   }
