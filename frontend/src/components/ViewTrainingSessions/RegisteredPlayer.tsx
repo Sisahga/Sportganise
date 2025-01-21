@@ -10,14 +10,16 @@ interface RegisteredPlayerProps {
   accountId: number;
 }
 
-const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({ accountId }) => {
+const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
+  accountId,
+}: RegisteredPlayerProps) => {
   const { data, loading, error } = usePersonalInformation(accountId);
   const [accountDetails, setAccountDetails] = useState<Account>();
   useEffect(() => {
     setAccountDetails(data ?? undefined);
     log.info(
       "RegisteredPlayer.tsx : usepersonalInformation(accountId) = ",
-      data,
+      data
     );
   }, [data]);
   return (
