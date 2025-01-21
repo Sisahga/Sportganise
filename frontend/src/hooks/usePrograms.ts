@@ -22,7 +22,7 @@ function usePrograms(accountId: number) {
       log.info("usePrograms message:", response.message);
       console.log(
         "usePrograms : const programs = useState<Program[]> => ",
-        programs
+        programs,
       );
     } catch (err) {
       console.error("Error fetching all programs:", err);

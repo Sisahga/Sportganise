@@ -17,7 +17,7 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({ accountId }) => {
     setAccountDetails(data ?? undefined);
     log.info(
       "RegisteredPlayer.tsx : usepersonalInformation(accountId) = ",
-      data
+      data,
     );
   }, [data]);
   return (

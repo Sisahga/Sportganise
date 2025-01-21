@@ -34,7 +34,7 @@ export default function ViewRegisteredPlayersContent({
         {attendees.length > 0 ? (
           attendees.map((attendee) => {
             const { data, loading, error } = usePersonalInformation(
-              attendee.accountId
+              attendee.accountId,
             );
 
             return (
