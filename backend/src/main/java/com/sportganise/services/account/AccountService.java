@@ -159,7 +159,7 @@ public class AccountService {
     Account account = this.getAccountById(accountId);
 
     // Upload file to data store
-    String url = blobService.uploadFile(file);
+    String url = blobService.uploadFile(file, accountId);
 
     // Update account entity with new picture URL
     account.setPictureUrl(url);

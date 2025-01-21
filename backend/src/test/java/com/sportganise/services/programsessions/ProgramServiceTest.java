@@ -16,6 +16,7 @@ import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
@@ -23,6 +24,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,8 @@ public class ProgramServiceTest {
   @Mock private AccountService accountService;
 
   @Mock private AccountRepository accountRepository;
+
+  @Mock private BlobService blobService;
 
   @InjectMocks private ProgramService programService;
 
@@ -106,7 +110,7 @@ public class ProgramServiceTest {
 
     assertEquals(2, participantDtos.size());
 
-    ProgramParticipantDto participantDto1 = participantDtos.get(0);
+    ProgramParticipantDto participantDto1 = participantDtos.getFirst();
     assertEquals(1, participantDto1.getProgramId());
     assertEquals(101, participantDto1.getAccountId());
     assertTrue(participantDto1.isConfirmed());
@@ -257,7 +261,7 @@ public class ProgramServiceTest {
 
     assertNotNull(programDtos);
 
-    ProgramDto programDto1 = programDtos.get(0);
+    ProgramDto programDto1 = programDtos.getFirst();
     assertEquals(1, programDto1.getProgramId());
     assertEquals("Training", programDto1.getProgramType());
     assertEquals("Training Program 1", programDto1.getTitle());
@@ -270,7 +274,8 @@ public class ProgramServiceTest {
     assertEquals("Training", programDto2.getProgramType());
     assertEquals("Training Program 2", programDto2.getTitle());
     assertEquals(1, programDto2.getProgramAttachments().size());
-    assertEquals("attachment3.url", programDto2.getProgramAttachments().get(0).getAttachmentUrl());
+    assertEquals(
+        "attachment3.url", programDto2.getProgramAttachments().getFirst().getAttachmentUrl());
   }
 
   @Test
@@ -297,7 +302,13 @@ public class ProgramServiceTest {
                     "10:30",
                     "12:30",
                     "Updated Location",
-                    null));
+                    Collections.emptyList(), // Empty list for attachments to add
+                    Collections.emptyList(), // Empty list for attachments to remove
+                    2)); // Mock account ID
+
     assertEquals("Program not found with ID: 1", exception.getMessage());
+    Mockito.verify(programRepository).findById(1);
+    Mockito.verifyNoInteractions(blobService);
+    Mockito.verifyNoInteractions(programAttachmentRepository);
   }
 }

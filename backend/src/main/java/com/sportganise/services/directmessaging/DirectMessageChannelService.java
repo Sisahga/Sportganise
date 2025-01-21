@@ -3,11 +3,15 @@ package com.sportganise.services.directmessaging;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
+import com.sportganise.services.BlobService;
+import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Service Class related to Direct Message Channel. */
 @Service
@@ -25,6 +30,7 @@ public class DirectMessageChannelService {
   private final AccountRepository accountRepository;
   private final DirectMessageChannelMemberService directMessageChannelMemberService;
   private final DirectMessageService directMessageService;
+  private final BlobService blobService;
 
   /**
    * Service Constructor.
@@ -39,12 +45,14 @@ public class DirectMessageChannelService {
       DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
       AccountRepository accountRepository,
       DirectMessageChannelMemberService directMessageChannelMemberService,
-      DirectMessageService directMessageService) {
+      DirectMessageService directMessageService,
+      BlobService blobService) {
     this.directMessageChannelRepository = directMessageChannelRepository;
     this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
     this.accountRepository = accountRepository;
     this.directMessageChannelMemberService = directMessageChannelMemberService;
     this.directMessageService = directMessageService;
+    this.blobService = blobService;
   }
 
   /**
@@ -196,6 +204,39 @@ public class DirectMessageChannelService {
   }
 
   /**
+   * Updates the image of a channel.
+   *
+   * @param channelId The ID of the channel to update.
+   * @param image The new image of the channel.
+   * @param userId The ID of the user updating the channel.
+   * @throws ChannelNotFoundException If the channel is not found.
+   */
+  @Transactional
+  public UpdateChannelImageResponseDto updateChannelPicture(
+      int channelId, MultipartFile image, Integer userId) throws ChannelNotFoundException {
+    try {
+      String oldImageBlobUrl =
+          this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
+      String newImageBlobUrl = this.blobService.uploadFile(image, false, null, userId);
+      UpdateChannelImageResponseDto response = new UpdateChannelImageResponseDto();
+      response.setChannelImageUrl(newImageBlobUrl);
+
+      int rowsAffected =
+          this.directMessageChannelRepository.updateChannelImage(channelId, newImageBlobUrl);
+      if (rowsAffected == 0) {
+        log.error("Failed to update channel picture with id: {}", channelId);
+        throw new ChannelNotFoundException("Channel not found.");
+      }
+      deleteOldImageBlob(oldImageBlobUrl);
+      log.info("Successfully updated channel picture with id: {}", channelId);
+      return response;
+    } catch (IOException e) {
+      log.error("Failed to update channel picture: {}", e.getMessage());
+      return null;
+    }
+  }
+
+  /**
    * Formats the channel name to be the first names of all members in the channel if no name was
    * given.
    *
@@ -227,5 +268,14 @@ public class DirectMessageChannelService {
       }
     }
     return channelNameBuilder;
+  }
+
+  private void deleteOldImageBlob(String oldImageBlob) {
+    try {
+      this.blobService.deleteFile(oldImageBlob);
+      log.debug("Deleted old image blob: {}", oldImageBlob);
+    } catch (IOException e) {
+      log.warn("Failed to delete old image blob: {}", e.getMessage());
+    }
   }
 }

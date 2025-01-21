@@ -16,9 +16,11 @@ export interface Address {
   postalCode: string;
 }
 
+export type AccountType = "ADMIN" | "COACH" | "PLAYER" | "GENERAL";
+
 export interface Account {
   accountId: number;
-  type: string;
+  type: AccountType;
   email: string;
   auth0Id: string;
   address: Address;
