@@ -81,5 +81,13 @@ public interface DirectMessageChannelRepository
         SET dmc.imageBlob = :imageObjectUrl
         WHERE dmc.channelId = :channelId
       """)
-  int updateGroupChannelProfilePicture(int channelId, String imageObjectUrl);
+  int updateChannelImage(int channelId, String imageObjectUrl);
+
+  @Query(
+      """
+        SELECT dmc.imageBlob
+        FROM DirectMessageChannel dmc
+        WHERE dmc.channelId = :channelId
+      """)
+  String getDirectMessageChannelImageBlob(int channelId);
 }
