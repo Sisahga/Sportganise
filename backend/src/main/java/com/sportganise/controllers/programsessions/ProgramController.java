@@ -14,6 +14,7 @@ import java.util.Optional;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,7 +89,7 @@ public class ProgramController {
    * @param attachments List of attachments.
    * @return HTTP Response for newly created program.
    */
-  @PostMapping("/{accountId}/create-program")
+  @PostMapping(value = "/{accountId}/create-program", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
           @PathVariable Integer accountId,
           @RequestPart("programData") ProgramRequestDto programRequestDto,
@@ -142,14 +143,15 @@ public class ProgramController {
   }
 
   /**
-   * Put mapping for modifying/updating an existing program.
+   * POST mapping for modifying/updating an existing program.
    *
    * @param accountId Id of user who is making the request.
    * @param programId Id of the program that we wish to modify.
    * @param programRequestDto Dto for the request body.
+   * @param attachments List of attachments.
    * @return HTTP Response for modified/updated data
    */
-  @PutMapping("/{accountId}/{programId}/modify-program")
+  @PostMapping(value = "/{accountId}/{programId}/modify-program", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
