@@ -4,20 +4,28 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.RenameChannelDto;
+import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
+import com.sportganise.exceptions.ChannelNotFoundException;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import com.sportganise.services.directmessaging.DirectMessageService;
+import jakarta.validation.constraints.Null;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /** REST Controller for handling HTTP requests related to Direct Message Channels. */
 @RestController
@@ -121,6 +129,66 @@ public class DirectMessageChannelController {
       ResponseDto<LastMessageDto> response =
           new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "No messages found", null);
       return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+  }
+
+  /**
+   * Endpoint /api/messaging/channel/rename-channel: Put Mapping for Renaming a Direct Message
+   * Channel.
+   *
+   * @param renameChannelDto DTO object for renaming a channel.
+   * @return HTTP Code 200 if successful, 404 if channel not found, 500 otherwise.
+   */
+  @PutMapping("/rename-channel")
+  public ResponseEntity<ResponseDto<Null>> renameChannel(
+      @RequestBody RenameChannelDto renameChannelDto) {
+    try {
+      directMessageChannelService.renameGroupChannel(
+          renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.OK.value(), "Channel renamed successfully", null),
+          HttpStatus.OK);
+    } catch (ChannelNotFoundException e) {
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "Channel not found", null),
+          HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null),
+          HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Endpoint /api/messaging/channel/update-channel-picture: Put Mapping for Updating a Direct
+   * Message Channel's Picture.
+   *
+   * @param channelId The ID of the channel to update the picture for.
+   * @param image The new image to set for the channel.
+   * @param accountId The ID of the account updating the channel picture.
+   * @return HTTP Code 200 if successful, 404 if channel not found, 500 otherwise.
+   */
+  @PostMapping(value = "/update-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<ResponseDto<UpdateChannelImageResponseDto>> updateChannelPicture(
+      @RequestParam("channelId") int channelId,
+      @RequestParam("image") MultipartFile image,
+      @RequestParam("accountId") int accountId) {
+    try {
+      UpdateChannelImageResponseDto responseDataDto =
+          directMessageChannelService.updateChannelPicture(channelId, image, accountId);
+      log.debug("New image URL: {}", responseDataDto.getChannelImageUrl());
+      return new ResponseEntity<>(
+          new ResponseDto<>(
+              HttpStatus.OK.value(), "Channel picture updated successfully", responseDataDto),
+          HttpStatus.OK);
+    } catch (ChannelNotFoundException e) {
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "Channel not found", null),
+          HttpStatus.NOT_FOUND);
+    } catch (Exception e) {
+      return new ResponseEntity<>(
+          new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null),
+          HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

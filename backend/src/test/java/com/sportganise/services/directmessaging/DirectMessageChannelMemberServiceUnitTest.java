@@ -1,6 +1,7 @@
 package com.sportganise.services.directmessaging;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
@@ -97,5 +98,33 @@ public class DirectMessageChannelMemberServiceUnitTest {
     assertEquals(expectedAffectedRows, actualAffectedRows);
     verify(directMessageChannelMemberRepository, times(1))
         .updateChannelMemberReadStatus(accountId, channelId);
+  }
+
+  @Test
+  public void removeMemberFromChannel_shouldDeleteMember() {
+    int channelId = 1;
+    int accountId = 100;
+
+    directMessageChannelMemberService.removeMemberFromChannel(channelId, accountId);
+
+    verify(directMessageChannelMemberRepository, times(1))
+        .deleteByChannelIdAndAccountId(channelId, accountId);
+  }
+
+  @Test
+  public void removeMemberFromChannel_whenRepositoryThrowsException_shouldPropagateException() {
+    int channelId = 1;
+    int accountId = 100;
+
+    doThrow(new RuntimeException("Database error"))
+        .when(directMessageChannelMemberRepository)
+        .deleteByChannelIdAndAccountId(channelId, accountId);
+
+    assertThrows(
+        RuntimeException.class,
+        () -> directMessageChannelMemberService.removeMemberFromChannel(channelId, accountId));
+
+    verify(directMessageChannelMemberRepository, times(1))
+        .deleteByChannelIdAndAccountId(channelId, accountId);
   }
 }

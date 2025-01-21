@@ -56,7 +56,8 @@ public interface DirectMessageChannelMemberRepository
             cm.compositeKey.accountId,
             a.firstName,
             a.lastName,
-            a.pictureUrl
+            a.pictureUrl,
+            cm.role
         )
         FROM DirectMessageChannelMember cm
         JOIN Account a ON cm.compositeKey.accountId = a.accountId
@@ -67,15 +68,25 @@ public interface DirectMessageChannelMemberRepository
 
   @Query(
       """
-        SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
-            cm.compositeKey.accountId,
-            a.firstName,
-            a.lastName,
-            a.pictureUrl
-        )
-        FROM DirectMessageChannelMember cm
-        JOIN Account a ON cm.compositeKey.accountId = a.accountId
-        WHERE cm.compositeKey.channelId = :channelId
-        """)
+              SELECT new com.sportganise.dto.directmessaging.ChannelMembersDto(
+                  cm.compositeKey.accountId,
+                  a.firstName,
+                  a.lastName,
+                  a.pictureUrl,
+                  cm.role
+              )
+              FROM DirectMessageChannelMember cm
+              JOIN Account a ON cm.compositeKey.accountId = a.accountId
+              WHERE cm.compositeKey.channelId = :channelId
+              """)
   List<ChannelMembersDto> getAllChannelMembers(int channelId);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+        DELETE FROM DirectMessageChannelMember cm
+        WHERE cm.compositeKey.channelId = :channelId AND cm.compositeKey.accountId = :accountId
+        """)
+  void deleteByChannelIdAndAccountId(int channelId, int accountId);
 }

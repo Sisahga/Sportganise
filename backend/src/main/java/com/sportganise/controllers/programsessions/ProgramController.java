@@ -1,14 +1,14 @@
 package com.sportganise.controllers.programsessions;
 
+import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
-import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.dto.programsessions.ProgramRequestDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,117 +37,105 @@ public class ProgramController {
     this.accountService = accountService;
   }
 
-  /** Helper method to fetch and validate user account based on accountId. */
-  private Optional<Account> getAccount(Integer accountId) {
-    return accountService.getAccount(accountId);
-  }
-
-  /** Helper method to check user permissions. */
-  private boolean hasPermissions(Account user) {
-    return accountService.hasPermissions(user.getType());
-  }
-
-  /** Helper method to extract fields from payload. */
-  private Map<String, Object> extractPayloadFields(Map<String, Object> payload) {
-    return payload;
-  }
-
   /**
    * Get mapping for program session details.
    *
    * @param accountId Id of account
-   * @param programId Id of program
    * @return HTTP Response
    */
-  @GetMapping("/{accountId}/{programId}/details")
-  public ResponseEntity<ProgramDetailsParticipantsDto> getProgramDetails(
-      @PathVariable Integer accountId, @PathVariable Integer programId) {
+  @GetMapping("/{accountId}/details")
+  public ResponseEntity<ResponseDto<List<ProgramDetailsParticipantsDto>>> getProgramDetails(
+      @PathVariable Integer accountId) {
 
-    // Get account from accountId (this is a wrapper, not the actual)
+    ResponseDto<List<ProgramDetailsParticipantsDto>> responseDto = new ResponseDto<>();
+
     Optional<Account> userOptional = getAccount(accountId);
 
-    // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+      responseDto.setMessage("User not found.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // If not empty, then we go fetch the actual user value
     Account user = userOptional.get();
 
-    // Fetch program details
-    ProgramDto programDto = programService.getProgramDetails(programId);
+    List<ProgramDto> programDtos = programService.getPrograms();
 
-    // Check if the value of programDtoOptional is null
-    if (programDto == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    if (programDtos.isEmpty()) {
+      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+      responseDto.setMessage("No program found.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // Initialize a list of AccountDto as an empty/null arraylist
-    List<ProgramParticipantDto> participants = new ArrayList<>();
+    List<ProgramDetailsParticipantsDto> allPrograms = new ArrayList<>();
 
-    // Check if this user has permissions to see training sessions attendees
-    // (i.e. if the user is of type COACH or ADMIN)
-    // If they have permission, then they can see the list of participants
-    if (accountService.hasPermissions(user.getType())) {
-      participants = programService.getParticipants(programId);
+    Boolean canDisplayAttendees = false;
+
+    if (hasPermissions(user)) {
+      canDisplayAttendees = true;
     }
 
-    // Wrap program details and participants into the ProgramDetailsParticipantsDto
-    // response DTO
-    ProgramDetailsParticipantsDto response =
-        new ProgramDetailsParticipantsDto(programDto, participants);
+    allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, canDisplayAttendees);
 
-    return ResponseEntity.ok(response);
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Programs successfully fetched.");
+    responseDto.setData(allPrograms);
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**
    * Post mapping for creating new program.
    *
    * @param accountId Id of user who is making the request.
-   * @param payload Json payload passed from frontend.
+   * @param programRequestDto Dto for the request body.
    * @return HTTP Response for newly created program.
    */
   @PostMapping("/{accountId}/create-program")
-  public ResponseEntity<ProgramDto> createProgram(
-      @PathVariable Integer accountId, @RequestBody Map<String, Object> payload) {
+  public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
+      @PathVariable Integer accountId, @RequestBody ProgramRequestDto programRequestDto) {
 
-    // Get account from accountId (this is a wrapper, not the actual)
+    ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
+
     Optional<Account> userOptional = getAccount(accountId);
 
-    // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+      responseDto.setMessage("User not found.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // If not empty, then we go fetch the actual user value
     Account user = userOptional.get();
 
-    // If user is not a COACH or ADMIN then they will get an error
-    // as they are not allowed to access this feature
     if (!hasPermissions(user)) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
+      responseDto.setMessage("User does not have permission.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
     try {
-      Map<String, Object> fields = extractPayloadFields(payload);
-      ProgramDto programDto =
+      ProgramDto newProgramDto =
           programService.createProgramDto(
-              (String) fields.get("title"),
-              (String) fields.get("type"),
-              (String) fields.get("start_date"),
-              (String) fields.get("end_date"),
-              (Boolean) fields.get("recurring"),
-              (String) fields.get("visibility"),
-              (String) fields.get("description"),
-              (Integer) fields.get("capacity"),
-              (Boolean) fields.get("notify"),
-              (String) fields.get("start_time"),
-              (String) fields.get("end_time"),
-              (String) fields.get("location"),
-              (List<Map<String, String>>) fields.get("attachment"));
-      return new ResponseEntity<>(programDto, HttpStatus.CREATED);
+              programRequestDto.getTitle(),
+              programRequestDto.getType(),
+              programRequestDto.getStartDate(),
+              programRequestDto.getEndDate(),
+              programRequestDto.getRecurring(),
+              programRequestDto.getVisibility(),
+              programRequestDto.getDescription(),
+              programRequestDto.getCapacity(),
+              programRequestDto.getStartTime(),
+              programRequestDto.getEndTime(),
+              programRequestDto.getLocation(),
+              programRequestDto.getAttachments());
+
+      responseDto.setStatusCode(HttpStatus.CREATED.value());
+      responseDto.setMessage("Created a new program successfully.");
+      responseDto.setData(newProgramDto);
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+      responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+      responseDto.setMessage("Could not create a new program successfully.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
   }
 
@@ -156,60 +144,76 @@ public class ProgramController {
    *
    * @param accountId Id of user who is making the request.
    * @param programId Id of the program that we wish to modify.
-   * @param payload Json payload passed from frontend.
+   * @param programRequestDto Dto for the request body.
    * @return HTTP Response for modified/updated data
    */
   @PutMapping("/{accountId}/{programId}/modify-program")
-  ResponseEntity<ProgramDto> modifyProgram(
+  ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
-      @RequestBody Map<String, Object> payload) {
+      @RequestBody ProgramRequestDto programRequestDto) {
 
-    // Get account from accountId (this is a wrapper, not the actual)
+    ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
+
     Optional<Account> userOptional = getAccount(accountId);
 
-    // Check if the value of userOptional is empty
     if (userOptional.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+      responseDto.setMessage("User not found.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // If not empty, then we go fetch the actual user value
     Account user = userOptional.get();
 
-    // If user is not a COACH or ADMIN then they will get an error
-    // as they are not allowed to access this feature
     if (!hasPermissions(user)) {
-      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+      responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
+      responseDto.setMessage("User does not have permission.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    // Fetch program details
     ProgramDto programDtoToModify = programService.getProgramDetails(programId);
 
-    // Check if the value of programDtoOptional is null
     if (programDtoToModify == null) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+      responseDto.setMessage("Program not found.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
     try {
-      Map<String, Object> fields = extractPayloadFields(payload);
-      programService.modifyProgram(
-          programDtoToModify,
-          (String) fields.get("title"),
-          (String) fields.get("type"),
-          (String) fields.get("start_date"),
-          (String) fields.get("end_date"),
-          (Boolean) fields.get("recurring"),
-          (String) fields.get("visibility"),
-          (String) fields.get("description"),
-          (Integer) fields.get("capacity"),
-          (Boolean) fields.get("notify"),
-          (String) fields.get("start_time"),
-          (String) fields.get("end_time"),
-          (String) fields.get("location"),
-          (List<Map<String, String>>) fields.get("attachment"));
-      return new ResponseEntity<>(HttpStatus.OK);
+      ProgramDto updatedProgramDto =
+          programService.modifyProgram(
+              programDtoToModify,
+              programRequestDto.getTitle(),
+              programRequestDto.getType(),
+              programRequestDto.getStartDate(),
+              programRequestDto.getEndDate(),
+              programRequestDto.getRecurring(),
+              programRequestDto.getVisibility(),
+              programRequestDto.getDescription(),
+              programRequestDto.getCapacity(),
+              programRequestDto.getStartTime(),
+              programRequestDto.getEndTime(),
+              programRequestDto.getLocation(),
+              programRequestDto.getAttachments());
+
+      responseDto.setStatusCode(HttpStatus.OK.value());
+      responseDto.setMessage("Modified the program successfully.");
+      responseDto.setData(updatedProgramDto);
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+      responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+      responseDto.setMessage("Could not modify the program successfully.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
+  }
+
+  /** Helper method to fetch and validate user account based on accountId. */
+  private Optional<Account> getAccount(Integer accountId) {
+    return accountService.getAccount(accountId);
+  }
+
+  /** Helper method to check user permissions. */
+  private boolean hasPermissions(Account user) {
+    return accountService.hasPermissions(user.getType());
   }
 }

@@ -9,9 +9,7 @@ import {
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 
-const ChatMessages = ({ messages }: ChatMessageProps) => {
-  const userId = 2; // TODO: Take cookie user id.
-
+const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
   const formatSentAt = (
     sentAt: string,
     timeZone: string = "America/New_York",
@@ -60,10 +58,10 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
                 )}
 
                 <div
-                  className={`flex items-end gap-2 ${message.senderId == userId ? "justify-end" : ""}`}
+                  className={`flex items-end gap-2 ${message.senderId == currentUserId ? "justify-end" : ""}`}
                 >
                   {/* Sender Avatar */}
-                  {message.senderId !== userId && (
+                  {message.senderId !== currentUserId && (
                     <div className="flex items-end">
                       <img
                         src={message.avatarUrl}
@@ -74,10 +72,10 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
                   )}
                   {/* Message Bubble */}
                   <div
-                    className={`flex flex-col ${message.senderId === userId ? "items-end" : "items-start"}`}
+                    className={`flex flex-col ${message.senderId === currentUserId ? "items-end" : "items-start"}`}
                     style={{ maxWidth: "80%" }}
                   >
-                    {message.senderId !== userId && (
+                    {message.senderId !== currentUserId && (
                       <div className="px-3">
                         <p className="text-xs font-extralight">
                           {message.senderFirstName}
@@ -87,7 +85,7 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
                     {/* Message Content */}
                     <div
                       className={`px-3 py-2 rounded-2xl ${
-                        message.senderId === userId
+                        message.senderId === currentUserId
                           ? "bg-secondaryColour text-gray-800"
                           : "bg-gray-200 text-gray-800"
                       }`}
@@ -102,21 +100,7 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
             <div>
               {message.type == "JOIN" && (
                 <div className="text-center faded-primary-colour font-light text-sm">
-                  {message.senderId === userId && index === 0 ? (
-                    <p>You {message.messageContent.split("*")[3]}</p>
-                  ) : (
-                    <p>
-                      {message.messageContent.split("*")[2]}{" "}
-                      {message.messageContent.split("*")[3]}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-            <div>
-              {message.type == "BLOCK" && (
-                <div className="text-center faded-primary-colour font-light text-sm">
-                  {message.senderId === userId ? (
+                  {message.senderId === currentUserId && index === 0 ? (
                     <p>{message.messageContent.split("*")[2]}</p>
                   ) : (
                     <p>{message.messageContent.split("*")[3]}</p>
@@ -124,10 +108,47 @@ const ChatMessages = ({ messages }: ChatMessageProps) => {
                 </div>
               )}
             </div>
+            {/* BLOCK Message (SIMPLE channels only) */}
+            <div>
+              {message.type == "BLOCK" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === currentUserId ? (
+                    <p>{message.messageContent.split("*")[2]}</p>
+                  ) : (
+                    <p>{message.messageContent.split("*")[3]}</p>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* UNBLOCK Message (SIMPLE channels only) */}
             <div>
               {message.type == "UNBLOCK" && (
                 <div className="text-center faded-primary-colour font-light text-sm">
-                  {message.senderId === userId ? (
+                  {message.senderId === currentUserId ? (
+                    <p>{message.messageContent.split("*")[2]}</p>
+                  ) : (
+                    <p>{message.messageContent.split("*")[3]}</p>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* LEAVE Message (Player/coach leaves from channel or gets removed) */}
+            <div>
+              {message.type == "LEAVE" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === currentUserId ? (
+                    <p>{message.messageContent.split("*")[2]}</p>
+                  ) : (
+                    <p>{message.messageContent.split("*")[3]}</p>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* LEAVE Message (Player/coach leaves from channel or gets removed) */}
+            <div>
+              {message.type == "UPDATE" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === currentUserId ? (
                     <p>{message.messageContent.split("*")[2]}</p>
                   ) : (
                     <p>{message.messageContent.split("*")[3]}</p>

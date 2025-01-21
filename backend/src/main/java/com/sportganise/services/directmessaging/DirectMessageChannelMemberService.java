@@ -80,4 +80,14 @@ public class DirectMessageChannelMemberService {
   public List<ChannelMembersDto> getAllChannelMembers(int channelId) {
     return this.directMessageChannelMemberRepository.getAllChannelMembers(channelId);
   }
+
+  /**
+   * Removes a user from a channel.
+   *
+   * @param channelId The channel id.
+   * @param accountId The account id.
+   */
+  public void removeMemberFromChannel(int channelId, int accountId) {
+    this.directMessageChannelMemberRepository.deleteByChannelIdAndAccountId(channelId, accountId);
+  }
 }
