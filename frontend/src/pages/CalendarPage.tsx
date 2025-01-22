@@ -1,9 +1,9 @@
-import { TrainingSessionsList } from "@/components/ViewTrainingSessions";
+import { CalendarContent } from "@/components/Calendar";
 
 export default function CalendarPage() {
   return (
     <div>
-      <TrainingSessionsList />
+      <CalendarContent />
     </div>
   );
 }
