@@ -186,25 +186,25 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    ProgramRequestDto mockProgramRequestDto = new ProgramRequestDto();
-    mockProgramRequestDto.setTitle("Updated Training Program");
-    mockProgramRequestDto.setType("Training");
-    mockProgramRequestDto.setStartDate("2024-02-01");
-    mockProgramRequestDto.setEndDate("2024-02-10");
-    mockProgramRequestDto.setRecurring(false);
-    mockProgramRequestDto.setVisibility("private");
-    mockProgramRequestDto.setDescription("Updated Description");
-    mockProgramRequestDto.setCapacity(20);
-    mockProgramRequestDto.setStartTime("09:00");
-    mockProgramRequestDto.setEndTime("11:00");
-    mockProgramRequestDto.setLocation("Updated Location");
+    ProgramModifyRequestDto mockProgramModifyRequestDto = new ProgramModifyRequestDto();
+    mockProgramModifyRequestDto.setTitle("Updated Training Program");
+    mockProgramModifyRequestDto.setType("Training");
+    mockProgramModifyRequestDto.setStartDate("2024-02-01");
+    mockProgramModifyRequestDto.setEndDate("2024-02-10");
+    mockProgramModifyRequestDto.setRecurring(false);
+    mockProgramModifyRequestDto.setVisibility("private");
+    mockProgramModifyRequestDto.setDescription("Updated Description");
+    mockProgramModifyRequestDto.setCapacity(20);
+    mockProgramModifyRequestDto.setStartTime("09:00");
+    mockProgramModifyRequestDto.setEndTime("11:00");
+    mockProgramModifyRequestDto.setLocation("Updated Location");
 
     MockMultipartFile programData =
         new MockMultipartFile(
             "programData",
             "",
             MediaType.APPLICATION_JSON_VALUE,
-            new ObjectMapper().writeValueAsBytes(mockProgramRequestDto));
+            new ObjectMapper().writeValueAsBytes(mockProgramModifyRequestDto));
 
     MockMultipartFile attachment =
         new MockMultipartFile(
@@ -285,26 +285,26 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    ProgramRequestDto mockProgramRequestDto = new ProgramRequestDto();
-    mockProgramRequestDto.setTitle("Title");
-    mockProgramRequestDto.setType("Type");
-    mockProgramRequestDto.setStartDate("2024-01-30T10:00:00Z");
-    mockProgramRequestDto.setEndDate("2024-02-01T10:00:00Z");
-    mockProgramRequestDto.setRecurring(false);
-    mockProgramRequestDto.setVisibility("public");
-    mockProgramRequestDto.setDescription("description");
-    mockProgramRequestDto.setCapacity(10);
-    mockProgramRequestDto.setStartTime("10:30");
-    mockProgramRequestDto.setEndTime("12:30");
-    mockProgramRequestDto.setLocation("Centre-de-loisirs-St-Denis");
-    mockProgramRequestDto.setAttachmentsToRemove(List.of("file1.pdf", "file2.pdf"));
+    ProgramModifyRequestDto mockProgramModifyRequestDto = new ProgramModifyRequestDto();
+    mockProgramModifyRequestDto.setTitle("Title");
+    mockProgramModifyRequestDto.setType("Type");
+    mockProgramModifyRequestDto.setStartDate("2024-01-30T10:00:00Z");
+    mockProgramModifyRequestDto.setEndDate("2024-02-01T10:00:00Z");
+    mockProgramModifyRequestDto.setRecurring(false);
+    mockProgramModifyRequestDto.setVisibility("public");
+    mockProgramModifyRequestDto.setDescription("description");
+    mockProgramModifyRequestDto.setCapacity(10);
+    mockProgramModifyRequestDto.setStartTime("10:30");
+    mockProgramModifyRequestDto.setEndTime("12:30");
+    mockProgramModifyRequestDto.setLocation("Centre-de-loisirs-St-Denis");
+    mockProgramModifyRequestDto.setAttachmentsToRemove(List.of("file1.pdf", "file2.pdf"));
 
     MockMultipartFile programData =
         new MockMultipartFile(
             "programData",
             "",
             MediaType.APPLICATION_JSON_VALUE,
-            new ObjectMapper().writeValueAsBytes(mockProgramRequestDto));
+            new ObjectMapper().writeValueAsBytes(mockProgramModifyRequestDto));
 
     MockMultipartFile attachment1 =
         new MockMultipartFile(
@@ -336,19 +336,19 @@ public class ProgramControllerTest {
     Mockito.verify(programService)
         .modifyProgram(
             Mockito.eq(mockProgramDto),
-            Mockito.eq(mockProgramRequestDto.getTitle()),
-            Mockito.eq(mockProgramRequestDto.getType()),
-            Mockito.eq(mockProgramRequestDto.getStartDate()),
-            Mockito.eq(mockProgramRequestDto.getEndDate()),
-            Mockito.eq(mockProgramRequestDto.getRecurring()),
-            Mockito.eq(mockProgramRequestDto.getVisibility()),
-            Mockito.eq(mockProgramRequestDto.getDescription()),
-            Mockito.eq(mockProgramRequestDto.getCapacity()),
-            Mockito.eq(mockProgramRequestDto.getStartTime()),
-            Mockito.eq(mockProgramRequestDto.getEndTime()),
-            Mockito.eq(mockProgramRequestDto.getLocation()),
+            Mockito.eq(mockProgramModifyRequestDto.getTitle()),
+            Mockito.eq(mockProgramModifyRequestDto.getType()),
+            Mockito.eq(mockProgramModifyRequestDto.getStartDate()),
+            Mockito.eq(mockProgramModifyRequestDto.getEndDate()),
+            Mockito.eq(mockProgramModifyRequestDto.getRecurring()),
+            Mockito.eq(mockProgramModifyRequestDto.getVisibility()),
+            Mockito.eq(mockProgramModifyRequestDto.getDescription()),
+            Mockito.eq(mockProgramModifyRequestDto.getCapacity()),
+            Mockito.eq(mockProgramModifyRequestDto.getStartTime()),
+            Mockito.eq(mockProgramModifyRequestDto.getEndTime()),
+            Mockito.eq(mockProgramModifyRequestDto.getLocation()),
             Mockito.argThat(list -> list.size() == 2), // Assert 2 attachments were passed
-            Mockito.eq(mockProgramRequestDto.getAttachmentsToRemove()),
+            Mockito.eq(mockProgramModifyRequestDto.getAttachmentsToRemove()),
             Mockito.eq(2));
   }
 

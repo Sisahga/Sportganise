@@ -1,9 +1,10 @@
 package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.programsessions.ProgramCreateRequestDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
-import com.sportganise.dto.programsessions.ProgramRequestDto;
+import com.sportganise.dto.programsessions.ProgramModifyRequestDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
@@ -90,7 +91,7 @@ public class ProgramController {
    * Post mapping for creating new program.
    *
    * @param accountId Id of user who is making the request.
-   * @param programRequestDto Dto for the request body.
+   * @param programCreateRequestDto Dto for the request body.
    * @param attachments List of attachments.
    * @return HTTP Response for newly created program.
    */
@@ -99,7 +100,7 @@ public class ProgramController {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
       @PathVariable Integer accountId,
-      @RequestPart("programData") ProgramRequestDto programRequestDto,
+      @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
       @RequestParam("attachments") List<MultipartFile> attachments) {
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
@@ -124,17 +125,17 @@ public class ProgramController {
     try {
       ProgramDto newProgramDto =
           programService.createProgramDto(
-              programRequestDto.getTitle(),
-              programRequestDto.getType(),
-              programRequestDto.getStartDate(),
-              programRequestDto.getEndDate(),
-              programRequestDto.getRecurring(),
-              programRequestDto.getVisibility(),
-              programRequestDto.getDescription(),
-              programRequestDto.getCapacity(),
-              programRequestDto.getStartTime(),
-              programRequestDto.getEndTime(),
-              programRequestDto.getLocation(),
+              programCreateRequestDto.getTitle(),
+              programCreateRequestDto.getType(),
+              programCreateRequestDto.getStartDate(),
+              programCreateRequestDto.getEndDate(),
+              programCreateRequestDto.getRecurring(),
+              programCreateRequestDto.getVisibility(),
+              programCreateRequestDto.getDescription(),
+              programCreateRequestDto.getCapacity(),
+              programCreateRequestDto.getStartTime(),
+              programCreateRequestDto.getEndTime(),
+              programCreateRequestDto.getLocation(),
               attachments,
               accountId);
 
@@ -154,7 +155,7 @@ public class ProgramController {
    *
    * @param accountId Id of user who is making the request.
    * @param programId Id of the program that we wish to modify.
-   * @param programRequestDto Dto for the request body.
+   * @param programModifyRequestDto Dto for the request body.
    * @param attachments List of attachments.
    * @return HTTP Response for modified/updated data
    */
@@ -164,7 +165,7 @@ public class ProgramController {
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
-      @RequestPart("programData") ProgramRequestDto programRequestDto,
+      @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
       @RequestParam("attachments") List<MultipartFile> attachments) {
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
@@ -197,19 +198,19 @@ public class ProgramController {
       ProgramDto updatedProgramDto =
           programService.modifyProgram(
               programDtoToModify,
-              programRequestDto.getTitle(),
-              programRequestDto.getType(),
-              programRequestDto.getStartDate(),
-              programRequestDto.getEndDate(),
-              programRequestDto.getRecurring(),
-              programRequestDto.getVisibility(),
-              programRequestDto.getDescription(),
-              programRequestDto.getCapacity(),
-              programRequestDto.getStartTime(),
-              programRequestDto.getEndTime(),
-              programRequestDto.getLocation(),
+              programModifyRequestDto.getTitle(),
+              programModifyRequestDto.getType(),
+              programModifyRequestDto.getStartDate(),
+              programModifyRequestDto.getEndDate(),
+              programModifyRequestDto.getRecurring(),
+              programModifyRequestDto.getVisibility(),
+              programModifyRequestDto.getDescription(),
+              programModifyRequestDto.getCapacity(),
+              programModifyRequestDto.getStartTime(),
+              programModifyRequestDto.getEndTime(),
+              programModifyRequestDto.getLocation(),
               attachments,
-              programRequestDto.getAttachmentsToRemove(),
+              programModifyRequestDto.getAttachmentsToRemove(),
               accountId);
 
       responseDto.setStatusCode(HttpStatus.OK.value());
