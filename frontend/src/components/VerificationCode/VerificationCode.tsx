@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/Button";
 export default function VerificationCode() {
   const handleInput = (
     e: React.ChangeEvent<HTMLInputElement>,
-    nextInputId: string | undefined,
+    nextInputId: string | undefined
   ) => {
     if (e.target.value.length === e.target.maxLength && nextInputId) {
       const nextInput = document.getElementById(
-        nextInputId,
+        nextInputId
       ) as HTMLInputElement;
       if (nextInput) {
         nextInput.focus();
@@ -56,7 +56,17 @@ export default function VerificationCode() {
                 nextInputId="code-4"
                 handleInput={handleInput}
               />
-              <VerificationInput id="code-4" handleInput={handleInput} />
+              <VerificationInput
+                id="code-4"
+                nextInputId="code-5"
+                handleInput={handleInput}
+              />
+              <VerificationInput
+                id="code-5"
+                nextInputId="code-6"
+                handleInput={handleInput}
+              />
+              <VerificationInput id="code-6" handleInput={handleInput} />
             </div>
             <p
               id="helper-text-explanation"
