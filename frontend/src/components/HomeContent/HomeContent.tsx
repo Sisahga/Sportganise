@@ -2,17 +2,9 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
-import log from "loglevel";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
 
-log.info("HomeContent component is being rendered.");
 export default function HomeContent() {
-  const events = [1, 2, 3, 4, 5];
-  const cards = [1, 2, 3, 4];
-
-  log.debug("Upcoming events data:", events);
-  log.debug("General cards data:", cards);
-
   return (
     <div className="bg-primaryColour w-screen mt-32 z-40">
       <Toaster />
@@ -38,21 +30,16 @@ export default function HomeContent() {
               </h2>
               <ScrollArea className="w-full overflow-x whitespace-nowrap">
                 <div className="flex gap-4 pb-4">
-                  {events.map((item) => {
-                    log.debug(
-                      `Rendering upcoming event card for event ID: ${item}`,
-                    );
-                    return (
-                      <Card
-                        key={item}
-                        className="w-[250px] shrink-0 border-0 shadow-sm"
-                      >
-                        <CardContent className="p-4">
-                          <div className="aspect-[4/3] rounded-lg bg-textPlaceholderColour" />
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                  {[1, 2, 3, 4, 5].map((item) => (
+                    <Card
+                      key={item}
+                      className="w-[250px] shrink-0 border-0 shadow-sm"
+                    >
+                      <CardContent className="p-4">
+                        <div className="aspect-[4/3] rounded-lg bg-textPlaceholderColour" />
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
                 <ScrollBar orientation="horizontal" />
               </ScrollArea>
@@ -60,7 +47,6 @@ export default function HomeContent() {
                 <Button
                   variant="link"
                   className="flex justify-self-center text-secondaryColour font-bold font-font px-7 py-3 rounded-xl h-auto bg-textPlaceHolder"
-                  onClick={() => log.info("See all Events button clicked")}
                 >
                   See all Events
                 </Button>
@@ -68,16 +54,6 @@ export default function HomeContent() {
             </div>
 
             <div className="space-y-4">
-              {cards.map((item) => {
-                log.debug(`Rendering general card for ID: ${item}`);
-                return (
-                  <Card key={item} className="border-0 shadow-sm">
-                    <CardContent className="p-4">
-                      <div className="aspect-[3/2] rounded-lg bg-textPlaceholderColour" />
-                    </CardContent>
-                  </Card>
-                );
-              })}
               <TrainingSessionsList />
             </div>
           </div>

@@ -8,16 +8,12 @@ import {
   differenceInDays,
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
-import log from "loglevel";
-
-log.setLevel("info");
 
 const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
   const formatSentAt = (
     sentAt: string,
     timeZone: string = "America/New_York",
   ) => {
-    log.info(`Formatting sentAt: ${sentAt} for timeZone: ${timeZone}`);
     const date = parseISO(sentAt);
     const zonedDate = toZonedTime(date, timeZone);
 
@@ -34,9 +30,6 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
   return (
     <div className="flex flex-col justify-end flex-1 overflow-y-scroll px-4 py-4">
       {messages.map((message, index) => {
-        log.info(
-          `Rendering message: ${message.messageId}, type: ${message.type}`,
-        );
         const showTimestamp =
           index === 0 || // Always show the timestamp for the first message
           differenceInMinutes(
@@ -48,7 +41,6 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
             "chatScreenInputArea",
           );
           if (chatScreenInputArea) {
-            log.info("Chat input blocked due to BLOCK message");
             chatScreenInputArea.classList.add("pointer-events-none");
             chatScreenInputArea.classList.add("opacity-70");
           }
