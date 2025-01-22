@@ -68,7 +68,10 @@ export default function SignUp() {
       setFormData((prev) => ({
         ...prev,
         [parent]: {
-          ...((prev[parent as keyof typeof prev] || {}) as Record<string, string>), // Ensure parent is an object
+          ...((prev[parent as keyof typeof prev] || {}) as Record<
+            string,
+            string
+          >), // Ensure parent is an object
           [child]: value, // Update the child field
         },
       }));
@@ -260,10 +263,16 @@ export default function SignUp() {
               </div>
 
               <div>
-                <label htmlFor="accountType" className="text-sm font-medium">Account Type</label>
+                <label htmlFor="accountType" className="text-sm font-medium">
+                  Account Type
+                </label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button id= "accountType" variant="outline" className="w-full mt-2">
+                    <Button
+                      id="accountType"
+                      variant="outline"
+                      className="w-full mt-2"
+                    >
                       {formData.type}
                     </Button>
                   </DropdownMenuTrigger>
