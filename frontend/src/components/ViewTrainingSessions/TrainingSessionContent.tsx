@@ -181,7 +181,7 @@ const TrainingSessionContent = () => {
               {programDetails.programAttachments.map((attachment, index) => (
                 <div
                   key={index}
-                  className="flex items-center border-[1px] rounded-md p-2"
+                  className="flex items-center border-[1px] rounded-md p-2 w-[370px]"
                 >
                   <FileText
                     size={15}
