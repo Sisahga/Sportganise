@@ -54,8 +54,10 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       {/* Back Button */}
       <button
         className="p-2 rounded-full bg-white hover:bg-gray-300"
-        onClick={() =>
-          {log.info("Back button clicked: navigating to previous page"); navigate(-1)}}
+        onClick={() => {
+          log.info("Back button clicked: navigating to previous page");
+          navigate(-1);
+        }}
       >
         <ArrowLeft className="text-gray-800" size={24} />
       </button>

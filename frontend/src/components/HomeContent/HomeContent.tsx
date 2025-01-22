@@ -2,14 +2,10 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
-<<<<<<< HEAD
 import log from "loglevel";
+import { TrainingSessionsList } from "../ViewTrainingSessions";
 
 log.info("HomeContent component is being rendered.");
-=======
-import { TrainingSessionsList } from "../ViewTrainingSessions";
->>>>>>> cf47cd526da197cb9f29af5199012d59d6871929
-
 export default function HomeContent() {
   const events = [1, 2, 3, 4, 5];
   const cards = [1, 2, 3, 4];
@@ -72,7 +68,6 @@ export default function HomeContent() {
             </div>
 
             <div className="space-y-4">
-<<<<<<< HEAD
               {cards.map((item) => {
                 log.debug(`Rendering general card for ID: ${item}`);
                 return (
@@ -83,9 +78,7 @@ export default function HomeContent() {
                   </Card>
                 );
               })}
-=======
               <TrainingSessionsList />
->>>>>>> cf47cd526da197cb9f29af5199012d59d6871929
             </div>
           </div>
         </div>

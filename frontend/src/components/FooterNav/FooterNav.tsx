@@ -33,7 +33,6 @@ const routes = [
   },
 ];
 
-
 export default function FooterNav() {
   const location = useLocation();
   log.info("FooterNav rendered");
