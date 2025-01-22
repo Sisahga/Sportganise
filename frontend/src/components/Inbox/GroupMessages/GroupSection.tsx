@@ -1,8 +1,12 @@
 import MessagingDashboardChannelItem from "../DirectMessagesDashboard/MessagingDashboardChannelItem.tsx";
 import { GroupSectionProps } from "@/types/dmchannels.ts";
 import { Dot } from "lucide-react";
+import log from "loglevel";
 
 function GroupSection({ groupChannels }: GroupSectionProps) {
+  log.info(
+    `Rendering GroupSection with ${groupChannels.length} group channels`,
+  );
   return (
     <div className="mt-4 px-4">
       <div className="px-4 py-3 bg-white mt-4 rounded-lg shadow-lg">
