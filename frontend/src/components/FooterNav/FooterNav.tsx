@@ -1,9 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
 import { Home, Calendar, Bell, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import log from "loglevel";
-
-log.setLevel("info");
 
 const routes = [
   {
@@ -35,14 +32,13 @@ const routes = [
 
 export default function FooterNav() {
   const location = useLocation();
-  log.info("FooterNav rendered");
-  log.info("Current location:", location.pathname);
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50">
       <nav className="flex justify-around p-2">
         {routes.map((route) => {
           const isActive = location.pathname === route.href;
-          log.info(`Rendering route: ${route.label}, Active: ${isActive}`);
+
           return (
             <Link
               key={route.href}

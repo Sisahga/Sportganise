@@ -8,9 +8,6 @@ import {
 } from "@/components/ui/drawer";
 import logo from "../../assets/Logo.png";
 import { useState } from "react";
-import log from "loglevel";
-
-log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
   const [accountType /*setAccountType8*/] = useState<string>("coach"); //UPDATE WITH COOKIE
