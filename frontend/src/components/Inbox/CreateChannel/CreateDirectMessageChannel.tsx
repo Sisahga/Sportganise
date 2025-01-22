@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import useCreateChannel from "@/hooks/useCreateChannel.ts";
 import { CreateChannelDto } from "@/types/dmchannels.ts";
+import log from "loglevel";
 
 export default function CreateDirectMessagingChannel() {
   const userId = 2; // TODO: Replace with actual user ID from cookies
@@ -39,9 +40,9 @@ export default function CreateDirectMessagingChannel() {
       createdAt: new Date().toISOString(),
       avatarUrl: null,
     };
-    console.log("New Channel Details:", newChannelDetails);
+    log.info("New Channel Details:", newChannelDetails);
     const channelResponse = await createChannel(newChannelDetails, userId);
-    console.log("Channel Response:", channelResponse);
+    log.info("Channel Response:", channelResponse);
     if (channelResponse?.statusCode === 201) {
       navigate("/pages/DirectMessageChannelPage", {
         state: {
@@ -63,7 +64,7 @@ export default function CreateDirectMessagingChannel() {
         },
       });
     } else {
-      console.error("Error creating channel:", channelResponse);
+      log.error("Error creating channel:", channelResponse);
     }
   };
 
