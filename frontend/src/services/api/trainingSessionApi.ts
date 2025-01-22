@@ -1,4 +1,4 @@
-import { FormValues } from "@/types/trainingSessionFormValues";
+//import { FormValues } from "@/types/trainingSessionFormValues";
 import { Program } from "@/types/trainingSessionDetails";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
@@ -7,15 +7,12 @@ const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/programs";
 
 const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
-  createTrainingSession: async (accountId: number, jsonPayload: FormValues) => {
+  createTrainingSession: async (accountId: number, jsonPayload: FormData) => {
     const response = await fetch(
       `${baseMappingUrl}/${accountId}/create-program`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonPayload),
+        body: jsonPayload,
       },
     );
     console.log("In trainingSessionApi.createTrainingSession");

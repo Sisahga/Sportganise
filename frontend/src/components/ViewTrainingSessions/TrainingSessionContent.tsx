@@ -181,7 +181,7 @@ const TrainingSessionContent = () => {
               {programDetails.programAttachments.map((attachment, index) => (
                 <div
                   key={index}
-                  className="flex items-center border-[1px] rounded-md p-2"
+                  className="flex items-center border-[1px] rounded-md p-2 w-[370px]"
                 >
                   <FileText
                     size={15}
@@ -189,7 +189,7 @@ const TrainingSessionContent = () => {
                     className="w-8"
                   />
                   <a
-                    className="text-sm text-gray-500 hover:text-cyan-300"
+                    className="text-sm text-gray-500 hover:text-cyan-300 overflow-x-scroll px-3"
                     href={attachment.attachmentUrl}
                     target="_blank"
                     rel="noopener noreferrer"

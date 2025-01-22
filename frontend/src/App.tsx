@@ -18,6 +18,7 @@ import CalendarPage from "./pages/CalendarPage";
 import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
 import BlockedUsersListPage from "./pages/BlockedUserListPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
+import NotificationsPage from "./pages/NotificationsPage.tsx";
 
 function App() {
   return (
@@ -79,6 +80,10 @@ function App() {
           <Route
             path="/pages/TrainingPlanPage"
             element={<TrainingPlanPage />}
+          ></Route>
+          <Route
+            path="/pages/NotificationsPage"
+            element={<NotificationsPage />}
           ></Route>
         </Route>
       </Routes>

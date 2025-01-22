@@ -7,8 +7,10 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import logo from "../../assets/Logo.png";
+import { useState } from "react";
 
 export default function HeaderNav() {
+  const [accountType /*setAccountType8*/] = useState<string>("coach"); //UPDATE WITH COOKIE
   return (
     <div>
       <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
@@ -39,18 +41,23 @@ export default function HeaderNav() {
               >
                 Forum
               </Link>
-              <Link
-                to="/pages/CreateTrainingSessionPage"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
-              >
-                Training Session
-              </Link>
-              <Link
-                to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
-              >
-                Training Plan
-              </Link>
+              {(accountType.toLowerCase() === "coach" ||
+                accountType.toLowerCase() === "admin") && (
+                <>
+                  <Link
+                    to="/pages/CreateTrainingSessionPage"
+                    className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                  >
+                    Training Session
+                  </Link>
+                  <Link
+                    to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
+                    className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                  >
+                    Training Plan
+                  </Link>
+                </>
+              )}
               <Link
                 to="/" //add actual redirect once setting page is set up
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"

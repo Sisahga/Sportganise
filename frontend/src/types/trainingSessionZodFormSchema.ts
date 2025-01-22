@@ -4,7 +4,6 @@ export const formSchema = z
   .object({
     title: z.string(),
     type: z.string(),
-    notify: z.boolean().default(false),
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
     recurring: z.boolean().default(false),
