@@ -13,7 +13,7 @@ const trainingSessionApi = {
       {
         method: "POST",
         body: jsonPayload,
-      }
+      },
     );
     console.log("In trainingSessionApi.createTrainingSession");
     log.info("------ In trainingSessionApi.createTrainingSession");

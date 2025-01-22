@@ -15,8 +15,6 @@ import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -24,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -133,8 +132,8 @@ public class ProgramService {
     List<ProgramAttachment> programAttachments =
         programAttachmentRepository.findAttachmentsByProgramId(programId);
     log.debug("Program Id: " + programId);
-    for(int i = 0; i < programAttachments.size(); i++) {
-        log.debug("PROGRAM ATTACHMENT IN FOR LOOP : " + programAttachments.get(i).getAttachmentUrl());
+    for (int i = 0; i < programAttachments.size(); i++) {
+      log.debug("PROGRAM ATTACHMENT IN FOR LOOP : " + programAttachments.get(i).getAttachmentUrl());
     }
     return programAttachments.stream()
         .map(
