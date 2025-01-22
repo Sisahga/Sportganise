@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
+import { TrainingSessionsList } from "../ViewTrainingSessions";
 
 export default function HomeContent() {
   return (
@@ -53,13 +54,7 @@ export default function HomeContent() {
             </div>
 
             <div className="space-y-4">
-              {[1, 2, 3, 4].map((item) => (
-                <Card key={item} className="border-0 shadow-sm">
-                  <CardContent className="p-4">
-                    <div className="aspect-[3/2] rounded-lg bg-textPlaceholderColour" />
-                  </CardContent>
-                </Card>
-              ))}
+              <TrainingSessionsList />
             </div>
           </div>
         </div>

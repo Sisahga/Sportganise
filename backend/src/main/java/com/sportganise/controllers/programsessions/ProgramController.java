@@ -12,6 +12,7 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/api/programs")
+@Slf4j
 public class ProgramController {
   private final ProgramService programService;
   private final AccountService accountService;
@@ -102,6 +104,7 @@ public class ProgramController {
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
       @RequestParam("attachments") List<MultipartFile> attachments) {
+    log.debug("ATTACHMENTS COUNT: " + attachments.size());
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
