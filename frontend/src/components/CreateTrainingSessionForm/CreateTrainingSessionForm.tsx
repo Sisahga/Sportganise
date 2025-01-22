@@ -121,8 +121,54 @@ export default function CreateTrainingSessionForm() {
       log.info(JSON.stringify(jsonPayload, null, 2));
       console.log(JSON.stringify(jsonPayload, null, 2));
 
+      //FORMDATA
+      const formData = new FormData();
+      const programData = {
+        title: values.title,
+        type: values.type,
+        startDate: values.startDate.toISOString(),
+        endDate: values.endDate.toISOString(),
+        recurring: values.recurring.toString(),
+        visibility: values.visibility,
+        description: values.description,
+        capacity: values.capacity.toString(),
+        startTime: values.startTime,
+        endTime: values.endTime,
+        location: values.location,
+      };
+      formData.append(
+        "programData",
+        new Blob([JSON.stringify(programData)], {
+          type: "application/json",
+        }),
+      );
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file) => {
+          formData.append("attachments", file); //append each file
+        });
+      }
+
+      /*
+      formData.append("title", values.title);
+      formData.append("type", values.type);
+      formData.append("startDate", values.startDate.toISOString());
+      formData.append("endDate", values.endDate.toISOString());
+      formData.append("recurring", values.recurring.toString());
+      formData.append("visibility", values.visibility);
+      formData.append("description", values.description);
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file, index) => {
+          formData.append(`attachment[${index}]`, file); //append each file
+        });
+      }
+      formData.append("capacity", values.capacity.toString());
+      formData.append("startTime", values.startTime);
+      formData.append("endTime", values.endTime);
+      formData.append("location", values.location);
+      */
+
       // API submit form
-      const create = await createTrainingSession(accountId, jsonPayload);
+      const create = await createTrainingSession(accountId, formData); //JSON PAYLOAD CHANGED TO FORMDATA
       console.log(error);
       console.log("create", create);
       log.info("create", create);
@@ -651,7 +697,7 @@ export default function CreateTrainingSessionForm() {
           />
 
           {/** Notify All Players */}
-          <div>
+          {/* <div> MAY BE NEEDED BY US305+
             <FormField
               control={form.control}
               name="notify"
@@ -680,7 +726,7 @@ export default function CreateTrainingSessionForm() {
                 Customize attendance list
               </a>
             </div>
-          </div>
+          </div> */}
 
           {/** Submit Button */}
           <Button type="submit" className="w-full font-semibold">

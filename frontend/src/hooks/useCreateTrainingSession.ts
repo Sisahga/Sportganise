@@ -1,5 +1,5 @@
 import trainingSessionApi from "@/services/api/trainingSessionApi";
-import { FormValues } from "@/types/trainingSessionFormValues";
+//import { FormValues } from "@/types/trainingSessionFormValues";
 import { useState } from "react";
 import log from "loglevel";
 
@@ -10,7 +10,7 @@ function useCreateTrainingSession() {
 
   const createTrainingSession = async (
     accountId: number,
-    jsonPayload: FormValues,
+    jsonPayload: FormData,
   ) => {
     try {
       log.info("------- IN useCreateTrainingSession.tsx!");

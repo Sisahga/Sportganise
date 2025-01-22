@@ -4,7 +4,7 @@
 
 import log from "loglevel";
 import { useState } from "react";
-import { login } from "@/services/api/authService";
+import { login } from "@/services/api/authAPI";
 import { LoginRequest, LoginResponse } from "@/types/auth";
 import { isCookiesDto } from "@/services/cookiesService";
 
