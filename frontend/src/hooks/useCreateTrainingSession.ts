@@ -1,5 +1,5 @@
 import trainingSessionApi from "@/services/api/trainingSessionApi";
-import { FormValues } from "@/types/trainingSessionFormValues";
+//import { FormValues } from "@/types/trainingSessionFormValues";
 import { useState } from "react";
 import log from "loglevel";
 

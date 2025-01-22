@@ -15,6 +15,8 @@ import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -27,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /** Service layer for Programs. */
 @Service
+@Slf4j
 public class ProgramService {
 
   private final ProgramRepository programRepository;
@@ -129,7 +132,10 @@ public class ProgramService {
   public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
     List<ProgramAttachment> programAttachments =
         programAttachmentRepository.findAttachmentsByProgramId(programId);
-
+    log.debug("Program Id: " + programId);
+    for(int i = 0; i < programAttachments.size(); i++) {
+        log.debug("PROGRAM ATTACHMENT IN FOR LOOP : " + programAttachments.get(i).getAttachmentUrl());
+    }
     return programAttachments.stream()
         .map(
             programAttachment -> {
@@ -152,6 +158,8 @@ public class ProgramService {
     for (Program program : programs) {
 
       List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
+      log.debug("PROGRAM ATTACHMENTS : " + programAttachments);
+      log.debug("PROGRAM ATTACH COUNT :" + programAttachments.size());
 
       programDtos.add(
           new ProgramDto(
@@ -270,6 +278,7 @@ public class ProgramService {
     if (attachments != null && !attachments.isEmpty()) {
       for (MultipartFile attachment : attachments) {
         String s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+        log.debug("ATTACHMENTS SAVED: " + s3AttachmentUrl);
         if (s3AttachmentUrl != null) {
           programAttachmentsDto.add(
               new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
@@ -278,7 +287,8 @@ public class ProgramService {
               new ProgramAttachment(savedProgram.getProgramId(), s3AttachmentUrl));
         }
       }
-      programAttachmentRepository.saveAll(programAttachments);
+      List<ProgramAttachment> pa = programAttachmentRepository.saveAll(programAttachments);
+      log.debug("ATTACHMENTS SAVED IN DB: " + pa.size());
     }
 
     return new ProgramDto(savedProgram, programAttachmentsDto);

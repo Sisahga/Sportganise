@@ -9,6 +9,8 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/api/programs")
+@Slf4j
 public class ProgramController {
   private final ProgramService programService;
   private final AccountService accountService;
@@ -102,6 +105,7 @@ public class ProgramController {
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
       @RequestParam("attachments") List<MultipartFile> attachments) {
+        log.debug("ATTACHMENTS COUNT: " + attachments.size());
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 

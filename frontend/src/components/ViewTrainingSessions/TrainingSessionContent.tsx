@@ -121,14 +121,14 @@ const TrainingSessionContent = () => {
               <p className="text-sm text-gray-500">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-sm text-gray-500">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
+                  programDetails.durationMins
                 )}
               </p>
             </span>
@@ -150,7 +150,7 @@ const TrainingSessionContent = () => {
             <p className="text-sm text-gray-500">
               {programDetails.frequency || "one time"} on{" "}
               {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                new Date(programDetails.occurrenceDate),
+                new Date(programDetails.occurrenceDate)
               )}
             </p>
           </div>
@@ -181,7 +181,7 @@ const TrainingSessionContent = () => {
               {programDetails.programAttachments.map((attachment, index) => (
                 <div
                   key={index}
-                  className="flex items-center border-[1px] rounded-md p-2"
+                  className="flex items-center border-[1px] rounded-md p-2 w-[370px]"
                 >
                   <FileText
                     size={15}
@@ -189,7 +189,7 @@ const TrainingSessionContent = () => {
                     className="w-8"
                   />
                   <a
-                    className="text-sm text-gray-500 hover:text-cyan-300"
+                    className="text-sm text-gray-500 hover:text-cyan-300 overflow-x-scroll px-3"
                     href={attachment.attachmentUrl}
                     target="_blank"
                     rel="noopener noreferrer"

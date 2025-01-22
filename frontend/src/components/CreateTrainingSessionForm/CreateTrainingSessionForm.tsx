@@ -123,6 +123,32 @@ export default function CreateTrainingSessionForm() {
 
       //FORMDATA
       const formData = new FormData();
+      const programData = {
+        title: values.title,
+        type: values.type,
+        startDate: values.startDate.toISOString(),
+        endDate: values.endDate.toISOString(),
+        recurring: values.recurring.toString(),
+        visibility: values.visibility,
+        description: values.description,
+        capacity: values.capacity.toString(),
+        startTime: values.startTime,
+        endTime: values.endTime,
+        location: values.location,
+      };
+      formData.append(
+        "programData",
+        new Blob([JSON.stringify(programData)], {
+          type: "application/json",
+        })
+      );
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file) => {
+          formData.append("attachments", file); //append each file
+        });
+      }
+
+      /*
       formData.append("title", values.title);
       formData.append("type", values.type);
       formData.append("startDate", values.startDate.toISOString());
@@ -139,6 +165,7 @@ export default function CreateTrainingSessionForm() {
       formData.append("startTime", values.startTime);
       formData.append("endTime", values.endTime);
       formData.append("location", values.location);
+      */
 
       // API submit form
       const create = await createTrainingSession(accountId, formData); //JSON PAYLOAD CHANGED TO FORMDATA

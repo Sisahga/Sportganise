@@ -1,4 +1,4 @@
-import { FormValues } from "@/types/trainingSessionFormValues";
+//import { FormValues } from "@/types/trainingSessionFormValues";
 import { Program } from "@/types/trainingSessionDetails";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
@@ -9,13 +9,12 @@ const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
   createTrainingSession: async (accountId: number, jsonPayload: FormData) => {
     const response = await fetch(
-      "http://httpbin.org/post",
-      /*`${baseMappingUrl}/${accountId}/create-program`*/ {
+      `${baseMappingUrl}/${accountId}/create-program`,
+      {
         method: "POST",
         body: jsonPayload,
       }
     );
-    console.log("RESPONSE!!!!!!!", response);
     console.log("In trainingSessionApi.createTrainingSession");
     log.info("------ In trainingSessionApi.createTrainingSession");
     console.log("response in trainingSessionApi:", response);
