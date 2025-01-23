@@ -21,6 +21,7 @@ import TrainingPlanPage from "./pages/TrainingPlanPage";
 import NotificationsPage from "./pages/NotificationsPage.tsx";
 import ForumPage from "./pages/ForumPage.tsx";
 import PostDetailPage from "./pages/PostDetailPage.tsx";
+import ModifyPermissionPage from "./pages/ModifyPermissionPage.tsx";
 
 function App() {
   return (
@@ -54,6 +55,10 @@ function App() {
           ></Route>
           <Route path="/pages/ForumPage" element={<ForumPage />} />
           <Route path="/pages/PostDetailPage" element={<PostDetailPage />} />
+          <Route
+            path="/pages/ModifyPermissionPage"
+            element={<ModifyPermissionPage />}
+          />
           <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
           <Route
             path="/pages/DirectMessagesDashboard"
