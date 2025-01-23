@@ -173,7 +173,7 @@ class DirectMessageChannelMemberControllerUnitTest {
         .andExpect(
             jsonPath(
                 "$.message",
-                is("An unexpected error occurred while adding members to the channel")))
+                is("An unexpected error occured when trying to add members to channel.")))
         .andExpect(jsonPath("$.data").doesNotExist());
 
     verify(directMessageChannelMemberService, times(1))
