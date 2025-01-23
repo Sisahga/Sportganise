@@ -1,26 +1,34 @@
 package com.sportganise.exceptions;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.exceptions.ChannelExceptions.ChannelCreationException;
-import com.sportganise.exceptions.ChannelExceptions.ChannelDeletionException;
-import com.sportganise.exceptions.ChannelExceptions.ChannelFetchException;
-import com.sportganise.exceptions.ChannelMemberExceptions.ChannelMemberDeleteException;
-import com.sportganise.exceptions.ChannelMemberExceptions.ChannelMemberFetchException;
-import com.sportganise.exceptions.ChannelMemberExceptions.ChannelMemberMarkReadException;
-import com.sportganise.exceptions.ChannelMemberExceptions.ChannelMemberSaveException;
-import com.sportganise.exceptions.DirectMessageExceptions.DirectMessageFetchException;
-import com.sportganise.exceptions.DirectMessageExceptions.DirectMessageSendException;
-import com.sportganise.exceptions.ProgramExceptions.ProgramCreationException;
-import com.sportganise.exceptions.ProgramExceptions.ProgramModificationException;
+import com.sportganise.exceptions.channelExceptions.ChannelCreationException;
+import com.sportganise.exceptions.channelExceptions.ChannelDeletionException;
+import com.sportganise.exceptions.channelExceptions.ChannelFetchException;
+import com.sportganise.exceptions.channelMemberExceptions.ChannelMemberDeleteException;
+import com.sportganise.exceptions.channelMemberExceptions.ChannelMemberFetchException;
+import com.sportganise.exceptions.channelMemberExceptions.ChannelMemberMarkReadException;
+import com.sportganise.exceptions.channelMemberExceptions.ChannelMemberSaveException;
+import com.sportganise.exceptions.directMessageExceptions.DirectMessageFetchException;
+import com.sportganise.exceptions.directMessageExceptions.DirectMessageSendException;
+import com.sportganise.exceptions.programExceptions.ProgramCreationException;
+import com.sportganise.exceptions.programExceptions.ProgramModificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/** Global exception handler. */
+/**
+ * Global exception handler.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+  /**
+   * Handle general forbidden exceptions.
+   *
+   * @param e exception
+   * @return response dto with status 403.
+   */
   @ExceptionHandler(ForbiddenException.class)
   @ResponseStatus(HttpStatus.FORBIDDEN)
   public ResponseDto<?> handleForbiddenException(ForbiddenException e) {
@@ -30,6 +38,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle generatl resource not found exceptions.
+   *
+   * @param e exception
+   * @return response dto with status 404.
+   */
   @ExceptionHandler(ResourceNotFoundException.class)
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseDto<?> handleResourceNotFoundException(ResourceNotFoundException e) {
@@ -39,6 +53,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle bad request exception for channel creation.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
   @ExceptionHandler(ChannelCreationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleChannelCreationException(ChannelCreationException e) {
@@ -48,6 +68,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on channel deletion exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(ChannelDeletionException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelDeletionException(ChannelDeletionException e) {
@@ -57,6 +83,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on channel fetch exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(ChannelFetchException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelFetchException(ChannelFetchException e) {
@@ -66,6 +98,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on channel member save exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(ChannelMemberSaveException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberSaveException(ChannelMemberSaveException e) {
@@ -75,6 +113,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on channel member fetch exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(ChannelMemberFetchException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberFetchException(ChannelMemberFetchException e) {
@@ -84,6 +128,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on channel member deletion exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(ChannelMemberDeleteException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberDeletionException(ChannelMemberDeleteException e) {
@@ -93,6 +143,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on direct message send exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(DirectMessageSendException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleDirectMessageSendException(DirectMessageSendException e) {
@@ -102,6 +158,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on channel member mark read exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(ChannelMemberMarkReadException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMarkReadException(ChannelMemberMarkReadException e) {
@@ -111,6 +173,11 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle internal server error on direct message fetch exception.
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(DirectMessageFetchException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleDirectMessageFetchException(DirectMessageFetchException e) {
@@ -120,6 +187,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle program creation exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
   @ExceptionHandler(ProgramCreationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleProgramCreationException(ProgramCreationException e) {
@@ -129,6 +202,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle program modification exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
   @ExceptionHandler(ProgramModificationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleProgramModificationException(ProgramModificationException e) {
@@ -138,6 +217,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle file processing exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(FileProcessingException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleFileProcessingException(FileProcessingException e) {
@@ -147,6 +232,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle generic exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(Exception.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleGenericException(Exception e) {

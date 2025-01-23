@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.ChannelMemberExceptions;
+package com.sportganise.exceptions.channelMemberExceptions;
 
 public class ChannelMemberFetchException extends RuntimeException {
   public ChannelMemberFetchException(String message) {

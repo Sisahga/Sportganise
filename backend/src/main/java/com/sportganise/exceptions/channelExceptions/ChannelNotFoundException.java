@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.ChannelExceptions;
+package com.sportganise.exceptions.channelExceptions;
 
 import com.sportganise.exceptions.ResourceNotFoundException;
 

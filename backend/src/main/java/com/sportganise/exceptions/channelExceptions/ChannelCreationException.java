@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.ChannelExceptions;
+package com.sportganise.exceptions.channelExceptions;
 
 public class ChannelCreationException extends RuntimeException {
   public ChannelCreationException(String message) {
