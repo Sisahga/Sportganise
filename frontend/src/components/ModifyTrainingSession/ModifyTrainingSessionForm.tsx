@@ -44,6 +44,12 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
+import { useLocation } from "react-router-dom";
+import { ProgramDetails } from "@/types/trainingSessionDetails";
+import { formSchema } from "@/types/trainingSessionZodFormSchema";
+import { Attendees } from "@/types/trainingSessionDetails";
+import useModifyTrainingSession from "@/hooks/useModifyProgram";
+import log from "loglevel";
 
 //GLOBAL ---------------------------------------------------------------------------------------------------------------------------
 /**All select element options */
@@ -66,7 +72,11 @@ const visibilities = [
   },
   {
     label: "Members only",
-    value: "Private",
+    value: "members",
+  },
+  {
+    label: "Private",
+    value: "private",
   },
 ] as const;
 //Options for location select
@@ -89,180 +99,88 @@ const locations = [
   },
 ] as const;
 
-/** Form schema, data from the fields in the form will conform to these types. JSON string will follow this format.*/
-const formSchema = z
-  .object({
-    title: z.string(),
-    type: z.string(),
-    start_date: z.coerce.date(),
-    end_date: z.coerce.date(),
-    recurring: z.boolean().default(true),
-    visibility: z.string(),
-    description: z.string(),
-    attachment: z
-      .array(
-        //array of files
-        z.custom<File>((file) => file instanceof File && file.size > 0, {
-          message: "Each file must be a valid file and not empty.",
-        }),
-      )
-      .nullable()
-      .optional(),
-    capacity: z.number().min(0),
-    notify: z.boolean().default(true),
-    start_time: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid start time format"),
-    end_time: z
-      .string()
-      .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
-    location: z.string(),
-  })
-  .refine((data) => data.end_date >= data.start_date, {
-    message: "End date cannot be earlier than the start date.",
-    path: ["end_date"], //points to the end_date field in the error message
-  })
-  .refine((data) => data.end_time >= data.start_time, {
-    message: "End time cannot be earlier than start time.",
-    path: ["end_time"],
-  })
-  .refine(
-    (data) =>
-      !(
-        data.start_date.getTime() === data.end_date.getTime() && data.recurring
-      ),
-    {
-      message:
-        "Event start and end dates are the same and therefore cannot reccur.",
-      path: ["recurring"],
-    },
-  );
-
-//PAGE CONTENT ---------------------------------------------------------------------------------------------------
 export default function ModifyTrainingSessionForm() {
   const { toast } = useToast();
-  const { programId } = useParams();
-  const accountId = ""; //get from cookie
+  const accountId = 2; //get from cookie
   const navigate = useNavigate();
-  const [title, setTitle] = useState<string>(""); //assuming response is an object. Values will be overriden in fetch.
-  const [notFound, setNotFound] = useState(false);
+  const [title, setTitle] = useState<string>("");
+  let [attachmentsToRemove, setAttachmentsToRemove] = useState<string[]>([]);
+  const location = useLocation(); // Location state data sent from training session details page
+  const { modifyTrainingSession, loading, error } = useModifyTrainingSession();
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      //start_date: new Date(),
-      //end_date: new Date(),
-    },
   });
 
-  /** Fetch form data from database using API call*/
+  const [attendees, setAttendees] = useState<Attendees[]>([]);
+  const [programDetails, setProgramDetails] = useState<ProgramDetails>({
+    programId: 0,
+    title: "",
+    programType: "",
+    description: "",
+    capacity: 0,
+    occurrenceDate: new Date(),
+    durationMins: 0,
+    recurring: false,
+    expiryDate: new Date(),
+    location: "",
+    programAttachments: [],
+    frequency: "",
+    visibility: "",
+  });
   useEffect(() => {
-    const fetchSavedFormFields = async () => {
-      try {
-        const url = `/${accountId}/${programId}/modify-program`;
-        fetch(url) //"https://catfact.ninja/fact" for now to test if can obtain json data and render on page
-          .then((response) => {
-            if (!response.ok) {
-              // Handle specific HTTP statuses
-              if (response.status === 404) {
-                //render 404 component on the page
-                setNotFound(true);
-                console.log("Resource was notFound: " + notFound);
-              }
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json(); //turns response into a javascript object
-          })
-          .then((data) => {
-            console.log("Fetched data: ", data);
-            setTitle(data.title); //grab the value/data in the response.json()
+    // Update state safely using useEffect
+    if (location.state && location.state.programDetails) {
+      setProgramDetails(location.state.programDetails);
+      console.log("PROGRADETAILS: ", programDetails);
+    }
+  }, [location.state]);
+  useEffect(() => {
+    if (location.state && location.state.attendees) {
+      setAttendees(location.state.attendees);
+    }
+  }, [location.state]);
 
-            /*
-            const MockProgramDetails = {
-              programId: 1,
-              programType: "Training",
-              title: "Advanced Group",
-              description: "Intensive training camp for badminton pros",
-              capacity: 1,
-              occurrenceDate: "2024-07-01T10:00:00Z",
-              durationMins: 120,
-              expiryDate: "2024-08-01T12:00:00Z",
-              frequency: null,
-              location: "123 test water rd.",
-              visibility: "Public",
-              attachments: [
-                {
-                  programId: 1,
-                  attachment_url:
-                    "https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png",
-                },
-                {
-                  programId: 2,
-                  attachment_url: "https://something.com/",
-                },
-              ],
-              recurring: true,
-            };
-            */
-
-            /*
-            const fields = Object.keys(data); // Array of field names
-            console.log("fields: ", fields);
-            const parseData = formSchema.safeParse(data); //uses formSchema.safeParse to validate formData against the schema (formSchema)
-            console.log("PARSE DATA:" + parseData.data); //undefined if form data is invalid
-            console.log("formData: " + Object.values(formData));
-            if (parseData == undefined) {
-              throw new Error("Fetched data did not match form schema!");
-            }
-            */
-
-            // Set form defaults and update field values
-            form.setValue("title", data.title);
-            form.setValue("capacity", data.capacity);
-            form.setValue("type", data.programType);
-            form.setValue("start_date", new Date(data.occurrenceDate));
-            form.setValue("end_date", new Date(data.expiryDate));
-            form.setValue("recurring", data.recurring);
-            form.setValue("visibility", data.visibility);
-            form.setValue("description", data.description);
-            /*
-            if (data.attachments === null) {
-              form.setValue("attachment", data.attachments);
-            } else {
-              console.log(
-                data.attachments.filter(
-                  (attachment : File) => attachment.attachment_url
-                )
-              );
-            }
-            */
-            //form.setValue("notify", data.notify);
-            form.setValue(
-              "start_time",
-              format(new Date(data.occurrenceDate), "HH:mm"),
-            );
-            form.setValue(
-              "end_time",
-              format(new Date(data.expiryDate), "HH:mm"),
-            );
-            form.setValue("location", data.location);
-            setTitle(data.title);
-          });
-      } catch (error) {
-        console.log(error);
-        toast({
-          variant: "destructive",
-          title: "Uh oh! Something went wrong ✖",
-          description: "Event data could not be fetched. ",
+  useEffect(() => {
+    // Set form defaults and update field values
+    form.setValue("title", programDetails.title);
+    form.setValue("capacity", programDetails.capacity);
+    form.setValue("type", programDetails.programType);
+    form.setValue("startDate", new Date(programDetails.occurrenceDate));
+    form.setValue("endDate", new Date(programDetails.expiryDate));
+    form.setValue("recurring", programDetails.recurring);
+    form.setValue("visibility", programDetails.visibility);
+    form.setValue("description", programDetails.description);
+    if (programDetails.programAttachments) {
+      const files = programDetails.programAttachments.map((attachment) => {
+        const fileName = attachment.attachmentUrl.split("/").pop() || "file";
+        return new File([], fileName, {
+          type: "application/octet-stream",
         });
-      }
-    };
-    fetchSavedFormFields();
-  }, [form, notFound, programId, toast]);
+      });
+
+      form.setValue("attachment", files);
+    }
+    form.setValue(
+      "startTime",
+      new Date(programDetails.occurrenceDate).toISOString().slice(11, 16)
+    );
+    const endTime = new Date(programDetails.occurrenceDate);
+    endTime.setMinutes(endTime.getMinutes() + programDetails.durationMins); //REFACTOR
+    form.setValue("endTime", new Date(endTime).toISOString().slice(11, 16)); //REFACTOR
+    form.setValue("location", programDetails.location);
+    setTitle(programDetails.title);
+
+    //append all urls to new string[]
+    programDetails.programAttachments.map((attachment) => {
+      const fileName = attachment.attachmentUrl;
+      attachmentsToRemove.push(fileName);
+    });
+  }, [programDetails]);
 
   /** Handle files for file upload in form*/
-  const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
+  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
   const dropZoneConfig = {
     //File configurations
     maxFiles: 5,
@@ -276,45 +194,73 @@ export default function ModifyTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    //async request which may result error
     try {
-      // Merge the programId into the values object
       const json_payload = {
         ...values,
-        programId: programId ?? null,
-        attachment: files ?? [], //ensure attachment: appears in json payload body
+        programId: programDetails.programId ?? null,
+        attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
       };
       console.log(json_payload);
-      console.log(
-        "STRINGIFIED JSON PAYLOAD" + JSON.stringify(json_payload, null, 2),
-      );
+      log.info("Form to modify Training Session : ", json_payload);
 
-      // onSubmit API call
-      const response = await fetch(
-        `/${accountId}/${programId}/modify-program`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json", //If sending JSON
-          },
-          body: JSON.stringify(json_payload, null, 2),
-        },
+      // Prepare API body
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file) => {
+          attachmentsToRemove = attachmentsToRemove.filter(
+            (urlName) => urlName !== file.name
+          );
+        });
+        console.log("attachmentsToRemove: ", attachmentsToRemove);
+        log.info("attachmentsToRemove: ", attachmentsToRemove);
+      }
+      const formData = new FormData();
+      const programData = {
+        title: values.title,
+        type: values.type,
+        startDate: values.startDate.toISOString(),
+        endDate: values.endDate.toISOString(),
+        recurring: values.recurring.toString(),
+        visibility: values.visibility,
+        description: values.description,
+        capacity: values.capacity.toString(),
+        startTime: values.startTime,
+        endTime: values.endTime,
+        location: values.location,
+        attachmentsToRemove: attachmentsToRemove ?? [],
+      };
+      formData.append(
+        "programData",
+        new Blob([JSON.stringify(programData)], {
+          type: "application/json",
+        })
       );
-
-      // Check for HTTP errors
-      if (!response.ok) {
-        const errorData = await response
-          .json()
-          .catch(() => ({ message: "Unknown server error" })); // try to get error details from server
-        const errorMessage =
-          errorData.message || response.statusText || "An error occurred."; // prioritize specific error messages
-        throw new Error(errorMessage);
-        //throw new Error(`HTTP error! status: ${response.status}`); // re-throw for the catch block below
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file) => {
+          formData.append("attachments", file); //append each file
+        });
+      } else {
+        formData.append(
+          "attachments",
+          new Blob([], {
+            type: "application/json",
+          })
+        );
       }
 
-      // ...Rest of success handling
-      const data = await response.json(); //data sent back from backend response to url call
-      console.log("Form submitted successfully:", data);
+      // API call submit form
+      const modify = await modifyTrainingSession(
+        accountId,
+        programDetails.programId,
+        formData
+      );
+      log.info("modify", modify);
+      if (modify === null) {
+        throw new Error(
+          "Error from usemodifyTrainingSession.modifyTrainingSession!"
+        );
+      }
+      console.log("loading...", loading);
+      log.info("modifyTrainingSession submit success ✔");
 
       // Toast popup for user to say form submitted successfully
       toast({
@@ -322,45 +268,28 @@ export default function ModifyTrainingSessionForm() {
         description: "Event was updated in your calendar.",
       });
 
-      // Reset form fields
-      form.reset();
-      form.setValue("title", "");
-      form.setValue("type", "");
-      form.setValue("start_date", new Date());
-      form.setValue("end_date", new Date());
-      form.setValue("recurring", false);
-      form.setValue("visibility", "");
-      form.setValue("description", "");
-      form.setValue("attachment", undefined);
-      form.setValue("capacity", 0);
-      form.setValue("notify", false);
-      form.setValue("start_time", "");
-      form.setValue("end_time", "");
-      form.setValue("location", "");
-      form.reset();
-
-      // If successful, navigate to the success page with a message
-      navigate("/");
+      // If successful, navigate back to details page
+      navigate(-1);
     } catch (error) {
       console.error("Form submission error (error)", error);
-      //console.error("Error submitting form (message):", error.message);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description:
           "There was a problem with your request. Event was not updated.",
       });
+    } finally {
+      form.reset();
     }
   };
 
   return (
-    //RETURN -----------------------------------------------------------------------------------------------------------
     <div>
       {/** Navigate to previous page */}
       <Button
         className="rounded-full"
         variant="outline"
-        onClick={() => navigate("/")}
+        onClick={() => navigate(-1)}
       >
         <MoveLeft />
       </Button>
@@ -369,7 +298,7 @@ export default function ModifyTrainingSessionForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto py-10"
+          className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
         >
           {/*Form Title*/}
           <div>
@@ -411,7 +340,7 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
@@ -441,7 +370,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {type.label}
@@ -461,7 +390,7 @@ export default function ModifyTrainingSessionForm() {
           {/** Start Date */}
           <FormField
             control={form.control}
-            name="start_date"
+            name="startDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -474,7 +403,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -508,7 +437,7 @@ export default function ModifyTrainingSessionForm() {
           {/** End Date */}
           <FormField
             control={form.control}
-            name="end_date"
+            name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
@@ -521,7 +450,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -555,7 +484,7 @@ export default function ModifyTrainingSessionForm() {
             {/**Start Time */}
             <FormField
               control={form.control}
-              name="start_time"
+              name="startTime"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -575,7 +504,7 @@ export default function ModifyTrainingSessionForm() {
             {/**End Time */}
             <FormField
               control={form.control}
-              name="end_time"
+              name="endTime"
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
@@ -610,12 +539,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value,
+                              (location) => location.value === field.value
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -641,7 +570,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {location.label}
@@ -703,12 +632,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
+                              (visibility) => visibility.value === field.value
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -734,7 +663,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {visibility.label}
@@ -786,9 +715,9 @@ export default function ModifyTrainingSessionForm() {
                 </FormLabel>
                 <FormControl>
                   <FileUploader
-                    value={files}
+                    value={field.value || []}
                     onValueChange={(newFiles) => {
-                      setFiles(newFiles); // Update local state
+                      //setFiles(newFiles); // Update local state
                       field.onChange(newFiles); // Sync with React Hook Form
                     }}
                     dropzoneOptions={dropZoneConfig}
@@ -810,9 +739,9 @@ export default function ModifyTrainingSessionForm() {
                       </div>
                     </FileInput>
                     <FileUploaderContent>
-                      {files &&
-                        files.length > 0 &&
-                        files.map((file, i) => (
+                      {field.value &&
+                        field.value.length > 0 &&
+                        field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
                             <span>{file.name}</span>
@@ -843,7 +772,7 @@ export default function ModifyTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        e.target.value ? Number(e.target.value) : undefined
                       )
                     }
                   />
@@ -855,7 +784,7 @@ export default function ModifyTrainingSessionForm() {
           />
 
           {/** Notify All Players */}
-          <div>
+          {/* <div>
             <FormField
               control={form.control}
               name="notify"
@@ -884,16 +813,16 @@ export default function ModifyTrainingSessionForm() {
                 Customize attendance list
               </a>
             </div>
-          </div>
+          </div> */}
 
           {/** Submit Button */}
           <Button type="submit" className="w-full font-semibold">
             Update Event
           </Button>
-          <div className="text-center self-center">
-            <a href="../" className="underline text-neutral-400">
-              Done
-            </a>
+          <div className="justify-self-center">
+            <button className=" bg-transparent" onClick={() => navigate(-1)}>
+              <p className="text-center underline text-neutral-400">Cancel</p>
+            </button>
           </div>
         </form>
       </Form>

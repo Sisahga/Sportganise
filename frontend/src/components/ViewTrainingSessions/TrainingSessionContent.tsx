@@ -232,7 +232,11 @@ const TrainingSessionContent = () => {
         )}
 
         {/**Conditionally render different menu options based on account type */}
-        <DropDownMenuButton accountType={accountType} />
+        <DropDownMenuButton
+          accountType={accountType}
+          programDetails={programDetails}
+          attendees={attendees}
+        />
       </div>
     </div>
   );

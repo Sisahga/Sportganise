@@ -146,7 +146,15 @@ export default function CreateTrainingSessionForm() {
         values.attachment.forEach((file) => {
           formData.append("attachments", file); //append each file
         });
+      } else {
+        formData.append(
+          "attachments",
+          new Blob([], {
+            type: "application/json",
+          })
+        );
       }
+      console.log("formData: ", formData);
 
       /*
       formData.append("title", values.title);
