@@ -19,6 +19,8 @@ import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
 import BlockedUsersListPage from "./pages/BlockedUserListPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
 import NotificationsPage from "./pages/NotificationsPage.tsx";
+import ForumPage from "./pages/ForumPage.tsx";
+import PostDetailPage from "./pages/PostDetailPage.tsx";
 
 function App() {
   return (
@@ -50,6 +52,8 @@ function App() {
             path="/pages/EditProfilePage"
             element={<EditProfilePage />}
           ></Route>
+          <Route path="/pages/ForumPage" element={<ForumPage />} />
+          <Route path="/pages/PostDetailPage" element={<PostDetailPage />} />
           <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
           <Route
             path="/pages/DirectMessagesDashboard"
