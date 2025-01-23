@@ -2,13 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import log from "loglevel";
 
-interface Notification {
-  id: string;
-  message: string;
-  timestamp: string;
-  isRead: boolean;
-  sender: string;
-}
+import { Notification } from "@/types/notifications";
 
 log.setLevel("info");
 
