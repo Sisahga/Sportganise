@@ -19,6 +19,7 @@ import useUnblockUser from "@/hooks/useUnblockUser.ts";
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
 import useSendMessage from "@/hooks/useSendMessage.ts";
+import log from "loglevel";
 
 const UserBlockedComponent = ({
   showBlockedMessage,
@@ -34,7 +35,7 @@ const UserBlockedComponent = ({
   const [showComponent, setShowComponent] = useState(showBlockedMessage);
 
   const handleUnblock = async () => {
-    console.log("Unblocking user...");
+    log.info("Unblocking user...");
     if (channelType === "SIMPLE") {
       const unblockListRequestDto: BlockUserRequestDto = {
         accountId: currentUserId,
@@ -42,7 +43,7 @@ const UserBlockedComponent = ({
       };
       const unblockResponse = await unblockUser(unblockListRequestDto);
       if (unblockResponse === 204) {
-        console.log("User unblocked successfully.");
+        log.info("User unblocked successfully.");
         // Sends unblock message through web socket.
         const messagePayload: SendMessageComponent = {
           senderId: currentUserId,
