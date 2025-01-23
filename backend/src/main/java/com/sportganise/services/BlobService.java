@@ -2,6 +2,7 @@ package com.sportganise.services;
 
 import com.sportganise.entities.Blob;
 import com.sportganise.entities.directmessaging.DirectMessageBlob;
+import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.repositories.BlobRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageBlobRepository;
 import java.io.IOException;
@@ -75,11 +76,10 @@ public class BlobService {
    * @param messageId Id of the direct message, if the file is part of a direct message.
    * @param accountId Id of the account uploading the file.
    * @return The URL of the newly uploaded file.
-   * @throws IOException If an error occurs while uploading the file.
    */
   public String uploadFile(
       MultipartFile file, boolean isMessageFile, String messageId, Integer accountId)
-      throws RuntimeException, IOException {
+      throws FileProcessingException {
     String fileName = file.getOriginalFilename();
     // TODO: set proper key for file (accountId/uuid+filename)
     String uniqueFileName = UUID.randomUUID() + "_" + fileName;
@@ -106,14 +106,11 @@ public class BlobService {
         directMessageBlobRepository.save(directMessageBlob);
       }
       return s3Url;
-    } catch (S3Exception e) {
-      throw new RuntimeException("Error uploading file to S3: " + e.getMessage());
-    } catch (IOException e) {
-      log.error("Error uploading file: {}", e.getMessage());
-      throw new IOException("Error uploading file: " + e.getMessage());
+    } catch (S3Exception | IOException e) {
+      throw new FileProcessingException("Error uploading file: " + e.getMessage());
     } catch (Exception e) {
       log.error("Unexpected error while uploading file: {}", e.getMessage());
-      throw new IOException("Unexpected error while uploading file: " + e.getMessage());
+      throw new FileProcessingException("Unexpected error while uploading file: " + e.getMessage());
     }
   }
 

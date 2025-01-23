@@ -19,3 +19,55 @@ export interface CookiesDto {
   phone: string | null;
   organisationIds: number[];
 }
+
+export interface SignUpRequest {
+  type: "PLAYER" | "COACH" | "ADMIN"; //ENUM type
+  email: string;
+  password: string;
+  phone: string;
+  address: {
+    line: string;
+    city: string;
+    province: string;
+    country: string;
+    postalCode: string;
+  };
+  firstName: string;
+  lastName: string;
+}
+
+export interface SignUpResponse {
+  statusCode: number;
+  message: string;
+  data: null | {
+    accountId: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    pictureUrl: string | null;
+    type: string;
+    phone: string;
+    organisationIds: number[];
+  };
+}
+
+export interface SendCodeRequest {
+  email: string;
+}
+
+export interface SendCodeResponse {
+  statusCode: number;
+  message: string;
+  data: string; // Email to which the code was sent
+}
+
+export interface VerifyCodeRequest {
+  email: string;
+  code: string;
+}
+
+export interface VerifyCodeResponse {
+  statusCode: number;
+  message: string;
+  data: string | null;
+}

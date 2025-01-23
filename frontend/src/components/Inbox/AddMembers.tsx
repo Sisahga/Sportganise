@@ -11,6 +11,7 @@ import { useState } from "react";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import useAccountDetailsDirectMessaging from "@/hooks/useAccountDetailsDirectMessaging.ts";
 import { AddMembersDialogProps } from "@/types/dmchannels.ts";
+import log from "loglevel";
 
 export default function AddMembers({
   selectedUsers,
@@ -25,10 +26,17 @@ export default function AddMembers({
   const [isSearching, setIsSearching] = useState(false);
   const organizationId = 1; // TODO: Replace with actual organization ID from cookies
 
+  log.info(
+    `AddMembers component initialized for organization ID: ${organizationId}`,
+  );
+
   // Hook.
   const { users } = useAccountDetailsDirectMessaging(
     organizationId,
     currentUserId,
+  );
+  log.info(
+    `Fetched ${users.length} users for organization ID: ${organizationId}`,
   );
 
   // Updates user search to be more specific by letter as they type player's name

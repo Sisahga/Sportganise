@@ -10,6 +10,7 @@ const hideHeaderPaths = [
   "/login",
   "/signup",
   "/forgotpassword",
+  "/verificationcode",
 ]; // Header hidden on all these pages
 
 // Paths where the footer should be hidden
@@ -18,6 +19,7 @@ const hideFooterPaths = [
   "/login",
   "/signup",
   "/forgotpassword",
+  "/verificationcode",
 ]; // Footer hidden on /chat, login and signup pages
 
 // Define paths where you don't want horizontal margins (like full-width pages)

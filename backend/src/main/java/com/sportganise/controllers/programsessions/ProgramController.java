@@ -6,10 +6,12 @@ import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramModifyRequestDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.exceptions.ForbiddenException;
+import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.programexceptions.ProgramCreationException;
+import com.sportganise.exceptions.programexceptions.ProgramModificationException;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
-import jakarta.persistence.EntityNotFoundException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -73,13 +75,9 @@ public class ProgramController {
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    List<ProgramDetailsParticipantsDto> allPrograms = new ArrayList<>();
+    List<ProgramDetailsParticipantsDto> allPrograms;
 
-    Boolean canDisplayAttendees = false;
-
-    if (hasPermissions(user)) {
-      canDisplayAttendees = true;
-    }
+    boolean canDisplayAttendees = hasPermissions(user);
 
     allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, canDisplayAttendees);
 
@@ -104,25 +102,17 @@ public class ProgramController {
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
       @RequestParam("attachments") List<MultipartFile> attachments) {
-    log.debug("ATTACHMENTS COUNT: " + attachments.size());
 
-    ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
+    log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
-    Optional<Account> userOptional = getAccount(accountId);
-
-    if (userOptional.isEmpty()) {
-
-      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-      responseDto.setMessage("User not found.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    }
-
-    Account user = userOptional.get();
+    Account user =
+        getAccount(accountId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     if (!hasPermissions(user)) {
-      responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
-      responseDto.setMessage("User does not have permission.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+      throw new ForbiddenException(
+          "User with id: " + accountId + " does not have permission to create a program.");
     }
 
     try {
@@ -142,14 +132,15 @@ public class ProgramController {
               attachments,
               accountId);
 
-      responseDto.setStatusCode(HttpStatus.CREATED.value());
-      responseDto.setMessage("Created a new program successfully.");
-      responseDto.setData(newProgramDto);
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+      ResponseDto<ProgramDto> responseDto =
+          ResponseDto.<ProgramDto>builder()
+              .statusCode(HttpStatus.CREATED.value())
+              .message("Created a new program successfully.")
+              .data(newProgramDto)
+              .build();
+      return ResponseEntity.status(HttpStatus.CREATED.value()).body(responseDto);
     } catch (Exception e) {
-      responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
-      responseDto.setMessage("Could not create a new program successfully.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+      throw new ProgramCreationException("Failed to create program: " + e.getMessage());
     }
   }
 
@@ -171,26 +162,19 @@ public class ProgramController {
       @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
       @RequestParam("attachments") List<MultipartFile> attachments) {
 
-    ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
-
-    Optional<Account> userOptional = getAccount(accountId);
-
-    if (userOptional.isEmpty()) {
-      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-      responseDto.setMessage("User not found.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    }
-
-    Account user = userOptional.get();
+    Account user =
+        getAccount(accountId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     if (!hasPermissions(user)) {
-      responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
-      responseDto.setMessage("User does not have permission.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+      throw new ForbiddenException(
+          "User with id: " + accountId + " does not have permission to create a program.");
     }
 
-    ProgramDto programDtoToModify = programService.getProgramDetails(programId);
+    ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
+    ProgramDto programDtoToModify = programService.getProgramDetails(programId);
     if (programDtoToModify == null) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
       responseDto.setMessage("Program not found.");
@@ -220,14 +204,8 @@ public class ProgramController {
       responseDto.setMessage("Modified the program successfully.");
       responseDto.setData(updatedProgramDto);
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    } catch (EntityNotFoundException e) {
-      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-      responseDto.setMessage("Program not found.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     } catch (Exception e) {
-      responseDto.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-      responseDto.setMessage("Could not modify the program successfully.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+      throw new ProgramModificationException("Program modification failed: " + e.getMessage());
     }
   }
 

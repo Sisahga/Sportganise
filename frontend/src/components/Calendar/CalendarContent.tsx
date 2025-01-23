@@ -12,7 +12,7 @@ export default function CalendarContent() {
 
       {/**Tabs content */}
       <div className="my-5 grid-row-3 justify-items-center">
-        <Tabs defaultValue="month" className="w-[400px]">
+        <Tabs defaultValue="month" className="w-[100vw]">
           <div className="flex justify-center">
             <TabsList>
               <TabsTrigger value="month">Month</TabsTrigger>

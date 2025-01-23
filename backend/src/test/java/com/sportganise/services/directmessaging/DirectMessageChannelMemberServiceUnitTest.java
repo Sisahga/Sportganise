@@ -5,8 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
+import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +19,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
 
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageChannelMemberServiceUnitTest {
@@ -126,5 +129,47 @@ public class DirectMessageChannelMemberServiceUnitTest {
 
     verify(directMessageChannelMemberRepository, times(1))
         .deleteByChannelIdAndAccountId(channelId, accountId);
+  }
+
+  @Test
+  public void setGroupMemberRole_successfulRoleSet() {
+    int memberId = 100;
+    int channelId = 1;
+    ChannelMemberRoleType role = ChannelMemberRoleType.ADMIN;
+
+    when(directMessageChannelMemberRepository.setChannelMemberRole(memberId, channelId, role))
+        .thenReturn(1);
+
+    directMessageChannelMemberService.setGroupMemberRole(memberId, channelId, role);
+
+    verify(directMessageChannelMemberRepository).setChannelMemberRole(memberId, channelId, role);
+  }
+
+  @Test
+  public void setGroupMemberRole_noRowsAffected_throwsException() {
+    int memberId = 100;
+    int channelId = 1;
+    ChannelMemberRoleType role = ChannelMemberRoleType.REGULAR;
+
+    when(directMessageChannelMemberRepository.setChannelMemberRole(memberId, channelId, role))
+        .thenReturn(0);
+
+    assertThrows(
+        ChannelMemberSetRoleException.class,
+        () -> directMessageChannelMemberService.setGroupMemberRole(memberId, channelId, role));
+  }
+
+  @Test
+  public void setGroupMemberRole_databaseError_throwsException() {
+    int memberId = 100;
+    int channelId = 1;
+    ChannelMemberRoleType role = ChannelMemberRoleType.REGULAR;
+
+    when(directMessageChannelMemberRepository.setChannelMemberRole(memberId, channelId, role))
+        .thenThrow(new DataAccessException("Database error") {});
+
+    assertThrows(
+        ChannelMemberSetRoleException.class,
+        () -> directMessageChannelMemberService.setGroupMemberRole(memberId, channelId, role));
   }
 }
