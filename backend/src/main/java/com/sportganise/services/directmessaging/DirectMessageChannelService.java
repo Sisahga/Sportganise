@@ -4,6 +4,7 @@ import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
+import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
@@ -71,6 +72,7 @@ public class DirectMessageChannelService {
    * @param creatorAccountId Id of the account who created the channel.
    * @return DM Channel created.
    */
+  @Transactional
   public CreateDirectMessageChannelDto createDirectMessageChannel(
       List<Integer> memberIds, String channelName, int creatorAccountId) {
     try {
@@ -147,6 +149,12 @@ public class DirectMessageChannelService {
       String creatorFirstName = accountRepository.getFirstNameByAccountId(creatorAccountId);
       directMessageService.sendCreationDirectMessage(
           createdDmChannelId, creatorAccountId, creatorFirstName);
+
+      // If GROUP, make creator ADMIN, rest REGULAR
+      if (dmChannel.getType().equals("GROUP")) {
+        initializeGroupRoles(memberIds, creatorAccountId, createdDmChannelId);
+      }
+
       return dmChannelDto;
     } catch (DataAccessException e) {
       log.error("Database error occured while creating channel: {}", e.getMessage());
@@ -165,6 +173,7 @@ public class DirectMessageChannelService {
    * @param channelId The ID of the channel to delete.
    * @return True if the channel was deleted successfully.
    */
+  @Transactional
   public boolean deleteDirectMessageChannel(int channelId) {
     try {
       if (!directMessageChannelRepository.existsById(channelId)) {
@@ -187,6 +196,7 @@ public class DirectMessageChannelService {
    * @param accountId Id of the account to get Direct Message Channels for.
    * @return List of Direct Message Channels for the account.
    */
+  @Transactional
   public List<ListDirectMessageChannelDto> getDirectMessageChannels(int accountId) {
     if (!accountRepository.existsById(accountId)) {
       throw new AccountNotFoundException("Account not found.");
@@ -306,12 +316,36 @@ public class DirectMessageChannelService {
     return channelNameBuilder;
   }
 
+  /**
+   * Deletes the old image blob of a channel.
+   *
+   * @param oldImageBlob The URL of the old image blob.
+   */
   private void deleteOldImageBlob(String oldImageBlob) {
     try {
       this.blobService.deleteFile(oldImageBlob);
       log.debug("Deleted old image blob: {}", oldImageBlob);
     } catch (S3Exception | IOException e) {
       log.warn("Failed to delete old image blob: {}", e.getMessage());
+    }
+  }
+
+  /**
+   * Initializes the roles of the members in a group channel.
+   *
+   * @param memberIds List of member ids.
+   * @param creatorAccountId Id of the creator of the channel.
+   * @param channelId Id of the channel.
+   */
+  private void initializeGroupRoles(List<Integer> memberIds, int creatorAccountId, int channelId) {
+    for (int memberId : memberIds) {
+      if (memberId == creatorAccountId) {
+        directMessageChannelMemberService.setGroupMemberRole(
+                memberId, channelId, ChannelMemberRoleType.ADMIN);
+      } else {
+        directMessageChannelMemberService.setGroupMemberRole(
+                memberId, channelId, ChannelMemberRoleType.REGULAR);
+      }
     }
   }
 }
