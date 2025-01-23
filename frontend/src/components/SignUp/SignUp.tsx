@@ -119,7 +119,6 @@ export default function SignUp() {
 
   useEffect(() => {
     if (emailForVerification && !sendCodeError) {
-      // if (data?.statusCode === 201) {
       toast({
         variant: "success",
         title: "Account Created",
