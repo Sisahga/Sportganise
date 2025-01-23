@@ -1,8 +1,7 @@
 package com.sportganise.entities.programsessions;
 
-import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,11 +18,5 @@ import lombok.Setter;
 @Entity
 @Table(name = "program_attachments")
 public class ProgramAttachment {
-
-  @Id
-  @Column(name = "program_id")
-  private Integer programId;
-
-  @Column(name = "attachment_url")
-  private String attachmentUrl;
+  @EmbeddedId ProgramAttachmentCompositeKey compositeProgramAttachmentKey;
 }
