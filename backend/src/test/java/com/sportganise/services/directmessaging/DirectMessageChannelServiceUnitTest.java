@@ -141,18 +141,20 @@ public class DirectMessageChannelServiceUnitTest {
 
     given(directMessageChannelRepository.existsById(channelId)).willReturn(false);
 
-    Exception exception = assertThrows(ChannelDeletionException.class, () -> {
-      directMessageChannelService.deleteDirectMessageChannel(channelId);
-    });
+    Exception exception =
+        assertThrows(
+            ChannelDeletionException.class,
+            () -> {
+              directMessageChannelService.deleteDirectMessageChannel(channelId);
+            });
 
     assertEquals("Failed to delete channel: Channel not found.", exception.getMessage());
 
     verify(directMessageChannelRepository, times(1)).existsById(channelId);
     verify(directMessageChannelRepository, never()).deleteById(anyInt());
     verify(directMessageChannelMemberRepository, never())
-            .deleteDirectMessageChannelMemberByChannelId(anyInt());
+        .deleteDirectMessageChannelMemberByChannelId(anyInt());
   }
-
 
   @Test
   public void getDirectMessageChannelsTest_HasChannels() {
@@ -162,22 +164,22 @@ public class DirectMessageChannelServiceUnitTest {
     given(accountRepository.existsById(accountId)).willReturn(true);
 
     ListDirectMessageChannelDto channel1 =
-            new ListDirectMessageChannelDto(
-                    1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, ZonedDateTime.now());
+        new ListDirectMessageChannelDto(
+            1, "GROUP", "Channel 1", "image_blob_1", "I love you.", false, ZonedDateTime.now());
     ListDirectMessageChannelDto channel2 =
-            new ListDirectMessageChannelDto(2, "SIMPLE", null, null, null, true, null);
+        new ListDirectMessageChannelDto(2, "SIMPLE", null, null, null, true, null);
     List<ListDirectMessageChannelDto> expectedChannels = Arrays.asList(channel1, channel2);
 
     given(directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId))
-            .willReturn(expectedChannels);
+        .willReturn(expectedChannels);
 
     given(directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(2, accountId))
-            .willReturn(2);
+        .willReturn(2);
     given(accountRepository.getFirstNameByAccountId(2)).willReturn("John Doe");
     given(accountRepository.getPictureUrlByAccountId(2)).willReturn("image_blob_2");
 
     List<ListDirectMessageChannelDto> actualChannels =
-            directMessageChannelService.getDirectMessageChannels(accountId);
+        directMessageChannelService.getDirectMessageChannels(accountId);
 
     assertEquals(2, actualChannels.size());
 
@@ -189,10 +191,8 @@ public class DirectMessageChannelServiceUnitTest {
     verify(accountRepository, times(1)).existsById(accountId);
     verify(directMessageChannelRepository, times(1)).getDirectMessageChannelsByAccountId(accountId);
     verify(directMessageChannelMemberRepository, times(1))
-            .getOtherMemberIdInSimpleChannel(2, accountId);
+        .getOtherMemberIdInSimpleChannel(2, accountId);
   }
-
-
 
   @Test
   public void getDirectMessageChannelsTest_HasNoChannels() {
@@ -203,10 +203,10 @@ public class DirectMessageChannelServiceUnitTest {
 
     // Mock empty channel list
     given(directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId))
-            .willReturn(Collections.emptyList());
+        .willReturn(Collections.emptyList());
 
     List<ListDirectMessageChannelDto> actualChannels =
-            directMessageChannelService.getDirectMessageChannels(accountId);
+        directMessageChannelService.getDirectMessageChannels(accountId);
 
     // Assert that the returned list is empty
     assertEquals(0, actualChannels.size());
@@ -218,11 +218,10 @@ public class DirectMessageChannelServiceUnitTest {
 
     // Ensure no SIMPLE channel logic was invoked
     verify(directMessageChannelMemberRepository, never())
-            .getOtherMemberIdInSimpleChannel(anyInt(), anyInt());
+        .getOtherMemberIdInSimpleChannel(anyInt(), anyInt());
     verify(accountRepository, never()).getFirstNameByAccountId(anyInt());
     verify(accountRepository, never()).getPictureUrlByAccountId(anyInt());
   }
-
 
   @Test
   public void getDirectMessageChannels_ChannelsWithNoMessages() {
@@ -233,14 +232,14 @@ public class DirectMessageChannelServiceUnitTest {
 
     // Create a channel with no messages or image blobs
     ListDirectMessageChannelDto channel =
-            new ListDirectMessageChannelDto(1, "GROUP", "Channel 1", null, null, true, null);
+        new ListDirectMessageChannelDto(1, "GROUP", "Channel 1", null, null, true, null);
 
     // Mock repository response for channels
     given(directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId))
-            .willReturn(List.of(channel));
+        .willReturn(List.of(channel));
 
     List<ListDirectMessageChannelDto> actualChannels =
-            directMessageChannelService.getDirectMessageChannels(accountId);
+        directMessageChannelService.getDirectMessageChannels(accountId);
 
     // Assertions
     assertEquals(1, actualChannels.size());
@@ -252,7 +251,6 @@ public class DirectMessageChannelServiceUnitTest {
     verify(accountRepository, times(1)).existsById(accountId);
     verify(directMessageChannelRepository, times(1)).getDirectMessageChannelsByAccountId(accountId);
   }
-
 
   @Test
   void renameGroupChannel_Success() {
@@ -310,19 +308,19 @@ public class DirectMessageChannelServiceUnitTest {
     String newImageBlob = "new-image-blob";
 
     given(directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId))
-            .willReturn(oldImageBlob); // Simulate getting the old image blob URL
-    given(blobService.uploadFile(image, false, null, userId)).willReturn(newImageBlob); // Simulate file upload
-    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob)).willReturn(0); // Simulate no rows affected
+        .willReturn(oldImageBlob); // Simulate getting the old image blob URL
+    given(blobService.uploadFile(image, false, null, userId))
+        .willReturn(newImageBlob); // Simulate file upload
+    given(directMessageChannelRepository.updateChannelImage(channelId, newImageBlob))
+        .willReturn(0); // Simulate no rows affected
 
     assertThrows(
-            ChannelNotFoundException.class,
-            () -> directMessageChannelService.updateChannelPicture(channelId, image, userId)
-    );
+        ChannelNotFoundException.class,
+        () -> directMessageChannelService.updateChannelPicture(channelId, image, userId));
 
     verify(directMessageChannelRepository).getDirectMessageChannelImageBlob(channelId);
     verify(blobService).uploadFile(image, false, null, userId);
     verify(directMessageChannelRepository).updateChannelImage(channelId, newImageBlob);
     verify(blobService, never()).deleteFile(anyString()); // Ensure deleteFile was not called
   }
-
 }

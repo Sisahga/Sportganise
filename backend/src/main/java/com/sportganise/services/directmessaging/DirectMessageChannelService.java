@@ -77,7 +77,7 @@ public class DirectMessageChannelService {
       String stringRepresentation = memberIds.toString();
       String sha256hex = DigestUtils.sha256Hex(stringRepresentation);
       DuplicateChannelDto duplicateChannel =
-              directMessageChannelRepository.findChannelByChannelHash(sha256hex);
+          directMessageChannelRepository.findChannelByChannelHash(sha256hex);
       // If a channel with the same members already exists, return the existing channel.
       if (!(duplicateChannel == null)) {
         CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
@@ -86,7 +86,7 @@ public class DirectMessageChannelService {
         dmChannelDto.setMemberIds(memberIds);
         if (duplicateChannel.getChannelType().equals("SIMPLE")) {
           int otherMemberId =
-                  memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+              memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
           dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
           dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
         } else {
@@ -96,10 +96,10 @@ public class DirectMessageChannelService {
         return dmChannelDto;
       }
 
-    /*
-    Set the Channel Name to be the first names of members
-    in the channel if it is null or empty.
-    */
+      /*
+      Set the Channel Name to be the first names of members
+      in the channel if it is null or empty.
+      */
       if (channelName == null || channelName.isBlank() && memberIds.size() > 2) {
         StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
         channelName = channelNameBuilder.toString();
@@ -120,14 +120,14 @@ public class DirectMessageChannelService {
       int createdDmChannelId = createdDmChannel.getChannelId();
       // Create Channel Members
       this.directMessageChannelMemberService.saveMembers(
-              memberIds, createdDmChannelId, creatorAccountId);
+          memberIds, createdDmChannelId, creatorAccountId);
 
       // Return the DM Channel DTO
       CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
       dmChannelDto.setChannelId(createdDmChannelId);
       if (dmChannel.getType().equals("SIMPLE")) {
         int otherMemberId =
-                memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+            memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
         dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
       } else {
         dmChannelDto.setChannelName(channelName);
@@ -137,7 +137,7 @@ public class DirectMessageChannelService {
       dmChannelDto.setCreatedAt(timestamp.toString());
       if (dmChannel.getType().equals("SIMPLE")) {
         int otherMemberId =
-                memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+            memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
         dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
       } else {
         dmChannelDto.setAvatarUrl(null);
@@ -145,14 +145,16 @@ public class DirectMessageChannelService {
 
       String creatorFirstName = accountRepository.getFirstNameByAccountId(creatorAccountId);
       directMessageService.sendCreationDirectMessage(
-              createdDmChannelId, creatorAccountId, creatorFirstName);
+          createdDmChannelId, creatorAccountId, creatorFirstName);
       return dmChannelDto;
     } catch (DataAccessException e) {
       log.error("Database error occured while creating channel: {}", e.getMessage());
-      throw new ChannelCreationException("Database error occured while creating channel: " + e.getMessage());
+      throw new ChannelCreationException(
+          "Database error occured while creating channel: " + e.getMessage());
     } catch (Exception e) {
       log.error("Failed to create direct message channel: {}", e.getMessage());
-      throw new ChannelCreationException("Failed to create direct message channel: " + e.getMessage());
+      throw new ChannelCreationException(
+          "Failed to create direct message channel: " + e.getMessage());
     }
   }
 
@@ -160,7 +162,7 @@ public class DirectMessageChannelService {
    * Deletes a DM Channel and all of its channel members.
    *
    * @param channelId The ID of the channel to delete.
-    * @return True if the channel was deleted successfully.
+   * @return True if the channel was deleted successfully.
    */
   public boolean deleteDirectMessageChannel(int channelId) {
     try {
@@ -190,16 +192,17 @@ public class DirectMessageChannelService {
     }
     try {
       List<ListDirectMessageChannelDto> dmChannels =
-              directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
+          directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
       for (ListDirectMessageChannelDto dmChannel : dmChannels) {
         log.info("Channel read: {}", dmChannel.getRead());
       }
       for (ListDirectMessageChannelDto dmChannel : dmChannels) {
-        // Set image blob of channel to be the image blob of the other member of the channel if it is
+        // Set image blob of channel to be the image blob of the other member of the channel if it
+        // is
         if (dmChannel.getChannelType().equals("SIMPLE")) {
           int otherMemberId =
-                  directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
-                          dmChannel.getChannelId(), accountId);
+              directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                  dmChannel.getChannelId(), accountId);
           if (otherMemberId == 0) {
             throw new ChannelMemberNotFoundException("Channel member not found.");
           }
@@ -242,16 +245,16 @@ public class DirectMessageChannelService {
    */
   @Transactional
   public UpdateChannelImageResponseDto updateChannelPicture(
-          int channelId, MultipartFile image, Integer userId) {
+      int channelId, MultipartFile image, Integer userId) {
     try {
       String oldImageBlobUrl =
-              this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
+          this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
       String newImageBlobUrl = this.blobService.uploadFile(image, false, null, userId);
       UpdateChannelImageResponseDto response = new UpdateChannelImageResponseDto();
       response.setChannelImageUrl(newImageBlobUrl);
 
       int rowsAffected =
-              this.directMessageChannelRepository.updateChannelImage(channelId, newImageBlobUrl);
+          this.directMessageChannelRepository.updateChannelImage(channelId, newImageBlobUrl);
       if (rowsAffected == 0) {
         log.error("Failed to update channel picture with id: {}", channelId);
         throw new ChannelNotFoundException("Channel not found.");

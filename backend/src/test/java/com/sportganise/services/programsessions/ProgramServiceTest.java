@@ -17,7 +17,6 @@ import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -146,12 +145,12 @@ public class ProgramServiceTest {
 
     Mockito.when(programRepository.findProgramById(1)).thenReturn(mockProgram);
 
-    ProgramAttachmentCompositeKey attachment1Key = new ProgramAttachmentCompositeKey(1, "attachment1.url");
-    ProgramAttachmentCompositeKey attachment2Key = new ProgramAttachmentCompositeKey(1, "attachment2.url");
+    ProgramAttachmentCompositeKey attachment1Key =
+        new ProgramAttachmentCompositeKey(1, "attachment1.url");
+    ProgramAttachmentCompositeKey attachment2Key =
+        new ProgramAttachmentCompositeKey(1, "attachment2.url");
     List<ProgramAttachment> mockAttachments =
-        List.of(
-            new ProgramAttachment(attachment1Key),
-            new ProgramAttachment(attachment2Key));
+        List.of(new ProgramAttachment(attachment1Key), new ProgramAttachment(attachment2Key));
     Mockito.when(programAttachmentRepository.findAttachmentsByProgramId(1))
         .thenReturn(mockAttachments);
 
@@ -183,10 +182,12 @@ public class ProgramServiceTest {
   void testGetProgramAttachments() {
     Integer programId = 1;
 
-    ProgramAttachmentCompositeKey attachment1Key = new ProgramAttachmentCompositeKey(programId, "/file1.pdf");
+    ProgramAttachmentCompositeKey attachment1Key =
+        new ProgramAttachmentCompositeKey(programId, "/file1.pdf");
     ProgramAttachment attachment1 = new ProgramAttachment(attachment1Key);
 
-    ProgramAttachmentCompositeKey attachment2Key = new ProgramAttachmentCompositeKey(programId, "/file2.pdf");
+    ProgramAttachmentCompositeKey attachment2Key =
+        new ProgramAttachmentCompositeKey(programId, "/file2.pdf");
     ProgramAttachment attachment2 = new ProgramAttachment(attachment2Key);
 
     when(programAttachmentRepository.findAttachmentsByProgramId(programId))
@@ -203,31 +204,41 @@ public class ProgramServiceTest {
   }
 
   private List<Program> createMockPrograms() {
-    Program program1 = Program.builder()
+    Program program1 =
+        Program.builder()
             .programId(1)
             .programType("Training")
             .title("First Program")
             .description("First Description")
             .capacity(10)
-            .occurrenceDate(ZonedDateTime.of(LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
+            .occurrenceDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
             .durationMins(60)
             .isRecurring(false)
-            .expiryDate(ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
+            .expiryDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
             .frequency("None")
             .location("Location 1")
             .visibility("public")
             .build();
 
-    Program program2 = Program.builder()
+    Program program2 =
+        Program.builder()
             .programId(2)
             .programType("Event")
             .title("Second Program")
             .description("Second Description")
             .capacity(20)
-            .occurrenceDate(ZonedDateTime.of(LocalDate.of(2025, 6, 15), LocalTime.of(14, 0), ZoneId.systemDefault()))
+            .occurrenceDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 6, 15), LocalTime.of(14, 0), ZoneId.systemDefault()))
             .durationMins(120)
             .isRecurring(true)
-            .expiryDate(ZonedDateTime.of(LocalDate.of(2025, 6, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
+            .expiryDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 6, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
             .frequency("weekly")
             .location("Location 2")
             .visibility("private")
@@ -242,9 +253,10 @@ public class ProgramServiceTest {
     List<Program> mockPrograms = createMockPrograms();
     when(programRepository.findPrograms()).thenReturn(mockPrograms);
 
-    mockPrograms.forEach(program ->
+    mockPrograms.forEach(
+        program ->
             when(programAttachmentRepository.findAttachmentsByProgramId(program.getProgramId()))
-                    .thenReturn(List.of()));
+                .thenReturn(List.of()));
 
     // Act
     List<ProgramDto> result = programService.getPrograms();

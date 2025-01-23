@@ -1,9 +1,8 @@
 package com.sportganise.repositories.programsessions;
 
 import com.sportganise.entities.programsessions.ProgramAttachment;
-import java.util.List;
-
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -12,14 +11,17 @@ import org.springframework.stereotype.Repository;
 
 /** Repository for ProgramAttachment. */
 @Repository
-public interface ProgramAttachmentRepository extends JpaRepository<ProgramAttachment, ProgramAttachmentCompositeKey> {
+public interface ProgramAttachmentRepository
+    extends JpaRepository<ProgramAttachment, ProgramAttachmentCompositeKey> {
 
   @Query(
-      value = """
+      value =
+          """
             SELECT *
             FROM program_attachments pa
             WHERE pa.program_id = :programId
-            """, nativeQuery = true)
+            """,
+      nativeQuery = true)
   List<ProgramAttachment> findAttachmentsByProgramId(@Param("programId") Integer programId);
 
   @Modifying
@@ -34,7 +36,9 @@ public interface ProgramAttachmentRepository extends JpaRepository<ProgramAttach
 
   @Modifying
   @Query(
-          value = "INSERT INTO program_attachments (program_id, attachment_url) VALUES (:programId, :attachmentUrl)",
-          nativeQuery = true)
-  void saveProgramAttachment(@Param("programId") int programId, @Param("attachmentUrl") String attachmentUrl);
+      value =
+          "INSERT INTO program_attachments (program_id, attachment_url) VALUES (:programId, :attachmentUrl)",
+      nativeQuery = true)
+  void saveProgramAttachment(
+      @Param("programId") int programId, @Param("attachmentUrl") String attachmentUrl);
 }

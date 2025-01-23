@@ -58,7 +58,8 @@ public class DirectMessageChannelMemberController {
           "Failed to add members to channel: {}. Error: {}",
           addChannelMemberDto.getChannelId(),
           e.getMessage());
-      throw new ChannelMemberSaveException("An unexpected error occured when trying to add members to channel.");
+      throw new ChannelMemberSaveException(
+          "An unexpected error occured when trying to add members to channel.");
     }
   }
 
@@ -75,19 +76,20 @@ public class DirectMessageChannelMemberController {
       @PathVariable int channelId, @PathVariable int accountId) {
     try {
       List<ChannelMembersDto> channelMembersDto =
-              this.directMessageChannelMemberService.getNonUserChannelMembers(channelId, accountId);
+          this.directMessageChannelMemberService.getNonUserChannelMembers(channelId, accountId);
       log.debug("Channel members excluding current user retrieved successfully");
       ResponseDto<List<ChannelMembersDto>> response =
-              new ResponseDto<>(
-                      HttpStatus.OK.value(), "Channel members retrieved successfully", channelMembersDto);
+          new ResponseDto<>(
+              HttpStatus.OK.value(), "Channel members retrieved successfully", channelMembersDto);
       return new ResponseEntity<>(response, HttpStatus.OK);
     } catch (Exception e) {
       log.error(
-              "Failed to get channel members for channel id: {} and account id: {}. Error: {}",
-              channelId,
-              accountId,
-              e.getMessage());
-      throw new ChannelMemberFetchException("An unexpected error occured when trying to get channel members.");
+          "Failed to get channel members for channel id: {} and account id: {}. Error: {}",
+          channelId,
+          accountId,
+          e.getMessage());
+      throw new ChannelMemberFetchException(
+          "An unexpected error occured when trying to get channel members.");
     }
   }
 
@@ -102,18 +104,17 @@ public class DirectMessageChannelMemberController {
       @PathVariable int channelId) {
     try {
       List<ChannelMembersDto> channelMembersDto =
-              this.directMessageChannelMemberService.getAllChannelMembers(channelId);
+          this.directMessageChannelMemberService.getAllChannelMembers(channelId);
       log.debug("Channel members retrieved successfully");
       ResponseDto<List<ChannelMembersDto>> response =
-              new ResponseDto<>(
-                      HttpStatus.OK.value(), "Channel members retrieved successfully", channelMembersDto);
+          new ResponseDto<>(
+              HttpStatus.OK.value(), "Channel members retrieved successfully", channelMembersDto);
       return new ResponseEntity<>(response, HttpStatus.OK);
     } catch (Exception e) {
       log.error(
-              "Failed to get channel members for channel id: {}. Error: {}",
-              channelId,
-              e.getMessage());
-      throw new ChannelMemberFetchException("An unexpected error occured when trying to get channel members.");
+          "Failed to get channel members for channel id: {}. Error: {}", channelId, e.getMessage());
+      throw new ChannelMemberFetchException(
+          "An unexpected error occured when trying to get channel members.");
     }
   }
 
@@ -166,7 +167,8 @@ public class DirectMessageChannelMemberController {
           channelId,
           e.getMessage());
 
-      throw new ChannelMemberDeleteException("An unexpected error occured when trying to delete channel member.");
+      throw new ChannelMemberDeleteException(
+          "An unexpected error occured when trying to delete channel member.");
     }
   }
 }

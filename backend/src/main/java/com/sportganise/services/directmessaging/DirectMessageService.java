@@ -12,7 +12,6 @@ import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRe
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageRepository;
 import com.sportganise.services.BlobService;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,13 +62,18 @@ public class DirectMessageService {
     try {
       log.info("Getting messages for channel {}", channelId);
       List<DirectMessage> messagesNoAttachments =
-              directMessageRepository.getMessagesByChannelId(channelId);
+          directMessageRepository.getMessagesByChannelId(channelId);
       Map<Integer, MemberDetailsDto> memberDetails = getChannelMembersDetails(channelId);
       for (Map.Entry<Integer, MemberDetailsDto> entry : memberDetails.entrySet()) {
         Integer key = entry.getKey();
         MemberDetailsDto value = entry.getValue();
         System.out.println(
-                "Member Id: " + key + ", Values: " + value.getAvatarUrl() + ", " + value.getFirstName());
+            "Member Id: "
+                + key
+                + ", Values: "
+                + value.getAvatarUrl()
+                + ", "
+                + value.getFirstName());
         System.out.println(memberDetails.get(key).getFirstName());
       }
       log.info("Received member details for channel.");
@@ -82,33 +86,33 @@ public class DirectMessageService {
         if (!memberDetails.containsKey(message.getSenderId())) {
           log.info("Sender no longer in message channel.");
           messageDto =
-                  DirectMessageDto.builder()
-                          .messageId(message.getMessageId())
-                          .senderId(message.getSenderId())
-                          .senderFirstName("Removed User")
-                          .channelId(message.getChannelId())
-                          .messageContent(message.getContent())
-                          .attachments(Collections.emptyList())
-                          .sentAt(message.getSentAt().toString())
-                          .type(message.getType())
-                          .avatarUrl(null)
-                          .build();
+              DirectMessageDto.builder()
+                  .messageId(message.getMessageId())
+                  .senderId(message.getSenderId())
+                  .senderFirstName("Removed User")
+                  .channelId(message.getChannelId())
+                  .messageContent(message.getContent())
+                  .attachments(Collections.emptyList())
+                  .sentAt(message.getSentAt().toString())
+                  .type(message.getType())
+                  .avatarUrl(null)
+                  .build();
           messages.add(messageDto);
           continue;
         }
         attachments = directMessageRepository.getMessageAttachments(message.getMessageId());
         messageDto =
-                DirectMessageDto.builder()
-                        .messageId(message.getMessageId())
-                        .senderId(message.getSenderId())
-                        .senderFirstName(memberDetails.get(message.getSenderId()).getFirstName())
-                        .channelId(message.getChannelId())
-                        .messageContent(message.getContent())
-                        .attachments(attachments)
-                        .sentAt(message.getSentAt().toString())
-                        .type(message.getType())
-                        .avatarUrl(memberDetails.get(message.getSenderId()).getAvatarUrl())
-                        .build();
+            DirectMessageDto.builder()
+                .messageId(message.getMessageId())
+                .senderId(message.getSenderId())
+                .senderFirstName(memberDetails.get(message.getSenderId()).getFirstName())
+                .channelId(message.getChannelId())
+                .messageContent(message.getContent())
+                .attachments(attachments)
+                .sentAt(message.getSentAt().toString())
+                .type(message.getType())
+                .avatarUrl(memberDetails.get(message.getSenderId()).getAvatarUrl())
+                .build();
         messages.add(messageDto);
       }
       return messages;
@@ -132,17 +136,19 @@ public class DirectMessageService {
     try {
       log.info("Getting channel members details...");
       List<Object[]> memberDetails =
-              directMessageChannelMemberRepository.getChannelMembersDetails(channelId);
+          directMessageChannelMemberRepository.getChannelMembersDetails(channelId);
       return memberDetails.stream()
-              .collect(
-                      Collectors.toMap(
-                              row -> (Integer) row[0], // Key is the member id.
-                              row ->
-                                      new MemberDetailsDto((String) row[2], (String) row[1]) // firstName, pictureUrl.
-                      ));
+          .collect(
+              Collectors.toMap(
+                  row -> (Integer) row[0], // Key is the member id.
+                  row ->
+                      new MemberDetailsDto(
+                          (String) row[2], (String) row[1]) // firstName, pictureUrl.
+                  ));
     } catch (Exception e) {
       log.error("Error getting channel members details.");
-      throw new DirectMessageFetchException("Error occured while fetching channel members details.");
+      throw new DirectMessageFetchException(
+          "Error occured while fetching channel members details.");
     }
   }
 
@@ -154,7 +160,8 @@ public class DirectMessageService {
    * @return DTO containing information about the sent message.
    * @throws DirectMessageSendException If an error occurs while a message.
    */
-  public DirectMessageDto sendDirectMessage(SendDirectMessageRequestDto sendDirectMessageRequestDto) {
+  public DirectMessageDto sendDirectMessage(
+      SendDirectMessageRequestDto sendDirectMessageRequestDto) {
     try {
       int channelId = sendDirectMessageRequestDto.getChannelId();
       int senderId = sendDirectMessageRequestDto.getSenderId();
@@ -189,7 +196,7 @@ public class DirectMessageService {
       for (int i = 0; i < sendDirectMessageRequestDto.getAttachments().size(); i++) {
         MultipartFile file = sendDirectMessageRequestDto.getAttachments().get(i);
         String blobUrl =
-                blobService.uploadFile(file, true, directMessage.getMessageId().toString(), senderId);
+            blobService.uploadFile(file, true, directMessage.getMessageId().toString(), senderId);
         attachments.add(blobUrl);
       }
       directMessageDto.setAttachments(attachments);
@@ -204,7 +211,8 @@ public class DirectMessageService {
       throw new DirectMessageSendException("Database error occured while sending message.");
     } catch (Exception e) {
       log.error("Error uploading attachments.");
-      throw new DirectMessageSendException("An unexpected error occured when trying to send a message.");
+      throw new DirectMessageSendException(
+          "An unexpected error occured when trying to send a message.");
     }
   }
 
@@ -222,11 +230,11 @@ public class DirectMessageService {
       directMessage.setSenderId(creatorId);
       directMessage.setChannelId(channelId);
       directMessage.setContent(
-              "INIT*"
-                      + creatorId
-                      + "*You created the message channel*"
-                      + creatorFirstName
-                      + " created the message channel.");
+          "INIT*"
+              + creatorId
+              + "*You created the message channel*"
+              + creatorFirstName
+              + " created the message channel.");
       directMessage.setSentAt(ZonedDateTime.now());
       directMessage.setType(DirectMessageType.JOIN);
       directMessageRepository.save(directMessage);
@@ -235,10 +243,12 @@ public class DirectMessageService {
       directMessageChannelRepository.updateLastMessageId(channelId, directMessage.getMessageId());
     } catch (DataAccessException e) {
       log.error("Database error occured while sending creation message.");
-      throw new DirectMessageSendException("Database error occured while sending creation message.");
+      throw new DirectMessageSendException(
+          "Database error occured while sending creation message.");
     } catch (Exception e) {
       log.error("Error sending creation message.");
-      throw new DirectMessageSendException("An unexpected error occured when trying to send a creation message.");
+      throw new DirectMessageSendException(
+          "An unexpected error occured when trying to send a creation message.");
     }
   }
 
@@ -285,7 +295,8 @@ public class DirectMessageService {
       throw new DirectMessageSendException("Database error occured while adding member.");
     } catch (Exception e) {
       log.error("Error adding member.");
-      throw new DirectMessageSendException("An unexpected error occured when trying to add a member.");
+      throw new DirectMessageSendException(
+          "An unexpected error occured when trying to add a member.");
     }
   }
 
@@ -300,7 +311,8 @@ public class DirectMessageService {
       return directMessageRepository.getLastMessageByChannelId(channelId);
     } catch (Exception e) {
       log.error("Error fetching last message.");
-      throw new DirectMessageFetchException("An unexpected error occured when trying to fetch last message.");
+      throw new DirectMessageFetchException(
+          "An unexpected error occured when trying to fetch last message.");
     }
   }
 }

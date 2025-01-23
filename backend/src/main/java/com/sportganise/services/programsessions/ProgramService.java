@@ -18,7 +18,6 @@ import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import jakarta.transaction.Transactional;
-
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -26,14 +25,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * Service layer for Programs.
- */
+/** Service layer for Programs. */
 @Service
 @Slf4j
 public class ProgramService {
@@ -47,17 +43,17 @@ public class ProgramService {
   /**
    * Constructor for ProgramService.
    *
-   * @param programRepository           program repository object.
-   * @param accountService              account service object.
-   * @param accountRepository           account repository object.
+   * @param programRepository program repository object.
+   * @param accountService account service object.
+   * @param accountRepository account repository object.
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
-          ProgramRepository programRepository,
-          AccountService accountService,
-          AccountRepository accountRepository,
-          ProgramAttachmentRepository programAttachmentRepository,
-          BlobService blobService) {
+      ProgramRepository programRepository,
+      AccountService accountService,
+      AccountRepository accountRepository,
+      ProgramAttachmentRepository programAttachmentRepository,
+      BlobService blobService) {
     this.programRepository = programRepository;
     this.accountRepository = accountRepository;
     this.accountService = accountService;
@@ -77,29 +73,29 @@ public class ProgramService {
    */
   public List<ProgramParticipantDto> getParticipants(Integer programId) {
     List<ProgramParticipant> participants =
-            programRepository.findParticipantsByProgramId(programId);
+        programRepository.findParticipantsByProgramId(programId);
 
     return participants.stream()
-            .map(
-                    participant -> {
-                      Optional<Account> accountOptional =
-                              accountService.getAccount(participant.getAccountId());
+        .map(
+            participant -> {
+              Optional<Account> accountOptional =
+                  accountService.getAccount(participant.getAccountId());
 
-                      if (accountOptional.isEmpty()) {
-                        throw new IllegalArgumentException(
-                                "Account not found for id: " + participant.getAccountId());
-                      }
+              if (accountOptional.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Account not found for id: " + participant.getAccountId());
+              }
 
-                      Account account = accountOptional.get();
+              Account account = accountOptional.get();
 
-                      return new ProgramParticipantDto(
-                              account.getAccountId(),
-                              programId,
-                              participant.getRank(),
-                              participant.isConfirmed(),
-                              participant.getConfirmedDate());
-                    })
-            .toList();
+              return new ProgramParticipantDto(
+                  account.getAccountId(),
+                  programId,
+                  participant.getRank(),
+                  participant.isConfirmed(),
+                  participant.getConfirmedDate());
+            })
+        .toList();
   }
 
   /**
@@ -114,19 +110,19 @@ public class ProgramService {
     List<ProgramAttachmentDto> programAttachments = getProgramAttachments(programId);
 
     return new ProgramDto(
-            program.getProgramId(),
-            program.getProgramType(),
-            program.getTitle(),
-            program.getDescription(),
-            program.getCapacity(),
-            program.getOccurrenceDate(),
-            program.getDurationMins(),
-            program.isRecurring(),
-            program.getExpiryDate(),
-            program.getFrequency(),
-            program.getLocation(),
-            program.getVisibility(),
-            programAttachments);
+        program.getProgramId(),
+        program.getProgramType(),
+        program.getTitle(),
+        program.getDescription(),
+        program.getCapacity(),
+        program.getOccurrenceDate(),
+        program.getDurationMins(),
+        program.isRecurring(),
+        program.getExpiryDate(),
+        program.getFrequency(),
+        program.getLocation(),
+        program.getVisibility(),
+        programAttachments);
   }
 
   /**
@@ -137,14 +133,14 @@ public class ProgramService {
    */
   public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
     List<ProgramAttachment> programAttachments =
-            programAttachmentRepository.findAttachmentsByProgramId(programId);
+        programAttachmentRepository.findAttachmentsByProgramId(programId);
     List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
     log.debug("Program Id: {}", programId);
     for (ProgramAttachment attachment : programAttachments) {
       programAttachmentDtos.add(
-              new ProgramAttachmentDto(
-                      attachment.getCompositeProgramAttachmentKey().getProgramId(),
-                      attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
+          new ProgramAttachmentDto(
+              attachment.getCompositeProgramAttachmentKey().getProgramId(),
+              attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
     }
     return programAttachmentDtos;
   }
@@ -162,20 +158,20 @@ public class ProgramService {
     for (Program program : programs) {
       List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
       programDtos.add(
-              new ProgramDto(
-                      program.getProgramId(),
-                      program.getProgramType(),
-                      program.getTitle(),
-                      program.getDescription(),
-                      program.getCapacity(),
-                      program.getOccurrenceDate(),
-                      program.getDurationMins(),
-                      program.isRecurring(),
-                      program.getExpiryDate(),
-                      program.getFrequency(),
-                      program.getLocation(),
-                      program.getVisibility(),
-                      programAttachments));
+          new ProgramDto(
+              program.getProgramId(),
+              program.getProgramType(),
+              program.getTitle(),
+              program.getDescription(),
+              program.getCapacity(),
+              program.getOccurrenceDate(),
+              program.getDurationMins(),
+              program.isRecurring(),
+              program.getExpiryDate(),
+              program.getFrequency(),
+              program.getLocation(),
+              program.getVisibility(),
+              programAttachments));
     }
 
     return programDtos;
@@ -185,60 +181,71 @@ public class ProgramService {
    * Method to create a list of ProgramDetailsParticipantsDto with all the programs and their
    * participants depending if the user accessing this view has permissions or not.
    *
-   * @param programDtos    Dtos of programs.
+   * @param programDtos Dtos of programs.
    * @param hasPermissions Boolean for whether the user has permissions or not.
    * @return a list of ProgramDetailsParticipantsDto.
    */
   public List<ProgramDetailsParticipantsDto> getProgramDetailsParticipantsDto(
-          List<ProgramDto> programDtos, Boolean hasPermissions) {
+      List<ProgramDto> programDtos, Boolean hasPermissions) {
 
     return programDtos.stream()
-            .map(
-                    programDto -> {
-                      List<ProgramParticipantDto> participants =
-                              hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
-                      return new ProgramDetailsParticipantsDto(programDto, participants);
-                    })
-            .collect(Collectors.toList());
+        .map(
+            programDto -> {
+              List<ProgramParticipantDto> participants =
+                  hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
+              return new ProgramDetailsParticipantsDto(programDto, participants);
+            })
+        .collect(Collectors.toList());
   }
 
   /**
    * Method to create new ProgramDto.
    *
-   * @param title       Title of the program.
+   * @param title Title of the program.
    * @param programType Type of the program.
-   * @param startDate   The first or only date of occurrence of the program.
-   * @param endDate     The end date of the first or only program occurrence.
+   * @param startDate The first or only date of occurrence of the program.
+   * @param endDate The end date of the first or only program occurrence.
    * @param isRecurring Boolean for whether this program is recurring.
-   * @param visibility  Visibility of the program i.e. is it only visible to registered members or
-   *                    all members.
+   * @param visibility Visibility of the program i.e. is it only visible to registered members or
+   *     all members.
    * @param description Description of the program.
-   * @param capacity    Participants capacity.
-   * @param startTime   Start time of each occurrence of the program.
-   * @param endTime     End time of each occurrence of the program.
-   * @param location    Location of the program/session.
+   * @param capacity Participants capacity.
+   * @param startTime Start time of each occurrence of the program.
+   * @param endTime End time of each occurrence of the program.
+   * @param location Location of the program/session.
    * @param attachments String paths of files attached to this program/session.
-   * @param accountId   The account id of the user making the request.
+   * @param accountId The account id of the user making the request.
    * @return A newly created programDto.
    */
   @Transactional
   public ProgramDto createProgramDto(
-          String title,
-          String programType,
-          String startDate,
-          String endDate,
-          Boolean isRecurring,
-          String visibility,
-          String description,
-          Integer capacity,
-          String startTime,
-          String endTime,
-          String location,
-          List<MultipartFile> attachments,
-          Integer accountId) {
+      String title,
+      String programType,
+      String startDate,
+      String endDate,
+      Boolean isRecurring,
+      String visibility,
+      String description,
+      Integer capacity,
+      String startTime,
+      String endTime,
+      String location,
+      List<MultipartFile> attachments,
+      Integer accountId) {
 
-    Program savedProgram = createProgramObject(title, programType, startDate, endDate, isRecurring, visibility,
-            description, capacity, startTime, endTime, location);
+    Program savedProgram =
+        createProgramObject(
+            title,
+            programType,
+            startDate,
+            endDate,
+            isRecurring,
+            visibility,
+            description,
+            capacity,
+            startTime,
+            endTime,
+            location);
     programRepository.save(savedProgram);
 
     List<ProgramAttachmentDto> programAttachmentsDto = new ArrayList<>();
@@ -249,14 +256,13 @@ public class ProgramService {
           String s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
           log.debug("Attachment Saved to S3 bucket: {}", s3AttachmentUrl);
           programAttachmentsDto.add(
-                  new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
+              new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
           ProgramAttachmentCompositeKey savedProgramCompositeKey =
-                  new ProgramAttachmentCompositeKey(savedProgram.getProgramId(), s3AttachmentUrl);
-          ProgramAttachment programAttachment =
-                  new ProgramAttachment(savedProgramCompositeKey);
-          programAttachmentRepository.saveProgramAttachment
-                  (programAttachment.getCompositeProgramAttachmentKey().getProgramId(),
-                          programAttachment.getCompositeProgramAttachmentKey().getAttachmentUrl());
+              new ProgramAttachmentCompositeKey(savedProgram.getProgramId(), s3AttachmentUrl);
+          ProgramAttachment programAttachment = new ProgramAttachment(savedProgramCompositeKey);
+          programAttachmentRepository.saveProgramAttachment(
+              programAttachment.getCompositeProgramAttachmentKey().getProgramId(),
+              programAttachment.getCompositeProgramAttachmentKey().getAttachmentUrl());
         }
       } catch (FileProcessingException | IOException e) {
         throw new ProgramCreationException("Failed to create program: " + e.getMessage());
@@ -269,62 +275,72 @@ public class ProgramService {
    * Method to modify an existing program. Any attachment not already in the database will be added.
    * Any attachment in the database but not included in the payload will be removed.
    *
-   * @param programDtoToModify  programDto of the program to be modified.
-   * @param title               Title of the program.
-   * @param programType         Type of the program.
-   * @param startDate           Start date of the first or only occurrence.
-   * @param endDate             End date of the last or only occurrence.
-   * @param isRecurring         Whether or not the program is a recurring one.
-   * @param visibility          Visibility of the program. If it can be seen by registered members only or
-   *                            all members.
-   * @param description         Description of the program.
-   * @param capacity            Capacity of the program.
-   * @param startTime           Start time of each occurrence of the program.
-   * @param endTime             End time of each occurrence of the program.
-   * @param location            Location of the program/session.
-   * @param attachmentsToAdd    Attachments to add to the program.
+   * @param programDtoToModify programDto of the program to be modified.
+   * @param title Title of the program.
+   * @param programType Type of the program.
+   * @param startDate Start date of the first or only occurrence.
+   * @param endDate End date of the last or only occurrence.
+   * @param isRecurring Whether or not the program is a recurring one.
+   * @param visibility Visibility of the program. If it can be seen by registered members only or
+   *     all members.
+   * @param description Description of the program.
+   * @param capacity Capacity of the program.
+   * @param startTime Start time of each occurrence of the program.
+   * @param endTime End time of each occurrence of the program.
+   * @param location Location of the program/session.
+   * @param attachmentsToAdd Attachments to add to the program.
    * @param attachmentsToRemove Attachments to remove from the program.
-   * @param accountId           Id of the user making the request.
+   * @param accountId Id of the user making the request.
    * @return An updated programDto.
    */
   @Transactional
   public ProgramDto modifyProgram(
-          ProgramDto programDtoToModify,
-          String title,
-          String programType,
-          String startDate,
-          String endDate,
-          Boolean isRecurring,
-          String visibility,
-          String description,
-          Integer capacity,
-          String startTime,
-          String endTime,
-          String location,
-          List<MultipartFile> attachmentsToAdd,
-          List<String> attachmentsToRemove,
-          Integer accountId)
-          throws IOException {
+      ProgramDto programDtoToModify,
+      String title,
+      String programType,
+      String startDate,
+      String endDate,
+      Boolean isRecurring,
+      String visibility,
+      String description,
+      Integer capacity,
+      String startTime,
+      String endTime,
+      String location,
+      List<MultipartFile> attachmentsToAdd,
+      List<String> attachmentsToRemove,
+      Integer accountId)
+      throws IOException {
 
     Program existingProgram =
-            programRepository
-                    .findById(programDtoToModify.getProgramId())
-                    .orElseThrow(
-                            () ->
-                                    new EntityNotFoundException(
-                                            "Program not found with ID: " + programDtoToModify.getProgramId()));
+        programRepository
+            .findById(programDtoToModify.getProgramId())
+            .orElseThrow(
+                () ->
+                    new EntityNotFoundException(
+                        "Program not found with ID: " + programDtoToModify.getProgramId()));
 
-    Program updatedProgram = createProgramObject(
-            title, programType, startDate, endDate, isRecurring, visibility, description,
-            capacity, startTime, endTime, location);
+    Program updatedProgram =
+        createProgramObject(
+            title,
+            programType,
+            startDate,
+            endDate,
+            isRecurring,
+            visibility,
+            description,
+            capacity,
+            startTime,
+            endTime,
+            location);
     updatedProgram.setProgramId(existingProgram.getProgramId());
     programRepository.save(updatedProgram);
 
     if (!attachmentsToRemove.isEmpty()) {
       // Delete from repo.
       int rowsAffected =
-              programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
-                      programDtoToModify.getProgramId(), attachmentsToRemove);
+          programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+              programDtoToModify.getProgramId(), attachmentsToRemove);
       if (rowsAffected != attachmentsToRemove.size()) {
         throw new RuntimeException("Could not delete all attachments.");
       }
@@ -341,23 +357,33 @@ public class ProgramService {
       for (MultipartFile attachment : attachmentsToAdd) {
         s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
         ProgramAttachmentCompositeKey programAttachmentCompositeKey =
-                new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
-        programAttachments.add(
-                new ProgramAttachment(programAttachmentCompositeKey));
+            new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
+        programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
         programAttachmentDtos.add(
-                new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+            new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
       }
       programAttachmentRepository.saveAll(programAttachments);
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
   }
 
-  private Program createProgramObject(String title, String programType, String startDate, String endDate, Boolean isRecurring, String visibility, String description, Integer capacity, String startTime, String endTime, String location) {
+  private Program createProgramObject(
+      String title,
+      String programType,
+      String startDate,
+      String endDate,
+      Boolean isRecurring,
+      String visibility,
+      String description,
+      Integer capacity,
+      String startTime,
+      String endTime,
+      String location) {
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     int durationMins =
-            (int)
-                    java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
-                            .toMinutes();
+        (int)
+            java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
+                .toMinutes();
 
     ZonedDateTime expiryDate = null;
     String frequency = null;
@@ -374,16 +400,16 @@ public class ProgramService {
     }
 
     return new Program(
-            programType,
-            title,
-            description,
-            capacity,
-            occurrenceDate,
-            durationMins,
-            isRecurring,
-            expiryDate,
-            frequency,
-            location,
-            visibility);
+        programType,
+        title,
+        description,
+        capacity,
+        occurrenceDate,
+        durationMins,
+        isRecurring,
+        expiryDate,
+        frequency,
+        location,
+        visibility);
   }
 }

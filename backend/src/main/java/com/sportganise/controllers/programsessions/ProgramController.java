@@ -12,11 +12,8 @@ import com.sportganise.exceptions.ProgramExceptions.ProgramModificationException
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,7 +53,7 @@ public class ProgramController {
    */
   @GetMapping("/{accountId}/details")
   public ResponseEntity<ResponseDto<List<ProgramDetailsParticipantsDto>>> getProgramDetails(
-          @PathVariable Integer accountId) {
+      @PathVariable Integer accountId) {
 
     ResponseDto<List<ProgramDetailsParticipantsDto>> responseDto = new ResponseDto<>();
 
@@ -93,47 +90,50 @@ public class ProgramController {
   /**
    * Post mapping for creating new program.
    *
-   * @param accountId               Id of user who is making the request.
+   * @param accountId Id of user who is making the request.
    * @param programCreateRequestDto Dto for the request body.
-   * @param attachments             List of attachments.
+   * @param attachments List of attachments.
    * @return HTTP Response for newly created program.
    */
   @PostMapping(
-          value = "/{accountId}/create-program",
-          consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+      value = "/{accountId}/create-program",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
-          @PathVariable Integer accountId,
-          @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
-          @RequestParam("attachments") List<MultipartFile> attachments) {
+      @PathVariable Integer accountId,
+      @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
+      @RequestParam("attachments") List<MultipartFile> attachments) {
 
     log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
-    Account user = getAccount(accountId).orElseThrow(
-            () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+    Account user =
+        getAccount(accountId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     if (!hasPermissions(user)) {
-      throw new ForbiddenException("User with id: " + accountId +
-              " does not have permission to create a program.");
+      throw new ForbiddenException(
+          "User with id: " + accountId + " does not have permission to create a program.");
     }
 
     try {
       ProgramDto newProgramDto =
-              programService.createProgramDto(
-                      programCreateRequestDto.getTitle(),
-                      programCreateRequestDto.getType(),
-                      programCreateRequestDto.getStartDate(),
-                      programCreateRequestDto.getEndDate(),
-                      programCreateRequestDto.getRecurring(),
-                      programCreateRequestDto.getVisibility(),
-                      programCreateRequestDto.getDescription(),
-                      programCreateRequestDto.getCapacity(),
-                      programCreateRequestDto.getStartTime(),
-                      programCreateRequestDto.getEndTime(),
-                      programCreateRequestDto.getLocation(),
-                      attachments,
-                      accountId);
+          programService.createProgramDto(
+              programCreateRequestDto.getTitle(),
+              programCreateRequestDto.getType(),
+              programCreateRequestDto.getStartDate(),
+              programCreateRequestDto.getEndDate(),
+              programCreateRequestDto.getRecurring(),
+              programCreateRequestDto.getVisibility(),
+              programCreateRequestDto.getDescription(),
+              programCreateRequestDto.getCapacity(),
+              programCreateRequestDto.getStartTime(),
+              programCreateRequestDto.getEndTime(),
+              programCreateRequestDto.getLocation(),
+              attachments,
+              accountId);
 
-      ResponseDto<ProgramDto> responseDto = ResponseDto.<ProgramDto>builder()
+      ResponseDto<ProgramDto> responseDto =
+          ResponseDto.<ProgramDto>builder()
               .statusCode(HttpStatus.CREATED.value())
               .message("Created a new program successfully.")
               .data(newProgramDto)
@@ -147,27 +147,29 @@ public class ProgramController {
   /**
    * POST mapping for modifying/updating an existing program.
    *
-   * @param accountId               Id of user who is making the request.
-   * @param programId               Id of the program that we wish to modify.
+   * @param accountId Id of user who is making the request.
+   * @param programId Id of the program that we wish to modify.
    * @param programModifyRequestDto Dto for the request body.
-   * @param attachments             List of attachments.
+   * @param attachments List of attachments.
    * @return HTTP Response for modified/updated data
    */
   @PostMapping(
-          value = "/{accountId}/{programId}/modify-program",
-          consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+      value = "/{accountId}/{programId}/modify-program",
+      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
-          @PathVariable Integer accountId,
-          @PathVariable Integer programId,
-          @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
-          @RequestParam("attachments") List<MultipartFile> attachments) {
+      @PathVariable Integer accountId,
+      @PathVariable Integer programId,
+      @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
+      @RequestParam("attachments") List<MultipartFile> attachments) {
 
-    Account user = getAccount(accountId).orElseThrow(
-            () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+    Account user =
+        getAccount(accountId)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     if (!hasPermissions(user)) {
-      throw new ForbiddenException("User with id: " + accountId +
-              " does not have permission to create a program.");
+      throw new ForbiddenException(
+          "User with id: " + accountId + " does not have permission to create a program.");
     }
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
@@ -181,22 +183,22 @@ public class ProgramController {
 
     try {
       ProgramDto updatedProgramDto =
-              programService.modifyProgram(
-                      programDtoToModify,
-                      programModifyRequestDto.getTitle(),
-                      programModifyRequestDto.getType(),
-                      programModifyRequestDto.getStartDate(),
-                      programModifyRequestDto.getEndDate(),
-                      programModifyRequestDto.getRecurring(),
-                      programModifyRequestDto.getVisibility(),
-                      programModifyRequestDto.getDescription(),
-                      programModifyRequestDto.getCapacity(),
-                      programModifyRequestDto.getStartTime(),
-                      programModifyRequestDto.getEndTime(),
-                      programModifyRequestDto.getLocation(),
-                      attachments,
-                      programModifyRequestDto.getAttachmentsToRemove(),
-                      accountId);
+          programService.modifyProgram(
+              programDtoToModify,
+              programModifyRequestDto.getTitle(),
+              programModifyRequestDto.getType(),
+              programModifyRequestDto.getStartDate(),
+              programModifyRequestDto.getEndDate(),
+              programModifyRequestDto.getRecurring(),
+              programModifyRequestDto.getVisibility(),
+              programModifyRequestDto.getDescription(),
+              programModifyRequestDto.getCapacity(),
+              programModifyRequestDto.getStartTime(),
+              programModifyRequestDto.getEndTime(),
+              programModifyRequestDto.getLocation(),
+              attachments,
+              programModifyRequestDto.getAttachmentsToRemove(),
+              accountId);
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");
@@ -207,16 +209,12 @@ public class ProgramController {
     }
   }
 
-  /**
-   * Helper method to fetch and validate user account based on accountId.
-   */
+  /** Helper method to fetch and validate user account based on accountId. */
   private Optional<Account> getAccount(Integer accountId) {
     return accountService.getAccount(accountId);
   }
 
-  /**
-   * Helper method to check user permissions.
-   */
+  /** Helper method to check user permissions. */
   private boolean hasPermissions(Account user) {
     return accountService.hasPermissions(user.getType());
   }

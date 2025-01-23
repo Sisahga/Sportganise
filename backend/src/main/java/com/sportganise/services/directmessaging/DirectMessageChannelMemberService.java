@@ -9,7 +9,6 @@ import com.sportganise.exceptions.ChannelMemberExceptions.ChannelMemberSaveExcep
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import java.util.ArrayList;
 import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -70,7 +69,7 @@ public class DirectMessageChannelMemberService {
   public int markChannelAsRead(int channelId, int accountId) {
     try {
       return this.directMessageChannelMemberRepository.updateChannelMemberReadStatus(
-              accountId, channelId);
+          accountId, channelId);
     } catch (DataAccessException e) {
       log.error("Database error occuring when marking channel as read: {}", e.getMessage());
       throw new ChannelMemberSaveException("Failed to mark channel as read.");
@@ -86,10 +85,13 @@ public class DirectMessageChannelMemberService {
    */
   public List<ChannelMembersDto> getNonUserChannelMembers(int channelId, int accountId) {
     try {
-      return this.directMessageChannelMemberRepository.getNonUserChannelMembers(channelId, accountId);
+      return this.directMessageChannelMemberRepository.getNonUserChannelMembers(
+          channelId, accountId);
     } catch (DataAccessException e) {
-      log.error("Database error occuring when fetching non user channel members: {}", e.getMessage());
-      throw new ChannelMemberFetchException("Database error occured when fetching non user channel members.");
+      log.error(
+          "Database error occuring when fetching non user channel members: {}", e.getMessage());
+      throw new ChannelMemberFetchException(
+          "Database error occured when fetching non user channel members.");
     }
   }
 
@@ -104,7 +106,8 @@ public class DirectMessageChannelMemberService {
       return this.directMessageChannelMemberRepository.getAllChannelMembers(channelId);
     } catch (DataAccessException e) {
       log.error("Database error occuring when fetching all channel members: {}", e.getMessage());
-      throw new ChannelMemberFetchException("Database error occured when fetching all channel members.");
+      throw new ChannelMemberFetchException(
+          "Database error occured when fetching all channel members.");
     }
   }
 
@@ -119,7 +122,8 @@ public class DirectMessageChannelMemberService {
       this.directMessageChannelMemberRepository.deleteByChannelIdAndAccountId(channelId, accountId);
     } catch (DataAccessException e) {
       log.error("Database error occuring when removing member from channel: {}", e.getMessage());
-      throw new ChannelMemberDeleteException("Database error occured when trying to remove member from channel.");
+      throw new ChannelMemberDeleteException(
+          "Database error occured when trying to remove member from channel.");
     }
   }
 }
