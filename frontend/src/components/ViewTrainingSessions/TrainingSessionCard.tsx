@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useNavigate } from "react-router-dom";
 
 // Component imports
@@ -9,15 +8,24 @@ import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
 
 // Data structure for data received from API call
-import { Program } from "@/types/trainingSessionDetails";
+import {
+  Attendees,
+  Program,
+  ProgramDetails,
+} from "@/types/trainingSessionDetails";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
 
+interface TrainingSessionCardProps {
+  programDetails: ProgramDetails;
+  attendees: Attendees[];
+}
+
 const TrainingSessionCard: React.FC<Program> = ({
   programDetails,
   attendees,
-}) => {
+}: TrainingSessionCardProps) => {
   // Handle navigation to training session detail page
   const navigate = useNavigate();
   const handleNavigation = (path: string, data: Program) => {
@@ -50,14 +58,14 @@ const TrainingSessionCard: React.FC<Program> = ({
               <p className="text-gray-500 whitespace-break-spaces text-xs">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-gray-500 whitespace-break-spaces text-xs">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
+                  programDetails.durationMins
                 )}
               </p>
             </span>
