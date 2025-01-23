@@ -150,29 +150,6 @@ export default function SignUp() {
     }
   }, [emailForVerification, signUpError, sendCodeError, navigate, toast]);
 
-  // if (error) {
-  //   if (error.includes("Account already exists")) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Sign Up Failed",
-  //       description: "Account already exists.",
-  //     });
-  //     } else if (error.includes("Password too weak")) {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Sign Up Failed",
-  //         description: "Password too weak.",
-  //       });
-  //     } else {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Sign Up Failed",
-  //         description: "An unexpected error occurred.",
-  //       });
-  //     }
-  //   }
-  // }, [data, error, navigate, toast]);
-
   return (
     <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20 px-4 sm:px-6 lg:px-8">
       <div className="w-[350px] max-w-lg">
