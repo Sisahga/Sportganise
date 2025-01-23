@@ -1,1 +1,1 @@
-export { default as ForumContent} from "./ForumContent";
+export { default as ForumContent } from "./ForumContent";
