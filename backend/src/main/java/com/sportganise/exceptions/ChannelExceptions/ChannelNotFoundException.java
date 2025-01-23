@@ -1,4 +1,6 @@
-package com.sportganise.exceptions;
+package com.sportganise.exceptions.ChannelExceptions;
+
+import com.sportganise.exceptions.ResourceNotFoundException;
 
 /** Exception thrown when a channel is not found. */
 public class ChannelNotFoundException extends ResourceNotFoundException {
