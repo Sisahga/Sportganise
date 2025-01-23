@@ -162,6 +162,20 @@ CREATE TABLE message_blob (
 ALTER TABLE channel
 ADD last_message_id INTEGER REFERENCES message(message_id);
 
+CREATE TABLE delete_channel_request (
+    delete_request_id SERIAL PRIMARY KEY,
+    channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
+    requester_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    request_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE delete_channel_request_approver (
+    delete_request_id INTEGER NOT NULL REFERENCES delete_channel_request(delete_request_id) ON DELETE CASCADE,
+    approver_id INTEGER NOT NULL REFERENCES channel_member(account_id) ON DELETE CASCADE,
+    status VARCHAR(8) NOT NULL CHECK (status IN ('APPROVED', 'DENIED', 'PENDING')),
+    PRIMARY KEY (delete_request_id, approver_id)
+);
+
 CREATE TABLE post(
     post_id SERIAL PRIMARY KEY,
     account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
