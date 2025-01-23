@@ -341,10 +341,10 @@ public class DirectMessageChannelService {
     for (int memberId : memberIds) {
       if (memberId == creatorAccountId) {
         directMessageChannelMemberService.setGroupMemberRole(
-                memberId, channelId, ChannelMemberRoleType.ADMIN);
+            memberId, channelId, ChannelMemberRoleType.ADMIN);
       } else {
         directMessageChannelMemberService.setGroupMemberRole(
-                memberId, channelId, ChannelMemberRoleType.REGULAR);
+            memberId, channelId, ChannelMemberRoleType.REGULAR);
       }
     }
   }

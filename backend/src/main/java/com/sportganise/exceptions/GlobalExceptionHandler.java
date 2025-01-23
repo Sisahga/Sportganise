@@ -4,7 +4,11 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.exceptions.channelexceptions.ChannelCreationException;
 import com.sportganise.exceptions.channelexceptions.ChannelDeletionException;
 import com.sportganise.exceptions.channelexceptions.ChannelFetchException;
-import com.sportganise.exceptions.channelmemberexceptions.*;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberDeleteException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberMarkReadException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -93,6 +97,7 @@ public class GlobalExceptionHandler {
         .message(e.getMessage())
         .build();
   }
+
   // </editor-fold>
 
   // <editor-fold desc="Region: Channel Member Exceptions">
@@ -151,20 +156,27 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMarkReadException(ChannelMemberMarkReadException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
+  /**
+   * Handle internal server error on channel member set role exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(ChannelMemberSetRoleException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberSetRoleException(ChannelMemberSetRoleException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
-// </editor-fold>
+
+  // </editor-fold>
 
   // <editor-fold desc="Region: Direct Message Exceptions">
   /**
@@ -196,6 +208,7 @@ public class GlobalExceptionHandler {
         .message(e.getMessage())
         .build();
   }
+
   // </editor-fold>
 
   // <editor-fold desc="Region: Program Exceptions">
@@ -228,6 +241,7 @@ public class GlobalExceptionHandler {
         .message("Program modification failed: " + e.getMessage())
         .build();
   }
+
   // </editor-fold>
 
   /**

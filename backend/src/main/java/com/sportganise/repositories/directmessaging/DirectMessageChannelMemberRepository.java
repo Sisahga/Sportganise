@@ -92,7 +92,8 @@ public interface DirectMessageChannelMemberRepository
   void deleteByChannelIdAndAccountId(int channelId, int accountId);
 
   @Modifying
-  @Query("""
+  @Query(
+      """
         UPDATE DirectMessageChannelMember cm
         SET cm.role = :role
         WHERE cm.compositeKey.accountId = :memberId AND cm.compositeKey.channelId = :channelId

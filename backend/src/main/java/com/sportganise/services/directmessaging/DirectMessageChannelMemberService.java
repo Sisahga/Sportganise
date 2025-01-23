@@ -138,18 +138,20 @@ public class DirectMessageChannelMemberService {
    */
   public void setGroupMemberRole(int memberId, int channelId, ChannelMemberRoleType role) {
     try {
-      int rowsAffected = this.directMessageChannelMemberRepository
-              .setChannelMemberRole(memberId, channelId, role);
+      int rowsAffected =
+          this.directMessageChannelMemberRepository.setChannelMemberRole(memberId, channelId, role);
       if (rowsAffected == 0) {
         log.error("Failed to set role for member.");
         throw new ChannelMemberSetRoleException("Failed to set role for member.");
       }
     } catch (DataAccessException e) {
       log.error("Database error occuring when setting role for member: {}", e.getMessage());
-      throw new ChannelMemberSetRoleException("Database error occured when setting role for member.");
+      throw new ChannelMemberSetRoleException(
+          "Database error occured when setting role for member.");
     } catch (Exception e) {
       log.error("Unexepected error occuring when setting role for member: {}", e.getMessage());
-      throw new ChannelMemberSetRoleException("Unexpected error occured when setting role for member.");
+      throw new ChannelMemberSetRoleException(
+          "Unexpected error occured when setting role for member.");
     }
   }
 }
