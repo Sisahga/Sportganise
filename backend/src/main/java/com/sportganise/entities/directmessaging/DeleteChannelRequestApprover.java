@@ -1,14 +1,16 @@
 package com.sportganise.entities.directmessaging;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entity for delete_channel_request_approver.
- */
+/** Entity for delete_channel_request_approver. */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,8 +18,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "delete_channel_request_approver")
 public class DeleteChannelRequestApprover {
-  @EmbeddedId
-  DeleteChannelRequestApproverCompositeKey approverCompositeKey;
+  @EmbeddedId DeleteChannelRequestApproverCompositeKey approverCompositeKey;
 
   @Enumerated(EnumType.STRING)
   private DeleteChannelRequestStatusType status;
