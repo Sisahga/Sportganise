@@ -171,9 +171,10 @@ CREATE TABLE delete_channel_request (
 
 CREATE TABLE delete_channel_request_approver (
     delete_request_id INTEGER NOT NULL REFERENCES delete_channel_request(delete_request_id) ON DELETE CASCADE,
-    approver_id INTEGER NOT NULL REFERENCES channel_member(account_id) ON DELETE CASCADE,
-    status VARCHAR(8) NOT NULL CHECK (status IN ('APPROVED', 'DENIED', 'PENDING')),
-    PRIMARY KEY (delete_request_id, approver_id)
+    approver_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    status VARCHAR(8) NOT NULL,
+    PRIMARY KEY (delete_request_id, approver_id),
+    CONSTRAINT valid_status CHECK (status IN ('APPROVED', 'DENIED', 'PENDING'))
 );
 
 CREATE TABLE post(
