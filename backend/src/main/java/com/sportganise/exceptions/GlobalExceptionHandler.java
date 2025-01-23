@@ -8,6 +8,7 @@ import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberDeleteExc
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberMarkReadException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handle generatl resource not found exceptions.
+   * Handle general resource not found exceptions.
    *
    * @param e exception
    * @return response dto with status 404.
@@ -51,6 +52,7 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  // <editor-fold desc="Region: Channel Exceptions">
   /**
    * Handle bad request exception for channel creation.
    *
@@ -96,6 +98,9 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  // </editor-fold>
+
+  // <editor-fold desc="Region: Channel Member Exceptions">
   /**
    * Handle internal server error on channel member save exception.
    *
@@ -142,21 +147,6 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handle internal server error on direct message send exception.
-   *
-   * @param e exception
-   * @return response dto with status 500.
-   */
-  @ExceptionHandler(DirectMessageSendException.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseDto<?> handleDirectMessageSendException(DirectMessageSendException e) {
-    return ResponseDto.builder()
-        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-        .message(e.getMessage())
-        .build();
-  }
-
-  /**
    * Handle internal server error on channel member mark read exception.
    *
    * @param e exception
@@ -165,6 +155,39 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ChannelMemberMarkReadException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMarkReadException(ChannelMemberMarkReadException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle internal server error on channel member set role exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(ChannelMemberSetRoleException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleChannelMemberSetRoleException(ChannelMemberSetRoleException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  // </editor-fold>
+
+  // <editor-fold desc="Region: Direct Message Exceptions">
+  /**
+   * Handle internal server error on direct message send exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(DirectMessageSendException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleDirectMessageSendException(DirectMessageSendException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .message(e.getMessage())
@@ -186,6 +209,9 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  // </editor-fold>
+
+  // <editor-fold desc="Region: Program Exceptions">
   /**
    * Handle program creation exception.
    *
@@ -215,6 +241,8 @@ public class GlobalExceptionHandler {
         .message("Program modification failed: " + e.getMessage())
         .build();
   }
+
+  // </editor-fold>
 
   /**
    * Handle file processing exception.

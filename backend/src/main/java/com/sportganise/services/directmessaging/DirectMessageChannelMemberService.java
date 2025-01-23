@@ -1,11 +1,13 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
+import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberDeleteException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,6 +126,32 @@ public class DirectMessageChannelMemberService {
       log.error("Database error occuring when removing member from channel: {}", e.getMessage());
       throw new ChannelMemberDeleteException(
           "Database error occured when trying to remove member from channel.");
+    }
+  }
+
+  /**
+   * Sets the role of a member in a channel.
+   *
+   * @param memberId The member id.
+   * @param channelId The channel id.
+   * @param role The role to set.
+   */
+  public void setGroupMemberRole(int memberId, int channelId, ChannelMemberRoleType role) {
+    try {
+      int rowsAffected =
+          this.directMessageChannelMemberRepository.setChannelMemberRole(memberId, channelId, role);
+      if (rowsAffected == 0) {
+        log.error("Failed to set role for member.");
+        throw new ChannelMemberSetRoleException("Failed to set role for member.");
+      }
+    } catch (DataAccessException e) {
+      log.error("Database error occuring when setting role for member: {}", e.getMessage());
+      throw new ChannelMemberSetRoleException(
+          "Database error occured when setting role for member.");
+    } catch (Exception e) {
+      log.error("Unexepected error occuring when setting role for member: {}", e.getMessage());
+      throw new ChannelMemberSetRoleException(
+          "Unexpected error occured when setting role for member.");
     }
   }
 }
