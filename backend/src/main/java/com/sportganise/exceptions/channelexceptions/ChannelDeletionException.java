@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.channelExceptions;
+package com.sportganise.exceptions.channelexceptions;
 
 public class ChannelDeletionException extends RuntimeException {
   public ChannelDeletionException(String message) {

@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.programExceptions;
+package com.sportganise.exceptions.programexceptions;
 
 /** Exception thrown when an entity is not found in the database. */
 public class ProgramModificationException extends RuntimeException {

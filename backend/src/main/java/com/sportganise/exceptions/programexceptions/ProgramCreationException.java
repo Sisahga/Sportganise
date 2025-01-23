@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.programExceptions;
+package com.sportganise.exceptions.programexceptions;
 
 /** Exception thrown when a program cannot be created. */
 public class ProgramCreationException extends RuntimeException {

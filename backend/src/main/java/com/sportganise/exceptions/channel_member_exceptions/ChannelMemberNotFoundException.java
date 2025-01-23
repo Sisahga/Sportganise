@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.channelMemberExceptions;
+package com.sportganise.exceptions.channel_member_exceptions;
 
 import com.sportganise.exceptions.ResourceNotFoundException;
 
