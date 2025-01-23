@@ -56,7 +56,17 @@ export default function VerificationCode() {
                 nextInputId="code-4"
                 handleInput={handleInput}
               />
-              <VerificationInput id="code-4" handleInput={handleInput} />
+              <VerificationInput
+                id="code-4"
+                nextInputId="code-5"
+                handleInput={handleInput}
+              />
+              <VerificationInput
+                id="code-5"
+                nextInputId="code-6"
+                handleInput={handleInput}
+              />
+              <VerificationInput id="code-6" handleInput={handleInput} />
             </div>
             <p
               id="helper-text-explanation"

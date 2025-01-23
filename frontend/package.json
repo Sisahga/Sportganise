@@ -8,7 +8,9 @@
     "build": "tsc -b && vite build",
     "format": "prettier --write .",
     "lint": "eslint .",
-    "test": "echo 'No tests to run' && exit 0",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -30,6 +32,8 @@
     "@radix-ui/react-toast": "^1.2.4",
     "@shadcn/ui": "^0.0.4",
     "@stomp/stompjs": "^7.0.0",
+    "@tanstack/react-router": "^1.97.3",
+    "@tanstack/react-table": "^8.20.6",
     "@types/js-cookie": "^3.0.6",
     "@types/sockjs-client": "^1.5.4",
     "class-variance-authority": "^0.7.0",
@@ -58,7 +62,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^29.5.14",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.9.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -72,14 +80,14 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
+    "identity-obj-proxy": "^3.0.0",
     "postcss": "^8.4.49",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.15",
-    "ts-jest": "^29.2.5",
     "typescript": "~5.7.3",
     "typescript-eslint": "^8.11.0",
     "vite": "^5.4.10",
-    "vitest": "^2.1.5"
+    "vitest": "^2.1.8"
   },
   "packageManager": "pnpm@9.14.2"
 }

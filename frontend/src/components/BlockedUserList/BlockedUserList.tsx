@@ -15,6 +15,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import log from "loglevel";
+
+log.setLevel("info");
 
 interface BlockedUser {
   id: string;
@@ -42,15 +45,17 @@ export default function BlockedUsersList() {
 
   const handleUnblock = () => {
     if (selectedUser) {
+      log.info(`Attempting to unblock user: ${selectedUser.name}`);
       setBlockedUsers(
         blockedUsers.filter((user) => user.id !== selectedUser.id),
       );
-      console.log("User unblocked:", selectedUser.name);
+      log.info(`User unblocked: ${selectedUser.name}`);
       setIsUnblockOpen(false);
     }
   };
 
   const handleUnblockClick = (user: BlockedUser) => {
+    log.info(`Unblock button clicked for user: ${user.name}`);
     setSelectedUser(user);
     setIsUnblockOpen(true);
   };
@@ -60,7 +65,10 @@ export default function BlockedUsersList() {
       <Button
         className="rounded-full"
         variant="outline"
-        onClick={() => navigate("/pages/ProfilePage")}
+        onClick={() => {
+          log.info("Navigate button clicked: Redirecting to Profile Page");
+          navigate("/pages/ProfilePage");
+        }}
       >
         <MoveLeft />
       </Button>
