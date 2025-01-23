@@ -4,10 +4,10 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.exceptions.channelexceptions.ChannelCreationException;
 import com.sportganise.exceptions.channelexceptions.ChannelDeletionException;
 import com.sportganise.exceptions.channelexceptions.ChannelFetchException;
-import com.sportganise.exceptions.channel_member_exceptions.ChannelMemberDeleteException;
-import com.sportganise.exceptions.channel_member_exceptions.ChannelMemberFetchException;
-import com.sportganise.exceptions.channel_member_exceptions.ChannelMemberMarkReadException;
-import com.sportganise.exceptions.channel_member_exceptions.ChannelMemberSaveException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberDeleteException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberMarkReadException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -17,9 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * Global exception handler.
- */
+/** Global exception handler. */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -175,6 +173,7 @@ public class GlobalExceptionHandler {
 
   /**
    * Handle internal server error on direct message fetch exception.
+   *
    * @param e exception
    * @return response dto with status 500.
    */

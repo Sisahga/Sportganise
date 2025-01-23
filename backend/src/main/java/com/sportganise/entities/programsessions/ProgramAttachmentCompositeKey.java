@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Composite key for ProgramAttachment entity. */
 @Getter
 @Setter
 @NoArgsConstructor

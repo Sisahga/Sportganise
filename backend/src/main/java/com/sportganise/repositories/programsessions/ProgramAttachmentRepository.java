@@ -37,7 +37,8 @@ public interface ProgramAttachmentRepository
   @Modifying
   @Query(
       value =
-          "INSERT INTO program_attachments (program_id, attachment_url) VALUES (:programId, :attachmentUrl)",
+          "INSERT INTO program_attachments (program_id, attachment_url) "
+              + "VALUES (:programId, :attachmentUrl)",
       nativeQuery = true)
   void saveProgramAttachment(
       @Param("programId") int programId, @Param("attachmentUrl") String attachmentUrl);
