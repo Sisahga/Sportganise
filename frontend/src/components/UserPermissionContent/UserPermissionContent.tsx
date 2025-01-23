@@ -39,15 +39,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { getCookies } from "@/services/cookiesService";
 import { useToast } from "@/hooks/use-toast";
-
-interface AccountPermissions {
-  accountId: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  type: string;
-  pictureUrl: string;
-}
+import { AccountPermissions } from "@/types/account";
 
 const UserPermissionContent: React.FC = () => {
   const [data, setData] = useState<AccountPermissions[]>([]);
@@ -188,11 +180,11 @@ const UserPermissionContent: React.FC = () => {
                   <p className="text-sm font-bold text-primaryColour">
                     {user.firstName} {user.lastName}
                   </p>
-                  <p className="text-xs text-gray">
-                    <span className="font-bold text-gray-500">Email:</span>{" "}
+                  <p className="text-xs text-textColour">
+                    <span className="font-bold text-textColour">Email:</span>{" "}
                     {user.email}
                   </p>
-                  <p className="text-xs text-gray">
+                  <p className="text-xs text-textColour">
                     <span className="font-bold text-secondaryColour">
                       Role:
                     </span>{" "}
