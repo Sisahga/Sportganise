@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MoreVertical, Trash, UserX } from "lucide-react";
+import log from "loglevel";
 
 interface ChatHeaderProps {
   chatName: string;
@@ -12,6 +13,8 @@ interface ChatHeaderProps {
   onDeleteChat?: (channelId: number) => void;
   onBlockUser?: () => void;
 }
+
+log.setLevel("info");
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   chatName,
@@ -29,15 +32,19 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   };
 
   const handleDeleteClick = () => {
+    log.info(`Delete chat button clicked for channelId: ${channelId}`);
     if (onDeleteChat) {
       onDeleteChat(channelId);
+      log.info(`Chat deleted for channelId: ${channelId}`);
     }
     setShowMenu(false);
   };
 
   const handleBlockClick = () => {
+    log.info("Block user button clicked");
     if (onBlockUser) {
       onBlockUser();
+      log.info("User blocked");
     }
     setShowMenu(false);
   };
@@ -47,7 +54,10 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
       {/* Back Button */}
       <button
         className="p-2 rounded-full bg-white hover:bg-gray-300"
-        onClick={() => navigate(-1)}
+        onClick={() => {
+          log.info("Back button clicked: navigating to previous page");
+          navigate(-1);
+        }}
       >
         <ArrowLeft className="text-gray-800" size={24} />
       </button>

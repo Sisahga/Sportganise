@@ -101,8 +101,8 @@ CREATE TABLE program (
 
 CREATE TABLE program_attachments (
 	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
-	attachment_url VARCHAR(255) UNIQUE NOT NULL,
-	PRIMARY KEY (program_id, attachment_url)
+	attachment_url VARCHAR(255) NOT NULL,
+    PRIMARY KEY (program_id, attachment_url)
 );
 
 CREATE TABLE program_participants (
@@ -161,6 +161,21 @@ CREATE TABLE message_blob (
 
 ALTER TABLE channel
 ADD last_message_id INTEGER REFERENCES message(message_id);
+
+CREATE TABLE delete_channel_request (
+    delete_request_id SERIAL PRIMARY KEY,
+    channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
+    requester_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    request_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE delete_channel_request_approver (
+    delete_request_id INTEGER NOT NULL REFERENCES delete_channel_request(delete_request_id) ON DELETE CASCADE,
+    approver_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    status VARCHAR(8) NOT NULL,
+    PRIMARY KEY (delete_request_id, approver_id),
+    CONSTRAINT valid_status CHECK (status IN ('APPROVED', 'DENIED', 'PENDING'))
+);
 
 CREATE TABLE post(
     post_id SERIAL PRIMARY KEY,

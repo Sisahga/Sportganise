@@ -6,7 +6,7 @@ import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.RenameChannelDto;
 import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
-import com.sportganise.exceptions.ChannelNotFoundException;
+import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import com.sportganise.services.directmessaging.DirectMessageService;
 import jakarta.validation.constraints.Null;

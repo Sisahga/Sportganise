@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
 import useLastMessage from "@/hooks/useLastMessage.ts";
+import log from "loglevel";
 
 const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   channel,
@@ -14,7 +15,7 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   const { lastMessage } = useLastMessage(channel.channelId);
 
   const handleClick = () => {
-    console.log("Blocked status: ", lastMessage?.type);
+    log.info("Blocked status: ", lastMessage?.type);
     navigate("/pages/DirectMessageChannelPage", {
       state: {
         channelId: channel.channelId,

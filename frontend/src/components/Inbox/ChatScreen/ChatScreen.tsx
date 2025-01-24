@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/Button.tsx";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent.tsx";
+import log from "loglevel";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -93,7 +94,7 @@ const ChatScreen = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Messages fetched:", messages);
+    log.debug("Messages fetched:", messages);
   }, [messages]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);

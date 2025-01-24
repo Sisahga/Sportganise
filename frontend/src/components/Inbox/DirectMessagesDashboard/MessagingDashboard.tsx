@@ -5,6 +5,7 @@ import { Channel } from "@/types/dmchannels.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 import "./MessagingDashboard.css";
 import MessagingDashboardHeader from "@/components/Inbox/DirectMessagesDashboard/MessagingDashboardHeader.tsx";
+import log from "loglevel";
 
 function DirectMessagesDashboard() {
   const accountId = 2;
@@ -24,7 +25,7 @@ function DirectMessagesDashboard() {
       const response = await directMessagingApi.getChannels(accountId);
       setChannels(response);
     } catch (err) {
-      console.error("Error fetching chat messages:", err);
+      log.error("Error fetching chat messages:", err);
       setError("Failed to load messages.");
     }
   };
@@ -34,10 +35,10 @@ function DirectMessagesDashboard() {
   }, []);
 
   useEffect(() => {
-    console.log("Simple Channels: ", simpleChannels);
+    log.info("Simple Channels: ", simpleChannels);
   }, [simpleChannels]);
   useEffect(() => {
-    console.log("Group Channels: ", groupChannels);
+    log.info("Group Channels: ", groupChannels);
   }, [groupChannels]);
 
   if (loading) {

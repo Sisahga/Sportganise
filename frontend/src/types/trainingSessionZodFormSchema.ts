@@ -2,13 +2,13 @@ import * as z from "zod";
 
 export const formSchema = z
   .object({
-    title: z.string(),
+    title: z.string().max(30, "Only 30 characters accepted."),
     type: z.string(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date(),
     recurring: z.boolean().default(false),
     visibility: z.string(),
-    description: z.string(),
+    description: z.string().max(100, "Only 100 characters accepted."),
     attachment: z
       .array(
         //array of files
