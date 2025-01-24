@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import log from "loglevel";
-
 import { Notification } from "@/types/notifications";
 
 log.setLevel("info");
