@@ -121,14 +121,14 @@ const TrainingSessionContent = () => {
               <p className="text-sm text-gray-500">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-sm text-gray-500">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
+                  programDetails.durationMins
                 )}
               </p>
             </span>
@@ -150,7 +150,7 @@ const TrainingSessionContent = () => {
             <p className="text-sm text-gray-500">
               {programDetails.frequency || "one time"} on{" "}
               {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                new Date(programDetails.occurrenceDate),
+                new Date(programDetails.occurrenceDate)
               )}
             </p>
           </div>
@@ -181,14 +181,14 @@ const TrainingSessionContent = () => {
               {programDetails.programAttachments.map((attachment, index) => (
                 <div
                   key={index}
-                  className="flex items-center border-[1px] rounded-md p-2 w-[370px]"
+                  className="flex items-center border-[1px] rounded-md p-2"
                 >
                   <FileText
                     size={15}
                     color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
                     className="w-8 pr-2"
                   />
-                  <div className="w-[300px] overflow-x-scroll">
+                  <div className="overflow-x-scroll">
                     <a
                       className="text-sm text-gray-500 hover:text-cyan-300"
                       href={attachment.attachmentUrl}
@@ -196,7 +196,11 @@ const TrainingSessionContent = () => {
                       rel="noopener noreferrer"
                       download
                     >
-                      {attachment.attachmentUrl.split("/").pop()}
+                      {attachment.attachmentUrl
+                        .split("/")
+                        .pop()
+                        ?.split("_")
+                        .pop()}
                     </a>
                   </div>
                 </div>
