@@ -178,7 +178,7 @@ export default function TrainingPlanTable() {
                   <TableHead key={header.id}>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                   </TableHead>
                 );
@@ -196,7 +196,7 @@ export default function TrainingPlanTable() {
                     <div className="overflow-x-scroll max-w-[150px]">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </div>
                   </TableCell>
