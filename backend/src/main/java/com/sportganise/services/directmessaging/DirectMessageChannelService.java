@@ -354,10 +354,9 @@ public class DirectMessageChannelService {
           throw new ChannelMemberNotFoundException(
               "Request to delete channel failed: Channel member not found.");
         }
-        List<Integer> memberIds = List.of(deleteChannelRequestDto.getCreatorId(), otherMemberId);
         List<DeleteChannelRequestMembersDto> dcrMembersDto =
             this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
-                memberIds, newDeleteReq.getDeleteRequestId());
+                newDeleteReq.getDeleteRequestId());
         return new DeleteChannelRequestResponseDto(delReqResponse, dcrMembersDto);
       } else { // GROUPS
         // TODO: Implement for group channels.
