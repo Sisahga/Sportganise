@@ -3,9 +3,6 @@ import { describe, it, expect, beforeEach, vi, MockedFunction } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-// ---------------------------------------------------------------------------
-// 1) Mock react-router-dom with esModule: true
-// ---------------------------------------------------------------------------
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return {
@@ -14,15 +11,9 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-// ---------------------------------------------------------------------------
-// Now import the modules we just mocked
-// ---------------------------------------------------------------------------
 import { useNavigate } from "react-router-dom";
 import ChatHeader from "./ChatHeader";
 
-// ---------------------------------------------------------------------------
-// Create typed aliases for our mocked functions
-// ---------------------------------------------------------------------------
 type UseNavigateMock = MockedFunction<typeof useNavigate>;
 
 describe("ChatHeader", () => {
@@ -48,9 +39,6 @@ describe("ChatHeader", () => {
     (useNavigate as UseNavigateMock).mockReturnValue(mockNavigate);
   });
 
-  // -------------------------------------------------------------------------
-  // 1) Renders chat name and avatar
-  // -------------------------------------------------------------------------
   it("renders chat name and avatar", () => {
     render(<ChatHeader {...defaultProps} />);
     // Check that the chat name is rendered
@@ -64,9 +52,6 @@ describe("ChatHeader", () => {
     expect(avatarImg.src).toContain("test-avatar.jpg");
   });
 
-  // -------------------------------------------------------------------------
-  // 2) Navigation back
-  // -------------------------------------------------------------------------
   it("navigates back when the back button is clicked", () => {
     render(<ChatHeader {...defaultProps} />);
     // Locate the back button using aria-label
@@ -77,9 +62,6 @@ describe("ChatHeader", () => {
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
-  // -------------------------------------------------------------------------
-  // 3) Toggles the 3-dot options menu when clicked
-  // -------------------------------------------------------------------------
   it("toggles the 3-dot options menu when clicked", () => {
     render(<ChatHeader {...defaultProps} />);
 
@@ -101,9 +83,6 @@ describe("ChatHeader", () => {
     expect(screen.queryByText(/block user/i)).not.toBeInTheDocument();
   });
 
-  // -------------------------------------------------------------------------
-  // 4) Calls onDeleteChat with the channelId when "Delete Chat" is clicked
-  // -------------------------------------------------------------------------
   it('calls onDeleteChat with the channelId when "Delete Chat" is clicked', () => {
     render(<ChatHeader {...defaultProps} />);
 
@@ -119,9 +98,6 @@ describe("ChatHeader", () => {
     expect(mockOnDeleteChat).toHaveBeenCalledWith(123);
   });
 
-  // -------------------------------------------------------------------------
-  // 5) Calls onBlockUser when "Block User" is clicked
-  // -------------------------------------------------------------------------
   it('calls onBlockUser when "Block User" is clicked', () => {
     render(<ChatHeader {...defaultProps} />);
 
