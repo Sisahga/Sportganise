@@ -1,6 +1,9 @@
 //import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
+
+import log from "loglevel";
 
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
@@ -44,11 +47,13 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
-import { Check, ChevronsUpDown, CloudUpload, Paperclip } from "lucide-react";
-import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
-
-import log from "loglevel";
-import { Loader2 } from "lucide-react";
+import {
+  Check,
+  ChevronsUpDown,
+  CloudUpload,
+  Paperclip,
+  Loader2,
+} from "lucide-react";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
