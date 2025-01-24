@@ -129,10 +129,10 @@ export const columns = [
   },
   {
     accessorKey: "date",
-    header: (props: any) => {
+    header: () => {
       return (
         <div className="flex items-center">
-          {props.getContext}
+          Date
           <Calendar size={15} className="mx-2" />
         </div>
       );
@@ -155,10 +155,12 @@ export default function TrainingPlanTable() {
   });
   return (
     <div>
-      <div className="mb-4 flex items-center gap-4">
-        <Search />
+      <div className="relative w-full px-4 sm:px-0 mb-4">
+        <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <Input
+          type="text"
           placeholder="Search by file name"
+          className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
           value={
             (table.getColumn("trainingPlan")?.getFilterValue() as string) ?? ""
           }
@@ -176,7 +178,7 @@ export default function TrainingPlanTable() {
                   <TableHead key={header.id}>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext(),
+                      header.getContext()
                     )}
                   </TableHead>
                 );
@@ -194,7 +196,7 @@ export default function TrainingPlanTable() {
                     <div className="overflow-x-scroll max-w-[150px]">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </div>
                   </TableCell>

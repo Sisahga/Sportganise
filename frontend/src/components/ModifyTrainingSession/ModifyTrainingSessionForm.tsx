@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MoveLeft } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,21 +50,19 @@ import { formSchema } from "@/types/trainingSessionZodFormSchema";
 import { Attendees } from "@/types/trainingSessionDetails";
 import useModifyTrainingSession from "@/hooks/useModifyProgram";
 import log from "loglevel";
+import { Loader2 } from "lucide-react";
 
-//GLOBAL ---------------------------------------------------------------------------------------------------------------------------
 /**All select element options */
-//Options for type select
 const types = [
   {
     label: "Training Session",
     value: "Training",
   },
   {
-    label: "Fundraisor",
-    value: "Fundraisor",
+    label: "Fundraiser",
+    value: "Fundraiser",
   },
 ] as const;
-//Options for visibility select
 const visibilities = [
   {
     label: "Public",
@@ -79,7 +77,6 @@ const visibilities = [
     value: "private",
   },
 ] as const;
-//Options for location select
 const locations = [
   {
     label: "Centre de loisirs St-Denis",
@@ -100,20 +97,15 @@ const locations = [
 ] as const;
 
 export default function ModifyTrainingSessionForm() {
-  const { toast } = useToast();
   const accountId = 2; //get from cookie
-  const navigate = useNavigate();
-  const [title, setTitle] = useState<string>("");
-  let [attachmentsToRemove, setAttachmentsToRemove] = useState<string[]>([]);
+  const { toast } = useToast();
   const location = useLocation(); // Location state data sent from training session details page
-  const { modifyTrainingSession, loading, error } = useModifyTrainingSession();
-
-  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-  });
-
-  const [attendees, setAttendees] = useState<Attendees[]>([]);
+  const navigate = useNavigate();
+  let [attachmentsToRemove /* setAttachmentsToRemove */] = useState<string[]>(
+    []
+  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [, /* attendees */ setAttendees] = useState<Attendees[]>([]);
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
     title: "",
@@ -129,11 +121,30 @@ export default function ModifyTrainingSessionForm() {
     frequency: "",
     visibility: "",
   });
+  const { modifyTrainingSession } = useModifyTrainingSession();
+
+  /** Handle files for file upload in form*/
+  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
+  const dropZoneConfig = {
+    //File configurations
+    maxFiles: 5,
+    maxSize: 1024 * 1024 * 4,
+    multiple: true,
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg"],
+      "application/pdf": [".pdf"],
+    },
+  };
+
+  /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+  });
+
+  /** Update state */
   useEffect(() => {
-    // Update state safely using useEffect
     if (location.state && location.state.programDetails) {
       setProgramDetails(location.state.programDetails);
-      console.log("PROGRADETAILS: ", programDetails);
     }
   }, [location.state]);
   useEffect(() => {
@@ -148,7 +159,11 @@ export default function ModifyTrainingSessionForm() {
     form.setValue("capacity", programDetails.capacity);
     form.setValue("type", programDetails.programType);
     form.setValue("startDate", new Date(programDetails.occurrenceDate));
-    form.setValue("endDate", new Date(programDetails.expiryDate));
+    if (programDetails.frequency === null) {
+      form.setValue("endDate", new Date(programDetails.occurrenceDate));
+    } else {
+      form.setValue("endDate", new Date(programDetails.expiryDate));
+    }
     form.setValue("recurring", programDetails.recurring);
     form.setValue("visibility", programDetails.visibility);
     form.setValue("description", programDetails.description);
@@ -170,27 +185,13 @@ export default function ModifyTrainingSessionForm() {
     endTime.setMinutes(endTime.getMinutes() + programDetails.durationMins); //REFACTOR
     form.setValue("endTime", new Date(endTime).toISOString().slice(11, 16)); //REFACTOR
     form.setValue("location", programDetails.location);
-    setTitle(programDetails.title);
 
-    //append all urls to new string[]
+    // Append all programDetials.attachmentUrls to new string[]
     programDetails.programAttachments.map((attachment) => {
       const fileName = attachment.attachmentUrl;
       attachmentsToRemove.push(fileName);
     });
   }, [programDetails]);
-
-  /** Handle files for file upload in form*/
-  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
-  const dropZoneConfig = {
-    //File configurations
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg"],
-      "application/pdf": [".pdf"],
-    },
-  };
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -198,12 +199,12 @@ export default function ModifyTrainingSessionForm() {
       const json_payload = {
         ...values,
         programId: programDetails.programId ?? null,
-        attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
+        attachment: values.attachment ?? [],
       };
       console.log(json_payload);
       log.info("Form to modify Training Session : ", json_payload);
 
-      // Prepare API body
+      // Prepare API body : FormData
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
@@ -236,7 +237,7 @@ export default function ModifyTrainingSessionForm() {
       );
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
-          formData.append("attachments", file); //append each file
+          formData.append("attachments", file);
         });
       } else {
         formData.append(
@@ -248,18 +249,19 @@ export default function ModifyTrainingSessionForm() {
       }
 
       // API call submit form
+      setLoading(true);
       const modify = await modifyTrainingSession(
         accountId,
         programDetails.programId,
         formData
       );
-      log.info("modify", modify);
+      log.info("modify : ", modify);
+      setLoading(false);
       if (modify === null) {
         throw new Error(
           "Error from usemodifyTrainingSession.modifyTrainingSession!"
         );
       }
-      console.log("loading...", loading);
       log.info("modifyTrainingSession submit success ✔");
 
       // Toast popup for user to say form submitted successfully
@@ -268,8 +270,8 @@ export default function ModifyTrainingSessionForm() {
         description: "Event was updated in your calendar.",
       });
 
-      // If successful, navigate back to details page
-      navigate(-1);
+      // If successful, navigate back to calendar page
+      navigate("/pages/CalendarPage");
     } catch (error) {
       console.error("Form submission error (error)", error);
       toast({
@@ -280,6 +282,7 @@ export default function ModifyTrainingSessionForm() {
       });
     } finally {
       form.reset();
+      setLoading(false);
     }
   };
 
@@ -303,7 +306,11 @@ export default function ModifyTrainingSessionForm() {
           {/*Form Title*/}
           <div>
             <h2 className="text-2xl font-semibold">
-              Edit <span style={{ color: "#82DBD8" }}>{title}</span> Event
+              Edit{" "}
+              <span className="text-secondaryColour">
+                {programDetails.title}
+              </span>{" "}
+              Event
             </h2>
             <h2>Edit fields and update the form</h2>
           </div>
@@ -318,6 +325,7 @@ export default function ModifyTrainingSessionForm() {
                 <FormControl>
                   <Input placeholder="Name the event" type="text" {...field} />
                 </FormControl>
+                <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -698,7 +706,7 @@ export default function ModifyTrainingSessionForm() {
                     {...field}
                   />
                 </FormControl>
-
+                <FormDescription>Only 100 characters accepted.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -750,7 +758,9 @@ export default function ModifyTrainingSessionForm() {
                     </FileUploaderContent>
                   </FileUploader>
                 </FormControl>
-                <FormDescription>Select a file to upload.</FormDescription>
+                <FormDescription>
+                  Select a file to upload. Limit of 5 files.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -816,9 +826,16 @@ export default function ModifyTrainingSessionForm() {
           </div> */}
 
           {/** Submit Button */}
-          <Button type="submit" className="w-full font-semibold">
-            Update Event
-          </Button>
+          {loading ? (
+            <Button disabled className="w-full">
+              <Loader2 className="animate-spin" />
+              Updating Event
+            </Button>
+          ) : (
+            <Button type="submit" className="w-full font-semibold">
+              Update Event
+            </Button>
+          )}
           <div className="justify-self-center">
             <button className=" bg-transparent" onClick={() => navigate(-1)}>
               <p className="text-center underline text-neutral-400">Cancel</p>
