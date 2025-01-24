@@ -1,6 +1,7 @@
 package com.sportganise.repositories.directmessaging;
 
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestMembersDto;
 import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
@@ -28,7 +29,7 @@ public interface DirectMessageChannelMemberRepository
             WHERE d.compositeKey.channelId = :channelId
             AND d.compositeKey.accountId != :accountId
       """)
-  int getOtherMemberIdInSimpleChannel(
+  Integer getOtherMemberIdInSimpleChannel(
       @Param("channelId") int channelId, @Param("accountId") int accountId);
 
   @Query(
@@ -99,4 +100,13 @@ public interface DirectMessageChannelMemberRepository
         WHERE cm.compositeKey.accountId = :memberId AND cm.compositeKey.channelId = :channelId
         """)
   int setChannelMemberRole(int memberId, int channelId, ChannelMemberRoleType role);
+
+  @Query("""
+        SELECT cm.compositeKey.accountId
+        FROM DirectMessageChannelMember cm
+        WHERE cm.compositeKey.channelId = :channelId
+        AND cm.role = 'ADMIN'
+        AND cm.compositeKey.accountId != :accountId
+        """)
+  List<Integer> getOtherGroupAdminMemberIds(int channelId, int accountId);
 }
