@@ -153,7 +153,7 @@ describe("ChatMessages", () => {
     // Then it sees a 16-min difference => shows a second timestamp.
 
     // Let's find elements with your timestamp class ".text-xs.text-gray-500.text-center.mb-2"
-    const timeStamps = screen.queryAllByText((content, element) => {
+    const timeStamps = screen.queryAllByText((_content, element) => {
       if (!element) return false;
       return (
         element.className.includes("text-xs") &&
@@ -198,7 +198,7 @@ describe("ChatMessages", () => {
 
     // The difference is 10 min => not > 15 => second timestamp is NOT displayed
 
-    const timeStamps = screen.queryAllByText((content, element) => {
+    const timeStamps = screen.queryAllByText((_content, element) => {
       if (!element) return false;
       return (
         element.className.includes("text-xs") &&
