@@ -7,9 +7,8 @@ import static org.mockito.Mockito.*;
 import com.sportganise.entities.directmessaging.DeleteChannelRequestStatusType;
 import com.sportganise.exceptions.channelexceptions.ChannelDeletionException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberNotFoundException;
-import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
-
+import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,14 +17,11 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessException;
 
 public class DeleteChannelRequestServiceUnitTest {
-  @Mock
-  private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
+  @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
 
-  @Mock
-  private DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
+  @Mock private DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
 
-  @InjectMocks
-  private DirectMessageChannelService directMessageChannelService;
+  @InjectMocks private DirectMessageChannelService directMessageChannelService;
 
   @BeforeEach
   void setUp() {
@@ -40,14 +36,14 @@ public class DeleteChannelRequestServiceUnitTest {
     Integer otherMemberId = 4;
 
     when(directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(channelId, creatorId))
-            .thenReturn(otherMemberId);
+        .thenReturn(otherMemberId);
 
     directMessageChannelService.saveAuthorizedMembersToDeleteChannelRequest(
-            channelId, "SIMPLE", creatorId, deleteChannelRequestId);
+        channelId, "SIMPLE", creatorId, deleteChannelRequestId);
 
     verify(deleteChannelRequestApproverRepository, times(2)).save(any());
     verify(directMessageChannelMemberRepository)
-            .getOtherMemberIdInSimpleChannel(channelId, creatorId);
+        .getOtherMemberIdInSimpleChannel(channelId, creatorId);
   }
 
   @Test
@@ -58,10 +54,10 @@ public class DeleteChannelRequestServiceUnitTest {
     Integer[] otherAdminIds = {4, 5, 6};
 
     when(directMessageChannelMemberRepository.getOtherGroupAdminMemberIds(channelId, creatorId))
-            .thenReturn(java.util.Arrays.asList(otherAdminIds));
+        .thenReturn(java.util.Arrays.asList(otherAdminIds));
 
     directMessageChannelService.saveAuthorizedMembersToDeleteChannelRequest(
-            channelId, "GROUP", creatorId, deleteChannelRequestId);
+        channelId, "GROUP", creatorId, deleteChannelRequestId);
 
     verify(deleteChannelRequestApproverRepository, times(otherAdminIds.length + 1)).save(any());
   }
@@ -73,11 +69,13 @@ public class DeleteChannelRequestServiceUnitTest {
     int deleteChannelRequestId = 3;
 
     when(directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(channelId, creatorId))
-            .thenReturn(null);
+        .thenReturn(null);
 
-    assertThrows(ChannelMemberNotFoundException.class, () ->
+    assertThrows(
+        ChannelMemberNotFoundException.class,
+        () ->
             directMessageChannelService.saveAuthorizedMembersToDeleteChannelRequest(
-                    channelId, "SIMPLE", creatorId, deleteChannelRequestId));
+                channelId, "SIMPLE", creatorId, deleteChannelRequestId));
   }
 
   @Test
@@ -87,7 +85,7 @@ public class DeleteChannelRequestServiceUnitTest {
     DeleteChannelRequestStatusType status = DeleteChannelRequestStatusType.PENDING;
 
     directMessageChannelService.createDeleteChannelRequestApprover(
-            approverId, deleteChannelRequestId, status);
+        approverId, deleteChannelRequestId, status);
 
     verify(deleteChannelRequestApproverRepository).save(any());
   }
@@ -100,13 +98,16 @@ public class DeleteChannelRequestServiceUnitTest {
     Integer otherMemberId = 4;
 
     when(directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(channelId, creatorId))
-            .thenReturn(otherMemberId);
+        .thenReturn(otherMemberId);
 
     doThrow(new DataAccessException("Database error") {})
-            .when(deleteChannelRequestApproverRepository).save(any());
+        .when(deleteChannelRequestApproverRepository)
+        .save(any());
 
-    assertThrows(ChannelDeletionException.class, () ->
+    assertThrows(
+        ChannelDeletionException.class,
+        () ->
             directMessageChannelService.saveAuthorizedMembersToDeleteChannelRequest(
-                    channelId, "SIMPLE", creatorId, deleteChannelRequestId));
+                channelId, "SIMPLE", creatorId, deleteChannelRequestId));
   }
 }

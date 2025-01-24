@@ -1,7 +1,13 @@
 package com.sportganise.controllers.directmessaging;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.directmessaging.*;
+import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestResponseDto;
+import com.sportganise.dto.directmessaging.LastMessageDto;
+import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.RenameChannelDto;
+import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
 import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import com.sportganise.services.directmessaging.DirectMessageService;
@@ -178,13 +184,20 @@ public class DirectMessageChannelController {
     }
   }
 
+  /**
+   * Endpoint /api/messaging/delete-channel-request: Post Mapping for sending a request to delete a
+   * channel.
+   *
+   * @param deleteChannelRequestDto DTO object for deleting a channel.
+   * @return HTTP Code 200 if successful.
+   */
   @PostMapping("/delete-channel-request")
   public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> requestDeleteChannel(
       @RequestBody DeleteChannelRequestDto deleteChannelRequestDto) {
     DeleteChannelRequestResponseDto deleteReqResponse =
         directMessageChannelService.requestDeleteChannel(deleteChannelRequestDto);
     ResponseDto<DeleteChannelRequestResponseDto> responseDto =
-            ResponseDto.<DeleteChannelRequestResponseDto>builder()
+        ResponseDto.<DeleteChannelRequestResponseDto>builder()
             .statusCode(HttpStatus.OK.value())
             .message("Delete channel request sent successfully")
             .data(deleteReqResponse)

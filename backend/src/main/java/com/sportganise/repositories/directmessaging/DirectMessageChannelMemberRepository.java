@@ -1,7 +1,6 @@
 package com.sportganise.repositories.directmessaging;
 
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
-import com.sportganise.dto.directmessaging.DeleteChannelRequestMembersDto;
 import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
@@ -101,7 +100,8 @@ public interface DirectMessageChannelMemberRepository
         """)
   int setChannelMemberRole(int memberId, int channelId, ChannelMemberRoleType role);
 
-  @Query("""
+  @Query(
+      """
         SELECT cm.compositeKey.accountId
         FROM DirectMessageChannelMember cm
         WHERE cm.compositeKey.channelId = :channelId

@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * API object for receiving request body details regarding a channel delete request from client.
- */
+/** API object for receiving request body details regarding a channel delete request from client. */
 @Getter
 @Setter
 @AllArgsConstructor

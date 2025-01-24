@@ -1,7 +1,18 @@
 package com.sportganise.services.directmessaging;
 
-import com.sportganise.dto.directmessaging.*;
-import com.sportganise.entities.directmessaging.*;
+import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestMembersDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestResponseDto;
+import com.sportganise.dto.directmessaging.DuplicateChannelDto;
+import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
+import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
+import com.sportganise.entities.directmessaging.DeleteChannelRequest;
+import com.sportganise.entities.directmessaging.DeleteChannelRequestApprover;
+import com.sportganise.entities.directmessaging.DeleteChannelRequestApproverCompositeKey;
+import com.sportganise.entities.directmessaging.DeleteChannelRequestStatusType;
+import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.channelexceptions.ChannelCreationException;
@@ -300,48 +311,53 @@ public class DirectMessageChannelService {
    * @return The response to the delete channel request.
    */
   @Transactional
-  public DeleteChannelRequestResponseDto requestDeleteChannel(DeleteChannelRequestDto deleteChannelRequestDto) {
+  public DeleteChannelRequestResponseDto requestDeleteChannel(
+      DeleteChannelRequestDto deleteChannelRequestDto) {
     try {
       if (!directMessageChannelRepository.existsById(deleteChannelRequestDto.getChannelId())) {
         throw new ChannelNotFoundException("Channel not found.");
       }
       // Save the delete channel request.
-      DeleteChannelRequest deleteChannelRequest = DeleteChannelRequest.builder()
-          .channelId(deleteChannelRequestDto.getChannelId())
-          .requesterId(deleteChannelRequestDto.getCreatorId())
-          .build();
-      DeleteChannelRequest newDeleteReq = this.deleteChannelRequestRepository.save(deleteChannelRequest);
+      DeleteChannelRequest deleteChannelRequest =
+          DeleteChannelRequest.builder()
+              .channelId(deleteChannelRequestDto.getChannelId())
+              .requesterId(deleteChannelRequestDto.getCreatorId())
+              .build();
+      DeleteChannelRequest newDeleteReq =
+          this.deleteChannelRequestRepository.save(deleteChannelRequest);
 
       // Save all authorized members (DeleteChannelRequestApprover relationship).
       saveAuthorizedMembersToDeleteChannelRequest(
-              deleteChannelRequestDto.getChannelId(),
-              deleteChannelRequestDto.getChannelType(),
-              deleteChannelRequestDto.getCreatorId(),
-              newDeleteReq.getDeleteRequestId());
+          deleteChannelRequestDto.getChannelId(),
+          deleteChannelRequestDto.getChannelType(),
+          deleteChannelRequestDto.getCreatorId(),
+          newDeleteReq.getDeleteRequestId());
 
       String channelType = deleteChannelRequestDto.getChannelType();
 
       // Create the first part of the response dto (The delete request dto).
-      DeleteChannelRequestDto delReqResponse = DeleteChannelRequestDto.builder()
-          .deleteRequestId(newDeleteReq.getDeleteRequestId())
-          .channelId(newDeleteReq.getChannelId())
-          .creatorId(newDeleteReq.getRequesterId())
-          .channelType(channelType)
-          .build();
+      DeleteChannelRequestDto delReqResponse =
+          DeleteChannelRequestDto.builder()
+              .deleteRequestId(newDeleteReq.getDeleteRequestId())
+              .channelId(newDeleteReq.getChannelId())
+              .creatorId(newDeleteReq.getRequesterId())
+              .channelType(channelType)
+              .build();
 
       // Create the second part of the response dto (ChannelMembersDto).
       // Fetch all members of the channel and put them in DeleteChannelRequestMembers DTO.
       if (channelType.equals("SIMPLE")) {
-        Integer otherMemberId = directMessageChannelMemberRepository
-                .getOtherMemberIdInSimpleChannel(deleteChannelRequestDto.getChannelId(),
-                        deleteChannelRequestDto.getCreatorId());
+        Integer otherMemberId =
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                deleteChannelRequestDto.getChannelId(), deleteChannelRequestDto.getCreatorId());
         if (otherMemberId == null) {
           throw new ChannelMemberNotFoundException(
-                  "Request to delete channel failed: Channel member not found.");
+              "Request to delete channel failed: Channel member not found.");
         }
-        List<Integer> memberIDs = List.of(deleteChannelRequestDto.getCreatorId(), otherMemberId);
-        List<DeleteChannelRequestMembersDto> dcrMembersDto = this.deleteChannelRequestApproverRepository
-                .getChannelMembersDetailsForDeleteRequest(memberIDs, newDeleteReq.getDeleteRequestId());
+        List<Integer> memberIds = List.of(deleteChannelRequestDto.getCreatorId(), otherMemberId);
+        List<DeleteChannelRequestMembersDto> dcrMembersDto =
+            this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
+                memberIds, newDeleteReq.getDeleteRequestId());
         return new DeleteChannelRequestResponseDto(delReqResponse, dcrMembersDto);
       } else { // GROUPS
         // TODO: Implement for group channels.
@@ -350,9 +366,10 @@ public class DirectMessageChannelService {
     } catch (DataAccessException e) {
       log.error("Database error occured while requesting to delete channel: {}", e.getMessage());
       throw new ChannelDeletionException(
-              "Database error occured while requesting to delete channel: " + e.getMessage());
+          "Database error occured while requesting to delete channel: " + e.getMessage());
     }
   }
+
   /**
    * Formats the channel name to be the first names of all members in the channel if no name was
    * given.
@@ -420,47 +437,61 @@ public class DirectMessageChannelService {
     }
   }
 
+  /**
+   * Saves the authorized members to delete a channel request. The creator of the channel is
+   * automatically approved.
+   *
+   * @param channelId The ID of the channel to delete.
+   * @param channelType The type of the channel.
+   * @param creatorId The ID of the creator of the channel.
+   * @param deleteChannelRequestId The ID of the delete channel request.
+   */
   public void saveAuthorizedMembersToDeleteChannelRequest(
-          int channelId, String channelType, int creatorId, int deleteChannelRequestId) {
+      int channelId, String channelType, int creatorId, int deleteChannelRequestId) {
     try {
-      createDeleteChannelRequestApprover(creatorId, deleteChannelRequestId,
-              DeleteChannelRequestStatusType.APPROVED);
+      createDeleteChannelRequestApprover(
+          creatorId, deleteChannelRequestId, DeleteChannelRequestStatusType.APPROVED);
       if (channelType.equals("SIMPLE")) {
-        Integer otherMemberId = directMessageChannelMemberRepository
-                .getOtherMemberIdInSimpleChannel(channelId, creatorId);
+        Integer otherMemberId =
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                channelId, creatorId);
         if (otherMemberId == null) {
           throw new ChannelMemberNotFoundException("Channel member not found.");
         } else {
-          createDeleteChannelRequestApprover(otherMemberId, deleteChannelRequestId,
-                  DeleteChannelRequestStatusType.PENDING);
+          createDeleteChannelRequestApprover(
+              otherMemberId, deleteChannelRequestId, DeleteChannelRequestStatusType.PENDING);
         }
       } else if (channelType.equals("GROUP")) {
-        List<Integer> otherGroupAdminMemberIds = directMessageChannelMemberRepository
-                .getOtherGroupAdminMemberIds(channelId, creatorId);
+        List<Integer> otherGroupAdminMemberIds =
+            directMessageChannelMemberRepository.getOtherGroupAdminMemberIds(channelId, creatorId);
         for (Integer memberId : otherGroupAdminMemberIds) {
-          createDeleteChannelRequestApprover(memberId, deleteChannelRequestId,
-                  DeleteChannelRequestStatusType.PENDING);
+          createDeleteChannelRequestApprover(
+              memberId, deleteChannelRequestId, DeleteChannelRequestStatusType.PENDING);
         }
       }
     } catch (DataAccessException e) {
-      log.error("Database error occured while saving authorized members to delete channel request: {}",
-              e.getMessage());
+      log.error(
+          "Database error occured while saving authorized members to delete channel request: {}",
+          e.getMessage());
       throw new ChannelDeletionException(
-              "Database error occured while saving authorized members to delete channel request: "
-                      + e.getMessage());
+          "Database error occured while saving authorized members to delete channel request: "
+              + e.getMessage());
     }
   }
 
+  /**
+   * Creates a new Delete Channel Request Approver.
+   *
+   * @param approverId The ID of the approver.
+   * @param deleteChannelRequestId The ID of the delete channel request.
+   * @param status The status of the approver.
+   */
   public void createDeleteChannelRequestApprover(
-          int approverId,
-          int deleteChannelRequestId,
-          DeleteChannelRequestStatusType status
-  ) {
+      int approverId, int deleteChannelRequestId, DeleteChannelRequestStatusType status) {
     DeleteChannelRequestApproverCompositeKey key =
-            new DeleteChannelRequestApproverCompositeKey(approverId, deleteChannelRequestId);
+        new DeleteChannelRequestApproverCompositeKey(approverId, deleteChannelRequestId);
 
-    DeleteChannelRequestApprover approver =
-            new DeleteChannelRequestApprover(key, status);
+    DeleteChannelRequestApprover approver = new DeleteChannelRequestApprover(key, status);
 
     this.deleteChannelRequestApproverRepository.save(approver);
   }
