@@ -101,10 +101,11 @@ public class GlobalExceptionHandler {
 
   // </editor-fold>
 
-  //<editor-fold desc="Region: Delete Channel Request Exceptions">
+  // <editor-fold desc="Region: Delete Channel Request Exceptions">
 
   /**
    * Handle delete channel approver exception.
+   *
    * @param e exception
    * @return response dto with status 404.
    */
@@ -116,7 +117,8 @@ public class GlobalExceptionHandler {
         .message(e.getMessage())
         .build();
   }
-  //</editor-fold>
+
+  // </editor-fold>
 
   // <editor-fold desc="Region: Channel Member Exceptions">
   /**

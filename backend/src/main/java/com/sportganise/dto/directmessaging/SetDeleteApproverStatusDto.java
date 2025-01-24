@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * API object for Delete Channel Request Status.
- */
+/** API object for Delete Channel Request Status. */
 @Getter
 @Setter
 @NoArgsConstructor

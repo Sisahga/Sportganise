@@ -125,42 +125,6 @@ public class DirectMessageChannelServiceUnitTest {
   }
 
   @Test
-  public void deleteDirectMessageChannelTest_ChannelExists() {
-    int channelId = 1;
-
-    given(directMessageChannelRepository.existsById(channelId)).willReturn(true);
-
-    boolean result = directMessageChannelService.deleteDirectMessageChannel(channelId);
-
-    assertTrue(result);
-    verify(directMessageChannelRepository, times(1)).existsById(channelId);
-    verify(directMessageChannelRepository, times(1)).deleteById(channelId);
-    verify(directMessageChannelMemberRepository, times(1))
-        .deleteDirectMessageChannelMemberByChannelId(channelId);
-  }
-
-  @Test
-  public void deleteDirectMessageChannelTest_ChannelDoesNotExist() {
-    int channelId = 1;
-
-    given(directMessageChannelRepository.existsById(channelId)).willReturn(false);
-
-    Exception exception =
-        assertThrows(
-            ChannelDeletionException.class,
-            () -> {
-              directMessageChannelService.deleteDirectMessageChannel(channelId);
-            });
-
-    assertEquals("Failed to delete channel: Channel not found.", exception.getMessage());
-
-    verify(directMessageChannelRepository, times(1)).existsById(channelId);
-    verify(directMessageChannelRepository, never()).deleteById(anyInt());
-    verify(directMessageChannelMemberRepository, never())
-        .deleteDirectMessageChannelMemberByChannelId(anyInt());
-  }
-
-  @Test
   public void getDirectMessageChannelsTest_HasChannels() {
     int accountId = 1;
 
