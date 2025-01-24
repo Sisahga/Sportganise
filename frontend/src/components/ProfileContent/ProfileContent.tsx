@@ -44,7 +44,9 @@ const ProfileContent: React.FC = () => {
         <MoveLeft />
       </Button>
       <div className="flex flex-col items-center justify-center my-4">
-        <h1 className="text-5xl font-light">Profile</h1>
+        <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-4">
+          Profile
+        </h2>
 
         {/* Profile image */}
         <img

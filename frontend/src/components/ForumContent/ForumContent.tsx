@@ -165,7 +165,11 @@ const ForumContent: React.FC = () => {
         <MoveLeft />
       </Button>
 
-      <div className="mt-4 mb-2 flex items-center">
+      <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-8">
+        Forum
+      </h2>
+
+      <div className="mt-4 mb-2 flex items-center lg:mx-24">
         {/* Menu Bar with Filters */}
         <div className="mr-2">
           <Popover>
@@ -222,7 +226,7 @@ const ForumContent: React.FC = () => {
       </div>
 
       {/* Sessions Cards */}
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-4 lg:mx-24">
         {currentSessions.map((session) => (
           <Card
             key={session.id}

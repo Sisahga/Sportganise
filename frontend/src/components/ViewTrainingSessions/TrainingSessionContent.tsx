@@ -181,22 +181,28 @@ const TrainingSessionContent = () => {
               {programDetails.programAttachments.map((attachment, index) => (
                 <div
                   key={index}
-                  className="flex items-center border-[1px] rounded-md p-2 w-[370px]"
+                  className="flex items-center border-[1px] rounded-md p-2"
                 >
                   <FileText
                     size={15}
                     color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-                    className="w-8"
+                    className="w-8 pr-2"
                   />
-                  <a
-                    className="text-sm text-gray-500 hover:text-cyan-300 overflow-x-scroll px-3"
-                    href={attachment.attachmentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                  >
-                    {attachment.attachmentUrl.split("/").pop()}
-                  </a>
+                  <div className="overflow-x-scroll">
+                    <a
+                      className="text-sm text-gray-500 hover:text-cyan-300"
+                      href={attachment.attachmentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                    >
+                      {attachment.attachmentUrl
+                        .split("/")
+                        .pop()
+                        ?.split("_")
+                        .pop()}
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
@@ -230,7 +236,11 @@ const TrainingSessionContent = () => {
         )}
 
         {/**Conditionally render different menu options based on account type */}
-        <DropDownMenuButton accountType={accountType} />
+        <DropDownMenuButton
+          accountType={accountType}
+          programDetails={programDetails}
+          attendees={attendees}
+        />
       </div>
     </div>
   );

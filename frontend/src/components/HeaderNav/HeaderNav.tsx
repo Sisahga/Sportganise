@@ -39,7 +39,7 @@ export default function HeaderNav() {
                 Home
               </Link>
               <Link
-                to="/" //add actual redirect once forum page is set up
+                to="/pages/ForumPage"
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Forum
