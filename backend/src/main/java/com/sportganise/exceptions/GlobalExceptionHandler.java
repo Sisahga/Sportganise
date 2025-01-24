@@ -9,6 +9,7 @@ import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchExce
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberMarkReadException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
+import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelApproverException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -99,6 +100,23 @@ public class GlobalExceptionHandler {
   }
 
   // </editor-fold>
+
+  //<editor-fold desc="Region: Delete Channel Request Exceptions">
+
+  /**
+   * Handle delete channel approver exception.
+   * @param e exception
+   * @return response dto with status 404.
+   */
+  @ExceptionHandler(DeleteChannelApproverException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseDto<?> handleDeleteChannelApproverException(DeleteChannelApproverException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .message(e.getMessage())
+        .build();
+  }
+  //</editor-fold>
 
   // <editor-fold desc="Region: Channel Member Exceptions">
   /**

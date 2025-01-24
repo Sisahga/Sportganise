@@ -1,13 +1,7 @@
 package com.sportganise.controllers.directmessaging;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
-import com.sportganise.dto.directmessaging.DeleteChannelRequestDto;
-import com.sportganise.dto.directmessaging.DeleteChannelRequestResponseDto;
-import com.sportganise.dto.directmessaging.LastMessageDto;
-import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
-import com.sportganise.dto.directmessaging.RenameChannelDto;
-import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
+import com.sportganise.dto.directmessaging.*;
 import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.services.directmessaging.DirectMessageChannelService;
 import com.sportganise.services.directmessaging.DirectMessageService;
@@ -18,15 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /** REST Controller for handling HTTP requests related to Direct Message Channels. */
@@ -77,20 +63,6 @@ public class DirectMessageChannelController {
               HttpStatus.CREATED.value(), "Channel created successfully", dmChannelDto);
       return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-  }
-
-  /**
-   * Endpoint /api/messaging/delete-channel: Delete Mapping for Deleting a Direct Message Channel.
-   *
-   * @param id The Id of the DM Channel to delete.
-   * @return HTTP Code 204 with No Content.
-   */
-  @DeleteMapping("/delete-channel/{id}")
-  public ResponseEntity<Void> deleteChannel(@PathVariable Integer id) {
-    boolean deleted = directMessageChannelService.deleteDirectMessageChannel(id);
-    return deleted
-        ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        : new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   /**
@@ -203,5 +175,35 @@ public class DirectMessageChannelController {
             .data(deleteReqResponse)
             .build();
     return new ResponseEntity<>(responseDto, HttpStatus.OK);
+  }
+
+  /**
+   * Endpoint /api/messaging/set-delete-approver-status: Patch Mapping for setting the status of a
+   * delete channel request.
+   * @param setApproverStatusDto DTO object for setting the status of a delete channel request.
+   * @return HTTP Code 200 if successful, 204 if channel was approved for deletion and has been deleted.
+   */
+  @PatchMapping("set-delete-approver-status")
+  public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> setDeleteChannelApproverStatus(
+          @RequestBody SetDeleteApproverStatusDto setApproverStatusDto) {
+    DeleteChannelRequestResponseDto deleteReqResponse =
+            directMessageChannelService.setDeleteApproverStatus(setApproverStatusDto);
+    if (deleteReqResponse != null) {
+      ResponseDto<DeleteChannelRequestResponseDto> responseDto =
+              ResponseDto.<DeleteChannelRequestResponseDto>builder()
+                      .statusCode(HttpStatus.OK.value())
+                      .message("Delete channel request status updated successfully")
+                      .data(deleteReqResponse)
+                      .build();
+      return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    } else {
+      ResponseDto<DeleteChannelRequestResponseDto> responseDto =
+              ResponseDto.<DeleteChannelRequestResponseDto>builder()
+                      .statusCode(HttpStatus.NO_CONTENT.value())
+                      .message("The channel was approved for deletion, and has been deleted.")
+                      .data(null)
+                      .build();
+      return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
+    }
   }
 }
