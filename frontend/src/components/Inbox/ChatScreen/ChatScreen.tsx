@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/components/Inbox/ChatScreen/ChatScreen.tsx
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, FolderOpen } from "lucide-react";
@@ -21,7 +21,7 @@ const ChatScreen = () => {
 
   // Access chat data from location state
   const { state } = location || {};
-  const channelId = state.channelId;
+  const channelId = state?.channelId;
   const channelName = state?.channelName || null;
   const channelImageBlob = state?.channelImageBlob || defaultAvatar;
   const read = state?.read || false;
@@ -39,10 +39,7 @@ const ChatScreen = () => {
     useState(channelImageBlob);
 
   // Hooks
-  const { messages, setMessages, loading, error } = useChatMessages(
-    channelId,
-    read,
-  );
+  const { messages, setMessages, loading, error } = useChatMessages(channelId, read);
   const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {
@@ -133,9 +130,10 @@ const ChatScreen = () => {
     <div id="chatScreenMainCtn" className="flex flex-col h-screen bg-gray-100">
       {/* Header */}
       <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-4">
-        {/* Back Button */}
+        {/* Back Button with aria-label */}
         <Button
           variant="ghost"
+          aria-label="Back" 
           className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
           onClick={() => navigate("/pages/DirectMessagesDashboard")}
         >
@@ -150,9 +148,7 @@ const ChatScreen = () => {
             style={{ width: "40px", height: "40px" }}
             className="rounded-full object-cover"
           />
-          <h1 className="text-lg font-bold text-gray-800">
-            {currentChannelName}
-          </h1>
+          <h1 className="text-lg font-bold text-gray-800">{currentChannelName}</h1>
         </div>
 
         {/* Options Button */}
@@ -182,6 +178,7 @@ const ChatScreen = () => {
       {/* Chat Messages */}
       <ChatMessages messages={messages} currentUserId={currentUserId} />
 
+      {/* Show blocked component if channel is blocked */}
       <UserBlockedComponent
         showBlockedMessage={channelIsBlocked}
         channelIsBlocked={channelIsBlocked}
@@ -189,6 +186,7 @@ const ChatScreen = () => {
         channelId={channelId}
         channelType={channelType}
       />
+
       {/* Message Input Area */}
       <div
         id="chatScreenInputArea"
@@ -200,11 +198,7 @@ const ChatScreen = () => {
             variant="ghost"
             className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
           >
-            <FolderOpen
-              className="text-gray-800 folder-size"
-              size={24}
-              strokeWidth={1.5}
-            />
+            <FolderOpen className="text-gray-800 folder-size" size={24} strokeWidth={1.5} />
           </Button>
         </div>
 
@@ -219,10 +213,11 @@ const ChatScreen = () => {
           rows={1}
         />
 
-        {/* Send Button */}
+        {/* Send Button with aria-label */}
         <div className="h-full flex items-end">
           <Button
             variant="ghost"
+            aria-label="Send" 
             className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
             style={{ transform: "rotate(45deg)" }}
             onClick={handleSend}
