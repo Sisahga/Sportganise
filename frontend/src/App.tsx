@@ -184,11 +184,17 @@ function App() {
             element={<NotificationsPage />}
           ></Route>
           <Route
-              path="/pages/WaitlistTrainingSessionPage"
-              element={<WaitlistTrainingSessionPage />}
+            path="/pages/WaitlistTrainingSessionPage"
+            element={<WaitlistTrainingSessionPage />}
           ></Route>
-          <Route path="/waitlist" element={<WaitlistTrainingSessionList />}></Route>
-          <Route path="/pages/WaitlistDetailsPage" element={<WaitlistDetailsPage />}></Route>
+          <Route
+            path="/waitlist"
+            element={<WaitlistTrainingSessionList />}
+          ></Route>
+          <Route
+            path="/pages/WaitlistDetailsPage"
+            element={<WaitlistDetailsPage />}
+          ></Route>
         </Route>
       </Routes>
     </Router>
