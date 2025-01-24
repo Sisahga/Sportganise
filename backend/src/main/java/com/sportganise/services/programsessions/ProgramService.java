@@ -90,7 +90,7 @@ public class ProgramService {
 
               Account account = accountOptional.get();
 
-              log.debug("ACCOUNT ID: ", account.getFirstName(), " " ,account.getLastName());
+              log.debug("ACCOUNT ID: ", account.getFirstName(), " ", account.getLastName());
 
               return new ProgramParticipantDto(
                   account.getAccountId(),
@@ -345,7 +345,7 @@ public class ProgramService {
                 () ->
                     new EntityNotFoundException(
                         "Program not found with ID: " + programDtoToModify.getProgramId()));
-    
+
     log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: ", existingProgram.getProgramId());
 
     Program updatedProgram =
