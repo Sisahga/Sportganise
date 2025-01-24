@@ -9,7 +9,6 @@ import static org.mockito.Mockito.*;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
-import com.sportganise.exceptions.channelexceptions.ChannelDeletionException;
 import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;

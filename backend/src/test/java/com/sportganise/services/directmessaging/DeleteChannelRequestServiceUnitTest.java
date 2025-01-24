@@ -17,17 +17,16 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelAp
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataAccessException;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 public class DeleteChannelRequestServiceUnitTest {
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
@@ -137,8 +136,9 @@ public class DeleteChannelRequestServiceUnitTest {
     int channelId = 100;
 
     when(directMessageChannelRepository.existsById(channelId)).thenReturn(false);
-    assertThrows(ChannelNotFoundException.class,
-            () -> directMessageChannelService.deleteDirectMessageChannel(channelId));
+    assertThrows(
+        ChannelNotFoundException.class,
+        () -> directMessageChannelService.deleteDirectMessageChannel(channelId));
   }
 
   @Test
@@ -155,11 +155,13 @@ public class DeleteChannelRequestServiceUnitTest {
 
     List<DeleteChannelRequestApprover> totalApprovers = Arrays.asList(approver1, approver2);
 
-    when(deleteChannelRequestApproverRepository.findDeleteChannelRequestApproverByStatus(DeleteChannelRequestStatusType.APPROVED))
-            .thenReturn(approvedApprovers);
+    when(deleteChannelRequestApproverRepository.findDeleteChannelRequestApproverByStatus(
+            DeleteChannelRequestStatusType.APPROVED))
+        .thenReturn(approvedApprovers);
     when(deleteChannelRequestApproverRepository
-            .findDeleteChannelRequestApproverByApproverCompositeKey_DeleteRequestId(deleteRequestId))
-            .thenReturn(totalApprovers);
+            .findDeleteChannelRequestApproverByApproverCompositeKey_DeleteRequestId(
+                deleteRequestId))
+        .thenReturn(totalApprovers);
 
     when(directMessageChannelRepository.existsById(channelId)).thenReturn(true);
 
@@ -182,19 +184,22 @@ public class DeleteChannelRequestServiceUnitTest {
     DeleteChannelRequestApprover approver2 = mock(DeleteChannelRequestApprover.class);
     List<DeleteChannelRequestApprover> totalApprovers = Arrays.asList(approver1, approver2);
 
-    when(deleteChannelRequestApproverRepository.findDeleteChannelRequestApproverByStatus(DeleteChannelRequestStatusType.APPROVED))
-            .thenReturn(approvedApprovers);
+    when(deleteChannelRequestApproverRepository.findDeleteChannelRequestApproverByStatus(
+            DeleteChannelRequestStatusType.APPROVED))
+        .thenReturn(approvedApprovers);
     when(deleteChannelRequestApproverRepository
-            .findDeleteChannelRequestApproverByApproverCompositeKey_DeleteRequestId(deleteRequestId))
-            .thenReturn(totalApprovers);
+            .findDeleteChannelRequestApproverByApproverCompositeKey_DeleteRequestId(
+                deleteRequestId))
+        .thenReturn(totalApprovers);
 
     boolean result = spyService.checkDeleteRequestApprovalStatus(deleteRequestId, channelId);
 
     assertFalse(result);
     verify(spyService, never()).deleteDirectMessageChannel(channelId);
-    verify(deleteChannelRequestApproverRepository).findDeleteChannelRequestApproverByStatus(DeleteChannelRequestStatusType.APPROVED);
     verify(deleteChannelRequestApproverRepository)
-            .findDeleteChannelRequestApproverByApproverCompositeKey_DeleteRequestId(deleteRequestId);
+        .findDeleteChannelRequestApproverByStatus(DeleteChannelRequestStatusType.APPROVED);
+    verify(deleteChannelRequestApproverRepository)
+        .findDeleteChannelRequestApproverByApproverCompositeKey_DeleteRequestId(deleteRequestId);
   }
 
   @Test
@@ -210,24 +215,21 @@ public class DeleteChannelRequestServiceUnitTest {
     statusDto.setStatus("APPROVED");
 
     DeleteChannelRequestApproverCompositeKey key =
-            new DeleteChannelRequestApproverCompositeKey(accountId, deleteRequestId);
+        new DeleteChannelRequestApproverCompositeKey(accountId, deleteRequestId);
 
     DeleteChannelRequestApprover approver = mock(DeleteChannelRequestApprover.class);
 
     DirectMessageChannelService spyService = spy(directMessageChannelService);
 
-    when(deleteChannelRequestApproverRepository.findById(key))
-            .thenReturn(Optional.of(approver));
+    when(deleteChannelRequestApproverRepository.findById(key)).thenReturn(Optional.of(approver));
 
-    when(directMessageChannelRepository.existsById(channelId))
-            .thenReturn(true);
+    when(directMessageChannelRepository.existsById(channelId)).thenReturn(true);
 
     doReturn(true).when(spyService).checkDeleteRequestApprovalStatus(deleteRequestId, channelId);
 
     doNothing().when(spyService).deleteDirectMessageChannel(channelId);
 
-    DeleteChannelRequestResponseDto result =
-            spyService.setDeleteApproverStatus(statusDto);
+    DeleteChannelRequestResponseDto result = spyService.setDeleteApproverStatus(statusDto);
 
     assertNull(result);
     verify(deleteChannelRequestApproverRepository).save(approver);
@@ -246,32 +248,28 @@ public class DeleteChannelRequestServiceUnitTest {
     statusDto.setStatus("APPROVED");
 
     DeleteChannelRequestApproverCompositeKey key =
-            new DeleteChannelRequestApproverCompositeKey(accountId, deleteRequestId);
+        new DeleteChannelRequestApproverCompositeKey(accountId, deleteRequestId);
 
     DeleteChannelRequestApprover approver = mock(DeleteChannelRequestApprover.class);
     DirectMessageChannel channel = mock(DirectMessageChannel.class);
 
     DirectMessageChannelService spyService = spy(directMessageChannelService);
 
-    when(deleteChannelRequestApproverRepository.findById(key))
-            .thenReturn(Optional.of(approver));
+    when(deleteChannelRequestApproverRepository.findById(key)).thenReturn(Optional.of(approver));
 
-    when(directMessageChannelRepository.existsById(channelId))
-            .thenReturn(true);
+    when(directMessageChannelRepository.existsById(channelId)).thenReturn(true);
 
     doReturn(false).when(spyService).checkDeleteRequestApprovalStatus(deleteRequestId, channelId);
 
-    when(directMessageChannelRepository.findById(channelId))
-            .thenReturn(Optional.of(channel));
+    when(directMessageChannelRepository.findById(channelId)).thenReturn(Optional.of(channel));
 
     when(channel.getType()).thenReturn("GROUP");
 
-    when(deleteChannelRequestApproverRepository
-            .getChannelMembersDetailsForDeleteRequest(deleteRequestId))
-            .thenReturn(Collections.emptyList());
+    when(deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
+            deleteRequestId))
+        .thenReturn(Collections.emptyList());
 
-    DeleteChannelRequestResponseDto result =
-            spyService.setDeleteApproverStatus(statusDto);
+    DeleteChannelRequestResponseDto result = spyService.setDeleteApproverStatus(statusDto);
 
     assertNotNull(result);
     assertEquals(deleteRequestId, result.getDeleteChannelRequestDto().getDeleteRequestId());
@@ -286,12 +284,12 @@ public class DeleteChannelRequestServiceUnitTest {
     statusDto.setStatus("APPROVED");
 
     DeleteChannelRequestApproverCompositeKey key =
-            new DeleteChannelRequestApproverCompositeKey(1, 100);
+        new DeleteChannelRequestApproverCompositeKey(1, 100);
 
-    when(deleteChannelRequestApproverRepository.findById(key))
-            .thenReturn(Optional.empty());
+    when(deleteChannelRequestApproverRepository.findById(key)).thenReturn(Optional.empty());
 
-    assertThrows(DeleteChannelApproverException.class,
-            () -> directMessageChannelService.setDeleteApproverStatus(statusDto));
+    assertThrows(
+        DeleteChannelApproverException.class,
+        () -> directMessageChannelService.setDeleteApproverStatus(statusDto));
   }
 }
