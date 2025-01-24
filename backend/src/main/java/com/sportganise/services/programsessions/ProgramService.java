@@ -75,6 +75,8 @@ public class ProgramService {
     List<ProgramParticipant> participants =
         programRepository.findParticipantsByProgramId(programId);
 
+    log.debug("PARTICIPANTS COUNT: ", participants.size());
+
     return participants.stream()
         .map(
             participant -> {
@@ -87,6 +89,8 @@ public class ProgramService {
               }
 
               Account account = accountOptional.get();
+
+              log.debug("ACCOUNT ID: ", account.getFirstName(), " " ,account.getLastName());
 
               return new ProgramParticipantDto(
                   account.getAccountId(),
@@ -107,7 +111,11 @@ public class ProgramService {
   public ProgramDto getProgramDetails(Integer programId) {
     Program program = programRepository.findProgramById(programId);
 
+    log.debug("PROGRAM ID: ", program.getProgramId());
+
     List<ProgramAttachmentDto> programAttachments = getProgramAttachments(programId);
+
+    log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
 
     return new ProgramDto(
         program.getProgramId(),
@@ -132,16 +140,25 @@ public class ProgramService {
    * @return a list of ProgramAttachmentDto related to the program.
    */
   public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
+
+    log.debug("PROGRAM ID: {}", programId);
+
     List<ProgramAttachment> programAttachments =
         programAttachmentRepository.findAttachmentsByProgramId(programId);
+
+    log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: ", programAttachments.size());
+
     List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
-    log.debug("Program Id: {}", programId);
+
     for (ProgramAttachment attachment : programAttachments) {
       programAttachmentDtos.add(
           new ProgramAttachmentDto(
               attachment.getCompositeProgramAttachmentKey().getProgramId(),
               attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
     }
+
+    log.debug("PROGRAM ATTACHMENTS DTOS COUNT: ", programAttachmentDtos.size());
+
     return programAttachmentDtos;
   }
 
@@ -152,6 +169,8 @@ public class ProgramService {
    */
   public List<ProgramDto> getPrograms() {
     List<Program> programs = programRepository.findPrograms();
+
+    log.debug("PROGRAMS COUNT: ", programs.size());
 
     List<ProgramDto> programDtos = new ArrayList<>();
 
@@ -174,6 +193,8 @@ public class ProgramService {
               programAttachments));
     }
 
+    log.debug("PROGRAM DTOS COUNT: ", programDtos.size());
+
     return programDtos;
   }
 
@@ -193,6 +214,9 @@ public class ProgramService {
             programDto -> {
               List<ProgramParticipantDto> participants =
                   hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
+
+              log.debug("PROGRAM PARTICIPANTS COUNT: ", participants.size());
+
               return new ProgramDetailsParticipantsDto(programDto, participants);
             })
         .collect(Collectors.toList());
@@ -247,6 +271,8 @@ public class ProgramService {
             endTime,
             location);
     programRepository.save(savedProgram);
+
+    log.debug("NEW PROGRAM ID: ", savedProgram.getProgramId());
 
     List<ProgramAttachmentDto> programAttachmentsDto = new ArrayList<>();
 
@@ -319,6 +345,8 @@ public class ProgramService {
                 () ->
                     new EntityNotFoundException(
                         "Program not found with ID: " + programDtoToModify.getProgramId()));
+    
+    log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: ", existingProgram.getProgramId());
 
     Program updatedProgram =
         createProgramObject(
@@ -335,6 +363,8 @@ public class ProgramService {
             location);
     updatedProgram.setProgramId(existingProgram.getProgramId());
     programRepository.save(updatedProgram);
+
+    log.debug("PROGRAM ID OF MODIFIED PROGRAM: ", existingProgram.getProgramId());
 
     if (!attachmentsToRemove.isEmpty()) {
       // Delete from repo.
@@ -363,6 +393,8 @@ public class ProgramService {
             new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
       }
       programAttachmentRepository.saveAll(programAttachments);
+
+      log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
   }
@@ -380,10 +412,13 @@ public class ProgramService {
       String endTime,
       String location) {
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
+    log.debug("occurrenceDate: ", occurrenceDate);
+
     int durationMins =
         (int)
             java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
                 .toMinutes();
+    log.debug("durationMins: ", durationMins);
 
     ZonedDateTime expiryDate = null;
     String frequency = null;
@@ -396,6 +431,7 @@ public class ProgramService {
       while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
 
         currentOccurrence = currentOccurrence.plusDays(7);
+        log.debug("nextOccurrence: ", currentOccurrence);
       }
     }
 
