@@ -2,6 +2,8 @@ package com.sportganise.controllers.directmessaging;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestResponseDto;
 import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.RenameChannelDto;
@@ -142,21 +144,11 @@ public class DirectMessageChannelController {
   @PutMapping("/rename-channel")
   public ResponseEntity<ResponseDto<Null>> renameChannel(
       @RequestBody RenameChannelDto renameChannelDto) {
-    try {
-      directMessageChannelService.renameGroupChannel(
-          renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
-      return new ResponseEntity<>(
-          new ResponseDto<>(HttpStatus.OK.value(), "Channel renamed successfully", null),
-          HttpStatus.OK);
-    } catch (ChannelNotFoundException e) {
-      return new ResponseEntity<>(
-          new ResponseDto<>(HttpStatus.NOT_FOUND.value(), "Channel not found", null),
-          HttpStatus.NOT_FOUND);
-    } catch (Exception e) {
-      return new ResponseEntity<>(
-          new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null),
-          HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    directMessageChannelService.renameGroupChannel(
+        renameChannelDto.getChannelId(), renameChannelDto.getChannelName());
+    return new ResponseEntity<>(
+        new ResponseDto<>(HttpStatus.OK.value(), "Channel renamed successfully", null),
+        HttpStatus.OK);
   }
 
   /**
@@ -190,5 +182,26 @@ public class DirectMessageChannelController {
           new ResponseDto<>(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), null),
           HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  /**
+   * Endpoint /api/messaging/delete-channel-request: Post Mapping for sending a request to delete a
+   * channel.
+   *
+   * @param deleteChannelRequestDto DTO object for deleting a channel.
+   * @return HTTP Code 200 if successful.
+   */
+  @PostMapping("/delete-channel-request")
+  public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> requestDeleteChannel(
+      @RequestBody DeleteChannelRequestDto deleteChannelRequestDto) {
+    DeleteChannelRequestResponseDto deleteReqResponse =
+        directMessageChannelService.requestDeleteChannel(deleteChannelRequestDto);
+    ResponseDto<DeleteChannelRequestResponseDto> responseDto =
+        ResponseDto.<DeleteChannelRequestResponseDto>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Delete channel request sent successfully")
+            .data(deleteReqResponse)
+            .build();
+    return new ResponseEntity<>(responseDto, HttpStatus.OK);
   }
 }
