@@ -1,4 +1,3 @@
-// src/components/Inbox/ChatScreen/ChatScreen.tsx
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, FolderOpen } from "lucide-react";
@@ -7,7 +6,7 @@ import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService.ts";
-import { SendMessageComponent } from "@/types/messaging.ts";
+import { SendMessageComponent, MessageComponent } from "@/types/messaging.ts"; // Ensure this import
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
@@ -39,7 +38,10 @@ const ChatScreen = () => {
     useState(channelImageBlob);
 
   // Hooks
-  const { messages, setMessages, loading, error } = useChatMessages(channelId, read);
+  const { messages, setMessages, loading, error } = useChatMessages(
+    channelId,
+    read,
+  );
   const { sendDirectMessage } = useSendMessage();
 
   const connectWebSocket = async () => {
@@ -48,7 +50,8 @@ const ChatScreen = () => {
     setConnected(connSuccess);
   };
 
-  const onMessageReceived = (message: any) => {
+  const onMessageReceived = (message: MessageComponent) => {
+    // Changed from any to MessageComponent
     setMessages((prevMessages) => [...prevMessages, message]);
     if (message.type === "BLOCK") {
       setChannelIsBlocked(true);
@@ -71,7 +74,6 @@ const ChatScreen = () => {
       senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
       avatarUrl:
         "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
-      // TODO: Replace with actual avatar url from cookies
     };
 
     sendDirectMessage(messagePayload, webSocketServiceRef.current);
@@ -133,7 +135,7 @@ const ChatScreen = () => {
         {/* Back Button with aria-label */}
         <Button
           variant="ghost"
-          aria-label="Back" 
+          aria-label="Back"
           className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
           onClick={() => navigate("/pages/DirectMessagesDashboard")}
         >
@@ -148,7 +150,9 @@ const ChatScreen = () => {
             style={{ width: "40px", height: "40px" }}
             className="rounded-full object-cover"
           />
-          <h1 className="text-lg font-bold text-gray-800">{currentChannelName}</h1>
+          <h1 className="text-lg font-bold text-gray-800">
+            {currentChannelName}
+          </h1>
         </div>
 
         {/* Options Button */}
@@ -198,7 +202,11 @@ const ChatScreen = () => {
             variant="ghost"
             className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
           >
-            <FolderOpen className="text-gray-800 folder-size" size={24} strokeWidth={1.5} />
+            <FolderOpen
+              className="text-gray-800 folder-size"
+              size={24}
+              strokeWidth={1.5}
+            />
           </Button>
         </div>
 
@@ -217,7 +225,7 @@ const ChatScreen = () => {
         <div className="h-full flex items-end">
           <Button
             variant="ghost"
-            aria-label="Send" 
+            aria-label="Send"
             className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
             style={{ transform: "rotate(45deg)" }}
             onClick={handleSend}

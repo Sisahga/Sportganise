@@ -1,66 +1,67 @@
-import React from 'react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
-import ChatMessages from './ChatMessages'; // Adjust if needed
+import ChatMessages from "./ChatMessages"; // Adjust if needed
 
 // Utility: create a DOM element for "#chatScreenInputArea" if we test BLOCK logic
 function setupChatScreenInputArea() {
-  const inputArea = document.createElement('div');
-  inputArea.id = 'chatScreenInputArea';
+  const inputArea = document.createElement("div");
+  inputArea.id = "chatScreenInputArea";
   document.body.appendChild(inputArea);
   return inputArea;
 }
 
-describe('ChatMessages', () => {
+describe("ChatMessages", () => {
   beforeEach(() => {
     // Clear any prior DOM or mocks
-    document.body.innerHTML = '';
+    document.body.innerHTML = "";
     vi.resetAllMocks();
   });
 
-  it('renders a list of CHAT messages with required fields', () => {
+  it("renders a list of CHAT messages with required fields", () => {
     const messages = [
       {
         messageId: 1,
         channelId: 10,
         attachments: [],
-        type: 'CHAT',
+        type: "CHAT",
         senderId: 100,
-        senderFirstName: 'Alice',
-        avatarUrl: '/alice.png',
-        messageContent: 'Hello!',
-        sentAt: '2023-10-01T10:00:00Z',
+        senderFirstName: "Alice",
+        avatarUrl: "/alice.png",
+        messageContent: "Hello!",
+        sentAt: "2023-10-01T10:00:00Z",
       },
       {
         messageId: 2,
         channelId: 10,
         attachments: [],
-        type: 'CHAT',
+        type: "CHAT",
         senderId: 200,
-        senderFirstName: 'Bob',
-        avatarUrl: '/bob.png',
-        messageContent: 'Hi, Alice!',
-        sentAt: '2023-10-01T10:20:00Z',
+        senderFirstName: "Bob",
+        avatarUrl: "/bob.png",
+        messageContent: "Hi, Alice!",
+        sentAt: "2023-10-01T10:20:00Z",
       },
     ];
 
     render(<ChatMessages messages={messages} currentUserId={100} />);
 
     // Check first message
-    expect(screen.getByText('Hello!')).toBeInTheDocument();
+    expect(screen.getByText("Hello!")).toBeInTheDocument();
     // Current user is senderId=100 => no avatar for own messages
-    expect(screen.queryByRole('img', { name: /alice\.png/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("img", { name: /alice\.png/i }),
+    ).not.toBeInTheDocument();
 
     // Check second message
-    expect(screen.getByText('Hi, Alice!')).toBeInTheDocument();
+    expect(screen.getByText("Hi, Alice!")).toBeInTheDocument();
     // Bob's avatar should appear
-    const bobAvatar = screen.getByRole('img') as HTMLImageElement;
-    expect(bobAvatar.src).toContain('bob.png');
+    const bobAvatar = screen.getByRole("img") as HTMLImageElement;
+    expect(bobAvatar.src).toContain("bob.png");
   });
 
-  it('shows a JOIN message in the correct text', () => {
+  it("shows a JOIN message in the correct text", () => {
     // " from the user " is rendered with leading/trailing spaces
     // We'll use a partial/regex match to find it
     const messages = [
@@ -68,12 +69,12 @@ describe('ChatMessages', () => {
         messageId: 123,
         channelId: 999,
         attachments: [],
-        type: 'JOIN',
+        type: "JOIN",
         senderId: 999,
-        senderFirstName: 'John',
-        avatarUrl: '/john.png',
-        messageContent: 'some*join*message* from the user *stuff',
-        sentAt: '2023-10-02T09:00:00Z',
+        senderFirstName: "John",
+        avatarUrl: "/john.png",
+        messageContent: "some*join*message* from the user *stuff",
+        sentAt: "2023-10-02T09:00:00Z",
       },
     ];
 
@@ -84,7 +85,7 @@ describe('ChatMessages', () => {
     expect(screen.getByText(/from the user/i)).toBeInTheDocument();
   });
 
-  it('applies pointer-events-none if the last message is BLOCK', () => {
+  it("applies pointer-events-none if the last message is BLOCK", () => {
     const inputArea = setupChatScreenInputArea();
 
     const messages = [
@@ -92,56 +93,56 @@ describe('ChatMessages', () => {
         messageId: 1,
         channelId: 10,
         attachments: [],
-        type: 'CHAT',
+        type: "CHAT",
         senderId: 200,
-        senderFirstName: 'Bob',
-        avatarUrl: '/bob.png',
-        messageContent: 'Hello world!',
-        sentAt: '2023-10-01T10:00:00Z',
+        senderFirstName: "Bob",
+        avatarUrl: "/bob.png",
+        messageContent: "Hello world!",
+        sentAt: "2023-10-01T10:00:00Z",
       },
       {
         messageId: 2,
         channelId: 10,
         attachments: [],
-        type: 'BLOCK',
+        type: "BLOCK",
         senderId: 200,
-        senderFirstName: 'Bob',
-        avatarUrl: '/bob.png',
-        messageContent: 'some*block*message* from the user *stuff',
-        sentAt: '2023-10-01T10:05:00Z',
+        senderFirstName: "Bob",
+        avatarUrl: "/bob.png",
+        messageContent: "some*block*message* from the user *stuff",
+        sentAt: "2023-10-01T10:05:00Z",
       },
     ];
 
     render(<ChatMessages messages={messages} currentUserId={100} />);
     // The last message is BLOCK => the code disables #chatScreenInputArea
-    expect(inputArea).toHaveClass('pointer-events-none', 'opacity-70');
+    expect(inputArea).toHaveClass("pointer-events-none", "opacity-70");
   });
 
-  it('shows a second timestamp if messages are more than 15 minutes apart', () => {
+  it("shows a second timestamp if messages are more than 15 minutes apart", () => {
     const messages = [
       {
         messageId: 1,
         channelId: 10,
         attachments: [],
-        type: 'CHAT',
+        type: "CHAT",
         senderId: 100,
-        senderFirstName: 'Alice',
-        avatarUrl: '/alice.png',
-        messageContent: 'First message',
+        senderFirstName: "Alice",
+        avatarUrl: "/alice.png",
+        messageContent: "First message",
         // 10:00 UTC
-        sentAt: '2023-10-01T10:00:00Z',
+        sentAt: "2023-10-01T10:00:00Z",
       },
       {
         messageId: 2,
         channelId: 10,
         attachments: [],
-        type: 'CHAT',
+        type: "CHAT",
         senderId: 100,
-        senderFirstName: 'Alice',
-        avatarUrl: '/alice.png',
-        messageContent: 'Second message (16 minutes later)',
+        senderFirstName: "Alice",
+        avatarUrl: "/alice.png",
+        messageContent: "Second message (16 minutes later)",
         // 10:16 UTC => 16 min difference from 10:00
-        sentAt: '2023-10-01T10:16:00Z',
+        sentAt: "2023-10-01T10:16:00Z",
       },
     ];
 
@@ -155,9 +156,9 @@ describe('ChatMessages', () => {
     const timeStamps = screen.queryAllByText((content, element) => {
       if (!element) return false;
       return (
-        element.className.includes('text-xs') &&
-        element.className.includes('text-gray-500') &&
-        element.className.includes('text-center')
+        element.className.includes("text-xs") &&
+        element.className.includes("text-gray-500") &&
+        element.className.includes("text-center")
       );
     });
 
@@ -165,31 +166,31 @@ describe('ChatMessages', () => {
     expect(timeStamps).toHaveLength(2);
   });
 
-  it('omits second timestamp if messages are <= 15 minutes apart', () => {
+  it("omits second timestamp if messages are <= 15 minutes apart", () => {
     const messages = [
       {
         messageId: 1,
         channelId: 10,
         attachments: [],
-        type: 'CHAT',
+        type: "CHAT",
         senderId: 100,
-        senderFirstName: 'Alice',
-        avatarUrl: '/alice.png',
-        messageContent: 'First message',
+        senderFirstName: "Alice",
+        avatarUrl: "/alice.png",
+        messageContent: "First message",
         // 10:00 UTC
-        sentAt: '2023-10-01T10:00:00Z',
+        sentAt: "2023-10-01T10:00:00Z",
       },
       {
         messageId: 2,
         channelId: 10,
         attachments: [],
-        type: 'CHAT',
+        type: "CHAT",
         senderId: 100,
-        senderFirstName: 'Alice',
-        avatarUrl: '/alice.png',
-        messageContent: 'Second message (10 minutes later)',
+        senderFirstName: "Alice",
+        avatarUrl: "/alice.png",
+        messageContent: "Second message (10 minutes later)",
         // 10:10 UTC => 10 min difference from 10:00
-        sentAt: '2023-10-01T10:10:00Z',
+        sentAt: "2023-10-01T10:10:00Z",
       },
     ];
 
@@ -200,9 +201,9 @@ describe('ChatMessages', () => {
     const timeStamps = screen.queryAllByText((content, element) => {
       if (!element) return false;
       return (
-        element.className.includes('text-xs') &&
-        element.className.includes('text-gray-500') &&
-        element.className.includes('text-center')
+        element.className.includes("text-xs") &&
+        element.className.includes("text-gray-500") &&
+        element.className.includes("text-center")
       );
     });
 

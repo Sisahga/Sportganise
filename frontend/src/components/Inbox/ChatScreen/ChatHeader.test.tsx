@@ -1,15 +1,13 @@
 // src/components/Inbox/ChatScreen/ChatHeader.test.tsx
-
-import React from 'react';
-import { describe, it, expect, beforeEach, vi, MockedFunction } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
+import { describe, it, expect, beforeEach, vi, MockedFunction } from "vitest";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 // ---------------------------------------------------------------------------
 // 1) Mock react-router-dom with esModule: true
 // ---------------------------------------------------------------------------
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
   return {
     ...actual,
     useNavigate: vi.fn(),
@@ -19,22 +17,22 @@ vi.mock('react-router-dom', async () => {
 // ---------------------------------------------------------------------------
 // Now import the modules we just mocked
 // ---------------------------------------------------------------------------
-import { useNavigate } from 'react-router-dom';
-import ChatHeader from './ChatHeader';
+import { useNavigate } from "react-router-dom";
+import ChatHeader from "./ChatHeader";
 
 // ---------------------------------------------------------------------------
 // Create typed aliases for our mocked functions
 // ---------------------------------------------------------------------------
 type UseNavigateMock = MockedFunction<typeof useNavigate>;
 
-describe('ChatHeader', () => {
+describe("ChatHeader", () => {
   const mockNavigate = vi.fn();
   const mockOnDeleteChat = vi.fn();
   const mockOnBlockUser = vi.fn();
 
   const defaultProps = {
-    chatName: 'Test Chat',
-    chatAvatar: 'test-avatar.jpg',
+    chatName: "Test Chat",
+    chatAvatar: "test-avatar.jpg",
     channelId: 123,
     onDeleteChat: mockOnDeleteChat,
     onBlockUser: mockOnBlockUser,
@@ -53,24 +51,26 @@ describe('ChatHeader', () => {
   // -------------------------------------------------------------------------
   // 1) Renders chat name and avatar
   // -------------------------------------------------------------------------
-  it('renders chat name and avatar', () => {
+  it("renders chat name and avatar", () => {
     render(<ChatHeader {...defaultProps} />);
     // Check that the chat name is rendered
-    expect(screen.getByText('Test Chat')).toBeInTheDocument();
+    expect(screen.getByText("Test Chat")).toBeInTheDocument();
 
     // Check that the avatar is displayed with correct alt text
-    const avatarImg = screen.getByRole('img', { name: /test chat/i }) as HTMLImageElement;
+    const avatarImg = screen.getByRole("img", {
+      name: /test chat/i,
+    }) as HTMLImageElement;
     expect(avatarImg).toBeInTheDocument();
-    expect(avatarImg.src).toContain('test-avatar.jpg');
+    expect(avatarImg.src).toContain("test-avatar.jpg");
   });
 
   // -------------------------------------------------------------------------
   // 2) Navigation back
   // -------------------------------------------------------------------------
-  it('navigates back when the back button is clicked', () => {
+  it("navigates back when the back button is clicked", () => {
     render(<ChatHeader {...defaultProps} />);
     // Locate the back button using aria-label
-    const backButton = screen.getByRole('button', { name: /back/i });
+    const backButton = screen.getByRole("button", { name: /back/i });
     fireEvent.click(backButton);
 
     // Expect navigate(-1) to have been called
@@ -80,11 +80,11 @@ describe('ChatHeader', () => {
   // -------------------------------------------------------------------------
   // 3) Toggles the 3-dot options menu when clicked
   // -------------------------------------------------------------------------
-  it('toggles the 3-dot options menu when clicked', () => {
+  it("toggles the 3-dot options menu when clicked", () => {
     render(<ChatHeader {...defaultProps} />);
 
     // Locate the options button using aria-label
-    const optionsButton = screen.getByRole('button', { name: /options/i });
+    const optionsButton = screen.getByRole("button", { name: /options/i });
 
     // Initially, Delete Chat and Block User options should not be visible
     expect(screen.queryByText(/delete chat/i)).not.toBeInTheDocument();
@@ -108,7 +108,7 @@ describe('ChatHeader', () => {
     render(<ChatHeader {...defaultProps} />);
 
     // Open the options menu
-    const optionsButton = screen.getByRole('button', { name: /options/i });
+    const optionsButton = screen.getByRole("button", { name: /options/i });
     fireEvent.click(optionsButton);
 
     // Click the "Delete Chat" button
@@ -126,7 +126,7 @@ describe('ChatHeader', () => {
     render(<ChatHeader {...defaultProps} />);
 
     // Open the options menu
-    const optionsButton = screen.getByRole('button', { name: /options/i });
+    const optionsButton = screen.getByRole("button", { name: /options/i });
     fireEvent.click(optionsButton);
 
     // Click the "Block User" button
