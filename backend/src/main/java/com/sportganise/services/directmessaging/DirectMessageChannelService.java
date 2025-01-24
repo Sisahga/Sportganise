@@ -4,8 +4,15 @@ import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
+import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
-import com.sportganise.exceptions.ChannelNotFoundException;
+import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.channelexceptions.ChannelCreationException;
+import com.sportganise.exceptions.channelexceptions.ChannelDeletionException;
+import com.sportganise.exceptions.channelexceptions.ChannelFetchException;
+import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
@@ -18,8 +25,10 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 /** Service Class related to Direct Message Channel. */
 @Service
@@ -63,99 +72,121 @@ public class DirectMessageChannelService {
    * @param creatorAccountId Id of the account who created the channel.
    * @return DM Channel created.
    */
+  @Transactional
   public CreateDirectMessageChannelDto createDirectMessageChannel(
       List<Integer> memberIds, String channelName, int creatorAccountId) {
-    Collections.sort(memberIds);
-    String stringRepresentation = memberIds.toString();
-    String sha256hex = DigestUtils.sha256Hex(stringRepresentation);
-    DuplicateChannelDto duplicateChannel =
-        directMessageChannelRepository.findChannelByChannelHash(sha256hex);
-    if (!(duplicateChannel == null)) {
-      log.info("DUPLICATE CHANNEL HANDLED.");
+    try {
+      Collections.sort(memberIds);
+      String stringRepresentation = memberIds.toString();
+      String sha256hex = DigestUtils.sha256Hex(stringRepresentation);
+      DuplicateChannelDto duplicateChannel =
+          directMessageChannelRepository.findChannelByChannelHash(sha256hex);
+      // If a channel with the same members already exists, return the existing channel.
+      if (!(duplicateChannel == null)) {
+        CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
+        dmChannelDto.setChannelId(duplicateChannel.getChannelId());
+        dmChannelDto.setChannelType(duplicateChannel.getChannelType());
+        dmChannelDto.setMemberIds(memberIds);
+        if (duplicateChannel.getChannelType().equals("SIMPLE")) {
+          int otherMemberId =
+              memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
+          dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
+          dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
+        } else {
+          dmChannelDto.setChannelName(duplicateChannel.getChannelName());
+          dmChannelDto.setAvatarUrl(null);
+        }
+        return dmChannelDto;
+      }
+
+      /*
+      Set the Channel Name to be the first names of members
+      in the channel if it is null or empty.
+      */
+      if (channelName == null || channelName.isBlank() && memberIds.size() > 2) {
+        StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
+        channelName = channelNameBuilder.toString();
+      }
+      DirectMessageChannel dmChannel = new DirectMessageChannel();
+      dmChannel.setName(channelName);
+      if (memberIds.size() > 2) {
+        dmChannel.setType("GROUP");
+      } else {
+        dmChannel.setType("SIMPLE");
+      }
+
+      ZonedDateTime timestamp = ZonedDateTime.now();
+      dmChannel.setCreatedAt(timestamp);
+      dmChannel.setChannelHash(sha256hex);
+
+      DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
+      int createdDmChannelId = createdDmChannel.getChannelId();
+      // Create Channel Members
+      this.directMessageChannelMemberService.saveMembers(
+          memberIds, createdDmChannelId, creatorAccountId);
+
+      // Return the DM Channel DTO
       CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
-      dmChannelDto.setChannelId(duplicateChannel.getChannelId());
-      dmChannelDto.setChannelType(duplicateChannel.getChannelType());
-      dmChannelDto.setMemberIds(memberIds);
-      if (duplicateChannel.getChannelType().equals("SIMPLE")) {
+      dmChannelDto.setChannelId(createdDmChannelId);
+      if (dmChannel.getType().equals("SIMPLE")) {
         int otherMemberId =
-            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
-                duplicateChannel.getChannelId(), creatorAccountId);
+            memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
         dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
+      } else {
+        dmChannelDto.setChannelName(channelName);
+      }
+      dmChannelDto.setChannelType(createdDmChannel.getType());
+      dmChannelDto.setMemberIds(memberIds);
+      dmChannelDto.setCreatedAt(timestamp.toString());
+      if (dmChannel.getType().equals("SIMPLE")) {
+        int otherMemberId =
+            memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
         dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
       } else {
-        dmChannelDto.setChannelName(duplicateChannel.getChannelName());
         dmChannelDto.setAvatarUrl(null);
       }
+
+      String creatorFirstName = accountRepository.getFirstNameByAccountId(creatorAccountId);
+      directMessageService.sendCreationDirectMessage(
+          createdDmChannelId, creatorAccountId, creatorFirstName);
+
+      // If GROUP, make creator ADMIN, rest REGULAR
+      if (dmChannel.getType().equals("GROUP")) {
+        initializeGroupRoles(memberIds, creatorAccountId, createdDmChannelId);
+      }
+
       return dmChannelDto;
+    } catch (DataAccessException e) {
+      log.error("Database error occured while creating channel: {}", e.getMessage());
+      throw new ChannelCreationException(
+          "Database error occured while creating channel: " + e.getMessage());
+    } catch (Exception e) {
+      log.error("Failed to create direct message channel: {}", e.getMessage());
+      throw new ChannelCreationException(
+          "Failed to create direct message channel: " + e.getMessage());
     }
-
-    /*
-    Set the Channel Name to be the first names of members
-    in the channel if it is null or empty.
-    */
-    if (channelName == null || channelName.isBlank() && memberIds.size() > 2) {
-      StringBuilder channelNameBuilder = createChannelNameFromMembers(memberIds);
-      channelName = channelNameBuilder.toString();
-    }
-    DirectMessageChannel dmChannel = new DirectMessageChannel();
-    dmChannel.setName(channelName);
-    if (memberIds.size() > 2) {
-      dmChannel.setType("GROUP");
-    } else {
-      dmChannel.setType("SIMPLE");
-    }
-
-    ZonedDateTime timestamp = ZonedDateTime.now();
-    dmChannel.setCreatedAt(timestamp);
-    dmChannel.setChannelHash(sha256hex);
-
-    DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
-    int createdDmChannelId = createdDmChannel.getChannelId();
-    // Create Channel Members
-    this.directMessageChannelMemberService.saveMembers(
-        memberIds, createdDmChannelId, creatorAccountId);
-
-    // Return the DM Channel DTO
-    CreateDirectMessageChannelDto dmChannelDto = new CreateDirectMessageChannelDto();
-    dmChannelDto.setChannelId(createdDmChannelId);
-    if (dmChannel.getType().equals("SIMPLE")) {
-      int otherMemberId =
-          memberIds.get(0) == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
-      dmChannelDto.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
-    } else {
-      dmChannelDto.setChannelName(channelName);
-    }
-    dmChannelDto.setChannelType(createdDmChannel.getType());
-    dmChannelDto.setMemberIds(memberIds);
-    dmChannelDto.setCreatedAt(timestamp.toString());
-    if (dmChannel.getType().equals("SIMPLE")) {
-      int otherMemberId =
-          memberIds.getFirst() == creatorAccountId ? memberIds.get(1) : memberIds.get(0);
-      dmChannelDto.setAvatarUrl(accountRepository.getPictureUrlByAccountId(otherMemberId));
-    } else {
-      dmChannelDto.setAvatarUrl(null);
-    }
-
-    String creatorFirstName = accountRepository.getFirstNameByAccountId(creatorAccountId);
-    directMessageService.sendCreationDirectMessage(
-        createdDmChannelId, creatorAccountId, creatorFirstName);
-    return dmChannelDto;
   }
 
   /**
    * Deletes a DM Channel and all of its channel members.
    *
    * @param channelId The ID of the channel to delete.
+   * @return True if the channel was deleted successfully.
    */
+  @Transactional
   public boolean deleteDirectMessageChannel(int channelId) {
-    if (directMessageChannelRepository.existsById(channelId)) {
+    try {
+      if (!directMessageChannelRepository.existsById(channelId)) {
+        throw new ChannelNotFoundException("Channel not found.");
+      }
       // Delete the channel.
       directMessageChannelRepository.deleteById(channelId);
       // Delete all related channel members.
       directMessageChannelMemberRepository.deleteDirectMessageChannelMemberByChannelId(channelId);
       return true;
-    } else {
-      return false;
+    } catch (Exception e) {
+      log.error("Failed to delete channel: {}", e.getMessage());
+      throw new ChannelDeletionException("Failed to delete channel: " + e.getMessage());
     }
   }
 
@@ -165,24 +196,36 @@ public class DirectMessageChannelService {
    * @param accountId Id of the account to get Direct Message Channels for.
    * @return List of Direct Message Channels for the account.
    */
+  @Transactional
   public List<ListDirectMessageChannelDto> getDirectMessageChannels(int accountId) {
-    List<ListDirectMessageChannelDto> dmChannels =
-        directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
-    for (ListDirectMessageChannelDto dmChannel : dmChannels) {
-      log.info("Channel read: {}", dmChannel.getRead());
+    if (!accountRepository.existsById(accountId)) {
+      throw new AccountNotFoundException("Account not found.");
     }
-    for (ListDirectMessageChannelDto dmChannel : dmChannels) {
-      // Set image blob of channel to be the image blob of the other member of the channel if it is
-      if (dmChannel.getChannelType().equals("SIMPLE")) {
-        int otherMemberId =
-            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
-                dmChannel.getChannelId(), accountId);
-        log.info("Other member id: {}", otherMemberId);
-        dmChannel.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
-        dmChannel.setChannelImageBlob(accountRepository.getPictureUrlByAccountId(otherMemberId));
+    try {
+      List<ListDirectMessageChannelDto> dmChannels =
+          directMessageChannelRepository.getDirectMessageChannelsByAccountId(accountId);
+      for (ListDirectMessageChannelDto dmChannel : dmChannels) {
+        log.info("Channel read: {}", dmChannel.getRead());
       }
+      for (ListDirectMessageChannelDto dmChannel : dmChannels) {
+        // Set image blob of channel to be the image blob of the other member of the channel if it
+        // is
+        if (dmChannel.getChannelType().equals("SIMPLE")) {
+          int otherMemberId =
+              directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                  dmChannel.getChannelId(), accountId);
+          if (otherMemberId == 0) {
+            throw new ChannelMemberNotFoundException("Channel member not found.");
+          }
+          dmChannel.setChannelName(accountRepository.getFirstNameByAccountId(otherMemberId));
+          dmChannel.setChannelImageBlob(accountRepository.getPictureUrlByAccountId(otherMemberId));
+        }
+      }
+      return dmChannels;
+    } catch (Exception e) {
+      log.error("Failed to get direct message channels: {}", e.getMessage());
+      throw new ChannelFetchException("Failed to get direct message channels: " + e.getMessage());
     }
-    return dmChannels;
   }
 
   /**
@@ -213,7 +256,7 @@ public class DirectMessageChannelService {
    */
   @Transactional
   public UpdateChannelImageResponseDto updateChannelPicture(
-      int channelId, MultipartFile image, Integer userId) throws ChannelNotFoundException {
+      int channelId, MultipartFile image, Integer userId) {
     try {
       String oldImageBlobUrl =
           this.directMessageChannelRepository.getDirectMessageChannelImageBlob(channelId);
@@ -230,9 +273,12 @@ public class DirectMessageChannelService {
       deleteOldImageBlob(oldImageBlobUrl);
       log.info("Successfully updated channel picture with id: {}", channelId);
       return response;
-    } catch (IOException e) {
+    } catch (ChannelNotFoundException e) {
+      log.error(e.getMessage());
+      throw e;
+    } catch (Exception e) {
       log.error("Failed to update channel picture: {}", e.getMessage());
-      return null;
+      throw new FileProcessingException("Failed to update channel picture: " + e.getMessage());
     }
   }
 
@@ -270,12 +316,36 @@ public class DirectMessageChannelService {
     return channelNameBuilder;
   }
 
+  /**
+   * Deletes the old image blob of a channel.
+   *
+   * @param oldImageBlob The URL of the old image blob.
+   */
   private void deleteOldImageBlob(String oldImageBlob) {
     try {
       this.blobService.deleteFile(oldImageBlob);
       log.debug("Deleted old image blob: {}", oldImageBlob);
-    } catch (IOException e) {
+    } catch (S3Exception | IOException e) {
       log.warn("Failed to delete old image blob: {}", e.getMessage());
+    }
+  }
+
+  /**
+   * Initializes the roles of the members in a group channel.
+   *
+   * @param memberIds List of member ids.
+   * @param creatorAccountId Id of the creator of the channel.
+   * @param channelId Id of the channel.
+   */
+  private void initializeGroupRoles(List<Integer> memberIds, int creatorAccountId, int channelId) {
+    for (int memberId : memberIds) {
+      if (memberId == creatorAccountId) {
+        directMessageChannelMemberService.setGroupMemberRole(
+            memberId, channelId, ChannelMemberRoleType.ADMIN);
+      } else {
+        directMessageChannelMemberService.setGroupMemberRole(
+            memberId, channelId, ChannelMemberRoleType.REGULAR);
+      }
     }
   }
 }

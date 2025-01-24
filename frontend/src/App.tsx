@@ -22,6 +22,9 @@ import NotificationsPage from "./pages/NotificationsPage.tsx";
 import WaitlistTrainingSessionPage from "./pages/WaitlistTrainingSessionPage";
 import WaitlistTrainingSessionList from "@/components/WaitlistTrainingSession/WaitlistedTrainingSessionList";
 import WaitlistDetailsPage from "./pages/WaitlistDetailsPage";
+import ForumPage from "./pages/ForumPage.tsx";
+import PostDetailPage from "./pages/PostDetailPage.tsx";
+import ModifyPermissionPage from "./pages/ModifyPermissionPage.tsx";
 
 function App() {
   return (
@@ -53,6 +56,12 @@ function App() {
             path="/pages/EditProfilePage"
             element={<EditProfilePage />}
           ></Route>
+          <Route path="/pages/ForumPage" element={<ForumPage />} />
+          <Route path="/pages/PostDetailPage" element={<PostDetailPage />} />
+          <Route
+            path="/pages/ModifyPermissionPage"
+            element={<ModifyPermissionPage />}
+          />
           <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
           <Route
             path="/pages/DirectMessagesDashboard"

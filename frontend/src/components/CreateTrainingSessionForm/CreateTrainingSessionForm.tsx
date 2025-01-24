@@ -1,5 +1,9 @@
 //import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
+
+import log from "loglevel";
 
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
@@ -43,31 +47,32 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 
-import { Check, ChevronsUpDown, CloudUpload, Paperclip } from "lucide-react";
-import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
-
-import log from "loglevel";
+import {
+  Check,
+  ChevronsUpDown,
+  CloudUpload,
+  Paperclip,
+  Loader2,
+} from "lucide-react";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const accountId = 2; //update with cookie
   const { form } = useFormHandler();
-  const { createTrainingSession, error, loading } = useCreateTrainingSession();
+  const { createTrainingSession, error } = useCreateTrainingSession();
+  const [loading, setLoading] = useState<boolean>(false);
 
-  /**All select element options */
-  //Options for type select
   const types = [
     {
       label: "Training Session",
       value: "Training",
     },
     {
-      label: "Fundraisor",
-      value: "Fundraisor",
+      label: "Fundraiser",
+      value: "Fundraiser",
     },
   ] as const;
-  //Options for visibility select
   const visibilities = [
     {
       label: "Public",
@@ -82,7 +87,6 @@ export default function CreateTrainingSessionForm() {
       value: "private",
     },
   ] as const;
-  //Options for location select
   const locations = [
     {
       label: "Centre de loisirs St-Denis",
@@ -109,19 +113,17 @@ export default function CreateTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    //async request which may result error
     try {
-      // Prepare data to send through API as necessary
       const jsonPayload = {
         ...values,
-        attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
+        attachment: values.attachment ?? [],
       };
       log.info(jsonPayload);
       console.log(jsonPayload);
       log.info(JSON.stringify(jsonPayload, null, 2));
       console.log(JSON.stringify(jsonPayload, null, 2));
 
-      //FORMDATA
+      // Prepare API body
       const formData = new FormData();
       const programData = {
         title: values.title,
@@ -144,31 +146,22 @@ export default function CreateTrainingSessionForm() {
       );
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
-          formData.append("attachments", file); //append each file
+          formData.append("attachments", file);
         });
+      } else {
+        formData.append(
+          "attachments",
+          new Blob([], {
+            type: "application/json",
+          }),
+        );
       }
-
-      /*
-      formData.append("title", values.title);
-      formData.append("type", values.type);
-      formData.append("startDate", values.startDate.toISOString());
-      formData.append("endDate", values.endDate.toISOString());
-      formData.append("recurring", values.recurring.toString());
-      formData.append("visibility", values.visibility);
-      formData.append("description", values.description);
-      if (values.attachment && values.attachment.length > 0) {
-        values.attachment.forEach((file, index) => {
-          formData.append(`attachment[${index}]`, file); //append each file
-        });
-      }
-      formData.append("capacity", values.capacity.toString());
-      formData.append("startTime", values.startTime);
-      formData.append("endTime", values.endTime);
-      formData.append("location", values.location);
-      */
+      console.log("formData: ", formData);
 
       // API submit form
-      const create = await createTrainingSession(accountId, formData); //JSON PAYLOAD CHANGED TO FORMDATA
+      setLoading(true);
+      const create = await createTrainingSession(accountId, formData);
+      setLoading(false);
       console.log(error);
       console.log("create", create);
       log.info("create", create);
@@ -186,10 +179,8 @@ export default function CreateTrainingSessionForm() {
         description: "Event was added to your calendar.",
       });
 
-      log.info("Create training session form reset");
-
       // Navigate to home page
-      navigate("/");
+      navigate(-1);
     } catch (err) {
       console.error(
         "Create training session form submission error (error)",
@@ -203,8 +194,8 @@ export default function CreateTrainingSessionForm() {
           "There was a problem with your request. Event was not created.",
       });
     } finally {
-      // Reset form fields
       form.reset();
+      setLoading(false);
     }
   };
 
@@ -217,9 +208,13 @@ export default function CreateTrainingSessionForm() {
           className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
         >
           {/*Form Title*/}
-          <div>
-            <h2 className="text-2xl font-semibold">Create New Event</h2>
-            <h2>Complete the form and submit</h2>
+          <div className="text-center">
+            <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+              Create New Event
+            </h2>
+            <h2 className="text-fadedPrimaryColour text-center">
+              Complete the form and submit
+            </h2>
           </div>
 
           {/** Title */}
@@ -232,6 +227,7 @@ export default function CreateTrainingSessionForm() {
                 <FormControl>
                   <Input placeholder="Name the event" type="text" {...field} />
                 </FormControl>
+                <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -612,7 +608,7 @@ export default function CreateTrainingSessionForm() {
                     {...field}
                   />
                 </FormControl>
-
+                <FormDescription>Only 100 characters accepted.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -664,7 +660,9 @@ export default function CreateTrainingSessionForm() {
                     </FileUploaderContent>
                   </FileUploader>
                 </FormControl>
-                <FormDescription>Select a file to upload.</FormDescription>
+                <FormDescription>
+                  Select a file to upload. Limit of 5 files.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -729,13 +727,20 @@ export default function CreateTrainingSessionForm() {
           </div> */}
 
           {/** Submit Button */}
-          <Button type="submit" className="w-full font-semibold">
-            Create new Event
-          </Button>
-          <div className="text-center self-center">
-            <a href="../" className="underline text-neutral-400 pb-20">
-              Cancel
-            </a>
+          {loading ? (
+            <Button disabled className="w-full">
+              <Loader2 className="animate-spin" />
+              Creating Event
+            </Button>
+          ) : (
+            <Button type="submit" className="w-full font-semibold">
+              Create new Event
+            </Button>
+          )}
+          <div className="justify-self-center">
+            <button className=" bg-transparent" onClick={() => navigate(-1)}>
+              <p className="text-center underline text-neutral-400">Cancel</p>
+            </button>
           </div>
         </form>
       </Form>

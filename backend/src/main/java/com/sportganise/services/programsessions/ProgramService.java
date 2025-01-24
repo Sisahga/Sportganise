@@ -7,13 +7,16 @@ import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
+import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.exceptions.EntityNotFoundException;
+import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalTime;
@@ -78,7 +81,7 @@ public class ProgramService {
               Optional<Account> accountOptional =
                   accountService.getAccount(participant.getAccountId());
 
-              if (!accountOptional.isPresent()) {
+              if (accountOptional.isEmpty()) {
                 throw new IllegalArgumentException(
                     "Account not found for id: " + participant.getAccountId());
               }
@@ -131,17 +134,15 @@ public class ProgramService {
   public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
     List<ProgramAttachment> programAttachments =
         programAttachmentRepository.findAttachmentsByProgramId(programId);
-    log.debug("Program Id: " + programId);
-    for (int i = 0; i < programAttachments.size(); i++) {
-      log.debug("PROGRAM ATTACHMENT IN FOR LOOP : " + programAttachments.get(i).getAttachmentUrl());
+    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
+    log.debug("Program Id: {}", programId);
+    for (ProgramAttachment attachment : programAttachments) {
+      programAttachmentDtos.add(
+          new ProgramAttachmentDto(
+              attachment.getCompositeProgramAttachmentKey().getProgramId(),
+              attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
     }
-    return programAttachments.stream()
-        .map(
-            programAttachment -> {
-              return new ProgramAttachmentDto(
-                  programAttachment.getProgramId(), programAttachment.getAttachmentUrl());
-            })
-        .toList();
+    return programAttachmentDtos;
   }
 
   /**
@@ -155,11 +156,7 @@ public class ProgramService {
     List<ProgramDto> programDtos = new ArrayList<>();
 
     for (Program program : programs) {
-
       List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
-      log.debug("PROGRAM ATTACHMENTS : " + programAttachments);
-      log.debug("PROGRAM ATTACH COUNT :" + programAttachments.size());
-
       programDtos.add(
           new ProgramDto(
               program.getProgramId(),
@@ -220,6 +217,7 @@ public class ProgramService {
    * @param accountId The account id of the user making the request.
    * @return A newly created programDto.
    */
+  @Transactional
   public ProgramDto createProgramDto(
       String title,
       String programType,
@@ -233,63 +231,43 @@ public class ProgramService {
       String endTime,
       String location,
       List<MultipartFile> attachments,
-      Integer accountId)
-      throws IOException {
+      Integer accountId) {
 
-    ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
-    int durationMins =
-        (int)
-            java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
-                .toMinutes();
-
-    ZonedDateTime expiryDate = null;
-    String frequency = null;
-
-    if (isRecurring != null && isRecurring) {
-      ZonedDateTime currentOccurrence = occurrenceDate;
-      frequency = "weekly";
-      expiryDate = ZonedDateTime.parse(endDate);
-
-      while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
-
-        currentOccurrence = currentOccurrence.plusDays(7);
-      }
-    }
-
-    Program newProgram =
-        new Program(
-            programType,
+    Program savedProgram =
+        createProgramObject(
             title,
+            programType,
+            startDate,
+            endDate,
+            isRecurring,
+            visibility,
             description,
             capacity,
-            occurrenceDate,
-            durationMins,
-            isRecurring,
-            expiryDate,
-            frequency,
-            location,
-            visibility);
-    Program savedProgram = programRepository.save(newProgram);
+            startTime,
+            endTime,
+            location);
+    programRepository.save(savedProgram);
 
     List<ProgramAttachmentDto> programAttachmentsDto = new ArrayList<>();
-    List<ProgramAttachment> programAttachments = new ArrayList<>();
 
     if (attachments != null && !attachments.isEmpty()) {
-      for (MultipartFile attachment : attachments) {
-        String s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
-        log.debug("ATTACHMENTS SAVED: " + s3AttachmentUrl);
-        if (s3AttachmentUrl != null) {
+      try {
+        for (MultipartFile attachment : attachments) {
+          String s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+          log.debug("Attachment Saved to S3 bucket: {}", s3AttachmentUrl);
           programAttachmentsDto.add(
               new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
-
-          programAttachments.add(
-              new ProgramAttachment(savedProgram.getProgramId(), s3AttachmentUrl));
+          ProgramAttachmentCompositeKey savedProgramCompositeKey =
+              new ProgramAttachmentCompositeKey(savedProgram.getProgramId(), s3AttachmentUrl);
+          ProgramAttachment programAttachment = new ProgramAttachment(savedProgramCompositeKey);
+          programAttachmentRepository.saveProgramAttachment(
+              programAttachment.getCompositeProgramAttachmentKey().getProgramId(),
+              programAttachment.getCompositeProgramAttachmentKey().getAttachmentUrl());
         }
+      } catch (FileProcessingException | IOException e) {
+        throw new ProgramCreationException("Failed to create program: " + e.getMessage());
       }
-      List<ProgramAttachment> pa = programAttachmentRepository.saveAll(programAttachments);
-      log.debug("ATTACHMENTS SAVED IN DB: " + pa.size());
     }
-
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
 
@@ -342,40 +320,19 @@ public class ProgramService {
                     new EntityNotFoundException(
                         "Program not found with ID: " + programDtoToModify.getProgramId()));
 
-    ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
-    int durationMins =
-        (int)
-            java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
-                .toMinutes();
-
-    ZonedDateTime expiryDate = null;
-    String frequency = null;
-
-    if (isRecurring != null && isRecurring) {
-      ZonedDateTime currentOccurrence = occurrenceDate;
-      frequency = "weekly";
-      expiryDate = ZonedDateTime.parse(endDate);
-
-      while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
-
-        currentOccurrence = currentOccurrence.plusDays(7);
-      }
-    }
-
     Program updatedProgram =
-        new Program(
-            programType,
+        createProgramObject(
             title,
+            programType,
+            startDate,
+            endDate,
+            isRecurring,
+            visibility,
             description,
             capacity,
-            occurrenceDate,
-            durationMins,
-            isRecurring,
-            expiryDate,
-            frequency,
-            location,
-            visibility);
-
+            startTime,
+            endTime,
+            location);
     updatedProgram.setProgramId(existingProgram.getProgramId());
     programRepository.save(updatedProgram);
 
@@ -399,13 +356,60 @@ public class ProgramService {
     if (!attachmentsToAdd.isEmpty()) {
       for (MultipartFile attachment : attachmentsToAdd) {
         s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
-        programAttachments.add(
-            new ProgramAttachment(programDtoToModify.getProgramId(), s3AttachmentUrl));
+        ProgramAttachmentCompositeKey programAttachmentCompositeKey =
+            new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
+        programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
         programAttachmentDtos.add(
             new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
       }
       programAttachmentRepository.saveAll(programAttachments);
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
+  }
+
+  private Program createProgramObject(
+      String title,
+      String programType,
+      String startDate,
+      String endDate,
+      Boolean isRecurring,
+      String visibility,
+      String description,
+      Integer capacity,
+      String startTime,
+      String endTime,
+      String location) {
+    ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
+    int durationMins =
+        (int)
+            java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
+                .toMinutes();
+
+    ZonedDateTime expiryDate = null;
+    String frequency = null;
+
+    if (isRecurring != null && isRecurring) {
+      ZonedDateTime currentOccurrence = occurrenceDate;
+      frequency = "weekly";
+      expiryDate = ZonedDateTime.parse(endDate);
+
+      while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
+
+        currentOccurrence = currentOccurrence.plusDays(7);
+      }
+    }
+
+    return new Program(
+        programType,
+        title,
+        description,
+        capacity,
+        occurrenceDate,
+        durationMins,
+        isRecurring,
+        expiryDate,
+        frequency,
+        location,
+        visibility);
   }
 }

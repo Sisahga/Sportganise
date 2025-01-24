@@ -1,16 +1,24 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
+import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberDeleteException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
+import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 /** Service Class related to Direct Message Channel Members. */
 @Service
+@Slf4j
 public class DirectMessageChannelMemberService {
   private final DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
 
@@ -33,19 +41,24 @@ public class DirectMessageChannelMemberService {
    * @param creatorId Id of the member who created the channel.
    */
   public void saveMembers(List<Integer> memberIds, int channelId, int creatorId) {
-    List<DirectMessageChannelMember> dmChannelMembers = new ArrayList<>();
-    for (int memberId : memberIds) {
-      DirectMessageChannelMember dmChannelMember = new DirectMessageChannelMember();
-      // Create the composite key.
-      DirectMessageChannelMemberCompositeKey ck = new DirectMessageChannelMemberCompositeKey();
-      ck.setChannelId(channelId);
-      ck.setAccountId(memberId);
-      // Set the composite key as the id of the dmChannelMember
-      dmChannelMember.setCompositeKey(ck);
-      dmChannelMember.setRead(memberId == creatorId);
-      dmChannelMembers.add(dmChannelMember);
+    try {
+      List<DirectMessageChannelMember> dmChannelMembers = new ArrayList<>();
+      for (int memberId : memberIds) {
+        DirectMessageChannelMember dmChannelMember = new DirectMessageChannelMember();
+        // Create the composite key.
+        DirectMessageChannelMemberCompositeKey ck = new DirectMessageChannelMemberCompositeKey();
+        ck.setChannelId(channelId);
+        ck.setAccountId(memberId);
+        // Set the composite key as the id of the dmChannelMember
+        dmChannelMember.setCompositeKey(ck);
+        dmChannelMember.setRead(memberId == creatorId);
+        dmChannelMembers.add(dmChannelMember);
+      }
+      this.directMessageChannelMemberRepository.saveAll(dmChannelMembers);
+    } catch (DataAccessException e) {
+      log.error("Database error occuring when saving members to channel: {}", e.getMessage());
+      throw new ChannelMemberSaveException("Failed to save members to channel.");
     }
-    this.directMessageChannelMemberRepository.saveAll(dmChannelMembers);
   }
 
   /**
@@ -56,8 +69,13 @@ public class DirectMessageChannelMemberService {
    * @return The number of rows affected.
    */
   public int markChannelAsRead(int channelId, int accountId) {
-    return this.directMessageChannelMemberRepository.updateChannelMemberReadStatus(
-        accountId, channelId);
+    try {
+      return this.directMessageChannelMemberRepository.updateChannelMemberReadStatus(
+          accountId, channelId);
+    } catch (DataAccessException e) {
+      log.error("Database error occuring when marking channel as read: {}", e.getMessage());
+      throw new ChannelMemberSaveException("Failed to mark channel as read.");
+    }
   }
 
   /**
@@ -68,7 +86,15 @@ public class DirectMessageChannelMemberService {
    * @return A list of ChannelMembersDto.
    */
   public List<ChannelMembersDto> getNonUserChannelMembers(int channelId, int accountId) {
-    return this.directMessageChannelMemberRepository.getNonUserChannelMembers(channelId, accountId);
+    try {
+      return this.directMessageChannelMemberRepository.getNonUserChannelMembers(
+          channelId, accountId);
+    } catch (DataAccessException e) {
+      log.error(
+          "Database error occuring when fetching non user channel members: {}", e.getMessage());
+      throw new ChannelMemberFetchException(
+          "Database error occured when fetching non user channel members.");
+    }
   }
 
   /**
@@ -78,7 +104,13 @@ public class DirectMessageChannelMemberService {
    * @return A list of ChannelMembersDto.
    */
   public List<ChannelMembersDto> getAllChannelMembers(int channelId) {
-    return this.directMessageChannelMemberRepository.getAllChannelMembers(channelId);
+    try {
+      return this.directMessageChannelMemberRepository.getAllChannelMembers(channelId);
+    } catch (DataAccessException e) {
+      log.error("Database error occuring when fetching all channel members: {}", e.getMessage());
+      throw new ChannelMemberFetchException(
+          "Database error occured when fetching all channel members.");
+    }
   }
 
   /**
@@ -88,6 +120,38 @@ public class DirectMessageChannelMemberService {
    * @param accountId The account id.
    */
   public void removeMemberFromChannel(int channelId, int accountId) {
-    this.directMessageChannelMemberRepository.deleteByChannelIdAndAccountId(channelId, accountId);
+    try {
+      this.directMessageChannelMemberRepository.deleteByChannelIdAndAccountId(channelId, accountId);
+    } catch (DataAccessException e) {
+      log.error("Database error occuring when removing member from channel: {}", e.getMessage());
+      throw new ChannelMemberDeleteException(
+          "Database error occured when trying to remove member from channel.");
+    }
+  }
+
+  /**
+   * Sets the role of a member in a channel.
+   *
+   * @param memberId The member id.
+   * @param channelId The channel id.
+   * @param role The role to set.
+   */
+  public void setGroupMemberRole(int memberId, int channelId, ChannelMemberRoleType role) {
+    try {
+      int rowsAffected =
+          this.directMessageChannelMemberRepository.setChannelMemberRole(memberId, channelId, role);
+      if (rowsAffected == 0) {
+        log.error("Failed to set role for member.");
+        throw new ChannelMemberSetRoleException("Failed to set role for member.");
+      }
+    } catch (DataAccessException e) {
+      log.error("Database error occuring when setting role for member: {}", e.getMessage());
+      throw new ChannelMemberSetRoleException(
+          "Database error occured when setting role for member.");
+    } catch (Exception e) {
+      log.error("Unexepected error occuring when setting role for member: {}", e.getMessage());
+      throw new ChannelMemberSetRoleException(
+          "Unexpected error occured when setting role for member.");
+    }
   }
 }
