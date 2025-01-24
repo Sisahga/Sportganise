@@ -19,21 +19,21 @@ export default function HomeContent() {
       <div className="flex-1 max-w-[100vw] bg-white shadow-lg rounded-t-2xl pb-16">
         <div className="min-h-screen">
           <div className="p-4 space-y-6">
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm lg:mx-12">
               <CardHeader>
-                <CardTitle className="font-font font-medium text-xl">
+                <CardTitle className="font-font font-semibold text-xl">
                   Welcome to ONIBAD!
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-fadedPrimarycolour text-sm font-font">
-                  A non-profit badminton club for you to join.
+                <p className="text-fadedPrimarycolour text-base font-font">
+                A non-profit badminton club for you, where passion meets play!
                 </p>
               </CardContent>
             </Card>
 
-            <div>
-              <h2 className="text-lg font-medium font-font mb-4">
+            <div className="lg:mx-24">
+              <h2 className="text-lg font-font mb-4 text-sec font-semibold">
                 Upcoming Events
               </h2>
               <ScrollArea className="w-full overflow-x whitespace-nowrap">
@@ -58,26 +58,16 @@ export default function HomeContent() {
               </ScrollArea>
               <div>
                 <Button
-                  variant="link"
-                  className="flex justify-self-center text-secondaryColour font-bold font-font px-7 py-3 rounded-xl h-auto bg-textPlaceHolder"
-                  onClick={() => log.info("See all Events button clicked")}
-                >
-                  See all Events
-                </Button>
+            variant="outline"
+            className="flex justify-self-center font-medium font-font px-7 py-3 rounded-md h-auto mt-2"
+            onClick={() => log.info("See all Events button clicked")}
+          >
+            See all Events
+          </Button>
               </div>
             </div>
 
             <div className="space-y-4">
-              {cards.map((item) => {
-                log.debug(`Rendering general card for ID: ${item}`);
-                return (
-                  <Card key={item} className="border-0 shadow-sm">
-                    <CardContent className="p-4">
-                      <div className="aspect-[3/2] rounded-lg bg-textPlaceholderColour" />
-                    </CardContent>
-                  </Card>
-                );
-              })}
               <TrainingSessionsList />
             </div>
           </div>

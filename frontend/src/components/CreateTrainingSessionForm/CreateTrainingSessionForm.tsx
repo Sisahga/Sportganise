@@ -217,9 +217,11 @@ export default function CreateTrainingSessionForm() {
           className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
         >
           {/*Form Title*/}
-          <div>
-            <h2 className="text-2xl font-semibold">Create New Event</h2>
-            <h2>Complete the form and submit</h2>
+          <div className="text-center">
+            <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+            Create New Event
+        </h2>
+            <h2 className="text-fadedPrimaryColour text-center">Complete the form and submit</h2>
           </div>
 
           {/** Title */}
