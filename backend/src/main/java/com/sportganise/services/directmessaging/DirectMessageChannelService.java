@@ -1,10 +1,17 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.CreateDirectMessageChannelDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestMembersDto;
+import com.sportganise.dto.directmessaging.DeleteChannelRequestResponseDto;
 import com.sportganise.dto.directmessaging.DuplicateChannelDto;
 import com.sportganise.dto.directmessaging.ListDirectMessageChannelDto;
 import com.sportganise.dto.directmessaging.UpdateChannelImageResponseDto;
 import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
+import com.sportganise.entities.directmessaging.DeleteChannelRequest;
+import com.sportganise.entities.directmessaging.DeleteChannelRequestApprover;
+import com.sportganise.entities.directmessaging.DeleteChannelRequestApproverCompositeKey;
+import com.sportganise.entities.directmessaging.DeleteChannelRequestStatusType;
 import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
@@ -14,6 +21,8 @@ import com.sportganise.exceptions.channelexceptions.ChannelFetchException;
 import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberNotFoundException;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import com.sportganise.services.BlobService;
@@ -40,6 +49,8 @@ public class DirectMessageChannelService {
   private final DirectMessageChannelMemberService directMessageChannelMemberService;
   private final DirectMessageService directMessageService;
   private final BlobService blobService;
+  private final DeleteChannelRequestRepository deleteChannelRequestRepository;
+  private final DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
 
   /**
    * Service Constructor.
@@ -47,6 +58,10 @@ public class DirectMessageChannelService {
    * @param directMessageChannelRepository Direct Message Channel Repository.
    * @param accountRepository Account Repository.
    * @param directMessageChannelMemberService Direct Message Channel Member Repository.
+   * @param directMessageService Direct Message Service.
+   * @param blobService Blob Service.
+   * @param deleteChannelRequestRepository Delete Channel Request Repository.
+   * @param deleteChannelRequestApproverRepository Delete Channel Request Approver Repository.
    */
   @Autowired
   public DirectMessageChannelService(
@@ -55,13 +70,17 @@ public class DirectMessageChannelService {
       AccountRepository accountRepository,
       DirectMessageChannelMemberService directMessageChannelMemberService,
       DirectMessageService directMessageService,
-      BlobService blobService) {
+      BlobService blobService,
+      DeleteChannelRequestRepository deleteChannelRequestRepository,
+      DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository) {
     this.directMessageChannelRepository = directMessageChannelRepository;
     this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
     this.accountRepository = accountRepository;
     this.directMessageChannelMemberService = directMessageChannelMemberService;
     this.directMessageService = directMessageService;
     this.blobService = blobService;
+    this.deleteChannelRequestRepository = deleteChannelRequestRepository;
+    this.deleteChannelRequestApproverRepository = deleteChannelRequestApproverRepository;
   }
 
   /**
@@ -222,6 +241,9 @@ public class DirectMessageChannelService {
         }
       }
       return dmChannels;
+    } catch (AccountNotFoundException e) {
+      log.error(e.getMessage());
+      throw e;
     } catch (Exception e) {
       log.error("Failed to get direct message channels: {}", e.getMessage());
       throw new ChannelFetchException("Failed to get direct message channels: " + e.getMessage());
@@ -279,6 +301,71 @@ public class DirectMessageChannelService {
     } catch (Exception e) {
       log.error("Failed to update channel picture: {}", e.getMessage());
       throw new FileProcessingException("Failed to update channel picture: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Requests to delete a channel.
+   *
+   * @param deleteChannelRequestDto The request to delete a channel.
+   * @return The response to the delete channel request.
+   */
+  @Transactional
+  public DeleteChannelRequestResponseDto requestDeleteChannel(
+      DeleteChannelRequestDto deleteChannelRequestDto) {
+    try {
+      if (!directMessageChannelRepository.existsById(deleteChannelRequestDto.getChannelId())) {
+        throw new ChannelNotFoundException("Channel not found.");
+      }
+      // Save the delete channel request.
+      DeleteChannelRequest deleteChannelRequest =
+          DeleteChannelRequest.builder()
+              .channelId(deleteChannelRequestDto.getChannelId())
+              .requesterId(deleteChannelRequestDto.getCreatorId())
+              .build();
+      DeleteChannelRequest newDeleteReq =
+          this.deleteChannelRequestRepository.save(deleteChannelRequest);
+
+      // Save all authorized members (DeleteChannelRequestApprover relationship).
+      saveAuthorizedMembersToDeleteChannelRequest(
+          deleteChannelRequestDto.getChannelId(),
+          deleteChannelRequestDto.getChannelType(),
+          deleteChannelRequestDto.getCreatorId(),
+          newDeleteReq.getDeleteRequestId());
+
+      String channelType = deleteChannelRequestDto.getChannelType();
+
+      // Create the first part of the response dto (The delete request dto).
+      DeleteChannelRequestDto delReqResponse =
+          DeleteChannelRequestDto.builder()
+              .deleteRequestId(newDeleteReq.getDeleteRequestId())
+              .channelId(newDeleteReq.getChannelId())
+              .creatorId(newDeleteReq.getRequesterId())
+              .channelType(channelType)
+              .build();
+
+      // Create the second part of the response dto (ChannelMembersDto).
+      // Fetch all members of the channel and put them in DeleteChannelRequestMembers DTO.
+      if (channelType.equals("SIMPLE")) {
+        Integer otherMemberId =
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                deleteChannelRequestDto.getChannelId(), deleteChannelRequestDto.getCreatorId());
+        if (otherMemberId == null) {
+          throw new ChannelMemberNotFoundException(
+              "Request to delete channel failed: Channel member not found.");
+        }
+        List<DeleteChannelRequestMembersDto> dcrMembersDto =
+            this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
+                newDeleteReq.getDeleteRequestId());
+        return new DeleteChannelRequestResponseDto(delReqResponse, dcrMembersDto);
+      } else { // GROUPS
+        // TODO: Implement for group channels.
+        return null;
+      }
+    } catch (DataAccessException e) {
+      log.error("Database error occured while requesting to delete channel: {}", e.getMessage());
+      throw new ChannelDeletionException(
+          "Database error occured while requesting to delete channel: " + e.getMessage());
     }
   }
 
@@ -347,5 +434,64 @@ public class DirectMessageChannelService {
             memberId, channelId, ChannelMemberRoleType.REGULAR);
       }
     }
+  }
+
+  /**
+   * Saves the authorized members to delete a channel request. The creator of the channel is
+   * automatically approved.
+   *
+   * @param channelId The ID of the channel to delete.
+   * @param channelType The type of the channel.
+   * @param creatorId The ID of the creator of the channel.
+   * @param deleteChannelRequestId The ID of the delete channel request.
+   */
+  public void saveAuthorizedMembersToDeleteChannelRequest(
+      int channelId, String channelType, int creatorId, int deleteChannelRequestId) {
+    try {
+      createDeleteChannelRequestApprover(
+          creatorId, deleteChannelRequestId, DeleteChannelRequestStatusType.APPROVED);
+      if (channelType.equals("SIMPLE")) {
+        Integer otherMemberId =
+            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
+                channelId, creatorId);
+        if (otherMemberId == null) {
+          throw new ChannelMemberNotFoundException("Channel member not found.");
+        } else {
+          createDeleteChannelRequestApprover(
+              otherMemberId, deleteChannelRequestId, DeleteChannelRequestStatusType.PENDING);
+        }
+      } else if (channelType.equals("GROUP")) {
+        List<Integer> otherGroupAdminMemberIds =
+            directMessageChannelMemberRepository.getOtherGroupAdminMemberIds(channelId, creatorId);
+        for (Integer memberId : otherGroupAdminMemberIds) {
+          createDeleteChannelRequestApprover(
+              memberId, deleteChannelRequestId, DeleteChannelRequestStatusType.PENDING);
+        }
+      }
+    } catch (DataAccessException e) {
+      log.error(
+          "Database error occured while saving authorized members to delete channel request: {}",
+          e.getMessage());
+      throw new ChannelDeletionException(
+          "Database error occured while saving authorized members to delete channel request: "
+              + e.getMessage());
+    }
+  }
+
+  /**
+   * Creates a new Delete Channel Request Approver.
+   *
+   * @param approverId The ID of the approver.
+   * @param deleteChannelRequestId The ID of the delete channel request.
+   * @param status The status of the approver.
+   */
+  public void createDeleteChannelRequestApprover(
+      int approverId, int deleteChannelRequestId, DeleteChannelRequestStatusType status) {
+    DeleteChannelRequestApproverCompositeKey key =
+        new DeleteChannelRequestApproverCompositeKey(approverId, deleteChannelRequestId);
+
+    DeleteChannelRequestApprover approver = new DeleteChannelRequestApprover(key, status);
+
+    this.deleteChannelRequestApproverRepository.save(approver);
   }
 }

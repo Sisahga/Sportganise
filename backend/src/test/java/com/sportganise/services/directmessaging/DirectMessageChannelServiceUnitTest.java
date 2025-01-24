@@ -12,6 +12,8 @@ import com.sportganise.entities.directmessaging.DirectMessageChannel;
 import com.sportganise.exceptions.channelexceptions.ChannelDeletionException;
 import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import com.sportganise.services.BlobService;
@@ -36,6 +38,8 @@ public class DirectMessageChannelServiceUnitTest {
   @Mock private AccountRepository accountRepository;
   @Mock private DirectMessageService directMessageService;
   @Mock private BlobService blobService;
+  @Mock private DeleteChannelRequestRepository deleteChannelRequestRepository;
+  @Mock private DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
   @InjectMocks private DirectMessageChannelService directMessageChannelService;
 
   CreateDirectMessageChannelDto dmChannelDTO;

@@ -1,5 +1,6 @@
 //import { FormValues } from "@/types/trainingSessionFormValues";
 import { Program } from "@/types/trainingSessionDetails";
+import { ProgramDetails } from "@/types/trainingSessionDetails";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
 
@@ -34,6 +35,31 @@ const trainingSessionApi = {
     return response.json();
   },
   /**Submit ModifyTrainingSession form */
+  modifyTrainingSession: async (
+    accountId: number,
+    programId: number,
+    formValues: FormData,
+  ) => {
+    const response = await fetch(
+      `${baseMappingUrl}/${accountId}/${programId}/modify-program`,
+      {
+        method: "POST",
+        body: formValues,
+      },
+    );
+    log.info(
+      "Reponse from trainingSessionApi.modifyTrainignSession : ",
+      response,
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "trainingSessionApi.modifyTrainignSession : Reponse is not ok!",
+      );
+    }
+    const data: ResponseDto<ProgramDetails> = await response.json();
+    return data;
+  },
 
   /**Fetch all programs info */
   getPrograms: async (accountId: number) => {

@@ -4,7 +4,7 @@ const getBadgeProps = (programType: string): BadgeProps => {
   switch (programType.toLowerCase()) {
     case "training":
       return {};
-    case "funraisor":
+    case "fundraisor":
     case "fundraiser":
       return { variant: "secondary" };
     case "tournament":
