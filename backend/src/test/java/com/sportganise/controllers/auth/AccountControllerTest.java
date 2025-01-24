@@ -25,9 +25,11 @@ import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.services.account.AccountService;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -142,164 +146,232 @@ class AccountControllerTest {
         .andExpect(jsonPath("$[0].phone", is(accounts.getFirst().getPhone())));
   }
 
-  @Test
-  public void updateAccountTest_NotFound() throws Exception {
-    int accountId = 2;
-    String requestBody = "{}";
+  @Nested
+  class UpdateAccount {
 
-    doThrow(new AccountNotFoundException("Account not found"))
-        .when(accountService)
-        .updateAccount(anyInt(), any(UpdateAccountDto.class));
+    @Test
+    public void updateAccountTest_NotFound() throws Exception {
+      int accountId = 2;
+      String requestBody = "{}";
 
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-        .andExpect((status().isNotFound()));
+      doThrow(new AccountNotFoundException("Account not found"))
+          .when(accountService)
+          .updateAccount(anyInt(), any(UpdateAccountDto.class));
 
-    verify(accountService, times(1)).updateAccount(eq(accountId), any(UpdateAccountDto.class));
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(requestBody))
+          .andExpect((status().isNotFound()));
+
+      verify(accountService, times(1)).updateAccount(eq(accountId), any(UpdateAccountDto.class));
+    }
+
+    @Test
+    public void updateAccountTest_Success() throws Exception {
+
+      int accountId = 3;
+      String requestBody = "{}";
+
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(requestBody))
+          .andExpect(status().isNoContent());
+
+      verify(accountService, times(1)).updateAccount(eq(accountId), any(UpdateAccountDto.class));
+    }
   }
 
-  @Test
-  public void updateAccountTest_Success() throws Exception {
+  @Nested
+  class UpdateAccountPicture {
+    MockMultipartFile multipartFile =
+        new MockMultipartFile("file", "profile.jpg", MediaType.IMAGE_JPEG_VALUE, "asdf".getBytes());
 
-    int accountId = 3;
-    String requestBody = "{}";
+    @Test
+    public void updateAccountPicture_Success() throws Exception {
+      int accountId = 1;
 
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(requestBody))
-        .andExpect(status().isNoContent());
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.multipart(
+                      HttpMethod.PUT, "/api/account/{accountId}/picture", accountId)
+                  .file(multipartFile))
+          .andExpect(status().isNoContent());
 
-    verify(accountService, times(1)).updateAccount(eq(accountId), any(UpdateAccountDto.class));
+      verify(accountService, times(1)).updateAccountPicture(accountId, multipartFile);
+    }
+
+    @Test
+    public void updateAccountPicture_AccountNotFound() throws Exception {
+      int accountId = 2;
+
+      doThrow(new AccountNotFoundException("Account not found"))
+          .when(accountService)
+          .updateAccountPicture(any(), any());
+
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.multipart(
+                      HttpMethod.PUT, "/api/account/{accountId}/picture", accountId)
+                  .file(multipartFile))
+          .andExpect(status().isNotFound());
+
+      verify(accountService, times(1)).updateAccountPicture(accountId, multipartFile);
+    }
+
+    @Test
+    public void updateAccountPicture_UploadFailure() throws Exception {
+      int accountId = 1;
+
+      doThrow(new IOException("File upload failed"))
+          .when(accountService)
+          .updateAccountPicture(any(), any());
+
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.multipart(
+                      HttpMethod.PUT, "/api/account/{accountId}/picture", accountId)
+                  .file(multipartFile))
+          .andExpect(status().isInternalServerError());
+
+      verify(accountService, times(1)).updateAccountPicture(accountId, multipartFile);
+    }
   }
 
-  @Test
-  public void updateAccountPermissionTest_NotFound() throws Exception {
-    int accountId = 2;
-    UpdateAccountTypeDto dto = new UpdateAccountTypeDto("ADMIN");
+  @Nested
+  class UpdateAccountPermissions {
 
-    doThrow(new AccountNotFoundException("Account not found"))
-        .when(accountService)
-        .updateAccountRole(anyInt(), any());
+    @Test
+    public void updateAccountPermissionTest_NotFound() throws Exception {
+      int accountId = 2;
+      UpdateAccountTypeDto dto = new UpdateAccountTypeDto("ADMIN");
 
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isNotFound());
+      doThrow(new AccountNotFoundException("Account not found"))
+          .when(accountService)
+          .updateAccountRole(anyInt(), any());
 
-    verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isNotFound());
+
+      verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
+    }
+
+    @Test
+    public void updateAccountPermissionTest_InvalidRequest() throws Exception {
+      int accountId = 1;
+
+      doThrow(new InvalidAccountTypeException("Invalid account type"))
+          .when(accountService)
+          .updateAccountRole(anyInt(), anyString());
+
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content("{}"))
+          .andExpect(status().isBadRequest());
+
+      verify(accountService, times(0)).updateAccountRole(any(), any());
+    }
+
+    @Test
+    public void updateAccountPermissionTest_InvalidAccountType() throws Exception {
+      int accountId = 1;
+      UpdateAccountTypeDto dto = new UpdateAccountTypeDto("NOT_ADMIN");
+
+      doThrow(new InvalidAccountTypeException("Invalid account type"))
+          .when(accountService)
+          .updateAccountRole(anyInt(), anyString());
+
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isBadRequest());
+
+      verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
+    }
+
+    @Test
+    public void updateAccountPermissionTest_Success() throws Exception {
+      int accountId = 1;
+      UpdateAccountTypeDto dto = new UpdateAccountTypeDto("ADMIN");
+
+      mockMvc
+          .perform(
+              MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
+                  .contentType(MediaType.APPLICATION_JSON)
+                  .content(objectMapper.writeValueAsString(dto)))
+          .andExpect(status().isNoContent());
+
+      verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
+    }
   }
 
-  @Test
-  public void updateAccountPermissionTest_InvalidRequest() throws Exception {
-    int accountId = 1;
+  @Nested
+  class ListPermissions {
 
-    doThrow(new InvalidAccountTypeException("Invalid account type"))
-        .when(accountService)
-        .updateAccountRole(anyInt(), anyString());
+    @Test
+    public void listPermissionsTest_EmptyList() throws Exception {
+      // Mock data
+      List<AccountPermissions> accountPermissions = List.of();
 
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{}"))
-        .andExpect(status().isBadRequest());
+      given(accountService.getAccountPermissions()).willReturn(accountPermissions);
 
-    verify(accountService, times(0)).updateAccountRole(any(), any());
-  }
+      mockMvc
+          .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
+          .andExpect((status().isOk()))
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(content().json("[]"));
+    }
 
-  @Test
-  public void updateAccountPermissionTest_InvalidAccountType() throws Exception {
-    int accountId = 1;
-    UpdateAccountTypeDto dto = new UpdateAccountTypeDto("NOT_ADMIN");
+    @Test
+    public void listPermissionsTest_Success() throws Exception {
 
-    doThrow(new InvalidAccountTypeException("Invalid account type"))
-        .when(accountService)
-        .updateAccountRole(anyInt(), anyString());
+      // Mock data
+      AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
+      account1.setAccountId(1);
+      account1.setType(AccountType.PLAYER);
+      account1.setEmail("test1@example.com");
+      account1.setFirstName("John");
+      account1.setLastName("Doe");
 
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isBadRequest());
+      AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
+      account2.setAccountId(2);
+      account2.setType(AccountType.COACH);
+      account2.setEmail("test2@example.com");
+      account2.setFirstName("Jane");
+      account2.setLastName("Dane");
+      account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
 
-    verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
-  }
+      List<AccountPermissions> accountPermissions = List.of(account1, account2);
 
-  @Test
-  public void updateAccountPermissionTest_Success() throws Exception {
-    int accountId = 1;
-    UpdateAccountTypeDto dto = new UpdateAccountTypeDto("ADMIN");
+      given(accountService.getAccountPermissions()).willReturn(accountPermissions);
 
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/api/account/{accountId}/type", accountId)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(dto)))
-        .andExpect(status().isNoContent());
-
-    verify(accountService, times(1)).updateAccountRole(accountId, dto.getType());
-  }
-
-  @Test
-  public void listPermissionsTest_EmptyList() throws Exception {
-    // Mock data
-    List<AccountPermissions> accountPermissions = List.of();
-
-    given(this.accountService.getAccountPermissions()).willReturn(accountPermissions);
-
-    mockMvc
-        .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
-        .andExpect((status().isOk()))
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(content().json("[]"));
-  }
-
-  @Test
-  public void listPermissionsTest_Success() throws Exception {
-
-    // Mock data
-    AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
-    account1.setAccountId(1);
-    account1.setType(AccountType.PLAYER);
-    account1.setEmail("test1@example.com");
-    account1.setFirstName("John");
-    account1.setLastName("Doe");
-
-    AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
-    account2.setAccountId(2);
-    account2.setType(AccountType.COACH);
-    account2.setEmail("test2@example.com");
-    account2.setFirstName("Jane");
-    account2.setLastName("Dane");
-    account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
-
-    List<AccountPermissions> accountPermissions = List.of(account1, account2);
-
-    given(this.accountService.getAccountPermissions()).willReturn(accountPermissions);
-
-    mockMvc
-        .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
-        .andExpect((status().isOk()))
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(jsonPath("$.length()").value(2))
-        .andExpectAll( // account 1
-            jsonPath("$[0].accountId", is(account1.getAccountId())),
-            jsonPath("$[0].email", is(account1.getEmail())),
-            jsonPath("$[0].type", is(account1.getType().toString())),
-            jsonPath("$[0].pictureUrl").doesNotExist())
-        .andExpectAll( // account 2
-            jsonPath("$[1].accountId", is(account2.getAccountId())),
-            jsonPath("$[1].email", is(account2.getEmail())),
-            jsonPath("$[1].type", is(account2.getType().toString())),
-            jsonPath("$[1].pictureUrl", is(account2.getPictureUrl())));
+      mockMvc
+          .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
+          .andExpect((status().isOk()))
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+          .andExpect(jsonPath("$.length()").value(2))
+          .andExpectAll( // account 1
+              jsonPath("$[0].accountId", is(account1.getAccountId())),
+              jsonPath("$[0].email", is(account1.getEmail())),
+              jsonPath("$[0].type", is(account1.getType().toString())),
+              jsonPath("$[0].pictureUrl").doesNotExist())
+          .andExpectAll( // account 2
+              jsonPath("$[1].accountId", is(account2.getAccountId())),
+              jsonPath("$[1].email", is(account2.getEmail())),
+              jsonPath("$[1].type", is(account2.getType().toString())),
+              jsonPath("$[1].pictureUrl", is(account2.getPictureUrl())));
+    }
   }
 }
 
