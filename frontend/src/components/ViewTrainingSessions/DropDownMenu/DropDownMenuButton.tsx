@@ -20,15 +20,28 @@ import {
   Frown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  Attendees,
+  Program,
+  ProgramDetails,
+} from "@/types/trainingSessionDetails";
 
 interface DropDownMenuButtonProps {
   accountType: string;
+  programDetails: ProgramDetails;
+  attendees: Attendees[];
 }
 
 export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   accountType,
+  programDetails,
+  attendees,
 }) => {
   const navigate = useNavigate();
+  const handleNavigation = (path: string, data: Program) => {
+    navigate(path, { state: data });
+  };
+  console.log("DROPDOWN MENU: ", programDetails);
   //Confirmation of player absence
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -75,7 +88,12 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
           accountType.toLowerCase() === "admin" ? (
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onClick={() => navigate("/pages/ModifyTrainingSessionPage")}
+                onClick={() =>
+                  handleNavigation("/pages/ModifyTrainingSessionPage", {
+                    programDetails,
+                    attendees,
+                  })
+                }
               >
                 <Pencil />
                 <span>Edit Event</span>
