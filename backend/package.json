@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "scripts": {
+    "format": "mvn spotless:apply",
+    "lint": "mvn checkstyle:check -Dcheckstyle.violationSeverity=warning -Dcheckstyle.failOnViolation=true",
+    "test": "mvn test"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  },
+  "packageManager": "pnpm@9.15.4"
+}

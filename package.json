@@ -1,9 +1,18 @@
 {
   "name": "sportganise",
   "scripts": {
-    "format": "turbo run format",
-    "lint": "turbo run lint",
-    "test": "turbo run test"
+    "format": "pnpm run format:fe",
+    "format:fe": "turbo run format --filter frontend",
+    "format:be": "turbo run format --filter backend",
+    "format:all": "turbo run format",
+    "lint": "pnpm run lint:fe",
+    "lint:fe": "turbo run lint --filter frontend",
+    "lint:be": "turbo run lint --filter backend",
+    "lint:all": "turbo run lint",
+    "test": "pnpm run test:fe",
+    "test:fe": "turbo run test --filter frontend",
+    "test:be": "turbo run test --filter backend",
+    "test:all": "turbo run test"
   },
   "devDependencies": {
     "turbo": "^2.3.3"
