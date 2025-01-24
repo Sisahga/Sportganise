@@ -166,7 +166,7 @@ export default function CreateTrainingSessionForm() {
           })
         );
       }
-      console.log("formData: ", formData);
+      log.info("formData: ", formData);
 
       // API submit form
       setLoading(true);

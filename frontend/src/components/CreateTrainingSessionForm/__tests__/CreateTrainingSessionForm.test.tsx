@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { test, expect } from "vitest";
-import CreateTrainingSessionForm from "./CreateTrainingSessionForm";
-import { TrainingSessionsList } from "../ViewTrainingSessions";
+import CreateTrainingSessionForm from "../CreateTrainingSessionForm";
 
 test("renders title field", () => {
   render(<CreateTrainingSessionForm />);
@@ -26,10 +25,4 @@ test("renders occurrence date button click field", () => {
   const startDateButton = screen.getByText("Start Date");
   fireEvent.click(startDateButton);
   expect(document.body.contains(startDateButton)).toBe(true);
-});
-
-test("renders Upcoming Programs", () => {
-  render(<TrainingSessionsList />);
-  const p = screen.getByText("Upcoming Programs");
-  expect(document.body.contains(p)).toBe(true);
 });

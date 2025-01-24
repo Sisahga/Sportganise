@@ -10,15 +10,15 @@ function useModifyTrainingSession() {
   const [error, setError] = useState<string | null>(null);
 
   const modifyTrainingSession = async (
-    accountId: number,
+    accountId: number | null | undefined,
     programId: number,
-    formValues: FormData,
+    formValues: FormData
   ) => {
     try {
       const response = await trainingSessionApi.modifyTrainingSession(
         accountId,
         programId,
-        formValues,
+        formValues
       );
       setData(response);
 

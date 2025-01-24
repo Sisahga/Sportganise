@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getCookies } from "@/services/cookiesService";
 
 // Created components imports
 import DropDownMenuButton from "./DropDownMenu/DropDownMenuButton";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
+import RegisteredPlayer from "./RegisteredPlayer";
 
 // Components imports
 import {
@@ -26,12 +28,16 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
-import RegisteredPlayer from "./RegisteredPlayer";
 
 const TrainingSessionContent = () => {
-  const [accountType /*, setAccountType*/] = useState<string>("coach"); // Handle account type. Only coach or admin can view list of attendees.
+  const [accountType, setAccountType] = useState<string | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
+
+  useEffect(() => {
+    const user = getCookies();
+    setAccountType(user?.type);
+  }, [navigate]);
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
@@ -103,7 +109,6 @@ const TrainingSessionContent = () => {
             {programDetails.expiryDate ? (
               <div className="flex items-center gap-2">
                 <hr className="w-1 h-px border-0 bg-gray-500 " />
-
                 <p className="text-sm text-gray-500">
                   {new Date(programDetails.expiryDate).toDateString()}
                 </p>
@@ -121,14 +126,14 @@ const TrainingSessionContent = () => {
               <p className="text-sm text-gray-500">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-sm text-gray-500">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
+                  programDetails.durationMins
                 )}
               </p>
             </span>
@@ -150,7 +155,7 @@ const TrainingSessionContent = () => {
             <p className="text-sm text-gray-500">
               {programDetails.frequency || "one time"} on{" "}
               {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                new Date(programDetails.occurrenceDate),
+                new Date(programDetails.occurrenceDate)
               )}
             </p>
           </div>
@@ -210,8 +215,8 @@ const TrainingSessionContent = () => {
         </div>
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
-        {(accountType.toLowerCase() === "coach" ||
-          accountType.toLowerCase() === "admin") && (
+        {(accountType?.toLowerCase() === "coach" ||
+          accountType?.toLowerCase() === "admin") && (
           <>
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">Attendees</h2>
