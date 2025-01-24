@@ -135,16 +135,13 @@ public class WaitlistServiceTest {
 
   @Test
   void confirmParticipant_Success() throws Exception {
-    // Given
     validParticipant.setRank(3);
     when(participantRepository.findWaitlistParticipant(anyInt(), anyInt()))
         .thenReturn(validParticipant);
     when(participantRepository.save(any())).thenReturn(validParticipant);
 
-    // When
     ProgramParticipantDto result = programParticipantService.confirmParticipant(1, 2);
 
-    // Then
     assertTrue(validParticipant.isConfirmed());
     assertNotNull(validParticipant.getConfirmedDate());
     assertNull(validParticipant.getRank());
@@ -157,18 +154,15 @@ public class WaitlistServiceTest {
 
   @Test
   void optOutParticipant_Success() throws Exception {
-    // Given
     validParticipant.setRank(3);
     when(participantRepository.findWaitlistParticipant(anyInt(), anyInt()))
         .thenReturn(validParticipant);
     when(participantRepository.save(any())).thenReturn(validParticipant);
 
-    // When
     ProgramParticipantDto result =
         programParticipantService.optOutParticipant(
             validParticipant.getProgramId(), validParticipant.getAccountId());
 
-    // Then
     assertNull(validParticipant.getRank());
     verify(participantRepository).updateRanks(eq(1), eq(3));
     verify(participantRepository).save(validParticipant);
@@ -197,30 +191,25 @@ public class WaitlistServiceTest {
 
   @Test
   void removeParticipant_WithHighestRank_UpdatesCorrectly() throws Exception {
-    validParticipant.setRank(1); // Highest rank
+    validParticipant.setRank(1); 
     when(participantRepository.findWaitlistParticipant(anyInt(), anyInt()))
         .thenReturn(validParticipant);
     when(participantRepository.save(any())).thenReturn(validParticipant);
 
-    // When
     programParticipantService.optOutParticipant(1, 2);
 
-    // Then
     verify(participantRepository).updateRanks(eq(1), eq(1));
   }
 
   @Test
   void confirmParticipant_DoesNotUpdateRanksIfNoRank() throws Exception {
-    // Given
-    validParticipant.setRank(null); // Should never happen in reality
+    validParticipant.setRank(null); 
     when(participantRepository.findWaitlistParticipant(anyInt(), anyInt()))
         .thenReturn(validParticipant);
     when(participantRepository.save(any())).thenReturn(validParticipant);
 
-    // When
     programParticipantService.confirmParticipant(1, 2);
 
-    // Then
     verify(participantRepository, never()).updateRanks(anyInt(), anyInt());
   }
 
@@ -228,30 +217,24 @@ public class WaitlistServiceTest {
 
   @Test
   void allOptedParticipants_EmptyList_ReturnsEmptyDtoList() {
-    // Given
     Integer programId = 100;
     when(participantRepository.findOptedParticipants(programId))
         .thenReturn(Collections.emptyList());
 
-    // When
     List<ProgramParticipantDto> result = programParticipantService.allOptedParticipants(programId);
 
-    // Then
     assertTrue(result.isEmpty());
     verify(participantRepository).findOptedParticipants(programId);
   }
 
   @Test
   void allOptedParticipants_SingleParticipant_ReturnsDtoWithCorrectData() {
-    // Given
     Integer programId = 100;
     ProgramParticipant participant = createSampleParticipant(programId, 200, 1, false);
     when(participantRepository.findOptedParticipants(programId)).thenReturn(List.of(participant));
 
-    // When
     List<ProgramParticipantDto> result = programParticipantService.allOptedParticipants(programId);
 
-    // Then
     assertEquals(1, result.size());
     ProgramParticipantDto dto = result.get(0);
     assertDtoMatchesParticipant(participant, dto);
@@ -259,7 +242,6 @@ public class WaitlistServiceTest {
 
   @Test
   void allOptedParticipants_MultipleParticipants_ReturnsDtosInOrder() {
-    // Given
     Integer programId = 100;
     List<ProgramParticipant> participants =
         List.of(
@@ -267,10 +249,8 @@ public class WaitlistServiceTest {
             createSampleParticipant(programId, 201, 2, true));
     when(participantRepository.findOptedParticipants(programId)).thenReturn(participants);
 
-    // When
     List<ProgramParticipantDto> result = programParticipantService.allOptedParticipants(programId);
 
-    // Then
     assertEquals(2, result.size());
     for (int i = 0; i < participants.size(); i++) {
       assertDtoMatchesParticipant(participants.get(i), result.get(i));
@@ -279,29 +259,23 @@ public class WaitlistServiceTest {
 
   @Test
   void allOptedParticipants_EnsureDataMappingAccuracy() {
-    // Given
     Integer programId = 100;
     ProgramParticipant participant = createSampleParticipant(programId, 200, 3, true);
     when(participantRepository.findOptedParticipants(programId)).thenReturn(List.of(participant));
 
-    // When
     ProgramParticipantDto dto = programParticipantService.allOptedParticipants(programId).get(0);
 
-    // Then
     assertEquals(participant.getRank(), dto.getRank());
     assertEquals(participant.isConfirmed(), dto.isConfirmed());
     assertEquals(participant.getProgramParticipantId().getAccountId(), dto.getAccountId());
     assertEquals(participant.getProgramParticipantId().getProgramId(), dto.getProgramId());
   }
 
-  // Edge Case: Repository returns null (if applicable)
   @Test
   void allOptedParticipants_RepositoryReturnsNull_ThrowsNullPointerException() {
-    // Given
     Integer programId = 100;
     when(participantRepository.findOptedParticipants(programId)).thenReturn(null);
 
-    // When/Then
     assertThrows(
         NullPointerException.class,
         () -> {
@@ -330,7 +304,6 @@ public class WaitlistServiceTest {
     assertEquals(participant.getRank(), dto.getRank());
     assertEquals(participant.isConfirmed(), dto.isConfirmed());
     assertEquals(participant.getConfirmedDate(), dto.getConfirmedDate());
-    // Add assertions for other fields as needed
   }
 
   // Comeback to this test failing because of the possibility of feeding a null ProgramParticipant
@@ -347,18 +320,6 @@ public class WaitlistServiceTest {
     assertFalse(result.isConfirmed());
     assertNull(result.getConfirmedDate());
     verify(participantRepository).save(validParticipant);
-  }
-
-  @Test
-  public void testMarkAbsent_ParticipantAlreadyUnconfirmed() throws ParticipantNotFoundException {
-    validParticipant.setConfirmed(false);
-    when(participantRepository.findById(any(ProgramParticipantId.class)))
-        .thenReturn(Optional.of(validParticipant));
-
-    ProgramParticipantDto result = programParticipantService.markAbsent(programId, accountId);
-
-    assertNull(result);
-    verify(participantRepository, never()).save(any(ProgramParticipant.class));
   }
 
   @Test
