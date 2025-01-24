@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 // Created components imports
-import DropDownMenuButton from "@/components/ViewTrainingSessions/DropDownMenu/DropDownMenuButton";
+// import DropDownMenuButton from "@/components/ViewTrainingSessions/DropDownMenu/DropDownMenuButton";
 import EventBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/EventBadgeType";
 
 // Components imports
@@ -25,7 +25,7 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
-// import { Attendees } from "@/types/trainingSessionDetails"; //TODO: this should end up being the waitlist types i guess?
+import { Attendees } from "@/types/trainingSessionDetails"; //TODO: this should end up being the waitlist types i guess?
 // import Waitlisted from "./WaitlistedPlayer"; //TODO:copy paste and change a bit what sofia did to accomodate for a waitlisted player not a registered one
 
 const WaitlistDetailsComponent = () => {
@@ -57,12 +57,12 @@ const WaitlistDetailsComponent = () => {
 
   //TODO: CHANGE ATTENdees to be the waitlisted players and their ranks
 
-  // const [attendees, setAttendees] = useState<Attendees[]>([]);
-  // useEffect(() => {
-  //     if (location.state && location.state.attendees) {
-  //         setAttendees(location.state.attendees);
-  //     }
-  // }, [location.state]);
+  const [attendees, setAttendees] = useState<Attendees[]>([]);
+  useEffect(() => {
+      if (location.state && location.state.attendees) {
+          setAttendees(location.state.attendees);
+      }
+  }, [location.state]);
 
   return (
     <div className="mb-32 mt-5">
@@ -205,34 +205,61 @@ const WaitlistDetailsComponent = () => {
           </div>
         </div>
 
-        {/*/!**Conditionally render subscribed players only to Admin or Coach *!/*/}
-        {/*{(accountType.toLowerCase() === "coach" ||*/}
-        {/*    accountType.toLowerCase() === "admin") && (*/}
-        {/*    <>*/}
-        {/*        <div className="flex items-center">*/}
-        {/*            <h2 className="text-lg font-semibold">Waitlist</h2>*/}
-        {/*            <p className="text-sm font-medium text-gray-500 ml-3">*/}
-        {/*                {attendees.length}/{programDetails.capacity}*/}
-        {/*            </p>*/}
-        {/*        </div>*/}
-        {/*        <div className="mx-2">*/}
-        {/*            {attendees.length > 0 ? (*/}
-        {/*                attendees.map((attendee, index) => (*/}
-        {/*                    <div key={index}>*/}
-        {/*                        <WaitlistedPlayer accountId={attendee.accountId} />*/}
-        {/*                    </div>*/}
-        {/*                ))*/}
-        {/*            ) : (*/}
-        {/*                <p className="text-cyan-300 text-sm font-normal m-5 text-center">*/}
-        {/*                    There are no waitlisted players*/}
-        {/*                </p>*/}
-        {/*            )}*/}
-        {/*        </div>*/}
-        {/*    </>*/}
-        {/*)}*/}
+        {/* TODO: Change for checklist of waitlist players*/}
+        {/** Conditionally render subscribed players only to Admin or Coach */}
+        {(accountType.toLowerCase() === "coach" ||
+            accountType.toLowerCase() === "admin") && (
+            <>
+              <div className="flex items-center">
+                <h2 className="text-lg font-semibold">Waitlist</h2>
+                <p className="text-sm font-medium text-gray-500 ml-3">
+                  {attendees.length}/{programDetails.capacity}
+                </p>
+              </div>
+              <div className="mx-2">
+                {attendees.length > 0 ? (
+                    <form>
+                      {attendees.map((attendee, index) => (
+                          <div
+                              key={index}
+                              className="flex items-center gap-3 border-b border-gray-200 py-2"
+                          >
+                            <input
+                                type="checkbox"
+                                id={`attendee-${index}`}
+                                className="h-4 w-4"
+                                value={attendee.accountId}
+                            />
+                            <label
+                                htmlFor={`attendee-${index}`}
+                                className="text-sm text-gray-700 flex-1"
+                            >
+                              {attendee.name || `Player ${index + 1}`}
+                            </label>
+                            <span className="text-xs text-gray-500">
+                                {attendee.rank || "No rank"}
+                            </span>
+                          </div>
+                      ))}
+                      <button
+                          type="submit"
+                          className="mt-4 w-full bg-secondaryColour text-white py-2 rounded-md"
+                      >
+                        Confirm Player
+                      </button>
+                    </form>
+                ) : (
+                    <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                      There are no waitlisted players
+                    </p>
+                )}
+              </div>
+            </>
+        )}
+
 
         {/**Conditionally render different menu options based on account type */}
-        <DropDownMenuButton accountType={accountType} />
+        {/*<DropDownMenuButton accountType={accountType} />*/}
       </div>
     </div>
   );
