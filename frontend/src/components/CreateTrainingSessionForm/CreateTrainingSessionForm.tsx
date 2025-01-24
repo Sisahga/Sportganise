@@ -219,9 +219,11 @@ export default function CreateTrainingSessionForm() {
           {/*Form Title*/}
           <div className="text-center">
             <h2 className="font-semibold text-3xl text-secondaryColour text-center">
-            Create New Event
-        </h2>
-            <h2 className="text-fadedPrimaryColour text-center">Complete the form and submit</h2>
+              Create New Event
+            </h2>
+            <h2 className="text-fadedPrimaryColour text-center">
+              Complete the form and submit
+            </h2>
           </div>
 
           {/** Title */}

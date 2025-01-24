@@ -166,8 +166,8 @@ const ForumContent: React.FC = () => {
       </Button>
 
       <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-8">
-          Forum
-        </h2>
+        Forum
+      </h2>
 
       <div className="mt-4 mb-2 flex items-center lg:mx-24">
         {/* Menu Bar with Filters */}

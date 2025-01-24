@@ -27,7 +27,7 @@ export default function HomeContent() {
               </CardHeader>
               <CardContent>
                 <p className="text-fadedPrimarycolour text-base font-font">
-                A non-profit badminton club for you, where passion meets play!
+                  A non-profit badminton club for you, where passion meets play!
                 </p>
               </CardContent>
             </Card>
@@ -58,12 +58,12 @@ export default function HomeContent() {
               </ScrollArea>
               <div>
                 <Button
-            variant="outline"
-            className="flex justify-self-center font-medium font-font px-7 py-3 rounded-md h-auto mt-2"
-            onClick={() => log.info("See all Events button clicked")}
-          >
-            See all Events
-          </Button>
+                  variant="outline"
+                  className="flex justify-self-center font-medium font-font px-7 py-3 rounded-md h-auto mt-2"
+                  onClick={() => log.info("See all Events button clicked")}
+                >
+                  See all Events
+                </Button>
               </div>
             </div>
 
