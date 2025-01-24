@@ -1,4 +1,3 @@
-// src/components/Inbox/ChatScreen/ChatHeader.test.tsx
 import { describe, it, expect, beforeEach, vi, MockedFunction } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -30,21 +29,15 @@ describe("ChatHeader", () => {
   };
 
   beforeEach(() => {
-    // Reset mocks before each test
     mockNavigate.mockClear();
     mockOnDeleteChat.mockClear();
     mockOnBlockUser.mockClear();
-
-    // Type cast useNavigate as a MockedFunction to call .mockReturnValue
     (useNavigate as UseNavigateMock).mockReturnValue(mockNavigate);
   });
 
   it("renders chat name and avatar", () => {
     render(<ChatHeader {...defaultProps} />);
-    // Check that the chat name is rendered
     expect(screen.getByText("Test Chat")).toBeInTheDocument();
-
-    // Check that the avatar is displayed with correct alt text
     const avatarImg = screen.getByRole("img", {
       name: /test chat/i,
     }) as HTMLImageElement;
@@ -54,30 +47,19 @@ describe("ChatHeader", () => {
 
   it("navigates back when the back button is clicked", () => {
     render(<ChatHeader {...defaultProps} />);
-    // Locate the back button using aria-label
     const backButton = screen.getByRole("button", { name: /back/i });
     fireEvent.click(backButton);
-
-    // Expect navigate(-1) to have been called
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it("toggles the 3-dot options menu when clicked", () => {
     render(<ChatHeader {...defaultProps} />);
-
-    // Locate the options button using aria-label
     const optionsButton = screen.getByRole("button", { name: /options/i });
-
-    // Initially, Delete Chat and Block User options should not be visible
     expect(screen.queryByText(/delete chat/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/block user/i)).not.toBeInTheDocument();
-
-    // Click to open the menu
     fireEvent.click(optionsButton);
     expect(screen.getByText(/delete chat/i)).toBeInTheDocument();
     expect(screen.getByText(/block user/i)).toBeInTheDocument();
-
-    // Click again to close the menu
     fireEvent.click(optionsButton);
     expect(screen.queryByText(/delete chat/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/block user/i)).not.toBeInTheDocument();
@@ -85,31 +67,19 @@ describe("ChatHeader", () => {
 
   it('calls onDeleteChat with the channelId when "Delete Chat" is clicked', () => {
     render(<ChatHeader {...defaultProps} />);
-
-    // Open the options menu
     const optionsButton = screen.getByRole("button", { name: /options/i });
     fireEvent.click(optionsButton);
-
-    // Click the "Delete Chat" button
     const deleteButton = screen.getByText(/delete chat/i);
     fireEvent.click(deleteButton);
-
-    // Expect onDeleteChat to have been called with the correct channelId
     expect(mockOnDeleteChat).toHaveBeenCalledWith(123);
   });
 
   it('calls onBlockUser when "Block User" is clicked', () => {
     render(<ChatHeader {...defaultProps} />);
-
-    // Open the options menu
     const optionsButton = screen.getByRole("button", { name: /options/i });
     fireEvent.click(optionsButton);
-
-    // Click the "Block User" button
     const blockButton = screen.getByText(/block user/i);
     fireEvent.click(blockButton);
-
-    // Expect onBlockUser to have been called once
     expect(mockOnBlockUser).toHaveBeenCalledTimes(1);
   });
 });
