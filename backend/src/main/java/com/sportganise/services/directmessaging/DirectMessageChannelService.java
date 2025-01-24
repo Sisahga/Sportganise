@@ -334,6 +334,9 @@ public class DirectMessageChannelService {
           newDeleteReq.getDeleteRequestId());
 
       String channelType = deleteChannelRequestDto.getChannelType();
+      if (!channelType.equals("SIMPLE") && !channelType.equals("GROUP")) {
+        throw new IllegalArgumentException("Invalid channel type.");
+      }
 
       // Create the first part of the response dto (The delete request dto).
       DeleteChannelRequestDto delReqResponse =
@@ -345,23 +348,10 @@ public class DirectMessageChannelService {
               .build();
 
       // Create the second part of the response dto (ChannelMembersDto).
-      // Fetch all members of the channel and put them in DeleteChannelRequestMembers DTO.
-      if (channelType.equals("SIMPLE")) {
-        Integer otherMemberId =
-            directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(
-                deleteChannelRequestDto.getChannelId(), deleteChannelRequestDto.getCreatorId());
-        if (otherMemberId == null) {
-          throw new ChannelMemberNotFoundException(
-              "Request to delete channel failed: Channel member not found.");
-        }
-        List<DeleteChannelRequestMembersDto> dcrMembersDto =
-            this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
-                newDeleteReq.getDeleteRequestId());
-        return new DeleteChannelRequestResponseDto(delReqResponse, dcrMembersDto);
-      } else { // GROUPS
-        // TODO: Implement for group channels.
-        return null;
-      }
+      List<DeleteChannelRequestMembersDto> dcrMembersDto =
+          this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
+              newDeleteReq.getDeleteRequestId());
+      return new DeleteChannelRequestResponseDto(delReqResponse, dcrMembersDto);
     } catch (DataAccessException e) {
       log.error("Database error occured while requesting to delete channel: {}", e.getMessage());
       throw new ChannelDeletionException(
