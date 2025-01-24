@@ -11,4 +11,4 @@ NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./m
 - format: `./mvnw spotless:apply`
 - lint: `./mvnw checkstyle:check`
 
-Thanks for reading
+Alternatively, the lint, format and test commands are available as pnmp commands (e.g. `pnpm run format`).

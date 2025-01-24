@@ -137,12 +137,15 @@ A wonderful java app.
 
 ### Commands
 
-NOTE: On windows systems, use the `./mvnw.cmd` script. On unix systems, use `./mvnw` instead.
+The following commands require maven to be installed.
 
-- run: `./mvnw sprint-boot:run`
-- test: `./mvnw test`
-- format: `./mvnw spotless:apply`
-- lint: `./mvnw stylecheck:check`
+- format: `pnpm run format:be`
+- lint: `pnpm run lint:be`
+- test: `pnpm run test:be`
+- reading coverage: report available in `backend/target/site/jacoco/index.html`
+- run: from the backend folder, run `mvn spring-boot:run`
+
+Alternatively, follow instructions in `backend/Readme.md`.
 
 Thanks for reading
 
