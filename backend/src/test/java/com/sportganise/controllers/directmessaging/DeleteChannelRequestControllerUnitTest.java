@@ -3,7 +3,8 @@ package com.sportganise.controllers.directmessaging;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.*;
 import com.sportganise.dto.directmessaging.DeleteChannelRequestResponseDto;
@@ -32,37 +33,66 @@ public class DeleteChannelRequestControllerUnitTest {
   @Test
   public void testSetDeleteChannelApproverStatus_Success() {
     SetDeleteApproverStatusDto setApproverStatusDto = new SetDeleteApproverStatusDto();
+    setApproverStatusDto.setStatus("APPROVED");
+
     DeleteChannelRequestResponseDto responseDto = new DeleteChannelRequestResponseDto();
     when(directMessageChannelService.setDeleteApproverStatus(any(SetDeleteApproverStatusDto.class)))
-        .thenReturn(responseDto);
+            .thenReturn(responseDto);
 
     ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> response =
-        deleteChannelRequestController.setDeleteChannelApproverStatus(setApproverStatusDto);
+            deleteChannelRequestController.setDeleteChannelApproverStatus(setApproverStatusDto);
 
     assertThat(response.getStatusCode(), is(HttpStatus.OK));
     assertThat(
-        Objects.requireNonNull(response.getBody()).getStatusCode(), is(HttpStatus.OK.value()));
+            Objects.requireNonNull(response.getBody()).getStatusCode(), is(HttpStatus.OK.value()));
     assertThat(
-        response.getBody().getMessage(), is("Delete channel request status updated successfully"));
+            response.getBody().getMessage(), is("Delete channel request status updated successfully"));
     assertThat(response.getBody().getData(), is(responseDto));
   }
 
   @Test
-  public void testSetDeleteChannelApproverStatus_NoContent() {
+  public void testSetDeleteChannelApproverStatus_Approved_NoContent() {
     SetDeleteApproverStatusDto setApproverStatusDto = new SetDeleteApproverStatusDto();
+    setApproverStatusDto.setStatus("APPROVED");
+
     when(directMessageChannelService.setDeleteApproverStatus(any(SetDeleteApproverStatusDto.class)))
-        .thenReturn(null);
+            .thenReturn(null);
 
     ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> response =
-        deleteChannelRequestController.setDeleteChannelApproverStatus(setApproverStatusDto);
+            deleteChannelRequestController.setDeleteChannelApproverStatus(setApproverStatusDto);
 
     assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
     assertThat(
-        Objects.requireNonNull(response.getBody()).getStatusCode(),
-        is(HttpStatus.NO_CONTENT.value()));
+            Objects.requireNonNull(response.getBody()).getStatusCode(),
+            is(HttpStatus.NO_CONTENT.value()));
     assertThat(
-        response.getBody().getMessage(),
-        is("The channel was approved for deletion, and has been deleted."));
+            response.getBody().getMessage(),
+            is("The channel was approved for deletion, and has been deleted."));
     assertThat(response.getBody().getData(), is(nullValue()));
   }
+
+  @Test
+  public void testSetDeleteChannelApproverStatus_Denied_NoContent() {
+    SetDeleteApproverStatusDto setApproverStatusDto = new SetDeleteApproverStatusDto();
+    setApproverStatusDto.setStatus("DENIED");
+    setApproverStatusDto.setDeleteRequestId(123);
+
+    doNothing().when(directMessageChannelService).deleteChannelDeleteRequest(anyInt());
+
+    ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> response =
+            deleteChannelRequestController.setDeleteChannelApproverStatus(setApproverStatusDto);
+
+    assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+    assertThat(
+            Objects.requireNonNull(response.getBody()).getStatusCode(),
+            is(HttpStatus.NO_CONTENT.value()));
+    assertThat(
+            response.getBody().getMessage(),
+            is("The request for delete was denied. Request removed."));
+    assertThat(response.getBody().getData(), is(nullValue()));
+
+    verify(directMessageChannelService, times(1)).deleteChannelDeleteRequest(123);
+    verify(directMessageChannelService, never()).setDeleteApproverStatus(any());
+  }
+
 }
