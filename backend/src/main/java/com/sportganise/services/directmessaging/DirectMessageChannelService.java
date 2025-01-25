@@ -438,6 +438,45 @@ public class DirectMessageChannelService {
   }
 
   /**
+   * Checks if a channel has an ongoing delete channel request. If so, returns the delete channel
+   * request and the authorized members' status'.
+   *
+   * @param channelId The ID of the channel to check for a delete channel request.
+   * @return Null, or the delete channel request and the authorized members' status'.
+   */
+  public DeleteChannelRequestResponseDto getDeleteChannelRequestIsActive(int channelId) {
+    try {
+      DeleteChannelRequest deleteChannelRequest =
+          this.deleteChannelRequestRepository.findByChannelId(channelId);
+      if (deleteChannelRequest == null) {
+        return null;
+      } else {
+        String channelType = this.directMessageChannelRepository.findTypeByChannelId(channelId);
+        DeleteChannelRequestDto deleteChannelRequestDto =
+            DeleteChannelRequestDto.builder()
+                .deleteRequestId(deleteChannelRequest.getDeleteRequestId())
+                .channelId(deleteChannelRequest.getChannelId())
+                .creatorId(deleteChannelRequest.getRequesterId())
+                .channelType(channelType)
+                .build();
+        List<DeleteChannelRequestMembersDto> dcrMembersDto =
+            this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
+                deleteChannelRequest.getDeleteRequestId());
+        return new DeleteChannelRequestResponseDto(deleteChannelRequestDto, dcrMembersDto);
+      }
+    } catch (DataAccessException e) {
+      log.error("Database error occured while getting delete channel request: {}", e.getMessage());
+      throw new DeleteChannelRequestException(
+          "Database error occured while getting delete channel request: " + e.getMessage());
+    } catch (Exception e) {
+      log.error(
+          "An unexpected error occured while getting delete channel request: {}", e.getMessage());
+      throw new DeleteChannelRequestException(
+          "An unexpected error occured trying to get delete channel request: " + e.getMessage());
+    }
+  }
+
+  /**
    * Formats the channel name to be the first names of all members in the channel if no name was
    * given.
    *
