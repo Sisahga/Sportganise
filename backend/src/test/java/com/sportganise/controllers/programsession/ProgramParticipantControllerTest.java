@@ -8,6 +8,8 @@ import com.sportganise.controllers.programsessions.ProgramParticipantController;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.services.programsessions.WaitlistService;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -25,6 +27,8 @@ public class ProgramParticipantControllerTest {
   private Integer accountId = 2;
   private ProgramParticipantDto validParticipantDto;
 
+  MockMvc mockMvc;
+
   @BeforeEach
   public void setup() {
     MockitoAnnotations.openMocks(this);
@@ -37,9 +41,9 @@ public class ProgramParticipantControllerTest {
 
   @Test
   public void testMarkAbsent_Success() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     when(waitlistService.markAbsent(programId, accountId)).thenReturn(validParticipantDto);
 
-    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     MvcResult result =
         mockMvc
             .perform(
@@ -58,6 +62,7 @@ public class ProgramParticipantControllerTest {
 
   @Test
   public void testMarkAbsent_ParticipantNotFound() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     when(waitlistService.markAbsent(programId, accountId))
         .thenThrow(
             new ParticipantNotFoundException(
@@ -66,7 +71,6 @@ public class ProgramParticipantControllerTest {
                     + ", account: "
                     + accountId));
 
-    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     mockMvc
         .perform(
             MockMvcRequestBuilders.patch("/api/program-participant/mark-absent")
@@ -81,10 +85,10 @@ public class ProgramParticipantControllerTest {
 
   @Test
   public void testMarkAbsent_AlreadyUnconfirmed() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     validParticipantDto.setConfirmed(false);
     when(waitlistService.markAbsent(programId, accountId)).thenReturn(validParticipantDto);
 
-    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     mockMvc
         .perform(
             MockMvcRequestBuilders.patch("/api/program-participant/mark-absent")
@@ -98,9 +102,9 @@ public class ProgramParticipantControllerTest {
 
   @Test
   public void testMarkAbsent_MultipleConcurrentRequests() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     when(waitlistService.markAbsent(programId, accountId)).thenReturn(validParticipantDto);
 
-    MockMvc mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
     MvcResult result1 =
         mockMvc
             .perform(
@@ -122,5 +126,143 @@ public class ProgramParticipantControllerTest {
     assertNotNull(result1);
     assertNotNull(result2);
     verify(waitlistService, times(2)).markAbsent(programId, accountId);
+  }
+
+  @Test
+  public void testOptProgramParticipant_Success() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    Integer expectedRank = 3;
+    when(waitlistService.optProgramParticipantDto(programId, accountId)).thenReturn(expectedRank);
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/program-participant/opt-participant")
+                .param("programId", programId.toString())
+                .param("accountId", accountId.toString()))
+        .andExpect(status().isOk())
+        .andExpect(content().string(expectedRank.toString()));
+
+    verify(waitlistService).optProgramParticipantDto(programId, accountId);
+  }
+
+  @Test
+  public void testOptProgramParticipant_ParticipantNotFound() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    String errorMessage = "Participant not found";
+    when(waitlistService.optProgramParticipantDto(programId, accountId))
+        .thenThrow(new ParticipantNotFoundException(errorMessage));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/program-participant/opt-participant")
+                .param("programId", programId.toString())
+                .param("accountId", accountId.toString()))
+        .andExpect(status().isNotFound())
+        .andExpect(content().string(errorMessage));
+
+    verify(waitlistService).optProgramParticipantDto(programId, accountId);
+  }
+
+  @Test
+  public void testConfirmParticipant_Success() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    ProgramParticipantDto confirmedDto = new ProgramParticipantDto();
+    confirmedDto.setConfirmed(true);
+    when(waitlistService.confirmParticipant(programId, accountId)).thenReturn(confirmedDto);
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/program-participant/confirm-participant")
+                .param("programId", programId.toString())
+                .param("accountId", accountId.toString()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.confirmed").value(true));
+
+    verify(waitlistService).confirmParticipant(programId, accountId);
+  }
+
+  @Test
+  public void testConfirmParticipant_ParticipantNotFound() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    String errorMessage = "Participant not found";
+    when(waitlistService.confirmParticipant(programId, accountId))
+        .thenThrow(new ParticipantNotFoundException(errorMessage));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/program-participant/confirm-participant")
+                .param("programId", programId.toString())
+                .param("accountId", accountId.toString()))
+        .andExpect(status().isNotFound())
+        .andExpect(content().string(errorMessage));
+
+    verify(waitlistService).confirmParticipant(programId, accountId);
+  }
+
+  @Test
+  public void testOptOutParticipant_Success() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    ProgramParticipantDto outDto = new ProgramParticipantDto();
+    when(waitlistService.optOutParticipant(programId, accountId)).thenReturn(outDto);
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/program-participant/out-participant")
+                .param("accountId", accountId.toString()) // Note parameter order
+                .param("programId", programId.toString()))
+        .andExpect(status().isOk());
+
+    verify(waitlistService).optOutParticipant(programId, accountId);
+  }
+
+  @Test
+  public void testOptOutParticipant_ParticipantNotFound() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    String errorMessage = "Participant not found";
+    when(waitlistService.optOutParticipant(programId, accountId))
+        .thenThrow(new ParticipantNotFoundException(errorMessage));
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.patch("/api/program-participant/out-participant")
+                .param("accountId", accountId.toString())
+                .param("programId", programId.toString()))
+        .andExpect(status().isNotFound())
+        .andExpect(content().string(errorMessage));
+
+    verify(waitlistService).optOutParticipant(programId, accountId);
+  }
+
+  @Test
+  public void testGetOptedParticipants_Success() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    List<ProgramParticipantDto> participants = Collections.singletonList(validParticipantDto);
+    when(waitlistService.allOptedParticipants(programId)).thenReturn(participants);
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get("/api/program-participant/queue")
+                .param("programId", programId.toString()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].programId").value(programId))
+        .andExpect(jsonPath("$[0].accountId").value(accountId));
+
+    verify(waitlistService).allOptedParticipants(programId);
+  }
+
+  @Test
+  public void testGetOptedParticipants_EmptyList() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    when(waitlistService.allOptedParticipants(programId)).thenReturn(Collections.emptyList());
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get("/api/program-participant/queue")
+                .param("programId", programId.toString()))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$").isEmpty());
+
+    verify(waitlistService).allOptedParticipants(programId);
   }
 }
