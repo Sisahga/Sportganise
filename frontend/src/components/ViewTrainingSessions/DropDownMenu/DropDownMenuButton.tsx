@@ -24,6 +24,7 @@ import {
   Program,
   ProgramDetails,
 } from "@/types/trainingSessionDetails";
+import log from "loglevel";
 
 interface DropDownMenuButtonProps {
   accountType: string | null | undefined;
@@ -40,7 +41,9 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const handleNavigation = (path: string, data: Program) => {
     navigate(path, { state: data });
   };
-  console.log("DROPDOWN MENU: ", programDetails);
+  log.info("DropDownMenuButton programDetails: ", programDetails);
+  log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
+
   //Confirmation of player absence
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);

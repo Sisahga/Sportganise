@@ -62,7 +62,7 @@ const trainingSessionApi = {
   },
 
   /**Fetch all programs info */
-  getPrograms: async (accountId: number) => {
+  getPrograms: async (accountId: number | null | undefined) => {
     const response = await fetch(`${baseMappingUrl}/${accountId}/details`);
     const data: ResponseDto<Program[]> = await response.json();
 
