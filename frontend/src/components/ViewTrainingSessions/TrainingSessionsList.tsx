@@ -19,6 +19,7 @@ export default function TrainingSessionsList() {
     if (!accountId) {
       log.info("No accountId found");
     }
+    log.info(`TrainingSessionList accountId is ${accountId}`);
   }, [accountId]);
 
   // Fetch programs on component mount
