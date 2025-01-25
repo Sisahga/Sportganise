@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User2Icon } from "lucide-react";
 import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
+import log from "loglevel";
 
 interface RegisteredPlayerProps {
   accountId: number;
@@ -15,6 +16,7 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
     loading,
     error,
   } = usePersonalInformation(accountId);
+  log.debug("Rendering RegisteredPlayer");
 
   return (
     <div>

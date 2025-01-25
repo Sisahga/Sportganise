@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getCookies } from "@/services/cookiesService";
+import log from "loglevel";
 
 // Created components imports
 import DropDownMenuButton from "./DropDownMenu/DropDownMenuButton";
@@ -34,9 +35,11 @@ const TrainingSessionContent = () => {
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
 
+  log.debug("Rendering TrainingSessionContent");
   useEffect(() => {
     const user = getCookies();
     setAccountType(user?.type);
+    log.info("Training Session Card account type : ", user);
   }, [navigate]);
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
@@ -59,6 +62,7 @@ const TrainingSessionContent = () => {
     if (location.state && location.state.programDetails) {
       setProgramDetails(location.state.programDetails);
     }
+    log.info("Program details in training session content: ", programDetails);
   }, [location.state]);
 
   const [attendees, setAttendees] = useState<Attendees[]>([]);
@@ -66,6 +70,7 @@ const TrainingSessionContent = () => {
     if (location.state && location.state.attendees) {
       setAttendees(location.state.attendees);
     }
+    log.info("Attendees in training session content: ", attendees);
   }, [location.state]);
 
   return (
