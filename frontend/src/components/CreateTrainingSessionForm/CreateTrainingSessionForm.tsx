@@ -1,9 +1,7 @@
-//import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
-
 import log from "loglevel";
+import { useEffect, useState } from "react";
 
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
@@ -54,14 +52,24 @@ import {
   Paperclip,
   Loader2,
 } from "lucide-react";
+import { getCookies } from "@/services/cookiesService";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const accountId = 2; //update with cookie
+  const [accountId, setAccountId] = useState<number | null | undefined>(0); // fix undefined
   const { form } = useFormHandler();
   const { createTrainingSession, error } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const user = getCookies();
+    if (!user || user.type === "GENERAL") {
+      navigate("/");
+    }
+    setAccountId(user?.accountId);
+    log.debug(`Modify Training Session Form accountId : ${accountId}`);
+  }, [accountId]);
 
   const types = [
     {
@@ -156,7 +164,7 @@ export default function CreateTrainingSessionForm() {
           }),
         );
       }
-      console.log("formData: ", formData);
+      log.info("formData: ", formData);
 
       // API submit form
       setLoading(true);

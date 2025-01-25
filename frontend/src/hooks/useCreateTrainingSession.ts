@@ -9,7 +9,7 @@ function useCreateTrainingSession() {
   const [error, setError] = useState<string | null>(null);
 
   const createTrainingSession = async (
-    accountId: number,
+    accountId: number | null | undefined,
     jsonPayload: FormData,
   ) => {
     try {
