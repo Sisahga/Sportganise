@@ -191,7 +191,7 @@ public class WaitlistServiceTest {
 
   @Test
   void removeParticipant_WithHighestRank_UpdatesCorrectly() throws Exception {
-    validParticipant.setRank(1); 
+    validParticipant.setRank(1);
     when(participantRepository.findWaitlistParticipant(anyInt(), anyInt()))
         .thenReturn(validParticipant);
     when(participantRepository.save(any())).thenReturn(validParticipant);
@@ -203,7 +203,7 @@ public class WaitlistServiceTest {
 
   @Test
   void confirmParticipant_DoesNotUpdateRanksIfNoRank() throws Exception {
-    validParticipant.setRank(null); 
+    validParticipant.setRank(null);
     when(participantRepository.findWaitlistParticipant(anyInt(), anyInt()))
         .thenReturn(validParticipant);
     when(participantRepository.save(any())).thenReturn(validParticipant);
