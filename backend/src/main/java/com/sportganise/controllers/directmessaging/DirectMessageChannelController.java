@@ -203,8 +203,21 @@ public class DirectMessageChannelController {
   @PatchMapping("set-delete-approver-status")
   public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>>
       setDeleteChannelApproverStatus(@RequestBody SetDeleteApproverStatusDto setApproverStatusDto) {
+    // If the status to be set is DENIED, delete the request to delete the channel.
+    if (setApproverStatusDto.getStatus().equals("DENIED")) {
+      this.directMessageChannelService
+              .deleteChannelDeleteRequest(setApproverStatusDto.getDeleteRequestId());
+      ResponseDto<DeleteChannelRequestResponseDto> responseDto =
+              ResponseDto.<DeleteChannelRequestResponseDto>builder()
+                      .statusCode(HttpStatus.NO_CONTENT.value())
+                      .message("The request for delete was denied. Request removed.")
+                      .data(null)
+                      .build();
+      log.info("The request for delete was denied. Request removed.");
+      return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
+    }
     DeleteChannelRequestResponseDto deleteReqResponse =
-        directMessageChannelService.setDeleteApproverStatus(setApproverStatusDto);
+        this.directMessageChannelService.setDeleteApproverStatus(setApproverStatusDto);
     if (deleteReqResponse != null) {
       ResponseDto<DeleteChannelRequestResponseDto> responseDto =
           ResponseDto.<DeleteChannelRequestResponseDto>builder()

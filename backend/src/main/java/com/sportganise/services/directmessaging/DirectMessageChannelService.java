@@ -22,6 +22,7 @@ import com.sportganise.exceptions.channelexceptions.ChannelFetchException;
 import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberNotFoundException;
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelApproverException;
+import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestRepository;
@@ -418,6 +419,16 @@ public class DirectMessageChannelService {
       log.error("Database error occured while setting delete approver status: {}", e.getMessage());
       throw new DeleteChannelApproverException(
           "Database error occured while setting delete approver status: " + e.getMessage());
+    }
+  }
+
+  public void deleteChannelDeleteRequest(int deleteRequestId) {
+    try {
+      this.deleteChannelRequestRepository.deleteById(deleteRequestId);
+    } catch (DataAccessException e) {
+      log.error("Database error occured while deleting delete request: {}", e.getMessage());
+      throw new DeleteChannelRequestException(
+          "Database error occured while deleting delete request: " + e.getMessage());
     }
   }
 

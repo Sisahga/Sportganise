@@ -10,6 +10,7 @@ import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberMarkReadE
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelApproverException;
+import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -114,6 +115,15 @@ public class GlobalExceptionHandler {
   public ResponseDto<?> handleDeleteChannelApproverException(DeleteChannelApproverException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.NOT_FOUND.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  @ExceptionHandler(DeleteChannelRequestException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleDeleteChannelRequestException(DeleteChannelRequestException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .message(e.getMessage())
         .build();
   }
