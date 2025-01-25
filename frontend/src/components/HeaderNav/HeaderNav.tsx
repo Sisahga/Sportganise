@@ -1,5 +1,5 @@
 import { Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Drawer,
   DrawerContent,
@@ -9,11 +9,23 @@ import {
 import logo from "../../assets/Logo.png";
 import { useState } from "react";
 import log from "loglevel";
+import { Button } from "../ui/Button";
+import { clearCookies } from "@/services/cookiesService";
+
+
+
 
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
   const [accountType /*setAccountType8*/] = useState<string>("coach"); //UPDATE WITH COOKIE
+  const navigate = useNavigate();
+
+  const clearCookiesAndNavigate = () => {
+    clearCookies()
+    navigate("/login");
+  };
+
   return (
     <div>
       <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
@@ -67,12 +79,12 @@ export default function HeaderNav() {
               >
                 Setting
               </Link>
-              <Link
-                to="/login"
+              <button
+                onClick={clearCookiesAndNavigate}
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
-                Log In
-              </Link>
+                Log Out
+              </button>
             </nav>
           </DrawerContent>
         </Drawer>
