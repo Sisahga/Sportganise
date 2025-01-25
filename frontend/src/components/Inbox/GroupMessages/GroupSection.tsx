@@ -21,21 +21,22 @@ function GroupSection({ groupChannels }: GroupSectionProps) {
                 channel={channel}
                 layout="vertical"
                 extraInfo={
-                  <>
-                    {!channel.read && (
-                      <div className="relative">
-                        <Dot
-                          className="secondary-colour"
-                          strokeWidth={12}
-                          style={{
-                            position: "absolute",
-                            top: "-0.35rem",
-                            left: "0.35rem",
-                          }}
-                        ></Dot>
-                      </div>
-                    )}
-                  </>
+                  !channel.read && (
+                    <div
+                      className="relative"
+                      data-testid={`unread-dot-${channel.channelId}`}
+                    >
+                      <Dot
+                        className="secondary-colour"
+                        strokeWidth={12}
+                        style={{
+                          position: "absolute",
+                          top: "-0.35rem",
+                          left: "0.35rem",
+                        }}
+                      />
+                    </div>
+                  )
                 }
               />
             ))}

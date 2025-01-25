@@ -1,16 +1,31 @@
 services:
   frontend:
-    image: ghcr.io/sisahga/sportganise-frontend:latest
+    image: ghcr.io/bsenss6/sportganise-frontend:latest
     ports:
-      - "80:80"
+      - "80:3000"
     env_file:
-      - frontend/.env
+      - .env
     depends_on:
       - backend
 
   backend:
-    image: ghcr.io/sisahga/sportganise-backend:latest
+    image: ghcr.io/bsenss6/sportganise-backend:latest
     ports:
       - "8080:8080"
     env_file:
       - .env
+    depends_on:
+      - database
+
+  database:
+    image: "postgres:latest"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
