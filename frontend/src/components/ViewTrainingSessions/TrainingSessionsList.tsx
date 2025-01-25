@@ -17,7 +17,7 @@ export default function TrainingSessionsList() {
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
   useEffect(() => {
     if (!accountId) {
-      log.info("No accountId found");
+      log.debug("No accountId found");
     }
     log.info(`TrainingSessionList accountId is ${accountId}`);
   }, [accountId]);
