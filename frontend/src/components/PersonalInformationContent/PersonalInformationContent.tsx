@@ -1,4 +1,3 @@
-/**TODO: Remove hardcoded accounID, needs to be fetched */
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/Button";
@@ -14,14 +13,15 @@ import {
 import { MoveLeft, SquarePen } from "lucide-react";
 import { useForm } from "react-hook-form";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
+import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+import log from "loglevel";
 
 const PersonalInformationContent: React.FC = () => {
   const navigate = useNavigate();
-  const accountId = 1; // Hardcoded for testing, can be dynamically passed
+  const cookies = getCookies();
+  const accountId = cookies ? getAccountIdCookie(cookies) : null;
 
-  const { data, loading, error } = usePersonalInformation(accountId);
-
-  // Initialize the form with fetched data
+  const { data, loading, error } = usePersonalInformation(accountId || 0);
   const form = useForm({
     defaultValues: {
       firstName: data?.firstName ?? "",
@@ -37,12 +37,15 @@ const PersonalInformationContent: React.FC = () => {
   });
 
   useEffect(() => {
-    if (data) {
-      console.log("Fetched Personal Information:", data);
+    if (!cookies || !accountId) {
+      log.warn("No cookies or account ID found. Redirecting to login...");
+      navigate("/login");
     }
-  }, [data]);
+  }, [cookies, accountId, navigate]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (error) return <div className="text-red">{error}</div>;
 
