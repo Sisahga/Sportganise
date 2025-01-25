@@ -90,4 +90,6 @@ public interface DirectMessageChannelRepository
         WHERE dmc.channelId = :channelId
       """)
   String getDirectMessageChannelImageBlob(int channelId);
+
+  String findTypeByChannelId(Integer channelId);
 }

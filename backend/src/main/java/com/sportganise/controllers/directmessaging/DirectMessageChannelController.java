@@ -236,4 +236,35 @@ public class DirectMessageChannelController {
       return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
     }
   }
+
+  /**
+   * Endpoint /api/messaging/delete-request-active/{channelId} Get Mapping for checking if a channel
+   * has an ongoing delete request.
+   *
+   * @param channelId The ID of the channel to check for an active delete request.
+   * @return HTTP Code 200 if successful, 204 if no active delete request found.
+   */
+  @GetMapping("/delete-request-active/{channelId}")
+  public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>>
+      getIsChannelDeleteRequestApproved(@PathVariable Integer channelId) {
+    DeleteChannelRequestResponseDto deleteReqResponse =
+        this.directMessageChannelService.getDeleteChannelRequestIsActive(channelId);
+    if (deleteReqResponse == null) {
+      ResponseDto<DeleteChannelRequestResponseDto> responseDto =
+          ResponseDto.<DeleteChannelRequestResponseDto>builder()
+              .statusCode(HttpStatus.NO_CONTENT.value())
+              .message("No active delete request found for this channel.")
+              .data(null)
+              .build();
+      return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
+    } else {
+      ResponseDto<DeleteChannelRequestResponseDto> responseDto =
+          ResponseDto.<DeleteChannelRequestResponseDto>builder()
+              .statusCode(HttpStatus.OK.value())
+              .message("Active delete request found for this channel.")
+              .data(deleteReqResponse)
+              .build();
+      return new ResponseEntity<>(responseDto, HttpStatus.OK);
+    }
+  }
 }
