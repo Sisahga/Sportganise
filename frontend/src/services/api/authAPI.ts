@@ -8,6 +8,8 @@ import {
   SendCodeResponse,
   VerifyCodeRequest,
   VerifyCodeResponse,
+  ModifyPasswordRequest,
+  ModifyPasswordResponse,
 } from "@/types/auth";
 import { setCookies, isCookiesDto } from "@/services/cookiesService";
 
@@ -91,5 +93,25 @@ export const verifyCode = async (
     throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
   }
 
+  return await response.json();
+};
+
+export const modifyPassword = async (
+  data: ModifyPasswordRequest,
+): Promise<ModifyPasswordResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/modify-password`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json(); // Parse the response as JSON
+    throw new Error(
+      errorResponse.message || `HTTP error! status: ${response.status}`,
+    );
+  }
   return await response.json();
 };
