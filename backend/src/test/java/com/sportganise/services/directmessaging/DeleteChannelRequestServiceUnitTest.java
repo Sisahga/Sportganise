@@ -1,20 +1,22 @@
 package com.sportganise.services.directmessaging;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import com.sportganise.dto.directmessaging.DeleteChannelRequestMembersDto;
 import com.sportganise.dto.directmessaging.DeleteChannelRequestResponseDto;
 import com.sportganise.dto.directmessaging.SetDeleteApproverStatusDto;
-import com.sportganise.entities.directmessaging.DeleteChannelRequestApprover;
-import com.sportganise.entities.directmessaging.DeleteChannelRequestApproverCompositeKey;
-import com.sportganise.entities.directmessaging.DeleteChannelRequestStatusType;
-import com.sportganise.entities.directmessaging.DirectMessageChannel;
+import com.sportganise.entities.directmessaging.*;
 import com.sportganise.exceptions.channelexceptions.ChannelDeletionException;
 import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberNotFoundException;
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelApproverException;
+import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelRepository;
 import java.util.Arrays;
@@ -31,6 +33,7 @@ import org.springframework.dao.DataAccessException;
 public class DeleteChannelRequestServiceUnitTest {
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
   @Mock private DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
+  @Mock private DeleteChannelRequestRepository deleteChannelRequestRepository;
   @Mock private DirectMessageChannelRepository directMessageChannelRepository;
   @InjectMocks private DirectMessageChannelService directMessageChannelService;
 
@@ -291,5 +294,72 @@ public class DeleteChannelRequestServiceUnitTest {
     assertThrows(
         DeleteChannelApproverException.class,
         () -> directMessageChannelService.setDeleteApproverStatus(statusDto));
+  }
+
+  @Test
+  void getDeleteChannelRequestIsActive_ReturnsResponseDto() {
+    int channelId = 1;
+    int requesterId = 2;
+    DeleteChannelRequest deleteChannelRequest = new DeleteChannelRequest();
+    deleteChannelRequest.setDeleteRequestId(1);
+    deleteChannelRequest.setChannelId(channelId);
+    deleteChannelRequest.setRequesterId(requesterId);
+
+    when(deleteChannelRequestRepository.findByChannelId(channelId))
+        .thenReturn(deleteChannelRequest);
+    when(deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
+            deleteChannelRequest.getDeleteRequestId()))
+        .thenReturn(List.of(new DeleteChannelRequestMembersDto()));
+
+    DeleteChannelRequestResponseDto response =
+        directMessageChannelService.getDeleteChannelRequestIsActive(channelId);
+
+    assertNotNull(response);
+    assertEquals(channelId, response.getDeleteChannelRequestDto().getChannelId());
+    verify(deleteChannelRequestRepository).findByChannelId(channelId);
+  }
+
+  @Test
+  public void testGetDeleteChannelRequestIsActive_NoRequest() {
+    int channelId = 1;
+
+    when(deleteChannelRequestRepository.findByChannelId(channelId)).thenReturn(null);
+
+    DeleteChannelRequestResponseDto response =
+        directMessageChannelService.getDeleteChannelRequestIsActive(channelId);
+
+    assertThat(response, is(nullValue()));
+  }
+
+  @Test
+  public void testGetDeleteChannelRequestIsActive_DataAccessException() {
+    int channelId = 1;
+
+    when(deleteChannelRequestRepository.findByChannelId(channelId))
+        .thenThrow(new DataAccessException("...") {});
+
+    assertThrows(
+        DeleteChannelRequestException.class,
+        () -> {
+          directMessageChannelService.getDeleteChannelRequestIsActive(channelId);
+        });
+
+    verify(deleteChannelRequestRepository, times(1)).findByChannelId(channelId);
+  }
+
+  @Test
+  public void testGetDeleteChannelRequestIsActive_Exception() {
+    int channelId = 1;
+
+    when(deleteChannelRequestRepository.findByChannelId(channelId))
+        .thenThrow(new RuntimeException("..."));
+
+    assertThrows(
+        DeleteChannelRequestException.class,
+        () -> {
+          directMessageChannelService.getDeleteChannelRequestIsActive(channelId);
+        });
+
+    verify(deleteChannelRequestRepository, times(1)).findByChannelId(channelId);
   }
 }
