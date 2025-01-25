@@ -30,8 +30,8 @@ function App() {
     <Router>
       <Routes>
         <Route element={<PublicRoute />}>
-        <Route path="/login" element={<LogInPage />}></Route>
-        <Route path="/signup" element={<SignUpPage />}></Route>
+          <Route path="/login" element={<LogInPage />}></Route>
+          <Route path="/signup" element={<SignUpPage />}></Route>
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<HomePage />} />

@@ -12,9 +12,6 @@ import log from "loglevel";
 import { Button } from "../ui/Button";
 import { clearCookies } from "@/services/cookiesService";
 
-
-
-
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
@@ -22,7 +19,7 @@ export default function HeaderNav() {
   const navigate = useNavigate();
 
   const clearCookiesAndNavigate = () => {
-    clearCookies()
+    clearCookies();
     navigate("/login");
   };
 

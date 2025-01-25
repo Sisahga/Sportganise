@@ -9,7 +9,7 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ redirectTo = "/" }) => {
   const location = useLocation();
   const user = getCookies();
 
-  console.log(user)
+  console.log(user);
   if (user?.accountId) {
     return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
