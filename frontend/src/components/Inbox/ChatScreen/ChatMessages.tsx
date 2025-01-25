@@ -34,9 +34,6 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
   return (
     <div className="flex flex-col justify-end flex-1 overflow-y-scroll px-4 py-4">
       {messages.map((message, index) => {
-        log.info(
-          `Rendering message: ${message.messageId}, type: ${message.type}`,
-        );
         const showTimestamp =
           index === 0 || // Always show the timestamp for the first message
           differenceInMinutes(
