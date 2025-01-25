@@ -71,3 +71,21 @@ export interface VerifyCodeResponse {
   message: string;
   data: string | null;
 }
+
+export interface ChangePasswordFormValues {
+  email: string;
+  oldPassword: string;
+  password: string;
+  passwordAgain: string;
+}
+
+export interface ModifyPasswordRequest {
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface ModifyPasswordResponse {
+  statusCode: number;
+  message: string;
+}
