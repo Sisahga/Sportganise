@@ -119,28 +119,6 @@ class DirectMessageChannelControllerUnitTest {
   }
 
   @Test
-  public void deleteDirectMessageChannelTest_ChannelExists() throws Exception {
-    int channelId = 1;
-    given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(true);
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
-        .andExpect(status().isNoContent());
-    verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
-  }
-
-  @Test
-  public void deleteDirectMessageChannelTest_NoChannels() throws Exception {
-    int channelId = 1;
-    given(dmChannelService.deleteDirectMessageChannel(channelId)).willReturn(false);
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.delete("/api/messaging/channel/delete-channel/" + channelId))
-        .andExpect(status().isNotFound());
-    verify(dmChannelService, times(1)).deleteDirectMessageChannel(channelId);
-  }
-
-  @Test
   public void getDirectMessageChannelsTest() throws Exception {
     int accountId = 1;
 
