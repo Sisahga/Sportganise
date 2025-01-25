@@ -8,7 +8,7 @@ interface PrivateRouteProps {
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({
-  requiredRole = "PLAYER",
+  requiredRole,
   redirectingRoute = "/login",
 }) => {
   const location = useLocation();
@@ -20,7 +20,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     );
   }
 
-  if (user.type !== requiredRole && user.type !== "ADMIN") {
+  if (requiredRole && user.type !== requiredRole && user.type !== "ADMIN") {
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );
