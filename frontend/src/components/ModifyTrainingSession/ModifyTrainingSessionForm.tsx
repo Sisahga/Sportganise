@@ -132,7 +132,7 @@ export default function ModifyTrainingSessionForm() {
     }
     setAccountId(user?.accountId);
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [navigate]);
+  }, [navigate, accountId]);
 
   /** Handle files for file upload in form*/
   //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
@@ -202,7 +202,7 @@ export default function ModifyTrainingSessionForm() {
       const fileName = attachment.attachmentUrl;
       attachmentsToRemove.push(fileName);
     });
-  }, [programDetails]);
+  }, [programDetails, attachmentsToRemove, form]);
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
