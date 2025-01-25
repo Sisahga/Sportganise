@@ -422,6 +422,11 @@ public class DirectMessageChannelService {
     }
   }
 
+  /**
+   * Deletes a delete request.
+   *
+   * @param deleteRequestId The ID of the delete request to delete.
+   */
   public void deleteChannelDeleteRequest(int deleteRequestId) {
     try {
       this.deleteChannelRequestRepository.deleteById(deleteRequestId);

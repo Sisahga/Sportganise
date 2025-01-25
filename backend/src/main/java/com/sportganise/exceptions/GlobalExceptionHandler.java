@@ -119,6 +119,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle delete channel request exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
   @ExceptionHandler(DeleteChannelRequestException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleDeleteChannelRequestException(DeleteChannelRequestException e) {
