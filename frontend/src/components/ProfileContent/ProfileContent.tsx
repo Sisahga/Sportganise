@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- TODO: fix a11y issues*/
 /**TODO: Remove hardcoded accounID, needs to be fetched */
 import { Button } from "@/components/ui/Button";
 import {

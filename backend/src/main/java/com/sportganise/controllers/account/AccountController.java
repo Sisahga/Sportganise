@@ -49,6 +49,7 @@ public class AccountController {
   // GET: Account (1) by ID.
   @GetMapping("/{id}")
   public ResponseEntity<Optional<Account>> getAccount(@PathVariable Integer id) {
+    log.info("Received request to get account.");
     return new ResponseEntity<>(this.accountService.getAccount(id), HttpStatus.OK);
   }
 
@@ -63,7 +64,7 @@ public class AccountController {
   @PutMapping("/{accountId}")
   public ResponseEntity<Void> updateAccount(
       @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountDto body) {
-    log.info("Received request to get account.");
+    log.info("Received request to update account.");
 
     try {
       this.accountService.updateAccount(accountId, body);
@@ -142,6 +143,7 @@ public class AccountController {
   @GetMapping("/get-all-users/{organizationId}/{accountId}")
   public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(
       @PathVariable int organizationId, @PathVariable int accountId) {
+    log.info("Received request to list all users not blocked by account.");
     return new ResponseEntity<>(
         this.accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, accountId),
         HttpStatus.OK);
@@ -154,7 +156,7 @@ public class AccountController {
    */
   @GetMapping("/permissions")
   public ResponseEntity<List<AccountPermissions>> getAccountPermissions() {
-    log.debug("Listing all accounts with permissions.");
+    log.debug("Received request to list all accounts with permissions.");
     return ResponseEntity.ok(this.accountService.getAccountPermissions());
   }
 }
