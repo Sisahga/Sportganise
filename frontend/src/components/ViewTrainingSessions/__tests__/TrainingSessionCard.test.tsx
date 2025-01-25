@@ -39,7 +39,7 @@ test("renders title correctly", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const title = screen.getByText("Training");
   expect(document.body.contains(title)).toBe(true);
@@ -50,7 +50,7 @@ test("renders occurrence date correctly", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const date = screen.getByText("Mon Jul 01 2024");
   expect(document.body.contains(date)).toBe(true);
@@ -61,14 +61,14 @@ test("renders start time correctly", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const startTime = screen.getByText(
     MockProgramDetails.occurrenceDate.toLocaleTimeString("en-CA", {
       timeZone: "UTC",
       hour: "2-digit",
       minute: "2-digit",
-    })
+    }),
   );
   expect(document.body.contains(startTime)).toBe(true);
 });
@@ -78,13 +78,13 @@ test("renders end time correctly", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const endTime = screen.getByText(
     calculateEndTime(
       MockProgramDetails.occurrenceDate,
-      MockProgramDetails.durationMins
-    )
+      MockProgramDetails.durationMins,
+    ),
   );
   expect(document.body.contains(endTime)).toBe(true);
 });
@@ -94,7 +94,7 @@ test("renders duration mins correctly", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const duration = screen.getByText("120");
   expect(document.body.contains(duration)).toBe(true);
@@ -105,7 +105,7 @@ test("renders description correctly", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const desc = screen.getByText("Example Description");
   expect(document.body.contains(desc)).toBe(true);
@@ -116,7 +116,7 @@ test("renders description correctly", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const desc = screen.getByText("Example Description");
   expect(document.body.contains(desc)).toBe(true);
@@ -127,7 +127,7 @@ test("renders view more button", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const viewMore = screen.getByRole("button");
   expect(document.body.contains(viewMore)).toBe(true);
@@ -143,7 +143,7 @@ test("click view more button", () => {
     <TrainingSessionCard
       programDetails={MockProgramDetails}
       attendees={MockAttendees}
-    />
+    />,
   );
   const viewMore = screen.getByText("View details");
   expect(document.body.contains(viewMore)).toBe(true);
@@ -153,6 +153,6 @@ test("click view more button", () => {
     {
       programDetails: MockProgramDetails,
       attendees: MockAttendees,
-    }
+    },
   );
 });

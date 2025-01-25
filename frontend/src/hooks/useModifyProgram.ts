@@ -12,13 +12,13 @@ function useModifyTrainingSession() {
   const modifyTrainingSession = async (
     accountId: number | null | undefined,
     programId: number,
-    formValues: FormData
+    formValues: FormData,
   ) => {
     try {
       const response = await trainingSessionApi.modifyTrainingSession(
         accountId,
         programId,
-        formValues
+        formValues,
       );
       setData(response);
 

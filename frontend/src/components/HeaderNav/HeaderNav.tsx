@@ -15,7 +15,7 @@ log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
   const [accountType, setAccountType] = useState<string | null | undefined>(
-    "coach"
+    "coach",
   );
   useEffect(() => {
     const user = getCookies();
