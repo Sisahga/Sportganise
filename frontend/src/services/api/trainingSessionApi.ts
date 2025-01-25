@@ -36,25 +36,25 @@ const trainingSessionApi = {
   },
   /**Submit ModifyTrainingSession form */
   modifyTrainingSession: async (
-    accountId: number,
+    accountId: number | null | undefined,
     programId: number,
-    formValues: FormData,
+    formValues: FormData
   ) => {
     const response = await fetch(
       `${baseMappingUrl}/${accountId}/${programId}/modify-program`,
       {
         method: "POST",
         body: formValues,
-      },
+      }
     );
     log.info(
       "Reponse from trainingSessionApi.modifyTrainignSession : ",
-      response,
+      response
     );
 
     if (!response.ok) {
       throw new Error(
-        "trainingSessionApi.modifyTrainignSession : Reponse is not ok!",
+        "trainingSessionApi.modifyTrainignSession : Reponse is not ok!"
       );
     }
     const data: ResponseDto<ProgramDetails> = await response.json();
