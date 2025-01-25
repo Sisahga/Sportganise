@@ -216,10 +216,6 @@ public class ProgramController {
               programModifyRequestDto.getAttachmentsToRemove(),
               accountId);
 
-      log.debug(
-          "PROGRAM ID OF UPDATED PROGRAM (SAME ID AS BEFORE EXPECTED): ",
-          updatedProgramDto.getProgramId());
-
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");
       responseDto.setData(updatedProgramDto);
