@@ -15,9 +15,7 @@ import { clearCookies } from "@/services/cookiesService";
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
-  const [accountType, setAccountType] = useState<string | null | undefined>(
-    "coach"
-  );
+  const [accountType, setAccountType] = useState<string | null | undefined>();
   useEffect(() => {
     const user = getCookies();
     setAccountType(user?.type);
