@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -27,7 +26,7 @@ import {
 } from "@/types/trainingSessionDetails";
 
 interface DropDownMenuButtonProps {
-  accountType: string;
+  accountType: string | null | undefined;
   programDetails: ProgramDetails;
   attendees: Attendees[];
 }
@@ -36,7 +35,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   accountType,
   programDetails,
   attendees,
-}) => {
+}: DropDownMenuButtonProps) => {
   const navigate = useNavigate();
   const handleNavigation = (path: string, data: Program) => {
     navigate(path, { state: data });
@@ -84,8 +83,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>Options</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {accountType.toLowerCase() === "coach" ||
-          accountType.toLowerCase() === "admin" ? (
+          {accountType?.toLowerCase() === "coach" ||
+          accountType?.toLowerCase() === "admin" ? (
             <DropdownMenuGroup>
               <DropdownMenuItem
                 onClick={() =>

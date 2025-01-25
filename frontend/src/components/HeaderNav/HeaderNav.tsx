@@ -7,14 +7,19 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import logo from "../../assets/Logo.png";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import { clearCookies } from "@/services/cookiesService";
 
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
-  const [accountType /*setAccountType8*/] = useState<string>("coach"); //UPDATE WITH COOKIE
+  const [accountType, setAccountType] = useState<string | null | undefined>();
+  useEffect(() => {
+    const user = getCookies();
+    setAccountType(user?.type);
+  }, [accountType]);
   const navigate = useNavigate();
 
   const clearCookiesAndNavigate = () => {
@@ -52,8 +57,8 @@ export default function HeaderNav() {
               >
                 Forum
               </Link>
-              {(accountType.toLowerCase() === "coach" ||
-                accountType.toLowerCase() === "admin") && (
+              {(accountType?.toLowerCase() === "coach" ||
+                accountType?.toLowerCase() === "admin") && (
                 <>
                   <Link
                     to="/pages/CreateTrainingSessionPage"

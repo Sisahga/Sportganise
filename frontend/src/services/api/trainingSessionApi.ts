@@ -8,7 +8,10 @@ const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/programs";
 
 const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
-  createTrainingSession: async (accountId: number, jsonPayload: FormData) => {
+  createTrainingSession: async (
+    accountId: number | null | undefined,
+    jsonPayload: FormData,
+  ) => {
     const response = await fetch(
       `${baseMappingUrl}/${accountId}/create-program`,
       {
@@ -33,7 +36,7 @@ const trainingSessionApi = {
   },
   /**Submit ModifyTrainingSession form */
   modifyTrainingSession: async (
-    accountId: number,
+    accountId: number | null | undefined,
     programId: number,
     formValues: FormData,
   ) => {
