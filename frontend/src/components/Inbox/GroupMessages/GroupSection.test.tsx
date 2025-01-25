@@ -3,7 +3,6 @@ import "@testing-library/jest-dom";
 import { vi } from "vitest";
 import GroupSection from "./GroupSection";
 import { GroupSectionProps } from "@/types/dmchannels";
-import MessagingDashboardChannelItem from "../DirectMessagesDashboard/MessagingDashboardChannelItem";
 
 vi.mock("../DirectMessagesDashboard/MessagingDashboardChannelItem", () => ({
   __esModule: true,
