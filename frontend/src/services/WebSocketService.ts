@@ -2,6 +2,7 @@
 import { Frame, Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { MessageComponent, SendMessageComponent } from "@/types/messaging.ts";
+import {getBearerToken} from "@/services/apiHelper.ts";
 
 export default class WebSocketService {
   private stompClient: Client | null = null;
@@ -16,6 +17,9 @@ export default class WebSocketService {
     return new Promise((resolve) => {
       this.stompClient = new Client({
         webSocketFactory: () => new SockJS(this.url),
+        connectHeaders: {
+          Authorization: getBearerToken()
+        },
         onConnect: () => {
           console.log("WebSocket Connected!");
           this.stompClient?.subscribe(

@@ -1,3 +1,4 @@
+import {getBearerToken} from "@/services/apiHelper.ts";
 import {
   AddChannelMemberDto,
   Channel,
@@ -23,6 +24,7 @@ const directMessagingApi = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": getBearerToken(),
         },
         body: JSON.stringify(channel),
       },
@@ -34,6 +36,11 @@ const directMessagingApi = {
   getChannels: async (accountId: number | null) => {
     const response = await fetch(
       `${baseMappingUrl}/channel/get-channels/${accountId}`,
+        {
+          headers: {
+            "Authorization": getBearerToken(),
+          },
+        }
     );
     const data: Channel[] = await response.json();
     return data;
@@ -41,6 +48,11 @@ const directMessagingApi = {
   getNonUserChannelMembers: async (channelId: number, userId: number) => {
     const response = await fetch(
       `${baseMappingUrl}/channelmember/get-channel-members/${channelId}/${userId}`,
+        {
+          headers: {
+            "Authorization": getBearerToken(),
+          },
+        }
     );
     const data: ResponseDto<ChannelMember[]> = await response.json();
     return data;
@@ -48,6 +60,11 @@ const directMessagingApi = {
   getAllChannelMembers: async (channelId: number) => {
     const response = await fetch(
       `${baseMappingUrl}/channelmember/get-channel-members/${channelId}`,
+        {
+          headers: {
+            "Authorization": getBearerToken(),
+          },
+        }
     );
     const data: ResponseDto<ChannelMember[]> = await response.json();
     return data;
@@ -55,6 +72,11 @@ const directMessagingApi = {
   getDirectMessages: async (channelId: number | null) => {
     const response = await fetch(
       `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
+        {
+          headers: {
+            "Authorization": getBearerToken(),
+          },
+        }
     );
     const data: MessageComponent[] = await response.json();
     return data;
@@ -67,6 +89,9 @@ const directMessagingApi = {
       `${baseMappingUrl}/channelmember/${channelId}/${userId}/mark-as-read`,
       {
         method: "PUT",
+        headers: {
+          "Authorization": getBearerToken(),
+        }
       },
     );
     log.info(`Channel ${channelId} marked as read for user ${userId}`);
@@ -74,6 +99,11 @@ const directMessagingApi = {
   getLastChannelMessage: async (channelId: number) => {
     const response = await fetch(
       `${baseMappingUrl}/channel/get-last-message/${channelId}`,
+        {
+          headers: {
+            "Authorization": getBearerToken(),
+          },
+        }
     );
     const data: ResponseDto<LastMessageComponent> = await response.json();
     return data;
@@ -83,6 +113,9 @@ const directMessagingApi = {
       `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
       {
         method: "DELETE",
+        headers: {
+          "Authorization": getBearerToken(),
+        },
       },
     );
   },
@@ -91,6 +124,7 @@ const directMessagingApi = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": getBearerToken(),
       },
       body: JSON.stringify(channelMembersDto),
     });
@@ -100,6 +134,7 @@ const directMessagingApi = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": getBearerToken(),
       },
       body: JSON.stringify(renameChannelDto),
     });
@@ -107,6 +142,9 @@ const directMessagingApi = {
   updateChannelPicture: async (requestData: FormData) => {
     const response = await fetch(`${baseMappingUrl}/channel/update-image`, {
       method: "POST", // Its a more complex backend, so we need to use POST here.
+      headers: {
+        "Authorization": getBearerToken(),
+      },
       body: requestData,
     });
     const data: ResponseDto<UpdateChannelPictureResponse> =

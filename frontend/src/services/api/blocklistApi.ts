@@ -1,4 +1,5 @@
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
+import {getBearerToken} from "@/services/apiHelper.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/blocklist";
 
@@ -12,6 +13,7 @@ const blocklistApi = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": getBearerToken(),
       },
       body: JSON.stringify(blockUserRequestDto),
     });
@@ -28,6 +30,7 @@ const blocklistApi = {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": getBearerToken(),
         },
       },
     );

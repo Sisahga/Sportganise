@@ -1,15 +1,17 @@
-import {
-  AccountDetailsDirectMessaging,
-  Account,
-  UpdateAccountPayload,
-} from "@/types/account.ts";
+import {Account, AccountDetailsDirectMessaging, UpdateAccountPayload,} from "@/types/account.ts";
+import {getBearerToken} from "@/services/apiHelper.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/account";
 
 const accountApi = {
   getUserAccounts: async (organizationId: number, userId: number) => {
     const response = await fetch(
-      `${baseMappingUrl}/get-all-users/${organizationId}/${userId}`,
+        `${baseMappingUrl}/get-all-users/${organizationId}/${userId}`,
+        {
+          headers: {
+            "Authorization": getBearerToken() || "",
+          },
+        }
     );
     const data: AccountDetailsDirectMessaging[] = await response.json();
     return data;
@@ -17,23 +19,30 @@ const accountApi = {
 
   //Function to get account by id
   getAccountById: async (accountId: number): Promise<Account> => {
-    const response = await fetch(`${baseMappingUrl}/${accountId}`);
+    const response = await fetch(
+        `${baseMappingUrl}/${accountId}`,
+        {
+          headers: {
+            "Authorization": getBearerToken(),
+          }
+        }
+    );
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
-    const data: Account = await response.json();
-    return data;
+    return await response.json();
   },
 
   //Function to update account information
   updateAccount: async (
-    accountId: number,
-    data: UpdateAccountPayload,
+      accountId: number,
+      data: UpdateAccountPayload,
   ): Promise<void> => {
     const response = await fetch(`${baseMappingUrl}/${accountId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": getBearerToken(),
       },
       body: JSON.stringify(data),
     });
@@ -48,27 +57,30 @@ const accountApi = {
 
   // Function to update profile picture
   updateProfilePicture: async (
-    accountId: number,
-    file: File,
+      accountId: number,
+      file: File,
   ): Promise<{ success: boolean; message: string }> => {
     const formData = new FormData();
     formData.append("file", file);
 
     const response = await fetch(`${baseMappingUrl}/${accountId}/picture`, {
       method: "PUT",
+      headers: {
+        "Authorization": getBearerToken(),
+      },
       body: formData,
     });
 
     if (!response.ok) {
       if (response.status === 404) {
-        return { success: false, message: "Account not found" };
+        return {success: false, message: "Account not found"};
       } else if (response.status === 500) {
-        return { success: false, message: "Failed to upload the file" };
+        return {success: false, message: "Failed to upload the file"};
       } else {
         return {
           success: false,
           message:
-            "Unexpected error occurred while updating the profile picture",
+              "Unexpected error occurred while updating the profile picture",
         };
       }
     }
