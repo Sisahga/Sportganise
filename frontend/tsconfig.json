@@ -5,7 +5,7 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "types": ["vitest"],
+    "types": ["vitest/globals","node"],
     "baseUrl": ".",
     "forceConsistentCasingInFileNames": true,
     "paths": {
