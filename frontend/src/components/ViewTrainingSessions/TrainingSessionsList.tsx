@@ -4,13 +4,22 @@
 
 import TrainingSessionCard from "./TrainingSessionCard";
 import { Filter, Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import log from "loglevel";
 import usePrograms from "@/hooks/usePrograms";
+import { getCookies } from "@/services/cookiesService";
 
 export default function TrainingSessionsList() {
-  const accountId = 2; // TODO : replace with cookie
+  const [accountId, setAccountId] = useState<number | null | undefined>(0); // fix undefined
   const { programs, /*setPrograms,*/ error, loading } = usePrograms(accountId); // Program[]
+
+  log.debug("Rendering TrainingSessionList");
+  // AccountId from cookies
+  useEffect(() => {
+    const user = getCookies();
+    setAccountId(user?.accountId);
+    log.debug(`Training Session List accountId : ${accountId}`);
+  }, [accountId]);
 
   // Fetch programs on component mount
   useEffect(() => {
