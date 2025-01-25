@@ -9,7 +9,6 @@ import {
 import logo from "../../assets/Logo.png";
 import { useState } from "react";
 import log from "loglevel";
-import { Button } from "../ui/Button";
 import { clearCookies } from "@/services/cookiesService";
 
 log.info("HeaderNav component is being rendered.");

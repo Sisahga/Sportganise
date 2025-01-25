@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { getCookies } from "@/services/cookiesService";
+/* eslint-disable react/prop-types */
 
 interface PrivateRouteProps {
   requiredRole?: "PLAYER" | "COACH" | "ADMIN";
