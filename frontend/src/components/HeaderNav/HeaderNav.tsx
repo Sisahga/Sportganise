@@ -19,7 +19,7 @@ export default function HeaderNav() {
   useEffect(() => {
     const user = getCookies();
     setAccountType(user?.type);
-  }, []);
+  }, [accountType]);
   const navigate = useNavigate();
 
   const clearCookiesAndNavigate = () => {
