@@ -155,7 +155,7 @@ export default function TrainingPlanTable() {
   });
   return (
     <div>
-      <div className="relative w-full px-4 sm:px-0 mb-4">
+      <div className="relative w-full px-4 sm:px-0 mb-4 mx-auto max-w-5xl">
         <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <Input
           type="text"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
@@ -12,7 +12,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { MoveLeft, CirclePlus, Save } from "lucide-react";
+import { CirclePlus, Save } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -36,6 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { UpdateAccountPayload } from "@/types/account";
 import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 const EditProfileContent: React.FC = () => {
   const navigate = useNavigate();
@@ -200,15 +201,9 @@ const EditProfileContent: React.FC = () => {
 
   return (
     <div className="pb-8 min-h-screen">
-      <Button
-        className="rounded-full w-2"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center mx-auto max-w-2xl">
         <div className="relative">
           <img
             className="h-48 w-48 rounded-full border-2 border-gray-300 mx-auto my-2"

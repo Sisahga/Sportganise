@@ -1,6 +1,6 @@
 // src/components/Inbox/ChatScreen/ChatHeader.tsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { ArrowLeft, MoreVertical, Trash, UserX } from "lucide-react";
 import log from "loglevel";
 

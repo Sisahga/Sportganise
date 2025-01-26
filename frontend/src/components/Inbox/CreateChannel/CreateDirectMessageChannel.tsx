@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button.tsx";
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import AddMembers from "../AddMembers.tsx";
 import { useState } from "react";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
