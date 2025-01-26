@@ -1,16 +1,16 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import ChangePasswordContent from "./ChangePasswordContent";
 import useModifyPassword from "@/hooks/useModifyPassword";
 import { getCookies, getEmailCookie } from "@/services/cookiesService";
 import { useToast } from "@/hooks/use-toast";
 import { MockedFunction } from "vitest";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import "@testing-library/jest-dom";
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
   return {
     __esModule: true,
     ...actual,
@@ -137,7 +137,7 @@ describe("ChangePasswordContent Component", () => {
     ).toHaveValue(formValues.passwordAgain);
   });
 
-  it("navigates to the profile page when the back button is clicked", () => {
+  it("navigates back when the back button is clicked", () => {
     render(
       <MemoryRouter>
         <ChangePasswordContent />
@@ -148,7 +148,7 @@ describe("ChangePasswordContent Component", () => {
     const backButton = buttons[0];
     fireEvent.click(backButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/pages/ProfilePage");
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it("disables the submit button while the password is changing", () => {
@@ -229,7 +229,7 @@ describe("ChangePasswordContent Component", () => {
     });
   });
 
-  it("hows error message if the password checklist is not valid", async () => {
+  it("shows error message if the password checklist is not valid", async () => {
     render(
       <MemoryRouter>
         <ChangePasswordContent />

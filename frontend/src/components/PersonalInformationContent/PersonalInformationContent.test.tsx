@@ -1,16 +1,15 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, MockedFunction } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import PersonalInformationContent from "./PersonalInformationContent";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import "@testing-library/jest-dom";
 import { Account } from "@/types/account";
-import { CookiesDto } from "@/types/auth";
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
   return {
     __esModule: true,
     ...actual,
@@ -24,7 +23,7 @@ vi.mock("@/hooks/usePersonalInfromation", () => ({
 }));
 
 vi.mock("@/services/cookiesService", () => ({
-  getCookies: vi.fn<() => CookiesDto | null>(),
+  getCookies: vi.fn(),
   getAccountIdCookie: vi.fn(),
 }));
 
@@ -47,7 +46,7 @@ describe("PersonalInformationContent Component", () => {
     type: "COACH",
     phone: "123-456-7890",
     organisationIds: [1, 2, 3],
-    jwtToken: "token",
+    jwtToken: "Token",
   };
 
   const mockData: Account = {
@@ -175,7 +174,7 @@ describe("PersonalInformationContent Component", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/login");
   });
 
-  it("navigates back to the profile page when the back button is clicked", () => {
+  it("navigates back when the back button is clicked", () => {
     render(
       <MemoryRouter>
         <PersonalInformationContent />
@@ -186,7 +185,7 @@ describe("PersonalInformationContent Component", () => {
     const backButton = buttons[0];
     fireEvent.click(backButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/pages/ProfilePage");
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it("navigates to Edit Profile page when Edit button is clicked", () => {

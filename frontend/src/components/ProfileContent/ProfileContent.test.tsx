@@ -1,15 +1,16 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, MockedFunction } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import ProfileContent from "./ProfileContent";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import { getCookies, getTypeCookie } from "@/services/cookiesService";
+import { CookiesDto } from "@/types/auth";
 import { Account } from "@/types/account";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import "@testing-library/jest-dom";
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
   return {
     __esModule: true,
     ...actual,
@@ -39,7 +40,7 @@ describe("ProfileContent Component", () => {
     typeof getTypeCookie
   >;
 
-  const mockCookies = {
+  const mockCookies: CookiesDto = {
     accountId: 123,
     firstName: "John",
     lastName: "Doe",
@@ -127,21 +128,6 @@ describe("ProfileContent Component", () => {
       "src",
       mockData.pictureUrl,
     );
-  });
-
-  it("navigates back when the back button is clicked", () => {
-    render(
-      <MemoryRouter>
-        <ProfileContent />
-      </MemoryRouter>,
-    );
-
-    const buttons = screen.getAllByRole("button");
-    const backButton = buttons[0];
-    fireEvent.click(backButton);
-
-    // Check if navigate(-1) was called
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it("navigates to Personal Information page on button click", () => {

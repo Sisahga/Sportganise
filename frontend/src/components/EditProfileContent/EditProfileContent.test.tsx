@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import EditProfileContent from "./EditProfileContent";
 import { useToast } from "@/hooks/use-toast";
 import useUpdateAccount from "@/hooks/useUpdateAccount";
@@ -10,12 +10,12 @@ import { MockedFunction } from "vitest";
 import { Account } from "@/types/account";
 import { getCookies } from "@/services/cookiesService";
 import { CookiesDto } from "@/types/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import "@testing-library/jest-dom";
 
 // Mocking the hooks and services
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
   return {
     __esModule: true,
     ...actual,
@@ -122,6 +122,20 @@ describe("EditProfileContent Component", () => {
       dismiss: vi.fn(),
       toasts: [],
     });
+  });
+
+  it("navigates back when the back button is clicked", () => {
+    render(
+      <MemoryRouter>
+        <EditProfileContent />
+      </MemoryRouter>,
+    );
+
+    const buttons = screen.getAllByRole("button");
+    const backButton = buttons[0];
+    fireEvent.click(backButton);
+
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 
   it("renders form fields with initial values", () => {
