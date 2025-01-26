@@ -6,7 +6,7 @@ import {
   ClipboardList,
   MessagesSquare,
   Share2,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import log from "loglevel";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
@@ -24,8 +24,6 @@ interface FeatureCardProps {
   delay: number;
 }
 
-
-
 export default function HomeContent() {
   const navigate = useNavigate();
   const FeatureCard: React.FC<FeatureCardProps> = ({
@@ -37,21 +35,35 @@ export default function HomeContent() {
     delay,
   }) => (
     <motion.div
-    initial={{ opacity: 0, x: -10 }}
-    whileInView={{ opacity: 1, x: 0 }}
-    transition={{delay: delay}}
-    viewport={{ once: true }}
+      initial={{ opacity: 0, x: -10 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      transition={{ delay: delay }}
+      viewport={{ once: true }}
     >
-      <div onClick={()=>{navigate(link)}} className={`group p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg active:scale-95 ${linkText !== '' ? "cursor-pointer" : ''}`}>
+      <div
+        onClick={() => {
+          navigate(link);
+        }}
+        className={`group p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg active:scale-95 ${linkText !== "" ? "cursor-pointer" : ""}`}
+      >
         <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-lg bg-textPlaceholderColour/70 group-hover:bg-secondaryColour/10 transition-colors duration-300">
             {icon}
           </div>
           <h3 className="font-semibold text-nowrap">{title}</h3>
         </div>
-        <p className="text-primaryColour/90 md:min-h-[3lh] lg:min-h-[5lh] xl:min-h-[4lh]">{description}</p>
-        {linkText != '' && <Link to={{pathname: link}} className="flex mt-3 text-sm items-center xl:text-lg text-nowrap place-content-end text-primaryColour/90 group-hover:text-secondaryColour align-end">{linkText}<ChevronRight className="group-hover:translate-x-1 transition-all ease-in-out duration-200"/></Link>
-      }
+        <p className="text-primaryColour/90 md:min-h-[3lh] lg:min-h-[5lh] xl:min-h-[4lh]">
+          {description}
+        </p>
+        {linkText != "" && (
+          <Link
+            to={{ pathname: link }}
+            className="flex mt-3 text-sm items-center xl:text-lg text-nowrap place-content-end text-primaryColour/90 group-hover:text-secondaryColour align-end"
+          >
+            {linkText}
+            <ChevronRight className="group-hover:translate-x-1 transition-all ease-in-out duration-200" />
+          </Link>
+        )}
       </div>
     </motion.div>
   );
@@ -63,8 +75,8 @@ export default function HomeContent() {
       title: "Training Sessions",
       description:
         "Efficiently manage and schedule your training sessions. Stay organized and focused on what matters most - your game.",
-        linkText: "View My Schedule",
-        link: "/pages/CalendarPage"
+      linkText: "View My Schedule",
+      link: "/pages/CalendarPage",
     },
     {
       icon: (
@@ -73,8 +85,8 @@ export default function HomeContent() {
       title: "Community Forum",
       description:
         "Share experiences, give feedback, and learn from fellow players in our vibrant community forum.",
-        linkText: "View Community Feedback",
-        link: "/pages/ForumPage"
+      linkText: "View Community Feedback",
+      link: "/pages/ForumPage",
     },
     {
       icon: (
@@ -83,8 +95,8 @@ export default function HomeContent() {
       title: "Direct Messaging",
       description:
         "Connect directly with coaches and players. Build relationships and coordinate effortlessly.",
-        linkText: "View My Messages",
-        link: "/pages/DirectMessagesDashboard"
+      linkText: "View My Messages",
+      link: "/pages/DirectMessagesDashboard",
     },
     {
       icon: (
@@ -138,7 +150,7 @@ export default function HomeContent() {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 min-h-[3lh]">
                 {features.map((feature, index) => (
-                  <FeatureCard delay={0.1*index} key={index} {...feature} />
+                  <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}
               </div>
             </div>
