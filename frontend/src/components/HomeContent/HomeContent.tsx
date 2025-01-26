@@ -42,7 +42,7 @@ export default function HomeContent() {
       viewport={{ once: true }}
     >
       <div
-      role="presentation" 
+        role="presentation"
         onClick={() => {
           navigate(link);
         }}
