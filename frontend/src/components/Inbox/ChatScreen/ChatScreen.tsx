@@ -305,8 +305,9 @@ const ChatScreen: React.FC = () => {
           render={({ field }) => (
             <textarea
               {...field}
+              id="chatScreenInputArea"
               placeholder="Send a message..."
-              className="flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none"
+              className={`${channelIsBlocked ? "force-hide" : ""} flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none`}
               style={{ scrollbarWidth: "none" }}
               rows={1}
             />

@@ -188,6 +188,6 @@ describe("ChatScreen", () => {
 
     render(<ChatScreen />);
     const inputArea = document.getElementById("chatScreenInputArea");
-    expect(inputArea).toBeDisabled();
+    expect(inputArea).toHaveClass("force-hide");
   });
 });
