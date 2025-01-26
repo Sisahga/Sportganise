@@ -1,9 +1,10 @@
 import {
-  Account,
   AccountDetailsDirectMessaging,
+  Account,
   UpdateAccountPayload,
 } from "@/types/account.ts";
 import { getBearerToken } from "@/services/apiHelper.ts";
+import { setCookies, getCookies } from "@/services/cookiesService";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/account";
 
@@ -53,6 +54,15 @@ const accountApi = {
         throw new Error("Account not found");
       }
       throw new Error("Failed to update account");
+    }
+    if (data && response.ok) {
+      const currentCookies = getCookies();
+      if (currentCookies) {
+        setCookies({
+          ...currentCookies,
+          email: data.email || currentCookies.email,
+        });
+      }
     }
   },
 
