@@ -27,8 +27,10 @@ public class WebConfig implements WebMvcConfigurer {
   public FilterRegistrationBean<CorsFilter> corsFilter() {
     CorsConfiguration config = new CorsConfiguration();
     config.setAllowCredentials(true);
-    config.addAllowedOrigin("http://localhost:3000");
+    config.addAllowedOrigin("http://localhost:3000"); // Frontend sever
+    config.addAllowedOrigin("http://localhost:5173"); // Frontend running locally
     config.addAllowedOrigin("http://localhost");
+    config.addAllowedOrigin("http://localhost:5173");
     config.addAllowedOrigin("https://onibad.sportganise.com");
     config.addAllowedOrigin("http://localhost:5173");
     config.addAllowedHeader("*");

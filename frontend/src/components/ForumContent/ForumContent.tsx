@@ -1,13 +1,7 @@
 /**TODO: Connect and fetch from real API endpoint. Navigate to PostDetail with correct sessionID**/
 
 import React, { useState, useEffect } from "react";
-import {
-  CalendarIcon,
-  MoveLeft,
-  ThumbsUp,
-  MessageSquare,
-  Filter,
-} from "lucide-react";
+import { CalendarIcon, ThumbsUp, MessageSquare, Filter } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -23,7 +17,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import {
   Card,
   CardContent,
@@ -41,6 +35,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import "react-day-picker/dist/style.css";
+import BackButton from "../ui/back-button";
 
 interface TrainingSession {
   id: number;
@@ -157,13 +152,7 @@ const ForumContent: React.FC = () => {
 
   return (
     <div className="min-h-screen pb-20">
-      <Button
-        className="rounded-full w-2"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-8">
         Forum

@@ -1,14 +1,14 @@
 // MessagingDashboardHeader.test.tsx
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import MessagingDashboardHeader from "./MessagingDashboardHeader";
 
 const mockNavigate = vi.fn();
 
-vi.mock("react-router-dom", async () => {
-  const actual: typeof import("react-router-dom") =
-    await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual: typeof import("react-router") =
+    await vi.importActual("react-router");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
