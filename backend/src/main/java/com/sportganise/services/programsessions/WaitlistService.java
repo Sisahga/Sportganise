@@ -6,6 +6,7 @@ import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.exceptions.ParticipantNotFoundException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import java.time.ZonedDateTime;
@@ -178,8 +179,8 @@ public class WaitlistService {
    * @param programId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return A DTO representing the marked absent participant, or null if participant is not
-   *     confirmed
-   * @throws ParticipantNotFoundException whenever participant can't be found
+   *     confirmed.
+   * @throws ParticipantNotFoundException whenever participant can't be found.
    */
   public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
@@ -206,12 +207,24 @@ public class WaitlistService {
     return new ProgramParticipantDto(savedParticipant);
   }
 
-  public List<ProgramDto> getWaitlistPrograms() {
+  /**
+   * Gets all programs that are open for waitlisted participants to join.
+   *
+   * @return A list of ProgramDto's containing the waitlisted .
+   * @throws ResourceNotFoundException whenever programs can't be found.
+   */
+  public List<ProgramDto> getWaitlistPrograms() throws ResourceNotFoundException {
     List<Program> programs = programRepository.findByProgramType("Training");
+
+    if (programs == null) {
+      log.error("Program list is null. Can't fetch waitlist programs");
+      throw new ResourceNotFoundException("Programs list is null. Cannot fetch waitlist programs.");
+    }
 
     return programs.stream()
         .flatMap(
             program -> {
+              log.debug("{}", program);
               Integer participantCount =
                   participantRepository.countConfirmedParticipants(program.getProgramId());
 
