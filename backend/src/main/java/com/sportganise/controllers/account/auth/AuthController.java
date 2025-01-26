@@ -51,10 +51,11 @@ public class AuthController {
    */
   @Autowired
   public AuthController(
-          AccountService accountService,
-          EmailService emailService,
-          VerificationService verificationService,
-          CookiesService cookiesService, UserAuthProvider userAuthProvider) {
+      AccountService accountService,
+      EmailService emailService,
+      VerificationService verificationService,
+      CookiesService cookiesService,
+      UserAuthProvider userAuthProvider) {
     this.accountService = accountService;
     this.emailService = emailService;
     this.verificationService = verificationService;
