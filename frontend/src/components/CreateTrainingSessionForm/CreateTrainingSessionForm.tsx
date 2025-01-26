@@ -52,24 +52,31 @@ import {
   Paperclip,
   Loader2,
 } from "lucide-react";
-import { getCookies } from "@/services/cookiesService";
+import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [accountId, setAccountId] = useState<number | null | undefined>(0); // fix undefined
   const { form } = useFormHandler();
   const { createTrainingSession, error } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
 
+  // AccountId from cookies
+  const cookies = getCookies();
+  const accountId = cookies ? getAccountIdCookie(cookies) : null;
   useEffect(() => {
-    const user = getCookies();
-    if (!user || user.type === "GENERAL") {
+    if (!accountId) {
+      log.debug("No accountId found");
+    }
+    log.info(`TrainingSessionList accountId is ${accountId}`);
+  }, [accountId]);
+
+  useEffect(() => {
+    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
       navigate("/");
     }
-    setAccountId(user?.accountId);
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [accountId]);
+  }, [accountId, navigate, cookies]);
 
   const types = [
     {
