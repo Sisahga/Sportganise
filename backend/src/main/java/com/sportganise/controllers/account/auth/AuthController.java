@@ -95,7 +95,7 @@ public class AuthController {
       log.debug("Password too weak for user with email: " + accountDto.getEmail());
       responseDto.setMessage("Password too weak");
       responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
-
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     } catch (Exception e) {
       log.debug("Unexpected error for user with email: " + accountDto.getEmail(), e);
       responseDto.setMessage("Error creating user:" + e.getMessage());
