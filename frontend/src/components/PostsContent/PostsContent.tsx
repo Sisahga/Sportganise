@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { ThumbsUp, MessageCircle, MoveLeft } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";

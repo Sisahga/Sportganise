@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 import { ArrowLeft, Send, FolderOpen } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages.ts";
 import defaultAvatar from "../../../assets/defaultAvatar.png";

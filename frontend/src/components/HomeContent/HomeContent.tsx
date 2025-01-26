@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import log from "loglevel";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 
 log.info("HomeContent component is being rendered.");

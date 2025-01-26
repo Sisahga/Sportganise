@@ -23,7 +23,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import {
   Card,
   CardContent,

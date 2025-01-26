@@ -4,7 +4,7 @@ WORK IN PROGRESS*/
 import React, { useState, useEffect } from "react";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { MoveLeft, Search } from "lucide-react";
 import {
   Pagination,

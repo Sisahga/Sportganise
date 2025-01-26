@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router";
 import { HeaderNav } from "./HeaderNav";
 import { FooterNav } from "./FooterNav";
 import { Toaster } from "@/components/ui/toaster";

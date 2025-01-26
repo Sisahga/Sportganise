@@ -3,7 +3,7 @@ import "@testing-library/jest-dom";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import CreateDirectMessagingChannel from "./CreateDirectMessageChannel";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import useCreateChannel from "@/hooks/useCreateChannel";
 import log from "loglevel";
 import type { Mock } from "vitest";
@@ -24,8 +24,8 @@ interface AddMembersMockProps {
   createFunction: () => void;
 }
 
-vi.mock("react-router-dom", () => ({
-  ...vi.importActual("react-router-dom"),
+vi.mock("react-router", () => ({
+  ...vi.importActual("react-router"),
   useNavigate: vi.fn(),
 }));
 

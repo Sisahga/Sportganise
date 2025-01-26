@@ -2,8 +2,8 @@ import { describe, it, expect, beforeEach, vi, MockedFunction } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
   return {
     __esModule: true,
     ...actual,
@@ -28,7 +28,7 @@ vi.mock("@/hooks/useSendMessage.ts", () => {
   };
 });
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 import useChatMessages from "../../../hooks/useChatMessages.ts";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import ChatScreen from "./ChatScreen";

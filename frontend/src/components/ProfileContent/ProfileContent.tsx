@@ -9,7 +9,7 @@ import {
   KeyRound,
   UserX,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import {
   getCookies,

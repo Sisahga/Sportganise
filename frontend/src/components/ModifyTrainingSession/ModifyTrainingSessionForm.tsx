@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MoveLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,7 +43,7 @@ import {
 } from "@/components/ui/file-upload";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
 import { Attendees } from "@/types/trainingSessionDetails";
