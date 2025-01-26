@@ -76,7 +76,7 @@ export default function CreateTrainingSessionForm() {
       navigate("/");
     }
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [accountId]);
+  }, [accountId, navigate, cookies]);
 
   const types = [
     {

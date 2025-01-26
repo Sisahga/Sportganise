@@ -104,6 +104,7 @@ export default function ModifyTrainingSessionForm() {
     [],
   );
   const [loading, setLoading] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
   const [, /* attendees */ setAttendees] = useState<Attendees[]>([]); // For US305+
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
@@ -129,7 +130,7 @@ export default function ModifyTrainingSessionForm() {
     }
     setAccountId(user?.accountId);
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [accountId]);
+  }, [accountId, navigate]);
 
   /** Handle files for file upload in form*/
   const dropZoneConfig = {
@@ -142,6 +143,10 @@ export default function ModifyTrainingSessionForm() {
       "application/pdf": [".pdf"],
     },
   };
+
+  function fileName(file: File): string {
+    return file.name.split("_").pop() ?? "fileName"; //pop aws bucket
+  }
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -221,15 +226,6 @@ export default function ModifyTrainingSessionForm() {
             log.debug("File in form field appended to formData : ", file);
           }
         });
-      } else {
-        formData.append(
-          "attachments",
-          new Blob([], {
-            type: "application/json",
-          }),
-        );
-      }
-      if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
             (urlName) => urlName !== file.name,
@@ -239,6 +235,13 @@ export default function ModifyTrainingSessionForm() {
           log.debug("File in form field :", file);
         });
         log.info("attachmentsToRemove : ", attachmentsToRemove);
+      } else {
+        formData.append(
+          "attachments",
+          new Blob([], {
+            type: "application/json",
+          }),
+        );
       }
       const programData = {
         title: values.title,
@@ -759,9 +762,7 @@ export default function ModifyTrainingSessionForm() {
                         field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>
-                              {file.name.split("/").pop()?.split("_").pop()}
-                            </span>
+                            <span>{fileName(file)}</span>
                           </FileUploaderItem>
                         ))}
                     </FileUploaderContent>
