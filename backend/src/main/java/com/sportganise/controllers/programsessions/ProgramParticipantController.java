@@ -1,5 +1,6 @@
 package com.sportganise.controllers.programsessions;
 
+import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.services.programsessions.WaitlistService;
@@ -162,5 +163,11 @@ public class ProgramParticipantController {
           e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
+  }
+
+  @GetMapping("/waitlist-programs")
+  public ResponseEntity<?> getWaitlistPrograms() {
+    List<ProgramDto> ppc = waitlistService.getWaitlistPrograms();
+    return ResponseEntity.ok(ppc);
   }
 }

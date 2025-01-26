@@ -1,13 +1,17 @@
 package com.sportganise.services.programsessions;
 
+import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
+import com.sportganise.repositories.programsessions.ProgramRepository;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +21,17 @@ import org.springframework.stereotype.Service;
 public class WaitlistService {
 
   private final ProgramParticipantRepository participantRepository;
+  private final ProgramRepository programRepository;
 
   /**
    * Constructor for WaitlistService.
    *
    * @param participantRepository Repository for managing program participants.
    */
-  public WaitlistService(ProgramParticipantRepository participantRepository) {
+  public WaitlistService(
+      ProgramParticipantRepository participantRepository, ProgramRepository programRepository) {
     this.participantRepository = participantRepository;
+    this.programRepository = programRepository;
   }
 
   /**
@@ -197,5 +204,23 @@ public class WaitlistService {
 
     ProgramParticipant savedParticipant = participantRepository.save(programParticipant);
     return new ProgramParticipantDto(savedParticipant);
+  }
+
+  public List<ProgramDto> getWaitlistPrograms() {
+    List<Program> programs = programRepository.findByProgramType("Training");
+
+    return programs.stream()
+        .flatMap(
+            program -> {
+              Integer participantCount =
+                  participantRepository.countConfirmedParticipants(program.getProgramId());
+
+              if (participantCount >= program.getCapacity()) {
+                return Stream.empty();
+              }
+
+              return Stream.of(new ProgramDto(program, null));
+            })
+        .toList();
   }
 }
