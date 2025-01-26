@@ -2,7 +2,7 @@ import { useWaitlist } from "@/hooks/useWaitlist";
 import useJoinWaitlist from "@/hooks/useJoinWaitlist";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import {
