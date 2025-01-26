@@ -3,7 +3,7 @@ import {
   AddChannelMemberDto,
   Channel,
   ChannelMember,
-  CreateChannelDto,
+  CreateChannelDto, DeleteChannelRequestDto, DeleteChannelRequestResponseDto,
   RenameChannelDto,
   UpdateChannelPictureResponse,
 } from "@/types/dmchannels.ts";
@@ -151,6 +151,18 @@ const directMessagingApi = {
       await response.json();
     return data;
   },
+  requestChannelDelete: async (deleteChannelRequestDto: DeleteChannelRequestDto) => {
+    const response = await fetch(`${baseMappingUrl}/channel/delete-channel-request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getBearerToken(),
+      },
+      body: JSON.stringify(deleteChannelRequestDto),
+    });
+    const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+    return data;
+  }
 };
 
 export default directMessagingApi;

@@ -173,7 +173,7 @@ public class DirectMessageChannelController {
 
   /**
    * Endpoint /api/messaging/delete-channel-request: Post Mapping for sending a request to delete a
-   * channel.
+   * channel. Sets other concerned members status to PENDING by default.
    *
    * @param deleteChannelRequestDto DTO object for deleting a channel.
    * @return HTTP Code 200 if successful.
@@ -200,7 +200,7 @@ public class DirectMessageChannelController {
    * @return HTTP Code 200 if successful, 204 if channel was approved for deletion and has been
    *     deleted.
    */
-  @PatchMapping("set-delete-approver-status")
+  @PatchMapping("/set-delete-approver-status")
   public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>>
       setDeleteChannelApproverStatus(@RequestBody SetDeleteApproverStatusDto setApproverStatusDto) {
     // If the status to be set is DENIED, delete the request to delete the channel.

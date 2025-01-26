@@ -13,7 +13,7 @@ import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent.tsx";
 import log from "loglevel";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+// import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -27,8 +27,9 @@ const ChatScreen = () => {
   const read = state?.read || false;
   const channelType = state?.channelType || null;
   const isBlocked = state?.isBlocked || false;
-  const cookies = getCookies();
-  const currentUserId = getAccountIdCookie(cookies); // TODO: Replace with actual user ID from cookies
+  // const cookies = getCookies();
+  //const currentUserId = getAccountIdCookie(cookies); // TODO: Replace with actual user ID from cookies
+  const currentUserId = 2;
 
   // States
   const [connected, setConnected] = useState(false);

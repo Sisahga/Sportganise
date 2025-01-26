@@ -2,6 +2,17 @@ import React from "react";
 import WebSocketService from "@/services/WebSocketService.ts";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 
+export enum GroupChannelMemberRole {
+  ADMIN = "ADMIN",
+  REGULAR = "REGULAR",
+}
+
+export enum DeleteChannelRequestMemberStatus {
+  APPROVED = "APPROVED",
+  PENDING = "PENDING",
+  DENIED = "DENIED",
+}
+
 export interface Channel {
   channelId: number;
   channelName: string;
@@ -45,11 +56,6 @@ export interface ChannelSettingsDropdownProps {
   setCurrentChannelName: React.Dispatch<React.SetStateAction<string>>;
   currentChannelPictureUrl: string;
   setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
-}
-
-export enum GroupChannelMemberRole {
-  ADMIN = "ADMIN",
-  REGULAR = "REGULAR",
 }
 
 export interface ChannelMember {
@@ -118,4 +124,24 @@ export interface ChangePictureDialogProps {
 
 export interface UpdateChannelPictureResponse {
   channelImageUrl: string;
+}
+
+export interface DeleteChannelRequestDto {
+  deleteRequestId: number | null;
+  channelId: number;
+  creatorId: number;
+  channelType: string;
+}
+
+export interface DeleteChannelRequestMembersDto {
+  accountId: number;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | undefined;
+  status: DeleteChannelRequestMemberStatus;
+}
+
+export interface DeleteChannelRequestResponseDto {
+  deleteChannelRequestDto: DeleteChannelRequestDto;
+  channelMembers: DeleteChannelRequestMembersDto[];
 }
