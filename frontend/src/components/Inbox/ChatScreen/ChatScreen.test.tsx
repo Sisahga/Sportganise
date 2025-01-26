@@ -45,7 +45,6 @@ type SendDirectMessageMock = MockedFunction<
   (message: SendMessageComponent, ws: WebSocketService | null) => void
 >;
 
-
 interface MockUseSendMessageReturn {
   sendDirectMessage: SendDirectMessageMock;
 }
@@ -54,7 +53,6 @@ type UseLocationMock = MockedFunction<typeof useLocation>;
 type UseNavigateMock = MockedFunction<typeof useNavigate>;
 type UseChatMessagesMock = MockedFunction<typeof useChatMessages>;
 type UseSendMessageMock = MockedFunction<typeof useSendMessage>;
-
 
 describe("ChatScreen", () => {
   const mockNavigate = vi.fn();
@@ -97,9 +95,11 @@ describe("ChatScreen", () => {
     mockUseSendMessageReturn = {
       sendDirectMessage: mockSendDirectMessage,
     };
-    (useSendMessage as UseSendMessageMock).mockImplementation(() => mockUseSendMessageReturn);
+    (useSendMessage as UseSendMessageMock).mockImplementation(
+      () => mockUseSendMessageReturn,
+    );
   });
-  
+
   it("shows a loading screen when loading is true", () => {
     mockUseChatMessagesReturn.loading = true;
 
@@ -165,7 +165,7 @@ describe("ChatScreen", () => {
           messageContent: "Hello World",
           type: "CHAT",
         }),
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });
@@ -186,9 +186,8 @@ describe("ChatScreen", () => {
       },
     });
 
-
     render(<ChatScreen />);
     const inputArea = document.getElementById("chatScreenInputArea");
-    expect(inputArea).toBeDisabled;
+    expect(inputArea).toBeDisabled();
   });
 });
