@@ -17,7 +17,7 @@ import { ChevronDown } from "lucide-react";
 import { MemberStatus, DeleteRequestProps } from "@/types/deleteRequest";
 import log from "loglevel";
 
-// using Mock data for now until it is configured with BE
+// Using mock data for now until it's configured with BE
 const mockRequestedBy = "Jane Doe";
 const mockMembers: MemberStatus[] = [
   { name: "John", status: "approved" },
@@ -26,7 +26,7 @@ const mockMembers: MemberStatus[] = [
   { name: "Jeff", status: "pending" },
 ];
 
-// added Partial because i am using mock data, youll probably remove it
+// Added Partial because using mock data; you'll probably remove it
 export default function DeleteRequest({
   requestedBy = mockRequestedBy,
   members: initialMembers = mockMembers,
@@ -57,8 +57,10 @@ export default function DeleteRequest({
       <Drawer open={isOpen} onOpenChange={setIsOpen} direction="top">
         <DrawerTrigger asChild className="flex items-center justify-center">
           <div>
-            {" "}
-            <Button className="flex items-center gap-2">
+            <Button
+              className="flex items-center gap-2"
+              aria-label="Delete Request"
+            >
               Delete Request
               <ChevronDown className="h-4 w-4" />
             </Button>
@@ -70,11 +72,14 @@ export default function DeleteRequest({
               <DrawerTitle className="text-center mt-14">
                 Delete Request
               </DrawerTitle>
-              <DrawerDescription>
-                <p className="text-sm text-muted-foreground text-center">
+              <DrawerDescription
+                className="text-sm text-muted-foreground text-center"
+                data-testid="description" // Added data-testid
+              >
+                <span>
                   <strong>{requestedBy}</strong> requested to delete the
                   channel.
-                </p>
+                </span>
               </DrawerDescription>
             </DrawerHeader>
             <div className="px-4 py-2 space-y-3">
@@ -107,7 +112,7 @@ export default function DeleteRequest({
                 <Button
                   variant="default"
                   className="flex-1"
-                  onClick={() => handleApprove("Jeff")} // for now i am jeff to test out
+                  onClick={() => handleApprove("Jeff")} // For now, approving Jeff to test
                 >
                   Approve
                 </Button>
