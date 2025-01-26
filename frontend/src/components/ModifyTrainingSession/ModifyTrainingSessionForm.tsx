@@ -104,7 +104,8 @@ export default function ModifyTrainingSessionForm() {
     [],
   );
   const [loading, setLoading] = useState<boolean>(false);
-  const [, /* attendees */ setAttendees] = useState<Attendees[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
+  const [, /* attendees */ setAttendees] = useState<Attendees[]>([]); // For US305+
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
     title: "",
@@ -124,15 +125,14 @@ export default function ModifyTrainingSessionForm() {
 
   useEffect(() => {
     const user = getCookies();
-    if (!user || user.type === "GENERAL") {
+    if (!user || user.type === "GENERAL" || user.type === "PLAYER") {
       navigate("/");
     }
     setAccountId(user?.accountId);
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [accountId]);
+  }, [accountId, navigate]);
 
   /** Handle files for file upload in form*/
-  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
   const dropZoneConfig = {
     //File configurations
     maxFiles: 5,
@@ -143,6 +143,10 @@ export default function ModifyTrainingSessionForm() {
       "application/pdf": [".pdf"],
     },
   };
+
+  function fileName(file: File): string {
+    return file.name.split("_").pop() ?? "fileName"; //pop aws bucket
+  }
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -177,8 +181,7 @@ export default function ModifyTrainingSessionForm() {
     form.setValue("description", programDetails.description);
     if (programDetails.programAttachments) {
       const files = programDetails.programAttachments.map((attachment) => {
-        const fileName =
-          attachment.attachmentUrl.split("/").pop()?.split("_").pop() || "file";
+        const fileName = attachment.attachmentUrl || "file";
         return new File([attachment.attachmentUrl], fileName, {
           type: "application/octet-stream",
         });
@@ -213,16 +216,33 @@ export default function ModifyTrainingSessionForm() {
       log.info("Form to modify Training Session : ", json_payload);
 
       // Prepare API body : FormData
+      const formData = new FormData();
+      //atachmentsToRemove contains list of all old files
+      //if file.name of values.attachment exists in attachmentToRemove that means that we want to keep that old file
       if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file) => {
+          if (!attachmentsToRemove.includes(file.name)) {
+            formData.append("attachments", file);
+            log.debug("File in form field appended to formData : ", file);
+          }
+        });
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
             (urlName) => urlName !== file.name,
           );
         });
-        console.log("attachmentsToRemove: ", attachmentsToRemove);
-        log.info("attachmentsToRemove: ", attachmentsToRemove);
+        values.attachment.forEach((file) => {
+          log.debug("File in form field :", file);
+        });
+        log.info("attachmentsToRemove : ", attachmentsToRemove);
+      } else {
+        formData.append(
+          "attachments",
+          new Blob([], {
+            type: "application/json",
+          }),
+        );
       }
-      const formData = new FormData();
       const programData = {
         title: values.title,
         type: values.type,
@@ -243,18 +263,6 @@ export default function ModifyTrainingSessionForm() {
           type: "application/json",
         }),
       );
-      if (values.attachment && values.attachment.length > 0) {
-        values.attachment.forEach((file) => {
-          formData.append("attachments", file);
-        });
-      } else {
-        formData.append(
-          "attachments",
-          new Blob([], {
-            type: "application/json",
-          }),
-        );
-      }
 
       // API call submit form
       setLoading(true);
@@ -754,7 +762,7 @@ export default function ModifyTrainingSessionForm() {
                         field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
+                            <span>{fileName(file)}</span>
                           </FileUploaderItem>
                         ))}
                     </FileUploaderContent>

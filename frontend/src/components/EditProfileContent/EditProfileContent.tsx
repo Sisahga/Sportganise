@@ -203,7 +203,7 @@ const EditProfileContent: React.FC = () => {
     <div className="pb-8 min-h-screen">
       <BackButton />
 
-      <div className="flex flex-col items-center justify-center">
+      <div className="flex flex-col items-center justify-center mx-auto max-w-2xl">
         <div className="relative">
           <img
             className="h-48 w-48 rounded-full border-2 border-gray-300 mx-auto my-2"
