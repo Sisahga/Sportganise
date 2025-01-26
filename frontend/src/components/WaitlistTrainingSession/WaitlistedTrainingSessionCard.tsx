@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 // Component imports
 import { Card } from "@/components/ui/card";
