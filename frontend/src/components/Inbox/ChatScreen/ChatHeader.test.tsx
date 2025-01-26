@@ -2,15 +2,15 @@ import { describe, it, expect, beforeEach, vi, MockedFunction } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
   return {
     ...actual,
     useNavigate: vi.fn(),
   };
 });
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import ChatHeader from "./ChatHeader";
 
 type UseNavigateMock = MockedFunction<typeof useNavigate>;

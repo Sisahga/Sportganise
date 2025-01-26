@@ -4,8 +4,8 @@ WORK IN PROGRESS*/
 import React, { useState, useEffect } from "react";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
-import { useNavigate } from "react-router-dom";
-import { MoveLeft, Search } from "lucide-react";
+import { useNavigate } from "react-router";
+import { Search } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -40,6 +40,7 @@ import {
 import { getCookies } from "@/services/cookiesService";
 import { useToast } from "@/hooks/use-toast";
 import { AccountPermissions } from "@/types/account";
+import BackButton from "../ui/back-button";
 
 const UserPermissionContent: React.FC = () => {
   const [data, setData] = useState<AccountPermissions[]>([]);
@@ -146,13 +147,7 @@ const UserPermissionContent: React.FC = () => {
     <div>
       <div className="container max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-2">
-          <Button
-            className="rounded-full w-2"
-            variant="outline"
-            onClick={() => navigate("/")}
-          >
-            <MoveLeft />
-          </Button>
+          <BackButton />
           <h1 className="text-2xl font-light text-center flex-grow">
             User Permissions
           </h1>

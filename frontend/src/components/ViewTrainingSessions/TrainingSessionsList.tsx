@@ -30,7 +30,7 @@ export default function TrainingSessionsList() {
   }, [programs]); // update page if changes in programs occur
 
   return (
-    <div className="mb-32 mt-5 lg:mx-24">
+    <div className="mt-5 lg:mx-24">
       {/**List of events */}
       <div>
         <span className="flex mt-8 mx-1">
