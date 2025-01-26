@@ -41,6 +41,9 @@ import { getCookies } from "@/services/cookiesService";
 import { useToast } from "@/hooks/use-toast";
 import { AccountPermissions } from "@/types/account";
 import BackButton from "../ui/back-button";
+import { getBearerToken } from "@/services/apiHelper.ts";
+
+const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/account";
 
 const UserPermissionContent: React.FC = () => {
   const [data, setData] = useState<AccountPermissions[]>([]);
@@ -50,8 +53,8 @@ const UserPermissionContent: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<AccountPermissions | null>(
     null,
   );
-  const [newRole, setNewRole] = useState<string>(""); // Track new role
-  const [openDialog, setOpenDialog] = useState<boolean>(false); // For managing Alert Dialog visibility
+  const [newRole, setNewRole] = useState<string>("");
+  const [openDialog, setOpenDialog] = useState<boolean>(false); 
   const itemsPerPage = 5;
 
   const navigate = useNavigate();
@@ -68,13 +71,18 @@ const UserPermissionContent: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/account/permissions",
-        );
+        const response = await fetch(`${baseMappingUrl}/permissions`, {
+          method: "GET", // Specify the HTTP method
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: getBearerToken(), // Include the token from your utility function
+          },
+        });
+  
         if (!response.ok) {
-          throw new Error("Failed to fetch permissions");
+          throw new Error("Failed to fetch permissions from backend");
         }
-
+  
         const result = await response.json();
         console.log("API Response:", result);
         setData(result);
@@ -88,9 +96,10 @@ const UserPermissionContent: React.FC = () => {
         setLoading(false);
       }
     };
-
+  
     fetchData();
   }, []);
+  
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
