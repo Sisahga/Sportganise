@@ -1,6 +1,7 @@
 package com.sportganise.config;
 
 import java.util.Arrays;
+
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
     config.addAllowedOrigin("http://localhost:3000");
     config.addAllowedOrigin("http://localhost");
     config.addAllowedOrigin("https://onibad.sportganise.com");
+    config.addAllowedOrigin("http://localhost:5173");
     config.addAllowedHeader("*");
     config.setAllowedMethods(
         Arrays.asList(
