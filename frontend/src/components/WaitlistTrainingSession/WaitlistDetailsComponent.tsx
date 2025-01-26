@@ -3,6 +3,8 @@ import useJoinWaitlist from "@/hooks/useJoinWaitlist";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getCookies } from "@/services/cookiesService";
+import log from "loglevel";
 import {
   Calendar,
   Clock,
@@ -16,17 +18,38 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/Button";
-import useAccountRole from "@/hooks/useAccountRole";
 import { calculateEndTime } from "@/utils/calculateEndTime";
 
 const WaitlistDetailsComponent = () => {
-  const location = useLocation(); // Get location state data
-  const navigate = useNavigate(); // For navigation
-
-  // Extract program details from location state
+  const location = useLocation();
+  const navigate = useNavigate();
   const [programDetails, setProgramDetails] = useState<ProgramDetails | null>(
     null,
   );
+
+  useEffect(() => {
+    log.debug("Fetching account details from cookies...");
+    const user = getCookies();
+    setAccountId(user.accountId || null);
+    setAccountType(user.type || null);
+    log.info("Fetched account details: ", user);
+  }, []);
+
+  const [accountId, setAccountId] = useState<number | null>(null);
+  const [accountType, setAccountType] = useState<string | null>(null);
+  const programId = programDetails?.programId || 0;
+  const { waitlist, loading, error } = useWaitlist(programId);
+  const isCoachOrAdmin = accountType === "ADMIN" || accountType === "COACH";
+
+  const { joinQueue, joining, userRank, error: joinError } = useJoinWaitlist();
+
+  const handleJoinQueue = async () => {
+    if (accountId) {
+      await joinQueue(programId, accountId);
+    } else {
+      log.error("Account ID is missing!");
+    }
+  };
 
   useEffect(() => {
     if (location.state?.programDetails) {
@@ -34,22 +57,8 @@ const WaitlistDetailsComponent = () => {
     }
   }, [location.state]);
 
-  const programId = programDetails?.programId || 0; // Get programId
-  const { waitlist, loading, error } = useWaitlist(programId); // Fetch waitlist data
-
-  const accountId = 123; // TODO: Replace with dynamic accountId logic add cookies to it
-  const { role } = useAccountRole(accountId);
-  const isCoachOrAdmin = role === "ADMIN" || role === "COACH";
-
-  // Use joinQueue hook
-  const { joinQueue, joining, userRank, error: joinError } = useJoinWaitlist();
-
-  const handleJoinQueue = async () => {
-    await joinQueue(programId, accountId);
-  };
-
   return (
-    <div className="mb-32 mt-5">
+    <div className="mb-32 mt-32">
       {/** Back button */}
       <Button
         className="rounded-full mb-3"
