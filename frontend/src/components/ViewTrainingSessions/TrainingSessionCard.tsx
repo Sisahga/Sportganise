@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import log from "loglevel";
 
 // Component imports
 import { Card } from "@/components/ui/card";
@@ -31,6 +32,7 @@ const TrainingSessionCard: React.FC<Program> = ({
   const handleNavigation = (path: string, data: Program) => {
     navigate(path, { state: data });
   };
+  log.debug("Rendering training session card.");
 
   return (
     <Card>
