@@ -54,7 +54,7 @@ const UserPermissionContent: React.FC = () => {
     null,
   );
   const [newRole, setNewRole] = useState<string>("");
-  const [openDialog, setOpenDialog] = useState<boolean>(false); 
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const itemsPerPage = 5;
 
   const navigate = useNavigate();
@@ -78,11 +78,11 @@ const UserPermissionContent: React.FC = () => {
             Authorization: getBearerToken(), // Include the token from your utility function
           },
         });
-  
+
         if (!response.ok) {
           throw new Error("Failed to fetch permissions from backend");
         }
-  
+
         const result = await response.json();
         console.log("API Response:", result);
         setData(result);
@@ -96,10 +96,9 @@ const UserPermissionContent: React.FC = () => {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
