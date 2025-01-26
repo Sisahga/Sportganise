@@ -153,12 +153,11 @@ describe("ChatScreen", () => {
 
   it("sends message when send button is clicked", () => {
     const mockSendMessage = vi.fn();
-    (useSendMessage as any).mockReturnValue({ sendDirectMessage: mockSendMessage });
+    (useSendMessage as any).mockReturnValue({
+      sendDirectMessage: mockSendMessage,
+    });
 
-    render(
-        <ChatScreen />,
-        { wrapper: ({ children }) => <>{children}</> }
-    );
+    render(<ChatScreen />, { wrapper: ({ children }) => <>{children}</> });
 
     const textarea = screen.getByPlaceholderText("Send a message...");
     const sendButton = screen.getByRole("button", { name: /send/i });
@@ -168,14 +167,13 @@ describe("ChatScreen", () => {
     fireEvent.click(sendButton);
 
     expect(mockSendMessage).toHaveBeenCalledWith(
-        expect.objectContaining({
-          messageContent: "Hello World",
-          type: "CHAT",
-        }),
-        expect.any(Object)
+      expect.objectContaining({
+        messageContent: "Hello World",
+        type: "CHAT",
+      }),
+      expect.any(Object),
     );
   });
-
 
   it("if channel is blocked, hides the input area", () => {
     (useLocation as UseLocationMock).mockReturnValue({
