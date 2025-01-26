@@ -153,7 +153,7 @@ describe("ChatScreen", () => {
 
   it("sends message when send button is clicked", () => {
     const mockSendMessage = vi.fn();
-    (useSendMessage as any).mockReturnValue({
+    (useSendMessage as jest.Mock).mockReturnValue({
       sendDirectMessage: mockSendMessage,
     });
 
