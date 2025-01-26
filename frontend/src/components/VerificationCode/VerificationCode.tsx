@@ -31,23 +31,28 @@ export default function VerificationCode() {
   const location = useLocation();
   const state = location.state as VerificationCodeLocationState | undefined;
 
-  // Retrieve email from location state
-  const email = state?.email;
+  // Retrieve email from location state and trimming it
+  const email = state?.email?.trim() || "";
 
   // Log the email to confirm it's correct
   console.log("Email passed to VerificationCode:", email);
   console.log(location);
 
   // Ensure email is not null
-  if (!email) {
-    console.error("No email provided for verification");
-    toast({
-      variant: "destructive",
-      title: "Error",
-      description: "No email provided for verification. Please try again.",
-    });
-    return null;
-  }
+  useEffect(() => {
+    if (!email) {
+      console.error("No email provided for verification");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No email provided for verification. Please try again.",
+      });
+      // Redirect back to sign-up if email is missing
+      setTimeout(() => {
+        navigate("/signup");
+      }, 3000);
+    }
+  }, [email, navigate, toast]);
 
   const handleInput = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -74,14 +79,13 @@ export default function VerificationCode() {
   const handleVerify = async () => {
     // const codeString = code.join(""); // To combine code into a string
     const codeString = code.map((char) => char.trim()).join(""); // Ensure no spaces
-    const sanitizedEmail = email?.trim() || "";
 
     // Log the API URL and the request data being sent
     console.log(
       "API URL:",
       `${import.meta.env.VITE_API_BASE_URL}/api/auth/verify-code`,
     );
-    console.log("Request Data:", { sanitizedEmail, code: code.join("") });
+    console.log("Request Data:", { email, code: code.join("") });
 
     try {
       const response = await verifyUserCode({ email, code: codeString });
