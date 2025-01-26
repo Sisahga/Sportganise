@@ -16,6 +16,8 @@ import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendExcep
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingPathVariableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -291,6 +293,37 @@ public class GlobalExceptionHandler {
   public ResponseDto<?> handleFileProcessingException(FileProcessingException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle missing servlet request parameter exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleMissingServletRequestParameterException(
+      MissingServletRequestParameterException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle missing path variable exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(MissingPathVariableException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleMissingPathVariableException(MissingPathVariableException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
         .message(e.getMessage())
         .build();
   }

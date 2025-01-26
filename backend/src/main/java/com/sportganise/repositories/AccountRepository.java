@@ -2,6 +2,7 @@ package com.sportganise.repositories;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
+import com.sportganise.entities.Label;
 import com.sportganise.entities.account.Account;
 import java.util.List;
 import java.util.Optional;
@@ -63,4 +64,31 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
         """)
   List<AccountDetailsDirectMessaging> getAllNonBlockedAccountsByOrganization(
       int organizationId, int currentUserId);
+
+  /**
+   * Gets the label IDs for a given account ID and organization ID.
+   *
+   * @param accountId The ID of the account.
+   * @param orgId The ID of the organization.
+   * @return The label IDs.
+   */
+  @Query(
+      """
+          SELECT la.labelAccountsId.labelId
+          FROM LabelAccount la
+          JOIN Label l ON la.labelAccountsId.labelId = l.labelId
+          WHERE la.labelAccountsId.accountId = :accountId
+            AND l.orgId = :orgId
+          """)
+  List<Integer> getLabelIdsByAccountIdAndOrgId(
+      @Param("accountId") Long accountId, @Param("orgId") Long orgId);
+
+  /**
+   * Gets a label by its ID.
+   *
+   * @param labelId The ID of the label.
+   * @return The label.
+   */
+  @Query("SELECT l FROM Label l WHERE l.labelId = :labelId")
+  Label getLabelById(@Param("labelId") Integer labelId);
 }
