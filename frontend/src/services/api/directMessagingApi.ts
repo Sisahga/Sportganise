@@ -1,4 +1,4 @@
-import { getBearerToken } from "@/services/apiHelper.ts";
+import {getBearerToken} from "@/services/apiHelper.ts";
 import {
   AddChannelMemberDto,
   Channel,
@@ -7,7 +7,7 @@ import {
   RenameChannelDto,
   UpdateChannelPictureResponse,
 } from "@/types/dmchannels.ts";
-import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
+import {LastMessageComponent, MessageComponent} from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
 
@@ -15,19 +15,19 @@ const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/messaging";
 
 const directMessagingApi = {
   createChannel: async (
-    channel: CreateChannelDto,
-    creatorId: number,
+      channel: CreateChannelDto,
+      creatorId: number,
   ): Promise<ResponseDto<CreateChannelDto>> => {
     const response = await fetch(
-      `${baseMappingUrl}/channel/create-channel/${creatorId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/channel/create-channel/${creatorId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: getBearerToken(),
+          },
+          body: JSON.stringify(channel),
         },
-        body: JSON.stringify(channel),
-      },
     );
     const data = await response.json();
     console.log("Create Channel Response:", data);
@@ -35,88 +35,88 @@ const directMessagingApi = {
   },
   getChannels: async (accountId: number | null) => {
     const response = await fetch(
-      `${baseMappingUrl}/channel/get-channels/${accountId}`,
-      {
-        headers: {
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/channel/get-channels/${accountId}`,
+        {
+          headers: {
+            Authorization: getBearerToken(),
+          },
         },
-      },
     );
     const data: Channel[] = await response.json();
     return data;
   },
   getNonUserChannelMembers: async (channelId: number, userId: number) => {
     const response = await fetch(
-      `${baseMappingUrl}/channelmember/get-channel-members/${channelId}/${userId}`,
-      {
-        headers: {
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/channelmember/get-channel-members/${channelId}/${userId}`,
+        {
+          headers: {
+            Authorization: getBearerToken(),
+          },
         },
-      },
     );
     const data: ResponseDto<ChannelMember[]> = await response.json();
     return data;
   },
   getAllChannelMembers: async (channelId: number) => {
     const response = await fetch(
-      `${baseMappingUrl}/channelmember/get-channel-members/${channelId}`,
-      {
-        headers: {
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/channelmember/get-channel-members/${channelId}`,
+        {
+          headers: {
+            Authorization: getBearerToken(),
+          },
         },
-      },
     );
     const data: ResponseDto<ChannelMember[]> = await response.json();
     return data;
   },
   getDirectMessages: async (channelId: number | null) => {
     const response = await fetch(
-      `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
-      {
-        headers: {
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
+        {
+          headers: {
+            Authorization: getBearerToken(),
+          },
         },
-      },
     );
     const data: MessageComponent[] = await response.json();
     return data;
   },
   markChannelAsRead: async (
-    channelId: number,
-    userId: number,
+      channelId: number,
+      userId: number,
   ): Promise<void> => {
     await fetch(
-      `${baseMappingUrl}/channelmember/${channelId}/${userId}/mark-as-read`,
-      {
-        method: "PUT",
-        headers: {
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/channelmember/${channelId}/${userId}/mark-as-read`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: getBearerToken(),
+          },
         },
-      },
     );
     log.info(`Channel ${channelId} marked as read for user ${userId}`);
   },
   getLastChannelMessage: async (channelId: number) => {
     const response = await fetch(
-      `${baseMappingUrl}/channel/get-last-message/${channelId}`,
-      {
-        headers: {
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/channel/get-last-message/${channelId}`,
+        {
+          headers: {
+            Authorization: getBearerToken(),
+          },
         },
-      },
     );
     const data: ResponseDto<LastMessageComponent> = await response.json();
     return data;
   },
   removeChannelMember: async (channelId: number, accountId: number) => {
     return await fetch(
-      `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: getBearerToken(),
+        `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: getBearerToken(),
+          },
         },
-      },
     );
   },
   addChannelMembers: async (channelMembersDto: AddChannelMemberDto) => {
@@ -148,7 +148,7 @@ const directMessagingApi = {
       body: requestData,
     });
     const data: ResponseDto<UpdateChannelPictureResponse> =
-      await response.json();
+        await response.json();
     return data;
   },
   requestChannelDelete: async (deleteChannelRequestDto: DeleteChannelRequestDto) => {
@@ -161,6 +161,16 @@ const directMessagingApi = {
       body: JSON.stringify(deleteChannelRequestDto),
     });
     const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+    return data;
+  },
+  getIsDeleteChannelRequestActive: async (channelId: number) => {
+    const response = await
+        fetch(`${baseMappingUrl}/channel/delete-request-active/${channelId}`, {
+          headers: {
+            Authorization: getBearerToken(),
+          },
+        });
+    const data: ResponseDto<boolean> = await response.json();
     return data;
   }
 };
