@@ -60,12 +60,12 @@ export default function BlockedUsersList() {
   };
 
   return (
-    <div className="px-4 flex-1 pb-16">
+    <div className="md:px-4 flex-1 pb-16">
       <BackButton />
 
-      <Card className="space-y-8 max-w-3xl mx-auto pt-10 border-none shadow-none">
+      <Card className="space-y-8 max-w-3xl mx-auto mt-4 border shadow-md mx-auto max-w-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-font font-bold flex items-center gap-2">
+          <CardTitle className="text-2xl font-font font-bold flex items-center justify-center gap-2">
             <UserX className="h-6 w-6" />
             Blocked Users
           </CardTitle>
