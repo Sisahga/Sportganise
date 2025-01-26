@@ -59,7 +59,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
           AND p.occurrenceDate BETWEEN CAST( :threeMonthsAgo AS TIMESTAMP)
               AND CAST(  :yesterday AS TIMESTAMP)
           AND (:type  IS NULL OR p.type = :type)
-    """)
+     """)
   Page<Post> searchAndFilterPosts(
       @Param("searchTerm") String searchTerm,
       @Param("labels") List<Integer> labels,
