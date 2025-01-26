@@ -32,7 +32,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(controllers = DirectMessageChannelController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class DirectMessageChannelControllerUnitTest {
   @Autowired private MockMvc mockMvc;
 

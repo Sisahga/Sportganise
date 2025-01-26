@@ -18,6 +18,7 @@ export interface CookiesDto {
   type: string | null;
   phone: string | null;
   organisationIds: number[];
+  jwtToken: string | null;
 }
 
 export interface SignUpRequest {
@@ -48,6 +49,7 @@ export interface SignUpResponse {
     type: string;
     phone: string;
     organisationIds: number[];
+    jwtToken: string | null;
   };
 }
 
