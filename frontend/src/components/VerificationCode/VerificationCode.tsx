@@ -213,7 +213,6 @@ export default function VerificationCode() {
               <VerificationInput id="code-6" handleInput={handleInput} />
             </div>
             <p className="my-2 text-xs md:text-sm text-black">
-              {" "}
               Did not receive a code?
               <Button
                 variant="link"

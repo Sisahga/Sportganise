@@ -153,7 +153,14 @@ export default function SignUp() {
 
       sendCode();
     }
-  }, [emailForVerification, isCodeSent, sendVerificationCode, navigate, toast]);
+  }, [
+    emailForVerification,
+    isCodeSent,
+    sendVerificationCode,
+    navigate,
+    toast,
+    formData.email,
+  ]);
 
   // To handle errors
   useEffect(() => {

@@ -5,7 +5,7 @@ import { SendCodeRequest, SendCodeResponse } from "@/types/auth";
 export const useSendCode = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<SendCodeResponse | null>(null);
+  const [data] = useState<SendCodeResponse | null>(null);
 
   const sendVerificationCode = async (email: string) => {
     if (!email) {
@@ -19,7 +19,6 @@ export const useSendCode = () => {
     try {
       const request: SendCodeRequest = { email };
       const sendCodeResponse = await sendCode(request); // Send code API call
-      setData(sendCodeResponse);
       return sendCodeResponse;
     } catch (err) {
       setError((err as Error).message);
