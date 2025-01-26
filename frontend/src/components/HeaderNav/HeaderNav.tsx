@@ -84,12 +84,6 @@ export default function HeaderNav() {
                   >
                     Training Plan
                   </Link>
-                  <Link
-                    to="/pages/WaitlistTrainingSessionPage"
-                    className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
-                  >
-                    Waitlist
-                  </Link>
                 </>
               )}
               {accountType?.toLowerCase() === "admin" && (
@@ -104,9 +98,14 @@ export default function HeaderNav() {
                 </>
               )}
               <Link
-                to="/pages/NotificationSettingsPage"
-                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
-                onClick={closeDrawer}
+                to="/pages/WaitlistTrainingSessionPage"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+              >
+                Waitlist
+              </Link>
+              <Link
+                to="/" //add actual redirect once setting page is set up
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Settings
               </Link>
