@@ -51,7 +51,7 @@ export default function VerificationCode() {
 
   const handleInput = (
     e: React.ChangeEvent<HTMLInputElement>,
-    nextInputId: string | undefined
+    nextInputId: string | undefined,
   ) => {
     const value = e.target.value;
     const index = parseInt(e.target.id.split("-")[1]) - 1;
@@ -63,7 +63,7 @@ export default function VerificationCode() {
 
     if (value.length === e.target.maxLength && nextInputId) {
       const nextInput = document.getElementById(
-        nextInputId
+        nextInputId,
       ) as HTMLInputElement;
       if (nextInput) {
         nextInput.focus();
@@ -79,14 +79,15 @@ export default function VerificationCode() {
     // Log the API URL and the request data being sent
     console.log(
       "API URL:",
-      `${import.meta.env.VITE_API_BASE_URL}/api/auth/verify-code`
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/verify-code`,
     );
     console.log("Request Data:", { sanitizedEmail, code: code.join("") });
 
     try {
       const response = await verifyUserCode({ email, code: codeString });
 
-      if (response?.statusCode === 201) {   // Changed 200 to 201
+      if (response?.statusCode === 201) {
+        // Changed 200 to 201
         toast({
           variant: "success",
           title: "Verification Successful",
@@ -126,16 +127,16 @@ export default function VerificationCode() {
 
       console.log("Resend response:", response);
 
-      if(response?.statusCode === 201) {
-      toast({
-        variant: "success",
-        title: "Resend Verification Code Sucessful",
-        description:
-          "An email with a new verification code has been sent. It will expire in 10min!!!",
-      });
-    } else {
-      throw new Error ("Failed to resend verification code.");
-    }
+      if (response?.statusCode === 201) {
+        toast({
+          variant: "success",
+          title: "Resend Verification Code Sucessful",
+          description:
+            "An email with a new verification code has been sent. It will expire in 10min!!!",
+        });
+      } else {
+        throw new Error("Failed to resend verification code.");
+      }
     } catch (err) {
       console.error("Resend error:", err);
       toast({
@@ -168,7 +169,6 @@ export default function VerificationCode() {
     <div className="bg-white min-h-screen overflow-x-hidden">
       <div className="w-full pt-32">
         <div className="mx-auto max-w-[90%] md:max-w-[80%] lg:max-w-[60%] p-4">
-
           <h1 className="text-2xl md:text-4xl text-left">
             Email Verification
             <p className="mt-4 text-sm md:text-lg text-primaryColour-600">

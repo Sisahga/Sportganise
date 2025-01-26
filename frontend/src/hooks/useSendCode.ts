@@ -7,27 +7,26 @@ export const useSendCode = () => {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<SendCodeResponse | null>(null);
 
-  
-    const sendVerificationCode = async (email: string) => {
-      if(!email) {
-        setError("Email is required to send the verification code.");
-        return;
-      }
+  const sendVerificationCode = async (email: string) => {
+    if (!email) {
+      setError("Email is required to send the verification code.");
+      return;
+    }
 
-      setIsLoading(true);
-      setError(null);
+    setIsLoading(true);
+    setError(null);
 
-      try {
-        const request: SendCodeRequest = { email };
-        const sendCodeResponse = await sendCode(request); // Send code API call
-        setData(sendCodeResponse);
-        return sendCodeResponse;
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    try {
+      const request: SendCodeRequest = { email };
+      const sendCodeResponse = await sendCode(request); // Send code API call
+      setData(sendCodeResponse);
+      return sendCodeResponse;
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return { isLoading, error, data, sendVerificationCode };
 };

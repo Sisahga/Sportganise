@@ -17,9 +17,9 @@ export const useVerifyCode = () => {
       console.log("Response from verify-code API:", verifyCodeResponse);
       setData(verifyCodeResponse);
       return verifyCodeResponse;
-
     } catch (err) {
-      const errorMessage = (err as Error).message || "An unexpected error occured."
+      const errorMessage =
+        (err as Error).message || "An unexpected error occured.";
       setError(errorMessage);
       console.error("Error verifying code:", errorMessage);
       throw new Error(errorMessage);

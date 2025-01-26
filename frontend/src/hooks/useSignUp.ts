@@ -16,16 +16,14 @@ export const useSignUp = () => {
       const signUpResponse = await signUp(requestData);
       setData(signUpResponse);
       return signUpResponse;
-      
     } catch (err) {
-      const errorMessage = (err as Error).message || "An unexpected error occured."
+      const errorMessage =
+        (err as Error).message || "An unexpected error occured.";
       setError(errorMessage);
-      throw new Error(errorMessage); 
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
   return { isLoading, error, data, signUpUser };
 };
-
-

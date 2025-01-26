@@ -31,7 +31,9 @@ export default function SignUp() {
     sendVerificationCode,
   } = useSendCode();
 
-  const [emailForVerification, setEmailForVerification] = useState<string | null>(null);
+  const [emailForVerification, setEmailForVerification] = useState<
+    string | null
+  >(null);
 
   const [formData, setFormData] = useState<SignUpRequest>({
     type: "PLAYER",
@@ -139,13 +141,12 @@ export default function SignUp() {
           toast({
             variant: "success",
             title: "Account Created",
-            description:
-              "A verification code has been sent to your email.",
+            description: "A verification code has been sent to your email.",
           });
 
-          navigate("/verificationcode", {state : {email: formData.email}});
+          navigate("/verificationcode", { state: { email: formData.email } });
         } catch (err) {
-          setIsCodeSent(false); 
+          setIsCodeSent(false);
           console.error("Failed to send verification code", err);
         }
       };
@@ -153,7 +154,6 @@ export default function SignUp() {
       sendCode();
     }
   }, [emailForVerification, isCodeSent, sendVerificationCode, navigate, toast]);
-
 
   // To handle errors
   useEffect(() => {
