@@ -2,6 +2,7 @@ package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -18,9 +19,11 @@ import lombok.Setter;
 @Embeddable
 public class ProgramParticipantId implements Serializable {
 
+  @NotNull
   @Column(name = "program_id")
   private Integer programId;
 
+  @NotNull
   @Column(name = "account_id")
   private Integer accountId;
 }

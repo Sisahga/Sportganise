@@ -3,16 +3,23 @@ import { Program } from "@/types/trainingSessionDetails";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
+import { getBearerToken } from "@/services/apiHelper.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/programs";
 
 const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
-  createTrainingSession: async (accountId: number, jsonPayload: FormData) => {
+  createTrainingSession: async (
+    accountId: number | null | undefined,
+    jsonPayload: FormData,
+  ) => {
     const response = await fetch(
       `${baseMappingUrl}/${accountId}/create-program`,
       {
         method: "POST",
+        headers: {
+          Authorization: getBearerToken(),
+        },
         body: jsonPayload,
       },
     );
@@ -33,7 +40,7 @@ const trainingSessionApi = {
   },
   /**Submit ModifyTrainingSession form */
   modifyTrainingSession: async (
-    accountId: number,
+    accountId: number | null | undefined,
     programId: number,
     formValues: FormData,
   ) => {
@@ -41,6 +48,9 @@ const trainingSessionApi = {
       `${baseMappingUrl}/${accountId}/${programId}/modify-program`,
       {
         method: "POST",
+        headers: {
+          Authorization: getBearerToken(),
+        },
         body: formValues,
       },
     );
@@ -59,8 +69,12 @@ const trainingSessionApi = {
   },
 
   /**Fetch all programs info */
-  getPrograms: async (accountId: number) => {
-    const response = await fetch(`${baseMappingUrl}/${accountId}/details`);
+  getPrograms: async (accountId: number | null | undefined) => {
+    const response = await fetch(`${baseMappingUrl}/${accountId}/details`, {
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
     const data: ResponseDto<Program[]> = await response.json();
 
     if (!response.ok) {

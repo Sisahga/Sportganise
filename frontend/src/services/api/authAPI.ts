@@ -8,8 +8,12 @@ import {
   SendCodeResponse,
   VerifyCodeRequest,
   VerifyCodeResponse,
+  CookiesDto,
+  ModifyPasswordRequest,
+  ModifyPasswordResponse,
 } from "@/types/auth";
 import { setCookies, isCookiesDto } from "@/services/cookiesService";
+import { setAuthToken } from "@/services/apiHelper.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -31,6 +35,7 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
 
   if (loginResponse.data && isCookiesDto(loginResponse.data)) {
     setCookies(loginResponse.data);
+    setAuthToken(loginResponse.data.jwtToken || "");
   } else {
     log.warn("No cookies data found in login response");
   }
@@ -54,7 +59,22 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
     throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
   }
 
-  return await response.json();
+  const signUpResponse: SignUpResponse = await response.json();
+  const cookies: CookiesDto = {
+    accountId: signUpResponse.data?.accountId || null,
+    firstName: signUpResponse.data?.firstName || "",
+    lastName: signUpResponse.data?.lastName || "",
+    email: signUpResponse.data?.email || "",
+    pictureUrl: signUpResponse.data?.pictureUrl || null,
+    type: signUpResponse.data?.type || null,
+    phone: signUpResponse.data?.phone || null,
+    organisationIds: signUpResponse.data?.organisationIds || [],
+    jwtToken: null,
+  };
+  setCookies(cookies);
+  setAuthToken(signUpResponse.data?.jwtToken || "");
+
+  return signUpResponse;
 };
 
 export const sendCode = async (
@@ -91,5 +111,25 @@ export const verifyCode = async (
     throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
   }
 
+  return await response.json();
+};
+
+export const modifyPassword = async (
+  data: ModifyPasswordRequest,
+): Promise<ModifyPasswordResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/modify-password`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json(); // Parse the response as JSON
+    throw new Error(
+      errorResponse.message || `HTTP error! status: ${response.status}`,
+    );
+  }
   return await response.json();
 };

@@ -114,7 +114,7 @@ export default function SignUp() {
       return;
     }
 
-    signUpUser(formData);
+    await signUpUser(formData);
   };
 
   useEffect(() => {

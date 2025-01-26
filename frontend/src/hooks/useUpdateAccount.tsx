@@ -1,6 +1,7 @@
 import { useState } from "react";
 import accountApi from "@/services/api/accountApi.ts";
 import { UpdateAccountPayload } from "@/types/account.ts";
+import log from "loglevel";
 
 function useUpdateAccount() {
   const [success, setSuccess] = useState<boolean>(false);
@@ -12,13 +13,15 @@ function useUpdateAccount() {
   ) => {
     setSuccess(false);
     setMessage(null);
+    log.info("Updating personal information:", data);
 
     try {
       await accountApi.updateAccount(accountId, data);
       setSuccess(true);
       setMessage("Account successfully updated.");
+      log.info("Profile updated successfully");
     } catch (err) {
-      console.error("Error updating account:", err);
+      log.error("Profile update failed:", err);
       if (err instanceof Error) {
         setMessage(err.message);
       } else {

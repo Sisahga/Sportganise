@@ -18,6 +18,7 @@ export interface CookiesDto {
   type: string | null;
   phone: string | null;
   organisationIds: number[];
+  jwtToken: string | null;
 }
 
 export interface SignUpRequest {
@@ -48,6 +49,7 @@ export interface SignUpResponse {
     type: string;
     phone: string;
     organisationIds: number[];
+    jwtToken: string | null;
   };
 }
 
@@ -70,4 +72,22 @@ export interface VerifyCodeResponse {
   statusCode: number;
   message: string;
   data: string | null;
+}
+
+export interface ChangePasswordFormValues {
+  email: string;
+  oldPassword: string;
+  password: string;
+  passwordAgain: string;
+}
+
+export interface ModifyPasswordRequest {
+  email: string;
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface ModifyPasswordResponse {
+  statusCode: number;
+  message: string;
 }
