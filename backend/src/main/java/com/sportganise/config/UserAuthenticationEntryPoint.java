@@ -11,9 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-/**
- * UserAuthenticationEntryPoint class is used to handle the unauthorized request.
- */
+/** UserAuthenticationEntryPoint class is used to handle the unauthorized request. */
 @Component
 public class UserAuthenticationEntryPoint implements AuthenticationEntryPoint {
   private static final ObjectMapper MAPPER = new ObjectMapper();

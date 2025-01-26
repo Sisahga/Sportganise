@@ -13,8 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * JwtAuthFilter class is used to filter the request and validate the JWT token.
- * For now we set the websocket endpoint as public, to fix later.
+ * JwtAuthFilter class is used to filter the request and validate the JWT token. For now we set the
+ * websocket endpoint as public, to fix later.
  */
 @RequiredArgsConstructor
 @Slf4j

@@ -7,10 +7,11 @@ import {
   SendCodeRequest,
   SendCodeResponse,
   VerifyCodeRequest,
-  VerifyCodeResponse, CookiesDto,
+  VerifyCodeResponse,
+  CookiesDto,
 } from "@/types/auth";
 import { setCookies, isCookiesDto } from "@/services/cookiesService";
-import {setAuthToken} from "@/services/apiHelper.ts";
+import { setAuthToken } from "@/services/apiHelper.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -67,7 +68,7 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
     phone: signUpResponse.data?.phone || null,
     organisationIds: signUpResponse.data?.organisationIds || [],
     jwtToken: null,
-  }
+  };
   setCookies(cookies);
   setAuthToken(signUpResponse.data?.jwtToken || "");
 

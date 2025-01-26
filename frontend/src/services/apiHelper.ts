@@ -1,4 +1,4 @@
-import { jwtDecode } from 'jwt-decode';
+import { jwtDecode } from "jwt-decode";
 
 interface JwtPayload {
   exp: number;
@@ -14,11 +14,11 @@ export const getAuthToken = () => {
     }
     return token;
   }
-}
+};
 
 export const setAuthToken = (token: string) => {
   window.localStorage.setItem("auth_token", token);
-}
+};
 
 export const getBearerToken = () => {
   const token = getAuthToken();
@@ -27,4 +27,4 @@ export const getBearerToken = () => {
   } else {
     return "";
   }
-}
+};

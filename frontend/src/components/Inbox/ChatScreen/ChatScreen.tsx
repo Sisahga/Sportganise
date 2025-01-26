@@ -13,7 +13,7 @@ import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent.tsx";
 import log from "loglevel";
-import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 const ChatScreen = () => {
   const navigate = useNavigate();

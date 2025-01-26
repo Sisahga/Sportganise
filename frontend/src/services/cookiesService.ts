@@ -37,7 +37,7 @@ export const getCookies = (): CookiesDto => {
       organisationIds: Cookies.get("organisationIds")
         ? JSON.parse(Cookies.get("organisationIds")!)
         : [],
-      jwtToken: null
+      jwtToken: null,
     };
   } catch (e) {
     log.error("Failed to parse cookies:", e);
@@ -50,7 +50,7 @@ export const getCookies = (): CookiesDto => {
       type: "",
       phone: "",
       organisationIds: [],
-      jwtToken: null
+      jwtToken: null,
     };
   }
 };
