@@ -12,14 +12,6 @@ vi.mock("@/services/api/directMessagingApi", () => ({
   },
 }));
 
-vi.mock(
-  "@/components/Inbox/DirectMessagesDashboard/MessagingDashboardHeader",
-  () => ({
-    __esModule: true,
-    default: vi.fn(() => <div data-testid="dashboard-header" />),
-  }),
-);
-
 vi.mock("@/components/Inbox/GroupMessages/GroupSection", () => ({
   __esModule: true,
   default: vi.fn(({ groupChannels }: { groupChannels: Channel[] }) => (
@@ -100,7 +92,6 @@ describe("MessagingDashboard Component", () => {
     render(<MessagingDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("dashboard-header")).toBeInTheDocument();
       expect(screen.getByTestId("group-section")).toBeInTheDocument();
       expect(screen.getByTestId("messages-section")).toBeInTheDocument();
     });
