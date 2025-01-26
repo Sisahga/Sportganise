@@ -9,9 +9,13 @@ test("renders the welcome message", () => {
     observe: vi.fn(),
     takeRecords: vi.fn(),
     unobserve: vi.fn(),
-  }))
-  vi.stubGlobal(`IntersectionObserver`, MockIntersectionObserver)
-  render(<Router><HomeContent/></Router>);
+  }));
+  vi.stubGlobal(`IntersectionObserver`, MockIntersectionObserver);
+  render(
+    <Router>
+      <HomeContent />
+    </Router>,
+  );
   const welcomeMessage = screen.getByText("Welcome to ONIBAD!");
   expect(welcomeMessage.parentNode).not.toBeNull();
 });
