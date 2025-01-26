@@ -17,7 +17,6 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
     sentAt: string,
     timeZone: string = "America/New_York",
   ) => {
-    log.info(`Formatting sentAt: ${sentAt} for timeZone: ${timeZone}`);
     const date = parseISO(sentAt);
     const zonedDate = toZonedTime(date, timeZone);
 
