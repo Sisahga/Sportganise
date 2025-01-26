@@ -21,6 +21,6 @@ public interface LikesRepository extends JpaRepository<Likes, Integer> {
       SELECT COUNT(l)
       FROM Likes l
       WHERE l.likeCompositeKey.postId = :postId
-     """)
+      """)
   Integer countByPostId(@Param("postId") Integer postId);
 }
