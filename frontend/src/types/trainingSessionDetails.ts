@@ -4,7 +4,7 @@ export interface Attendees {
   programId: number;
   confirmedDate: Date;
   confirmed: boolean;
-  rank: string | null;
+  rank: number | null;
 }
 
 export interface ProgramDetails {
