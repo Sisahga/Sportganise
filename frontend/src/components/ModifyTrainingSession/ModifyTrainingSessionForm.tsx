@@ -124,7 +124,7 @@ export default function ModifyTrainingSessionForm() {
 
   useEffect(() => {
     const user = getCookies();
-    if (!user || user.type === "GENERAL") {
+    if (!user || user.type === "GENERAL" || user.type === "PLAYER") {
       navigate("/");
     }
     setAccountId(user?.accountId);

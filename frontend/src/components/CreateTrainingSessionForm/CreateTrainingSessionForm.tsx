@@ -72,7 +72,7 @@ export default function CreateTrainingSessionForm() {
   }, [accountId]);
 
   useEffect(() => {
-    if (!cookies || cookies.type === "GENERAL") {
+    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
       navigate("/");
     }
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
