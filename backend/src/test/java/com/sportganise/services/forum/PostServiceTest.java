@@ -1,96 +1,172 @@
 package com.sportganise.services.forum;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.sportganise.dto.forum.PostDto;
 import com.sportganise.entities.forum.Post;
+import com.sportganise.entities.forum.PostType;
+import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.forum.LikesRepository;
+import com.sportganise.repositories.forum.PostAttachmentRepository;
 import com.sportganise.repositories.forum.PostRepository;
+import java.lang.reflect.Method;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
+@ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
 
   @Mock private PostRepository postRepository;
 
+  @Mock private AccountRepository accountRepository;
+
+  @Mock private LikesRepository likesRepository;
+
+  @Mock private PostAttachmentRepository attachmentRepository;
+
   @InjectMocks private PostService postService;
 
-  @BeforeEach
-  public void setUp() {
-    MockitoAnnotations.openMocks(this);
-  }
-
   @Test
-  public void testSearchPostsWithoutSortingOrPagination() {
-    Post post1 = new Post("Fundraiser for OniBad", "Join us for fundraiser this week!");
-    Post post2 = new Post("Sunday Training", "This week we did usual intensive training.");
+  public void searchAndFilterPosts_ShouldReturn_AllPosts_WhenNoFiltersApplied() {
+
+    Post post1 =
+        Post.builder()
+            .postId(1)
+            .title("Fundraiser for OniBad")
+            .description("Join us for fundraiser this week!")
+            .type(PostType.FUNDRAISER)
+            .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .creationDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .build();
+    Post post2 =
+        Post.builder()
+            .postId(2)
+            .title("Charity Gala Event")
+            .description("Attend our charity gala this weekend.")
+            .type(PostType.SPECIAL)
+            .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .creationDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .build();
     List<Post> posts = Arrays.asList(post1, post2);
-    Pageable pageable = PageRequest.of(0, 10);
+    Page<Post> postPage = new PageImpl<>(posts);
+    ZonedDateTime absurdDate = ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
+    ZonedDateTime threeMonthsAgo = ZonedDateTime.parse("2025-01-02T10:30:00Z");
+    ZonedDateTime yesterday = ZonedDateTime.parse("2025-01-20T10:30:00Z");
 
-    when(postRepository.searchPosts(any(), any(Pageable.class)))
-        .thenReturn(new PageImpl<>(posts, pageable, posts.size()));
+    when(postRepository.searchAndFilterPosts(
+            any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class)))
+        .thenReturn(postPage);
 
-    List<Post> result = postService.searchPosts("fundraiser", null, null, null, null);
+    List<PostDto> result =
+        postService.searchAndFilterPosts(
+            null, null, null, null, 10, 0, "creationDate", "desc", 1L, 1L);
 
-    verify(postRepository, times(1)).searchPosts(any(), any(Pageable.class));
-    assert result.size() == 2;
-    assert result.get(0).getTitle().equals("Fundraiser for OniBad");
+    assertEquals(2, result.size());
+    assertEquals("Fundraiser for OniBad", result.get(0).getTitle());
+    assertEquals("Charity Gala Event", result.get(1).getTitle());
   }
 
   @Test
-  public void testSearchPostsWithPagination() {
-    Post post1 = new Post("Fundraiser for OniBad", "Join us for fundraiser this week!");
-    Post post2 = new Post("Sunday Training", "This week we did usual intensive training.");
+  public void searchAndFilterPosts_ShouldReturn_SortedPosts_ByLikeCount() {
+    Post post1 =
+        Post.builder()
+            .postId(1)
+            .title("Fundraiser for OniBad")
+            .description("Join us for fundraiser this week!")
+            .type(PostType.FUNDRAISER)
+            .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .creationDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .build();
+    Post post2 =
+        Post.builder()
+            .postId(2)
+            .title("Charity Gala Event")
+            .description("Attend our charity gala this weekend.")
+            .type(PostType.SPECIAL)
+            .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .creationDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .build();
     List<Post> posts = Arrays.asList(post1, post2);
+    Page<Post> postPage = new PageImpl<>(posts);
 
-    Pageable pageable = PageRequest.of(0, 1);
+    when(postRepository.searchAndFilterPosts(
+            any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class)))
+        .thenReturn(postPage);
 
-    when(postRepository.searchPosts(any(), eq(pageable)))
-        .thenReturn(new PageImpl<>(posts.subList(0, 1), pageable, posts.size()));
+    List<PostDto> result =
+        postService.searchAndFilterPosts(
+            null, null, null, null, 10, 0, "likeCount", "desc", 1L, 1L);
 
-    List<Post> result = postService.searchPosts("training", 1, 0, null, null);
-
-    verify(postRepository, times(1)).searchPosts(any(), eq(pageable));
-    assert result.size() == 1;
-    assert result.get(0).getTitle().equals("Fundraiser for OniBad");
+    assertEquals(2, result.size());
+    assertEquals("Fundraiser for OniBad", result.get(0).getTitle());
+    assertEquals("Charity Gala Event", result.get(1).getTitle());
   }
 
   @Test
-  public void testSearchPostsWithSorting() {
-    Post post1 = new Post("Fundraiser for OniBad", "Join us for fundraiser this week!");
-    Post post2 = new Post("Sunday Training", "This week we did usual intensive training.");
-    List<Post> posts = Arrays.asList(post2, post1);
-    Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "title"));
+  public void searchAndFilterPosts_ShouldCallAccountRepository_WhenFetchingLabels() {
+    Post post1 =
+        Post.builder()
+            .postId(1)
+            .title("Fundraiser for OniBad")
+            .description("Join us for fundraiser this week!")
+            .type(PostType.FUNDRAISER)
+            .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .creationDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .build();
+    Post post2 =
+        Post.builder()
+            .postId(2)
+            .title("Charity Gala Event")
+            .description("Attend our charity gala this weekend.")
+            .type(PostType.SPECIAL)
+            .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .creationDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
+            .build();
+    List<Post> posts = Arrays.asList(post1, post2);
+    Page<Post> postPage = new PageImpl<>(posts);
 
-    when(postRepository.searchPosts(any(), any(Pageable.class)))
-        .thenReturn(new PageImpl<>(posts, pageable, posts.size()));
+    when(postRepository.searchAndFilterPosts(
+            any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class)))
+        .thenReturn(postPage);
 
-    List<Post> result = postService.searchPosts("training", null, null, "title", "desc");
+    postService.searchAndFilterPosts(null, null, null, null, 10, 0, "creationDate", "desc", 1L, 1L);
 
-    verify(postRepository, times(1)).searchPosts(any(), any(Pageable.class));
-    assert result.size() == 2;
-    assert result.get(0).getTitle().equals("Sunday Training");
+    verify(accountRepository, times(1)).getLabelIdsByAccountIdAndOrgId(1L, 1L);
   }
 
   @Test
-  public void testSearchPostsWithNoResults() {
-    Pageable pageable = PageRequest.of(0, 10);
-    List<Post> posts = Arrays.asList();
+  public void getThreeMonthsAgo_ShouldReturn_CorrectDate() throws Exception {
+    Method method = PostService.class.getDeclaredMethod("getThreeMonthsAgo");
+    method.setAccessible(true);
 
-    when(postRepository.searchPosts(any(), any(Pageable.class)))
-        .thenReturn(new PageImpl<>(posts, pageable, posts.size()));
+    ZonedDateTime result = (ZonedDateTime) method.invoke(postService);
 
-    List<Post> result = postService.searchPosts("nonexistent", 10, 0, null, null);
+    ZonedDateTime expectedDate = ZonedDateTime.now().minusMonths(3);
+    assertEquals(expectedDate.toLocalDate(), result.toLocalDate()); // Compare dates only, not time
+  }
 
-    verify(postRepository, times(1)).searchPosts(any(), any(Pageable.class));
-    assert result.size() == 0;
+  @Test
+  public void getYesterday_ShouldReturn_CorrectDate() throws Exception {
+    Method method = PostService.class.getDeclaredMethod("getYesterday");
+    method.setAccessible(true);
+
+    ZonedDateTime result = (ZonedDateTime) method.invoke(postService);
+
+    ZonedDateTime expectedDate = ZonedDateTime.now().minusDays(1);
+    assertEquals(expectedDate.toLocalDate(), result.toLocalDate()); // Compare dates only, not time
   }
 }
