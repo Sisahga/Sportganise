@@ -28,6 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
     config.setAllowCredentials(true);
     config.addAllowedOrigin("http://localhost:3000");
     config.addAllowedOrigin("http://localhost");
+    config.addAllowedOrigin("http://localhost:5173");
     config.addAllowedOrigin("https://onibad.sportganise.com");
     config.addAllowedHeader("*");
     config.setAllowedMethods(

@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { vi } from "vitest";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import MessagingDashboardChannelItem from "@/components/Inbox/DirectMessagesDashboard/MessagingDashboardChannelItem";
 import useLastMessage from "@/hooks/useLastMessage";
 
@@ -11,7 +11,7 @@ vi.mock("@/hooks/useLastMessage", () => ({
 }));
 
 const mockNavigate = vi.fn();
-vi.mock("react-router-dom", async (importOriginal) => {
+vi.mock("react-router", async (importOriginal) => {
   const actual = (await importOriginal()) as object;
   return {
     ...actual,
