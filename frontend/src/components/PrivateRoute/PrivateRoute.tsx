@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { getCookies } from "@/services/cookiesService";
+import {getBearerToken} from "@/services/apiHelper.ts";
 /* eslint-disable react/prop-types */
 
 interface PrivateRouteProps {
@@ -13,8 +14,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 }) => {
   const location = useLocation();
   const user = getCookies();
+  const token = getBearerToken();
 
-  if (!user?.accountId) {
+  if (token === null || token === "" || token === undefined) {
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );
