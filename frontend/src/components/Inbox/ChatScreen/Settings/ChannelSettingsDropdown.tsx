@@ -163,7 +163,7 @@ const ChannelSettingsDropdown = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 p-0 bg-placeholder-colour"
+            className="h-9 w-9 p-0 border border-input shadow bg-white rounded-xl"
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>

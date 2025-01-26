@@ -1,8 +1,6 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events -- TODO: fix a11y issues*/
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import {
-  MoveLeft,
   ChevronRight,
   CircleUserRound,
   Settings,
@@ -45,15 +43,10 @@ const ProfileContent: React.FC = () => {
   return (
     <div className="pb-20">
       <div className="container mx-auto max-w-lg">
-        <Button
-          className="rounded-full w-2"
-          variant="outline"
-          onClick={() => navigate(-1)}
-        >
-          <MoveLeft />
-        </Button>
         <div className="flex flex-col items-center justify-center my-4">
-          <h1 className="text-5xl font-light">Profile</h1>
+          <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+            Profile
+          </h2>
 
           {/* Profile image */}
           <img

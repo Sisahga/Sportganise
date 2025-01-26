@@ -12,9 +12,9 @@ import DeleteRequest from "./DeleteRequest";
 
 const mockNavigate = vi.fn();
 
-vi.mock("react-router-dom", async () => {
+vi.mock("react-router", async () => {
   const actual: typeof import("react-router") =
-    await vi.importActual("react-router-dom");
+    await vi.importActual("react-router");
   return {
     ...actual,
     useNavigate: () => mockNavigate,

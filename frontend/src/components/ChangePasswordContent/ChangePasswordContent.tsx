@@ -11,7 +11,6 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { MoveLeft } from "lucide-react";
 import PasswordChecklist from "react-password-checklist";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
@@ -20,6 +19,7 @@ import { getCookies, getEmailCookie } from "@/services/cookiesService";
 import useModifyPassword from "@/hooks/useModifyPassword";
 import { ChangePasswordFormValues } from "@/types/auth";
 import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 const ChangePasswordContent: React.FC = () => {
   const navigate = useNavigate();
@@ -122,16 +122,10 @@ const ChangePasswordContent: React.FC = () => {
 
   return (
     <div className="">
-      <Button
-        className="rounded-full w-2 mb-4"
-        variant="outline"
-        onClick={() => navigate("/pages/ProfilePage")}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       {/* Card for the entire form */}
-      <Card className="shadow-md mb-24">
+      <Card className="shadow-md mb-24 mt-4">
         <CardHeader>
           <CardTitle className="flex justify-center text-2xl font-light">
             Change Password

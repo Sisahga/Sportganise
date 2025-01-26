@@ -1,59 +1,105 @@
-import { useState, useRef, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router";
-import { ArrowLeft, Send, FolderOpen } from "lucide-react";
-import useChatMessages from "../../../hooks/useChatMessages.ts";
+import type React from "react";
+import { useState, useRef, useEffect, type DragEvent } from "react";
+import { useLocation } from "react-router";
+import { Send, FolderOpen, Paperclip } from "lucide-react";
+import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
-import WebSocketService from "@/services/WebSocketService.ts";
-import { SendMessageComponent, MessageComponent } from "@/types/messaging.ts"; // Ensure this import
-import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
-import { Button } from "@/components/ui/Button.tsx";
-import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
-import useSendMessage from "@/hooks/useSendMessage.ts";
-import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent.tsx";
+import WebSocketService from "@/services/WebSocketService";
+import type { MessageComponent, SendMessageComponent } from "@/types/messaging";
+import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages";
+import { Button } from "@/components/ui/Button";
+import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown";
+import useSendMessage from "@/hooks/useSendMessage";
+import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
+import BackButton from "@/components/ui/back-button";
+import {
+  FileInput,
+  FileUploader,
+  FileUploaderContent,
+  FileUploaderItem,
+} from "@/components/ui/file-upload";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
-const ChatScreen = () => {
-  const navigate = useNavigate();
+const formSchema = z.object({
+  message: z.string().optional(),
+  attachments: z.array(z.custom<File>()).optional(),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export interface ChatScreenProps {
+  channelId: number;
+  channelName: string;
+  channelImageBlob: string;
+  read: boolean;
+  channelType: string;
+  isBlocked: boolean;
+}
+
+export interface FileAttachment {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  fileUrl: string;
+}
+
+export interface SendMessagePayload extends MessageComponent {
+  attachments: FileAttachment[];
+}
+
+const ChatScreen: React.FC = () => {
   const location = useLocation();
 
-  // Access chat data from location state
-  const { state } = location || {};
-  const channelId = state?.channelId;
-  const channelName = state?.channelName || null;
-  const channelImageBlob = state?.channelImageBlob || defaultAvatar;
-  const read = state?.read || false;
-  const channelType = state?.channelType || null;
-  const isBlocked = state?.isBlocked || false;
+  const { state } = location;
+  const {
+    channelId,
+    channelName,
+    channelImageBlob,
+    read,
+    channelType,
+    isBlocked,
+  } = state as ChatScreenProps;
+
   const cookies = getCookies();
-  const currentUserId = getAccountIdCookie(cookies); // TODO: Replace with actual user ID from cookies
+  const currentUserId = getAccountIdCookie(cookies);
 
-  // States
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState<boolean>(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
-  const [newMessage, setNewMessage] = useState("");
-  const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
-  const [currentChannelName, setCurrentChannelName] = useState(channelName);
-  const [currentChannelImageUrl, setCurrentChannelImageUrl] =
-    useState(channelImageBlob);
+  const [channelIsBlocked, setChannelIsBlocked] = useState<boolean>(isBlocked);
+  const [currentChannelName, setCurrentChannelName] =
+    useState<string>(channelName);
+  const [currentChannelImageUrl, setCurrentChannelImageUrl] = useState<string>(
+    channelImageBlob || defaultAvatar,
+  );
+  const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  // Hooks
   const { messages, setMessages, loading, error } = useChatMessages(
     channelId,
     read,
   );
   const { sendDirectMessage } = useSendMessage();
 
-  const connectWebSocket = async () => {
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      message: "",
+      attachments: [],
+    },
+  });
+
+  const connectWebSocket = async (): Promise<void> => {
     webSocketServiceRef.current = new WebSocketService(onMessageReceived);
     const connSuccess = await webSocketServiceRef.current.connect();
     setConnected(connSuccess);
   };
 
-  const onMessageReceived = (message: MessageComponent) => {
-    // Changed from any to MessageComponent
+  const onMessageReceived = (message: MessageComponent): void => {
     setMessages((prevMessages) => [...prevMessages, message]);
     if (message.type === "BLOCK") {
       setChannelIsBlocked(true);
@@ -62,15 +108,54 @@ const ChatScreen = () => {
     }
   };
 
-  const handleSend = () => {
-    if (newMessage.trim() === "") return;
+  const handleDragEnter = (e: DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
 
-    // Send the new message to the server
+  const handleDragLeave = (e: DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: DragEvent<HTMLDivElement>): void => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      form.setValue("attachments", files);
+    }
+  };
+
+  const onSubmit = (data: FormData) => {
+    if (
+      data.message?.trim() === "" &&
+      (!data.attachments || data.attachments.length === 0)
+    )
+      return;
+
+    const fileAttachments: FileAttachment[] =
+      data.attachments?.map((file) => ({
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        fileUrl: URL.createObjectURL(file),
+      })) || [];
+
     const messagePayload: SendMessageComponent = {
-      senderId: currentUserId, // TODO: Replace with actual sender ID from cookies
+      senderId: currentUserId,
       channelId: channelId,
-      messageContent: newMessage,
-      attachments: [],
+      messageContent: data.message || "",
+      attachments: fileAttachments,
       sentAt: new Date().toISOString(),
       type: "CHAT",
       senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
@@ -79,7 +164,7 @@ const ChatScreen = () => {
     };
 
     sendDirectMessage(messagePayload, webSocketServiceRef.current);
-    setNewMessage("");
+    form.reset();
   };
 
   useEffect(() => {
@@ -92,27 +177,11 @@ const ChatScreen = () => {
         }
       });
     }
-  }, []);
+  }, [connected, connectWebSocket]); // Added connectWebSocket to dependencies
 
   useEffect(() => {
     log.debug("Messages fetched:", messages);
   }, [messages]);
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    const adjustHeight = () => {
-      textarea.style.height = "auto";
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    };
-
-    adjustHeight();
-
-    window.addEventListener("resize", adjustHeight);
-    return () => window.removeEventListener("resize", adjustHeight);
-  }, [newMessage]);
 
   if (loading) {
     return (
@@ -131,44 +200,41 @@ const ChatScreen = () => {
   }
 
   return (
-    <div id="chatScreenMainCtn" className="flex flex-col h-screen bg-gray-100">
+    <div
+      id="chatScreenMainCtn"
+      className={`flex flex-col h-[90vh] -mt-16 ${isDragging ? "bg-blue-100" : ""}`}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       {/* Header */}
       <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-4">
-        {/* Back Button with aria-label */}
-        <Button
-          variant="ghost"
-          aria-label="Back"
-          className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-          onClick={() => navigate("/pages/DirectMessagesDashboard")}
-        >
-          <ArrowLeft className="text-gray-800" size={28} strokeWidth={3} />
-        </Button>
-
-        {/* Chat Information */}
-        <div className="flex flex-grow items-center gap-3">
-          <img
-            src={currentChannelImageUrl}
-            alt={defaultGroupAvatar}
-            style={{ width: "40px", height: "40px" }}
-            className="rounded-full object-cover"
+        <div className="flex flex-grow items-center gap-3 place-content-between">
+          <BackButton />
+          <div className="flex items-center gap-3">
+            <img
+              src={currentChannelImageUrl || "/placeholder.svg"}
+              alt={defaultGroupAvatar}
+              style={{ width: "36px", height: "36px" }}
+              className="rounded-full object-cover"
+            />
+            <h1 className="text-lg font-bold text-gray-800 te">
+              {currentChannelName}
+            </h1>
+          </div>
+          <ChannelSettingsDropdown
+            channelType={channelType}
+            channelId={channelId}
+            webSocketRef={webSocketServiceRef.current}
+            isBlocked={channelIsBlocked}
+            currentUserId={currentUserId}
+            channelName={channelName}
+            setCurrentChannelName={setCurrentChannelName}
+            currentChannelPictureUrl={currentChannelImageUrl}
+            setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
           />
-          <h1 className="text-lg font-bold text-gray-800">
-            {currentChannelName}
-          </h1>
         </div>
-
-        {/* Options Button */}
-        <ChannelSettingsDropdown
-          channelType={channelType}
-          channelId={channelId}
-          webSocketRef={webSocketServiceRef.current}
-          isBlocked={channelIsBlocked}
-          currentUserId={currentUserId}
-          channelName={channelName}
-          setCurrentChannelName={setCurrentChannelName}
-          currentChannelPictureUrl={currentChannelImageUrl}
-          setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
-        />
       </header>
 
       {/* Display when failing to connect to web socket. */}
@@ -194,54 +260,85 @@ const ChatScreen = () => {
       />
 
       {/* Message Input Area */}
-      <div
-        id="chatScreenInputArea"
-        className={`${channelIsBlocked ? "force-hide" : ""}
-           flex items-center gap-3 px-4 py-3 bg-white shadow`}
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={`${channelIsBlocked ? "force-hide" : ""} flex items-end gap-3 px-4 py-3 bg-white shadow`}
       >
-        <div className="h-full flex items-end">
-          <Button
-            variant="ghost"
-            className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-          >
-            <FolderOpen
-              className="text-gray-800 folder-size"
-              size={24}
-              strokeWidth={1.5}
-            />
-          </Button>
-        </div>
-
-        {/* Text Input */}
-        <textarea
-          ref={textareaRef}
-          placeholder="Send a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none"
-          style={{ scrollbarWidth: "none" }}
-          rows={1}
+        <Controller
+          name="attachments"
+          control={form.control}
+          render={({ field }) => (
+            <FileUploader
+              className="w-auto"
+              value={field.value || []}
+              onValueChange={field.onChange}
+              dropzoneOptions={{
+                maxFiles: 5,
+                maxSize: 1024 * 1024 * 10, // 10MB
+                multiple: true,
+              }}
+            >
+              <FileInput className="rounded-full bg-white w-10 h-10 flex items-center justify-center">
+                <FolderOpen
+                  className="text-gray-800 folder-size"
+                  size={24}
+                  strokeWidth={1.5}
+                />
+              </FileInput>
+              <FileUploaderContent className="flex-row absolute bottom-[50px] left-0 overflow-auto w-[100vw]">
+                {field.value &&
+                  field.value.length > 0 &&
+                  field.value.map((file, index) => (
+                    <FileUploaderItem key={index} index={index} className="">
+                      <Paperclip className="h-4 w-4 stroke-current" />
+                      <span>{file.name}</span>
+                    </FileUploaderItem>
+                  ))}
+              </FileUploaderContent>
+            </FileUploader>
+          )}
         />
 
-        {/* Send Button with aria-label */}
-        <div className="h-full flex items-end">
-          <Button
-            variant="ghost"
-            aria-label="Send"
-            className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-            style={{ transform: "rotate(45deg)" }}
-            onClick={handleSend}
-            disabled={newMessage.trim() === ""}
-          >
-            <Send
-              className={`folder-size ${newMessage.trim() === "" ? "faded-primary-colour" : "secondary-colour"}`}
-              size={20}
-              strokeWidth={2}
-              style={{ position: "relative", left: "-1.5px", top: "1.5px" }}
+        <Controller
+          name="message"
+          control={form.control}
+          render={({ field }) => (
+            <textarea
+              {...field}
+              placeholder="Send a message..."
+              className="flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none"
+              style={{ scrollbarWidth: "none" }}
+              rows={1}
             />
-          </Button>
-        </div>
-      </div>
+          )}
+        />
+
+        <Button
+          type="submit"
+          variant="ghost"
+          aria-label="Send"
+          className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
+          style={{ transform: "rotate(45deg)" }}
+          disabled={
+            form.watch("message")?.trim() === "" &&
+            (!form.watch("attachments") ||
+              form.watch("attachments")?.length === 0)
+          }
+        >
+          <Send
+            className={`folder-size ${
+              form.watch("message")?.trim() === "" &&
+              (!form.watch("attachments") ||
+                form.watch("attachments")?.length === 0)
+                ? "faded-primary-colour"
+                : "secondary-colour"
+            }`}
+            size={20}
+            strokeWidth={2}
+            style={{ position: "relative", left: "-1.5px", top: "1.5px" }}
+          />
+        </Button>
+      </form>
     </div>
   );
 };

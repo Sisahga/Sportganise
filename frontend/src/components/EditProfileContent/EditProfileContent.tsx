@@ -12,7 +12,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { MoveLeft, CirclePlus, Save } from "lucide-react";
+import { CirclePlus, Save } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -36,6 +36,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { UpdateAccountPayload } from "@/types/account";
 import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 const EditProfileContent: React.FC = () => {
   const navigate = useNavigate();
@@ -200,13 +201,7 @@ const EditProfileContent: React.FC = () => {
 
   return (
     <div className="pb-8 min-h-screen">
-      <Button
-        className="rounded-full w-2"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       <div className="flex flex-col items-center justify-center">
         <div className="relative">

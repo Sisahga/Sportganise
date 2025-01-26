@@ -1,9 +1,8 @@
 //TODO: Connect and fetch from sessionId
 
 import React, { useState, useEffect } from "react";
-import { ThumbsUp, MessageCircle, MoveLeft } from "lucide-react";
+import { ThumbsUp, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { useNavigate } from "react-router";
 import { formatDistanceToNow } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
@@ -15,6 +14,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import BackButton from "../ui/back-button";
 
 // Define the types for Post and Comment
 interface Comment {
@@ -35,7 +35,6 @@ interface Post {
 }
 
 const PostsContent: React.FC = () => {
-  const navigate = useNavigate();
   const [newComment, setNewComment] = useState<string>("");
 
   const [post, setPost] = useState<Post | null>(null);
@@ -132,13 +131,7 @@ const PostsContent: React.FC = () => {
 
   return (
     <div className="py-4 min-h-screen pb-20">
-      <Button
-        className="rounded-full w-2"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       <div className="container mx-auto py-6">
         <Card className="w-full mx-auto">

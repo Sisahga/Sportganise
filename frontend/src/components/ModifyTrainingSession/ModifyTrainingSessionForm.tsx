@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { MoveLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -50,6 +49,7 @@ import { Attendees } from "@/types/trainingSessionDetails";
 import useModifyTrainingSession from "@/hooks/useModifyProgram";
 import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 /**All select element options */
 const types = [
@@ -297,13 +297,7 @@ export default function ModifyTrainingSessionForm() {
   return (
     <div>
       {/** Navigate to previous page */}
-      <Button
-        className="rounded-full"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       {/** Create Training Session Form */}
       <Form {...form}>

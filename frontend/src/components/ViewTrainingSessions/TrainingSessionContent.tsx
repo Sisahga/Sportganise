@@ -15,13 +15,11 @@ import {
   MapPin,
   CircleUserRound,
   FileText,
-  MoveLeft,
   User2Icon,
   Hourglass,
   Repeat,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/Button";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
@@ -29,6 +27,7 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
+import BackButton from "../ui/back-button";
 
 const TrainingSessionContent = () => {
   const [accountType, setAccountType] = useState<string | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -76,13 +75,7 @@ const TrainingSessionContent = () => {
   return (
     <div className="mb-32 mt-5">
       {/**Return to previous page */}
-      <Button
-        className="rounded-full mb-3"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       {/**Event title */}
       <div className="flex items-center gap-3 my-5">

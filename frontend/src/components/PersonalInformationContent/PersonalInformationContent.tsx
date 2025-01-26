@@ -10,11 +10,12 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { MoveLeft, SquarePen } from "lucide-react";
+import { SquarePen } from "lucide-react";
 import { useForm } from "react-hook-form";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 const PersonalInformationContent: React.FC = () => {
   const navigate = useNavigate();
@@ -51,13 +52,7 @@ const PersonalInformationContent: React.FC = () => {
 
   return (
     <div className="pb-8 min-h-screen">
-      <Button
-        className="rounded-full w-2"
-        variant="outline"
-        onClick={() => navigate("/pages/ProfilePage")}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       <div className="flex flex-col items-center justify-center mt-2">
         <div className="relative">
