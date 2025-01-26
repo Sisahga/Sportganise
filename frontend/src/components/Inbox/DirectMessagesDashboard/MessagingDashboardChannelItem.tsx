@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
 import useLastMessage from "@/hooks/useLastMessage.ts";
 import log from "loglevel";

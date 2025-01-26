@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Ban, UserX, MoveLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Ban, UserX } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +15,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 log.setLevel("info");
 
@@ -26,7 +26,6 @@ interface BlockedUser {
 }
 
 export default function BlockedUsersList() {
-  const navigate = useNavigate();
   const [blockedUsers, setBlockedUsers] = useState<BlockedUser[]>([
     {
       id: "1",
@@ -62,16 +61,7 @@ export default function BlockedUsersList() {
 
   return (
     <div className="px-4 flex-1 pb-16">
-      <Button
-        className="rounded-full"
-        variant="outline"
-        onClick={() => {
-          log.info("Navigate button clicked: Redirecting to Profile Page");
-          navigate("/pages/ProfilePage");
-        }}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       <Card className="space-y-8 max-w-3xl mx-auto pt-10 border-none shadow-none">
         <CardHeader>

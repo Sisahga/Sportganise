@@ -41,7 +41,7 @@ import { RenameGroupDialog } from "@/components/Inbox/ChatScreen/Settings/Rename
 import { ChangePictureDialog } from "@/components/Inbox/ChatScreen/Settings/ChangeGroupPicture.tsx";
 import { LeaveGroupDialog } from "@/components/Inbox/ChatScreen/Settings/LeaveGroup.tsx";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 const ChannelSettingsDropdown = ({
   channelType,
@@ -163,7 +163,7 @@ const ChannelSettingsDropdown = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 p-0 bg-placeholder-colour"
+            className="h-9 w-9 p-0 border border-input shadow bg-white rounded-xl"
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
