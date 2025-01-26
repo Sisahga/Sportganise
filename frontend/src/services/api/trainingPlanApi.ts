@@ -1,6 +1,7 @@
 import log from "loglevel";
 import ResponseDto from "@/types/response";
-import { UploadTrainingPlansDto } from "@/types/trainingplans"; //trainingPlans: string[]
+import { UploadTrainingPlansDto } from "@/types/trainingplans";
+import { getBearerToken } from "@/services/apiHelper.ts"; //trainingPlans: string[]
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api/training-plans";
 
@@ -13,6 +14,7 @@ const trainingPlanApi = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: getBearerToken(),
       },
       body: JSON.stringify(trainingPlans),
     });

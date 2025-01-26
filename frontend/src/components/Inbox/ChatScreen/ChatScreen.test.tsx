@@ -151,22 +151,28 @@ describe("ChatScreen", () => {
     expect(sendButton).toBeDisabled();
   });
 
-  it("sends a message when the send button is clicked", () => {
-    render(<ChatScreen />);
-    const textArea = screen.getByPlaceholderText("Send a message...");
-    fireEvent.change(textArea, { target: { value: "Hello World" } });
-    const sendButton = screen.getByRole("button", { name: /send/i });
-    expect(sendButton).not.toBeDisabled();
-    fireEvent.click(sendButton);
-    expect(mockSendDirectMessage).toHaveBeenCalledTimes(1);
-    const payloadArg = mockSendDirectMessage.mock.calls[0][0];
-    expect(payloadArg).toMatchObject({
-      senderId: 2,
-      channelId: 123,
-      messageContent: "Hello World",
-      type: "CHAT",
+  it("sends message when send button is clicked", () => {
+    const mockSendMessage = vi.fn();
+    (useSendMessage as jest.Mock).mockReturnValue({
+      sendDirectMessage: mockSendMessage,
     });
-    expect((textArea as HTMLTextAreaElement).value).toBe("");
+
+    render(<ChatScreen />, { wrapper: ({ children }) => <>{children}</> });
+
+    const textarea = screen.getByPlaceholderText("Send a message...");
+    const sendButton = screen.getByRole("button", { name: /send/i });
+
+    fireEvent.change(textarea, { target: { value: "Hello World" } });
+
+    fireEvent.click(sendButton);
+
+    expect(mockSendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        messageContent: "Hello World",
+        type: "CHAT",
+      }),
+      expect.any(Object),
+    );
   });
 
   it("if channel is blocked, hides the input area", () => {

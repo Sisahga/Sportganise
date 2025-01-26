@@ -3,6 +3,7 @@ import {
   Account,
   UpdateAccountPayload,
 } from "@/types/account.ts";
+import { getBearerToken } from "@/services/apiHelper.ts";
 import { setCookies, getCookies } from "@/services/cookiesService";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/account";
@@ -11,6 +12,11 @@ const accountApi = {
   getUserAccounts: async (organizationId: number, userId: number) => {
     const response = await fetch(
       `${baseMappingUrl}/get-all-users/${organizationId}/${userId}`,
+      {
+        headers: {
+          Authorization: getBearerToken() || "",
+        },
+      },
     );
     const data: AccountDetailsDirectMessaging[] = await response.json();
     return data;
@@ -18,12 +24,15 @@ const accountApi = {
 
   //Function to get account by id
   getAccountById: async (accountId: number): Promise<Account> => {
-    const response = await fetch(`${baseMappingUrl}/${accountId}`);
+    const response = await fetch(`${baseMappingUrl}/${accountId}`, {
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
-    const data: Account = await response.json();
-    return data;
+    return await response.json();
   },
 
   //Function to update account information
@@ -35,6 +44,7 @@ const accountApi = {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
+        Authorization: getBearerToken(),
       },
       body: JSON.stringify(data),
     });
@@ -66,6 +76,9 @@ const accountApi = {
 
     const response = await fetch(`${baseMappingUrl}/${accountId}/picture`, {
       method: "PUT",
+      headers: {
+        Authorization: getBearerToken(),
+      },
       body: formData,
     });
 
