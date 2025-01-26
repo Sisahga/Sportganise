@@ -14,6 +14,7 @@ const BackButton: React.FC = () => {
       onClick={() => {
         navigate(-1);
       }}
+      aria-label="back"
     >
       <ChevronLeft />
       Back
