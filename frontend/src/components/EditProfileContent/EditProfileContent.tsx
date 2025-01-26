@@ -1,6 +1,5 @@
-/**TODO: Remove hardcoded accounID, needs to be fetched */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
@@ -13,7 +12,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { MoveLeft, CirclePlus, Save } from "lucide-react";
+import { CirclePlus, Save } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -33,22 +32,33 @@ import {
   allowedImageTypes,
   maxFileSizeInBytes,
 } from "./ProfileValidation";
-
 import { useToast } from "@/hooks/use-toast";
+import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+import { UpdateAccountPayload } from "@/types/account";
+import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 const EditProfileContent: React.FC = () => {
-  const accountId = 1;
   const navigate = useNavigate();
-  const [image, setImage] = useState<string>("https://via.placeholder.com/150");
+  const cookies = getCookies();
+  const accountId = cookies ? getAccountIdCookie(cookies) : null;
 
+  useEffect(() => {
+    if (!accountId) {
+      log.info("No accountId found, redirecting to login.");
+      navigate("/login");
+    }
+  }, [accountId, navigate]);
+
+  const { data, loading, error } = usePersonalInformation(accountId || 0);
+  const [image, setImage] = useState<string>("https://via.placeholder.com/150");
   const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
   const [isImageChangeDialogOpen, setIsImageChangeDialogOpen] = useState(false);
   const [newImage, setNewImage] = useState<File | null>(null);
-  const { data, loading, error } = usePersonalInformation(accountId);
   const { updateAccount, success, message } = useUpdateAccount();
   const { updateProfilePicture } = useUpdateProfilePicture();
-
   const { toast } = useToast();
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -66,7 +76,6 @@ const EditProfileContent: React.FC = () => {
 
   useEffect(() => {
     if (data) {
-      console.log("Fetched Personal Information:", data);
       setImage(data.pictureUrl || "https://via.placeholder.com/150");
     }
   }, [data]);
@@ -101,6 +110,7 @@ const EditProfileContent: React.FC = () => {
     const file = event.target.files?.[0];
 
     if (file && !allowedImageTypes.includes(file.type)) {
+      log.warn("Invalid file type uploaded:", file.type);
       toast({
         title: "Invalid File Type",
         description: "Please upload a JPEG or PNG image.",
@@ -110,6 +120,7 @@ const EditProfileContent: React.FC = () => {
     }
 
     if (file && file.size > maxFileSizeInBytes) {
+      log.warn("Uploaded file exceeds size limit:", file.size);
       toast({
         title: "File Too Large",
         description: "File size exceeds 2 MB. Please upload a smaller image.",
@@ -119,6 +130,7 @@ const EditProfileContent: React.FC = () => {
     }
 
     if (file) {
+      log.info("New image selected for upload:", file.name);
       setNewImage(file);
       setIsImageChangeDialogOpen(true);
     }
@@ -129,7 +141,7 @@ const EditProfileContent: React.FC = () => {
     if (newImage) {
       //Hook for update profile picture API
       const { success, message } = await updateProfilePicture(
-        accountId,
+        accountId || 0,
         newImage,
       );
 
@@ -154,19 +166,22 @@ const EditProfileContent: React.FC = () => {
   };
 
   const cancelImageChange = () => {
+    log.info("Image change cancelled.");
     setIsImageChangeDialogOpen(false);
     setNewImage(null);
   };
 
   const handleSavePersonalInfo = () => {
+    log.info("Opening save confirmation dialog.");
     setIsInfoDialogOpen(true);
   };
 
   const confirmSavePersonalInfo = async (data: ProfileFormValues) => {
-    const payload = {
+    const payload: UpdateAccountPayload = {
       firstName: data.firstName,
       lastName: data.lastName,
       phone: data.phone,
+      email: data.email,
       address: {
         line: data.address,
         city: data.city,
@@ -176,23 +191,17 @@ const EditProfileContent: React.FC = () => {
       },
     };
 
-    console.log("Data to be sent for update:", payload);
-    await updateAccount(accountId, payload);
+    await updateAccount(accountId || 0, payload);
   };
 
   const cancelSavePersonalInfo = () => {
+    log.info("Cancelled saving personal information.");
     setIsInfoDialogOpen(false);
   };
 
   return (
     <div className="pb-8 min-h-screen">
-      <Button
-        className="rounded-full w-2"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       <div className="flex flex-col items-center justify-center">
         <div className="relative">

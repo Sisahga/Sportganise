@@ -43,6 +43,7 @@ export interface UpdateAccountPayload {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  email?: string;
   address?: {
     line?: string;
     city?: string;

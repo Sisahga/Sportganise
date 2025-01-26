@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link } from "react-router";
 import { Home, Calendar, Bell, MessageSquare, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import log from "loglevel";

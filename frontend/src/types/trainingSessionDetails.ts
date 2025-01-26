@@ -4,6 +4,7 @@ export interface Attendees {
   programId: number;
   confirmedDate: Date;
   confirmed: boolean;
+  rank: string | null;
 }
 
 export interface ProgramDetails {

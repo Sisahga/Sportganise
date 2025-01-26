@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { MoveLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,12 +42,14 @@ import {
 } from "@/components/ui/file-upload";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
 import { Attendees } from "@/types/trainingSessionDetails";
 import useModifyTrainingSession from "@/hooks/useModifyProgram";
+import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 /**All select element options */
 const types = [
@@ -95,7 +96,7 @@ const locations = [
 ] as const;
 
 export default function ModifyTrainingSessionForm() {
-  const accountId = 2; //get from cookie
+  const [accountId, setAccountId] = useState<number | null | undefined>();
   const { toast } = useToast();
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
@@ -120,6 +121,15 @@ export default function ModifyTrainingSessionForm() {
     visibility: "",
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
+
+  useEffect(() => {
+    const user = getCookies();
+    if (!user || user.type === "GENERAL") {
+      navigate("/");
+    }
+    setAccountId(user?.accountId);
+    log.debug(`Modify Training Session Form accountId : ${accountId}`);
+  }, [accountId]);
 
   /** Handle files for file upload in form*/
   //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
@@ -189,7 +199,7 @@ export default function ModifyTrainingSessionForm() {
       const fileName = attachment.attachmentUrl;
       attachmentsToRemove.push(fileName);
     });
-  }, [programDetails]);
+  }, [programDetails, attachmentsToRemove, form]);
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -287,13 +297,7 @@ export default function ModifyTrainingSessionForm() {
   return (
     <div>
       {/** Navigate to previous page */}
-      <Button
-        className="rounded-full"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       {/** Create Training Session Form */}
       <Form {...form}>
