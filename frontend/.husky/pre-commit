@@ -2,3 +2,4 @@ echo "pnpm test" > .husky/pre-commit
 pnpm lint
 pnpm format
 pnpm test
+exit 1
