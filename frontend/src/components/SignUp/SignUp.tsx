@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormField } from "@/components/ui/formfield";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast"; // Toast hook
 import { useSignUp } from "@/hooks/useSignUp";
