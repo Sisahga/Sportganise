@@ -42,7 +42,7 @@ const ProfileContent: React.FC = () => {
 
   return (
     <div className="pb-20">
-      <div className="container mx-auto max-w-lg">
+      <div className="container mx-auto max-w-2xl">
         <div className="flex flex-col items-center justify-center my-4">
           <h2 className="font-semibold text-3xl text-secondaryColour text-center">
             Profile
@@ -55,10 +55,10 @@ const ProfileContent: React.FC = () => {
             alt="Profile"
           />
 
-          <p className="text-3xl font-medium">
+          <p className="text-3xl text-primaryColour font-medium">
             {data?.firstName} {data?.lastName}
           </p>
-          <p className="text-lg font-semibold">
+          <p className="text-lg font-semibold text-primaryColour">
             {data?.type
               ? data?.type.charAt(0).toUpperCase() + data?.type.slice(1)
               : ""}
@@ -68,11 +68,11 @@ const ProfileContent: React.FC = () => {
         <div className="flex flex-col mt-4">
           {/* Personal Information */}
           <Button
-            className="w-full px-4 py-3 mb-4 text-left flex justify-between items-center rounded-full"
+            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/PersonalInformationPage")}
           >
-            <span className="flex">
+            <span className="flex items-center">
               <CircleUserRound className="mr-2" />
               Personal Information
             </span>
@@ -81,11 +81,11 @@ const ProfileContent: React.FC = () => {
 
           {/* Settings */}
           <Button
-            className="w-full px-4 py-3 mb-4 text-left flex justify-between items-center rounded-full"
+            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/Settings")}
           >
-            <span className="flex">
+            <span className="flex items-center">
               <Settings className="mr-2" />
               Settings
             </span>
@@ -94,11 +94,11 @@ const ProfileContent: React.FC = () => {
 
           {/* Change Password */}
           <Button
-            className="w-full px-4 py-3 mb-4 text-left flex justify-between items-center rounded-full"
+            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/ChangePasswordPage")}
           >
-            <span className="flex">
+            <span className="flex items-center">
               <KeyRound className="mr-2" />
               Change Password
             </span>
@@ -107,11 +107,11 @@ const ProfileContent: React.FC = () => {
 
           {/* Blocked Users */}
           <Button
-            className="w-full px-4 py-3 mb-4 text-left flex justify-between items-center rounded-full"
+            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/BlockedUserListPage")}
           >
-            <span className="flex">
+            <span className="flex items-center">
               <UserX className="mr-2" />
               Blocked Users
             </span>
@@ -121,11 +121,11 @@ const ProfileContent: React.FC = () => {
           {/* Modify Permissions - Only visible for ADMIN */}
           {userType === "ADMIN" && (
             <Button
-              className="w-full px-4 py-3 mb-4 text-left flex justify-between items-center rounded-full"
+              className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
               variant="outline"
               onClick={() => navigate("/pages/ModifyPermissionPage")}
             >
-              <span className="flex">
+              <span className="flex items-center">
                 <UserX className="mr-2" />
                 Modify Permissions
               </span>

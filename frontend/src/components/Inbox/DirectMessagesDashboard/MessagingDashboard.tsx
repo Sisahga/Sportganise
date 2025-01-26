@@ -57,7 +57,7 @@ function DirectMessagesDashboard() {
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen lg:mx-24 gap-6">
       <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
         <div className="space-y-1">
           <h2 className="font-semibold text-3xl text-secondaryColour text-center">
