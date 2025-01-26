@@ -181,6 +181,7 @@ public class DirectMessageChannelController {
   @PostMapping("/delete-channel-request")
   public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> requestDeleteChannel(
       @RequestBody DeleteChannelRequestDto deleteChannelRequestDto) {
+    log.debug("Delete channel request: {}", deleteChannelRequestDto);
     DeleteChannelRequestResponseDto deleteReqResponse =
         directMessageChannelService.requestDeleteChannel(deleteChannelRequestDto);
     ResponseDto<DeleteChannelRequestResponseDto> responseDto =
@@ -246,7 +247,7 @@ public class DirectMessageChannelController {
    */
   @GetMapping("/delete-request-active/{channelId}")
   public ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>>
-      getIsChannelDeleteRequestApproved(@PathVariable Integer channelId) {
+      getIsChannelDeleteRequestOngoing(@PathVariable Integer channelId) {
     DeleteChannelRequestResponseDto deleteReqResponse =
         this.directMessageChannelService.getDeleteChannelRequestIsActive(channelId);
     if (deleteReqResponse == null) {
