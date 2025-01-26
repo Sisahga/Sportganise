@@ -12,10 +12,17 @@ export const useVerifyCode = () => {
     setError(null);
 
     try {
-      const response = await verifyCode(requestData);
-      setData(response);
+      console.log("Sending request to verify code:", requestData);
+      const verifyCodeResponse = await verifyCode(requestData);
+      console.log("Response from verify-code API:", verifyCodeResponse);
+      setData(verifyCodeResponse);
+      return verifyCodeResponse;
+
     } catch (err) {
-      setError((err as Error).message);
+      const errorMessage = (err as Error).message || "An unexpected error occured."
+      setError(errorMessage);
+      console.error("Error verifying code:", errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
