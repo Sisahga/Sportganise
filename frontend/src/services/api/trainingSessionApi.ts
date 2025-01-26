@@ -3,6 +3,7 @@ import { Program } from "@/types/trainingSessionDetails";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
+import { getBearerToken } from "@/services/apiHelper.ts";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/programs";
 
@@ -16,6 +17,9 @@ const trainingSessionApi = {
       `${baseMappingUrl}/${accountId}/create-program`,
       {
         method: "POST",
+        headers: {
+          Authorization: getBearerToken(),
+        },
         body: jsonPayload,
       },
     );
@@ -44,6 +48,9 @@ const trainingSessionApi = {
       `${baseMappingUrl}/${accountId}/${programId}/modify-program`,
       {
         method: "POST",
+        headers: {
+          Authorization: getBearerToken(),
+        },
         body: formValues,
       },
     );
@@ -63,7 +70,11 @@ const trainingSessionApi = {
 
   /**Fetch all programs info */
   getPrograms: async (accountId: number | null | undefined) => {
-    const response = await fetch(`${baseMappingUrl}/${accountId}/details`);
+    const response = await fetch(`${baseMappingUrl}/${accountId}/details`, {
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
     const data: ResponseDto<Program[]> = await response.json();
 
     if (!response.ok) {
