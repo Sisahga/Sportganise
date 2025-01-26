@@ -30,10 +30,20 @@ export interface Account {
   pictureUrl: string;
 }
 
+export interface AccountPermissions {
+  accountId: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  type: string;
+  pictureUrl: string;
+}
+
 export interface UpdateAccountPayload {
   firstName?: string;
   lastName?: string;
   phone?: string;
+  email?: string;
   address?: {
     line?: string;
     city?: string;

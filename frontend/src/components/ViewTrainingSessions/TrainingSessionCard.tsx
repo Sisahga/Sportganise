@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 import { useNavigate } from "react-router-dom";
+import log from "loglevel";
 
 // Component imports
 import { Card } from "@/components/ui/card";
@@ -9,20 +9,30 @@ import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
 
 // Data structure for data received from API call
-import { Program } from "@/types/trainingSessionDetails";
+import {
+  Attendees,
+  Program,
+  ProgramDetails,
+} from "@/types/trainingSessionDetails";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
 
+interface TrainingSessionCardProps {
+  programDetails: ProgramDetails;
+  attendees: Attendees[];
+}
+
 const TrainingSessionCard: React.FC<Program> = ({
   programDetails,
   attendees,
-}) => {
+}: TrainingSessionCardProps) => {
   // Handle navigation to training session detail page
   const navigate = useNavigate();
   const handleNavigation = (path: string, data: Program) => {
     navigate(path, { state: data });
   };
+  log.debug("Rendering training session card.");
 
   return (
     <Card>

@@ -3,7 +3,7 @@ import { Program } from "@/types/trainingSessionDetails";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
 import log from "loglevel";
 
-function usePrograms(accountId: number) {
+function usePrograms(accountId: number | null | undefined) {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null); //either exists or does not

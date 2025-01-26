@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import log from "loglevel";
-
 import { Notification } from "@/types/notifications";
 
 log.setLevel("info");
@@ -75,7 +74,7 @@ export default function NotificationsPage() {
         <h2 className="font-semibold text-3xl text-secondaryColour text-center">
           Notifications
         </h2>
-        <p className="text-fadedPrimaryColour text-center ">
+        <p className="text-fadedPrimaryColour text-center">
           You have {unreadCount} unread notifications
         </p>
       </div>

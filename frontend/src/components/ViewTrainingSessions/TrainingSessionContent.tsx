@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import log from "loglevel";
+import { getCookies } from "@/services/cookiesService";
 
 // Created components imports
 import DropDownMenuButton from "./DropDownMenu/DropDownMenuButton";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
+import RegisteredPlayer from "./RegisteredPlayer";
 
 // Components imports
 import {
@@ -26,12 +29,18 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
-import RegisteredPlayer from "./RegisteredPlayer";
 
 const TrainingSessionContent = () => {
-  const [accountType /*, setAccountType*/] = useState<string>("coach"); // Handle account type. Only coach or admin can view list of attendees.
+  const [accountType, setAccountType] = useState<string | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
+
+  log.debug("Rendering TrainingSessionContent");
+  useEffect(() => {
+    const user = getCookies();
+    setAccountType(user?.type);
+    log.info("Training Session Card account type : ", user);
+  }, [navigate]);
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
@@ -53,6 +62,7 @@ const TrainingSessionContent = () => {
     if (location.state && location.state.programDetails) {
       setProgramDetails(location.state.programDetails);
     }
+    log.info("Program details in training session content: ", programDetails);
   }, [location.state]);
 
   const [attendees, setAttendees] = useState<Attendees[]>([]);
@@ -60,6 +70,7 @@ const TrainingSessionContent = () => {
     if (location.state && location.state.attendees) {
       setAttendees(location.state.attendees);
     }
+    log.info("Attendees in training session content: ", attendees);
   }, [location.state]);
 
   return (
@@ -103,7 +114,6 @@ const TrainingSessionContent = () => {
             {programDetails.expiryDate ? (
               <div className="flex items-center gap-2">
                 <hr className="w-1 h-px border-0 bg-gray-500 " />
-
                 <p className="text-sm text-gray-500">
                   {new Date(programDetails.expiryDate).toDateString()}
                 </p>
@@ -181,22 +191,28 @@ const TrainingSessionContent = () => {
               {programDetails.programAttachments.map((attachment, index) => (
                 <div
                   key={index}
-                  className="flex items-center border-[1px] rounded-md p-2 w-[370px]"
+                  className="flex items-center border-[1px] rounded-md p-2"
                 >
                   <FileText
                     size={15}
                     color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-                    className="w-8"
+                    className="w-8 pr-2"
                   />
-                  <a
-                    className="text-sm text-gray-500 hover:text-cyan-300 overflow-x-scroll px-3"
-                    href={attachment.attachmentUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    download
-                  >
-                    {attachment.attachmentUrl.split("/").pop()}
-                  </a>
+                  <div className="overflow-x-scroll">
+                    <a
+                      className="text-sm text-gray-500 hover:text-cyan-300"
+                      href={attachment.attachmentUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                    >
+                      {attachment.attachmentUrl
+                        .split("/")
+                        .pop()
+                        ?.split("_")
+                        .pop()}
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
@@ -204,8 +220,8 @@ const TrainingSessionContent = () => {
         </div>
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
-        {(accountType.toLowerCase() === "coach" ||
-          accountType.toLowerCase() === "admin") && (
+        {(accountType?.toLowerCase() === "coach" ||
+          accountType?.toLowerCase() === "admin") && (
           <>
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">Attendees</h2>
@@ -230,7 +246,11 @@ const TrainingSessionContent = () => {
         )}
 
         {/**Conditionally render different menu options based on account type */}
-        <DropDownMenuButton accountType={accountType} />
+        <DropDownMenuButton
+          accountType={accountType}
+          programDetails={programDetails}
+          attendees={attendees}
+        />
       </div>
     </div>
   );

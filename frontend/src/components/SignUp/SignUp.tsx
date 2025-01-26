@@ -130,6 +130,7 @@ export default function SignUp() {
     } catch (err) {
       console.error("Sign-up failed:", err);
     }
+
   };
 
   useEffect(() => {

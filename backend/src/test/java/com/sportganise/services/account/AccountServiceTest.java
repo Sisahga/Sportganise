@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -23,7 +24,9 @@ import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.services.BlobService;
 import com.sportganise.services.account.auth.Auth0ApiService;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +39,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 public class AccountServiceTest {
@@ -43,6 +48,7 @@ public class AccountServiceTest {
   @Mock private AccountRepository accountRepository;
 
   @Mock private Auth0ApiService auth0ApiService;
+  @Mock private BlobService blobService;
 
   @InjectMocks private AccountService accountService;
 
@@ -131,6 +137,8 @@ public class AccountServiceTest {
   class UpdateAccount {
     int notAccountId;
     Account originalAccount;
+    MockMultipartFile file =
+        new MockMultipartFile("file", "profile.jpg", MediaType.IMAGE_JPEG_VALUE, "".getBytes());
 
     @BeforeEach
     public void setup() {
@@ -145,6 +153,33 @@ public class AccountServiceTest {
               .firstName("John")
               .lastName("Doe")
               .build();
+    }
+
+    @Test
+    public void updateAccountTest_SuccessFullUpdate() throws AccountNotFoundException {
+      int accountId = originalAccount.getAccountId();
+      given(accountRepository.findById(accountId)).willReturn(Optional.of(originalAccount));
+
+      UpdateAccountDto newAccount =
+          UpdateAccountDto.builder()
+              .firstName("John")
+              .lastName("Doe")
+              .email("john@email.com")
+              .phone("1231231234")
+              .address(
+                  Address.builder()
+                      .line("123 nowhere")
+                      .city("laval")
+                      .province("Manitoba")
+                      .country("Canada")
+                      .postalCode("H1H 2H2")
+                      .build())
+              .build();
+
+      accountService.updateAccount(accountId, newAccount);
+
+      originalAccount.setFirstName("John2");
+      verify(accountRepository, times(1)).save(originalAccount);
     }
 
     @Test
@@ -232,6 +267,42 @@ public class AccountServiceTest {
 
       verify(accountRepository, times(1)).findById(accountId);
       verify(accountRepository, times(1)).save(originalAccount);
+    }
+
+    @Test
+    public void updateAccountPicture_Success() throws AccountNotFoundException, IOException {
+      int accountId = originalAccount.getAccountId();
+      given(accountRepository.findById(anyInt())).willReturn(Optional.of(originalAccount));
+
+      accountService.updateAccountPicture(accountId, file);
+
+      verify(accountRepository, times(1)).findById(accountId);
+      verify(accountRepository, times(1)).save(originalAccount);
+    }
+
+    @Test
+    public void updateAccountPicture_NotFound() throws AccountNotFoundException, IOException {
+      int accountId = originalAccount.getAccountId();
+      given(accountRepository.findById(anyInt())).willReturn(Optional.empty());
+
+      assertThrows(
+          AccountNotFoundException.class,
+          () -> accountService.updateAccountPicture(accountId, file));
+
+      verify(accountRepository, times(1)).findById(accountId);
+      verify(accountRepository, times(0)).save(any());
+    }
+
+    @Test
+    public void updateAccountPicture_UploadFailed() throws AccountNotFoundException, IOException {
+      int accountId = originalAccount.getAccountId();
+      given(accountRepository.findById(anyInt())).willReturn(Optional.of(originalAccount));
+      doThrow(new IOException("Failed to upload file")).when(blobService).uploadFile(any(), any());
+
+      assertThrows(IOException.class, () -> accountService.updateAccountPicture(accountId, file));
+
+      verify(accountRepository, times(1)).findById(accountId);
+      verify(accountRepository, times(0)).save(any());
     }
   }
 
@@ -344,52 +415,56 @@ public class AccountServiceTest {
     verify(accountRepository, times(1)).getAllNonBlockedAccountsByOrganization(organizationId, 1);
   }
 
-  @Test
-  public void getAllAccountPermissions_NoAccount() {
-    given(accountRepository.findAccountPermissions()).willReturn(List.of());
+  @Nested
+  class GetAllAccountPermissions {
 
-    // Call the service method
-    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+    @Test
+    public void getAllAccountPermissions_NoAccount() {
+      given(accountRepository.findAccountPermissions()).willReturn(List.of());
 
-    // Assertions
-    assertTrue(result.isEmpty(), "The result should be an empty list");
-    verify(accountRepository, times(1)).findAccountPermissions();
-  }
+      // Call the service method
+      List<AccountPermissions> result = accountService.getAccountPermissions();
 
-  @Test
-  public void getAllAccountPermissions_FewAccounts() {
-    // Mock data
-    AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
-    account1.setAccountId(1);
-    account1.setType(AccountType.PLAYER);
-    account1.setEmail("test1@example.com");
-    account1.setFirstName("John");
-    account1.setLastName("Doe");
+      // Assertions
+      assertTrue(result.isEmpty(), "The result should be an empty list");
+      verify(accountRepository, times(1)).findAccountPermissions();
+    }
 
-    AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
-    account2.setAccountId(2);
-    account2.setType(AccountType.COACH);
-    account2.setEmail("test2@example.com");
-    account2.setFirstName("Jane");
-    account2.setLastName("Dane");
-    account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
+    @Test
+    public void getAllAccountPermissions_FewAccounts() {
+      // Mock data
+      AccountPermissionsTest account1 = factory.createProjection(AccountPermissionsTest.class);
+      account1.setAccountId(1);
+      account1.setType(AccountType.PLAYER);
+      account1.setEmail("test1@example.com");
+      account1.setFirstName("John");
+      account1.setLastName("Doe");
 
-    List<AccountPermissions> accountPermissions = List.of(account1, account2);
+      AccountPermissionsTest account2 = factory.createProjection(AccountPermissionsTest.class);
+      account2.setAccountId(2);
+      account2.setType(AccountType.COACH);
+      account2.setEmail("test2@example.com");
+      account2.setFirstName("Jane");
+      account2.setLastName("Dane");
+      account2.setPictureUrl("https://ui-avatars.com/api/?name=Jane+Dane");
 
-    given(accountRepository.findAccountPermissions()).willReturn(accountPermissions);
+      List<AccountPermissions> accountPermissions = List.of(account1, account2);
 
-    // Call the service method
-    List<AccountPermissions> result = this.accountService.getAccountPermissions();
+      given(accountRepository.findAccountPermissions()).willReturn(accountPermissions);
 
-    // Assertions
-    assertEquals(result.size(), 2);
-    assertEquals(result.get(0).getEmail(), account1.getEmail());
-    assertEquals(result.get(0).getPictureUrl(), account1.getPictureUrl());
-    assertEquals(result.get(0).getType(), account1.getType());
-    assertEquals(result.get(1).getEmail(), account2.getEmail());
-    assertEquals(result.get(1).getPictureUrl(), account2.getPictureUrl());
-    assertEquals(result.get(1).getType(), account2.getType());
-    verify(accountRepository, times(1)).findAccountPermissions();
+      // Call the service method
+      List<AccountPermissions> result = accountService.getAccountPermissions();
+
+      // Assertions
+      assertEquals(result.size(), 2);
+      assertEquals(result.get(0).getEmail(), account1.getEmail());
+      assertEquals(result.get(0).getPictureUrl(), account1.getPictureUrl());
+      assertEquals(result.get(0).getType(), account1.getType());
+      assertEquals(result.get(1).getEmail(), account2.getEmail());
+      assertEquals(result.get(1).getPictureUrl(), account2.getPictureUrl());
+      assertEquals(result.get(1).getType(), account2.getType());
+      verify(accountRepository, times(1)).findAccountPermissions();
+    }
   }
 }
 
