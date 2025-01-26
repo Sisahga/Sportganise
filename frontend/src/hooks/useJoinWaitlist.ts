@@ -24,8 +24,12 @@ const useJoinWaitlist = () => {
 
       const data = await response.json();
       setUserRank(data.rank);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message); // Extract the error message
+      } else {
+        setError("An unknown error occurred."); // Handle cases where err is not an Error instance
+      }
     } finally {
       setJoining(false);
     }
