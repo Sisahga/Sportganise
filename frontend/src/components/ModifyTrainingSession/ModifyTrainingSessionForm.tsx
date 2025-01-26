@@ -101,8 +101,9 @@ export default function ModifyTrainingSessionForm() {
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
   let [attachmentsToRemove /* setAttachmentsToRemove */] = useState<string[]>(
-    [],
+    []
   );
+  let [attachmentsToKeep] = useState<File[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [, /* attendees */ setAttendees] = useState<Attendees[]>([]);
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
@@ -177,8 +178,7 @@ export default function ModifyTrainingSessionForm() {
     form.setValue("description", programDetails.description);
     if (programDetails.programAttachments) {
       const files = programDetails.programAttachments.map((attachment) => {
-        const fileName =
-          attachment.attachmentUrl.split("/").pop()?.split("_").pop() || "file";
+        const fileName = attachment.attachmentUrl || "file";
         return new File([attachment.attachmentUrl], fileName, {
           type: "application/octet-stream",
         });
@@ -187,7 +187,7 @@ export default function ModifyTrainingSessionForm() {
     }
     form.setValue(
       "startTime",
-      new Date(programDetails.occurrenceDate).toISOString().slice(11, 16),
+      new Date(programDetails.occurrenceDate).toISOString().slice(11, 16)
     );
     const endTime = new Date(programDetails.occurrenceDate);
     endTime.setMinutes(endTime.getMinutes() + programDetails.durationMins); //REFACTOR
@@ -213,16 +213,35 @@ export default function ModifyTrainingSessionForm() {
       log.info("Form to modify Training Session : ", json_payload);
 
       // Prepare API body : FormData
+      const formData = new FormData();
+      //atachmentsToRemove contains list of all old files
+      //if file.name of values.attachment exists in attachmentToRemove that means that we want to keep that old file
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file) => {
+          if (!attachmentsToRemove.includes(file.name))
+            formData.append("attachments", file);
+        });
+      } else {
+        formData.append(
+          "attachments",
+          new Blob([], {
+            type: "application/json",
+          })
+        );
+      }
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
-            (urlName) => urlName !== file.name,
+            (urlName) => urlName !== file.name
           );
         });
-        console.log("attachmentsToRemove: ", attachmentsToRemove);
-        log.info("attachmentsToRemove: ", attachmentsToRemove);
+
+        values.attachment.forEach((file) => {
+          console.warn("FILE NAME OF VALUES ATTACHMENT: ", file);
+        });
+
+        log.info("attachmentsToRemove HEEEEEERE: ", attachmentsToRemove);
       }
-      const formData = new FormData();
       const programData = {
         title: values.title,
         type: values.type,
@@ -241,33 +260,21 @@ export default function ModifyTrainingSessionForm() {
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
-        }),
+        })
       );
-      if (values.attachment && values.attachment.length > 0) {
-        values.attachment.forEach((file) => {
-          formData.append("attachments", file);
-        });
-      } else {
-        formData.append(
-          "attachments",
-          new Blob([], {
-            type: "application/json",
-          }),
-        );
-      }
 
       // API call submit form
       setLoading(true);
       const modify = await modifyTrainingSession(
         accountId,
         programDetails.programId,
-        formData,
+        formData
       );
       log.info("modify : ", modify);
       setLoading(false);
       if (modify === null) {
         throw new Error(
-          "Error from usemodifyTrainingSession.modifyTrainingSession!",
+          "Error from usemodifyTrainingSession.modifyTrainingSession!"
         );
       }
       log.info("modifyTrainingSession submit success ✔");
@@ -356,7 +363,7 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
@@ -386,7 +393,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {type.label}
@@ -419,7 +426,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -466,7 +473,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -555,12 +562,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value,
+                              (location) => location.value === field.value
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -586,7 +593,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {location.label}
@@ -648,12 +655,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
+                              (visibility) => visibility.value === field.value
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -679,7 +686,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {visibility.label}
@@ -760,7 +767,9 @@ export default function ModifyTrainingSessionForm() {
                         field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
+                            <span>
+                              {file.name.split("/").pop()?.split("_").pop()}
+                            </span>
                           </FileUploaderItem>
                         ))}
                     </FileUploaderContent>
@@ -790,7 +799,7 @@ export default function ModifyTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        e.target.value ? Number(e.target.value) : undefined
                       )
                     }
                   />
