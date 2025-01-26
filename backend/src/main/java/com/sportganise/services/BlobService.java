@@ -2,16 +2,22 @@ package com.sportganise.services;
 
 import com.sportganise.entities.Blob;
 import com.sportganise.entities.directmessaging.DirectMessageBlob;
+import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.repositories.BlobRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageBlobRepository;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 /*
  * TODO:
@@ -54,11 +60,12 @@ public class BlobService {
    * Uploads a file to the AWS S3 Bucket.
    *
    * @param file File to be uploaded.
+   * @param accountId Id of the account uploading the file.
    * @return String indicating the status of the upload.
    * @throws IOException If an error occurs while uploading the file.
    */
-  public String uploadFile(MultipartFile file) throws IOException {
-    return uploadFile(file, false, null);
+  public String uploadFile(MultipartFile file, Integer accountId) throws IOException {
+    return uploadFile(file, false, null, accountId);
   }
 
   /**
@@ -67,21 +74,26 @@ public class BlobService {
    * @param file File to be uploaded.
    * @param isMessageFile Boolean indicating if the file is part of a direct message.
    * @param messageId Id of the direct message, if the file is part of a direct message.
+   * @param accountId Id of the account uploading the file.
    * @return The URL of the newly uploaded file.
-   * @throws IOException If an error occurs while uploading the file.
    */
-  public String uploadFile(MultipartFile file, boolean isMessageFile, String messageId)
-      throws IOException {
+  public String uploadFile(
+      MultipartFile file, boolean isMessageFile, String messageId, Integer accountId)
+      throws FileProcessingException {
     String fileName = file.getOriginalFilename();
-    log.debug("Uploading file: {}", fileName);
+    // TODO: set proper key for file (accountId/uuid+filename)
+    String uniqueFileName = UUID.randomUUID() + "_" + fileName;
+    String s3Key = accountId + "/" + uniqueFileName;
+
+    log.debug("Uploading file: {}", s3Key);
     try {
       assert fileName != null;
       PutObjectRequest objectRequest =
-          PutObjectRequest.builder().bucket(bucketName).key(fileName).build();
+          PutObjectRequest.builder().bucket(bucketName).key(s3Key).build();
       s3Client.putObject(objectRequest, RequestBody.fromBytes(file.getBytes()));
-      String s3Url = this.computeS3Url(fileName);
+      String s3Url = this.computeS3Url(s3Key);
 
-      // ** Save the URL in the Database.
+      // ** Save the S3 Object URL in the Database.
       // Case where it is not a message file.
       if (!isMessageFile) {
         Blob blob = new Blob();
@@ -94,9 +106,43 @@ public class BlobService {
         directMessageBlobRepository.save(directMessageBlob);
       }
       return s3Url;
-    } catch (IOException e) {
-      log.error("Error uploading file: {}", e.getMessage());
-      throw new IOException("Error uploading file: " + e.getMessage());
+    } catch (S3Exception | IOException e) {
+      throw new FileProcessingException("Error uploading file: " + e.getMessage());
+    } catch (Exception e) {
+      log.error("Unexpected error while uploading file: {}", e.getMessage());
+      throw new FileProcessingException("Unexpected error while uploading file: " + e.getMessage());
+    }
+  }
+
+  /**
+   * Deletes a file from the AWS S3 Bucket using its URL.
+   *
+   * @param s3Url The URL of the file to be deleted.
+   * @throws IllegalArgumentException If the S3 URL is invalid.
+   * @throws IOException If an error occurs while deleting the file.
+   * @throws S3Exception If an error occurs while deleting the file from S3.
+   */
+  public void deleteFile(String s3Url) throws IllegalArgumentException, IOException, S3Exception {
+    try {
+      // Extract the key from the S3 URL
+      URI s3Uri = new URI(s3Url);
+      String s3Key = s3Uri.getPath().substring(1);
+      log.debug("Deleting file with key: {}", s3Key);
+
+      DeleteObjectRequest deleteRequest =
+          DeleteObjectRequest.builder().bucket(bucketName).key(s3Key).build();
+
+      s3Client.deleteObject(deleteRequest);
+      log.debug("Successfully deleted file in S3 bucket: {}", s3Key);
+    } catch (URISyntaxException e) {
+      log.error("Error parsing S3 URL: {}", e.getMessage());
+      throw new IllegalArgumentException("Error parsing S3 URL: " + e.getMessage());
+    } catch (S3Exception e) {
+      log.error("Error deleting file from S3: {}", e.getMessage());
+      throw new IOException("Error deleting file from S3: " + e.getMessage());
+    } catch (Exception e) {
+      log.error("Unexpected error while deleting file: {}", e.getMessage());
+      throw new IOException("Unexpected error while deleting file: " + e.getMessage());
     }
   }
 

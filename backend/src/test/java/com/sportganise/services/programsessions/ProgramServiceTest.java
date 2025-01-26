@@ -1,6 +1,7 @@
 package com.sportganise.services.programsessions;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sportganise.dto.programsessions.ProgramAttachmentDto;
@@ -9,20 +10,19 @@ import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
-import com.sportganise.entities.programsessions.Program;
-import com.sportganise.entities.programsessions.ProgramAttachment;
-import com.sportganise.entities.programsessions.ProgramParticipant;
-import com.sportganise.entities.programsessions.ProgramParticipantId;
+import com.sportganise.entities.programsessions.*;
+import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
-import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -41,6 +41,8 @@ public class ProgramServiceTest {
   @Mock private AccountService accountService;
 
   @Mock private AccountRepository accountRepository;
+
+  @Mock private BlobService blobService;
 
   @InjectMocks private ProgramService programService;
 
@@ -106,7 +108,7 @@ public class ProgramServiceTest {
 
     assertEquals(2, participantDtos.size());
 
-    ProgramParticipantDto participantDto1 = participantDtos.get(0);
+    ProgramParticipantDto participantDto1 = participantDtos.getFirst();
     assertEquals(1, participantDto1.getProgramId());
     assertEquals(101, participantDto1.getAccountId());
     assertTrue(participantDto1.isConfirmed());
@@ -143,10 +145,12 @@ public class ProgramServiceTest {
 
     Mockito.when(programRepository.findProgramById(1)).thenReturn(mockProgram);
 
+    ProgramAttachmentCompositeKey attachment1Key =
+        new ProgramAttachmentCompositeKey(1, "attachment1.url");
+    ProgramAttachmentCompositeKey attachment2Key =
+        new ProgramAttachmentCompositeKey(1, "attachment2.url");
     List<ProgramAttachment> mockAttachments =
-        List.of(
-            new ProgramAttachment(1, "attachment1.url"),
-            new ProgramAttachment(1, "attachment2.url"));
+        List.of(new ProgramAttachment(attachment1Key), new ProgramAttachment(attachment2Key));
     Mockito.when(programAttachmentRepository.findAttachmentsByProgramId(1))
         .thenReturn(mockAttachments);
 
@@ -178,13 +182,13 @@ public class ProgramServiceTest {
   void testGetProgramAttachments() {
     Integer programId = 1;
 
-    ProgramAttachment attachment1 = new ProgramAttachment();
-    attachment1.setProgramId(programId);
-    attachment1.setAttachmentUrl("/file1.pdf");
+    ProgramAttachmentCompositeKey attachment1Key =
+        new ProgramAttachmentCompositeKey(programId, "/file1.pdf");
+    ProgramAttachment attachment1 = new ProgramAttachment(attachment1Key);
 
-    ProgramAttachment attachment2 = new ProgramAttachment();
-    attachment2.setProgramId(programId);
-    attachment2.setAttachmentUrl("/file2.pdf");
+    ProgramAttachmentCompositeKey attachment2Key =
+        new ProgramAttachmentCompositeKey(programId, "/file2.pdf");
+    ProgramAttachment attachment2 = new ProgramAttachment(attachment2Key);
 
     when(programAttachmentRepository.findAttachmentsByProgramId(programId))
         .thenReturn(Arrays.asList(attachment1, attachment2));
@@ -199,78 +203,81 @@ public class ProgramServiceTest {
     assertEquals(programId, result.get(1).getProgramId());
   }
 
+  private List<Program> createMockPrograms() {
+    Program program1 =
+        Program.builder()
+            .programId(1)
+            .programType("Training")
+            .title("First Program")
+            .description("First Description")
+            .capacity(10)
+            .occurrenceDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
+            .durationMins(60)
+            .isRecurring(false)
+            .expiryDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
+            .frequency("None")
+            .location("Location 1")
+            .visibility("public")
+            .build();
+
+    Program program2 =
+        Program.builder()
+            .programId(2)
+            .programType("Event")
+            .title("Second Program")
+            .description("Second Description")
+            .capacity(20)
+            .occurrenceDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 6, 15), LocalTime.of(14, 0), ZoneId.systemDefault()))
+            .durationMins(120)
+            .isRecurring(true)
+            .expiryDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 6, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
+            .frequency("weekly")
+            .location("Location 2")
+            .visibility("private")
+            .build();
+
+    return List.of(program1, program2);
+  }
+
   @Test
   void testGetPrograms() {
-    List<Program> mockPrograms =
-        List.of(
-            Program.builder()
-                .programId(1)
-                .programType("Training")
-                .title("Training Program 1")
-                .description("This is training program 1.")
-                .capacity(10)
-                .occurrenceDate(
-                    ZonedDateTime.of(
-                        LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
-                .durationMins(120)
-                .isRecurring(false)
-                .expiryDate(
-                    ZonedDateTime.of(
-                        LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
-                .frequency("None")
-                .location("111 Random Ave")
-                .visibility("public")
-                .build(),
-            Program.builder()
-                .programId(2)
-                .programType("Training")
-                .title("Training Program 2")
-                .description("This is training program 2.")
-                .capacity(10)
-                .occurrenceDate(
-                    ZonedDateTime.of(
-                        LocalDate.of(2025, 6, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
-                .durationMins(120)
-                .isRecurring(false)
-                .expiryDate(
-                    ZonedDateTime.of(
-                        LocalDate.of(2025, 6, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
-                .frequency("None")
-                .location("222 Random St")
-                .visibility("private")
-                .build());
+    // Arrange
+    List<Program> mockPrograms = createMockPrograms();
+    when(programRepository.findPrograms()).thenReturn(mockPrograms);
 
-    Mockito.when(programRepository.findPrograms()).thenReturn(mockPrograms);
+    mockPrograms.forEach(
+        program ->
+            when(programAttachmentRepository.findAttachmentsByProgramId(program.getProgramId()))
+                .thenReturn(List.of()));
 
-    List<ProgramAttachment> mockAttachments1 =
-        List.of(
-            new ProgramAttachment(1, "attachment1.url"),
-            new ProgramAttachment(1, "attachment2.url"));
-    Mockito.when(programAttachmentRepository.findAttachmentsByProgramId(1))
-        .thenReturn(mockAttachments1);
+    // Act
+    List<ProgramDto> result = programService.getPrograms();
 
-    List<ProgramAttachment> mockAttachments2 = List.of(new ProgramAttachment(1, "attachment3.url"));
-    Mockito.when(programAttachmentRepository.findAttachmentsByProgramId(2))
-        .thenReturn(mockAttachments2);
+    // Assert
+    assertNotNull(result);
+    assertEquals(2, result.size());
 
-    List<ProgramDto> programDtos = programService.getPrograms();
+    ProgramDto firstProgram = result.getFirst();
+    assertEquals(1, firstProgram.getProgramId());
+    assertEquals("Training", firstProgram.getProgramType());
+    assertEquals("First Program", firstProgram.getTitle());
+    assertTrue(firstProgram.getProgramAttachments().isEmpty());
 
-    assertNotNull(programDtos);
+    ProgramDto secondProgram = result.get(1);
+    assertEquals(2, secondProgram.getProgramId());
+    assertEquals("Event", secondProgram.getProgramType());
+    assertEquals("Second Program", secondProgram.getTitle());
+    assertTrue(secondProgram.getProgramAttachments().isEmpty());
 
-    ProgramDto programDto1 = programDtos.get(0);
-    assertEquals(1, programDto1.getProgramId());
-    assertEquals("Training", programDto1.getProgramType());
-    assertEquals("Training Program 1", programDto1.getTitle());
-    assertEquals(2, programDto1.getProgramAttachments().size());
-    assertEquals("attachment1.url", programDto1.getProgramAttachments().get(0).getAttachmentUrl());
-    assertEquals("attachment2.url", programDto1.getProgramAttachments().get(1).getAttachmentUrl());
-
-    ProgramDto programDto2 = programDtos.get(1);
-    assertEquals(2, programDto2.getProgramId());
-    assertEquals("Training", programDto2.getProgramType());
-    assertEquals("Training Program 2", programDto2.getTitle());
-    assertEquals(1, programDto2.getProgramAttachments().size());
-    assertEquals("attachment3.url", programDto2.getProgramAttachments().get(0).getAttachmentUrl());
+    verify(programRepository).findPrograms();
   }
 
   @Test
@@ -282,7 +289,7 @@ public class ProgramServiceTest {
 
     EntityNotFoundException exception =
         assertThrows(
-            EntityNotFoundException.class,
+            com.sportganise.exceptions.EntityNotFoundException.class,
             () ->
                 programService.modifyProgram(
                     programDtoToModify,
@@ -297,7 +304,13 @@ public class ProgramServiceTest {
                     "10:30",
                     "12:30",
                     "Updated Location",
-                    null));
+                    Collections.emptyList(), // Empty list for attachments to add
+                    Collections.emptyList(), // Empty list for attachments to remove
+                    2)); // Mock account ID
+
     assertEquals("Program not found with ID: 1", exception.getMessage());
+    verify(programRepository).findById(1);
+    Mockito.verifyNoInteractions(blobService);
+    Mockito.verifyNoInteractions(programAttachmentRepository);
   }
 }

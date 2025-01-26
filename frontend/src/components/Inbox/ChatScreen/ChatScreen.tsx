@@ -1,17 +1,19 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Send, FolderOpen } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages.ts";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
+import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService.ts";
-import { SendMessageComponent } from "@/types/messaging.ts";
+import { SendMessageComponent, MessageComponent } from "@/types/messaging.ts"; // Ensure this import
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages.tsx";
 import { Button } from "@/components/ui/Button.tsx";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown.tsx";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent.tsx";
+import log from "loglevel";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 const ChatScreen = () => {
   const navigate = useNavigate();
@@ -19,13 +21,14 @@ const ChatScreen = () => {
 
   // Access chat data from location state
   const { state } = location || {};
-  const channelId = state.channelId;
+  const channelId = state?.channelId;
   const channelName = state?.channelName || null;
   const channelImageBlob = state?.channelImageBlob || defaultAvatar;
   const read = state?.read || false;
   const channelType = state?.channelType || null;
   const isBlocked = state?.isBlocked || false;
-  const currentUserId = 2; // TODO: Replace with actual user ID from cookies
+  const cookies = getCookies();
+  const currentUserId = getAccountIdCookie(cookies); // TODO: Replace with actual user ID from cookies
 
   // States
   const [connected, setConnected] = useState(false);
@@ -33,6 +36,8 @@ const ChatScreen = () => {
   const [newMessage, setNewMessage] = useState("");
   const [channelIsBlocked, setChannelIsBlocked] = useState(isBlocked);
   const [currentChannelName, setCurrentChannelName] = useState(channelName);
+  const [currentChannelImageUrl, setCurrentChannelImageUrl] =
+    useState(channelImageBlob);
 
   // Hooks
   const { messages, setMessages, loading, error } = useChatMessages(
@@ -47,7 +52,8 @@ const ChatScreen = () => {
     setConnected(connSuccess);
   };
 
-  const onMessageReceived = (message: any) => {
+  const onMessageReceived = (message: MessageComponent) => {
+    // Changed from any to MessageComponent
     setMessages((prevMessages) => [...prevMessages, message]);
     if (message.type === "BLOCK") {
       setChannelIsBlocked(true);
@@ -70,7 +76,6 @@ const ChatScreen = () => {
       senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
       avatarUrl:
         "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
-      // TODO: Replace with actual avatar url from cookies
     };
 
     sendDirectMessage(messagePayload, webSocketServiceRef.current);
@@ -90,7 +95,7 @@ const ChatScreen = () => {
   }, []);
 
   useEffect(() => {
-    console.log("Messages fetched:", messages);
+    log.debug("Messages fetched:", messages);
   }, [messages]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -129,9 +134,10 @@ const ChatScreen = () => {
     <div id="chatScreenMainCtn" className="flex flex-col h-screen bg-gray-100">
       {/* Header */}
       <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-4">
-        {/* Back Button */}
+        {/* Back Button with aria-label */}
         <Button
           variant="ghost"
+          aria-label="Back"
           className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
           onClick={() => navigate("/pages/DirectMessagesDashboard")}
         >
@@ -141,8 +147,8 @@ const ChatScreen = () => {
         {/* Chat Information */}
         <div className="flex flex-grow items-center gap-3">
           <img
-            src={channelImageBlob}
-            alt={channelName}
+            src={currentChannelImageUrl}
+            alt={defaultGroupAvatar}
             style={{ width: "40px", height: "40px" }}
             className="rounded-full object-cover"
           />
@@ -160,6 +166,8 @@ const ChatScreen = () => {
           currentUserId={currentUserId}
           channelName={channelName}
           setCurrentChannelName={setCurrentChannelName}
+          currentChannelPictureUrl={currentChannelImageUrl}
+          setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
         />
       </header>
 
@@ -176,6 +184,7 @@ const ChatScreen = () => {
       {/* Chat Messages */}
       <ChatMessages messages={messages} currentUserId={currentUserId} />
 
+      {/* Show blocked component if channel is blocked */}
       <UserBlockedComponent
         showBlockedMessage={channelIsBlocked}
         channelIsBlocked={channelIsBlocked}
@@ -183,6 +192,7 @@ const ChatScreen = () => {
         channelId={channelId}
         channelType={channelType}
       />
+
       {/* Message Input Area */}
       <div
         id="chatScreenInputArea"
@@ -213,10 +223,11 @@ const ChatScreen = () => {
           rows={1}
         />
 
-        {/* Send Button */}
+        {/* Send Button with aria-label */}
         <div className="h-full flex items-end">
           <Button
             variant="ghost"
+            aria-label="Send"
             className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
             style={{ transform: "rotate(45deg)" }}
             onClick={handleSend}

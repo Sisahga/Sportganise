@@ -8,6 +8,9 @@ import {
   differenceInDays,
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
+import log from "loglevel";
+
+log.setLevel("info");
 
 const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
   const formatSentAt = (
@@ -41,6 +44,7 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
             "chatScreenInputArea",
           );
           if (chatScreenInputArea) {
+            log.info("Chat input blocked due to BLOCK message");
             chatScreenInputArea.classList.add("pointer-events-none");
             chatScreenInputArea.classList.add("opacity-70");
           }

@@ -65,7 +65,7 @@ public class DirectMessageController {
   }
 
   /**
-   * Notifies a channel that a member is active in the channel.
+   * Notifies a channel that a member was added in the channel. (NOT USED)
    *
    * @param messageDto Direct message request DTO for adding a member.
    * @param headerAccessor SimpMessageHeaderAccessor for the web socket session.

@@ -7,29 +7,38 @@ import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
+import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.exceptions.EntityNotFoundException;
+import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Service layer for Programs. */
 @Service
+@Slf4j
 public class ProgramService {
 
   private final ProgramRepository programRepository;
   private final AccountService accountService;
   private final AccountRepository accountRepository;
   private final ProgramAttachmentRepository programAttachmentRepository;
+  private final BlobService blobService;
 
   /**
    * Constructor for ProgramService.
@@ -43,11 +52,13 @@ public class ProgramService {
       ProgramRepository programRepository,
       AccountService accountService,
       AccountRepository accountRepository,
-      ProgramAttachmentRepository programAttachmentRepository) {
+      ProgramAttachmentRepository programAttachmentRepository,
+      BlobService blobService) {
     this.programRepository = programRepository;
     this.accountRepository = accountRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
+    this.blobService = blobService;
   }
 
   public Optional<Program> getSessionById(Integer id) {
@@ -70,7 +81,7 @@ public class ProgramService {
               Optional<Account> accountOptional =
                   accountService.getAccount(participant.getAccountId());
 
-              if (!accountOptional.isPresent()) {
+              if (accountOptional.isEmpty()) {
                 throw new IllegalArgumentException(
                     "Account not found for id: " + participant.getAccountId());
               }
@@ -123,14 +134,15 @@ public class ProgramService {
   public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
     List<ProgramAttachment> programAttachments =
         programAttachmentRepository.findAttachmentsByProgramId(programId);
-
-    return programAttachments.stream()
-        .map(
-            programAttachment -> {
-              return new ProgramAttachmentDto(
-                  programAttachment.getProgramId(), programAttachment.getAttachmentUrl());
-            })
-        .toList();
+    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
+    log.debug("Program Id: {}", programId);
+    for (ProgramAttachment attachment : programAttachments) {
+      programAttachmentDtos.add(
+          new ProgramAttachmentDto(
+              attachment.getCompositeProgramAttachmentKey().getProgramId(),
+              attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
+    }
+    return programAttachmentDtos;
   }
 
   /**
@@ -144,9 +156,7 @@ public class ProgramService {
     List<ProgramDto> programDtos = new ArrayList<>();
 
     for (Program program : programs) {
-
       List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
-
       programDtos.add(
           new ProgramDto(
               program.getProgramId(),
@@ -204,8 +214,10 @@ public class ProgramService {
    * @param endTime End time of each occurrence of the program.
    * @param location Location of the program/session.
    * @param attachments String paths of files attached to this program/session.
+   * @param accountId The account id of the user making the request.
    * @return A newly created programDto.
    */
+  @Transactional
   public ProgramDto createProgramDto(
       String title,
       String programType,
@@ -218,61 +230,44 @@ public class ProgramService {
       String startTime,
       String endTime,
       String location,
-      List<Map<String, String>> attachments) {
+      List<MultipartFile> attachments,
+      Integer accountId) {
 
-    ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
-    int durationMins =
-        (int)
-            java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
-                .toMinutes();
-
-    ZonedDateTime expiryDate = null;
-    String frequency = null;
-
-    if (isRecurring != null && isRecurring) {
-      ZonedDateTime currentOccurrence = occurrenceDate;
-      frequency = "weekly";
-      expiryDate = ZonedDateTime.parse(endDate);
-
-      while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
-
-        currentOccurrence = currentOccurrence.plusDays(7);
-      }
-    }
-
-    Program newProgram =
-        new Program(
-            programType,
+    Program savedProgram =
+        createProgramObject(
             title,
+            programType,
+            startDate,
+            endDate,
+            isRecurring,
+            visibility,
             description,
             capacity,
-            occurrenceDate,
-            durationMins,
-            isRecurring,
-            expiryDate,
-            frequency,
-            location,
-            visibility);
-    Program savedProgram = programRepository.save(newProgram);
+            startTime,
+            endTime,
+            location);
+    programRepository.save(savedProgram);
 
     List<ProgramAttachmentDto> programAttachmentsDto = new ArrayList<>();
-    List<ProgramAttachment> programAttachments = new ArrayList<>();
 
     if (attachments != null && !attachments.isEmpty()) {
-      for (Map<String, String> attachment : attachments) {
-        String attachmentPath = attachment.get("path");
-        if (attachmentPath != null) {
-
+      try {
+        for (MultipartFile attachment : attachments) {
+          String s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+          log.debug("Attachment Saved to S3 bucket: {}", s3AttachmentUrl);
           programAttachmentsDto.add(
-              new ProgramAttachmentDto(savedProgram.getProgramId(), attachmentPath));
-
-          programAttachments.add(
-              new ProgramAttachment(savedProgram.getProgramId(), attachmentPath));
+              new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
+          ProgramAttachmentCompositeKey savedProgramCompositeKey =
+              new ProgramAttachmentCompositeKey(savedProgram.getProgramId(), s3AttachmentUrl);
+          ProgramAttachment programAttachment = new ProgramAttachment(savedProgramCompositeKey);
+          programAttachmentRepository.saveProgramAttachment(
+              programAttachment.getCompositeProgramAttachmentKey().getProgramId(),
+              programAttachment.getCompositeProgramAttachmentKey().getAttachmentUrl());
         }
+      } catch (FileProcessingException | IOException e) {
+        throw new ProgramCreationException("Failed to create program: " + e.getMessage());
       }
-      programAttachmentRepository.saveAll(programAttachments);
     }
-
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
 
@@ -293,9 +288,12 @@ public class ProgramService {
    * @param startTime Start time of each occurrence of the program.
    * @param endTime End time of each occurrence of the program.
    * @param location Location of the program/session.
-   * @param attachments List of Strings of paths uploaded, if any.
+   * @param attachmentsToAdd Attachments to add to the program.
+   * @param attachmentsToRemove Attachments to remove from the program.
+   * @param accountId Id of the user making the request.
    * @return An updated programDto.
    */
+  @Transactional
   public ProgramDto modifyProgram(
       ProgramDto programDtoToModify,
       String title,
@@ -309,7 +307,10 @@ public class ProgramService {
       String startTime,
       String endTime,
       String location,
-      List<Map<String, String>> attachments) {
+      List<MultipartFile> attachmentsToAdd,
+      List<String> attachmentsToRemove,
+      Integer accountId)
+      throws IOException {
 
     Program existingProgram =
         programRepository
@@ -319,6 +320,65 @@ public class ProgramService {
                     new EntityNotFoundException(
                         "Program not found with ID: " + programDtoToModify.getProgramId()));
 
+    Program updatedProgram =
+        createProgramObject(
+            title,
+            programType,
+            startDate,
+            endDate,
+            isRecurring,
+            visibility,
+            description,
+            capacity,
+            startTime,
+            endTime,
+            location);
+    updatedProgram.setProgramId(existingProgram.getProgramId());
+    programRepository.save(updatedProgram);
+
+    if (!attachmentsToRemove.isEmpty()) {
+      // Delete from repo.
+      int rowsAffected =
+          programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+              programDtoToModify.getProgramId(), attachmentsToRemove);
+      if (rowsAffected != attachmentsToRemove.size()) {
+        throw new RuntimeException("Could not delete all attachments.");
+      }
+      // Delete from S3 bucket.
+      for (String attachment : attachmentsToRemove) {
+        this.blobService.deleteFile(attachment);
+      }
+    }
+
+    List<ProgramAttachment> programAttachments = new ArrayList<>();
+    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
+    String s3AttachmentUrl;
+    if (!attachmentsToAdd.isEmpty()) {
+      for (MultipartFile attachment : attachmentsToAdd) {
+        s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+        ProgramAttachmentCompositeKey programAttachmentCompositeKey =
+            new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
+        programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
+        programAttachmentDtos.add(
+            new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+      }
+      programAttachmentRepository.saveAll(programAttachments);
+    }
+    return new ProgramDto(updatedProgram, programAttachmentDtos);
+  }
+
+  private Program createProgramObject(
+      String title,
+      String programType,
+      String startDate,
+      String endDate,
+      Boolean isRecurring,
+      String visibility,
+      String description,
+      Integer capacity,
+      String startTime,
+      String endTime,
+      String location) {
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     int durationMins =
         (int)
@@ -327,11 +387,6 @@ public class ProgramService {
 
     ZonedDateTime expiryDate = null;
     String frequency = null;
-
-    if (isRecurring != null && isRecurring) {
-      frequency = "weekly";
-      expiryDate = ZonedDateTime.parse(endDate);
-    }
 
     if (isRecurring != null && isRecurring) {
       ZonedDateTime currentOccurrence = occurrenceDate;
@@ -344,67 +399,17 @@ public class ProgramService {
       }
     }
 
-    Program updatedProgram =
-        new Program(
-            programType,
-            title,
-            description,
-            capacity,
-            occurrenceDate,
-            durationMins,
-            isRecurring,
-            expiryDate,
-            frequency,
-            location,
-            visibility);
-
-    updatedProgram.setProgramId(existingProgram.getProgramId());
-
-    programRepository.save(updatedProgram);
-
-    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
-
-    if (attachments != null) {
-      List<ProgramAttachment> existingAttachments =
-          programAttachmentRepository.findAttachmentsByProgramId(programDtoToModify.getProgramId());
-
-      List<ProgramAttachment> attachmentsToAdd = new ArrayList<>();
-      List<ProgramAttachment> attachmentsToRemove = new ArrayList<>(existingAttachments);
-
-      for (Map<String, String> attachment : attachments) {
-        String attachmentPath = attachment.get("path");
-        if (attachmentPath != null) {
-          boolean exists = false;
-          for (ProgramAttachment existingAttachment : existingAttachments) {
-            if (existingAttachment.getAttachmentUrl().equals(attachmentPath)) {
-              exists = true;
-              attachmentsToRemove.remove(existingAttachment);
-
-              programAttachmentDtos.add(
-                  new ProgramAttachmentDto(programDtoToModify.getProgramId(), attachmentPath));
-              break;
-            }
-          }
-
-          if (!exists) {
-            attachmentsToAdd.add(
-                new ProgramAttachment(programDtoToModify.getProgramId(), attachmentPath));
-
-            programAttachmentDtos.add(
-                new ProgramAttachmentDto(programDtoToModify.getProgramId(), attachmentPath));
-          }
-        }
-      }
-
-      if (!attachmentsToRemove.isEmpty()) {
-        programAttachmentRepository.deleteAll(attachmentsToRemove);
-      }
-
-      if (!attachmentsToAdd.isEmpty()) {
-        programAttachmentRepository.saveAll(attachmentsToAdd);
-      }
-    }
-
-    return new ProgramDto(updatedProgram, programAttachmentDtos);
+    return new Program(
+        programType,
+        title,
+        description,
+        capacity,
+        occurrenceDate,
+        durationMins,
+        isRecurring,
+        expiryDate,
+        frequency,
+        location,
+        visibility);
   }
 }

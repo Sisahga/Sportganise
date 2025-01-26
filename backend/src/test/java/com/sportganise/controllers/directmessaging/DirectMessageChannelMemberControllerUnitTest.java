@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(controllers = DirectMessageChannelMemberController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class DirectMessageChannelMemberControllerUnitTest {
   @Autowired private MockMvc mockMvc;
 
@@ -173,7 +173,7 @@ class DirectMessageChannelMemberControllerUnitTest {
         .andExpect(
             jsonPath(
                 "$.message",
-                is("An unexpected error occurred while adding members to the channel")))
+                is("An unexpected error occured when trying to add members to channel.")))
         .andExpect(jsonPath("$.data").doesNotExist());
 
     verify(directMessageChannelMemberService, times(1))

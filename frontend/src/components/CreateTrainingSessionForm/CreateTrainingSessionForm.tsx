@@ -1,5 +1,7 @@
-//import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
+import log from "loglevel";
+import { useEffect, useState } from "react";
 
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
@@ -44,36 +46,41 @@ import {
 } from "@/components/ui/file-upload";
 
 import {
-  MoveLeft,
   Check,
   ChevronsUpDown,
   CloudUpload,
   Paperclip,
+  Loader2,
 } from "lucide-react";
-import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
-
-import log from "loglevel";
+import { getCookies } from "@/services/cookiesService";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const accountId = 2; //update with cookie
+  const [accountId, setAccountId] = useState<number | null | undefined>(0); // fix undefined
   const { form } = useFormHandler();
-  const { createTrainingSession, error, loading } = useCreateTrainingSession();
+  const { createTrainingSession, error } = useCreateTrainingSession();
+  const [loading, setLoading] = useState<boolean>(false);
 
-  /**All select element options */
-  //Options for type select
+  useEffect(() => {
+    const user = getCookies();
+    if (!user || user.type === "GENERAL") {
+      navigate("/");
+    }
+    setAccountId(user?.accountId);
+    log.debug(`Modify Training Session Form accountId : ${accountId}`);
+  }, [accountId]);
+
   const types = [
     {
       label: "Training Session",
       value: "Training",
     },
     {
-      label: "Fundraisor",
-      value: "Fundraisor",
+      label: "Fundraiser",
+      value: "Fundraiser",
     },
   ] as const;
-  //Options for visibility select
   const visibilities = [
     {
       label: "Public",
@@ -88,7 +95,6 @@ export default function CreateTrainingSessionForm() {
       value: "private",
     },
   ] as const;
-  //Options for location select
   const locations = [
     {
       label: "Centre de loisirs St-Denis",
@@ -115,20 +121,55 @@ export default function CreateTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    //async request which may result error
     try {
-      // Prepare data to send through API as necessary
       const jsonPayload = {
         ...values,
-        attachment: values.attachment ?? [], //ensure attachment: appears in json payload body
+        attachment: values.attachment ?? [],
       };
       log.info(jsonPayload);
       console.log(jsonPayload);
       log.info(JSON.stringify(jsonPayload, null, 2));
       console.log(JSON.stringify(jsonPayload, null, 2));
 
+      // Prepare API body
+      const formData = new FormData();
+      const programData = {
+        title: values.title,
+        type: values.type,
+        startDate: values.startDate.toISOString(),
+        endDate: values.endDate.toISOString(),
+        recurring: values.recurring.toString(),
+        visibility: values.visibility,
+        description: values.description,
+        capacity: values.capacity.toString(),
+        startTime: values.startTime,
+        endTime: values.endTime,
+        location: values.location,
+      };
+      formData.append(
+        "programData",
+        new Blob([JSON.stringify(programData)], {
+          type: "application/json",
+        }),
+      );
+      if (values.attachment && values.attachment.length > 0) {
+        values.attachment.forEach((file) => {
+          formData.append("attachments", file);
+        });
+      } else {
+        formData.append(
+          "attachments",
+          new Blob([], {
+            type: "application/json",
+          }),
+        );
+      }
+      log.info("formData: ", formData);
+
       // API submit form
-      const create = await createTrainingSession(accountId, jsonPayload);
+      setLoading(true);
+      const create = await createTrainingSession(accountId, formData);
+      setLoading(false);
       console.log(error);
       console.log("create", create);
       log.info("create", create);
@@ -146,10 +187,8 @@ export default function CreateTrainingSessionForm() {
         description: "Event was added to your calendar.",
       });
 
-      log.info("Create training session form reset");
-
       // Navigate to home page
-      navigate("/");
+      navigate(-1);
     } catch (err) {
       console.error(
         "Create training session form submission error (error)",
@@ -163,21 +202,13 @@ export default function CreateTrainingSessionForm() {
           "There was a problem with your request. Event was not created.",
       });
     } finally {
-      // Reset form fields
       form.reset();
+      setLoading(false);
     }
   };
 
   return (
     <>
-      {/** Navigate to previous page */}
-      <Button
-        className="rounded-full"
-        variant="outline"
-        onClick={() => navigate("/")}
-      >
-        <MoveLeft />
-      </Button>
       {/** Create Training Session Form */}
       <Form {...form}>
         <form
@@ -185,9 +216,13 @@ export default function CreateTrainingSessionForm() {
           className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
         >
           {/*Form Title*/}
-          <div>
-            <h2 className="text-2xl font-semibold">Create New Event</h2>
-            <h2>Complete the form and submit</h2>
+          <div className="text-center">
+            <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+              Create New Event
+            </h2>
+            <h2 className="text-fadedPrimaryColour text-center">
+              Complete the form and submit
+            </h2>
           </div>
 
           {/** Title */}
@@ -200,6 +235,7 @@ export default function CreateTrainingSessionForm() {
                 <FormControl>
                   <Input placeholder="Name the event" type="text" {...field} />
                 </FormControl>
+                <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -580,7 +616,7 @@ export default function CreateTrainingSessionForm() {
                     {...field}
                   />
                 </FormControl>
-
+                <FormDescription>Only 100 characters accepted.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -632,7 +668,9 @@ export default function CreateTrainingSessionForm() {
                     </FileUploaderContent>
                   </FileUploader>
                 </FormControl>
-                <FormDescription>Select a file to upload.</FormDescription>
+                <FormDescription>
+                  Select a file to upload. Limit of 5 files.
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -665,7 +703,7 @@ export default function CreateTrainingSessionForm() {
           />
 
           {/** Notify All Players */}
-          <div>
+          {/* <div> MAY BE NEEDED BY US305+
             <FormField
               control={form.control}
               name="notify"
@@ -694,16 +732,23 @@ export default function CreateTrainingSessionForm() {
                 Customize attendance list
               </a>
             </div>
-          </div>
+          </div> */}
 
           {/** Submit Button */}
-          <Button type="submit" className="w-full font-semibold">
-            Create new Event
-          </Button>
-          <div className="text-center self-center">
-            <a href="../" className="underline text-neutral-400 pb-20">
-              Cancel
-            </a>
+          {loading ? (
+            <Button disabled className="w-full">
+              <Loader2 className="animate-spin" />
+              Creating Event
+            </Button>
+          ) : (
+            <Button type="submit" className="w-full font-semibold">
+              Create new Event
+            </Button>
+          )}
+          <div className="justify-self-center">
+            <button className=" bg-transparent" onClick={() => navigate(-1)}>
+              <p className="text-center underline text-neutral-400">Cancel</p>
+            </button>
           </div>
         </form>
       </Form>

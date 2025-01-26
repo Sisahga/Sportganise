@@ -1,9 +1,9 @@
-import { AddTrainingPlanButton } from "@/components/TrainingPlan";
+import { TrainingPlanContent } from "@/components/TrainingPlan";
 
 export default function TrainingPlanPage() {
   return (
     <div>
-      <AddTrainingPlanButton />
+      <TrainingPlanContent />
     </div>
   );
 }

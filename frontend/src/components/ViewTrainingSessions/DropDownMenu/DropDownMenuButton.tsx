@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -20,15 +19,31 @@ import {
   Frown,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  Attendees,
+  Program,
+  ProgramDetails,
+} from "@/types/trainingSessionDetails";
+import log from "loglevel";
 
 interface DropDownMenuButtonProps {
-  accountType: string;
+  accountType: string | null | undefined;
+  programDetails: ProgramDetails;
+  attendees: Attendees[];
 }
 
 export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   accountType,
-}) => {
+  programDetails,
+  attendees,
+}: DropDownMenuButtonProps) => {
   const navigate = useNavigate();
+  const handleNavigation = (path: string, data: Program) => {
+    navigate(path, { state: data });
+  };
+  log.info("DropDownMenuButton programDetails: ", programDetails);
+  log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
+
   //Confirmation of player absence
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -63,7 +78,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         <DropdownMenuTrigger asChild>
           <button
             aria-label="Add new item"
-            className="fixed bottom-20 right-5 bg-secondaryColour text-white p-4 rounded-full shadow-lg hover:bg-cyan-500 focus:outline-none flex items-center justify-center"
+            className="fixed bottom-24 right-5 bg-secondaryColour text-white p-4 rounded-full shadow-lg hover:bg-cyan-500 focus:outline-none flex items-center justify-center"
           >
             <EllipsisVertical />
           </button>
@@ -71,11 +86,16 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>Options</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {accountType.toLowerCase() === "coach" ||
-          accountType.toLowerCase() === "admin" ? (
+          {accountType?.toLowerCase() === "coach" ||
+          accountType?.toLowerCase() === "admin" ? (
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onClick={() => navigate("/pages/ModifyTrainingSessionPage")}
+                onClick={() =>
+                  handleNavigation("/pages/ModifyTrainingSessionPage", {
+                    programDetails,
+                    attendees,
+                  })
+                }
               >
                 <Pencil />
                 <span>Edit Event</span>

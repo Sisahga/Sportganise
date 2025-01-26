@@ -8,9 +8,11 @@ import com.sportganise.repositories.programsessions.ProgramParticipantRepository
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /** Service for managing the waitlist and participation in program sessions. */
+@Slf4j
 @Service
 public class WaitlistService {
 
@@ -35,12 +37,15 @@ public class WaitlistService {
    */
   public Integer optProgramParticipantDto(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
+    log.debug("opt-in participant (programId={}, accountId={})", programId, accountId);
     Integer maxRank = participantRepository.findMaxRank(programId);
     int newRank = (maxRank == null) ? 1 : maxRank + 1;
 
     ProgramParticipant optedParticipant =
         participantRepository.findWaitlistParticipant(programId, accountId);
     if (optedParticipant == null) {
+      log.error(
+          "Participant not found on waitlist for program={}, account={}", programId, accountId);
       throw new ParticipantNotFoundException(
           "Participant not found on waitlist for program: "
               + programId
@@ -48,6 +53,7 @@ public class WaitlistService {
               + accountId);
     }
     if (optedParticipant.isConfirmed() == true || optedParticipant.getRank() != null) {
+      log.warn("Participant already confirmed");
       return null;
     }
 
@@ -70,6 +76,7 @@ public class WaitlistService {
    */
   public ProgramParticipantDto confirmParticipant(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
+    log.info("Confirming participant's spot (programId={}, accountId={})", programId, accountId);
     return removeParticipant(programId, accountId, true);
   }
 
@@ -83,6 +90,8 @@ public class WaitlistService {
    */
   public ProgramParticipantDto optOutParticipant(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
+    log.info(
+        "Opting out participant from waitlist (programId={}, accountId={})", programId, accountId);
     return removeParticipant(programId, accountId, false);
   }
 
@@ -99,10 +108,19 @@ public class WaitlistService {
   public ProgramParticipantDto removeParticipant(
       Integer programId, Integer accountId, boolean confirmParticipant)
       throws ParticipantNotFoundException {
+    log.debug(
+        "Participant removal/confirmation from waitlist (programId={}, accountId={}, confirm={})",
+        programId,
+        accountId);
+
     ProgramParticipant optedParticipant =
         participantRepository.findWaitlistParticipant(programId, accountId);
 
     if (optedParticipant == null) {
+      log.error(
+          "Participant not found removal/confirmation (programId={}, accountId={})",
+          programId,
+          accountId);
       throw new ParticipantNotFoundException(
           "Participant not found on waitlist for program: "
               + programId
@@ -122,6 +140,10 @@ public class WaitlistService {
     optedParticipant.setRank(null);
 
     ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
+    log.debug(
+        "Participant processed successfully (programId={}, accountId={})",
+        savedParticipant.getProgramId(),
+        savedParticipant.getAccountId());
 
     return new ProgramParticipantDto(savedParticipant);
   }
@@ -137,18 +159,20 @@ public class WaitlistService {
 
     List<ProgramParticipantDto> queueDto =
         queue.stream().map(pp -> new ProgramParticipantDto(pp)).collect(Collectors.toList());
+    log.debug("Found {} opted participants:{}", queueDto.size(), queueDto);
+    ;
 
     return queueDto;
   }
 
   /**
-   * Function used by optOut and confirmParticipant to refactor and clean code.
+   * Marks a confirmed participant as absent and removes their confirmation.
    *
    * @param programId The ID of the program.
    * @param accountId The ID of the participant's account.
-   * @return A DTO representing the marked absent participant, or null if participant is already not
-   *     confirmed for a program.
-   * @throws ParticipantNotFoundException whenever participant can't be found.
+   * @return A DTO representing the marked absent participant, or null if participant is not
+   *     confirmed
+   * @throws ParticipantNotFoundException whenever participant can't be found
    */
   public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {

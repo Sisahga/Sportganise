@@ -1,7 +1,8 @@
-// ChatHeader.tsx
+// src/components/Inbox/ChatScreen/ChatHeader.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, MoreVertical, Trash, UserX } from "lucide-react";
+import log from "loglevel";
 
 interface ChatHeaderProps {
   chatName: string;
@@ -12,6 +13,8 @@ interface ChatHeaderProps {
   onDeleteChat?: (channelId: number) => void;
   onBlockUser?: () => void;
 }
+
+log.setLevel("info");
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
   chatName,
@@ -29,25 +32,33 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   };
 
   const handleDeleteClick = () => {
+    log.info(`Delete chat button clicked for channelId: ${channelId}`);
     if (onDeleteChat) {
       onDeleteChat(channelId);
+      log.info(`Chat deleted for channelId: ${channelId}`);
     }
     setShowMenu(false);
   };
 
   const handleBlockClick = () => {
+    log.info("Block user button clicked");
     if (onBlockUser) {
       onBlockUser();
+      log.info("User blocked");
     }
     setShowMenu(false);
   };
 
   return (
     <header className="flex items-center justify-between px-4 py-3 bg-white shadow relative">
-      {/* Back Button */}
+      {/* Back Button with aria-label */}
       <button
+        aria-label="Back" // Added aria-label
         className="p-2 rounded-full bg-white hover:bg-gray-300"
-        onClick={() => navigate(-1)}
+        onClick={() => {
+          log.info("Back button clicked: navigating to previous page");
+          navigate(-1);
+        }}
       >
         <ArrowLeft className="text-gray-800" size={24} />
       </button>
@@ -62,9 +73,10 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         <h1 className="text-lg font-bold text-gray-800">{chatName}</h1>
       </div>
 
-      {/* Options (3-dot) */}
+      {/* Options (3-dot) Button with aria-label */}
       <div className="relative">
         <button
+          aria-label="Options" // Added aria-label
           className="p-2 rounded-full bg-gray-200 hover:bg-gray-300"
           onClick={handleOptionsClick}
         >

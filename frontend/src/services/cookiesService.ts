@@ -22,7 +22,7 @@ export const setCookies = (cookies: CookiesDto) => {
   });
 };
 
-export const getCookies = (): CookiesDto | null => {
+export const getCookies = (): CookiesDto => {
   try {
     return {
       accountId: Cookies.get("accountId")
@@ -37,10 +37,21 @@ export const getCookies = (): CookiesDto | null => {
       organisationIds: Cookies.get("organisationIds")
         ? JSON.parse(Cookies.get("organisationIds")!)
         : [],
+      jwtToken: null,
     };
   } catch (e) {
     log.error("Failed to parse cookies:", e);
-    return null;
+    return {
+      accountId: null,
+      firstName: "",
+      lastName: "",
+      email: "",
+      pictureUrl: null,
+      type: "",
+      phone: "",
+      organisationIds: [],
+      jwtToken: null,
+    };
   }
 };
 
@@ -48,8 +59,8 @@ export const getOrgCookie = (cookiesDto: CookiesDto): number[] => {
   return cookiesDto.organisationIds || [];
 };
 
-export const getAccountIdCookie = (cookiesDto: CookiesDto): number | null => {
-  return cookiesDto.accountId || null;
+export const getAccountIdCookie = (cookiesDto: CookiesDto): number => {
+  return <number>cookiesDto.accountId;
 };
 
 export const getFirstNameCookie = (cookiesDto: CookiesDto): string => {
