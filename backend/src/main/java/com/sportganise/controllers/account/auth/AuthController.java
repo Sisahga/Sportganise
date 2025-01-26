@@ -1,5 +1,6 @@
 package com.sportganise.controllers.account.auth;
 
+import com.sportganise.config.UserAuthProvider;
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.account.CookiesDto;
 import com.sportganise.dto.account.auth.AccountDto;
@@ -39,6 +40,7 @@ public class AuthController {
   private final EmailService emailService;
   private final VerificationService verificationService;
   private final CookiesService cookiesService;
+  private final UserAuthProvider userAuthProvider;
 
   /**
    * Constructor for the AuthController.
@@ -52,11 +54,13 @@ public class AuthController {
       AccountService accountService,
       EmailService emailService,
       VerificationService verificationService,
-      CookiesService cookiesService) {
+      CookiesService cookiesService,
+      UserAuthProvider userAuthProvider) {
     this.accountService = accountService;
     this.emailService = emailService;
     this.verificationService = verificationService;
     this.cookiesService = cookiesService;
+    this.userAuthProvider = userAuthProvider;
   }
 
   /**
@@ -73,6 +77,7 @@ public class AuthController {
       String auth0Id = accountService.createAccount(accountDto);
       log.debug("User created in Auth0 with ID: " + auth0Id);
       CookiesDto cookiesDto = cookiesService.createCookiesDto(accountDto.getEmail());
+      cookiesDto.setJwtToken(userAuthProvider.createToken(accountDto.getEmail()));
 
       responseDto.setData(cookiesDto);
       responseDto.setMessage("User created");
@@ -90,7 +95,7 @@ public class AuthController {
       log.debug("Password too weak for user with email: " + accountDto.getEmail());
       responseDto.setMessage("Password too weak");
       responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
-
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     } catch (Exception e) {
       log.debug("Unexpected error for user with email: " + accountDto.getEmail(), e);
       responseDto.setMessage("Error creating user:" + e.getMessage());
@@ -117,7 +122,9 @@ public class AuthController {
         responseDto.setMessage("Login successful");
         responseDto.setStatusCode(HttpStatus.OK.value());
         log.debug("Cookies created for user: " + auth0AccountDto.getEmail());
-        responseDto.setData(cookiesService.createCookiesDto(auth0AccountDto.getEmail()));
+        CookiesDto cookiesDto = cookiesService.createCookiesDto(auth0AccountDto.getEmail());
+        cookiesDto.setJwtToken(userAuthProvider.createToken(auth0AccountDto.getEmail()));
+        responseDto.setData(cookiesDto);
 
         return ResponseEntity.ok(responseDto);
       } else {

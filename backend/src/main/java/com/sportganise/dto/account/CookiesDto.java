@@ -23,4 +23,5 @@ public class CookiesDto {
   private AccountType type;
   private String phone;
   private List<Integer> organisationIds;
+  private String jwtToken;
 }
