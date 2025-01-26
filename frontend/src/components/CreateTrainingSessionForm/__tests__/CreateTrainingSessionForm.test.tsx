@@ -1,8 +1,21 @@
 import { render, screen } from "@testing-library/react";
 import { HomeContent } from "@/components/HomeContent";
+import { MemoryRouter as Router } from "react-router";
+import { vi } from "vitest";
 
 test("renders the welcome message", () => {
-  render(<HomeContent />);
+  const MockIntersectionObserver = vi.fn(() => ({
+    disconnect: vi.fn(),
+    observe: vi.fn(),
+    takeRecords: vi.fn(),
+    unobserve: vi.fn(),
+  }));
+  vi.stubGlobal(`IntersectionObserver`, MockIntersectionObserver);
+  render(
+    <Router>
+      <HomeContent />
+    </Router>,
+  );
   const welcomeMessage = screen.getByText("Welcome to ONIBAD!");
   expect(welcomeMessage.parentNode).not.toBeNull();
 });
