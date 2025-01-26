@@ -54,7 +54,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   private boolean isPublicEndpoint(HttpServletRequest request) {
     String[] publicEndpoints = {
-            "/api/**",
+      "/api/**",
       "/api/auth/login",
       "/api/auth/signup",
       "/login",
