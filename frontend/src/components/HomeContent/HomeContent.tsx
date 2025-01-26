@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
   MessageCircle,
@@ -41,6 +42,7 @@ export default function HomeContent() {
       viewport={{ once: true }}
     >
       <div
+      role="presentation" 
         onClick={() => {
           navigate(link);
         }}
