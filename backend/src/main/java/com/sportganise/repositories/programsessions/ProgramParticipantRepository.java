@@ -60,4 +60,13 @@ public interface ProgramParticipantRepository
       AND pp.rank >= 1
       """)
   List<ProgramParticipant> findOptedParticipants(@Param("programId") Integer programId);
+
+  @Query(
+      """
+      SELECT COUNT(pp)
+      FROM ProgramParticipant pp
+      WHERE pp.programParticipantId.programId = :programId
+      AND pp.isConfirmed = TRUE
+      """)
+  int countConfirmedParticipants(@Param("programId") Integer programId);
 }
