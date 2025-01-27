@@ -62,18 +62,9 @@ export default function CreateTrainingSessionForm() {
   const { createTrainingSession, error } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
 
-  // AccountId from cookies
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
   useEffect(() => {
-    if (!accountId) {
-      log.debug("No accountId found");
-    }
-    log.info(`TrainingSessionList accountId is ${accountId}`);
-  }, [accountId]);
-
-  useEffect(() => {
-    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
+    const user = getCookies();
+    if (!user || user.type === "GENERAL") {
       navigate("/");
     } else {
       setAccountId(user.accountId);
