@@ -7,12 +7,6 @@ import { useToast } from "@/hooks/use-toast"; // Toast hook
 import { useSignUp } from "@/hooks/useSignUp";
 import { useSendCode } from "@/hooks/useSendCode";
 import { SignUpRequest } from "@/types/auth";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -89,13 +83,6 @@ export default function SignUp() {
         [name]: value,
       }));
     }
-  };
-
-  const handleAccountTypeChange = (type: "PLAYER" | "COACH" | "ADMIN") => {
-    setFormData((prev) => ({
-      ...prev,
-      type,
-    }));
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -270,40 +257,6 @@ export default function SignUp() {
                   value={formData.address.country}
                   onChange={handleInputChange}
                 />
-              </div>
-
-              <div>
-                <label htmlFor="accountType" className="text-sm font-medium">
-                  Account Type
-                </label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      id="accountType"
-                      variant="outline"
-                      className="w-full mt-2"
-                    >
-                      {formData.type}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("PLAYER")}
-                    >
-                      Player
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("COACH")}
-                    >
-                      Coach
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("ADMIN")}
-                    >
-                      Admin
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
 
               <Button
