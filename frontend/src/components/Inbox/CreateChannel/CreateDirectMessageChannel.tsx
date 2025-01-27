@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button.tsx";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router";
 import AddMembers from "../AddMembers.tsx";
 import { useState } from "react";
@@ -69,29 +69,34 @@ export default function CreateDirectMessagingChannel() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div
+      className="bg-white flex flex-col bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]"
+      style={{ height: "calc(-192px + 100vh)" }}
+    >
       {/* header for the messages page, different from main layout */}
-      <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-6">
+      <header
+        className="flex items-center justify-between p-4 bg-white shadow gap-6"
+        style={{ borderRadius: "0 0 1rem 1rem" }}
+      >
         {/* Back Button */}
         <Button
-          variant="ghost"
-          className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
-          onClick={() => navigate(-1)}
+          className="rounded-xl font-semibold"
+          variant="outline"
+          onClick={() => {
+            navigate(-1);
+          }}
+          aria-label="back"
         >
-          <ArrowLeft
-            className="text-gray-800"
-            size={24}
-            style={{ width: "1.25rem", height: "1.25rem" }}
-            strokeWidth={3}
-          />
+          <ChevronLeft />
+          <p className="sm:block hidden">Back</p>
         </Button>
-
-        {/* Title */}
-        <h1 className="text-xl font-bold flex-grow text-gray-800">Messages</h1>
+        <h1 className="text-xl font-bold flex-grow text-gray-800">
+          Create Channel
+        </h1>
       </header>
       {/* user can search for any players to send his first message */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 relative">
-        <div className="max-w-md mx-auto space-y-6 sm:space-y-8 mt-[-12rem]">
+        <div className="max-w-md mx-auto space-y-6">
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold font-font text-center leading-tight px-4 animate-textPulse">
             Chat with other players and coaches!
           </h1>

@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import {clearCookies, getCookies} from "@/services/cookiesService";
+import { clearCookies, getCookies } from "@/services/cookiesService";
 import { getBearerToken } from "@/services/apiHelper.ts";
 /* eslint-disable react/prop-types */
 

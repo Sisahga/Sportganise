@@ -14,7 +14,8 @@ const hideHeaderPaths = [
 const noTopMarginPaths = [
   "/pages/DirectMessagesDashboard",
   "/pages/DirectMessageChannelPage",
-]
+  "/pages/CreateDmChannelPage",
+];
 
 // Paths where the footer should be hidden
 const hideFooterPaths = [
@@ -29,6 +30,7 @@ const hideFooterPaths = [
 const fullWidthPaths = [
   "/pages/DirectMessagesDashboard",
   "/pages/DirectMessageChannelPage",
+  "/pages/CreateDmChannelPage",
 ]; // Full-width layout on these paths
 
 // Function to check if the current path matches any hide paths
