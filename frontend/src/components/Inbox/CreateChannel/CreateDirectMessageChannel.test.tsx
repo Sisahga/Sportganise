@@ -149,8 +149,12 @@ describe("CreateDirectMessagingChannel", () => {
   it("should render the component with correct header and title", () => {
     render(<CreateDirectMessagingChannel />);
 
-    expect(screen.getByRole("heading", { name: "Create Channel" })).toBeInTheDocument();
-    expect(screen.getByText("Chat with other players and coaches!")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Create Channel" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Chat with other players and coaches!"),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("back")).toBeInTheDocument();
   });
 
@@ -168,8 +172,8 @@ describe("CreateDirectMessagingChannel", () => {
         channelId: "123",
         channelName: "",
         channelType: "SIMPLE",
-        avatarUrl: null
-      }
+        avatarUrl: null,
+      },
     });
 
     render(<CreateDirectMessagingChannel />);
@@ -188,17 +192,17 @@ describe("CreateDirectMessagingChannel", () => {
         channelType: "SIMPLE",
         memberIds: [1],
         avatarUrl: null,
-        createdAt: expect.any(String)
+        createdAt: expect.any(String),
       });
 
       expect(mockNavigate).toHaveBeenCalledWith(
-          "/pages/DirectMessageChannelPage",
-          expect.objectContaining({
-            state: expect.objectContaining({
-              channelId: "123",
-              read: true
-            })
-          })
+        "/pages/DirectMessageChannelPage",
+        expect.objectContaining({
+          state: expect.objectContaining({
+            channelId: "123",
+            read: true,
+          }),
+        }),
       );
     });
   });
@@ -209,8 +213,8 @@ describe("CreateDirectMessagingChannel", () => {
         channelId: "456",
         channelName: "",
         channelType: "GROUP",
-        avatarUrl: null
-      }
+        avatarUrl: null,
+      },
     });
 
     render(<CreateDirectMessagingChannel />);
@@ -229,7 +233,7 @@ describe("CreateDirectMessagingChannel", () => {
         channelType: "GROUP",
         memberIds: [1, 3, 4],
         avatarUrl: null,
-        createdAt: expect.any(String)
+        createdAt: expect.any(String),
       });
     });
   });
@@ -241,8 +245,8 @@ describe("CreateDirectMessagingChannel", () => {
         channelId: "789",
         channelName: "Existing Channel",
         channelType: "SIMPLE",
-        avatarUrl: null
-      }
+        avatarUrl: null,
+      },
     });
 
     render(<CreateDirectMessagingChannel />);
@@ -252,13 +256,13 @@ describe("CreateDirectMessagingChannel", () => {
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith(
-          "/pages/DirectMessageChannelPage",
-          expect.objectContaining({
-            state: expect.objectContaining({
-              channelId: "789",
-              read: false
-            })
-          })
+        "/pages/DirectMessageChannelPage",
+        expect.objectContaining({
+          state: expect.objectContaining({
+            channelId: "789",
+            read: false,
+          }),
+        }),
       );
     });
   });
