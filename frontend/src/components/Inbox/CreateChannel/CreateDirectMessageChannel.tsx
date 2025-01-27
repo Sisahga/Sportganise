@@ -20,19 +20,16 @@ export default function CreateDirectMessagingChannel() {
 
   const currentUser = {
     accountId: userId,
-    firstName: "Walter",
-    lastName: "White",
-    pictureUrl:
-      "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
-    type: "COACH",
-    phone: "333-333-3333",
+    firstName: cookies.firstName,
+    lastName: cookies.lastName,
+    pictureUrl: cookies.pictureUrl || "",
+    type: cookies.type!,
+    phone: cookies.phone || "",
     selected: true,
   };
 
   const handleCreateChannel = async () => {
     const updatedUsersWithCurrent = [...selectedUsers, currentUser];
-    setSelectedUsers(updatedUsersWithCurrent);
-
     const selectedUserIds = updatedUsersWithCurrent.map(
       (user) => user.accountId,
     );
@@ -46,6 +43,7 @@ export default function CreateDirectMessagingChannel() {
       createdAt: new Date().toISOString(),
       avatarUrl: null,
     };
+    setSelectedUsers(updatedUsersWithCurrent);
     log.info("New Channel Details:", newChannelDetails);
     const channelResponse = await createChannel(newChannelDetails, userId);
     log.info("Channel Response:", channelResponse);
