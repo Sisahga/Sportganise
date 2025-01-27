@@ -164,6 +164,7 @@ const ChannelSettingsDropdown = ({
             variant="ghost"
             size="icon"
             className="h-9 w-9 p-0 border border-input shadow bg-white rounded-xl"
+            style={{minWidth: "2.25rem"}}
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
@@ -218,7 +219,7 @@ const ChannelSettingsDropdown = ({
               )}
               <DropdownMenuItem
                 onSelect={() => setIsDeleteOpen(true)}
-                className="text-red hover:text-white hover:bg-red cursor-pointer flex hidden
+                className="text-red hover:text-white hover:bg-red cursor-pointer hidden
                 justify-between items-center"
               >
                 <span>Delete</span>
