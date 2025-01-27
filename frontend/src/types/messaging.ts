@@ -21,7 +21,7 @@ export interface SendMessageComponent {
   sentAt: string;
   type: string;
   senderFirstName: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
 }
 
 export interface ChatMessageProps {

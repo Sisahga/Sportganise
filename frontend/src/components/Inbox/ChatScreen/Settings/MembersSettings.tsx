@@ -29,6 +29,7 @@ import useSendMessage from "@/hooks/useSendMessage.ts";
 import AddMembers from "@/components/Inbox/AddMembers.tsx";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
+import {getCookies} from "@/services/cookiesService.ts";
 
 export function MembersSettingsDialog({
   isOpen,
@@ -38,6 +39,8 @@ export function MembersSettingsDialog({
   websocketRef,
   currentUserId,
 }: MembersSettingsDialogProps) {
+  const cookies = getCookies();
+  const userFirstName = cookies.firstName;
   const [members, setMembers] = useState<ChannelMember[]>(channelMembers);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [addMembersIsOpen, setAddMembersIsOpen] = useState(false);
@@ -74,19 +77,17 @@ export function MembersSettingsDialog({
           `Member ${selectedMember.accountId} removed from channel ${channelId}`,
         );
         const leaveMessageRemoverViewContent = `You removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
-        // TODO: Replace with actual first name from cookies
-        const leaveMessageContent = `Walter removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
+        const leaveMessageContent = `${userFirstName} removed ${selectedMember.firstName} ${selectedMember.lastName} from the group.`;
         const messagePayload: SendMessageComponent = {
-          senderId: currentUserId, // TODO: Replace with actual sender ID from cookies
+          senderId: currentUserId,
           channelId: channelId,
           messageContent: `LEAVE*${currentUserId}*${leaveMessageRemoverViewContent}*${leaveMessageContent}`,
           attachments: [],
           sentAt: new Date().toISOString(),
           type: "LEAVE",
-          senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
-          // TODO: Replace with actual avatar url from cookies
+          senderFirstName: userFirstName,
           avatarUrl:
-            "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+            cookies.pictureUrl,
         };
         sendDirectMessage(messagePayload, websocketRef);
         setAlertDialogOpen(false);
@@ -123,14 +124,13 @@ export function MembersSettingsDialog({
       const messagePayload: SendMessageComponent = {
         senderId: currentUserId,
         channelId: channelId,
-        // TODO: Replace with actual name from cookies.
         messageContent: `JOIN*${currentUserId}*You added ${newMemberNames} to the group.*Walter added ${newMemberNames} to the group.`,
         attachments: [],
         sentAt: new Date().toISOString(),
         type: "JOIN",
-        senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+        senderFirstName: userFirstName,
         avatarUrl:
-          "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+          cookies.pictureUrl,
       };
       sendDirectMessage(messagePayload, websocketRef);
 

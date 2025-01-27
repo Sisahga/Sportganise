@@ -7,9 +7,11 @@ import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import useCreateChannel from "@/hooks/useCreateChannel.ts";
 import { CreateChannelDto } from "@/types/dmchannels.ts";
 import log from "loglevel";
+import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
 
 export default function CreateDirectMessagingChannel() {
-  const userId = 2; // TODO: Replace with actual user ID from cookies
+  const cookies = getCookies();
+  const userId = getAccountIdCookie(cookies);
   const navigate = useNavigate();
   const [selectedUsers, setSelectedUsers] = useState<
     AccountDetailsDirectMessaging[]
@@ -17,7 +19,7 @@ export default function CreateDirectMessagingChannel() {
   const { createChannel } = useCreateChannel();
 
   const currentUser = {
-    accountId: 2,
+    accountId: userId,
     firstName: "Walter",
     lastName: "White",
     pictureUrl:

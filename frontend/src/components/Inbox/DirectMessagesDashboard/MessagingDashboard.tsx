@@ -7,9 +7,11 @@ import "./MessagingDashboard.css";
 import log from "loglevel";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router";
+import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
 
 function DirectMessagesDashboard() {
-  const accountId = 2;
+  const cookies = getCookies();
+  const accountId = getAccountIdCookie(cookies);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
