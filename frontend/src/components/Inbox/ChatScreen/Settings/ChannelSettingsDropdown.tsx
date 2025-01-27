@@ -164,7 +164,7 @@ const ChannelSettingsDropdown = ({
             variant="ghost"
             size="icon"
             className="h-9 w-9 p-0 border border-input shadow bg-white rounded-xl"
-            style={{minWidth: "2.25rem"}}
+            style={{ minWidth: "2.25rem" }}
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>

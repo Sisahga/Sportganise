@@ -33,8 +33,9 @@ export default function CreateDirectMessagingChannel() {
     const updatedUsersWithCurrent = [...selectedUsers, currentUser];
     setSelectedUsers(updatedUsersWithCurrent);
 
-    const selectedUserIds =
-        updatedUsersWithCurrent.map((user) => user.accountId);
+    const selectedUserIds = updatedUsersWithCurrent.map(
+      (user) => user.accountId,
+    );
     const channelName = ""; // TODO: Add option for user to name the channel if more than 2 members.
     const channelType = selectedUserIds.length > 2 ? "GROUP" : "SIMPLE";
     const newChannelDetails: CreateChannelDto = {
