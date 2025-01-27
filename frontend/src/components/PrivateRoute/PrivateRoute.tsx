@@ -16,8 +16,13 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const user = getCookies();
   const token = getBearerToken();
 
-  if ((token === null || token === "" || token === undefined)
-      || (user.accountId === null || user.accountId === undefined)) {
+  if (
+    token === null ||
+    token === "" ||
+    token === undefined ||
+    user.accountId === null ||
+    user.accountId === undefined
+  ) {
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );

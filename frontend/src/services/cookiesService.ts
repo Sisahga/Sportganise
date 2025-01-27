@@ -1,7 +1,7 @@
 import Cookies from "js-cookie";
 import { CookiesDto } from "@/types/auth";
 import log from "loglevel";
-import {removeAuthToken} from "@/services/apiHelper.ts";
+import { removeAuthToken } from "@/services/apiHelper.ts";
 
 export const setCookies = (cookies: CookiesDto) => {
   Cookies.set("accountId", cookies.accountId?.toString() || "", {

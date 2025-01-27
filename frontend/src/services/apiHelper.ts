@@ -22,7 +22,7 @@ export const setAuthToken = (token: string) => {
 
 export const removeAuthToken = () => {
   window.localStorage.removeItem("auth_token");
-}
+};
 
 export const getBearerToken = () => {
   const token = getAuthToken();
