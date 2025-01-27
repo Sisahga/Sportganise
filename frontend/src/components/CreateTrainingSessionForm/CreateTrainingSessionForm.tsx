@@ -39,7 +39,6 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  FileInput,
   FileUploader,
   FileUploaderContent,
   FileUploaderItem,
@@ -53,11 +52,12 @@ import {
   Loader2,
 } from "lucide-react";
 import { getCookies } from "@/services/cookiesService";
+import FileInput from "@/components/ui/file-input"; // Adjust the import path as necessary
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [accountId, setAccountId] = useState<number | null | undefined>(0); // fix undefined
+  const [accountId, setAccountId] = useState<number | null | undefined>(null);
   const { form } = useFormHandler();
   const { createTrainingSession, error } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
@@ -66,10 +66,11 @@ export default function CreateTrainingSessionForm() {
     const user = getCookies();
     if (!user || user.type === "GENERAL") {
       navigate("/");
+    } else {
+      setAccountId(user.accountId);
+      log.debug(`Modify Training Session Form accountId : ${user.accountId}`);
     }
-    setAccountId(user?.accountId);
-    log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [accountId]);
+  }, [navigate]);
 
   const types = [
     {
@@ -107,9 +108,8 @@ export default function CreateTrainingSessionForm() {
   ] as const;
 
   /** Handle files for file upload in form*/
-  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
   const dropZoneConfig = {
-    //File configurations
+    // File configurations
     maxFiles: 5,
     maxSize: 1024 * 1024 * 4,
     multiple: true,
@@ -156,13 +156,6 @@ export default function CreateTrainingSessionForm() {
         values.attachment.forEach((file) => {
           formData.append("attachments", file);
         });
-      } else {
-        formData.append(
-          "attachments",
-          new Blob([], {
-            type: "application/json",
-          }),
-        );
       }
       log.info("formData: ", formData);
 
@@ -215,7 +208,7 @@ export default function CreateTrainingSessionForm() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
         >
-          {/*Form Title*/}
+          {/* Form Title */}
           <div className="text-center">
             <h2 className="font-semibold text-3xl text-secondaryColour text-center">
               Create New Event
@@ -233,7 +226,12 @@ export default function CreateTrainingSessionForm() {
               <FormItem>
                 <FormLabel className="font-semibold text-base">Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name the event" type="text" {...field} />
+                  <Input
+                    placeholder="Name the event"
+                    type="text"
+                    {...field}
+                    aria-label="Title"
+                  />
                 </FormControl>
                 <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
@@ -256,6 +254,7 @@ export default function CreateTrainingSessionForm() {
                       <Button
                         variant="outline"
                         role="combobox"
+                        aria-label="Type of Event"
                         className={cn(
                           "justify-between",
                           !field.value && "text-muted-foreground",
@@ -322,6 +321,11 @@ export default function CreateTrainingSessionForm() {
                           "pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground",
                         )}
+                        aria-label={
+                          field.value
+                            ? `Select start date, ${format(field.value, "PPP")}`
+                            : "Pick a start date"
+                        }
                       >
                         {field.value ? (
                           format(field.value, "PPP")
@@ -369,6 +373,11 @@ export default function CreateTrainingSessionForm() {
                           "pl-3 text-left font-normal",
                           !field.value && "text-muted-foreground",
                         )}
+                        aria-label={
+                          field.value
+                            ? `Select end date, ${format(field.value, "PPP")}`
+                            : "Pick an end date"
+                        }
                       >
                         {field.value ? (
                           format(field.value, "PPP")
@@ -399,7 +408,7 @@ export default function CreateTrainingSessionForm() {
 
           {/** Time */}
           <div className="flex gap-2">
-            {/**Start Time */}
+            {/** Start Time */}
             <FormField
               control={form.control}
               name="startTime"
@@ -409,7 +418,12 @@ export default function CreateTrainingSessionForm() {
                     Start Time
                   </FormLabel>
                   <FormControl>
-                    <Input type="time" className="w-full" {...field} />
+                    <Input
+                      type="time"
+                      className="w-full"
+                      {...field}
+                      aria-label="Start Time"
+                    />
                   </FormControl>
                   <FormDescription>
                     Select the time the event starts.
@@ -419,7 +433,7 @@ export default function CreateTrainingSessionForm() {
               )}
             />
 
-            {/**End Time */}
+            {/** End Time */}
             <FormField
               control={form.control}
               name="endTime"
@@ -429,7 +443,7 @@ export default function CreateTrainingSessionForm() {
                     End Time
                   </FormLabel>
                   <FormControl>
-                    <Input type="time" {...field} />
+                    <Input type="time" {...field} aria-label="End Time" />
                   </FormControl>
                   <FormDescription>
                     Select the time the event ends.
@@ -455,6 +469,7 @@ export default function CreateTrainingSessionForm() {
                       <Button
                         variant="outline"
                         role="combobox"
+                        aria-label="Location"
                         className={cn(
                           "justify-between",
                           !field.value && "text-muted-foreground",
@@ -518,6 +533,7 @@ export default function CreateTrainingSessionForm() {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    aria-label="Recurring event"
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
@@ -548,6 +564,7 @@ export default function CreateTrainingSessionForm() {
                       <Button
                         variant="outline"
                         role="combobox"
+                        aria-label="Visibility"
                         className={cn(
                           "justify-between",
                           !field.value && "text-muted-foreground",
@@ -614,6 +631,7 @@ export default function CreateTrainingSessionForm() {
                     placeholder="Add description of the event here ..."
                     className="resize-none"
                     {...field}
+                    aria-label="Description"
                   />
                 </FormControl>
                 <FormDescription>Only 100 characters accepted.</FormDescription>
@@ -635,7 +653,6 @@ export default function CreateTrainingSessionForm() {
                   <FileUploader
                     value={field.value || []}
                     onValueChange={(newFiles) => {
-                      //setFiles(newFiles); // Update local state
                       field.onChange(newFiles); // Sync with React Hook Form
                     }}
                     dropzoneOptions={dropZoneConfig}
@@ -643,7 +660,9 @@ export default function CreateTrainingSessionForm() {
                   >
                     <FileInput
                       id="fileInput"
+                      data-testid="file-input" // Added data-testid directly to the input
                       className="outline-dashed outline-1 outline-slate-500"
+                      aria-label="Add Attachment"
                     >
                       <div className="flex items-center justify-center flex-col p-8 w-full ">
                         <CloudUpload className="text-gray-500 w-10 h-10" />
@@ -690,6 +709,7 @@ export default function CreateTrainingSessionForm() {
                     placeholder="Write the max number of attendees"
                     type="number"
                     {...field}
+                    aria-label="Attendance Capacity"
                     onChange={(e) =>
                       field.onChange(
                         e.target.value ? Number(e.target.value) : undefined,
@@ -702,38 +722,6 @@ export default function CreateTrainingSessionForm() {
             )}
           />
 
-          {/** Notify All Players */}
-          {/* <div> MAY BE NEEDED BY US305+
-            <FormField
-              control={form.control}
-              name="notify"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel className="font-semibold">
-                      Notify all players
-                    </FormLabel>
-                    <FormDescription>
-                      Notifies all subscribed members.
-                    </FormDescription>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <div className="mt-2">
-              <a href="../" className=" underline text-neutral-400">
-                Customize attendance list
-              </a>
-            </div>
-          </div> */}
-
           {/** Submit Button */}
           {loading ? (
             <Button disabled className="w-full">
@@ -741,13 +729,21 @@ export default function CreateTrainingSessionForm() {
               Creating Event
             </Button>
           ) : (
-            <Button type="submit" className="w-full font-semibold">
+            <Button
+              type="submit"
+              className="w-full font-semibold"
+              aria-label="Create new Event"
+            >
               Create new Event
             </Button>
           )}
           <div className="justify-self-center">
-            <button className=" bg-transparent" onClick={() => navigate(-1)}>
-              <p className="text-center underline text-neutral-400">Cancel</p>
+            <button
+              className="bg-transparent"
+              onClick={() => navigate(-1)}
+              aria-label="Cancel"
+            >
+              Cancel
             </button>
           </div>
         </form>
