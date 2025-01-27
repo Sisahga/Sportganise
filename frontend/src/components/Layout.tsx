@@ -13,7 +13,7 @@ const hideHeaderPaths = [
 
 const noTopMarginPaths = [
   "/pages/DirectMessagesDashboard",
-  "/pages",
+  "/pages/DirectMessageChannelPage",
 ]
 
 // Paths where the footer should be hidden
@@ -52,7 +52,7 @@ const Layout = () => {
       {/* Main content area */}
       <main
         className={`flex-1 ${
-          !hideHeader && noTopMargin ? "mt-40" : "mt-28"
+          !hideHeader && !noTopMargin ? "mt-40" : "mt-28"
         } ${isFullWidth ? "mx-0" : "mx-6"}`}
       >
         <Outlet /> {/* This will render the routed page content */}

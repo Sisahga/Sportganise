@@ -202,17 +202,18 @@ const ChatScreen: React.FC = () => {
   return (
     <div
       id="chatScreenMainCtn"
-      className={`flex flex-col h-[90vh] -mt-16 ${isDragging ? "bg-blue-100" : ""}`}
+      className={`flex flex-col ${isDragging ? "bg-blue-100" : ""}`}
+      style={{height: "calc(100vh - 7rem)"}}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       {/* Header */}
-      <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-4">
-        <div className="flex flex-grow items-center gap-3 place-content-between">
+      <header className="flex items-center justify-between p-4 bg-white shadow gap-4">
+        <div className="flex flex-grow items-center gap-4">
           <BackButton />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center flex-grow gap-3">
             <img
               src={currentChannelImageUrl || "/placeholder.svg"}
               alt={defaultGroupAvatar}
