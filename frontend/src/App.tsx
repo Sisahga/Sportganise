@@ -44,6 +44,18 @@ function App() {
             path="/pages/CreateDmChannelPage"
             element={<CreateDmChannelPage />}
           ></Route>
+          <Route
+            path="/pages/WaitlistTrainingSessionPage"
+            element={<WaitlistTrainingSessionPage />}
+          ></Route>
+          <Route
+            path="/waitlist"
+            element={<WaitlistTrainingSessionList />}
+          ></Route>
+          <Route
+            path="/pages/WaitlistDetailsPage"
+            element={<WaitlistDetailsPage />}
+          ></Route>
           <Route path="/" element={<Layout />}>
             {/*Place the routes to all your pages nested beneath this Route tag */}
             <Route
@@ -106,18 +118,6 @@ function App() {
             <Route
               path="/pages/NotificationsPage"
               element={<NotificationsPage />}
-            ></Route>
-            <Route
-                path="/pages/WaitlistTrainingSessionPage"
-                element={<WaitlistTrainingSessionPage />}
-            ></Route>
-            <Route
-                path="/waitlist"
-                element={<WaitlistTrainingSessionList />}
-            ></Route>
-            <Route
-                path="/pages/WaitlistDetailsPage"
-                element={<WaitlistDetailsPage />}
             ></Route>
           </Route>
         </Route>
