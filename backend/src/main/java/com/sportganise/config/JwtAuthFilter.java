@@ -57,6 +57,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       "/api/**",
       "/api/auth/login",
       "/api/auth/signup",
+      "/api/auth/send-code",
+      "/api/auth/verify-code",
       "/login",
       "/signup",
       "/verificationcode",

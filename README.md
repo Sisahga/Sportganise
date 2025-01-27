@@ -6,7 +6,7 @@ A sport Management Application <br>
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Jest](https://img.shields.io/badge/Jest-C21325?style=for-the-badge&logo=jest&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
 ![JUnit](https://img.shields.io/badge/JUnit-25A162?style=for-the-badge&logo=junit5&logoColor=white)
 ![Mockito](https://img.shields.io/badge/Mockito-4EA94B?style=for-the-badge&logo=mockito&logoColor=white)
 ![SLF4J](https://img.shields.io/badge/SLF4J-FF9900?style=for-the-badge&logo=slf4j&logoColor=white)
@@ -21,26 +21,23 @@ Release 2 (Jan 26): -
 Release 3 (Apr 5): -
 
 ## Important Files 
-(To add as project progresses)
 |File  | Description  |
 |-----------|-----------|
 | [docker-compose.yml](https://github.com/Sisahga/Sportganise/blob/v.1.0/docker-compose.yml)    | Sets up Docker Containerization for the app and runs PostgreSql DB on docker volume with initial seed
-| [pom.xml](https://github.com/Sisahga/Sportganise/blob/v.1.0/backend/pom.xml)    | Maintains all currently required dependencies for our backend
-|   -  |   -  |
-|   -  |  -   |
-|  -   |   -  |
+| [.github/workflows/pr-ci-frontend.yml](https://github.com/Sisahga/Sportganise/blob/main/.github/workflows/pr-ci-frontend.yml)   | Main tool to safeguard code quality
+|   [backend/src/main/java/com/sportganise/controllers/account/AccountController.java](https://github.com/Sisahga/Sportganise/blob/main/backend/src/main/java/com/sportganise/controllers/account/AccountController.java)  |   One of our main controllers where it manages the accounts in an organisation|
+|   [frontend/src/App.tsx](https://github.com/Sisahga/Sportganise/blob/main/frontend/src/App.tsx)|   Routes all our pages to display for the user|
+| [backend/src/main/java/com/sportganise/config/JwtAuthFilter.java](https://github.com/Sisahga/Sportganise/blob/main/backend/src/main/java/com/sportganise/config/JwtAuthFilter.java)  |   Filter the request and validate the JWT token|
     
 
 ## Important Tests  
-(To add as project progresses)
-
 | Test  | Description  | 
 |-----------|-----------|
 | [ci-frontend.yml ](https://github.com/Sisahga/Sportganise/blob/v.1.0/.github/workflows/ci-frontend.yml)   | CI for frontend, makes sure code passes all checks before being able to merge    
 |[ci-backend.yml](https://github.com/Sisahga/Sportganise/blob/v.1.0/.github/workflows/ci-backend.yml)     | CI for backend, makes sure code passes all checks before being able to merge
-|   -  |   -  |
-|   -  |  -   |
-|  -   |   -  |
+|   [backend/src/test/java/com/sportganise/controllers/auth/AccountControllerTest.java](https://github.com/Sisahga/Sportganise/blob/main/backend/src/test/java/com/sportganise/controllers/auth/AccountControllerTest.java)  |   Ensures our important files are working properly - anything related to account (100% code coverage) |
+|   [backend/src/test/java/com/sportganise/services/account/AccountServiceTest.java](https://github.com/Sisahga/Sportganise/blob/main/backend/src/test/java/com/sportganise/services/account/AccountServiceTest.java)  |  Tests the logic behind an account and includes authentication as well|
+|  [frontend/src/components/HomeContent/HomeContent.test.tsx](https://github.com/Sisahga/Sportganise/blob/main/frontend/src/components/HomeContent/HomeContent.test.tsx)   |   Ensure that content on the home page renders properly|
 
 
 ## Project Summary
@@ -59,7 +56,7 @@ This project is a website and mobile application designed for Accès Badminton, 
 | Arshpreet Singh    | 40172137  | [92754282](https://github.com/Sisahga/Sportganise/commits?author=Ashx11)  | arshpreets425@gmail.com  |
 | Sofia Valiante  | 40191897  | [91510546](https://github.com/Sisahga/Sportganise/commits?author=s-vali)| valiante.sofia@gmail.com  |
 | Dannick Bujold-Senss  | 40180290 | [44579430](https://github.com/Sisahga/Sportganise/commits?author=Bsenss6) | dannickbsenss@gmail.com |
-| Jeremy Rimokh | 40110746 | [98069409](https://github.com/Sisahga/Sportganise/commits?author=j3rrimmy) | jeremy5727@hotmail.com |
+| Jeremy Rimokh (NEW MEMBER)| 40110746 | [98069409](https://github.com/Sisahga/Sportganise/commits?author=j3rrimmy) | jeremy5727@hotmail.com |
 
 ## Developer getting started guide
 This monorepo project is home to two workspaces: frontend and backend.
@@ -183,4 +180,4 @@ The following link will direct you to our Figma page where we implemented the ap
 * [API Endpoint Documentation](https://github.com/Sisahga/Sportganise/wiki/API-Endpoint)
 
 ## Diversity Statement 
-“We’re committed to creating an inclusive environment where everyone feels welcome, no matter their background, gender, or abilities. Our goal is to make sure the app is accessible to all users and helps bring people together in a way that promotes fairness and respect. We believe diversity makes our platform stronger and allows us to better serve all the clubs and players that use it.”
+“We’re deeply committed to fostering an inclusive environment where everyone feels valued, respected, and empowered, regardless of their background, gender, abilities, or identity. Our mission is to ensure that the app is accessible and equitable for all users, creating a space where clubs and players can connect, collaborate, and thrive. We aim to break down barriers, promote fairness, mutual respect, and understanding in every interaction. We firmly believe that diversity strengthens our platform by bringing richer perspectives and ideas, enabling us to better support and celebrate the unique journeys of all the clubs and players who rely on our app. Together, we’re building a community that champions inclusivity and sets a standard for equity in sports and beyond.”
