@@ -5,12 +5,15 @@ import {Channel} from "@/types/dmchannels.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 import "./MessagingDashboard.css";
 import log from "loglevel";
+import {Plus} from "lucide-react";
+import {useNavigate} from "react-router";
 
 function DirectMessagesDashboard() {
   const accountId = 2;
   const [channels, setChannels] = useState<Channel[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
 
   const simpleChannels = channels.filter(
       (channel) => channel.channelType === "SIMPLE",
@@ -57,8 +60,11 @@ function DirectMessagesDashboard() {
   }
 
   return (
-      <div className="flex flex-col h-screen lg:mx-24 gap-6 pt-12 overflow-y-scroll
-    bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
+      <div
+          className="flex flex-col lg:mx-24 gap-6 pt-12 relative overflow-y-scroll
+    bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]"
+          style={{maxHeight: "calc(100vh - 192px)"}}
+      >
         <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
           <div className="space-y-1">
             <h2 className="font-semibold text-3xl text-secondaryColour text-center">
@@ -67,6 +73,18 @@ function DirectMessagesDashboard() {
             <p className="text-fadedPrimaryColour text-center">
               You have 0 unread messages
             </p>
+          </div>
+          <div className="absolute right-5 top-0">
+            {/* Add New Message Button */}
+            <button
+                className="p-2 rounded-lg bg-secondaryColour shadow-md"
+                aria-label="Add New Message"
+                onClick={() => {
+                  navigate("/pages/CreateDmChannelPage");
+                }}
+            >
+              <Plus className="text-white" strokeWidth={4} size={20} />
+            </button>
           </div>
         </div>
         <GroupSection groupChannels={groupChannels}/>
