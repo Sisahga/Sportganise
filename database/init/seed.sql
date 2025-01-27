@@ -123,9 +123,9 @@ UPDATE channel SET last_message_id = 5 WHERE channel_id = 3;
 UPDATE channel SET last_message_id = 6 WHERE channel_id = 4;
 
 INSERT INTO post (account_id, title, description, type) VALUES
-(1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!','EVENT'),
-(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.','EVENT'),
-(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.','EVENT');
+(1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!','FUNDRAISER'),
+(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.','FUNDRAISER'),
+(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.','FUNDRAISER');
 
 INSERT INTO post (account_id, title, description, type, metadata) VALUES
 (1, 'Training Class for Beginners', 'We offer beginner-friendly sessions exclusive.','TRAINING','{"programID":1}'),
