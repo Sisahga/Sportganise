@@ -9,11 +9,15 @@ import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchExce
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberMarkReadException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
+import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelApproverException;
+import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingPathVariableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -92,6 +96,40 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ChannelFetchException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelFetchException(ChannelFetchException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  // </editor-fold>
+
+  // <editor-fold desc="Region: Delete Channel Request Exceptions">
+
+  /**
+   * Handle delete channel approver exception.
+   *
+   * @param e exception
+   * @return response dto with status 404.
+   */
+  @ExceptionHandler(DeleteChannelApproverException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseDto<?> handleDeleteChannelApproverException(DeleteChannelApproverException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle delete channel request exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(DeleteChannelRequestException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleDeleteChannelRequestException(DeleteChannelRequestException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .message(e.getMessage())
@@ -255,6 +293,37 @@ public class GlobalExceptionHandler {
   public ResponseDto<?> handleFileProcessingException(FileProcessingException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle missing servlet request parameter exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleMissingServletRequestParameterException(
+      MissingServletRequestParameterException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle missing path variable exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(MissingPathVariableException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleMissingPathVariableException(MissingPathVariableException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
         .message(e.getMessage())
         .build();
   }

@@ -184,8 +184,8 @@ CREATE TABLE post(
     description TEXT NOT NULL,
     attachment VARCHAR(255),
     metadata JSON ,
-    type VARCHAR(20) CHECK (type IN ('EVENT', 'TRAINING')),
-    occurence_date TIMESTAMPTZ,
+    type VARCHAR(20) CHECK (type IN ('TRAINING', 'FUNDRAISER', 'TOURNAMENT','SPECIAL')),
+    occurrence_date TIMESTAMPTZ,
     creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 

@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
+import log from "loglevel";
+import { getCookies } from "@/services/cookiesService";
 
 // Created components imports
 import DropDownMenuButton from "./DropDownMenu/DropDownMenuButton";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
+import RegisteredPlayer from "./RegisteredPlayer";
 
 // Components imports
 import {
@@ -12,13 +15,11 @@ import {
   MapPin,
   CircleUserRound,
   FileText,
-  MoveLeft,
   User2Icon,
   Hourglass,
   Repeat,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/Button";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
@@ -26,12 +27,19 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
-import RegisteredPlayer from "./RegisteredPlayer";
+import BackButton from "../ui/back-button";
 
 const TrainingSessionContent = () => {
-  const [accountType /*, setAccountType*/] = useState<string>("coach"); // Handle account type. Only coach or admin can view list of attendees.
+  const [accountType, setAccountType] = useState<string | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
+
+  log.debug("Rendering TrainingSessionContent");
+  useEffect(() => {
+    const user = getCookies();
+    setAccountType(user?.type);
+    log.info("Training Session Card account type : ", user);
+  }, [navigate]);
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
@@ -53,6 +61,7 @@ const TrainingSessionContent = () => {
     if (location.state && location.state.programDetails) {
       setProgramDetails(location.state.programDetails);
     }
+    log.info("Program details in training session content: ", programDetails);
   }, [location.state]);
 
   const [attendees, setAttendees] = useState<Attendees[]>([]);
@@ -60,18 +69,13 @@ const TrainingSessionContent = () => {
     if (location.state && location.state.attendees) {
       setAttendees(location.state.attendees);
     }
+    log.info("Attendees in training session content: ", attendees);
   }, [location.state]);
 
   return (
     <div className="mb-32 mt-5">
       {/**Return to previous page */}
-      <Button
-        className="rounded-full mb-3"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       {/**Event title */}
       <div className="flex items-center gap-3 my-5">
@@ -103,7 +107,6 @@ const TrainingSessionContent = () => {
             {programDetails.expiryDate ? (
               <div className="flex items-center gap-2">
                 <hr className="w-1 h-px border-0 bg-gray-500 " />
-
                 <p className="text-sm text-gray-500">
                   {new Date(programDetails.expiryDate).toDateString()}
                 </p>
@@ -210,8 +213,8 @@ const TrainingSessionContent = () => {
         </div>
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
-        {(accountType.toLowerCase() === "coach" ||
-          accountType.toLowerCase() === "admin") && (
+        {(accountType?.toLowerCase() === "coach" ||
+          accountType?.toLowerCase() === "admin") && (
           <>
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">Attendees</h2>

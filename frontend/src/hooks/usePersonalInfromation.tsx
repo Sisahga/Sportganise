@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import accountApi from "@/services/api/accountApi.ts";
 import { Account } from "@/types/account";
+import log from "loglevel";
 
 const usePersonalInformation = (accountId: number) => {
   const [data, setData] = useState<Account | null>(null);
@@ -9,11 +10,13 @@ const usePersonalInformation = (accountId: number) => {
 
   useEffect(() => {
     const fetchAccountData = async () => {
+      log.info("Fetching personal information");
       try {
         const accountData = await accountApi.getAccountById(accountId);
         setData(accountData);
+        log.info("Fetched personal information succesfully", accountData);
       } catch (error) {
-        console.error("Error fetching account", error);
+        log.error("Error fetching personal information:", error);
         setError("Failed to fetch account data from the server.");
       } finally {
         setLoading(false);

@@ -1,6 +1,5 @@
-/**TODO: Connect to backend with API endpoints. Using mock data as of right now. */
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
@@ -12,23 +11,33 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { MoveLeft } from "lucide-react";
 import PasswordChecklist from "react-password-checklist";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
-
-interface ChangePasswordFormValues {
-  oldPassword: string;
-  password: string;
-  passwordAgain: string;
-}
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCookies, getEmailCookie } from "@/services/cookiesService";
+import useModifyPassword from "@/hooks/useModifyPassword";
+import { ChangePasswordFormValues } from "@/types/auth";
+import log from "loglevel";
+import BackButton from "../ui/back-button";
 
 const ChangePasswordContent: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const cookies = getCookies();
+  const email = cookies ? getEmailCookie(cookies) : null;
+
+  useEffect(() => {
+    if (!cookies || !email) {
+      log.warn("No valid session. Redirecting to login.");
+      navigate("/login");
+    }
+  }, [cookies, email, navigate]);
+
   const form = useForm<ChangePasswordFormValues>({
     defaultValues: {
+      email: email || "",
       oldPassword: "",
       password: "",
       passwordAgain: "",
@@ -39,20 +48,30 @@ const ChangePasswordContent: React.FC = () => {
     handleSubmit,
     control,
     watch,
+    setValue,
     formState: { errors },
   } = form;
+
   const [progress, setProgress] = useState(0);
   const [isChecklistValid, setIsChecklistValid] = useState(false);
   const password = watch("password");
   const passwordAgain = watch("passwordAgain");
+  const { isLoading, success, Message, error, modifyPassword } =
+    useModifyPassword();
 
-  // Calculate password strength
+  useEffect(() => {
+    if (email) {
+      setValue("email", email);
+    }
+  }, [email, setValue]);
+
   const calculatePasswordStrength = (password: string) => {
     let strength = 0;
-    if (password.length >= 8) strength += 25;
-    if (/[A-Z]/.test(password)) strength += 25;
-    if (/\d/.test(password)) strength += 25;
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 25;
+    if (password.length >= 8) strength += 20;
+    if (/[A-Z]/.test(password)) strength += 20;
+    if (/[a-z]/.test(password)) strength += 20;
+    if (/\d/.test(password)) strength += 20;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 20;
 
     setProgress(strength);
   };
@@ -61,13 +80,15 @@ const ChangePasswordContent: React.FC = () => {
     if (password) calculatePasswordStrength(password);
   }, [password]);
 
-  // Track password checklist validity
   const handleChecklistChange = (isValid: boolean) => {
     setIsChecklistValid(isValid);
   };
 
-  const onSubmit: SubmitHandler<ChangePasswordFormValues> = (data) => {
+  const onSubmit: SubmitHandler<ChangePasswordFormValues> = async (data) => {
+    log.debug("Form submitted with data:", data);
+
     if (!isChecklistValid) {
+      log.warn("Form submission blocked due to invalid password checklist");
       toast({
         title: "Password change unsuccessful!",
         description: "Please ensure the checklist is fulfilled.",
@@ -76,137 +97,151 @@ const ChangePasswordContent: React.FC = () => {
       return;
     }
 
-    if (
-      data.oldPassword === "0987aaaAA." &&
-      data.password === data.passwordAgain
-    ) {
-      console.log("Old Password:", data.oldPassword);
-      console.log("New Password:", data.password);
-      console.log("Confirm New Password:", data.passwordAgain);
+    modifyPassword({
+      email: data.email,
+      oldPassword: data.oldPassword,
+      newPassword: data.password,
+    });
+  };
 
+  useEffect(() => {
+    if (success) {
       toast({
-        title: "Password changed successfully!",
-        description: "Your password has been updated.",
-        variant: "default",
+        title: "Success!",
+        description: Message,
+        variant: "success",
       });
-    } else if (data.oldPassword !== "0987aaaAA.") {
+    } else if (error) {
       toast({
-        title: "Password change unsuccessful!",
-        description: "Please check your old password is correct.",
+        title: "Error!",
+        description: Message,
         variant: "destructive",
       });
     }
-  };
+  }, [Message, error, toast]);
 
   return (
-    <div>
-      <div>
-        <Button
-          className="rounded-full w-2"
-          variant="outline"
-          onClick={() => navigate("/pages/ProfilePage")}
-        >
-          <MoveLeft />
-        </Button>
-      </div>
+    <div className="">
+      <BackButton />
 
-      <div>
-        <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="m-4 space-y-4">
-            {/* Old Password */}
-            <FormField
-              name="oldPassword"
-              control={control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Old Password:</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="Enter your old password"
-                    />
-                  </FormControl>
-                  <FormMessage>{errors.oldPassword?.message}</FormMessage>
-                </FormItem>
-              )}
-            />
-
-            {/* New Password */}
-            <FormField
-              name="password"
-              control={control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label>New Password:</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="Enter your new password"
-                    />
-                  </FormControl>
-                  <FormMessage>{errors.password?.message}</FormMessage>
-                </FormItem>
-              )}
-            />
-
-            {/* Confirm New Password */}
-            <FormField
-              name="passwordAgain"
-              control={control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label>Confirm New Password:</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="password"
-                      placeholder="Confirm your new password"
-                    />
-                  </FormControl>
-                  <FormMessage>{errors.passwordAgain?.message}</FormMessage>
-                </FormItem>
-              )}
-            />
-
-            {/* Progress Bar */}
-            {password && (
-              <div className="m-4 mb-2">
-                <Progress value={progress} max={100} />
-              </div>
-            )}
-
-            {/* Password Checklist */}
-            <div className="m-4 mb-2">
-              <PasswordChecklist
-                rules={[
-                  "minLength",
-                  "specialChar",
-                  "number",
-                  "capital",
-                  "match",
-                ]}
-                minLength={8}
-                value={password}
-                valueAgain={passwordAgain}
-                onChange={handleChecklistChange}
+      {/* Card for the entire form */}
+      <Card className="shadow-md mb-24 mt-4 mx-auto max-w-2xl">
+        <CardHeader>
+          <CardTitle className="flex justify-center text-2xl font-semibold">
+            Change Password
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="text-sm space-y-4"
+            >
+              {/* Old Password Field */}
+              <FormField
+                name="oldPassword"
+                control={control}
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Current password</Label>
+                    <FormControl>
+                      <Input
+                        className="text-sm"
+                        {...field}
+                        type="password"
+                        placeholder="Enter your current password"
+                        required
+                      />
+                    </FormControl>
+                    <FormMessage>{errors.oldPassword?.message}</FormMessage>
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Submit Button */}
-            <div className="flex justify-center pb-24">
-              <Button
-                className="w-40 h-10 bg-secondaryColour text-white rounded-full"
-                variant="outline"
-                type="submit"
-              >
-                Change Password
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </div>
+              {/* New Password Field */}
+              <FormField
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>New password</Label>
+                    <FormControl>
+                      <Input
+                        className="text-sm"
+                        {...field}
+                        type="password"
+                        placeholder="Enter your new password"
+                        required
+                      />
+                    </FormControl>
+                    <FormMessage>{errors.password?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+
+              {/* Confirm New Password Field */}
+              <FormField
+                name="passwordAgain"
+                control={control}
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Confirm password</Label>
+                    <FormControl>
+                      <Input
+                        className="text-sm"
+                        {...field}
+                        type="password"
+                        placeholder="Confirm your new password"
+                        required
+                      />
+                    </FormControl>
+                    <FormMessage>{errors.passwordAgain?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+
+              {/* Progress Bar */}
+              {password && (
+                <div className="m-4 mb-2">
+                  <Progress value={progress} max={100} />
+                </div>
+              )}
+
+              {/* Password Checklist */}
+              <div className="m-4 mb-2">
+                <PasswordChecklist
+                  validColor="#82DBD8"
+                  invalidColor="#383C42"
+                  rules={[
+                    "minLength",
+                    "capital",
+                    "lowercase",
+                    "number",
+                    "specialChar",
+                    "match",
+                  ]}
+                  minLength={8}
+                  value={password}
+                  valueAgain={passwordAgain}
+                  onChange={handleChecklistChange}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-center p-2">
+                <Button
+                  className="w-40 h-10 bg-secondaryColour text-white rounded-xl"
+                  variant="outline"
+                  type="submit"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Changing Password..." : "Change Password"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -1,49 +1,158 @@
 package com.sportganise.services.forum;
 
+import com.sportganise.dto.forum.PostDto;
 import com.sportganise.entities.forum.Post;
+import com.sportganise.entities.forum.PostType;
+import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.forum.LikesRepository;
+import com.sportganise.repositories.forum.PostAttachmentRepository;
 import com.sportganise.repositories.forum.PostRepository;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /** Service class for handling Post related operations. */
+@Slf4j
 @Service
 public class PostService {
 
   @Autowired private PostRepository postRepository;
+  @Autowired private LikesRepository likesRepository;
+  @Autowired private PostAttachmentRepository attachmentRepository;
+  @Autowired private AccountRepository accountRepository;
+
+  private static final ZonedDateTime ABSURD_DATE =
+      ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
 
   /**
-   * Search posts by title or description.
+   * Fetches posts based on search criteria.
    *
-   * @param searchTerm search term
-   * @param limit limit the number of posts to return
-   * @param page page number to return
-   * @param sortBy field to sort by
-   * @param sortDir sort direction
-   * @return list of posts
+   * @param searchTerm Search term to filter posts by.
+   * @param occurrenceDate Date of occurrence of the post.
+   * @param type Type of the post.
+   * @param selectedLabel Label selected to filter posts by.
+   * @param limit Number of posts to fetch.
+   * @param page Page number of posts to fetch.
+   * @param sortBy Field to sort posts by.
+   * @param sortDirection Direction to sort posts in.
+   * @param orgId ID of the organization.
+   * @param accountId ID of the account.
+   * @return List of fetched posts.
    */
-  public List<Post> searchPosts(
-      String searchTerm, Integer limit, Integer page, String sortBy, String sortDir) {
-    Pageable pageable;
+  public List<PostDto> searchAndFilterPosts(
+      String searchTerm,
+      ZonedDateTime occurrenceDate,
+      PostType type,
+      Integer selectedLabel,
+      int limit,
+      int page,
+      String sortBy,
+      String sortDirection,
+      Long orgId,
+      Long accountId) {
 
-    if ((sortBy == null || sortBy.isEmpty()) && (sortDir == null || sortDir.isEmpty())) {
-      pageable =
-          (limit == null || limit <= 0)
-              ? Pageable.unpaged()
-              : PageRequest.of(page != null ? page : 0, limit);
-    } else {
-      Sort sort =
-          Sort.by(
-              sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC, sortBy);
-      pageable =
-          (limit == null || limit <= 0)
-              ? Pageable.unpaged()
-              : PageRequest.of(page != null ? page : 0, limit, sort);
+    log.info("Fetching posts with search criteria");
+
+    List<Integer> labels = accountRepository.getLabelIdsByAccountIdAndOrgId(accountId, orgId);
+
+    Sort sort =
+        sortBy.equals("likeCount")
+            ? Sort.unsorted()
+            : Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+
+    Pageable pageable = PageRequest.of(page, limit, sort);
+
+    log.debug("Fetching posts with labels: {}", labels);
+    log.debug("Fetching posts with selectedLabel: {}", selectedLabel);
+    log.debug("Fetching posts with searchTerm: {}", searchTerm);
+    log.debug("Fetching posts with occurrenceDate: {}", occurrenceDate);
+    log.debug("If null, occurrenceDate will be set to: {}", ABSURD_DATE);
+    log.debug("Fetching posts with type: {}", type);
+    log.debug("Fetching posts with page: {}", page);
+    log.debug("Fetching posts with limit: {}", limit);
+    log.debug("Fetching posts with sortBy: {}", sortBy);
+    log.debug("Fetching posts with sortDirection: {}", sortDirection);
+
+    Page<Post> posts =
+        postRepository.searchAndFilterPosts(
+            searchTerm,
+            labels,
+            selectedLabel,
+            occurrenceDate != null ? occurrenceDate : ABSURD_DATE,
+            this.getThreeMonthsAgo(),
+            this.getYesterday(),
+            ABSURD_DATE,
+            type,
+            pageable);
+
+    List<PostDto> dtos =
+        posts.stream()
+            .map(
+                post -> {
+                  long likeCount = likesRepository.countByPostId(post.getPostId());
+                  PostDto dto =
+                      new PostDto(
+                          post.getPostId(),
+                          post.getTitle(),
+                          post.getDescription(),
+                          post.getType(),
+                          post.getOccurrenceDate(),
+                          post.getCreationDate(),
+                          likeCount);
+                  dto.setLikeCount(likeCount);
+                  dto.setAttachments(
+                      attachmentRepository.findAttachmentsByPostId(post.getPostId()));
+                  return dto;
+                })
+            .collect(Collectors.toList());
+
+    if (sortBy.equals("likeCount")) {
+      dtos.sort(
+          (a, b) ->
+              sortDirection.equalsIgnoreCase("asc")
+                  ? Long.compare(a.getLikeCount(), b.getLikeCount())
+                  : Long.compare(b.getLikeCount(), a.getLikeCount()));
     }
 
-    return postRepository.searchPosts(searchTerm, pageable).getContent();
+    log.info("Fetched posts with search criteria");
+    return dtos;
+  }
+
+  /**
+   * Fetches all available post types.
+   *
+   * @return List of available post types.
+   */
+  public List<String> getAvailableTypes() {
+    log.info("Fetching available post types");
+    return postRepository.findDistinctTypes();
+  }
+
+  /**
+   * Fetches the date three months ago.
+   *
+   * @return The date three months ago.
+   */
+  private ZonedDateTime getThreeMonthsAgo() {
+    log.debug("Fetching date three months ago");
+    return ZonedDateTime.now().minusMonths(3);
+  }
+
+  /**
+   * Fetches the date yesterday.
+   *
+   * @return The date yesterday.
+   */
+  private ZonedDateTime getYesterday() {
+    log.debug("Fetching date yesterday");
+    return ZonedDateTime.now().minusDays(1);
   }
 }

@@ -1,6 +1,7 @@
+// MessagingDashboardHeader.tsx
 import { Button } from "@/components/ui/Button.tsx";
 import { ArrowLeft, Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 const MessagingDashboardHeader = () => {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ const MessagingDashboardHeader = () => {
         variant="ghost"
         className="rounded-full bg-white w-10 h-10 flex items-center justify-center"
         onClick={() => navigate("/")}
+        aria-label="Back"
       >
         <ArrowLeft
           className="text-gray-800"
@@ -24,15 +26,14 @@ const MessagingDashboardHeader = () => {
       <h1 className="text-xl font-bold flex-grow text-gray-800">Messages</h1>
 
       {/* Add New Message Button */}
-      <button className="p-2 rounded-full bg-secondaryColour shadow-md">
-        <Plus
-          className="text-white"
-          strokeWidth={4}
-          size={20}
-          onClick={() => {
-            navigate("/pages/CreateDmChannelPage");
-          }}
-        />
+      <button
+        className="p-2 rounded-full bg-secondaryColour shadow-md"
+        aria-label="Add New Message"
+        onClick={() => {
+          navigate("/pages/CreateDmChannelPage");
+        }}
+      >
+        <Plus className="text-white" strokeWidth={4} size={20} />
       </button>
     </header>
   );

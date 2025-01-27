@@ -1,5 +1,6 @@
 package com.sportganise.controllers.account;
 
+import com.sportganise.dto.LabelDto;
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AccountController {
 
   private final AccountService accountService;
+  private List<LabelDto> labelsByAccountIdAndOrgId;
 
   public AccountController(AccountService accountService) {
     this.accountService = accountService;
@@ -49,6 +51,7 @@ public class AccountController {
   // GET: Account (1) by ID.
   @GetMapping("/{id}")
   public ResponseEntity<Optional<Account>> getAccount(@PathVariable Integer id) {
+    log.info("Received request to get account.");
     return new ResponseEntity<>(this.accountService.getAccount(id), HttpStatus.OK);
   }
 
@@ -63,7 +66,7 @@ public class AccountController {
   @PutMapping("/{accountId}")
   public ResponseEntity<Void> updateAccount(
       @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountDto body) {
-    log.info("Received request to get account.");
+    log.info("Received request to update account.");
 
     try {
       this.accountService.updateAccount(accountId, body);
@@ -142,6 +145,7 @@ public class AccountController {
   @GetMapping("/get-all-users/{organizationId}/{accountId}")
   public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(
       @PathVariable int organizationId, @PathVariable int accountId) {
+    log.info("Received request to list all users not blocked by account.");
     return new ResponseEntity<>(
         this.accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, accountId),
         HttpStatus.OK);
@@ -154,7 +158,26 @@ public class AccountController {
    */
   @GetMapping("/permissions")
   public ResponseEntity<List<AccountPermissions>> getAccountPermissions() {
-    log.debug("Listing all accounts with permissions.");
+    log.debug("Received request to list all accounts with permissions.");
     return ResponseEntity.ok(this.accountService.getAccountPermissions());
+  }
+
+  /**
+   * Fetches all labels by account ID and organization ID.
+   *
+   * @param accountId ID of the account.
+   * @param orgId ID of the organization.
+   * @return ResponseDto containing the fetched labels.
+   */
+  @GetMapping("/{accountId}/{orgId}/labels")
+  public ResponseDto<List<LabelDto>> getLabelsByAccountIdAndOrgId(
+      @PathVariable Long accountId, @PathVariable Long orgId) {
+    List<LabelDto> labels = accountService.getLabelsByAccountIdAndOrgId(accountId, orgId);
+    ResponseDto<List<LabelDto>> responseDto = new ResponseDto<>();
+    responseDto.setData(labelsByAccountIdAndOrgId);
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Labels fetched successfully");
+
+    return responseDto;
   }
 }

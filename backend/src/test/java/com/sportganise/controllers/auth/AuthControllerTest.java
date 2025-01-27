@@ -2,12 +2,15 @@ package com.sportganise.controllers.auth;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sportganise.config.UserAuthProvider;
 import com.sportganise.controllers.account.auth.AuthController;
+import com.sportganise.dto.account.CookiesDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
@@ -32,7 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(controllers = AuthController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 public class AuthControllerTest {
 
   @Autowired private MockMvc mockMvc;
@@ -44,6 +47,8 @@ public class AuthControllerTest {
   @MockBean private VerificationService verificationService;
 
   @MockBean private CookiesService cookiesService;
+
+  @MockBean private UserAuthProvider userAuthProvider;
 
   private ObjectMapper objectMapper;
   private AccountDto accountDto;
@@ -73,22 +78,41 @@ public class AuthControllerTest {
 
   @Test
   @Order(1)
-  public void signup_shouldreturn_success() throws Exception {
-    Mockito.when(accountService.createAccount(Mockito.any(AccountDto.class))).thenReturn("auth0Id");
+  public void signup_shouldReturnCreated() throws Exception {
+    AccountDto accountDto = new AccountDto();
+    accountDto.setEmail("test@example.com");
+    accountDto.setFirstName("John");
+    accountDto.setLastName("Doe");
+
+    CookiesDto cookiesDto = new CookiesDto();
+    cookiesDto.setJwtToken("dummyToken");
+
+    when(accountService.createAccount(accountDto)).thenReturn("auth0Id");
+    when(cookiesService.createCookiesDto(accountDto.getEmail())).thenReturn(cookiesDto);
+    when(userAuthProvider.createToken(accountDto.getEmail())).thenReturn("dummyToken");
 
     mockMvc
         .perform(
             post("/api/auth/signup")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(accountDto)))
-        .andExpect(status().isCreated());
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.message").value("User created"))
+        .andExpect(jsonPath("$.data.jwtToken").value("dummyToken"));
   }
 
   @Test
   @Order(2)
   public void login_shouldReturnSuccess() throws Exception {
-    Mockito.when(accountService.authenticateAccount(Mockito.any(Auth0AccountDto.class)))
-        .thenReturn(true);
+    Auth0AccountDto auth0AccountDto = new Auth0AccountDto();
+    auth0AccountDto.setEmail("test@example.com");
+
+    CookiesDto cookiesDto = new CookiesDto();
+    cookiesDto.setJwtToken("dummyToken");
+
+    when(accountService.authenticateAccount(auth0AccountDto)).thenReturn(true);
+    when(cookiesService.createCookiesDto(auth0AccountDto.getEmail())).thenReturn(cookiesDto);
+    when(userAuthProvider.createToken(auth0AccountDto.getEmail())).thenReturn("dummyToken");
 
     mockMvc
         .perform(
@@ -97,14 +121,13 @@ public class AuthControllerTest {
                 .content(objectMapper.writeValueAsString(auth0AccountDto)))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.message").value("Login successful"))
-        .andExpect(jsonPath("$.statusCode").value(200));
+        .andExpect(jsonPath("$.data.jwtToken").value("dummyToken"));
   }
 
   @Test
   @Order(3)
   public void login_shouldReturnUnauthorized() throws Exception {
-    Mockito.when(accountService.authenticateAccount(Mockito.any(Auth0AccountDto.class)))
-        .thenReturn(false);
+    when(accountService.authenticateAccount(Mockito.any(Auth0AccountDto.class))).thenReturn(false);
 
     mockMvc
         .perform(
@@ -119,7 +142,7 @@ public class AuthControllerTest {
   @Test
   @Order(4)
   public void signup_shouldReturnGenericException() throws Exception {
-    Mockito.when(accountService.createAccount(Mockito.any(AccountDto.class)))
+    when(accountService.createAccount(Mockito.any(AccountDto.class)))
         .thenThrow(new RuntimeException("Internal server error"));
 
     mockMvc
@@ -135,7 +158,7 @@ public class AuthControllerTest {
   @Test
   @Order(5)
   public void login_shouldReturnGenericException() throws Exception {
-    Mockito.when(accountService.authenticateAccount(Mockito.any(Auth0AccountDto.class)))
+    when(accountService.authenticateAccount(Mockito.any(Auth0AccountDto.class)))
         .thenThrow(new RuntimeException("Internal server error"));
 
     mockMvc
@@ -151,8 +174,8 @@ public class AuthControllerTest {
   @Test
   @Order(6)
   public void sendCode_shouldCallServices() throws Exception {
-    Mockito.when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
-    Mockito.when(verificationService.createVerification(Mockito.any(Account.class)))
+    when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
+    when(verificationService.createVerification(Mockito.any(Account.class)))
         .thenReturn(mock(Verification.class));
     mockMvc
         .perform(
@@ -169,8 +192,8 @@ public class AuthControllerTest {
   @Test
   @Order(7)
   public void verifyCode_shouldCallServices() throws Exception {
-    Mockito.when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
-    Mockito.when(verificationService.validateCode(Mockito.anyInt(), Mockito.anyInt()))
+    when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
+    when(verificationService.validateCode(Mockito.anyInt(), Mockito.anyInt()))
         .thenReturn(Optional.ofNullable(mock(Verification.class)));
     mockMvc
         .perform(

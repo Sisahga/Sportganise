@@ -17,8 +17,6 @@ export function LeaveGroupDialog({
 }: LeaveGroupDialogProps) {
   if (isOpen) {
     log.info("LeaveGroupDialog opened");
-  } else {
-    log.info("LeaveGroupDialog closed");
   }
 
   const handleCancel = () => {

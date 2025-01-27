@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { useState } from "react";
 import {
   DropdownMenu,
@@ -19,15 +18,16 @@ import {
   MessageCircle,
   Frown,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import {
   Attendees,
   Program,
   ProgramDetails,
 } from "@/types/trainingSessionDetails";
+import log from "loglevel";
 
 interface DropDownMenuButtonProps {
-  accountType: string;
+  accountType: string | null | undefined;
   programDetails: ProgramDetails;
   attendees: Attendees[];
 }
@@ -36,12 +36,14 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   accountType,
   programDetails,
   attendees,
-}) => {
+}: DropDownMenuButtonProps) => {
   const navigate = useNavigate();
   const handleNavigation = (path: string, data: Program) => {
     navigate(path, { state: data });
   };
-  console.log("DROPDOWN MENU: ", programDetails);
+  log.info("DropDownMenuButton programDetails: ", programDetails);
+  log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
+
   //Confirmation of player absence
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -84,8 +86,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>Options</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {accountType.toLowerCase() === "coach" ||
-          accountType.toLowerCase() === "admin" ? (
+          {accountType?.toLowerCase() === "coach" ||
+          accountType?.toLowerCase() === "admin" ? (
             <DropdownMenuGroup>
               <DropdownMenuItem
                 onClick={() =>
