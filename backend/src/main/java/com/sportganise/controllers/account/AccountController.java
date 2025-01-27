@@ -1,5 +1,6 @@
 package com.sportganise.controllers.account;
 
+import com.sportganise.dto.LabelDto;
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
@@ -36,6 +37,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AccountController {
 
   private final AccountService accountService;
+  private List<LabelDto> labelsByAccountIdAndOrgId;
 
   public AccountController(AccountService accountService) {
     this.accountService = accountService;
@@ -158,5 +160,24 @@ public class AccountController {
   public ResponseEntity<List<AccountPermissions>> getAccountPermissions() {
     log.debug("Received request to list all accounts with permissions.");
     return ResponseEntity.ok(this.accountService.getAccountPermissions());
+  }
+
+  /**
+   * Fetches all labels by account ID and organization ID.
+   *
+   * @param accountId ID of the account.
+   * @param orgId ID of the organization.
+   * @return ResponseDto containing the fetched labels.
+   */
+  @GetMapping("/{accountId}/{orgId}/labels")
+  public ResponseDto<List<LabelDto>> getLabelsByAccountIdAndOrgId(
+      @PathVariable Long accountId, @PathVariable Long orgId) {
+    List<LabelDto> labels = accountService.getLabelsByAccountIdAndOrgId(accountId, orgId);
+    ResponseDto<List<LabelDto>> responseDto = new ResponseDto<>();
+    responseDto.setData(labelsByAccountIdAndOrgId);
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Labels fetched successfully");
+
+    return responseDto;
   }
 }
