@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import GroupSection from "@/components/Inbox/GroupMessages/GroupSection";
 import MessagesSection from "../SimpleMessages/MessagesSection.tsx";
-import { Channel } from "@/types/dmchannels.ts";
+import {Channel} from "@/types/dmchannels.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 import "./MessagingDashboard.css";
 import log from "loglevel";
@@ -13,10 +13,10 @@ function DirectMessagesDashboard() {
   const [loading, setLoading] = useState<boolean>(true);
 
   const simpleChannels = channels.filter(
-    (channel) => channel.channelType === "SIMPLE",
+      (channel) => channel.channelType === "SIMPLE",
   );
   const groupChannels = channels.filter(
-    (channel) => channel.channelType === "GROUP",
+      (channel) => channel.channelType === "GROUP",
   );
 
   const fetchChannels = async () => {
@@ -42,35 +42,36 @@ function DirectMessagesDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
-      </div>
+        <div className="flex items-center justify-center h-screen">
+          <p>Loading...</p>
+        </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500">{error}</p>
-      </div>
+        <div className="flex items-center justify-center h-screen">
+          <p className="text-red-500">{error}</p>
+        </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen lg:mx-24 gap-6">
-      <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
-        <div className="space-y-1">
-          <h2 className="font-semibold text-3xl text-secondaryColour text-center">
-            Messages
-          </h2>
-          <p className="text-fadedPrimaryColour text-center">
-            You have 0 unread messages
-          </p>
+      <div className="flex flex-col h-screen lg:mx-24 gap-6 pt-12 overflow-y-scroll
+    bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
+        <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
+          <div className="space-y-1">
+            <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+              Messages
+            </h2>
+            <p className="text-fadedPrimaryColour text-center">
+              You have 0 unread messages
+            </p>
+          </div>
         </div>
+        <GroupSection groupChannels={groupChannels}/>
+        <MessagesSection messageChannels={simpleChannels}/>
       </div>
-      <GroupSection groupChannels={groupChannels} />
-      <MessagesSection messageChannels={simpleChannels} />
-    </div>
   );
 }
 
