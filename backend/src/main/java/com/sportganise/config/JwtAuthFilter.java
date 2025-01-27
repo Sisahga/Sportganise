@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 /**
  * JwtAuthFilter class is used to filter the request and validate the JWT token. For now we set the
  * websocket endpoint as public, to fix later.
