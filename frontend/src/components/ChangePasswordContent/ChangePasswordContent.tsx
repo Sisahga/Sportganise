@@ -125,9 +125,9 @@ const ChangePasswordContent: React.FC = () => {
       <BackButton />
 
       {/* Card for the entire form */}
-      <Card className="shadow-md mb-24 mt-4">
+      <Card className="shadow-md mb-24 mt-4 mx-auto max-w-2xl">
         <CardHeader>
-          <CardTitle className="flex justify-center text-2xl font-light">
+          <CardTitle className="flex justify-center text-2xl font-semibold">
             Change Password
           </CardTitle>
         </CardHeader>
@@ -230,7 +230,7 @@ const ChangePasswordContent: React.FC = () => {
               {/* Submit Button */}
               <div className="flex justify-center p-2">
                 <Button
-                  className="w-40 h-10 bg-secondaryColour text-white rounded-full"
+                  className="w-40 h-10 bg-secondaryColour text-white rounded-xl"
                   variant="outline"
                   type="submit"
                   disabled={isLoading}

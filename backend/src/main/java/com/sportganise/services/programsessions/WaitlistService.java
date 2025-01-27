@@ -1,13 +1,18 @@
 package com.sportganise.services.programsessions;
 
+import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.exceptions.ParticipantNotFoundException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
+import com.sportganise.repositories.programsessions.ProgramRepository;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +22,17 @@ import org.springframework.stereotype.Service;
 public class WaitlistService {
 
   private final ProgramParticipantRepository participantRepository;
+  private final ProgramRepository programRepository;
 
   /**
    * Constructor for WaitlistService.
    *
    * @param participantRepository Repository for managing program participants.
    */
-  public WaitlistService(ProgramParticipantRepository participantRepository) {
+  public WaitlistService(
+      ProgramParticipantRepository participantRepository, ProgramRepository programRepository) {
     this.participantRepository = participantRepository;
+    this.programRepository = programRepository;
   }
 
   /**
@@ -171,8 +179,8 @@ public class WaitlistService {
    * @param programId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return A DTO representing the marked absent participant, or null if participant is not
-   *     confirmed
-   * @throws ParticipantNotFoundException whenever participant can't be found
+   *     confirmed.
+   * @throws ParticipantNotFoundException whenever participant can't be found.
    */
   public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
@@ -197,5 +205,35 @@ public class WaitlistService {
 
     ProgramParticipant savedParticipant = participantRepository.save(programParticipant);
     return new ProgramParticipantDto(savedParticipant);
+  }
+
+  /**
+   * Gets all programs that are open for waitlisted participants to join.
+   *
+   * @return A list of ProgramDto's containing the waitlisted .
+   * @throws ResourceNotFoundException whenever programs can't be found.
+   */
+  public List<ProgramDto> getWaitlistPrograms() throws ResourceNotFoundException {
+    List<Program> programs = programRepository.findByProgramType("Training");
+
+    if (programs == null) {
+      log.error("Program list is null. Can't fetch waitlist programs");
+      throw new ResourceNotFoundException("Programs list is null. Cannot fetch waitlist programs.");
+    }
+
+    return programs.stream()
+        .flatMap(
+            program -> {
+              log.debug("{}", program);
+              Integer participantCount =
+                  participantRepository.countConfirmedParticipants(program.getProgramId());
+
+              if (participantCount >= program.getCapacity()) {
+                return Stream.empty();
+              }
+
+              return Stream.of(new ProgramDto(program, null));
+            })
+        .toList();
   }
 }

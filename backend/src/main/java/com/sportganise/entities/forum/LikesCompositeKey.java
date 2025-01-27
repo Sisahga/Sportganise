@@ -23,5 +23,6 @@ public class LikesCompositeKey implements Serializable {
   @Column(name = "account_id")
   private Integer accountId;
 
-  @Column private Integer postId;
+  @Column(name = "post_id")
+  private Integer postId;
 }

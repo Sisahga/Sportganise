@@ -25,9 +25,10 @@ public class Post {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "post_id", nullable = false, updatable = false)
   private Integer postId;
 
-  @Column(nullable = false)
+  @Column(name = "account_id", nullable = false)
   private Integer accountId;
 
   @Column(nullable = false, length = 100)
@@ -43,9 +44,10 @@ public class Post {
   @Column(length = 20)
   private PostType type;
 
-  @Column private ZonedDateTime occurenceDate;
+  @Column(name = "occurrence_date")
+  private ZonedDateTime occurrenceDate;
 
-  @Column(nullable = false, updatable = false)
+  @Column(name = "creation_date", nullable = false, updatable = false)
   @Builder.Default
   private ZonedDateTime creationDate = ZonedDateTime.now();
 
