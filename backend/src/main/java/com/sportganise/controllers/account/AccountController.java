@@ -174,7 +174,7 @@ public class AccountController {
       @PathVariable Long accountId, @PathVariable Long orgId) {
     List<LabelDto> labels = accountService.getLabelsByAccountIdAndOrgId(accountId, orgId);
     ResponseDto<List<LabelDto>> responseDto = new ResponseDto<>();
-    responseDto.setData(labelsByAccountIdAndOrgId);
+    responseDto.setData(labels);
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Labels fetched successfully");
 

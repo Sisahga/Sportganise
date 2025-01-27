@@ -55,7 +55,12 @@ INSERT INTO label_account (label_id, account_id, role) VALUES
 (1,3, 'Subscribed'),
 (1,2,'Coach'),
 (1,4,'Waitlisted'),
-(1,5,'Waitlisted');
+(1,5,'Waitlisted'),
+(2,1,null),
+(2,2,null),
+(2,3,null),
+(2,4,null),
+(2,5,null);
 
 INSERT INTO organization_sport (org_id, sport_id) VALUES
 (1, 2),
@@ -122,15 +127,15 @@ UPDATE channel SET last_message_id = 4 WHERE channel_id = 2;
 UPDATE channel SET last_message_id = 5 WHERE channel_id = 3;
 UPDATE channel SET last_message_id = 6 WHERE channel_id = 4;
 
-INSERT INTO post (account_id, title, description, type) VALUES
-(1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!','FUNDRAISER'),
-(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.','FUNDRAISER'),
-(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.','FUNDRAISER');
+INSERT INTO post (account_id, title, description, occurrence_date,type) VALUES
+(1, 'Fundraiser for OniBad', 'Join us for fundraiser this week!','2025-01-20 10:30:00','FUNDRAISER'),
+(1, 'Charity Gala Event', 'Attend our charity gala and contribute to a noble cause this weekend.','2025-01-20 10:30:00','FUNDRAISER'),
+(2, 'Spring Cleanup Drive', 'Help me clean my Jersey Shore beachfront as part of the community initiative.','2025-01-19 10:30:00','FUNDRAISER');
 
-INSERT INTO post (account_id, title, description, type, metadata) VALUES
-(1, 'Training Class for Beginners', 'We offer beginner-friendly sessions exclusive.','TRAINING','{"programID":1}'),
-(2, 'Weekly Tennis Challenge', 'Participate in our tennis challenge and win a high-five.','TRAINING','{"programID":1}'),
-(2, 'Sunday Training','This week we did usual intensive training. Please Let me know if you have questions.','TRAINING','{"programID":1}');
+INSERT INTO post (account_id, title, description,occurrence_date, type, metadata) VALUES
+(1, 'Training Class for Beginners', 'We offer beginner-friendly sessions exclusive.','2025-01-21 10:30:00','TRAINING','{"programID":1}'),
+(2, 'Weekly Tennis Challenge', 'Participate in our tennis challenge and win a high-five.','2025-01-01 10:30:00','TRAINING','{"programID":1}'),
+(2, 'Sunday Training','This week we did usual intensive training. Please Let me know if you have questions.','2025-01-23 10:30:00','TRAINING','{"programID":1}');
 
 INSERT INTO post_label(post_id, label_id) VALUES
 (1, 2),
@@ -154,6 +159,6 @@ INSERT INTO likes(post_id, account_id) VALUES
 
 
 INSERT INTO feedback (post_id, account_id, content) VALUES
-(1, 2, 'Are cats aloud??'),
+(1, 2, 'Are cats allowed??'),
 (2, 3, 'It was mediocre. ');
 
