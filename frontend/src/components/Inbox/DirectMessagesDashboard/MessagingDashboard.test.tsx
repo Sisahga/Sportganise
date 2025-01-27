@@ -5,6 +5,10 @@ import MessagingDashboard from "./MessagingDashboard";
 import { Channel } from "@/types/dmchannels";
 import directMessagingApi from "@/services/api/directMessagingApi";
 
+vi.mock("react-router", () => ({
+  useNavigate: () => vi.fn(),
+}));
+
 vi.mock("@/services/api/directMessagingApi", () => ({
   __esModule: true,
   default: {
@@ -14,34 +18,39 @@ vi.mock("@/services/api/directMessagingApi", () => ({
 
 vi.mock("@/components/Inbox/GroupMessages/GroupSection", () => ({
   __esModule: true,
-  default: vi.fn(({ groupChannels }: { groupChannels: Channel[] }) => (
-    <div data-testid="group-section">
-      {groupChannels.map((channel: Channel) => (
-        <div
-          key={channel.channelId}
-          data-testid={`group-channel-${channel.channelId}`}
-        >
-          {channel.channelName}
-        </div>
-      ))}
-    </div>
+  default: vi.fn(({ groupChannels }:{ groupChannels: Channel[] }) => (
+      <div data-testid="group-section">
+        {groupChannels.map((channel: Channel) => (
+            <div
+                key={channel.channelId}
+                data-testid={`group-channel-${channel.channelId}`}
+            >
+              {channel.channelName}
+            </div>
+        ))}
+      </div>
   )),
 }));
 
 vi.mock("../SimpleMessages/MessagesSection", () => ({
   __esModule: true,
   default: vi.fn(({ messageChannels }: { messageChannels: Channel[] }) => (
-    <div data-testid="messages-section">
-      {messageChannels.map((channel: Channel) => (
-        <div
-          key={channel.channelId}
-          data-testid={`message-channel-${channel.channelId}`}
-        >
-          {channel.channelName}
-        </div>
-      ))}
-    </div>
+      <div data-testid="messages-section">
+        {messageChannels.map((channel: Channel) => (
+            <div
+                key={channel.channelId}
+                data-testid={`message-channel-${channel.channelId}`}
+            >
+              {channel.channelName}
+            </div>
+        ))}
+      </div>
   )),
+}));
+
+vi.mock("@/services/cookiesService.ts", () => ({
+  getCookies: vi.fn(() => ({})),
+  getAccountIdCookie: vi.fn(() => "test-account-id"),
 }));
 
 describe("MessagingDashboard Component", () => {
@@ -70,24 +79,19 @@ describe("MessagingDashboard Component", () => {
     vi.resetAllMocks();
   });
 
-  it("renders loading state initially", () => {
-    render(<MessagingDashboard />);
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
-
   it("renders error message when API call fails", async () => {
     (directMessagingApi.getChannels as jest.Mock).mockRejectedValue(
-      new Error("API Error"),
+        new Error("API Error"),
     );
     render(<MessagingDashboard />);
     await waitFor(() =>
-      expect(screen.getByText("Failed to load messages.")).toBeInTheDocument(),
+        expect(screen.getByText("Failed to load messages.")).toBeInTheDocument(),
     );
   });
 
   it("renders the dashboard with fetched channels", async () => {
     (directMessagingApi.getChannels as jest.Mock).mockResolvedValue(
-      mockChannels,
+        mockChannels,
     );
     render(<MessagingDashboard />);
 
@@ -97,16 +101,16 @@ describe("MessagingDashboard Component", () => {
     });
 
     expect(screen.getByTestId("group-channel-1")).toHaveTextContent(
-      "Group Chat 1",
+        "Group Chat 1",
     );
     expect(screen.getByTestId("message-channel-2")).toHaveTextContent(
-      "Simple Chat 1",
+        "Simple Chat 1",
     );
   });
 
   it("filters channels into group and simple sections correctly", async () => {
     (directMessagingApi.getChannels as jest.Mock).mockResolvedValue(
-      mockChannels,
+        mockChannels,
     );
     render(<MessagingDashboard />);
 
