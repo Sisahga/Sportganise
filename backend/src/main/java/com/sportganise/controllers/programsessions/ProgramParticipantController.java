@@ -1,7 +1,9 @@
 package com.sportganise.controllers.programsessions;
 
+import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.programsessions.WaitlistService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -161,6 +163,24 @@ public class ProgramParticipantController {
           accountId,
           e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+  }
+
+  /**
+   * Fetches all the training sessions missing a player, making waitlist players available to join.
+   */
+  @GetMapping("/waitlist-programs")
+  public ResponseEntity<?> getWaitlistPrograms() {
+    try {
+      List<ProgramDto> ppc = waitlistService.getWaitlistPrograms();
+      log.info("Successfully fetched {} waitlist programs", ppc.size());
+      return ResponseEntity.ok(ppc);
+    } catch (ResourceNotFoundException e) {
+      log.error("Program list is empy", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error fetching waitlist programs");
     }
   }
 }
