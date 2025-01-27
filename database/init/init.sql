@@ -182,7 +182,6 @@ CREATE TABLE post(
     account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
-    attachment VARCHAR(255),
     metadata JSON ,
     type VARCHAR(20) CHECK (type IN ('TRAINING', 'FUNDRAISER', 'TOURNAMENT','SPECIAL')),
     occurrence_date TIMESTAMPTZ,
