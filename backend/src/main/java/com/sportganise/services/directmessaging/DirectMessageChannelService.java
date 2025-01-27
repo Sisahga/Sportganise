@@ -142,6 +142,7 @@ public class DirectMessageChannelService {
       dmChannel.setChannelHash(sha256hex);
 
       DirectMessageChannel createdDmChannel = directMessageChannelRepository.save(dmChannel);
+      log.info("Channel created with ID {}", createdDmChannel.getChannelId());
       int createdDmChannelId = createdDmChannel.getChannelId();
       // Create Channel Members
       this.directMessageChannelMemberService.saveMembers(
