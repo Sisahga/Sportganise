@@ -8,13 +8,12 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sportganise.controllers.account.AccountController;
+import com.sportganise.dto.LabelDto;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
@@ -32,6 +31,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -46,7 +46,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @WebMvcTest(controllers = AccountController.class)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 class AccountControllerTest {
 
@@ -372,6 +372,25 @@ class AccountControllerTest {
               jsonPath("$[1].type", is(account2.getType().toString())),
               jsonPath("$[1].pictureUrl", is(account2.getPictureUrl())));
     }
+  }
+
+  @Test
+  public void getLabelsByAccountIdAndOrgId_Success() throws Exception {
+    long accountId = 1;
+    long orgId = 1;
+    LabelDto label1 = new LabelDto(1, "label1");
+    LabelDto label2 = new LabelDto(2, "label2");
+    List<LabelDto> labels = List.of(label1, label2);
+
+    when(accountService.getLabelsByAccountIdAndOrgId(anyLong(), anyLong())).thenReturn(labels);
+
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.get("/api/account/{accountId}/{orgId}/labels", accountId, orgId))
+        .andExpect(status().isOk());
+
+    Mockito.verify(accountService, Mockito.times(1))
+        .getLabelsByAccountIdAndOrgId(eq(accountId), eq(orgId));
   }
 }
 

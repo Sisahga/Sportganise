@@ -66,8 +66,10 @@ public class ProgramController {
     }
 
     Account user = userOptional.get();
+    log.debug("USER ID:", user.getAccountId());
 
     List<ProgramDto> programDtos = programService.getPrograms();
+    log.debug("PROGRAMDTOS COUNT: ", programDtos.size());
 
     if (programDtos.isEmpty()) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
@@ -78,8 +80,10 @@ public class ProgramController {
     List<ProgramDetailsParticipantsDto> allPrograms;
 
     boolean canDisplayAttendees = hasPermissions(user);
+    log.debug("HAS PERMISSION: ", canDisplayAttendees);
 
     allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, canDisplayAttendees);
+    log.debug("ALL PROGRAMS COUNT: ", allPrograms.size());
 
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Programs successfully fetched.");
@@ -110,10 +114,14 @@ public class ProgramController {
             .orElseThrow(
                 () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
+    log.debug("USER ID: ", user.getAccountId());
+
     if (!hasPermissions(user)) {
       throw new ForbiddenException(
           "User with id: " + accountId + " does not have permission to create a program.");
     }
+
+    log.debug("HAS PERMISSION: ", hasPermissions(user));
 
     try {
       ProgramDto newProgramDto =
@@ -131,6 +139,8 @@ public class ProgramController {
               programCreateRequestDto.getLocation(),
               attachments,
               accountId);
+
+      log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
 
       ResponseDto<ProgramDto> responseDto =
           ResponseDto.<ProgramDto>builder()
@@ -167,10 +177,14 @@ public class ProgramController {
             .orElseThrow(
                 () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
+    log.debug("USER ID: ", user.getAccountId());
+
     if (!hasPermissions(user)) {
       throw new ForbiddenException(
           "User with id: " + accountId + " does not have permission to create a program.");
     }
+
+    log.debug("HAS PERMISSION: ", hasPermissions(user));
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
@@ -180,6 +194,8 @@ public class ProgramController {
       responseDto.setMessage("Program not found.");
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
+
+    log.debug("PROGRAM ID OF PROGRAM TO MODIFY: ", programDtoToModify.getProgramId());
 
     try {
       ProgramDto updatedProgramDto =

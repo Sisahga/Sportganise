@@ -1,3 +1,4 @@
+import { FileAttachment } from "@/components/Inbox/ChatScreen/ChatScreen";
 import WebSocketService from "@/services/WebSocketService.ts";
 
 export interface MessageComponent {
@@ -6,7 +7,7 @@ export interface MessageComponent {
   senderFirstName: string;
   channelId: number;
   messageContent: string;
-  attachments: string[];
+  attachments: FileAttachment[];
   sentAt: string;
   type: string;
   avatarUrl: string | undefined;
@@ -16,7 +17,7 @@ export interface SendMessageComponent {
   senderId: number;
   channelId: number;
   messageContent: string;
-  attachments: File[];
+  attachments: FileAttachment[];
   sentAt: string;
   type: string;
   senderFirstName: string;

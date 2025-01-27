@@ -1,10 +1,47 @@
+// CreateTrainingSessionForm.test.tsx
 import "@testing-library/jest-dom";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import userEvent from "@testing-library/user-event";
 import CreateTrainingSessionForm from "./CreateTrainingSessionForm";
-import { BrowserRouter } from "react-router-dom";
+import { RouterProvider, createMemoryRouter } from "react-router";
 
+// Mock implementations
+const mockNavigate = vi.fn();
+const mockCreateTrainingSession = vi.fn();
+let mockError: Error | null = null;
+const mockToast = vi.fn();
+
+// Mock react-router with all actual exports and overridden useNavigate
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+// Mock other dependencies as needed
+vi.mock("@/hooks/useCreateTrainingSession", () => ({
+  default: () => ({
+    createTrainingSession: mockCreateTrainingSession,
+    error: mockError,
+  }),
+}));
+
+vi.mock("@/hooks/use-toast", () => ({
+  useToast: () => ({
+    toast: mockToast,
+    dismiss: vi.fn(),
+    toasts: [],
+  }),
+}));
+
+vi.mock("@/services/cookiesService", () => ({
+  getCookies: () => mockCookiesValue,
+}));
+
+// Define mockCookiesValue outside the describe block if needed
 interface CookiesValue {
   accountId: number | null;
   type: string;
@@ -15,58 +52,6 @@ interface CookiesValue {
   phone: string;
   organisationIds: number[];
 }
-
-beforeAll(() => {
-  class ResizeObserver {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    observe(_: Element): void {}
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    unobserve(_: Element): void {}
-    disconnect(): void {}
-  }
-  Object.defineProperty(global, "ResizeObserver", {
-    writable: true,
-    configurable: true,
-    value: ResizeObserver,
-  });
-
-  Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
-    value: vi.fn(),
-    writable: true,
-    configurable: true,
-  });
-});
-
-const mockNavigate: ReturnType<typeof vi.fn> = vi.fn();
-
-vi.mock("react-router-dom", async () => {
-  const actual: typeof import("react-router-dom") =
-    await vi.importActual("react-router-dom");
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
-
-const mockCreateTrainingSession: ReturnType<typeof vi.fn> = vi.fn();
-let mockError: Error | null = null;
-
-vi.mock("@/hooks/useCreateTrainingSession", () => ({
-  default: () => ({
-    createTrainingSession: mockCreateTrainingSession,
-    error: mockError,
-  }),
-}));
-
-const mockToast: ReturnType<typeof vi.fn> = vi.fn();
-
-vi.mock("@/hooks/use-toast", () => ({
-  useToast: () => ({
-    toast: mockToast,
-    dismiss: vi.fn(),
-    toasts: [],
-  }),
-}));
 
 let mockCookiesValue: CookiesValue = {
   accountId: 1,
@@ -79,14 +64,34 @@ let mockCookiesValue: CookiesValue = {
   organisationIds: [42],
 };
 
-vi.mock("@/services/cookiesService", () => ({
-  getCookies: () => mockCookiesValue,
-}));
-
 describe("CreateTrainingSessionForm", () => {
+  beforeAll(() => {
+    // Mock ResizeObserver if necessary
+    class ResizeObserver {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      observe(_: Element): void {}
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      unobserve(_: Element): void {}
+      disconnect(): void {}
+    }
+    Object.defineProperty(global, "ResizeObserver", {
+      writable: true,
+      configurable: true,
+      value: ResizeObserver,
+    });
+
+    // Mock scrollIntoView if necessary
+    Object.defineProperty(HTMLElement.prototype, "scrollIntoView", {
+      value: vi.fn(),
+      writable: true,
+      configurable: true,
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
 
+    // Reset mockCookiesValue and mockError before each test
     mockCookiesValue = {
       accountId: 1,
       type: "ADMIN",
@@ -99,6 +104,7 @@ describe("CreateTrainingSessionForm", () => {
     };
     mockError = null;
 
+    // Mock window.matchMedia if necessary
     Object.defineProperty(window, "matchMedia", {
       writable: true,
       value: vi.fn().mockImplementation(
@@ -111,55 +117,63 @@ describe("CreateTrainingSessionForm", () => {
           addEventListener: vi.fn(),
           removeEventListener: vi.fn(),
           dispatchEvent: vi.fn(),
-        }),
+        })
       ),
     });
   });
 
   function renderComponent() {
-    return render(
-      <BrowserRouter>
-        <CreateTrainingSessionForm />
-      </BrowserRouter>,
-    );
+    const routes = [
+      {
+        path: "/create",
+        element: <CreateTrainingSessionForm />,
+      },
+      {
+        path: "/",
+        element: <div>Home Page</div>, // Mock home page for redirection
+      },
+    ];
+    const router = createMemoryRouter(routes, { initialEntries: ["/create"] });
+
+    return render(<RouterProvider router={router} />);
   }
 
   it("renders the form correctly", () => {
     renderComponent();
 
     expect(
-      screen.getByRole("heading", { name: "Create New Event" }),
+      screen.getByRole("heading", { name: "Create New Event" })
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText(/Complete the form and submit/i),
+      screen.getByText(/Complete the form and submit/i)
     ).toBeInTheDocument();
 
     expect(screen.getByLabelText(/Title/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: /Type of Event/i }),
+      screen.getByRole("combobox", { name: /Type of Event/i })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Pick a start date/i }),
+      screen.getByRole("button", { name: /Pick a start date/i })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Pick an end date/i }),
+      screen.getByRole("button", { name: /Pick an end date/i })
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Start Time/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/End Time/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: /Location/i }),
+      screen.getByRole("combobox", { name: /Location/i })
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Recurring event/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: /Visibility/i }),
+      screen.getByRole("combobox", { name: /Visibility/i })
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Add Attachment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Attendance Capacity/i)).toBeInTheDocument();
 
     expect(
-      screen.getByRole("button", { name: /Create new Event/i }),
+      screen.getByRole("button", { name: /Create new Event/i })
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Cancel/i })).toBeInTheDocument();
   });
@@ -178,7 +192,7 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Title/i), "Test Event");
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Type of Event/i }),
+      screen.getByRole("combobox", { name: /Type of Event/i })
     );
     await userEvent.click(screen.getByText("Training Session"));
 
@@ -217,13 +231,13 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.click(screen.getByLabelText(/Recurring event/i));
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Visibility/i }),
+      screen.getByRole("combobox", { name: /Visibility/i })
     );
     await userEvent.click(screen.getByText("Public"));
 
     await userEvent.type(
       screen.getByLabelText(/Description/i),
-      "This is a test event.",
+      "This is a test event."
     );
 
     const file = new File(["dummy content"], "test.png", { type: "image/png" });
@@ -235,13 +249,13 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Attendance Capacity/i), "100");
 
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i }),
+      screen.getByRole("button", { name: /Create new Event/i })
     );
 
     await waitFor(() => {
       expect(mockCreateTrainingSession).toHaveBeenCalledWith(
         1,
-        expect.any(FormData),
+        expect.any(FormData)
       );
       expect(mockToast).toHaveBeenCalledWith({
         title: "Form submitted successfully ✔",
@@ -258,7 +272,7 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Title/i), "Test Event");
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Type of Event/i }),
+      screen.getByRole("combobox", { name: /Type of Event/i })
     );
     await userEvent.click(screen.getByText("Training Session"));
 
@@ -297,25 +311,25 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.click(screen.getByLabelText(/Recurring event/i));
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Visibility/i }),
+      screen.getByRole("combobox", { name: /Visibility/i })
     );
     await userEvent.click(screen.getByText("Public"));
 
     await userEvent.type(
       screen.getByLabelText(/Description/i),
-      "This is a test event.",
+      "This is a test event."
     );
 
     await userEvent.type(screen.getByLabelText(/Attendance Capacity/i), "100");
 
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i }),
+      screen.getByRole("button", { name: /Create new Event/i })
     );
 
     await waitFor(() => {
       expect(mockCreateTrainingSession).toHaveBeenCalledWith(
         1,
-        expect.any(FormData),
+        expect.any(FormData)
       );
       expect(mockToast).toHaveBeenCalledWith({
         variant: "destructive",
@@ -339,7 +353,7 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Title/i), "Test Event");
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Type of Event/i }),
+      screen.getByRole("combobox", { name: /Type of Event/i })
     );
     await userEvent.click(screen.getByText("Training Session"));
 
@@ -378,19 +392,19 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.click(screen.getByLabelText(/Recurring event/i));
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Visibility/i }),
+      screen.getByRole("combobox", { name: /Visibility/i })
     );
     await userEvent.click(screen.getByText("Public"));
 
     await userEvent.type(
       screen.getByLabelText(/Description/i),
-      "This is a test event.",
+      "This is a test event."
     );
 
     await userEvent.type(screen.getByLabelText(/Attendance Capacity/i), "100");
 
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i }),
+      screen.getByRole("button", { name: /Create new Event/i })
     );
 
     const creatingButton = await screen.findByRole("button", {
@@ -403,7 +417,7 @@ describe("CreateTrainingSessionForm", () => {
     await waitFor(() => {
       expect(mockCreateTrainingSession).toHaveBeenCalledWith(
         1,
-        expect.any(FormData),
+        expect.any(FormData)
       );
       expect(mockToast).toHaveBeenCalledWith({
         title: "Form submitted successfully ✔",
@@ -411,7 +425,7 @@ describe("CreateTrainingSessionForm", () => {
       });
       expect(mockNavigate).toHaveBeenCalledWith(-1);
       expect(
-        screen.queryByRole("button", { name: /Creating Event/i }),
+        screen.queryByRole("button", { name: /Creating Event/i })
       ).not.toBeInTheDocument();
     });
   });
@@ -419,12 +433,12 @@ describe("CreateTrainingSessionForm", () => {
   it("shows validation errors when required fields are missing", async () => {
     renderComponent();
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i }),
+      screen.getByRole("button", { name: /Create new Event/i })
     );
 
     await waitFor(() => {
       const requiredErrors = screen.getAllByText(/Required/i);
-      const numberOfFields = 8;
+      const numberOfFields = 8; // Adjust based on actual required fields
       expect(requiredErrors.length).toBeGreaterThanOrEqual(numberOfFields);
     });
   });

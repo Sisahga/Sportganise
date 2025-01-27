@@ -32,4 +32,6 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
       WHERE p.programParticipantId.programId = :programId
       """)
   List<ProgramParticipant> findParticipantsByProgramId(@Param("programId") Integer programId);
+
+  List<Program> findByProgramType(String type);
 }

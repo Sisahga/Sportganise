@@ -4,7 +4,6 @@ import MessagesSection from "../SimpleMessages/MessagesSection.tsx";
 import { Channel } from "@/types/dmchannels.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 import "./MessagingDashboard.css";
-import MessagingDashboardHeader from "@/components/Inbox/DirectMessagesDashboard/MessagingDashboardHeader.tsx";
 import log from "loglevel";
 
 function DirectMessagesDashboard() {
@@ -58,8 +57,17 @@ function DirectMessagesDashboard() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <MessagingDashboardHeader />
+    <div className="flex flex-col h-screen lg:mx-24 gap-6">
+      <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
+        <div className="space-y-1">
+          <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+            Messages
+          </h2>
+          <p className="text-fadedPrimaryColour text-center">
+            You have 0 unread messages
+          </p>
+        </div>
+      </div>
       <GroupSection groupChannels={groupChannels} />
       <MessagesSection messageChannels={simpleChannels} />
     </div>

@@ -1,10 +1,13 @@
 package com.sportganise.controllers.forum;
 
-import com.sportganise.entities.forum.Post;
+import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.forum.PostDto;
+import com.sportganise.entities.forum.PostType;
 import com.sportganise.services.forum.PostService;
+import java.time.ZonedDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,23 +21,65 @@ public class PostController {
   @Autowired private PostService postService;
 
   /**
-   * Endpoint /api/forum/posts/search: Get Mapping for Searching Posts.
+   * Fetches posts based on search criteria.
    *
-   * @param searchTerm Search term to search for in the posts.
-   * @param limit Limit the number of posts to return.
-   * @param page Page number to return.
-   * @param sortBy Field to sort by.
-   * @param sortDir Sort direction.
-   * @return List of Posts.
+   * @param searchTerm Search term to filter posts by.
+   * @param occurrenceDate Date of occurrence of the post.
+   * @param type Type of the post.
+   * @param selectedLabel Label selected to filter posts by.
+   * @param limit Number of posts to fetch.
+   * @param page Page number of posts to fetch.
+   * @param sortBy Field to sort posts by.
+   * @param sortDir Direction to sort posts in.
+   * @param orgId ID of the organization.
+   * @param accountId ID of the account.
+   * @return ResponseDto containing the fetched posts.
    */
   @GetMapping("/search")
-  public ResponseEntity<List<Post>> searchPosts(
-      @RequestParam String searchTerm,
-      @RequestParam(required = false) Integer limit,
-      @RequestParam(required = false) Integer page,
-      @RequestParam(required = false) String sortBy,
-      @RequestParam(required = false) String sortDir) {
-    List<Post> posts = postService.searchPosts(searchTerm, limit, page, sortBy, sortDir);
-    return ResponseEntity.ok(posts);
+  public ResponseDto<List<PostDto>> searchAndFilterPosts(
+      @RequestParam(required = false) String searchTerm,
+      @RequestParam(required = false) ZonedDateTime occurrenceDate,
+      @RequestParam(required = false) PostType type,
+      @RequestParam(required = false) Integer selectedLabel,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "occurrenceDate") String sortBy,
+      @RequestParam(defaultValue = "desc") String sortDir,
+      @RequestParam Long orgId,
+      @RequestParam Long accountId) {
+    List<PostDto> postDtos =
+        postService.searchAndFilterPosts(
+            searchTerm,
+            occurrenceDate,
+            type,
+            selectedLabel,
+            limit,
+            page,
+            sortBy,
+            sortDir,
+            orgId,
+            accountId);
+    ResponseDto<List<PostDto>> responseDto = new ResponseDto<>();
+    responseDto.setData(postDtos);
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Posts fetched successfully");
+
+    return responseDto;
+  }
+
+  /**
+   * Fetches all available post types.
+   *
+   * @return ResponseDto containing the fetched post types.
+   */
+  @GetMapping("/types")
+  public ResponseDto<List<String>> getAllPostTypes() {
+    List<String> types = postService.getAvailableTypes();
+    ResponseDto<List<String>> responseDto = new ResponseDto<>();
+    responseDto.setData(types);
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Post types fetched successfully");
+
+    return responseDto;
   }
 }

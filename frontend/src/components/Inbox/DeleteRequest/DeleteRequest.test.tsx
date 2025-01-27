@@ -7,14 +7,14 @@ import {
   within,
 } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import DeleteRequest from "./DeleteRequest";
 
 const mockNavigate = vi.fn();
 
-vi.mock("react-router-dom", async () => {
-  const actual: typeof import("react-router-dom") =
-    await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual: typeof import("react-router") =
+    await vi.importActual("react-router");
   return {
     ...actual,
     useNavigate: () => mockNavigate,
@@ -44,7 +44,7 @@ describe("DeleteRequest", () => {
     render(
       <BrowserRouter>
         <DeleteRequest />
-      </BrowserRouter>,
+      </BrowserRouter>
     );
 
   it("renders the Delete Request button", () => {
@@ -76,7 +76,7 @@ describe("DeleteRequest", () => {
 
     const description = await screen.findByTestId("description");
     expect(description).toHaveTextContent(
-      /jane doe requested to delete the channel\./i,
+      /jane doe requested to delete the channel\./i
     );
 
     const john = screen.getByText(/john/i);
@@ -107,7 +107,7 @@ describe("DeleteRequest", () => {
     fireEvent.click(approveButton);
 
     const approvalMessage = await screen.findByText(
-      /you approved the request!/i,
+      /you approved the request!/i
     );
     expect(approvalMessage).toBeInTheDocument();
 

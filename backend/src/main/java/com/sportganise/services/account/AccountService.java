@@ -1,10 +1,12 @@
 package com.sportganise.services.account;
 
+import com.sportganise.dto.LabelDto;
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
 import com.sportganise.dto.account.UpdateAccountDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
+import com.sportganise.entities.Label;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
@@ -12,6 +14,7 @@ import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.exceptions.PasswordTooWeakException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.organization.AccountOrganizationRepository;
 import com.sportganise.services.BlobService;
@@ -20,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -266,7 +270,42 @@ public class AccountService {
     return accountRepository.getAllNonBlockedAccountsByOrganization(organizationId, currentUserId);
   }
 
+  /**
+   * Method to get the organization IDs of an account.
+   *
+   * @param accountId ID of the account
+   * @return List of organization IDs
+   */
   public List<Integer> getOrganizationIdsByAccountId(int accountId) {
     return accountOrganizationRepository.getOrganizationIdsByAccountId(accountId);
+  }
+
+  /**
+   * Fetches all labels by account ID and organization ID.
+   *
+   * @param accountId ID of the account.
+   * @param orgId ID of the organization.
+   * @return List of labels.
+   */
+  public List<LabelDto> getLabelsByAccountIdAndOrgId(Long accountId, Long orgId) {
+    log.info("Fetching labels by account ID and organization ID");
+    List<Integer> labelIds = accountRepository.getLabelIdsByAccountIdAndOrgId(accountId, orgId);
+    return labelIds.stream().map(this::getLabelById).collect(Collectors.toList());
+  }
+
+  /**
+   * Fetches a label by its ID.
+   *
+   * @param labelId ID of the label.
+   * @return The label.
+   */
+  private LabelDto getLabelById(int labelId) {
+    Label label = accountRepository.getLabelById(labelId);
+    if (label != null) {
+      return new LabelDto(label.getLabelId(), label.getLabelName());
+    } else {
+      log.info("Label not found");
+      throw new ResourceNotFoundException("Label not found");
+    }
   }
 }
