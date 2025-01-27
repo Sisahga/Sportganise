@@ -2,7 +2,7 @@ import { useWaitlist } from "@/hooks/useWaitlist";
 import useJoinWaitlist from "@/hooks/useJoinWaitlist";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation } from "react-router";
 import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import {
@@ -11,18 +11,17 @@ import {
   MapPin,
   CircleUserRound,
   FileText,
-  MoveLeft,
   User2Icon,
   Hourglass,
   Repeat,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/Button";
+import BackButton from "@/components/ui/back-button";
 import { calculateEndTime } from "@/utils/calculateEndTime";
 
 const WaitlistDetailsComponent = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [programDetails, setProgramDetails] = useState<ProgramDetails | null>(
     null,
   );
@@ -58,15 +57,9 @@ const WaitlistDetailsComponent = () => {
   }, [location.state]);
 
   return (
-    <div className="mb-32 mt-32">
+    <div className="mb-32 mt-32 my-8 mx-8">
       {/** Back button */}
-      <Button
-        className="rounded-full mb-3"
-        variant="outline"
-        onClick={() => navigate(-1)}
-      >
-        <MoveLeft />
-      </Button>
+      <BackButton />
 
       {/** Program details */}
       {programDetails && (
