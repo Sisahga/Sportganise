@@ -44,7 +44,7 @@ describe("DeleteRequest", () => {
     render(
       <BrowserRouter>
         <DeleteRequest />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
   it("renders the Delete Request button", () => {
@@ -76,7 +76,7 @@ describe("DeleteRequest", () => {
 
     const description = await screen.findByTestId("description");
     expect(description).toHaveTextContent(
-      /jane doe requested to delete the channel\./i
+      /jane doe requested to delete the channel\./i,
     );
 
     const john = screen.getByText(/john/i);
@@ -107,7 +107,7 @@ describe("DeleteRequest", () => {
     fireEvent.click(approveButton);
 
     const approvalMessage = await screen.findByText(
-      /you approved the request!/i
+      /you approved the request!/i,
     );
     expect(approvalMessage).toBeInTheDocument();
 

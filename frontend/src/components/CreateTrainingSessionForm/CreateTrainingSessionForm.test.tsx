@@ -116,7 +116,7 @@ describe("CreateTrainingSessionForm", () => {
           addEventListener: vi.fn(),
           removeEventListener: vi.fn(),
           dispatchEvent: vi.fn(),
-        })
+        }),
       ),
     });
   });
@@ -141,38 +141,38 @@ describe("CreateTrainingSessionForm", () => {
     renderComponent();
 
     expect(
-      screen.getByRole("heading", { name: "Create New Event" })
+      screen.getByRole("heading", { name: "Create New Event" }),
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText(/Complete the form and submit/i)
+      screen.getByText(/Complete the form and submit/i),
     ).toBeInTheDocument();
 
     expect(screen.getByLabelText(/Title/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: /Type of Event/i })
+      screen.getByRole("combobox", { name: /Type of Event/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Pick a start date/i })
+      screen.getByRole("button", { name: /Pick a start date/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /Pick an end date/i })
+      screen.getByRole("button", { name: /Pick an end date/i }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Start Time/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/End Time/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: /Location/i })
+      screen.getByRole("combobox", { name: /Location/i }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Recurring event/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: /Visibility/i })
+      screen.getByRole("combobox", { name: /Visibility/i }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Description/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Add Attachment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Attendance Capacity/i)).toBeInTheDocument();
 
     expect(
-      screen.getByRole("button", { name: /Create new Event/i })
+      screen.getByRole("button", { name: /Create new Event/i }),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Cancel/i })).toBeInTheDocument();
   });
@@ -191,7 +191,7 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Title/i), "Test Event");
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Type of Event/i })
+      screen.getByRole("combobox", { name: /Type of Event/i }),
     );
     await userEvent.click(screen.getByText("Training Session"));
 
@@ -230,13 +230,13 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.click(screen.getByLabelText(/Recurring event/i));
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Visibility/i })
+      screen.getByRole("combobox", { name: /Visibility/i }),
     );
     await userEvent.click(screen.getByText("Public"));
 
     await userEvent.type(
       screen.getByLabelText(/Description/i),
-      "This is a test event."
+      "This is a test event.",
     );
 
     const file = new File(["dummy content"], "test.png", { type: "image/png" });
@@ -248,13 +248,13 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Attendance Capacity/i), "100");
 
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i })
+      screen.getByRole("button", { name: /Create new Event/i }),
     );
 
     await waitFor(() => {
       expect(mockCreateTrainingSession).toHaveBeenCalledWith(
         1,
-        expect.any(FormData)
+        expect.any(FormData),
       );
       expect(mockToast).toHaveBeenCalledWith({
         title: "Form submitted successfully ✔",
@@ -271,7 +271,7 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Title/i), "Test Event");
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Type of Event/i })
+      screen.getByRole("combobox", { name: /Type of Event/i }),
     );
     await userEvent.click(screen.getByText("Training Session"));
 
@@ -310,25 +310,25 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.click(screen.getByLabelText(/Recurring event/i));
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Visibility/i })
+      screen.getByRole("combobox", { name: /Visibility/i }),
     );
     await userEvent.click(screen.getByText("Public"));
 
     await userEvent.type(
       screen.getByLabelText(/Description/i),
-      "This is a test event."
+      "This is a test event.",
     );
 
     await userEvent.type(screen.getByLabelText(/Attendance Capacity/i), "100");
 
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i })
+      screen.getByRole("button", { name: /Create new Event/i }),
     );
 
     await waitFor(() => {
       expect(mockCreateTrainingSession).toHaveBeenCalledWith(
         1,
-        expect.any(FormData)
+        expect.any(FormData),
       );
       expect(mockToast).toHaveBeenCalledWith({
         variant: "destructive",
@@ -352,7 +352,7 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.type(screen.getByLabelText(/Title/i), "Test Event");
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Type of Event/i })
+      screen.getByRole("combobox", { name: /Type of Event/i }),
     );
     await userEvent.click(screen.getByText("Training Session"));
 
@@ -391,19 +391,19 @@ describe("CreateTrainingSessionForm", () => {
     await userEvent.click(screen.getByLabelText(/Recurring event/i));
 
     await userEvent.click(
-      screen.getByRole("combobox", { name: /Visibility/i })
+      screen.getByRole("combobox", { name: /Visibility/i }),
     );
     await userEvent.click(screen.getByText("Public"));
 
     await userEvent.type(
       screen.getByLabelText(/Description/i),
-      "This is a test event."
+      "This is a test event.",
     );
 
     await userEvent.type(screen.getByLabelText(/Attendance Capacity/i), "100");
 
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i })
+      screen.getByRole("button", { name: /Create new Event/i }),
     );
 
     const creatingButton = await screen.findByRole("button", {
@@ -416,7 +416,7 @@ describe("CreateTrainingSessionForm", () => {
     await waitFor(() => {
       expect(mockCreateTrainingSession).toHaveBeenCalledWith(
         1,
-        expect.any(FormData)
+        expect.any(FormData),
       );
       expect(mockToast).toHaveBeenCalledWith({
         title: "Form submitted successfully ✔",
@@ -424,7 +424,7 @@ describe("CreateTrainingSessionForm", () => {
       });
       expect(mockNavigate).toHaveBeenCalledWith(-1);
       expect(
-        screen.queryByRole("button", { name: /Creating Event/i })
+        screen.queryByRole("button", { name: /Creating Event/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -432,7 +432,7 @@ describe("CreateTrainingSessionForm", () => {
   it("shows validation errors when required fields are missing", async () => {
     renderComponent();
     await userEvent.click(
-      screen.getByRole("button", { name: /Create new Event/i })
+      screen.getByRole("button", { name: /Create new Event/i }),
     );
 
     await waitFor(() => {

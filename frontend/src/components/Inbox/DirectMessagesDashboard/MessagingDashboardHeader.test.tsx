@@ -24,7 +24,7 @@ describe("MessagingDashboardHeader", () => {
     render(
       <BrowserRouter>
         <MessagingDashboardHeader />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
   it("renders the back button, title, and add new message button", () => {
