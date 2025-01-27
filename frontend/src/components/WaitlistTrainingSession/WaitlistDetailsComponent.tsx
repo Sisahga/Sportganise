@@ -25,6 +25,9 @@ const WaitlistDetailsComponent = () => {
   const [programDetails, setProgramDetails] = useState<ProgramDetails | null>(
     null,
   );
+  const [accountId, setAccountId] = useState<number | null>(null);
+  const [accountType, setAccountType] = useState<string | null>(null);
+  const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]); // For coaches/admins
 
   useEffect(() => {
     log.debug("Fetching account details from cookies...");
@@ -34,8 +37,6 @@ const WaitlistDetailsComponent = () => {
     log.info("Fetched account details: ", user);
   }, []);
 
-  const [accountId, setAccountId] = useState<number | null>(null);
-  const [accountType, setAccountType] = useState<string | null>(null);
   const programId = programDetails?.programId || 0;
   const { waitlist, loading, error } = useWaitlist(programId);
   const isCoachOrAdmin = accountType === "ADMIN" || accountType === "COACH";
@@ -48,6 +49,21 @@ const WaitlistDetailsComponent = () => {
     } else {
       log.error("Account ID is missing!");
     }
+  };
+
+  const handlePlayerSelect = (playerId: number) => {
+    setSelectedPlayers(
+      (prev) =>
+        prev.includes(playerId)
+          ? prev.filter((id) => id !== playerId) // Unselect if already selected
+          : [...prev, playerId], // Add to selection if not already selected
+    );
+  };
+
+  const confirmPlayers = () => {
+    log.info("Confirmed Players:", selectedPlayers);
+    alert(`Confirmed Players: ${selectedPlayers.join(", ")}`);
+    setSelectedPlayers([]); // Clear the selection after confirmation
   };
 
   useEffect(() => {
@@ -183,8 +199,21 @@ const WaitlistDetailsComponent = () => {
         ) : waitlist.length > 0 ? (
           <ul>
             {waitlist.map((participant, index) => (
-              <li key={participant.accountId}>
-                {participant.accountId} - Position: {index + 1}
+              <li
+                key={participant.accountId}
+                className="flex items-center gap-4"
+              >
+                {isCoachOrAdmin && (
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    checked={selectedPlayers.includes(participant.accountId)}
+                    onChange={() => handlePlayerSelect(participant.accountId)}
+                  />
+                )}
+                <span>
+                  {participant.accountId} - Position: {index + 1}
+                </span>
               </li>
             ))}
           </ul>
@@ -193,6 +222,18 @@ const WaitlistDetailsComponent = () => {
             No players on the waitlist
           </p>
         )}
+
+        {/** Confirm button for coaches/admins */}
+        {isCoachOrAdmin && waitlist.length > 0 && (
+          <Button
+            className="mt-4 w-full bg-secondaryColour text-white py-2 rounded-md"
+            onClick={confirmPlayers}
+          >
+            Confirm Selected Players
+          </Button>
+        )}
+
+        {/** Join Queue button for regular users */}
         {!isCoachOrAdmin && (
           <Button
             className="mt-4 w-full bg-secondaryColour text-white py-2 rounded-md"
