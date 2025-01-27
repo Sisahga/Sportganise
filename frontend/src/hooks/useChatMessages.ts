@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { MessageComponent } from "@/types/messaging.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
-import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 function useChatMessages(channelId: number, read: boolean) {
   const [messages, setMessages] = useState<MessageComponent[]>([]);

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
 import useLastMessage from "@/hooks/useLastMessage.ts";
 import log from "loglevel";
-import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   channel,

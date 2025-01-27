@@ -7,7 +7,7 @@ import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import useCreateChannel from "@/hooks/useCreateChannel.ts";
 import { CreateChannelDto } from "@/types/dmchannels.ts";
 import log from "loglevel";
-import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 export default function CreateDirectMessagingChannel() {
   const cookies = getCookies();

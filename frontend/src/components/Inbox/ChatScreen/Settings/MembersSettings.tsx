@@ -29,7 +29,7 @@ import useSendMessage from "@/hooks/useSendMessage.ts";
 import AddMembers from "@/components/Inbox/AddMembers.tsx";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
-import {getCookies} from "@/services/cookiesService.ts";
+import { getCookies } from "@/services/cookiesService.ts";
 
 export function MembersSettingsDialog({
   isOpen,
@@ -86,8 +86,7 @@ export function MembersSettingsDialog({
           sentAt: new Date().toISOString(),
           type: "LEAVE",
           senderFirstName: userFirstName,
-          avatarUrl:
-            cookies.pictureUrl,
+          avatarUrl: cookies.pictureUrl,
         };
         sendDirectMessage(messagePayload, websocketRef);
         setAlertDialogOpen(false);
@@ -129,8 +128,7 @@ export function MembersSettingsDialog({
         sentAt: new Date().toISOString(),
         type: "JOIN",
         senderFirstName: userFirstName,
-        avatarUrl:
-          cookies.pictureUrl,
+        avatarUrl: cookies.pictureUrl,
       };
       sendDirectMessage(messagePayload, websocketRef);
 

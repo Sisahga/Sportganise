@@ -7,7 +7,7 @@ import "./MessagingDashboard.css";
 import log from "loglevel";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router";
-import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 function DirectMessagesDashboard() {
   const cookies = getCookies();
