@@ -16,7 +16,7 @@ A sport Management Application <br>
 ## Release Demos
 Release 1: https://drive.google.com/file/d/1UsRUmvnBbStKwHjvWQnSvQ8CL8Uo43cr/view?usp=drive_link
 
-Release 2 (Jan 26): -
+Release 2 (Jan 26): https://drive.google.com/file/d/1ZR2Kzu-3m0_4q3iK0jbFxGDulEswFCIK/view?usp=drive_link (if this one doesn't work try this one: https://drive.google.com/file/d/17PjGi0htj1HTh7uOTOJakSlLiGE2qZJv/view?usp=drive_link)
 
 Release 3 (Apr 5): -
 
