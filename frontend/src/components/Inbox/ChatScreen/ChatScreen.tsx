@@ -1,7 +1,7 @@
 import type React from "react";
 import {useState, useRef, useEffect, type DragEvent} from "react";
-import {useLocation} from "react-router";
-import {Send, FolderOpen, Paperclip} from "lucide-react";
+import {useLocation, useNavigate} from "react-router";
+import {Send, FolderOpen, Paperclip, ChevronLeft} from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
@@ -15,7 +15,6 @@ import useSendMessage from "@/hooks/useSendMessage";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
 import {getAccountIdCookie, getCookies} from "@/services/cookiesService";
-import BackButton from "@/components/ui/back-button";
 import {
   FileInput,
   FileUploader,
@@ -69,6 +68,7 @@ const ChatScreen: React.FC = () => {
   const cookies = getCookies();
   const currentUserId = getAccountIdCookie(cookies);
 
+  const navigate = useNavigate();
   const [connected, setConnected] = useState<boolean>(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
   const [channelIsBlocked, setChannelIsBlocked] = useState<boolean>(isBlocked);
@@ -216,7 +216,17 @@ const ChatScreen: React.FC = () => {
             style={{borderRadius: "0 0 1rem 1rem"}}
         >
           <div className="flex flex-grow items-center gap-4">
-            <BackButton/>
+            <Button
+                className="rounded-xl font-semibold"
+                variant="outline"
+                onClick={() => {
+                  navigate("/pages/DirectMessagesDashboard");
+                }}
+                aria-label="back"
+            >
+              <ChevronLeft />
+              <p className="sm:block hidden">Back</p>
+            </Button>
             <div className="flex items-center flex-grow gap-3">
               <img
                   src={currentChannelImageUrl || "/placeholder.svg"}

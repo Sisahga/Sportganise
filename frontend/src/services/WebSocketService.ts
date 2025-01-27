@@ -7,8 +7,6 @@ import { getBearerToken } from "@/services/apiHelper.ts";
 export default class WebSocketService {
   private stompClient: Client | null = null;
   private url = import.meta.env.VITE_API_BASE_URL + "/ws";
-  private RECONNECT_DELAY = 3000;
-  // private MAX_RECONNECT_TIME = 30000;
   onMessageReceivedCallback: (message: MessageComponent) => void;
 
   constructor(onMessageReceivedCallback: (message: MessageComponent) => void) {
@@ -22,7 +20,6 @@ export default class WebSocketService {
         connectHeaders: {
           Authorization: getBearerToken(),
         },
-        reconnectDelay: this.RECONNECT_DELAY,
         onConnect: () => {
           console.log("WebSocket Connected!");
           this.stompClient?.subscribe(
