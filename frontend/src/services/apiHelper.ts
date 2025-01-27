@@ -20,6 +20,10 @@ export const setAuthToken = (token: string) => {
   window.localStorage.setItem("auth_token", token);
 };
 
+export const removeAuthToken = () => {
+  window.localStorage.removeItem("auth_token");
+}
+
 export const getBearerToken = () => {
   const token = getAuthToken();
   if (token) {
