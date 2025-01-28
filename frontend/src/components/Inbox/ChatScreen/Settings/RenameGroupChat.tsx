@@ -19,6 +19,7 @@ import useRenameChannel from "@/hooks/useRenameChannel.ts";
 import log from "loglevel";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
+import {getCookies} from "@/services/cookiesService.ts";
 
 export function RenameGroupDialog({
   isOpen,
@@ -29,6 +30,8 @@ export function RenameGroupDialog({
   currentUserId,
   webSocketRef,
 }: RenameGroupDialogProps) {
+  const cookies = getCookies();
+
   const [currentName, setCurrentName] = useState(channelName);
   const [newName, setNewName] = useState("");
 
@@ -44,9 +47,8 @@ export function RenameGroupDialog({
       const response = await renameChannel(renameChannelDto);
       if (response?.status === 200) {
         log.info("Channel renamed successfully");
-        const updaterMessageView = "You changed the group name to " + newName;
-        // TODO: Change to actual first name from cookies or smt
-        const otherMessageView = "Walter group name was changed to " + newName;
+        const updaterMessageView = `You changed the group name to ${newName}`;
+        const otherMessageView = `${cookies.firstName} group name was changed to ${newName}`;
         const messagePayload: SendMessageComponent = {
           senderId: currentUserId,
           channelId: channelId,
@@ -54,7 +56,7 @@ export function RenameGroupDialog({
           attachments: [],
           sentAt: new Date().toISOString(),
           type: "UPDATE",
-          senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
+          senderFirstName: cookies.firstName,
           avatarUrl:
             "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
         };

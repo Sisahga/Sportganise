@@ -114,6 +114,7 @@ export interface ChangePictureDialogProps {
   currentChannelPictureUrl: string;
   setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
   webSocketRef: WebSocketService | null;
+  currentUserId: number;
 }
 
 export interface UpdateChannelPictureResponse {
