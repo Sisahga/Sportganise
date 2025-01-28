@@ -37,12 +37,12 @@ function App() {
           <Route path="/" element={<HomePage />} />
           {/*placed route here as it does not use original layout with Nav, bottom
         nav, ...*/}
-          <Route
-            path="/pages/CreateDmChannelPage"
-            element={<CreateDmChannelPage />}
-          ></Route>
           <Route path="/" element={<Layout />}>
             {/*Place the routes to all your pages nested beneath this Route tag */}
+            <Route
+              path="/pages/CreateDmChannelPage"
+              element={<CreateDmChannelPage />}
+            ></Route>
             <Route
               path="/pages/ChangePasswordPage"
               element={<ChangePasswordPage />}

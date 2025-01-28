@@ -164,6 +164,7 @@ const ChannelSettingsDropdown = ({
             variant="ghost"
             size="icon"
             className="h-9 w-9 p-0 border border-input shadow bg-white rounded-xl"
+            style={{ minWidth: "2.25rem" }}
           >
             <MoreHorizontal className="h-4 w-4" />
           </Button>
@@ -178,14 +179,6 @@ const ChannelSettingsDropdown = ({
               >
                 <span>Block</span>
                 <Ban className="h-4 w-4 ml-2" />
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onSelect={() => setIsDeleteOpen(true)}
-                className="text-red hover:text-white hover:bg-red cursor-pointer flex
-                justify-between items-center"
-              >
-                <span>Delete</span>
-                <Trash2 className="h-4 w-4 ml-2" />
               </DropdownMenuItem>
             </>
           )}
@@ -224,6 +217,14 @@ const ChannelSettingsDropdown = ({
               {currentMemberRole == GroupChannelMemberRole.ADMIN && (
                 <DropdownMenuSeparator className="bg-primaryColour/20" />
               )}
+              <DropdownMenuItem
+                onSelect={() => setIsDeleteOpen(true)}
+                className="text-red hover:text-white hover:bg-red cursor-pointer hidden
+                justify-between items-center"
+              >
+                <span>Delete</span>
+                <Trash2 className="h-4 w-4 ml-2" />
+              </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex items-center justify-between py-3 font-font text-primaryColour
                     bg-white hover:bg-secondaryColour/20 primary-red"

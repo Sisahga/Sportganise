@@ -17,7 +17,7 @@ const BackButton: React.FC = () => {
       aria-label="back"
     >
       <ChevronLeft />
-      Back
+      <p className="sm:block hidden">Back</p>
     </Button>
   );
 };

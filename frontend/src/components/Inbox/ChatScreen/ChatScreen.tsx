@@ -1,7 +1,7 @@
 import type React from "react";
 import { useState, useRef, useEffect, type DragEvent } from "react";
-import { useLocation } from "react-router";
-import { Send, FolderOpen, Paperclip } from "lucide-react";
+import { useLocation, useNavigate } from "react-router";
+import { Send, FolderOpen, Paperclip, ChevronLeft } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
@@ -15,7 +15,6 @@ import useSendMessage from "@/hooks/useSendMessage";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
-import BackButton from "@/components/ui/back-button";
 import {
   FileInput,
   FileUploader,
@@ -69,6 +68,7 @@ const ChatScreen: React.FC = () => {
   const cookies = getCookies();
   const currentUserId = getAccountIdCookie(cookies);
 
+  const navigate = useNavigate();
   const [connected, setConnected] = useState<boolean>(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
   const [channelIsBlocked, setChannelIsBlocked] = useState<boolean>(isBlocked);
@@ -158,9 +158,8 @@ const ChatScreen: React.FC = () => {
       attachments: fileAttachments,
       sentAt: new Date().toISOString(),
       type: "CHAT",
-      senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
-      avatarUrl:
-        "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+      senderFirstName: cookies.firstName,
+      avatarUrl: cookies.pictureUrl,
     };
 
     sendDirectMessage(messagePayload, webSocketServiceRef.current);
@@ -177,7 +176,7 @@ const ChatScreen: React.FC = () => {
         }
       });
     }
-  }, [connected, connectWebSocket]); // Added connectWebSocket to dependencies
+  }, []); // Added connectWebSocket to dependencies
 
   useEffect(() => {
     log.debug("Messages fetched:", messages);
@@ -202,17 +201,32 @@ const ChatScreen: React.FC = () => {
   return (
     <div
       id="chatScreenMainCtn"
-      className={`flex flex-col h-[90vh] -mt-16 ${isDragging ? "bg-blue-100" : ""}`}
+      className={`flex flex-col bg-gradient-to-b from-secondaryColour/20 to-white to-[20%] 
+      ${isDragging ? "bg-blue-100" : ""}`}
+      style={{ height: "calc(100vh - 7rem)" }}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       {/* Header */}
-      <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-4">
-        <div className="flex flex-grow items-center gap-3 place-content-between">
-          <BackButton />
-          <div className="flex items-center gap-3">
+      <header
+        className="flex items-center justify-between p-4 bg-white shadow gap-4"
+        style={{ borderRadius: "0 0 1rem 1rem" }}
+      >
+        <div className="flex flex-grow items-center gap-4">
+          <Button
+            className="rounded-xl font-semibold"
+            variant="outline"
+            onClick={() => {
+              navigate("/pages/DirectMessagesDashboard");
+            }}
+            aria-label="back"
+          >
+            <ChevronLeft />
+            <p className="sm:block hidden">Back</p>
+          </Button>
+          <div className="flex items-center flex-grow gap-3">
             <img
               src={currentChannelImageUrl || "/placeholder.svg"}
               alt={defaultGroupAvatar}

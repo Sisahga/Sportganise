@@ -11,6 +11,12 @@ const hideHeaderPaths = [
   "/verificationcode",
 ]; // Header hidden on all these pages
 
+const noTopMarginPaths = [
+  "/pages/DirectMessagesDashboard",
+  "/pages/DirectMessageChannelPage",
+  "/pages/CreateDmChannelPage",
+];
+
 // Paths where the footer should be hidden
 const hideFooterPaths = [
   "/pages/DirectMessageChannelPage",
@@ -24,6 +30,7 @@ const hideFooterPaths = [
 const fullWidthPaths = [
   "/pages/DirectMessagesDashboard",
   "/pages/DirectMessageChannelPage",
+  "/pages/CreateDmChannelPage",
 ]; // Full-width layout on these paths
 
 // Function to check if the current path matches any hide paths
@@ -36,6 +43,7 @@ const Layout = () => {
   const hideHeader = shouldHide(hideHeaderPaths, location.pathname);
   const hideFooter = shouldHide(hideFooterPaths, location.pathname);
   const isFullWidth = shouldHide(fullWidthPaths, location.pathname);
+  const noTopMargin = shouldHide(noTopMarginPaths, location.pathname);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -46,7 +54,7 @@ const Layout = () => {
       {/* Main content area */}
       <main
         className={`flex-1 ${
-          !hideHeader ? "mt-40" : ""
+          !hideHeader && !noTopMargin ? "mt-40" : "mt-28"
         } ${isFullWidth ? "mx-0" : "mx-6"}`}
       >
         <Outlet /> {/* This will render the routed page content */}
