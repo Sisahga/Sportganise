@@ -15,6 +15,7 @@ function DirectMessagesDashboard() {
   const [channels, setChannels] = useState<Channel[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [unreadChannelCount, setUnreadChannelCount] = useState<number>(0);
   const navigate = useNavigate();
 
   const simpleChannels = channels.filter(
@@ -28,6 +29,11 @@ function DirectMessagesDashboard() {
     try {
       const response = await directMessagingApi.getChannels(accountId);
       setChannels(response);
+      response.forEach((channel) => {
+        if (!channel.read) {
+          setUnreadChannelCount((prev) => prev + 1);
+        }
+      });
     } catch (err) {
       log.error("Error fetching chat messages:", err);
       setError("Failed to load messages.");
@@ -73,7 +79,7 @@ function DirectMessagesDashboard() {
             Messages
           </h2>
           <p className="text-fadedPrimaryColour text-center">
-            {/*You have 0 unread messages TODO: Update get channels to include # of unread channels. */}
+            You have {unreadChannelCount} unread messages.
           </p>
         </div>
         <div className="absolute right-5 top-0">
