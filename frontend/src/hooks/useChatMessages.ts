@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { MessageComponent } from "@/types/messaging.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 function useChatMessages(channelId: number, read: boolean) {
   const [messages, setMessages] = useState<MessageComponent[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const userId = 2; // TODO: Replace with actual user ID from cookies
+  const cookies = getCookies();
+  const userId = getAccountIdCookie(cookies);
 
   const fetchMessages = async () => {
     try {

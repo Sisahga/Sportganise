@@ -1,32 +1,33 @@
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FormField } from "@/components/ui/formfield";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast"; // Toast hook
 import { useSignUp } from "@/hooks/useSignUp";
 import { useSendCode } from "@/hooks/useSendCode";
 import { SignUpRequest } from "@/types/auth";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 export default function SignUp() {
   const navigate = useNavigate();
   const { toast } = useToast(); // Toast function
+  const [isCodeSent, setIsCodeSent] = useState(false); // New flag for sending state
 
   // Hooks
   const {
     isLoading: signUpLoading,
     error: signUpError,
-    emailForVerification,
     signUpUser,
   } = useSignUp();
-  const { isLoading: sendCodeLoading, error: sendCodeError } =
-    useSendCode(emailForVerification);
+  const {
+    isLoading: sendCodeLoading,
+    error: sendCodeError,
+    sendVerificationCode,
+  } = useSendCode();
+
+  const [emailForVerification, setEmailForVerification] = useState<
+    string | null
+  >(null);
 
   const [formData, setFormData] = useState<SignUpRequest>({
     type: "PLAYER",
@@ -84,13 +85,6 @@ export default function SignUp() {
     }
   };
 
-  const handleAccountTypeChange = (type: "PLAYER" | "COACH" | "ADMIN") => {
-    setFormData((prev) => ({
-      ...prev,
-      type,
-    }));
-  };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -114,23 +108,49 @@ export default function SignUp() {
       return;
     }
 
-    await signUpUser(formData);
+    try {
+      const response = await signUpUser(formData); // Perform sign-up
+
+      if (response?.statusCode === 201) {
+        setEmailForVerification(formData.email); // Set email for verification only on success
+      }
+    } catch (err) {
+      console.error("Sign-up failed:", err);
+    }
   };
 
   useEffect(() => {
-    if (emailForVerification && !sendCodeError) {
-      // if (data?.statusCode === 201) {
-      toast({
-        variant: "success",
-        title: "Account Created",
-        description:
-          "A verification code has been sent to your email. Redirecting...",
-      });
+    if (emailForVerification && !isCodeSent) {
+      const sendCode = async () => {
+        try {
+          setIsCodeSent(true); // Mark as sent
+          await sendVerificationCode(emailForVerification);
+          toast({
+            variant: "success",
+            title: "Account Created",
+            description: "A verification code has been sent to your email.",
+          });
 
-      // Redirect to verification code page
-      navigate("/verificationcode");
+          navigate("/verificationcode", { state: { email: formData.email } });
+        } catch (err) {
+          setIsCodeSent(false);
+          console.error("Failed to send verification code", err);
+        }
+      };
+
+      sendCode();
     }
+  }, [
+    emailForVerification,
+    isCodeSent,
+    sendVerificationCode,
+    navigate,
+    toast,
+    formData.email,
+  ]);
 
+  // To handle errors
+  useEffect(() => {
     if (signUpError) {
       toast({
         variant: "destructive",
@@ -148,30 +168,7 @@ export default function SignUp() {
         description: "Failed to send verification code. Please try again.",
       });
     }
-  }, [emailForVerification, signUpError, sendCodeError, navigate, toast]);
-
-  // if (error) {
-  //   if (error.includes("Account already exists")) {
-  //     toast({
-  //       variant: "destructive",
-  //       title: "Sign Up Failed",
-  //       description: "Account already exists.",
-  //     });
-  //     } else if (error.includes("Password too weak")) {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Sign Up Failed",
-  //         description: "Password too weak.",
-  //       });
-  //     } else {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Sign Up Failed",
-  //         description: "An unexpected error occurred.",
-  //       });
-  //     }
-  //   }
-  // }, [data, error, navigate, toast]);
+  }, [signUpError, sendCodeError, toast]);
 
   return (
     <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20 px-4 sm:px-6 lg:px-8">
@@ -262,47 +259,14 @@ export default function SignUp() {
                 />
               </div>
 
-              <div>
-                <label htmlFor="accountType" className="text-sm font-medium">
-                  Account Type
-                </label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      id="accountType"
-                      variant="outline"
-                      className="w-full mt-2"
-                    >
-                      {formData.type}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("PLAYER")}
-                    >
-                      Player
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("COACH")}
-                    >
-                      Coach
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("ADMIN")}
-                    >
-                      Admin
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-
               <Button
                 type="submit"
                 className="w-full text-white bg-primaryColour mt-4"
                 disabled={signUpLoading || sendCodeLoading}
-                // disabled={isLoading} // To disable the button while the API call is being made
               >
-                {signUpLoading ? "Creating Account..." : "Sign Up"}
+                {signUpLoading || sendCodeLoading
+                  ? "Creating Account..."
+                  : "Sign Up"}
               </Button>
             </form>
           </CardContent>

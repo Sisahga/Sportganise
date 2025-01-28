@@ -20,6 +20,7 @@ import {
   MAX_SINGLE_FILE_SIZE_TEXT,
 } from "@/constants/file.constants.ts";
 import { useToast } from "@/hooks/use-toast.ts";
+import { getCookies } from "@/services/cookiesService.ts";
 
 export function ChangePictureDialog({
   isOpen,
@@ -28,7 +29,10 @@ export function ChangePictureDialog({
   currentChannelPictureUrl,
   setCurrentChannelPictureUrl,
   webSocketRef,
+  currentUserId,
 }: ChangePictureDialogProps) {
+  const cookies = getCookies();
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [popupChannelPicture, setPopupChannelPicture] = useState<
     string | undefined
@@ -60,7 +64,7 @@ export function ChangePictureDialog({
       const formData = new FormData();
       formData.append("channelId", currentChannelId.toString());
       formData.append("image", selectedFile);
-      formData.append("accountId", "2"); // TODO: Replace with actual user ID from cookies
+      formData.append("accountId", currentUserId.toString());
 
       setUploading(true);
       document.body.classList.add("pointer-events-none");
@@ -68,20 +72,18 @@ export function ChangePictureDialog({
       if (response.statusCode === 200) {
         log.info("Channel picture updated successfully.");
         setCurrentChannelPictureUrl(response.data?.channelImageUrl || "");
-        // TODO: Change to actual first name from cookies or smt
         const updaterMessageView = "You changed the group picture";
-        const otherMessageView = "Walter changed the group picture";
+        const otherMessageView = `${cookies.firstName} changed the group picture`;
 
         const messagePayload: SendMessageComponent = {
-          senderId: 2, // TODO: Replace with actual user ID from cookies
+          senderId: currentUserId,
           channelId: currentChannelId,
-          messageContent: `UPDATE*2*${updaterMessageView}*${otherMessageView}`, // TODO: Replace with actual user ID from cookies
+          messageContent: `UPDATE*${currentUserId}*${updaterMessageView}*${otherMessageView}`,
           attachments: [],
           sentAt: new Date().toISOString(),
           type: "UPDATE",
-          senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
-          avatarUrl:
-            "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+          senderFirstName: cookies.firstName,
+          avatarUrl: cookies.pictureUrl,
         };
         sendDirectMessage(messagePayload, webSocketRef);
 

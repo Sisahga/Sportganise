@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router";
 import { getCookies } from "@/services/cookiesService";
 
 interface PublicRouteProps {

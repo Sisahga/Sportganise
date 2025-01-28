@@ -21,10 +21,10 @@ export default function AddMembers({
   currentUserId,
   excludedMembers,
 }: AddMembersDialogProps) {
+  const organizationId = 1; // TODO: Get from cookies once org cookies is properly setup.
   // States.
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const organizationId = 1; // TODO: Replace with actual organization ID from cookies
 
   log.info(
     `AddMembers component initialized for organization ID: ${organizationId}`,
@@ -89,7 +89,7 @@ export default function AddMembers({
       </div>
       {/* once user searches for a player, results will start to show */}
       {(isSearching || selectedUsers.length > 0) && (
-        <ScrollArea className="flex-1 w-full max-h-[400px] rounded-md border overflow-y-auto">
+        <ScrollArea className="flex-1 w-full max-h-[40vh] rounded-md border overflow-y-auto">
           <div className="p-4 space-y-4">
             {/* Render selected players at the top */}
             {selectedUsers.map((user) => (

@@ -6,7 +6,7 @@ export interface MessageComponent {
   senderFirstName: string;
   channelId: number;
   messageContent: string;
-  attachments: string[];
+  attachments: FileAttachment[];
   sentAt: string;
   type: string;
   avatarUrl: string | undefined;
@@ -16,16 +16,23 @@ export interface SendMessageComponent {
   senderId: number;
   channelId: number;
   messageContent: string;
-  attachments: File[];
+  attachments: FileAttachment[];
   sentAt: string;
   type: string;
   senderFirstName: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
 }
 
 export interface ChatMessageProps {
   messages: MessageComponent[];
   currentUserId: number;
+}
+
+export interface FileAttachment {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  fileUrl: string;
 }
 
 export interface LastMessageComponent {

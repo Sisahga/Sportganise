@@ -5,10 +5,7 @@ import { SignUpRequest, SignUpResponse } from "@/types/auth";
 export const useSignUp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<SignUpResponse | null>(null);
-  const [emailForVerification, setEmailForVerification] = useState<
-    string | null
-  >(null);
+  const [data] = useState<SignUpResponse | null>(null);
 
   const signUpUser = async (requestData: SignUpRequest) => {
     setIsLoading(true);
@@ -17,15 +14,14 @@ export const useSignUp = () => {
     try {
       // Sign Up API call
       const signUpResponse = await signUp(requestData);
-      setData(signUpResponse);
-
-      // Save email for verification if sign-up is successful
-      setEmailForVerification(requestData.email);
+      return signUpResponse;
     } catch (err) {
-      setError((err as Error).message);
+      const errorMessage =
+        (err as Error).message || "An unexpected error occured.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
-  return { isLoading, error, data, emailForVerification, signUpUser };
+  return { isLoading, error, data, signUpUser };
 };

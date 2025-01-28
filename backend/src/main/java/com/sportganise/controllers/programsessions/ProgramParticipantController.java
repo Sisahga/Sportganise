@@ -1,9 +1,12 @@
 package com.sportganise.controllers.programsessions;
 
+import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.programsessions.WaitlistService;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST controller for managing program participants and their waitlist operations. */
+@Slf4j
 @RestController
 @RequestMapping("/api/program-participant")
 public class ProgramParticipantController {
-
-  private WaitlistService waitlistService;
+  private final WaitlistService waitlistService;
 
   /**
    * Constructor for ProgramParticipantController.
@@ -40,12 +43,22 @@ public class ProgramParticipantController {
   @PatchMapping("/opt-participant")
   public ResponseEntity<?> optProgramParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
+    log.info("Opting in participant: programId: {}, accountId: {}", programId, accountId);
 
-    Integer rank = null;
     try {
-      rank = waitlistService.optProgramParticipantDto(programId, accountId);
+      Integer rank = waitlistService.optProgramParticipantDto(programId, accountId);
+      log.info(
+          "Successfully opted in participant. programId: {}, accountId: {}, with rank: {}",
+          programId,
+          accountId,
+          rank);
       return ResponseEntity.ok(rank);
     } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant not found for opt-in. programId: {}, accountId: {}. Error: {}",
+          programId,
+          accountId,
+          e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
   }
@@ -60,13 +73,20 @@ public class ProgramParticipantController {
   @PatchMapping("/confirm-participant")
   public ResponseEntity<?> confirmParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
+    log.info("Confirming participant. programId: {}, accountId: {}", programId, accountId);
 
-    // Update the participant's confirmation status
-    ProgramParticipantDto confirmedParticipant = null;
     try {
-      confirmedParticipant = waitlistService.confirmParticipant(programId, accountId);
+      ProgramParticipantDto confirmedParticipant =
+          waitlistService.confirmParticipant(programId, accountId);
+      log.info(
+          "Participant confirmed successfully. programId: {}, accountId: {}", programId, accountId);
       return ResponseEntity.ok(confirmedParticipant);
     } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant confirmation failed. programId: {}, accountId: {}. Error: {}",
+          programId,
+          accountId,
+          e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
   }
@@ -81,12 +101,20 @@ public class ProgramParticipantController {
   @PatchMapping("/out-participant")
   public ResponseEntity<?> optOutParticipant(
       @RequestParam Integer accountId, @RequestParam Integer programId) {
+    log.info("Opting out participant. programId: {}, accountId: {}", programId, accountId);
 
-    ProgramParticipantDto outParticipant = null;
     try {
-      outParticipant = waitlistService.optOutParticipant(programId, accountId);
+      ProgramParticipantDto outParticipant =
+          waitlistService.optOutParticipant(programId, accountId);
+      log.info(
+          "Participant opted out successfully. programId: {}, accountId: {}", programId, accountId);
       return ResponseEntity.ok(outParticipant);
     } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant opt-out failed. programId: {}, accountId: {}. Error: {}",
+          programId,
+          accountId,
+          e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
   }
@@ -100,9 +128,12 @@ public class ProgramParticipantController {
   @GetMapping("/queue")
   public ResponseEntity<List<ProgramParticipantDto>> getOptedParticipants(
       @RequestParam Integer programId) {
+    log.info("Fetching opted participants queue for programId: {}", programId);
 
     List<ProgramParticipantDto> optedInParticipants =
         waitlistService.allOptedParticipants(programId);
+    log.info(
+        "Retrieved {} opted participants for programId: {}", optedInParticipants.size(), programId);
     return ResponseEntity.ok(optedInParticipants);
   }
 
@@ -116,12 +147,40 @@ public class ProgramParticipantController {
   @PatchMapping("/mark-absent")
   public ResponseEntity<?> markAbsent(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
-    ProgramParticipantDto programParticipant = null;
+    log.info("Marking participant as absent. programId: {}, accountId: {}", programId, accountId);
+
     try {
-      programParticipant = waitlistService.markAbsent(programId, accountId);
+      ProgramParticipantDto programParticipant = waitlistService.markAbsent(programId, accountId);
+      log.info(
+          "Successfully marked participant as absent. programId: {}, accountId: {}",
+          programId,
+          accountId);
       return ResponseEntity.ok(programParticipant);
     } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Mark absent failed. programId: {}, accountId: {}. Error: {}",
+          programId,
+          accountId,
+          e.getMessage());
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+  }
+
+  /**
+   * Fetches all the training sessions missing a player, making waitlist players available to join.
+   */
+  @GetMapping("/waitlist-programs")
+  public ResponseEntity<?> getWaitlistPrograms() {
+    try {
+      List<ProgramDto> ppc = waitlistService.getWaitlistPrograms();
+      log.info("Successfully fetched {} waitlist programs", ppc.size());
+      return ResponseEntity.ok(ppc);
+    } catch (ResourceNotFoundException e) {
+      log.error("Program list is empy", e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Error fetching waitlist programs");
     }
   }
 }

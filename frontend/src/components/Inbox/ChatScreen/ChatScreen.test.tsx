@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi, MockedFunction } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
-vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual("react-router-dom");
+vi.mock("react-router", async () => {
+  const actual = await vi.importActual("react-router");
   return {
     __esModule: true,
     ...actual,
@@ -19,18 +19,16 @@ vi.mock("../../../hooks/useChatMessages.ts", () => {
   };
 });
 
-vi.mock("@/hooks/useSendMessage.ts", () => {
+vi.mock("@/hooks/useSendMessage", () => {
   return {
     __esModule: true,
-    default: vi.fn().mockReturnValue({
-      sendDirectMessage: vi.fn(),
-    }),
+    default: vi.fn(),
   };
 });
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 import useChatMessages from "../../../hooks/useChatMessages.ts";
-import useSendMessage from "@/hooks/useSendMessage.ts";
+import useSendMessage from "@/hooks/useSendMessage";
 import ChatScreen from "./ChatScreen";
 
 import { SendMessageComponent, MessageComponent } from "@/types/messaging.ts";
@@ -62,8 +60,9 @@ describe("ChatScreen", () => {
   let mockSendDirectMessage: SendDirectMessageMock;
   let mockUseSendMessageReturn: MockUseSendMessageReturn;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    vi.resetModules();
 
     (useLocation as UseLocationMock).mockReturnValue({
       pathname: "/some-path",
@@ -96,8 +95,8 @@ describe("ChatScreen", () => {
     mockUseSendMessageReturn = {
       sendDirectMessage: mockSendDirectMessage,
     };
-    (useSendMessage as UseSendMessageMock).mockReturnValue(
-      mockUseSendMessageReturn,
+    (useSendMessage as UseSendMessageMock).mockImplementation(
+      () => mockUseSendMessageReturn,
     );
   });
 
@@ -123,7 +122,7 @@ describe("ChatScreen", () => {
       {
         messageId: 1,
         channelId: 123,
-        attachments: ["https://example.com/image.png"],
+        attachments: [],
         type: "CHAT",
         senderId: 999,
         senderFirstName: "Alice",
@@ -151,12 +150,7 @@ describe("ChatScreen", () => {
     expect(sendButton).toBeDisabled();
   });
 
-  it("sends message when send button is clicked", () => {
-    const mockSendMessage = vi.fn();
-    (useSendMessage as jest.Mock).mockReturnValue({
-      sendDirectMessage: mockSendMessage,
-    });
-
+  it("sends message when send button is clicked", async () => {
     render(<ChatScreen />, { wrapper: ({ children }) => <>{children}</> });
 
     const textarea = screen.getByPlaceholderText("Send a message...");
@@ -165,14 +159,15 @@ describe("ChatScreen", () => {
     fireEvent.change(textarea, { target: { value: "Hello World" } });
 
     fireEvent.click(sendButton);
-
-    expect(mockSendMessage).toHaveBeenCalledWith(
-      expect.objectContaining({
-        messageContent: "Hello World",
-        type: "CHAT",
-      }),
-      expect.any(Object),
-    );
+    await waitFor(() => {
+      expect(mockSendDirectMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          messageContent: "Hello World",
+          type: "CHAT",
+        }),
+        expect.any(Object),
+      );
+    });
   });
 
   it("if channel is blocked, hides the input area", () => {

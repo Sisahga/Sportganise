@@ -46,6 +46,15 @@ export interface CreateChannelDto {
   avatarUrl: string | null;
 }
 
+export interface ChatScreenProps {
+  channelId: number;
+  channelName: string;
+  channelImageBlob: string;
+  read: boolean;
+  channelType: string;
+  isBlocked: boolean;
+}
+
 export interface ChannelSettingsDropdownProps {
   channelId: number;
   channelType: string;
@@ -120,6 +129,7 @@ export interface ChangePictureDialogProps {
   currentChannelPictureUrl: string;
   setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
   webSocketRef: WebSocketService | null;
+  currentUserId: number;
 }
 
 export interface UpdateChannelPictureResponse {

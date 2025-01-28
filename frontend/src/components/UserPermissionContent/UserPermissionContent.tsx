@@ -4,8 +4,8 @@ WORK IN PROGRESS*/
 import React, { useState, useEffect } from "react";
 import { Card, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
-import { useNavigate } from "react-router-dom";
-import { MoveLeft, Search } from "lucide-react";
+import { useNavigate } from "react-router";
+import { Search } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -40,6 +40,10 @@ import {
 import { getCookies } from "@/services/cookiesService";
 import { useToast } from "@/hooks/use-toast";
 import { AccountPermissions } from "@/types/account";
+import BackButton from "../ui/back-button";
+import { getBearerToken } from "@/services/apiHelper.ts";
+
+const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/account";
 
 const UserPermissionContent: React.FC = () => {
   const [data, setData] = useState<AccountPermissions[]>([]);
@@ -49,8 +53,8 @@ const UserPermissionContent: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<AccountPermissions | null>(
     null,
   );
-  const [newRole, setNewRole] = useState<string>(""); // Track new role
-  const [openDialog, setOpenDialog] = useState<boolean>(false); // For managing Alert Dialog visibility
+  const [newRole, setNewRole] = useState<string>("");
+  const [openDialog, setOpenDialog] = useState<boolean>(false);
   const itemsPerPage = 5;
 
   const navigate = useNavigate();
@@ -67,11 +71,16 @@ const UserPermissionContent: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8080/api/account/permissions",
-        );
+        const response = await fetch(`${baseMappingUrl}/permissions`, {
+          method: "GET", // Specify the HTTP method
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: getBearerToken(), // Include the token from your utility function
+          },
+        });
+
         if (!response.ok) {
-          throw new Error("Failed to fetch permissions");
+          throw new Error("Failed to fetch permissions from backend");
         }
 
         const result = await response.json();
@@ -146,13 +155,7 @@ const UserPermissionContent: React.FC = () => {
     <div>
       <div className="container max-w-lg mx-auto">
         <div className="flex items-center justify-between mb-2">
-          <Button
-            className="rounded-full w-2"
-            variant="outline"
-            onClick={() => navigate("/")}
-          >
-            <MoveLeft />
-          </Button>
+          <BackButton />
           <h1 className="text-2xl font-light text-center flex-grow">
             User Permissions
           </h1>

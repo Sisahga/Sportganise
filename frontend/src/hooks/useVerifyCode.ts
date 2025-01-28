@@ -5,17 +5,22 @@ import { VerifyCodeRequest, VerifyCodeResponse } from "@/types/auth";
 export const useVerifyCode = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<VerifyCodeResponse | null>(null);
+  const [data] = useState<VerifyCodeResponse | null>(null);
 
   const verifyUserCode = async (requestData: VerifyCodeRequest) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await verifyCode(requestData);
-      setData(response);
+      console.log("Sending request to verify code:", requestData);
+      const verifyCodeResponse = await verifyCode(requestData);
+      console.log("Response from verify-code API:", verifyCodeResponse);
+      return verifyCodeResponse;
     } catch (err) {
-      setError((err as Error).message);
+      const errorMessage =
+        (err as Error).message || "An unexpected error occured.";
+      setError(errorMessage);
+      console.error("Error verifying code:", errorMessage);
     } finally {
       setIsLoading(false);
     }

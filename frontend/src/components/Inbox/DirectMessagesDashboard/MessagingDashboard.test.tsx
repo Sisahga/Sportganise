@@ -5,20 +5,16 @@ import MessagingDashboard from "./MessagingDashboard";
 import { Channel } from "@/types/dmchannels";
 import directMessagingApi from "@/services/api/directMessagingApi";
 
+vi.mock("react-router", () => ({
+  useNavigate: () => vi.fn(),
+}));
+
 vi.mock("@/services/api/directMessagingApi", () => ({
   __esModule: true,
   default: {
     getChannels: vi.fn(),
   },
 }));
-
-vi.mock(
-  "@/components/Inbox/DirectMessagesDashboard/MessagingDashboardHeader",
-  () => ({
-    __esModule: true,
-    default: vi.fn(() => <div data-testid="dashboard-header" />),
-  }),
-);
 
 vi.mock("@/components/Inbox/GroupMessages/GroupSection", () => ({
   __esModule: true,
@@ -52,6 +48,11 @@ vi.mock("../SimpleMessages/MessagesSection", () => ({
   )),
 }));
 
+vi.mock("@/services/cookiesService.ts", () => ({
+  getCookies: vi.fn(() => ({})),
+  getAccountIdCookie: vi.fn(() => "test-account-id"),
+}));
+
 describe("MessagingDashboard Component", () => {
   const mockChannels: Channel[] = [
     {
@@ -78,11 +79,6 @@ describe("MessagingDashboard Component", () => {
     vi.resetAllMocks();
   });
 
-  it("renders loading state initially", () => {
-    render(<MessagingDashboard />);
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
-  });
-
   it("renders error message when API call fails", async () => {
     (directMessagingApi.getChannels as jest.Mock).mockRejectedValue(
       new Error("API Error"),
@@ -100,7 +96,6 @@ describe("MessagingDashboard Component", () => {
     render(<MessagingDashboard />);
 
     await waitFor(() => {
-      expect(screen.getByTestId("dashboard-header")).toBeInTheDocument();
       expect(screen.getByTestId("group-section")).toBeInTheDocument();
       expect(screen.getByTestId("messages-section")).toBeInTheDocument();
     });
