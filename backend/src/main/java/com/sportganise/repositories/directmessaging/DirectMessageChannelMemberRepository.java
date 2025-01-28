@@ -43,7 +43,7 @@ public interface DirectMessageChannelMemberRepository
   @Transactional
   @Modifying
   @Query(
-          """
+      """
             UPDATE DirectMessageChannelMember cm
             SET cm.read = CASE
                 WHEN cm.compositeKey.accountId = :accountId THEN true
@@ -52,7 +52,7 @@ public interface DirectMessageChannelMemberRepository
             WHERE cm.compositeKey.channelId = :channelId
             """)
   int updateChannelMemberReadStatus(
-          @Param("accountId") int accountId, @Param("channelId") int channelId);
+      @Param("accountId") int accountId, @Param("channelId") int channelId);
 
   @Query(
       """
