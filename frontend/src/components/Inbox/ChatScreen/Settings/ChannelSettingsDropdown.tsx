@@ -42,7 +42,7 @@ import { ChangePictureDialog } from "@/components/Inbox/ChatScreen/Settings/Chan
 import { LeaveGroupDialog } from "@/components/Inbox/ChatScreen/Settings/LeaveGroup.tsx";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
 import { useNavigate } from "react-router";
-import {getCookies} from "@/services/cookiesService.ts";
+import { getCookies } from "@/services/cookiesService.ts";
 
 const ChannelSettingsDropdown = ({
   channelType,
@@ -98,8 +98,7 @@ const ChannelSettingsDropdown = ({
         sentAt: new Date().toISOString(),
         type: "BLOCK",
         senderFirstName: cookies.firstName,
-        avatarUrl:
-          cookies.pictureUrl,
+        avatarUrl: cookies.pictureUrl,
       };
       sendDirectMessage(messagePayload, webSocketRef);
 
@@ -137,8 +136,7 @@ const ChannelSettingsDropdown = ({
         sentAt: new Date().toISOString(),
         type: "LEAVE",
         senderFirstName: cookies.firstName,
-        avatarUrl:
-          cookies.pictureUrl,
+        avatarUrl: cookies.pictureUrl,
       };
       sendDirectMessage(messagePayload, webSocketRef);
       setIsLeaveGroupOpen(false);

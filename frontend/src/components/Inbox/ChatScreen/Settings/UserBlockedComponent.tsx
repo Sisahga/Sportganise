@@ -20,7 +20,7 @@ import { BlockUserRequestDto } from "@/types/blocklist.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import log from "loglevel";
-import {getAccountIdCookie, getCookies} from "@/services/cookiesService.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 
 const UserBlockedComponent = ({
   showBlockedMessage,
@@ -55,8 +55,7 @@ const UserBlockedComponent = ({
           sentAt: new Date().toISOString(),
           type: "UNBLOCK",
           senderFirstName: cookies.firstName,
-          avatarUrl:
-            cookies.pictureUrl,
+          avatarUrl: cookies.pictureUrl,
         };
         sendDirectMessage(messagePayload, webSocketRef);
         setShowComponent(false);

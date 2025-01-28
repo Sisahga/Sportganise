@@ -19,7 +19,7 @@ import useRenameChannel from "@/hooks/useRenameChannel.ts";
 import log from "loglevel";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
-import {getCookies} from "@/services/cookiesService.ts";
+import { getCookies } from "@/services/cookiesService.ts";
 
 export function RenameGroupDialog({
   isOpen,

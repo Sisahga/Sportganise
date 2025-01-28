@@ -20,7 +20,7 @@ import {
   MAX_SINGLE_FILE_SIZE_TEXT,
 } from "@/constants/file.constants.ts";
 import { useToast } from "@/hooks/use-toast.ts";
-import {getCookies} from "@/services/cookiesService.ts";
+import { getCookies } from "@/services/cookiesService.ts";
 
 export function ChangePictureDialog({
   isOpen,
@@ -29,7 +29,7 @@ export function ChangePictureDialog({
   currentChannelPictureUrl,
   setCurrentChannelPictureUrl,
   webSocketRef,
-  currentUserId
+  currentUserId,
 }: ChangePictureDialogProps) {
   const cookies = getCookies();
 
@@ -83,8 +83,7 @@ export function ChangePictureDialog({
           sentAt: new Date().toISOString(),
           type: "UPDATE",
           senderFirstName: cookies.firstName,
-          avatarUrl:
-            cookies.pictureUrl,
+          avatarUrl: cookies.pictureUrl,
         };
         sendDirectMessage(messagePayload, webSocketRef);
 
