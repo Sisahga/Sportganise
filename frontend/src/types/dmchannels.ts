@@ -35,6 +35,15 @@ export interface CreateChannelDto {
   avatarUrl: string | null;
 }
 
+export interface ChatScreenProps {
+  channelId: number;
+  channelName: string;
+  channelImageBlob: string;
+  read: boolean;
+  channelType: string;
+  isBlocked: boolean;
+}
+
 export interface ChannelSettingsDropdownProps {
   channelId: number;
   channelType: string;

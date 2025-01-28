@@ -1,4 +1,3 @@
-import { FileAttachment } from "@/components/Inbox/ChatScreen/ChatScreen";
 import WebSocketService from "@/services/WebSocketService.ts";
 
 export interface MessageComponent {
@@ -27,6 +26,13 @@ export interface SendMessageComponent {
 export interface ChatMessageProps {
   messages: MessageComponent[];
   currentUserId: number;
+}
+
+export interface FileAttachment {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  fileUrl: string;
 }
 
 export interface LastMessageComponent {
