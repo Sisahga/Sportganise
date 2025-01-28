@@ -7,7 +7,11 @@ import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
-import type { MessageComponent, SendMessageComponent, FileAttachment } from "@/types/messaging";
+import type {
+  MessageComponent,
+  SendMessageComponent,
+  FileAttachment,
+} from "@/types/messaging";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages";
 import { Button } from "@/components/ui/Button";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown";
@@ -24,7 +28,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {ChatScreenProps} from "@/types/dmchannels.ts";
+import { ChatScreenProps } from "@/types/dmchannels.ts";
 
 const formSchema = z.object({
   message: z.string().optional(),
