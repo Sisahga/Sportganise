@@ -36,23 +36,25 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http.exceptionHandling(
-                    configurer -> configurer.authenticationEntryPoint(userAuthenticationEntryPoint))
-            .addFilterBefore(
-                    new JwtAuthFilter(userAuthProvider, environment), UsernamePasswordAuthenticationFilter.class)
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(
-                    session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(
-                    request -> {
-                      if (environment.equals("DEV")) {
-                        request.anyRequest().permitAll();
-                      } else {
-                        request.requestMatchers("/api/auth/**", "/ws/**", "/ws")
-                                .permitAll()
-                                .anyRequest()
-                                .authenticated();
-                      }
-                    })
-            .build();
+            configurer -> configurer.authenticationEntryPoint(userAuthenticationEntryPoint))
+        .addFilterBefore(
+            new JwtAuthFilter(userAuthProvider, environment),
+            UsernamePasswordAuthenticationFilter.class)
+        .csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            request -> {
+              if (environment.equals("DEV")) {
+                request.anyRequest().permitAll();
+              } else {
+                request
+                    .requestMatchers("/api/auth/**", "/ws/**", "/ws")
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated();
+              }
+            })
+        .build();
   }
 }
