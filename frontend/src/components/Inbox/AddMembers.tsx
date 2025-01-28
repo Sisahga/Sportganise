@@ -21,10 +21,10 @@ export default function AddMembers({
   currentUserId,
   excludedMembers,
 }: AddMembersDialogProps) {
+  const organizationId = 1; // TODO: Get from cookies once org cookies is properly setup.
   // States.
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const organizationId = 1; // TODO: Replace with actual organization ID from cookies
 
   log.info(
     `AddMembers component initialized for organization ID: ${organizationId}`,

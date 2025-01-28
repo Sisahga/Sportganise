@@ -42,6 +42,7 @@ import { ChangePictureDialog } from "@/components/Inbox/ChatScreen/Settings/Chan
 import { LeaveGroupDialog } from "@/components/Inbox/ChatScreen/Settings/LeaveGroup.tsx";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
 import { useNavigate } from "react-router";
+import { getCookies } from "@/services/cookiesService.ts";
 
 const ChannelSettingsDropdown = ({
   channelType,
@@ -54,6 +55,8 @@ const ChannelSettingsDropdown = ({
   currentChannelPictureUrl,
   setCurrentChannelPictureUrl,
 }: ChannelSettingsDropdownProps) => {
+  const cookies = getCookies();
+
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
   const [userBlocked, setUserBlocked] = useState(isBlocked);
@@ -94,9 +97,8 @@ const ChannelSettingsDropdown = ({
         attachments: [],
         sentAt: new Date().toISOString(),
         type: "BLOCK",
-        senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
-        avatarUrl:
-          "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+        senderFirstName: cookies.firstName,
+        avatarUrl: cookies.pictureUrl,
       };
       sendDirectMessage(messagePayload, webSocketRef);
 
@@ -125,7 +127,7 @@ const ChannelSettingsDropdown = ({
     if (response?.status === 200) {
       log.info(`User ${currentUserId} left group ${channelId}`);
       const leaveMessageRemoverViewContent = "You left the group.";
-      const leaveMessageContent = `Walter left the group.`; // TODO: Replace with actual first name from cookies.
+      const leaveMessageContent = `${cookies.firstName} left the group.`;
       const messagePayload: SendMessageComponent = {
         senderId: currentUserId,
         channelId: channelId,
@@ -133,10 +135,8 @@ const ChannelSettingsDropdown = ({
         attachments: [],
         sentAt: new Date().toISOString(),
         type: "LEAVE",
-        senderFirstName: "Walter", // TODO: Replace with actual first name from cookies.
-        // TODO: Replace with actual avatar url from cookies.
-        avatarUrl:
-          "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+        senderFirstName: cookies.firstName,
+        avatarUrl: cookies.pictureUrl,
       };
       sendDirectMessage(messagePayload, webSocketRef);
       setIsLeaveGroupOpen(false);
@@ -263,6 +263,7 @@ const ChannelSettingsDropdown = ({
         currentChannelPictureUrl={currentChannelPictureUrl}
         setCurrentChannelPictureUrl={setCurrentChannelPictureUrl}
         webSocketRef={webSocketRef}
+        currentUserId={currentUserId}
       />
       <LeaveGroupDialog
         isOpen={isLeaveGroupOpen}

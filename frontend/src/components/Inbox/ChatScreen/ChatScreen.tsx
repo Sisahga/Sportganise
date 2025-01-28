@@ -136,6 +136,17 @@ const ChatScreen: React.FC = () => {
     }
   };
 
+  const adjustTextAreaHeight = (element: HTMLTextAreaElement) => {
+    if (!element) return;
+    element.style.height = "auto";
+    element.style.height = `${element.scrollHeight}px`;
+  };
+
+  const resetTextAreaHeight = (element: HTMLTextAreaElement) => {
+    if (!element) return;
+    element.style.height = "auto";
+  };
+
   const onSubmit = (data: FormData) => {
     if (
       data.message?.trim() === "" &&
@@ -164,6 +175,9 @@ const ChatScreen: React.FC = () => {
 
     sendDirectMessage(messagePayload, webSocketServiceRef.current);
     form.reset();
+    resetTextAreaHeight(
+      document.getElementById("chatScreenInputArea") as HTMLTextAreaElement,
+    );
   };
 
   useEffect(() => {
@@ -324,6 +338,10 @@ const ChatScreen: React.FC = () => {
               className={`${channelIsBlocked ? "force-hide" : ""} flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none`}
               style={{ scrollbarWidth: "none" }}
               rows={1}
+              onChange={(e) => {
+                field.onChange(e);
+                adjustTextAreaHeight(e.target);
+              }}
             />
           )}
         />
