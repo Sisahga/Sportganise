@@ -1,6 +1,7 @@
 package com.sportganise.config;
 
 import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
   private static final Long MAX_AGE = 3600L;
   private static final int CORS_FILTER_ORDER = -100;
 
+  @Value("${environment}")
+  private String environment;
+
   /**
    * CORS filter configuration.
    *
@@ -31,6 +35,9 @@ public class WebConfig implements WebMvcConfigurer {
     config.addAllowedOrigin("http://localhost");
     config.addAllowedOrigin("http://localhost:5173");
     config.addAllowedOrigin("https://onibad.sportganise.com");
+    if (environment.equals("DEV")) {
+      config.addAllowedOrigin("postman");
+    }
     config.addAllowedHeader("*");
     config.setAllowedMethods(
         Arrays.asList(
