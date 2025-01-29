@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -457,22 +459,24 @@ public class DirectMessageChannelService {
    */
   public DeleteChannelRequestResponseDto getDeleteChannelRequestIsActive(int channelId) {
     try {
-      DeleteChannelRequest deleteChannelRequest =
+      Optional<DeleteChannelRequest> deleteChannelRequest =
           this.deleteChannelRequestRepository.findByChannelId(channelId);
-      if (deleteChannelRequest == null) {
+      if (deleteChannelRequest.isEmpty()) {
+        log.info("No delete channel request found for channel ID: {}", channelId);
         return null;
       } else {
+        log.debug("Delete Channel Request ID found: {}", deleteChannelRequest.get().getDeleteRequestId());
         String channelType = this.directMessageChannelRepository.findTypeByChannelId(channelId);
         DeleteChannelRequestDto deleteChannelRequestDto =
             DeleteChannelRequestDto.builder()
-                .deleteRequestId(deleteChannelRequest.getDeleteRequestId())
-                .channelId(deleteChannelRequest.getChannelId())
-                .creatorId(deleteChannelRequest.getRequesterId())
+                .deleteRequestId(deleteChannelRequest.get().getDeleteRequestId())
+                .channelId(deleteChannelRequest.get().getChannelId())
+                .creatorId(deleteChannelRequest.get().getRequesterId())
                 .channelType(channelType)
                 .build();
         List<DeleteChannelRequestMembersDto> dcrMembersDto =
             this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
-                deleteChannelRequest.getDeleteRequestId());
+                deleteChannelRequest.get().getDeleteRequestId());
         return new DeleteChannelRequestResponseDto(deleteChannelRequestDto, dcrMembersDto);
       }
     } catch (DataAccessException e) {
