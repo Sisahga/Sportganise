@@ -40,7 +40,7 @@ export interface SignUpRequest {
 export interface SignUpResponse {
   statusCode: number;
   message: string;
-  data: null | {email: string};
+  data: null | { email: string };
 }
 
 export interface SendCodeRequest {

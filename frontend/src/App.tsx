@@ -33,8 +33,14 @@ function App() {
           <Route element={<Layout />}>
             <Route path="/login" element={<LogInPage />}></Route>
             <Route path="/signup" element={<SignUpPage />}></Route>
-            <Route path="/verificationcode" element={<VerificationCodePage />}></Route>
-            <Route path="/forgotpassword" element={<ForgotPasswordPage />}></Route>
+            <Route
+              path="/verificationcode"
+              element={<VerificationCodePage />}
+            ></Route>
+            <Route
+              path="/forgotpassword"
+              element={<ForgotPasswordPage />}
+            ></Route>
           </Route>
         </Route>
         <Route element={<PrivateRoute />}>

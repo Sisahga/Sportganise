@@ -17,7 +17,6 @@ export default function VerificationCode() {
   const navigate = useNavigate();
   const [verified, setVerified] = useState(false);
 
-
   const {
     verifyUserCode,
     isLoading: verifyLoading,
@@ -101,7 +100,6 @@ export default function VerificationCode() {
           title: "Verification Successful",
           description: "You will be redirected to the home page shortly",
         });
-
 
         // Redirect to home page
         setTimeout(() => {

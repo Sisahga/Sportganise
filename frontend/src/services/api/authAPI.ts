@@ -12,8 +12,8 @@ import {
   VerifyCodeRequest,
   VerifyCodeResponse,
 } from "@/types/auth";
-import {isCookiesDto, setCookies} from "@/services/cookiesService";
-import {setAuthToken} from "@/services/apiHelper.ts";
+import { isCookiesDto, setCookies } from "@/services/cookiesService";
+import { setAuthToken } from "@/services/apiHelper.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -60,7 +60,6 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
   }
 
   return await response.json();
-
 };
 
 export const sendCode = async (
