@@ -16,31 +16,6 @@ export default function LogIn() {
     password: "",
   });
 
-  // // Helper function to validate password constraints
-  // const validatePassword = (password: string): boolean => {
-  //   const hasMinLength = password.length >= 8; // Check if password has at least 8 characters
-  //   const hasUpperCase = /[A-Z]/.test(password); // Check if password has an uppercase letter
-  //   const hasLowerCase = /[a-z]/.test(password); // Check if password has a lowercase letter
-  //   const hasSpecialChar = /[!@#$%^&*]/.test(password); // Check if password has a special character
-
-  //   // Count how many conditions are met
-  //   const conditionsMet = [
-  //     hasMinLength,
-  //     hasUpperCase,
-  //     hasLowerCase,
-  //     hasSpecialChar,
-  //   ].filter(Boolean).length;
-
-  //   console.log("Password Validation Conditions:", {
-  //     hasMinLength,
-  //     hasUpperCase,
-  //     hasLowerCase,
-  //     hasSpecialChar,
-  //   }); // Debug: Log results
-
-  //   return conditionsMet >= 3; // Return true if at least 3 conditions are met
-  // };
-
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -50,17 +25,6 @@ export default function LogIn() {
   // Handle login submission
   const handleLogIn = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate password constraints
-    // if (!validatePassword(formData.password)) {
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Invalid Password",
-    //     description:
-    //       "Password must be at least 8 characters long and include 1 uppercase letter, 1 lowercase letter, and 1 special character (!@#$%^&*).",
-    //   });
-    //   return;
-    // }
 
     console.log("Calling loginUser with:", formData); // Debug
     loginUser(formData).catch((err) => {
