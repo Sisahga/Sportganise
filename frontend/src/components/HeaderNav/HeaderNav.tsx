@@ -78,7 +78,7 @@ export default function HeaderNav() {
                 to="/" //add actual redirect once setting page is set up
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
-                Setting
+                Settings
               </Link>
               <button
                 onClick={clearCookiesAndNavigate}
