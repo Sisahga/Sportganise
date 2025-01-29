@@ -62,6 +62,9 @@
 .bg-primary-red {
   background-color: var(--primary-red) !important;
 }
+.bg-secondaryColour-msg-gradient {
+  background: var(--secondary-colour);
+}
 
 .force-hide {
   display: none !important;
