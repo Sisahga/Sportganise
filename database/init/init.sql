@@ -22,7 +22,8 @@ CREATE TABLE account (
 	phone VARCHAR(20) NOT NULL,
 	first_name VARCHAR(50) NOT NULL,
 	last_name VARCHAR(50) NOT NULL,
-	picture VARCHAR(255)
+	picture VARCHAR(255),
+    verified BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE blob (

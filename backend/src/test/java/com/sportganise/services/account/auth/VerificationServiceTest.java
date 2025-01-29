@@ -5,7 +5,9 @@ import static org.mockito.Mockito.*;
 
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Verification;
+import com.sportganise.exceptions.InvalidCodeException;
 import com.sportganise.repositories.VerificationRepository;
+import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -24,16 +26,24 @@ public class VerificationServiceTest {
   @Mock private VerificationRepository mockVerificationRepository;
 
   @Test
-  public void generateCode_shouldReturnSixDigitNumber() {
-    int code = verificationService.generateCode();
-    assertTrue(code >= 100000 && code <= 999999, "Code should be a 6-digit number.");
+  public void generateCode_shouldReturnSixDigitNumber() throws Exception {
+    Method method = VerificationService.class.getDeclaredMethod("generateCode");
+    method.setAccessible(true);
+    Object result = method.invoke(verificationService);
+    assertTrue(
+        (Integer) result >= 100000 && (Integer) result <= 999999,
+        "Code should be a 6-digit number.");
   }
 
   @Test
-  public void calculateExpiryDate_shouldReturnCorrectExpiryTime() {
+  public void calculateExpiryDate_shouldReturnCorrectExpiryTime() throws Exception {
+    Method method = VerificationService.class.getDeclaredMethod("calculateExpiryDate", int.class);
+    method.setAccessible(true);
+
     Timestamp expectedExpiryDate =
         Timestamp.valueOf(LocalDateTime.now().plusMinutes(10).minusSeconds(2));
-    Timestamp expiryDate = verificationService.calculateExpiryDate(10);
+    Object result = method.invoke(verificationService, 10);
+    Timestamp expiryDate = (Timestamp) result;
 
     assertTrue(expiryDate.after(expectedExpiryDate), "Expiry date should be after current time.");
     assertTrue(
@@ -58,15 +68,18 @@ public class VerificationServiceTest {
   }
 
   @Test
-  public void validateCode_shouldReturnEmptyWhenInvalidCode() {
+  public void validateCode_shouldThrowInvalidCodeException() {
     int accountId = 1;
     int invalidCode = 999999;
 
     when(mockVerificationRepository.findByAccount_AccountIdAndCode(accountId, invalidCode))
         .thenReturn(Optional.empty());
 
-    Optional<Verification> verification = verificationService.validateCode(accountId, invalidCode);
-
-    assertFalse(verification.isPresent(), "Verification should be empty for invalid code.");
+    assertThrows(
+        InvalidCodeException.class,
+        () -> {
+          verificationService.validateCode(accountId, invalidCode);
+        },
+        "InvalidCodeException should be thrown for invalid code.");
   }
 }

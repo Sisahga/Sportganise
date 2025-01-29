@@ -21,7 +21,6 @@ import com.sportganise.services.EmailService;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.account.CookiesService;
 import com.sportganise.services.account.auth.VerificationService;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -193,8 +192,7 @@ public class AuthControllerTest {
   @Order(7)
   public void verifyCode_shouldCallServices() throws Exception {
     when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
-    when(verificationService.validateCode(Mockito.anyInt(), Mockito.anyInt()))
-        .thenReturn(Optional.ofNullable(mock(Verification.class)));
+
     mockMvc
         .perform(
             post("/api/auth/verify-code")
