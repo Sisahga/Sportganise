@@ -17,10 +17,7 @@ const medTopMarginPaths = [
   "/pages/CreateDmChannelPage",
 ];
 
-const noTopMarginPaths = [
-  "/login",
-  "/signup",
-];
+const noTopMarginPaths = ["/login", "/signup"];
 
 // Paths where the footer should be hidden
 const hideFooterPaths = [

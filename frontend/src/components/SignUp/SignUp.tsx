@@ -173,7 +173,7 @@ export default function SignUp() {
 
   return (
     <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20">
-       <SecondaryHeader />
+      <SecondaryHeader />
       <div className="w-[350px] max-w-lg pt-16 pb-8 px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl md:text-4xl text-left whitespace-normal text-center">
           Welcome!

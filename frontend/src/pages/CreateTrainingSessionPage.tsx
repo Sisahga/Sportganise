@@ -3,7 +3,7 @@ import { CreateTrainingSessionForm } from "@/components/CreateTrainingSessionFor
 export default function CreateTrainingSessionPage() {
   return (
     <div className="">
-        <CreateTrainingSessionForm />
+      <CreateTrainingSessionForm />
     </div>
   );
 }
