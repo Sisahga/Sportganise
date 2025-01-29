@@ -34,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/messaging/channel")
 @Slf4j
-public class DirectMessageChannelController {
+public class  DirectMessageChannelController {
   private final DirectMessageChannelService directMessageChannelService;
   private final DirectMessageService directMessageService;
 
