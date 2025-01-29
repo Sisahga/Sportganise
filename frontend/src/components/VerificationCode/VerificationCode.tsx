@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useSendCode } from "@/hooks/useSendCode";
 import { useVerifyCode } from "@/hooks/useVerifyCode";
+import { SecondaryHeader } from "../SecondaryHeader";
 
 interface VerificationCodeLocationState {
   email?: string;
@@ -180,6 +181,7 @@ export default function VerificationCode() {
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
+       <SecondaryHeader />
       <div className="w-full pt-32">
         <div className="mx-auto max-w-[90%] md:max-w-[80%] lg:max-w-[60%] p-4">
           <h1 className="text-2xl md:text-4xl text-left">
