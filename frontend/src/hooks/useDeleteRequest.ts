@@ -1,4 +1,4 @@
-import {DeleteChannelRequestDto} from "@/types/dmchannels.ts";
+import {DeleteChannelRequestDto} from "@/types/deleteRequest.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
 
 function useDeleteRequest() {
