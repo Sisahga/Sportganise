@@ -6,10 +6,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.account.AccountDetailsDirectMessaging;
 import com.sportganise.dto.account.AccountPermissions;
@@ -19,10 +16,7 @@ import com.sportganise.dto.account.auth.Auth0AccountDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
-import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
-import com.sportganise.exceptions.AccountNotFoundException;
-import com.sportganise.exceptions.InvalidAccountTypeException;
-import com.sportganise.exceptions.PasswordTooWeakException;
+import com.sportganise.exceptions.*;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.auth.Auth0ApiService;
@@ -83,7 +77,13 @@ public class AccountServiceTest {
 
     @Test
     public void authenticateAccount_shouldReturnTrue() {
+
+      Account mockAccount = mock(Account.class);
+      mockAccount.setEmail(auth0AccountDto.getEmail());
+
+      given(mockAccount.getVerified()).willReturn(true);
       given(auth0ApiService.verifyPassword(any(Auth0AccountDto.class))).willReturn(true);
+      given(accountRepository.findByEmail(anyString())).willReturn(Optional.of(mockAccount));
 
       boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDto);
       assertTrue(isAuthenticated);
@@ -92,13 +92,14 @@ public class AccountServiceTest {
     }
 
     @Test
-    public void authenticateAccount_shouldReturnFalse() {
-      given(auth0ApiService.verifyPassword(any(Auth0AccountDto.class))).willReturn(false);
+    public void
+        authenticateAccount_shouldReturnInvalidCredentialsException_whenAuthenticationFails() {
 
-      boolean isAuthenticated = accountService.authenticateAccount(auth0AccountDto);
-      assertFalse(isAuthenticated);
-
-      verify(auth0ApiService, times(1)).verifyPassword(any(Auth0AccountDto.class));
+      InvalidCredentialsException thrown =
+          assertThrows(
+              InvalidCredentialsException.class,
+              () -> accountService.authenticateAccount(auth0AccountDto));
+      assertEquals("Invalid Credentials", thrown.getMessage());
     }
 
     @Test

@@ -329,6 +329,66 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(InvalidCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(ExpiredCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle account not verified exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(AccountNotVerifiedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle invalid credentials exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(InvalidCredentialsException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
    * Handle generic exception.
    *
    * @param e exception
