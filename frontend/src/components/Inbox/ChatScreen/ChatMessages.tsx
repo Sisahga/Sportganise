@@ -160,6 +160,18 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
                 </div>
               )}
             </div>
+            {/* DELETE message (Delete Requests) */}
+            <div>
+              {message.type == "DELETE" && (
+                  <div className="text-center faded-primary-colour font-light text-sm">
+                    {message.senderId === currentUserId ? (
+                        <p>{message.messageContent.split("*")[2]}</p>
+                    ) : (
+                        <p>{message.messageContent.split("*")[3]}</p>
+                    )}
+                  </div>
+              )}
+            </div>
           </div>
         );
       })}
