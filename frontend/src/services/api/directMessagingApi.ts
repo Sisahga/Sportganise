@@ -3,10 +3,15 @@ import {
   AddChannelMemberDto,
   Channel,
   ChannelMember,
-  CreateChannelDto, DeleteChannelRequestDto, DeleteChannelRequestResponseDto,
+  CreateChannelDto,
   RenameChannelDto,
   UpdateChannelPictureResponse,
 } from "@/types/dmchannels.ts";
+import {
+  DeleteChannelRequestDto,
+  DeleteChannelRequestResponseDto,
+  SetDeleteApproverStatusDto
+} from "@/types/deleteRequest.ts";
 import {LastMessageComponent, MessageComponent} from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
@@ -160,8 +165,17 @@ const directMessagingApi = {
       },
       body: JSON.stringify(deleteChannelRequestDto),
     });
-    const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
-    return data;
+    if (response.status === 204) {
+      const data: ResponseDto<null> = {
+        statusCode: 204,
+        message: "Channel immediately and successfully deleted.",
+        data: null,
+      }
+      return data;
+    } else {
+      const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+      return data;
+    }
   },
   getIsDeleteChannelRequestActive: async (channelId: number) => {
     const response = await
@@ -170,8 +184,54 @@ const directMessagingApi = {
             Authorization: getBearerToken(),
           },
         });
-    const data: ResponseDto<boolean> = await response.json();
-    return data;
+    if (response.status === 204) {
+      const data: ResponseDto<null> = {
+        statusCode: 204,
+        message: "No delete request found",
+        data: null,
+      }
+      return data;
+    } else if (response.status === 200) {
+      const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+      return data;
+    } else {
+      const data: ResponseDto<null> = {
+        statusCode: response.status,
+        message: "Error fetching delete request.",
+        data: null,
+      }
+      return data;
+    }
+  },
+  setApproverDeleteStatus: async (setDeleteApproverStatusDto: SetDeleteApproverStatusDto) => {
+    const response = await fetch(`${baseMappingUrl}/channel/set-delete-approver-status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getBearerToken(),
+      },
+      body: JSON.stringify(setDeleteApproverStatusDto),
+    })
+    log.info("Set Approver Delete Status Response:", response);
+    if (response.status === 204) {
+      const data: ResponseDto<null> = {
+        statusCode: 204,
+        message: "No delete request found",
+        data: null,
+      }
+      log.info("Channel denied deletion.");
+      return data;
+    } else if (response.status === 200) {
+      const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+      return data;
+    } else {
+      const data: ResponseDto<null> = {
+        statusCode: response.status,
+        message: "Error fetching delete request.",
+        data: null,
+      }
+      return data;
+    }
   }
 };
 
