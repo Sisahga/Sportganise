@@ -5,10 +5,12 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.account.CookiesDto;
 import com.sportganise.dto.account.auth.AccountDto;
 import com.sportganise.dto.account.auth.Auth0AccountDto;
+import com.sportganise.dto.account.auth.VerificationDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.Verification;
 import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.InvalidCredentialsException;
 import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.services.EmailService;
 import com.sportganise.services.account.AccountService;
@@ -16,7 +18,6 @@ import com.sportganise.services.account.CookiesService;
 import com.sportganise.services.account.auth.VerificationService;
 import jakarta.validation.Valid;
 import java.util.Map;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -70,16 +71,13 @@ public class AuthController {
    * @return ResponseEntity containing the response message.
    */
   @PostMapping("/signup")
-  public ResponseEntity<ResponseDto<CookiesDto>> signup(@Valid @RequestBody AccountDto accountDto) {
-    ResponseDto<CookiesDto> responseDto = new ResponseDto<>();
+  public ResponseEntity<ResponseDto<String>> signup(@Valid @RequestBody AccountDto accountDto) {
+    ResponseDto<String> responseDto = new ResponseDto<>();
     try {
       log.debug("Creating user with email: " + accountDto.getEmail());
       String auth0Id = accountService.createAccount(accountDto);
       log.debug("User created in Auth0 with ID: " + auth0Id);
-      CookiesDto cookiesDto = cookiesService.createCookiesDto(accountDto.getEmail());
-      cookiesDto.setJwtToken(userAuthProvider.createToken(accountDto.getEmail()));
-
-      responseDto.setData(cookiesDto);
+      responseDto.setData(accountDto.getEmail());
       responseDto.setMessage("User created");
       log.debug("User created with Auth0 ID: " + auth0Id);
       responseDto.setStatusCode(HttpStatus.CREATED.value());
@@ -114,30 +112,21 @@ public class AuthController {
   public ResponseEntity<ResponseDto<CookiesDto>> login(
       @Valid @RequestBody Auth0AccountDto auth0AccountDto) {
     ResponseDto<CookiesDto> responseDto = new ResponseDto<>();
-    try {
-      boolean isValid = accountService.authenticateAccount(auth0AccountDto);
+    boolean isValid = accountService.authenticateAccount(auth0AccountDto);
 
-      if (isValid) {
-        log.debug("User logged in with email: " + auth0AccountDto.getEmail());
-        responseDto.setMessage("Login successful");
-        responseDto.setStatusCode(HttpStatus.OK.value());
-        log.debug("Cookies created for user: " + auth0AccountDto.getEmail());
-        CookiesDto cookiesDto = cookiesService.createCookiesDto(auth0AccountDto.getEmail());
-        cookiesDto.setJwtToken(userAuthProvider.createToken(auth0AccountDto.getEmail()));
-        responseDto.setData(cookiesDto);
+    if (isValid) {
+      log.debug("User logged in with email: " + auth0AccountDto.getEmail());
+      responseDto.setMessage("Login successful");
+      responseDto.setStatusCode(HttpStatus.OK.value());
+      log.debug("Cookies created for user: " + auth0AccountDto.getEmail());
+      CookiesDto cookiesDto = cookiesService.createCookiesDto(auth0AccountDto.getEmail());
+      cookiesDto.setJwtToken(userAuthProvider.createToken(auth0AccountDto.getEmail()));
+      responseDto.setData(cookiesDto);
 
-        return ResponseEntity.ok(responseDto);
-      } else {
-        responseDto.setMessage("Invalid credentials");
-        responseDto.setStatusCode(HttpStatus.UNAUTHORIZED.value());
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseDto);
-      }
-    } catch (Exception e) {
-      responseDto.setMessage("Error during login: " + e.getMessage());
-      responseDto.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR.value());
-
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseDto);
+      return ResponseEntity.ok(responseDto);
+    } else {
+      log.debug("Invalid credentials for user with email: " + auth0AccountDto.getEmail());
+      throw new InvalidCredentialsException("Invalid credentials");
     }
   }
 
@@ -169,22 +158,21 @@ public class AuthController {
    * @return ResponseEntity containing the response message.
    */
   @PostMapping("/verify-code")
-  public ResponseEntity<ResponseDto<String>> validateCode(
-      @RequestBody Map<String, String> requestBody) throws AccountNotFoundException {
-    ResponseDto<String> responseDto = new ResponseDto<>();
-    String email = requestBody.get("email");
-    responseDto.setData(email);
-    int code = Integer.parseInt(requestBody.get("code"));
+  public ResponseEntity<ResponseDto<CookiesDto>> validateCode(
+      @RequestBody VerificationDto requestBody) {
+    ResponseDto<CookiesDto> responseDto = new ResponseDto<>();
+    String email = requestBody.getEmail();
+    int code = requestBody.getCode();
     Account account = accountService.getAccountByEmail(email);
-    Optional<Verification> verification =
-        verificationService.validateCode(account.getAccountId(), code);
-    if (verification.isPresent()) {
-      responseDto.setStatusCode(HttpStatus.CREATED.value());
-      responseDto.setMessage("Code verified successfully");
-    } else {
-      responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
-      responseDto.setMessage("Invalid or expired code");
-    }
+    verificationService.validateCode(account.getAccountId(), code);
+    responseDto.setStatusCode(HttpStatus.CREATED.value());
+    responseDto.setMessage("Code verified successfully");
+
+    CookiesDto cookiesDto = cookiesService.createCookiesDto(email);
+    cookiesDto.setJwtToken(userAuthProvider.createToken(email));
+
+    responseDto.setData(cookiesDto);
+
     return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 

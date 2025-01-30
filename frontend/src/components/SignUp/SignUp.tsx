@@ -7,6 +7,7 @@ import { useToast } from "@/hooks/use-toast"; // Toast hook
 import { useSignUp } from "@/hooks/useSignUp";
 import { useSendCode } from "@/hooks/useSendCode";
 import { SignUpRequest } from "@/types/auth";
+import { SecondaryHeader } from "../SecondaryHeader";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -171,11 +172,12 @@ export default function SignUp() {
   }, [signUpError, sendCodeError, toast]);
 
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20 px-4 sm:px-6 lg:px-8">
-      <div className="w-[350px] max-w-lg">
-        <h1 className="text-3xl md:text-4xl text-left whitespace-normal">
+    <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20">
+      <SecondaryHeader />
+      <div className="w-[350px] max-w-lg pt-16 pb-8 px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl md:text-4xl text-left whitespace-normal text-center">
           Welcome!
-          <p className="mt-4 text-lg text-primaryColour-600 whitespace-normal">
+          <p className="mt-4 text-lg text-primaryColour-600 whitespace-normal text-center">
             Create a new account
           </p>
         </h1>

@@ -30,8 +30,18 @@ function App() {
     <Router>
       <Routes>
         <Route element={<PublicRoute />}>
-          <Route path="/login" element={<LogInPage />}></Route>
-          <Route path="/signup" element={<SignUpPage />}></Route>
+          <Route element={<Layout />}>
+            <Route path="/login" element={<LogInPage />}></Route>
+            <Route path="/signup" element={<SignUpPage />}></Route>
+            <Route
+              path="/verificationcode"
+              element={<VerificationCodePage />}
+            ></Route>
+            <Route
+              path="/forgotpassword"
+              element={<ForgotPasswordPage />}
+            ></Route>
+          </Route>
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<HomePage />} />
@@ -75,11 +85,6 @@ function App() {
               element={<PersonalInformationPage />}
             ></Route>
             <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
-            <Route
-              path="/verificationcode"
-              element={<VerificationCodePage />}
-            />
-            <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
             <Route
               path="/pages/ViewTrainingSessionPage"
               element={<ViewTrainingSessionPage />}
