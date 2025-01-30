@@ -226,7 +226,7 @@ public class AccountService {
           throw new AccountNotVerifiedException("Account not verified");
         }
       } else {
-        throw new InvalidCredentialsException("Invalid Credential");
+        throw new InvalidCredentialsException("Invalid Credentials");
       }
 
     } catch (AccountNotFoundException e) {

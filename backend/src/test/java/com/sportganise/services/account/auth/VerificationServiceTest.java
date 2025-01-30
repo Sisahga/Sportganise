@@ -17,11 +17,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class) // Automatically initializes mocks
+@ExtendWith(MockitoExtension.class)
 public class VerificationServiceTest {
 
-  @InjectMocks
-  private VerificationService verificationService; // Automatically injects the mock repository
+  @InjectMocks private VerificationService verificationService;
 
   @Mock private VerificationRepository mockVerificationRepository;
 
@@ -54,17 +53,22 @@ public class VerificationServiceTest {
   @Test
   public void createVerification_shouldSaveVerification() {
     Account mockAccount = new Account();
+    mockAccount.setAccountId(1);
     Verification mockVerification =
         new Verification(
             mockAccount, 123456, Timestamp.valueOf(LocalDateTime.now().plusMinutes(10)));
 
+    VerificationService spyVerificationService = spy(verificationService);
+    doNothing().when(spyVerificationService).deleteVerificationForAccount(anyInt());
+
     when(mockVerificationRepository.save(any(Verification.class))).thenReturn(mockVerification);
 
-    Verification verification = verificationService.createVerification(mockAccount);
+    Verification verification = spyVerificationService.createVerification(mockAccount);
 
     assertNotNull(verification, "Verification should not be null.");
-    verify(mockVerificationRepository, times(1))
-        .save(any(Verification.class)); // Ensure save is called once
+    verify(mockVerificationRepository, times(1)).save(any(Verification.class));
+
+    verify(spyVerificationService, times(1)).deleteVerificationForAccount(anyInt());
   }
 
   @Test
