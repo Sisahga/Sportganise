@@ -272,7 +272,8 @@ const ChatScreen: React.FC = () => {
         </div>
       </div>
 
-      {deleteRequestActive &&
+      {/* Don't display to non-admin group members */}
+      {deleteRequestActive && currentMemberStatus !== undefined &&
           <DeleteRequest
               deleteRequestActive={deleteRequestActive}
               deleteRequest={deleteRequest}
