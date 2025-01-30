@@ -27,9 +27,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
 import {
-  ChannelSettingsDropdownProps, DeleteChannelRequestDto,
+  ChannelSettingsDropdownProps,
   GroupChannelMemberRole,
 } from "@/types/dmchannels.ts";
+import {DeleteChannelRequestDto} from "@/types/deleteRequest.ts";
 import useBlockUser from "@/hooks/useBlockUser.ts";
 import {BlockUserRequestDto} from "@/types/blocklist.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
@@ -56,6 +57,7 @@ const ChannelSettingsDropdown = ({
                                    setCurrentChannelName,
                                    currentChannelPictureUrl,
                                    setCurrentChannelPictureUrl,
+                                   isDeleteRequestActive
                                  }: ChannelSettingsDropdownProps) => {
   const cookies = getCookies();
 
@@ -127,18 +129,42 @@ const ChannelSettingsDropdown = ({
       channelId: channelId,
       creatorId: currentUserId,
       channelType: channelType,
+      creatorName: null // TODO: make field in DB.
     }
     const response = await sendDeleteRequest(deleteChannelRequestDto);
     console.log("Response: ", response);
     if (response?.statusCode === 200) {
       toast({
-        title: "Success",
+        title: "Request Sent",
         description: "Delete request successfully sent.",
         variant: "success",
         duration: 3000,
       });
+
+      const messagePayload: SendMessageComponent = {
+        senderId: currentUserId,
+        channelId: channelId,
+        messageContent:
+            `DELETE*${currentUserId}*You requested to delete the channel*${cookies.firstName} requested to delete the channel`,
+        attachments: [],
+        sentAt: new Date().toISOString(),
+        type: "DELETE",
+        senderFirstName: cookies.firstName,
+        avatarUrl: cookies.pictureUrl,
+      };
+      log.info("WebSocketRef: ", webSocketRef);
+      log.info("MessagePayload: ", messagePayload);
+      sendDirectMessage(messagePayload, webSocketRef);
       log.info(`Channel ${channelId} now has a delete request ongoing.`);
-      // navigate("/pages/DirectMessagesDashboard");
+    } else if (response?.statusCode === 204) {
+      toast({
+        title: "Channel Successfully Deleted",
+        description: "The channel and its contents have been deleted.",
+        variant: "success",
+        duration: 3000,
+      });
+      log.info("Channel immediately and successfully deleted.");
+      navigate("/pages/DirectMessagesDashboard");
     } else {
       toast({
         title: "Error",
@@ -209,61 +235,63 @@ const ChannelSettingsDropdown = ({
                     <span>Block</span>
                     <Ban className="h-4 w-4 ml-2"/>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                      onSelect={() => setIsDeleteOpen(true)}
-                      className="text-red hover:text-white hover:bg-red cursor-pointer flex
+                  {!isDeleteRequestActive &&
+                      <DropdownMenuItem
+                          onSelect={() => setIsDeleteOpen(true)}
+                          className="text-red hover:text-white hover:bg-red cursor-pointer flex
                   justify-between items-center"
-                  >
-                    <span>Delete</span>
-                    <Trash2 className="h-4 w-4 ml-2"/>
-                  </DropdownMenuItem>
+                      >
+                        <span>Delete</span>
+                        <Trash2 className="h-4 w-4 ml-2"/>
+                      </DropdownMenuItem>
+                  }
                 </>
             )}
             {channelType === "GROUP" && (
                 <>
                   {/* GROUP Settings for ADMIN Members */}
-              {currentMemberRole === GroupChannelMemberRole.ADMIN && (
-                  <>
-                    <DropdownMenuItem
-                        className="flex items-center justify-between py-3 font-font text-primaryColour
+                  {currentMemberRole === GroupChannelMemberRole.ADMIN && (
+                      <>
+                        <DropdownMenuItem
+                            className="flex items-center justify-between py-3 font-font text-primaryColour
                       bg-white hover:bg-secondaryColour/20"
-                        onSelect={() => setIsMembersSettingsOpen(true)}
-                    >
-                      <span>Members Settings</span>
-                      <Users className="h-4 w-4 ml-2"/>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-primaryColour/20"/>
-                    <DropdownMenuItem
-                        className="flex items-center justify-between py-3 font-font text-primaryColour
+                            onSelect={() => setIsMembersSettingsOpen(true)}
+                        >
+                          <span>Members Settings</span>
+                          <Users className="h-4 w-4 ml-2"/>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator className="bg-primaryColour/20"/>
+                        <DropdownMenuItem
+                            className="flex items-center justify-between py-3 font-font text-primaryColour
                       bg-white hover:bg-secondaryColour/20"
-                        onSelect={() => setIsRenameGroupOpen(true)}
-                    >
-                      <span>Rename Group</span>
-                      <Edit className="h-4 w-4 ml-2"/>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        className="flex items-center justify-between py-3 font-font text-primaryColour
+                            onSelect={() => setIsRenameGroupOpen(true)}
+                        >
+                          <span>Rename Group</span>
+                          <Edit className="h-4 w-4 ml-2"/>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            className="flex items-center justify-between py-3 font-font text-primaryColour
                       bg-white hover:bg-secondaryColour/20"
-                        onSelect={() => setIsChangePictureOpen(true)}
-                    >
-                      <span>Change Picture</span>
-                      <Image className="h-4 w-4 ml-2"/>
-                    </DropdownMenuItem>
-                  </>
-              )}
-              {currentMemberRole == GroupChannelMemberRole.ADMIN && (
-                  <>
-                    <DropdownMenuSeparator className="bg-primaryColour/20"/>
-                    <DropdownMenuItem
-                        onSelect={() => setIsDeleteOpen(true)}
-                        className="text-red hover:text-white hover:bg-red cursor-pointer flex
+                            onSelect={() => setIsChangePictureOpen(true)}
+                        >
+                          <span>Change Picture</span>
+                          <Image className="h-4 w-4 ml-2"/>
+                        </DropdownMenuItem>
+                      </>
+                  )}
+                  {currentMemberRole == GroupChannelMemberRole.ADMIN && (
+                      <>
+                        <DropdownMenuSeparator className="bg-primaryColour/20"/>
+                        <DropdownMenuItem
+                            onSelect={() => setIsDeleteOpen(true)}
+                            className="text-red hover:text-white hover:bg-red cursor-pointer flex
                   justify-between items-center mt-3"
-                    >
-                      <span>Delete</span>
-                      <Trash2 className="h-4 w-4 ml-2"/>
-                    </DropdownMenuItem>
-                  </>
-              )}
+                        >
+                          <span>Delete</span>
+                          <Trash2 className="h-4 w-4 ml-2"/>
+                        </DropdownMenuItem>
+                      </>
+                  )}
                   <DropdownMenuItem
                       className="flex items-center justify-between py-3 font-font text-primaryColour
                     bg-white hover:bg-secondaryColour/20 primary-red"
