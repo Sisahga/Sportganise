@@ -48,7 +48,8 @@ public interface DeleteChannelRequestApproverRepository
       """
           SELECT dcra
           FROM DeleteChannelRequestApprover dcra
-          JOIN DeleteChannelRequest dcr ON dcra.approverCompositeKey.deleteRequestId = dcr.deleteRequestId
+          JOIN DeleteChannelRequest dcr
+                  ON dcra.approverCompositeKey.deleteRequestId = dcr.deleteRequestId
           WHERE dcr.channelId = :channelId
           AND dcra.approverCompositeKey.approverId = :accountId
         """)
