@@ -1,34 +1,26 @@
-import type React from "react";
-import { useState, useRef, useEffect, type DragEvent } from "react";
-import { useLocation, useNavigate } from "react-router";
-import { Send, FolderOpen, Paperclip, ChevronLeft } from "lucide-react";
+import React, {type DragEvent, useEffect, useRef, useState} from "react";
+import {useLocation, useNavigate} from "react-router";
+import {ChevronLeft, FolderOpen, Paperclip, Send} from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
-import type {
-  MessageComponent,
-  SendMessageComponent,
-  FileAttachment,
-} from "@/types/messaging";
+import type {FileAttachment, MessageComponent, SendMessageComponent,} from "@/types/messaging";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages";
-import { Button } from "@/components/ui/Button";
+import {Button} from "@/components/ui/Button";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown";
 import useSendMessage from "@/hooks/useSendMessage";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
-import {
-  FileInput,
-  FileUploader,
-  FileUploaderContent,
-  FileUploaderItem,
-} from "@/components/ui/file-upload";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {getAccountIdCookie, getCookies} from "@/services/cookiesService";
+import {FileInput, FileUploader, FileUploaderContent, FileUploaderItem,} from "@/components/ui/file-upload";
+import {Controller, useForm} from "react-hook-form";
+import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ChatScreenProps } from "@/types/dmchannels.ts";
+import {ChatScreenProps} from "@/types/dmchannels.ts";
+import useGetDeleteChannelRequest from "@/hooks/useGetDeleteChannelRequest.ts";
+import {DeleteRequest} from "@/components/Inbox/ChatScreen/DeleteRequest";
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -54,6 +46,8 @@ const ChatScreen: React.FC = () => {
   const currentUserId = getAccountIdCookie(cookies);
 
   const navigate = useNavigate();
+
+  // States
   const [connected, setConnected] = useState<boolean>(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
   const [channelIsBlocked, setChannelIsBlocked] = useState<boolean>(isBlocked);
@@ -64,11 +58,19 @@ const ChatScreen: React.FC = () => {
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
+  // Hooks.
   const { messages, setMessages, loading, error } = useChatMessages(
     channelId,
     read,
-  );
+  ); // Fetch messages.
   const { sendDirectMessage } = useSendMessage();
+  const {
+    deleteRequestActive,
+    deleteRequest,
+    setDeleteRequestActive,
+    setDeleteRequest,
+    currentMemberStatus
+  } = useGetDeleteChannelRequest(channelId, currentUserId); // Check if a delete request is active.
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -90,6 +92,8 @@ const ChatScreen: React.FC = () => {
       setChannelIsBlocked(true);
     } else if (message.type === "UNBLOCK") {
       setChannelIsBlocked(false);
+    } else if (message.type === "DELETE") {
+      setDeleteRequestActive(true);
     }
   };
 
@@ -175,11 +179,18 @@ const ChatScreen: React.FC = () => {
         }
       });
     }
-  }, []); // Added connectWebSocket to dependencies
+  }, []); // TODO: Add proper dependencies.
 
   useEffect(() => {
     log.debug("Messages fetched:", messages);
   }, [messages]);
+
+  useEffect(() => {
+    if (deleteRequestActive && deleteRequest) {
+      log.info("Delete request active:", deleteRequest);
+      log.info("Current member status:", currentMemberStatus);
+    }
+  }, [deleteRequestActive]);
 
   if (loading) {
     return (
@@ -246,6 +257,7 @@ const ChatScreen: React.FC = () => {
             setCurrentChannelName={setCurrentChannelName}
             currentChannelPictureUrl={currentChannelImageUrl}
             setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
+            isDeleteRequestActive={deleteRequestActive}
           />
         </div>
       </header>
@@ -259,6 +271,18 @@ const ChatScreen: React.FC = () => {
           <p>Web socket connection failed.</p>
         </div>
       </div>
+
+      {deleteRequestActive &&
+          <DeleteRequest
+              deleteRequestActive={deleteRequestActive}
+              deleteRequest={deleteRequest}
+              currentUserId={currentUserId}
+              currentUserApproverStatus={currentMemberStatus}
+              setDeleteRequestActive={setDeleteRequestActive}
+              websocketRef={webSocketServiceRef.current}
+              setDeleteRequest={setDeleteRequest}
+          />
+      }
 
       {/* Chat Messages */}
       <ChatMessages messages={messages} currentUserId={currentUserId} />
