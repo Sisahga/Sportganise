@@ -6,7 +6,6 @@ import com.sportganise.entities.directmessaging.DeleteChannelRequestApproverComp
 import com.sportganise.entities.directmessaging.DeleteChannelRequestStatusType;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -36,7 +35,8 @@ public interface DeleteChannelRequestApproverRepository
   List<DeleteChannelRequestApprover> findDeleteChannelRequestApproverByStatus(
       DeleteChannelRequestStatusType status);
 
-  @Query("""
+  @Query(
+      """
           SELECT dcra
           FROM DeleteChannelRequestApprover dcra
           WHERE dcra.approverCompositeKey.deleteRequestId = :deleteRequestId
@@ -44,7 +44,8 @@ public interface DeleteChannelRequestApproverRepository
         """)
   Optional<DeleteChannelRequestApprover> findByKey(int deleteRequestId, int approverId);
 
-  @Query("""
+  @Query(
+      """
           SELECT dcra
           FROM DeleteChannelRequestApprover dcra
           JOIN DeleteChannelRequest dcr ON dcra.approverCompositeKey.deleteRequestId = dcr.deleteRequestId

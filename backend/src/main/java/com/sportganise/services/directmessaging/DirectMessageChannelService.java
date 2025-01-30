@@ -35,7 +35,6 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -329,11 +328,13 @@ public class DirectMessageChannelService {
 
       // Check if GROUP & the requester is the only admin channel member, if so delete immediately.
       if (deleteChannelRequestDto.getChannelType().equals("GROUP")) {
-        boolean existsOtherAdmins = existsOtherAdminChannelMember(
+        boolean existsOtherAdmins =
+            existsOtherAdminChannelMember(
                 deleteChannelRequestDto.getChannelId(), deleteChannelRequestDto.getCreatorId());
         if (!existsOtherAdmins) {
-          log.info("Requester is the only admin channel member. Deleting channel {}...",
-                  deleteChannelRequestDto.getChannelId());
+          log.info(
+              "Requester is the only admin channel member. Deleting channel {}...",
+              deleteChannelRequestDto.getChannelId());
           deleteDirectMessageChannel(deleteChannelRequestDto.getChannelId());
           return Optional.empty();
         }
@@ -402,11 +403,14 @@ public class DirectMessageChannelService {
       SetDeleteApproverStatusDto setDeleteApproverStatusDto) {
     try {
       log.debug("Approver ID before key: {}", setDeleteApproverStatusDto.getAccountId());
-      log.debug("Delete Request ID before key: {}", setDeleteApproverStatusDto.getDeleteRequestId());
+      log.debug(
+          "Delete Request ID before key: {}", setDeleteApproverStatusDto.getDeleteRequestId());
       DeleteChannelRequestApprover approver =
-              this.deleteChannelRequestApproverRepository.findByKey(
-                      setDeleteApproverStatusDto.getDeleteRequestId(), setDeleteApproverStatusDto.getAccountId()
-              ).orElse(null);
+          this.deleteChannelRequestApproverRepository
+              .findByKey(
+                  setDeleteApproverStatusDto.getDeleteRequestId(),
+                  setDeleteApproverStatusDto.getAccountId())
+              .orElse(null);
 
       log.info("Approver found: {}", approver);
 
@@ -428,7 +432,8 @@ public class DirectMessageChannelService {
         log.info("Channel {} deleted.", setDeleteApproverStatusDto.getChannelId());
         return null;
       } else {
-        log.debug("Channel {} closer to being approved.", setDeleteApproverStatusDto.getChannelId());
+        log.debug(
+            "Channel {} closer to being approved.", setDeleteApproverStatusDto.getChannelId());
         DirectMessageChannel channel =
             this.directMessageChannelRepository
                 .findById(setDeleteApproverStatusDto.getChannelId())
@@ -441,7 +446,9 @@ public class DirectMessageChannelService {
                 .channelId(setDeleteApproverStatusDto.getChannelId())
                 .creatorId(setDeleteApproverStatusDto.getAccountId())
                 .channelType(channelType)
-                .creatorName(accountRepository.getFirstNameByAccountId(setDeleteApproverStatusDto.getAccountId()))
+                .creatorName(
+                    accountRepository.getFirstNameByAccountId(
+                        setDeleteApproverStatusDto.getAccountId()))
                 .build();
         List<DeleteChannelRequestMembersDto> dcrMembersDto =
             this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
@@ -485,7 +492,8 @@ public class DirectMessageChannelService {
         log.info("No delete channel request found for channel ID: {}", channelId);
         return null;
       } else {
-        log.debug("Delete Channel Request ID found: {}", deleteChannelRequest.get().getDeleteRequestId());
+        log.debug(
+            "Delete Channel Request ID found: {}", deleteChannelRequest.get().getDeleteRequestId());
         String channelType = this.directMessageChannelRepository.findTypeByChannelId(channelId);
         DeleteChannelRequestDto deleteChannelRequestDto =
             DeleteChannelRequestDto.builder()
@@ -493,7 +501,9 @@ public class DirectMessageChannelService {
                 .channelId(deleteChannelRequest.get().getChannelId())
                 .creatorId(deleteChannelRequest.get().getRequesterId())
                 .channelType(channelType)
-                .creatorName(accountRepository.getFirstNameByAccountId(deleteChannelRequest.get().getRequesterId()))
+                .creatorName(
+                    accountRepository.getFirstNameByAccountId(
+                        deleteChannelRequest.get().getRequesterId()))
                 .build();
         List<DeleteChannelRequestMembersDto> dcrMembersDto =
             this.deleteChannelRequestApproverRepository.getChannelMembersDetailsForDeleteRequest(
@@ -602,7 +612,10 @@ public class DirectMessageChannelService {
           throw new ChannelMemberNotFoundException("Channel member not found.");
         } else {
           createDeleteChannelRequestApprover(
-              otherMemberId, deleteChannelRequestId, DeleteChannelRequestStatusType.PENDING, channelId);
+              otherMemberId,
+              deleteChannelRequestId,
+              DeleteChannelRequestStatusType.PENDING,
+              channelId);
         }
       } else if (channelType.equals("GROUP")) {
         List<Integer> otherGroupAdminMemberIds =
@@ -631,7 +644,10 @@ public class DirectMessageChannelService {
    * @param status The status of the approver.
    */
   public void createDeleteChannelRequestApprover(
-      int approverId, int deleteChannelRequestId, DeleteChannelRequestStatusType status, int channelId) {
+      int approverId,
+      int deleteChannelRequestId,
+      DeleteChannelRequestStatusType status,
+      int channelId) {
     log.debug("CREATOR METHOD, APPROVER ID: {}", approverId);
     log.debug("CREATOR METHOD, DELETE REQ ID: {}", deleteChannelRequestId);
     log.debug("CREATOR METHOD, APPROVER STATUS: {}", status);
@@ -639,7 +655,8 @@ public class DirectMessageChannelService {
         new DeleteChannelRequestApproverCompositeKey(deleteChannelRequestId, approverId);
 
     log.debug("CREATOR METHOD, APPROVER KEY: {}", key);
-    DeleteChannelRequestApprover approver = new DeleteChannelRequestApprover(key, channelId, status);
+    DeleteChannelRequestApprover approver =
+        new DeleteChannelRequestApprover(key, channelId, status);
 
     log.debug("Creating approver with DELETE_REQUEST_ID: {}", deleteChannelRequestId);
     log.debug("Full Approver Object before save: {}", approver);
@@ -674,6 +691,7 @@ public class DirectMessageChannelService {
   }
 
   public boolean existsOtherAdminChannelMember(int channelId, int accountId) {
-    return directMessageChannelMemberRepository.getAdminChannelMembersCount(channelId, accountId) > 0;
+    return directMessageChannelMemberRepository.getAdminChannelMembersCount(channelId, accountId)
+        > 0;
   }
 }

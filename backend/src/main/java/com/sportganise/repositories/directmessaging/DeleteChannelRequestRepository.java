@@ -1,10 +1,9 @@
 package com.sportganise.repositories.directmessaging;
 
 import com.sportganise.entities.directmessaging.DeleteChannelRequest;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.Optional;
 
 /** Repository for handling Delete Channel Requests. */
 public interface DeleteChannelRequestRepository

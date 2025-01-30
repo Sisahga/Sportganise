@@ -109,7 +109,8 @@ public interface DirectMessageChannelMemberRepository
         """)
   List<Integer> getOtherGroupAdminMemberIds(int channelId, int accountId);
 
-  @Query("""
+  @Query(
+      """
           SELECT COUNT(*)
           FROM DirectMessageChannelMember cm
           WHERE cm.compositeKey.channelId = :channelId
