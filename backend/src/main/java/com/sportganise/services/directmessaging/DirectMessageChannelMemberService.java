@@ -1,16 +1,19 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.ChannelMembersDto;
-import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
-import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
-import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
+import com.sportganise.entities.directmessaging.*;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberDeleteException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberFetchException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSaveException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -21,6 +24,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DirectMessageChannelMemberService {
   private final DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
+  private final DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
+  private final DeleteChannelRequestRepository deleteChannelRequestRepository;
 
   /**
    * Service Constructor.
@@ -29,8 +34,12 @@ public class DirectMessageChannelMemberService {
    */
   @Autowired
   public DirectMessageChannelMemberService(
-      DirectMessageChannelMemberRepository directMessageChannelMemberRepository) {
+      DirectMessageChannelMemberRepository directMessageChannelMemberRepository,
+      DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository,
+      DeleteChannelRequestRepository deleteChannelRequestRepository) {
     this.directMessageChannelMemberRepository = directMessageChannelMemberRepository;
+    this.deleteChannelRequestApproverRepository = deleteChannelRequestApproverRepository;
+    this.deleteChannelRequestRepository = deleteChannelRequestRepository;
   }
 
   /**
@@ -115,13 +124,42 @@ public class DirectMessageChannelMemberService {
 
   /**
    * Removes a user from a channel.
+   * If the user was an admin of the channel, and a delete request is ongoing, and
+   * this user was the last admin needed to approve, the delete request is cancelled.
    *
    * @param channelId The channel id.
    * @param accountId The account id.
    */
+  @Transactional
   public void removeMemberFromChannel(int channelId, int accountId) {
     try {
+      Optional<DeleteChannelRequestApprover> dcra =
+              this.deleteChannelRequestApproverRepository.approverExists(channelId, accountId);
+      log.debug("Member leaving channel is approver for an ongoing delete request: {}", dcra.isPresent());
       this.directMessageChannelMemberRepository.deleteByChannelIdAndAccountId(channelId, accountId);
+      log.info("Member {} removed from channel {}", accountId, channelId);
+
+      // Check if we need to delete a delete request.
+      if (dcra.isPresent()) {
+        List<DeleteChannelRequestApprover> approvers =
+            this.deleteChannelRequestApproverRepository
+                    .findDeleteChannelRequestApproverByApproverCompositeKey_DeleteRequestId(
+                          dcra.get().getApproverCompositeKey().getDeleteRequestId());
+        log.debug("Number of approvers for delete request remaining: {}", approvers.size());
+        int approvedCount = 0;
+        for (DeleteChannelRequestApprover approver : approvers) {
+          if (approver.getStatus() == DeleteChannelRequestStatusType.PENDING) {
+            return;
+          } else if (approver.getStatus() == DeleteChannelRequestStatusType.APPROVED) {
+            approvedCount++;
+          }
+        }
+        // Delete request to delete channel, as admin channel member who left was last admin needed to approve.
+        if (approvedCount == approvers.size()) {
+          this.deleteChannelRequestRepository.deleteById(dcra.get().getApproverCompositeKey().getDeleteRequestId());
+          log.info("Delete request for channel {} cancelled as last admin need to approve left channel.", channelId);
+        }
+      }
     } catch (DataAccessException e) {
       log.error("Database error occuring when removing member from channel: {}", e.getMessage());
       throw new ChannelMemberDeleteException(

@@ -97,9 +97,10 @@ public class DeleteChannelRequestServiceUnitTest {
     int approverId = 1;
     int deleteChannelRequestId = 2;
     DeleteChannelRequestStatusType status = DeleteChannelRequestStatusType.PENDING;
+    int channelId = 1;
 
     directMessageChannelService.createDeleteChannelRequestApprover(
-        approverId, deleteChannelRequestId, status);
+        approverId, deleteChannelRequestId, status, channelId);
 
     verify(deleteChannelRequestApproverRepository).save(any());
   }

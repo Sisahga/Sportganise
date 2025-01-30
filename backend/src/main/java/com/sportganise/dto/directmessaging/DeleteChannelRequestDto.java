@@ -16,5 +16,6 @@ public class DeleteChannelRequestDto {
   private Integer deleteRequestId; // Will be null on initial request from client.
   private int channelId;
   private int creatorId;
+  private String creatorName; // Will be null when used as request object, but will be populated when used as response object.
   private String channelType;
 }
