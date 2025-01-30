@@ -106,6 +106,7 @@ INSERT INTO channel_member (channel_id, account_id, read, role) VALUES
 (1, 2, false, 'ADMIN'),
 (1, 3, false, 'REGULAR'),
 (1, 4, true, 'ADMIN'),
+(1, 1, false, 'ADMIN'),
 (2,1, true, 'ADMIN'),
 (2,2, false, 'REGULAR'),
 (2, 4, true, 'REGULAR'),
