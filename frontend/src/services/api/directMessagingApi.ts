@@ -1,4 +1,4 @@
-import {getBearerToken} from "@/services/apiHelper.ts";
+import { getBearerToken } from "@/services/apiHelper.ts";
 import {
   AddChannelMemberDto,
   Channel,
@@ -10,9 +10,9 @@ import {
 import {
   DeleteChannelRequestDto,
   DeleteChannelRequestResponseDto,
-  SetDeleteApproverStatusDto
+  SetDeleteApproverStatusDto,
 } from "@/types/deleteRequest.ts";
-import {LastMessageComponent, MessageComponent} from "@/types/messaging.ts";
+import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
 
@@ -20,19 +20,19 @@ const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/messaging";
 
 const directMessagingApi = {
   createChannel: async (
-      channel: CreateChannelDto,
-      creatorId: number,
+    channel: CreateChannelDto,
+    creatorId: number,
   ): Promise<ResponseDto<CreateChannelDto>> => {
     const response = await fetch(
-        `${baseMappingUrl}/channel/create-channel/${creatorId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: getBearerToken(),
-          },
-          body: JSON.stringify(channel),
+      `${baseMappingUrl}/channel/create-channel/${creatorId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBearerToken(),
         },
+        body: JSON.stringify(channel),
+      },
     );
     const data = await response.json();
     console.log("Create Channel Response:", data);
@@ -40,88 +40,88 @@ const directMessagingApi = {
   },
   getChannels: async (accountId: number | null) => {
     const response = await fetch(
-        `${baseMappingUrl}/channel/get-channels/${accountId}`,
-        {
-          headers: {
-            Authorization: getBearerToken(),
-          },
+      `${baseMappingUrl}/channel/get-channels/${accountId}`,
+      {
+        headers: {
+          Authorization: getBearerToken(),
         },
+      },
     );
     const data: Channel[] = await response.json();
     return data;
   },
   getNonUserChannelMembers: async (channelId: number, userId: number) => {
     const response = await fetch(
-        `${baseMappingUrl}/channelmember/get-channel-members/${channelId}/${userId}`,
-        {
-          headers: {
-            Authorization: getBearerToken(),
-          },
+      `${baseMappingUrl}/channelmember/get-channel-members/${channelId}/${userId}`,
+      {
+        headers: {
+          Authorization: getBearerToken(),
         },
+      },
     );
     const data: ResponseDto<ChannelMember[]> = await response.json();
     return data;
   },
   getAllChannelMembers: async (channelId: number) => {
     const response = await fetch(
-        `${baseMappingUrl}/channelmember/get-channel-members/${channelId}`,
-        {
-          headers: {
-            Authorization: getBearerToken(),
-          },
+      `${baseMappingUrl}/channelmember/get-channel-members/${channelId}`,
+      {
+        headers: {
+          Authorization: getBearerToken(),
         },
+      },
     );
     const data: ResponseDto<ChannelMember[]> = await response.json();
     return data;
   },
   getDirectMessages: async (channelId: number | null) => {
     const response = await fetch(
-        `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
-        {
-          headers: {
-            Authorization: getBearerToken(),
-          },
+      `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
+      {
+        headers: {
+          Authorization: getBearerToken(),
         },
+      },
     );
     const data: MessageComponent[] = await response.json();
     return data;
   },
   markChannelAsRead: async (
-      channelId: number,
-      userId: number,
+    channelId: number,
+    userId: number,
   ): Promise<void> => {
     await fetch(
-        `${baseMappingUrl}/channelmember/${channelId}/${userId}/mark-as-read`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: getBearerToken(),
-          },
+      `${baseMappingUrl}/channelmember/${channelId}/${userId}/mark-as-read`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: getBearerToken(),
         },
+      },
     );
     log.info(`Channel ${channelId} marked as read for user ${userId}`);
   },
   getLastChannelMessage: async (channelId: number) => {
     const response = await fetch(
-        `${baseMappingUrl}/channel/get-last-message/${channelId}`,
-        {
-          headers: {
-            Authorization: getBearerToken(),
-          },
+      `${baseMappingUrl}/channel/get-last-message/${channelId}`,
+      {
+        headers: {
+          Authorization: getBearerToken(),
         },
+      },
     );
     const data: ResponseDto<LastMessageComponent> = await response.json();
     return data;
   },
   removeChannelMember: async (channelId: number, accountId: number) => {
     return await fetch(
-        `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: getBearerToken(),
-          },
+      `${baseMappingUrl}/channelmember/remove/${channelId}/${accountId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: getBearerToken(),
         },
+      },
     );
   },
   addChannelMembers: async (channelMembersDto: AddChannelMemberDto) => {
@@ -153,86 +153,101 @@ const directMessagingApi = {
       body: requestData,
     });
     const data: ResponseDto<UpdateChannelPictureResponse> =
-        await response.json();
+      await response.json();
     return data;
   },
-  requestChannelDelete: async (deleteChannelRequestDto: DeleteChannelRequestDto) => {
-    const response = await fetch(`${baseMappingUrl}/channel/delete-channel-request`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: getBearerToken(),
+  requestChannelDelete: async (
+    deleteChannelRequestDto: DeleteChannelRequestDto,
+  ) => {
+    const response = await fetch(
+      `${baseMappingUrl}/channel/delete-channel-request`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBearerToken(),
+        },
+        body: JSON.stringify(deleteChannelRequestDto),
       },
-      body: JSON.stringify(deleteChannelRequestDto),
-    });
+    );
     if (response.status === 204) {
       const data: ResponseDto<null> = {
         statusCode: 204,
         message: "Channel immediately and successfully deleted.",
         data: null,
-      }
+      };
       return data;
     } else {
-      const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+      const data: ResponseDto<DeleteChannelRequestResponseDto> =
+        await response.json();
       return data;
     }
   },
   getIsDeleteChannelRequestActive: async (channelId: number) => {
-    const response = await
-        fetch(`${baseMappingUrl}/channel/delete-request-active/${channelId}`, {
-          headers: {
-            Authorization: getBearerToken(),
-          },
-        });
+    const response = await fetch(
+      `${baseMappingUrl}/channel/delete-request-active/${channelId}`,
+      {
+        headers: {
+          Authorization: getBearerToken(),
+        },
+      },
+    );
     if (response.status === 204) {
       const data: ResponseDto<null> = {
         statusCode: 204,
         message: "No delete request found",
         data: null,
-      }
+      };
       return data;
     } else if (response.status === 200) {
-      const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+      const data: ResponseDto<DeleteChannelRequestResponseDto> =
+        await response.json();
       return data;
     } else {
       const data: ResponseDto<null> = {
         statusCode: response.status,
         message: "Error fetching delete request.",
         data: null,
-      }
+      };
       return data;
     }
   },
-  setApproverDeleteStatus: async (setDeleteApproverStatusDto: SetDeleteApproverStatusDto) => {
-    const response = await fetch(`${baseMappingUrl}/channel/set-delete-approver-status`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: getBearerToken(),
+  setApproverDeleteStatus: async (
+    setDeleteApproverStatusDto: SetDeleteApproverStatusDto,
+  ) => {
+    const response = await fetch(
+      `${baseMappingUrl}/channel/set-delete-approver-status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBearerToken(),
+        },
+        body: JSON.stringify(setDeleteApproverStatusDto),
       },
-      body: JSON.stringify(setDeleteApproverStatusDto),
-    })
+    );
     log.info("Set Approver Delete Status Response:", response);
     if (response.status === 204) {
       const data: ResponseDto<null> = {
         statusCode: 204,
         message: "No delete request found",
         data: null,
-      }
+      };
       log.info("Channel denied deletion.");
       return data;
     } else if (response.status === 200) {
-      const data: ResponseDto<DeleteChannelRequestResponseDto> = await response.json();
+      const data: ResponseDto<DeleteChannelRequestResponseDto> =
+        await response.json();
       return data;
     } else {
       const data: ResponseDto<null> = {
         statusCode: response.status,
         message: "Error fetching delete request.",
         data: null,
-      }
+      };
       return data;
     }
-  }
+  },
 };
 
 export default directMessagingApi;

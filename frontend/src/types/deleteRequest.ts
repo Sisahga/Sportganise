@@ -14,7 +14,9 @@ export interface DeleteRequestProps {
   currentUserApproverStatus: DeleteChannelRequestMemberStatus | undefined;
   setDeleteRequestActive: React.Dispatch<React.SetStateAction<boolean>>;
   websocketRef: WebSocketService | null;
-  setDeleteRequest: React.Dispatch<React.SetStateAction<DeleteChannelRequestResponseDto | null>>;
+  setDeleteRequest: React.Dispatch<
+    React.SetStateAction<DeleteChannelRequestResponseDto | null>
+  >;
 }
 
 export interface DeleteChannelRequestDto {

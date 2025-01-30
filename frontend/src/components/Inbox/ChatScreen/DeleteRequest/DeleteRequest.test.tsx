@@ -1,9 +1,15 @@
 import "@testing-library/jest-dom";
-import {fireEvent, render, screen, waitFor, within,} from "@testing-library/react";
-import {beforeEach, describe, expect, it, vi} from "vitest";
-import {BrowserRouter} from "react-router";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BrowserRouter } from "react-router";
 import DeleteRequest from "./DeleteRequest.tsx";
-import {DeleteChannelRequestMemberStatus} from "@/types/deleteRequest.ts";
+import { DeleteChannelRequestMemberStatus } from "@/types/deleteRequest.ts";
 
 const mockNavigate = vi.fn();
 
@@ -40,13 +46,13 @@ describe.skip("DeleteRequest", () => {
     render(
       <BrowserRouter>
         <DeleteRequest
-            deleteRequest={null}
-            deleteRequestActive={false}
-            currentUserId={1}
-            currentUserApproverStatus={DeleteChannelRequestMemberStatus.PENDING}
-            setDeleteRequestActive={vi.fn()}
-            websocketRef={null}
-            setDeleteRequest={vi.fn()}
+          deleteRequest={null}
+          deleteRequestActive={false}
+          currentUserId={1}
+          currentUserApproverStatus={DeleteChannelRequestMemberStatus.PENDING}
+          setDeleteRequestActive={vi.fn()}
+          websocketRef={null}
+          setDeleteRequest={vi.fn()}
         />
       </BrowserRouter>,
     );

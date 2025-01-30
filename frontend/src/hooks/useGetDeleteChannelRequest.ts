@@ -1,26 +1,35 @@
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import log from "loglevel";
-import {DeleteChannelRequestMemberStatus, DeleteChannelRequestResponseDto} from "@/types/deleteRequest.ts";
+import {
+  DeleteChannelRequestMemberStatus,
+  DeleteChannelRequestResponseDto,
+} from "@/types/deleteRequest.ts";
 import ResponseDto from "@/types/response.ts";
 
 function useGetDeleteChannelRequest(channelId: number, currentUserId: number) {
-  const [deleteRequestActive, setDeleteRequestActive] = useState<boolean>(false);
-  const [deleteRequest, setDeleteRequest] = useState<DeleteChannelRequestResponseDto | null>(null);
-  const [currentMemberStatus, setCurrentMemberStatus] = useState<DeleteChannelRequestMemberStatus>();
+  const [deleteRequestActive, setDeleteRequestActive] =
+    useState<boolean>(false);
+  const [deleteRequest, setDeleteRequest] =
+    useState<DeleteChannelRequestResponseDto | null>(null);
+  const [currentMemberStatus, setCurrentMemberStatus] =
+    useState<DeleteChannelRequestMemberStatus>();
   useEffect(() => {
     const fetchDeleteRequest = async () => {
       try {
-        const response: ResponseDto<null> | ResponseDto<DeleteChannelRequestResponseDto> =
-            await directMessagingApi.getIsDeleteChannelRequestActive(channelId);
+        const response:
+          | ResponseDto<null>
+          | ResponseDto<DeleteChannelRequestResponseDto> =
+          await directMessagingApi.getIsDeleteChannelRequestActive(channelId);
         log.info("RESPONSE CODE: ", response.statusCode);
         if (response.statusCode === 200) {
           setDeleteRequestActive(true);
-          setDeleteRequest(response.data)
+          setDeleteRequest(response.data);
           log.info("Delete Request Response:", response);
           setCurrentMemberStatus(
-              response.data?.channelMembers.find(
-                  member => member.accountId === currentUserId)?.status
+            response.data?.channelMembers.find(
+              (member) => member.accountId === currentUserId,
+            )?.status,
           );
         } else if (response.statusCode === 204) {
           setDeleteRequestActive(false);
@@ -31,8 +40,8 @@ function useGetDeleteChannelRequest(channelId: number, currentUserId: number) {
       } catch (error) {
         log.error("Error fetching delete request:", error);
       }
-    }
-    fetchDeleteRequest().then(r => r);
+    };
+    fetchDeleteRequest().then((r) => r);
   }, [deleteRequestActive]);
 
   return {
@@ -40,7 +49,7 @@ function useGetDeleteChannelRequest(channelId: number, currentUserId: number) {
     setDeleteRequest,
     setDeleteRequestActive,
     deleteRequest,
-    currentMemberStatus
-  }
+    currentMemberStatus,
+  };
 }
 export default useGetDeleteChannelRequest;
