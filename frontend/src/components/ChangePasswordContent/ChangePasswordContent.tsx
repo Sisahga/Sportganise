@@ -20,6 +20,7 @@ import useModifyPassword from "@/hooks/useModifyPassword";
 import { ChangePasswordFormValues } from "@/types/auth";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
+import { KeyRound } from "lucide-react";
 
 const ChangePasswordContent: React.FC = () => {
   const navigate = useNavigate();
@@ -127,7 +128,8 @@ const ChangePasswordContent: React.FC = () => {
       {/* Card for the entire form */}
       <Card className="shadow-md mb-24 mt-4 mx-auto max-w-2xl">
         <CardHeader>
-          <CardTitle className="flex justify-center text-2xl font-semibold">
+          <CardTitle className="flex justify-center text-2xl font-bold items-center justify-center gap-2">
+            <KeyRound className="h-6 w-6" />
             Change Password
           </CardTitle>
         </CardHeader>

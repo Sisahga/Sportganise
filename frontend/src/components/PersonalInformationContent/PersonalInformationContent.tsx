@@ -73,7 +73,7 @@ const PersonalInformationContent: React.FC = () => {
           Edit
         </Button>
 
-        <h2 className="mt-4 text-2xl font-light">Personal Information</h2>
+        <h2 className="mt-4 text-2xl font-bold">Personal Information</h2>
 
         <Form {...form}>
           <form className="p-4 space-y-4 mt-1">

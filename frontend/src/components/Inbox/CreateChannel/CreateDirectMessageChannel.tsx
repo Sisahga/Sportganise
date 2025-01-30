@@ -74,12 +74,12 @@ export default function CreateDirectMessagingChannel() {
 
   return (
     <div
-      className="bg-white flex flex-col bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]"
+      className="flex flex-col bg-transparent"
       style={{ height: "calc(-192px + 100vh)" }}
     >
       {/* header for the messages page, different from main layout */}
       <header
-        className="flex items-center justify-between p-4 bg-white shadow gap-6"
+        className="flex items-center justify-between p-4 bg-transparent shadow gap-6"
         style={{ borderRadius: "0 0 1rem 1rem" }}
       >
         {/* Back Button */}

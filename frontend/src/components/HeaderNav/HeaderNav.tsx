@@ -75,7 +75,7 @@ export default function HeaderNav() {
                 </>
               )}
               <Link
-                to="/" //add actual redirect once setting page is set up
+                to="/pages/NotificationSettingsPage" //add actual redirect once setting page is set up
                 className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Settings

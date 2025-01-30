@@ -24,6 +24,7 @@ import PostDetailPage from "./pages/PostDetailPage.tsx";
 import ModifyPermissionPage from "./pages/ModifyPermissionPage.tsx";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute.tsx";
 import { PublicRoute } from "./components/PublicRoute/index.tsx";
+import NotificationSettingsPage from "./pages/NotificationSettingsPage.tsx";
 
 function App() {
   return (
@@ -105,6 +106,10 @@ function App() {
             <Route
               path="/pages/NotificationsPage"
               element={<NotificationsPage />}
+            ></Route>
+            <Route
+              path="/pages/NotificationSettingsPage"
+              element={<NotificationSettingsPage />}
             ></Route>
           </Route>
         </Route>

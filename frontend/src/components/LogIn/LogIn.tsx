@@ -56,7 +56,7 @@ export default function LogIn() {
   }, [data, error, navigate, toast]);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-white">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-white bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
       <img
         src={logo}
         alt="Logo"
@@ -101,14 +101,19 @@ export default function LogIn() {
           >
             Don&#39;t have an account?
             <Link
-              className="ml-2 text-secondaryColour font-bold underline p-0 bg-white border-none hover:bg-transparent"
+              className="ml-2 text-secondaryColour font-bold underline p-0 bg-white border-none hover:bg-transparent hover:text-primaryColour"
               to="/signup"
             >
               Sign Up
             </Link>
           </p>
-          <p className="mt-2 mb-6 text-primaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent">
-            <Link to="/forgotpassword">Forgot password?</Link>
+          <p>
+            <Link
+              className="mt-2 mb-6 text-primaryColour hover:text-secondaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent"
+              to="/forgotpassword"
+            >
+              Forgot password?
+            </Link>
           </p>
         </CardFooter>
       </Card>

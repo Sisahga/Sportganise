@@ -128,7 +128,7 @@ export default function HomeContent() {
 
   return (
     <div className="bg-primaryColour w-screen mt-32 z-40">
-      <div className="flex-1 max-w-[100vw] bg-white shadow-md bg-gradient-to-b from-secondaryColour/20 to-white to-[20%] rounded-t-2xl pb-16">
+      <div className="flex-1 max-w-[100vw] bg-white shadow-md rounded-t-2xl pb-16 bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
         <div className="min-h-screen">
           <div className="p-4 space-y-6">
             <Card className="border-0 lg:mx-20 rounded-md overflow-hidden mb-12 bg-transparent shadow-none">
