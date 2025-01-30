@@ -35,9 +35,7 @@ export function LeaveGroupDialog({
         style={{ maxWidth: "90vw" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Leave Group
-          </DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Leave Group</DialogTitle>
         </DialogHeader>
         <div className="py-4 text-primaryColour text-center flex flex-col">
           <p>

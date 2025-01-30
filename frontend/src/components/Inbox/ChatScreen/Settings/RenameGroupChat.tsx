@@ -80,9 +80,7 @@ export function RenameGroupDialog({
         style={{ maxWidth: "90vw" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">
-            Rename Group
-          </DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Rename Group</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
           <div className="flex justify-between items-center gap-2">
