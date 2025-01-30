@@ -15,7 +15,6 @@ import BackButton from "@/components/ui/back-button";
 import { BellRing } from "lucide-react";
 import { NotificationOption } from "@/types/notificationSettingOption";
 
-
 // using mock data need to connect, next step
 export default function NotificationSettings() {
   const [notificationChannels, setNotificationChannels] = useState({
