@@ -61,7 +61,8 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
             <p className="text-md font-semibold">{channel.channelName}</p>
             {!channel.lastMessage?.startsWith("INIT*") &&
               !channel.lastMessage?.startsWith("BLOCK*") &&
-              !channel.lastMessage?.startsWith("UNBLOCK*") && (
+              !channel.lastMessage?.startsWith("UNBLOCK*") &&
+              !channel.lastMessage?.startsWith("DELETE*") && (
                 <p className="text-sm text-gray-500 mt-1 truncate">
                   {channel.lastMessage}
                 </p>
@@ -93,6 +94,13 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
                   ? channel.lastMessage.split("*")[2]
                   : channel.lastMessage.split("*")[3]}
               </p>
+            )}
+            {channel.lastMessage?.startsWith("DELETE*") && (
+                <p className="text-sm text-gray-500 mt-1 truncate italic">
+                  {parseInt(channel.lastMessage.split("*")[1]) === userId
+                      ? channel.lastMessage.split("*")[2]
+                      : channel.lastMessage.split("*")[3]}
+                </p>
             )}
           </div>
           <div className="flex flex-col min-w-fit">{extraInfo}</div>
