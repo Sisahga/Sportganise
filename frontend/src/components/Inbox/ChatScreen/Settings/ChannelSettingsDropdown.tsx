@@ -129,7 +129,7 @@ const ChannelSettingsDropdown = ({
       channelId: channelId,
       creatorId: currentUserId,
       channelType: channelType,
-      creatorName: null // TODO: make field in DB.
+      creatorName: null,
     }
     const response = await sendDeleteRequest(deleteChannelRequestDto);
     console.log("Response: ", response);
