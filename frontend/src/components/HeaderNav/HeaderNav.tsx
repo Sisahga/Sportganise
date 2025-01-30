@@ -47,13 +47,13 @@ export default function HeaderNav() {
             <nav className="flex flex-col gap-4">
               <Link
                 to="/"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Home
               </Link>
               <Link
                 to="/pages/ForumPage"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Forum
               </Link>
@@ -62,13 +62,13 @@ export default function HeaderNav() {
                 <>
                   <Link
                     to="/pages/CreateTrainingSessionPage"
-                    className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
                   >
                     Training Session
                   </Link>
                   <Link
                     to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
-                    className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
                   >
                     Training Plan
                   </Link>
@@ -76,13 +76,13 @@ export default function HeaderNav() {
               )}
               <Link
                 to="/pages/NotificationSettingsPage" //add actual redirect once setting page is set up
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Settings
               </Link>
               <button
                 onClick={clearCookiesAndNavigate}
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Log Out
               </button>

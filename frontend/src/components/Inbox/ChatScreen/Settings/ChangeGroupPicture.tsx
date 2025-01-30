@@ -105,11 +105,11 @@ export function ChangePictureDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+        className="sm:max-w-[425px] bg-white text-primaryColour rounded-lg"
         style={{ maxWidth: "90vw" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-font font-bold">
+          <DialogTitle className="text-2xl font-bold">
             Change Group Picture
           </DialogTitle>
         </DialogHeader>
@@ -142,7 +142,7 @@ export function ChangePictureDialog({
                 >
                   Browse <ImageIcon size={16} />
                 </span>
-                <span className="text-sm font-font text-fadedPrimaryColour">
+                <span className="text-sm text-fadedPrimaryColour">
                   {selectedFile ? selectedFile.name : "No file chosen"}
                 </span>
               </label>

@@ -77,13 +77,13 @@ export default function NotificationSettings() {
       <BackButton />
       <Card className="shadow-md mb-24 mt-4 mx-auto max-w-2xl">
         <CardHeader>
-          <CardTitle className="flex justify-center text-2xl font-bold items-center gap-2 text-primaryColour font-font">
+          <CardTitle className="flex justify-center text-2xl font-bold items-center gap-2 text-primaryColour">
             {" "}
             <BellRing className="h-6 w-6" />
             Notification Settings{" "}
           </CardTitle>
 
-          <CardDescription className="flex justify-center text-medium font-light items-center justify-center text-primaryColour font-font">
+          <CardDescription className="flex justify-center text-medium font-light items-center justify-center text-primaryColour">
             Choose how you want to receive notifications
           </CardDescription>
         </CardHeader>
@@ -102,7 +102,7 @@ export default function NotificationSettings() {
                 />
                 <Label
                   htmlFor="email"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primaryColour font-font"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primaryColour"
                 >
                   Email
                 </Label>
@@ -115,7 +115,7 @@ export default function NotificationSettings() {
                 />
                 <Label
                   htmlFor="phone"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primaryColour font-font"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primaryColour"
                 >
                   Phone
                 </Label>
@@ -125,7 +125,7 @@ export default function NotificationSettings() {
 
           {/* Show message if no channel selected */}
           {!notificationChannels.email && !notificationChannels.phone && (
-            <div className="text-sm text-muted-foreground italic text-primaryColour font-font">
+            <div className="text-sm text-muted-foreground italic text-primaryColour">
               Select at least one notification method to configure your
               notifications
             </div>
@@ -134,7 +134,7 @@ export default function NotificationSettings() {
           {/* Notification Options */}
           {(notificationChannels.email || notificationChannels.phone) && (
             <div className="space-y-4">
-              <Label className="flex text-base font-bold text-primaryColour font-font">
+              <Label className="flex text-base font-bold text-primaryColour">
                 Notification preferences
               </Label>
               <div className="space-y-2">

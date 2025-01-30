@@ -75,17 +75,17 @@ const UserBlockedComponent = ({
           variant="outline"
           className={`gap-2 py-8 ${!showComponent && channelIsBlocked ? "" : "force-hide"}`}
         >
-          <UserUnlock className="h-4 w-4 font-font text-primaryColour" />
+          <UserUnlock className="h-4 w-4 text-primaryColour" />
           Unblock User
         </Button>
       </DrawerTrigger>
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
-            <DrawerTitle className="text-center font-font text-primaryColour">
+            <DrawerTitle className="text-center text-primaryColour">
               Blocked
             </DrawerTitle>
-            <DrawerDescription className="text-center font-font text-primaryColour/50 mt-2">
+            <DrawerDescription className="text-center text-primaryColour/50 mt-2">
               Unblock this user to send a message.
             </DrawerDescription>
           </DrawerHeader>

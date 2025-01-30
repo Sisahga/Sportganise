@@ -160,7 +160,7 @@ export default function TrainingPlanTable() {
         <Input
           type="text"
           placeholder="Search by file name"
-          className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
+          className="pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
           value={
             (table.getColumn("trainingPlan")?.getFilterValue() as string) ?? ""
           }

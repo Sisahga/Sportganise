@@ -65,14 +65,14 @@ export default function BlockedUsersList() {
 
       <Card className="space-y-8 max-w-3xl mx-auto mt-4 border shadow-md mx-auto max-w-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-font font-bold flex items-center justify-center gap-2">
+          <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2">
             <UserX className="h-6 w-6" />
             Blocked Users
           </CardTitle>
         </CardHeader>
         <CardContent>
           {blockedUsers.length === 0 ? (
-            <div className="text-center py-8 text-fadedPrimaryColour font-font">
+            <div className="text-center py-8 text-fadedPrimaryColour">
               No blocked users
             </div>
           ) : (
@@ -93,7 +93,7 @@ export default function BlockedUsersList() {
                   <Button
                     variant="destructive"
                     onClick={() => handleUnblockClick(user)}
-                    className="bg-red hover:bg-red/90 text-white font-font px-2 py-1 text-xs sm:px-2 sm:py-1 sm:text-sm"
+                    className="bg-red hover:bg-red/90 text-white px-2 py-1 text-xs sm:px-2 sm:py-1 sm:text-sm"
                   >
                     <Ban className="h-4 w-4 mr-2 sm:h-3 sm:w-3 sm:mr-1" />
                     Unblock
@@ -106,7 +106,7 @@ export default function BlockedUsersList() {
       </Card>
 
       <AlertDialog open={isUnblockOpen} onOpenChange={setIsUnblockOpen}>
-        <AlertDialogContent className="font-font">
+        <AlertDialogContent className="">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to unblock this user?
@@ -116,12 +116,12 @@ export default function BlockedUsersList() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-white text-primaryColour hover:bg-fadedPrimaryColour hover:text-white font-font">
+            <AlertDialogCancel className="bg-white text-primaryColour hover:bg-fadedPrimaryColour hover:text-white">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleUnblock}
-              className="bg-red text-white hover:bg-red/90 font-font"
+              className="bg-red text-white hover:bg-red/90"
             >
               Unblock User
             </AlertDialogAction>

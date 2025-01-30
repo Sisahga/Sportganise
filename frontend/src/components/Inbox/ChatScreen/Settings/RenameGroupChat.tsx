@@ -76,11 +76,11 @@ export function RenameGroupDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+        className="sm:max-w-[425px] bg-white text-primaryColour rounded-lg"
         style={{ maxWidth: "90vw" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-font font-bold">
+          <DialogTitle className="text-2xl font-bold">
             Rename Group
           </DialogTitle>
         </DialogHeader>
@@ -88,21 +88,21 @@ export function RenameGroupDialog({
           <div className="flex justify-between items-center gap-2">
             <Label
               htmlFor="current-name"
-              className="w-2/5 text-left font-font font-medium whitespace-nowrap"
+              className="w-2/5 text-left font-medium whitespace-nowrap"
             >
               Current Name
             </Label>
             <Input
               id="current-name"
               value={currentName}
-              className="w-3/5 font-font bg-textPlaceholderColour text-primaryColour"
+              className="w-3/5 bg-textPlaceholderColour text-primaryColour"
               disabled
             />
           </div>
           <div className="flex justify-between items-center gap-2">
             <Label
               htmlFor="new-name"
-              className="w-2/5 text-left font-font font-medium whitespace-nonwrap"
+              className="w-2/5 text-left font-medium whitespace-nonwrap"
             >
               New Name
             </Label>

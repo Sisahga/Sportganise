@@ -101,7 +101,7 @@ export default function CreateDirectMessagingChannel() {
       {/* user can search for any players to send his first message */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 relative">
         <div className="max-w-md mx-auto space-y-6">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold font-font text-center leading-tight px-4 animate-textPulse">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center leading-tight px-4 animate-textPulse">
             Chat with other players and coaches!
           </h1>
           <AddMembers

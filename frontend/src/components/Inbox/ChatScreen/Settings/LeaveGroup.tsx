@@ -31,15 +31,15 @@ export function LeaveGroupDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+        className="sm:max-w-[425px] bg-white text-primaryColour rounded-lg"
         style={{ maxWidth: "90vw" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-font font-bold">
+          <DialogTitle className="text-2xl font-bold">
             Leave Group
           </DialogTitle>
         </DialogHeader>
-        <div className="py-4 text-primaryColour font-font text-center flex flex-col">
+        <div className="py-4 text-primaryColour text-center flex flex-col">
           <p>
             Are you sure you want to leave the group? You will no longer have
             access to its content.

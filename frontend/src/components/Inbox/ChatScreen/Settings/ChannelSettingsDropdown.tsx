@@ -169,7 +169,7 @@ const ChannelSettingsDropdown = ({
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="font-font">
+        <DropdownMenuContent align="end" className="">
           {channelType === "SIMPLE" && (
             <>
               <DropdownMenuItem
@@ -188,7 +188,7 @@ const ChannelSettingsDropdown = ({
               {currentMemberRole === GroupChannelMemberRole.ADMIN && (
                 <>
                   <DropdownMenuItem
-                    className="flex items-center justify-between py-3 font-font text-primaryColour
+                    className="flex items-center justify-between py-3 text-primaryColour
                       bg-white hover:bg-secondaryColour/20"
                     onSelect={() => setIsMembersSettingsOpen(true)}
                   >
@@ -197,7 +197,7 @@ const ChannelSettingsDropdown = ({
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-primaryColour/20" />
                   <DropdownMenuItem
-                    className="flex items-center justify-between py-3 font-font text-primaryColour
+                    className="flex items-center justify-between py-3 text-primaryColour
                       bg-white hover:bg-secondaryColour/20"
                     onSelect={() => setIsRenameGroupOpen(true)}
                   >
@@ -205,7 +205,7 @@ const ChannelSettingsDropdown = ({
                     <Edit className="h-4 w-4 ml-2" />
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="flex items-center justify-between py-3 font-font text-primaryColour
+                    className="flex items-center justify-between py-3 text-primaryColour
                       bg-white hover:bg-secondaryColour/20"
                     onSelect={() => setIsChangePictureOpen(true)}
                   >
@@ -226,7 +226,7 @@ const ChannelSettingsDropdown = ({
                 <Trash2 className="h-4 w-4 ml-2" />
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="flex items-center justify-between py-3 font-font text-primaryColour
+                className="flex items-center justify-between py-3 text-primaryColour
                     bg-white hover:bg-secondaryColour/20 primary-red"
                 onSelect={() => setIsLeaveGroupOpen(true)}
               >
@@ -271,7 +271,7 @@ const ChannelSettingsDropdown = ({
         onLeave={handleLeaveGroup}
       />
       <AlertDialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
-        <AlertDialogContent className="font-font" style={{ maxWidth: "90vw" }}>
+        <AlertDialogContent className="" style={{ maxWidth: "90vw" }}>
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to block this user?
@@ -284,13 +284,13 @@ const ChannelSettingsDropdown = ({
           <AlertDialogFooter>
             <AlertDialogCancel
               className="bg-white text-primaryColour hover:bg-fadedPrimaryColour
-                hover:text-white font-font"
+                hover:text-white"
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBlock}
-              className="bg-red text-white hover:bg-red/90 font-font"
+              className="bg-red text-white hover:bg-red/90"
             >
               Block User
             </AlertDialogAction>
@@ -299,7 +299,7 @@ const ChannelSettingsDropdown = ({
       </AlertDialog>
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogContent className="font-font" style={{ maxWidth: "90vw" }}>
+        <AlertDialogContent className="" style={{ maxWidth: "90vw" }}>
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to delete this conversation?
@@ -312,13 +312,13 @@ const ChannelSettingsDropdown = ({
           <AlertDialogFooter>
             <AlertDialogCancel
               className="bg-white text-primaryColour hover:bg-fadedPrimaryColour
-                hover:text-white font-font"
+                hover:text-white"
             >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red text-white hover:bg-red/90 font-font"
+              className="bg-red text-white hover:bg-red/90"
             >
               Delete Conversation
             </AlertDialogAction>

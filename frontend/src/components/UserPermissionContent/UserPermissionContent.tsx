@@ -163,7 +163,7 @@ const UserPermissionContent: React.FC = () => {
       <div className="container max-w-2xl mx-auto">
         <Card className="space-y-8 max-w-3xl mx-auto mt-4 border shadow-md mx-auto max-w-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl font-font font-bold flex items-center justify-center gap-2 mt-4">
+            <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2 mt-4">
               <FileKey2 className="h-6 w-6" />
               User Permissions
             </CardTitle>

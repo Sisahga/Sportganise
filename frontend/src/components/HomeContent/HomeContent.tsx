@@ -134,13 +134,13 @@ export default function HomeContent() {
             <Card className="border-0 lg:mx-20 rounded-md overflow-hidden mb-12 bg-transparent shadow-none">
               <div className="py-4">
                 <CardHeader>
-                  <CardTitle className="font-font font-bold text-3xl text-primaryColour">
+                  <CardTitle className="font-bold text-3xl text-primaryColour">
                     Welcome to ONIBAD!
                   </CardTitle>
                 </CardHeader>
               </div>
               <CardContent className="mb-4">
-                <p className="text-primaryColour text-lg font-font leading-relaxed">
+                <p className="text-primaryColour text-lg leading-relaxed">
                   A non-profit badminton club for you, where passion meets play!
                 </p>
               </CardContent>
@@ -163,7 +163,7 @@ export default function HomeContent() {
               <Link
                 to="/pages/CalendarPage"
                 className="inline-flex items-center justify-center font-medium text-primaryColour hover:text-primaryColour hover:bg-textPlaceholderColour/40
-                text-sm font-font px-6 py-2 border rounded-md h-auto mb-4 group transition-all duration-300 hover:shadow-md"
+                text-sm px-6 py-2 border rounded-md h-auto mb-4 group transition-all duration-300 hover:shadow-md"
               >
                 See all Programs
               </Link>
