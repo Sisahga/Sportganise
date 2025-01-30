@@ -12,7 +12,9 @@ import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
 import com.sportganise.exceptions.AccountAlreadyExistsInAuth0;
 import com.sportganise.exceptions.AccountNotFoundException;
+import com.sportganise.exceptions.AccountNotVerifiedException;
 import com.sportganise.exceptions.InvalidAccountTypeException;
+import com.sportganise.exceptions.InvalidCredentialsException;
 import com.sportganise.exceptions.PasswordTooWeakException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
@@ -96,6 +98,20 @@ public class AccountService {
     return accountRepository
         .findById(accountId)
         .orElseThrow(() -> new AccountNotFoundException("Failed to find account."));
+  }
+
+  /**
+   * Updates the verification status of an account.
+   *
+   * @param accountId ID of the account.
+   */
+  public void updateAccountVerificationStatus(Integer accountId) {
+    Account account = getAccountById(accountId);
+    if (account == null) {
+      throw new AccountNotFoundException("Account not found");
+    }
+    account.setVerified(true);
+    accountRepository.save(account);
   }
 
   /**
@@ -198,9 +214,32 @@ public class AccountService {
    * @return True if the account is authenticated, false otherwise.
    */
   public boolean authenticateAccount(Auth0AccountDto auth0AccountDto) {
-    return auth0ApiService.verifyPassword(auth0AccountDto);
+    try {
+      Account account = this.getAccountByEmail(auth0AccountDto.getEmail());
+
+      boolean isValid = auth0ApiService.verifyPassword(auth0AccountDto);
+
+      if (isValid) {
+        if (account.getVerified()) {
+          return true;
+        } else {
+          throw new AccountNotVerifiedException("Account not verified");
+        }
+      } else {
+        throw new InvalidCredentialsException("Invalid Credentials");
+      }
+
+    } catch (AccountNotFoundException e) {
+      throw new InvalidCredentialsException("Invalid Credentials");
+    }
   }
 
+  /**
+   * Retrieves an account by its email.
+   *
+   * @param id id of the account.
+   * @return The Account with the matching email.
+   */
   public Optional<Account> getAccount(Integer id) {
     return accountRepository.findById(id);
   }

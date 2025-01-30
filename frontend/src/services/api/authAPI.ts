@@ -1,18 +1,18 @@
 import log from "loglevel";
 import {
+  CookiesDto,
   LoginRequest,
   LoginResponse,
-  SignUpRequest,
-  SignUpResponse,
-  SendCodeRequest,
-  SendCodeResponse,
-  VerifyCodeRequest,
-  VerifyCodeResponse,
-  CookiesDto,
   ModifyPasswordRequest,
   ModifyPasswordResponse,
+  SendCodeRequest,
+  SendCodeResponse,
+  SignUpRequest,
+  SignUpResponse,
+  VerifyCodeRequest,
+  VerifyCodeResponse,
 } from "@/types/auth";
-import { setCookies, isCookiesDto } from "@/services/cookiesService";
+import { isCookiesDto, setCookies } from "@/services/cookiesService";
 import { setAuthToken } from "@/services/apiHelper.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -59,22 +59,7 @@ export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
     throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
   }
 
-  const signUpResponse: SignUpResponse = await response.json();
-  const cookies: CookiesDto = {
-    accountId: signUpResponse.data?.accountId || null,
-    firstName: signUpResponse.data?.firstName || "",
-    lastName: signUpResponse.data?.lastName || "",
-    email: signUpResponse.data?.email || "",
-    pictureUrl: signUpResponse.data?.pictureUrl || null,
-    type: signUpResponse.data?.type || null,
-    phone: signUpResponse.data?.phone || null,
-    organisationIds: signUpResponse.data?.organisationIds || [],
-    jwtToken: null,
-  };
-  setCookies(cookies);
-  setAuthToken(signUpResponse.data?.jwtToken || "");
-
-  return signUpResponse;
+  return await response.json();
 };
 
 export const sendCode = async (
@@ -111,7 +96,22 @@ export const verifyCode = async (
     throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
   }
 
-  return await response.json();
+  const verifyCodeResponse: VerifyCodeResponse = await response.json();
+  const cookies: CookiesDto = {
+    accountId: verifyCodeResponse.data?.accountId || null,
+    firstName: verifyCodeResponse.data?.firstName || "",
+    lastName: verifyCodeResponse.data?.lastName || "",
+    email: verifyCodeResponse.data?.email || "",
+    pictureUrl: verifyCodeResponse.data?.pictureUrl || null,
+    type: verifyCodeResponse.data?.type || null,
+    phone: verifyCodeResponse.data?.phone || null,
+    organisationIds: verifyCodeResponse.data?.organisationIds || [],
+    jwtToken: null,
+  };
+  setCookies(cookies);
+  setAuthToken(verifyCodeResponse.data?.jwtToken || "");
+
+  return verifyCodeResponse;
 };
 
 export const modifyPassword = async (
@@ -131,5 +131,6 @@ export const modifyPassword = async (
       errorResponse.message || `HTTP error! status: ${response.status}`,
     );
   }
+
   return await response.json();
 };
