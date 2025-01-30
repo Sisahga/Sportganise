@@ -208,11 +208,11 @@ CREATE TABLE post_attachment(
 );
 
 CREATE TABLE feedback(
+    feedback_id SERIAL PRIMARY KEY,
 	post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	content TEXT NOT NULL,
-	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	PRIMARY KEY (post_id,account_id)
+	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 SET TIME ZONE 'America/New_York';
