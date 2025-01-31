@@ -165,16 +165,19 @@ ADD last_message_id INTEGER REFERENCES message(message_id);
 
 CREATE TABLE delete_channel_request (
     delete_request_id SERIAL PRIMARY KEY,
-    channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
-    requester_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-    request_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+    channel_id INTEGER UNIQUE NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
+    requester_id INTEGER NOT NULL,
+    request_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (channel_id, requester_id) REFERENCES channel_member(channel_id, account_id) ON DELETE CASCADE
 );
 
 CREATE TABLE delete_channel_request_approver (
     delete_request_id INTEGER NOT NULL REFERENCES delete_channel_request(delete_request_id) ON DELETE CASCADE,
-    approver_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    channel_id INTEGER NOT NULL,
+    approver_id INTEGER NOT NULL,
     status VARCHAR(8) NOT NULL,
     PRIMARY KEY (delete_request_id, approver_id),
+    FOREIGN KEY (channel_id, approver_id) REFERENCES channel_member(channel_id, account_id) ON DELETE CASCADE,
     CONSTRAINT valid_status CHECK (status IN ('APPROVED', 'DENIED', 'PENDING'))
 );
 

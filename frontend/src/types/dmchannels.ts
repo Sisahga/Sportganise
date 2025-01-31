@@ -2,6 +2,11 @@ import React from "react";
 import WebSocketService from "@/services/WebSocketService.ts";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 
+export enum GroupChannelMemberRole {
+  ADMIN = "ADMIN",
+  REGULAR = "REGULAR",
+}
+
 export interface Channel {
   channelId: number;
   channelName: string;
@@ -54,11 +59,7 @@ export interface ChannelSettingsDropdownProps {
   setCurrentChannelName: React.Dispatch<React.SetStateAction<string>>;
   currentChannelPictureUrl: string;
   setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
-}
-
-export enum GroupChannelMemberRole {
-  ADMIN = "ADMIN",
-  REGULAR = "REGULAR",
+  isDeleteRequestActive: boolean;
 }
 
 export interface ChannelMember {

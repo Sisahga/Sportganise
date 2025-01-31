@@ -88,9 +88,9 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
                     )}
                     {/* Message Content */}
                     <div
-                      className={`px-3 py-2 rounded-2xl ${
+                      className={`px-3 py-2 rounded-2xl shadow-lg  ${
                         message.senderId === currentUserId
-                          ? "bg-secondaryColour text-gray-800"
+                          ? "bg-secondaryColour-msg-gradient text-gray-800"
                           : "bg-gray-200 text-gray-800"
                       }`}
                     >
@@ -151,6 +151,18 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
             {/* LEAVE Message (Player/coach leaves from channel or gets removed) */}
             <div>
               {message.type == "UPDATE" && (
+                <div className="text-center faded-primary-colour font-light text-sm">
+                  {message.senderId === currentUserId ? (
+                    <p>{message.messageContent.split("*")[2]}</p>
+                  ) : (
+                    <p>{message.messageContent.split("*")[3]}</p>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* DELETE message (Delete Requests) */}
+            <div>
+              {message.type == "DELETE" && (
                 <div className="text-center faded-primary-colour font-light text-sm">
                   {message.senderId === currentUserId ? (
                     <p>{message.messageContent.split("*")[2]}</p>

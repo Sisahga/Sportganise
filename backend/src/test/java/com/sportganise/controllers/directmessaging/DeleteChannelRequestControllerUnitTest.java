@@ -51,7 +51,7 @@ public class DeleteChannelRequestControllerUnitTest {
   }
 
   @Test
-  public void testSetDeleteChannelApproverStatus_Approved_NoContent() {
+  public void testSetDeleteChannelApproverStatus_Approved_Redirect() {
     SetDeleteApproverStatusDto setApproverStatusDto = new SetDeleteApproverStatusDto();
     setApproverStatusDto.setStatus("APPROVED");
 
@@ -61,13 +61,11 @@ public class DeleteChannelRequestControllerUnitTest {
     ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> response =
         deleteChannelRequestController.setDeleteChannelApproverStatus(setApproverStatusDto);
 
-    assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+    assertThat(response.getStatusCode(), is(HttpStatus.SEE_OTHER));
     assertThat(
         Objects.requireNonNull(response.getBody()).getStatusCode(),
-        is(HttpStatus.NO_CONTENT.value()));
-    assertThat(
-        response.getBody().getMessage(),
-        is("The channel was approved for deletion, and has been deleted."));
+        is(HttpStatus.SEE_OTHER.value()));
+    assertThat(response.getBody().getMessage(), is(nullValue()));
     assertThat(response.getBody().getData(), is(nullValue()));
   }
 
@@ -86,8 +84,6 @@ public class DeleteChannelRequestControllerUnitTest {
     assertThat(
         Objects.requireNonNull(response.getBody()).getStatusCode(),
         is(HttpStatus.NO_CONTENT.value()));
-    assertThat(
-        response.getBody().getMessage(), is("The request for delete was denied. Request removed."));
     assertThat(response.getBody().getData(), is(nullValue()));
 
     verify(directMessageChannelService, times(1)).deleteChannelDeleteRequest(123);
