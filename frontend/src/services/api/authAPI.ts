@@ -11,6 +11,7 @@ import {
   SignUpResponse,
   VerifyCodeRequest,
   VerifyCodeResponse,
+  ResetPasswordResponse,
 } from "@/types/auth";
 import { isCookiesDto, setCookies } from "@/services/cookiesService";
 import { setAuthToken } from "@/services/apiHelper.ts";
@@ -112,6 +113,25 @@ export const verifyCode = async (
   setAuthToken(verifyCodeResponse.data?.jwtToken || "");
 
   return verifyCodeResponse;
+};
+
+export const resetPassword = async (
+  email: string,
+): Promise<ResetPasswordResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.text();
+    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
 };
 
 export const modifyPassword = async (
