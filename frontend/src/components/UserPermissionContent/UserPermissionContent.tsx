@@ -2,10 +2,16 @@
 WORK IN PROGRESS*/
 /*DONE : UI Implemented, Fetched users from backend*/
 import React, { useState, useEffect } from "react";
-import { Card, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
 import { useNavigate } from "react-router";
-import { Search } from "lucide-react";
+import { Search, FileKey2 } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -153,106 +159,119 @@ const UserPermissionContent: React.FC = () => {
 
   return (
     <div>
-      <div className="container max-w-lg mx-auto">
-        <div className="flex items-center justify-between mb-2">
-          <BackButton />
-          <h1 className="text-2xl font-light text-center flex-grow">
-            User Permissions
-          </h1>
-        </div>
+      <BackButton />
+      <div className="container max-w-2xl mx-auto">
+        <Card className="space-y-8 max-w-3xl mx-auto mt-4 border shadow-md mx-auto max-w-2xl">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2 mt-4">
+              <FileKey2 className="h-6 w-6" />
+              User Permissions
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Search Bar */}
+            <div className="relative mb-4">
+              <Input className="mb-2 pl-10" placeholder="Search..." />
+              <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                <Search size={16} />
+              </div>
+            </div>
 
-        {/* Search Bar */}
-        <div className="relative">
-          <Input className="mb-2 pl-10" placeholder="Search..." />
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
-            <Search size={16} />
-          </div>
-        </div>
-
-        {/* Display user data */}
-        <div className="grid grid-cols-1 gap-3">
-          {paginatedData.length > 0 ? (
-            paginatedData.map((user) => (
-              <Card key={user.accountId} className="w-full">
-                <div className="flex items-center gap-2 p-2 pb-0">
-                  <img
-                    src={user.pictureUrl || "https://via.placeholder.com/150"}
-                    alt={user.firstName}
-                    className="h-12 w-12 rounded-full"
-                  />
-                  <div>
-                    <p className="text-sm font-bold text-primaryColour">
-                      {user.firstName} {user.lastName}
-                    </p>
-                    <p className="text-xs text-gray">
-                      <span className="font-bold text-gray-500">Email:</span>{" "}
-                      {user.email}
-                    </p>
-                    <p className="text-xs text-gray">
-                      <span className="font-bold text-secondaryColour">
-                        Role:
-                      </span>{" "}
-                      {user.type}
-                    </p>
-                  </div>
-                </div>
-                <CardFooter className="justify-end p-0 pb-2 pr-2">
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        className="w-20 h-7"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openPopover(user)}
-                      >
-                        Modify
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-80 mr-8">
-                      <p className="text-sm text-muted-foreground mb-1">
-                        Modify the permissions for {user.firstName}{" "}
-                        {user.lastName}.
-                      </p>
-                      {/* Dropdown to change role */}
-                      <Select value={newRole} onValueChange={handleRoleChange}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="ADMIN">Admin</SelectItem>
-                          <SelectItem value="COACH">Coach</SelectItem>
-                          <SelectItem value="PLAYER">Player</SelectItem>
-                        </SelectContent>
-                      </Select>
-
-                      <div className="text-center mt-4">
-                        <Button
-                          onClick={saveRoleChanges}
-                          variant="outline"
-                          size="sm"
-                        >
-                          Save Changes
-                        </Button>
+            {/* Display user data */}
+            <div className="grid grid-cols-1 gap-3">
+              {paginatedData.length > 0 ? (
+                paginatedData.map((user) => (
+                  <Card key={user.accountId} className="w-full">
+                    <div className="flex items-center gap-2 p-2 pb-0">
+                      <img
+                        src={
+                          user.pictureUrl || "https://via.placeholder.com/150"
+                        }
+                        alt={user.firstName}
+                        className="h-12 w-12 rounded-full"
+                      />
+                      <div>
+                        <p className="text-sm font-bold text-primaryColour">
+                          {user.firstName} {user.lastName}
+                        </p>
+                        <p className="text-xs text-gray">
+                          <span className="font-bold text-gray-500">
+                            Email:
+                          </span>{" "}
+                          {user.email}
+                        </p>
+                        <p className="text-xs text-gray">
+                          <span className="font-bold text-secondaryColour">
+                            Role:
+                          </span>{" "}
+                          {user.type}
+                        </p>
                       </div>
-                    </PopoverContent>
-                  </Popover>
-                </CardFooter>
-              </Card>
-            ))
-          ) : (
-            <div>No users found.</div>
-          )}
-        </div>
+                    </div>
+                    <CardFooter className="justify-end p-0 pb-2 pr-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            className="w-20 h-7"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openPopover(user)}
+                          >
+                            Modify
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-80 mr-8">
+                          <p className="text-sm text-muted-foreground mb-1">
+                            Modify the permissions for {user.firstName}{" "}
+                            {user.lastName}.
+                          </p>
+                          {/* Dropdown to change role */}
+                          <Select
+                            value={newRole}
+                            onValueChange={handleRoleChange}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Role" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="ADMIN">Admin</SelectItem>
+                              <SelectItem value="COACH">Coach</SelectItem>
+                              <SelectItem value="PLAYER">Player</SelectItem>
+                            </SelectContent>
+                          </Select>
+
+                          <div className="text-center mt-4">
+                            <Button
+                              onClick={saveRoleChanges}
+                              variant="outline"
+                              size="sm"
+                            >
+                              Save Changes
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </CardFooter>
+                  </Card>
+                ))
+              ) : (
+                <div>No users found.</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Pagination */}
         <Pagination className="mt-2 pb-20">
           <PaginationContent>
             <PaginationPrevious
+              className="text-primaryColour"
               onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
             />
             {Array.from({ length: totalPages }, (_, i) => (
               <PaginationItem key={i}>
                 <PaginationLink
+                  className="text-primaryColour"
                   onClick={() => handlePageChange(i + 1)}
                   isActive={i + 1 === currentPage}
                 >
@@ -261,6 +280,7 @@ const UserPermissionContent: React.FC = () => {
               </PaginationItem>
             ))}
             <PaginationNext
+              className="text-primaryColour"
               onClick={() =>
                 handlePageChange(Math.min(currentPage + 1, totalPages))
               }

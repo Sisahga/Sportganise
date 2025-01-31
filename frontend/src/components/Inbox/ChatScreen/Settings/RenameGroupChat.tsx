@@ -76,33 +76,31 @@ export function RenameGroupDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent
-        className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+        className="sm:max-w-[425px] bg-white text-primaryColour rounded-lg"
         style={{ maxWidth: "90vw" }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-font font-bold">
-            Rename Group
-          </DialogTitle>
+          <DialogTitle className="text-2xl font-bold">Rename Group</DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4 py-4">
           <div className="flex justify-between items-center gap-2">
             <Label
               htmlFor="current-name"
-              className="w-2/5 text-left font-font font-medium whitespace-nowrap"
+              className="w-2/5 text-left font-medium whitespace-nowrap"
             >
               Current Name
             </Label>
             <Input
               id="current-name"
               value={currentName}
-              className="w-3/5 font-font bg-textPlaceholderColour text-primaryColour"
+              className="w-3/5 bg-textPlaceholderColour text-primaryColour"
               disabled
             />
           </div>
           <div className="flex justify-between items-center gap-2">
             <Label
               htmlFor="new-name"
-              className="w-2/5 text-left font-font font-medium whitespace-nonwrap"
+              className="w-2/5 text-left font-medium whitespace-nonwrap"
             >
               New Name
             </Label>
@@ -110,26 +108,26 @@ export function RenameGroupDialog({
               id="new-name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="w-3/5 border-primaryColour focus:ring-secondaryColour focus:border-secondaryColour"
+              className="w-3/5 border-primaryColour"
               maxLength={50}
             />
           </div>
         </div>
         <DialogFooter className="flex justify-end space-x-2">
           <Button
+            onClick={handleSave}
+            disabled={!newName.trim()}
+            className="py-2 px-4 mx-force-none
+             font-bold disabled:bg-fadedPrimaryColour disabled:text-white"
+          >
+            Save
+          </Button>{" "}
+          <Button
             variant="outline"
             onClick={onClose}
             className="text-primaryColour bg-white hover:bg-textPlaceholderColour"
           >
             Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!newName.trim()}
-            className="bg-secondaryColour text-primaryColour py-2 px-4 mx-force-none
-            rounded font-bold hover:bg-textPlaceholderColour disabled:bg-fadedPrimaryColour disabled:text-white"
-          >
-            Save
           </Button>
         </DialogFooter>
       </DialogContent>

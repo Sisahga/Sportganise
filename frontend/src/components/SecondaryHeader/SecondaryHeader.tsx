@@ -4,7 +4,7 @@ import BackButton from "../ui/back-button";
 export default function SecondaryHeader() {
   return (
     <div>
-      <header className="fixed top-0 left-0 right-0 p-4 flex items-center justify-between bg-white">
+      <header className="fixed top-0 left-0 right-0 p-4 flex items-center justify-between bg-transparent">
         <BackButton />
         <div className="flex items-center gap-2 ml-auto">
           <img

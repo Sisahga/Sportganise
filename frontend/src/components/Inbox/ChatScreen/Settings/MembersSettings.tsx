@@ -156,11 +156,11 @@ export function MembersSettingsDialog({
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent
-          className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+          className="sm:max-w-[425px] bg-white text-primaryColour rounded-lg"
           style={{ maxWidth: "90vw" }}
         >
           <DialogHeader>
-            <DialogTitle className="text-2xl text-primaryColour font-font font-bold">
+            <DialogTitle className="text-2xl text-primaryColour font-bold">
               Members Settings
             </DialogTitle>
           </DialogHeader>
@@ -168,7 +168,7 @@ export function MembersSettingsDialog({
             {members.map((member) => (
               <div
                 key={member.accountId}
-                className="flex items-center justify-between py-2 font-font text-primaryColour gap-4"
+                className="flex items-center justify-between py-2 text-primaryColour gap-4"
               >
                 <div className="flex w-full justify-between items-center">
                   <span>
@@ -201,8 +201,8 @@ export function MembersSettingsDialog({
             ))}
           </div>
           <Button
-            className="mt-4 bg-secondaryColour text-primaryColour font-bold
-            py-2 px-4 rounded hover:bg-textPlaceholderColour"
+            className="mt-4 font-bold
+            py-2 px-4"
             onClick={() => {
               setAddMembersIsOpen(true);
             }}
@@ -215,11 +215,11 @@ export function MembersSettingsDialog({
 
       <Dialog open={addMembersIsOpen} onOpenChange={setAddMembersIsOpen}>
         <DialogContent
-          className="sm:max-w-[425px] bg-white text-primaryColour font-font rounded-lg"
+          className="sm:max-w-[425px] bg-white text-primaryColour rounded-lg"
           style={{ maxWidth: "95vw" }}
         >
           <DialogHeader>
-            <DialogTitle className="text-xl text-primaryColour font-font font-bold">
+            <DialogTitle className="text-xl text-primaryColour font-bold">
               Select Members to Add
             </DialogTitle>
           </DialogHeader>
@@ -236,7 +236,7 @@ export function MembersSettingsDialog({
 
       <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
         <AlertDialogContent
-          className="bg-white text-primaryColour font-font rounded-lg"
+          className="bg-white text-primaryColour rounded-lg"
           style={{ maxWidth: "85vw" }}
         >
           <AlertDialogHeader>
