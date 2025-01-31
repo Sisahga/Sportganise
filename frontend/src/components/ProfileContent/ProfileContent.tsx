@@ -83,7 +83,7 @@ const ProfileContent: React.FC = () => {
           <Button
             className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
             variant="outline"
-            onClick={() => navigate("/pages/Settings")}
+            onClick={() => navigate("/pages/NotificationSettingsPage")}
           >
             <span className="flex items-center">
               <Settings className="mr-2" />

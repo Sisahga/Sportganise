@@ -10,26 +10,49 @@ const routes = [
     label: "Home",
     icon: Home,
     href: "/",
+    activeRoutes: ["/"],
   },
   {
     label: "Calendar",
     icon: Calendar,
     href: "/pages/CalendarPage",
+    activeRoutes: [
+      "/pages/CalendarPage",
+      "/pages/ViewTrainingSessionPage",
+      "/pages/CreateTrainingSessionPage",
+      "/pages/ModifyTrainingSessionPage",
+    ],
   },
   {
     label: "Alerts",
     icon: Bell,
     href: "/pages/NotificationsPage",
+    activeRoutes: ["/pages/NotificationsPage"],
   },
   {
     label: "Inbox",
     icon: MessageSquare,
     href: "/pages/DirectMessagesDashboard",
+    activeRoutes: [
+      "/pages/DirectMessagesDashboard",
+      "/pages/CreateDmChannelPage",
+      "/pages/DirectMessageChannelPage",
+      "/pages/DirectMessagesDashboard",
+    ],
   },
   {
     label: "Profile",
     icon: User,
     href: "/pages/ProfilePage",
+    activeRoutes: [
+      "/pages/ProfilePage",
+      "/pages/ChangePasswordPage",
+      "/pages/EditProfilePage",
+      "/pages/ModifyPermissionPage",
+      "/pages/PersonalInformationPage",
+      "/pages/BlockedUserListPage",
+      "/pages/NotificationSettingsPage",
+    ],
   },
 ];
 
@@ -39,10 +62,11 @@ export default function FooterNav() {
   log.info("Current location:", location.pathname);
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50">
-      <nav className="flex justify-around p-2">
+      <nav className="fixed bottom-0 w-full bg-white shadow-md p-3 flex justify-around">
         {routes.map((route) => {
-          const isActive = location.pathname === route.href;
+          const isActive = route.activeRoutes.includes(location.pathname);
           log.info(`Rendering route: ${route.label}, Active: ${isActive}`);
+
           return (
             <Link
               key={route.href}
@@ -55,7 +79,7 @@ export default function FooterNav() {
               )}
             >
               <route.icon className="w-6 h-6" />
-              <span className="text-sm font-medium">{route.label}</span>
+              <span>{route.label}</span>
             </Link>
           );
         })}

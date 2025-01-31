@@ -222,27 +222,24 @@ export default function ModifyTrainingSessionForm() {
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           if (!attachmentsToRemove.includes(file.name)) {
-            formData.append("attachments", file);
+            formData.append("attachments", file); //attachment to add
             log.debug("File in form field appended to formData : ", file);
           }
         });
+        values.attachment.forEach((file) => {
+          log.debug("All files in form field, not the ones to append :", file);
+        });
+      }
+
+      if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
             (urlName) => urlName !== file.name,
           );
         });
-        values.attachment.forEach((file) => {
-          log.debug("File in form field :", file);
-        });
-        log.info("attachmentsToRemove : ", attachmentsToRemove);
-      } else {
-        formData.append(
-          "attachments",
-          new Blob([], {
-            type: "application/json",
-          }),
-        );
       }
+      console.warn("attachmentsToRemove : ", attachmentsToRemove);
+
       const programData = {
         title: values.title,
         type: values.type,

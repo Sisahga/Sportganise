@@ -172,15 +172,15 @@ export default function SignUp() {
   }, [signUpError, sendCodeError, toast]);
 
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20">
+    <div className="bg-white min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
       <SecondaryHeader />
       <div className="w-[350px] max-w-lg pt-16 pb-8 px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl md:text-4xl text-left whitespace-normal text-center">
+        <h1 className="text-3xl md:text-4xl font-semibold text-left whitespace-normal text-center">
           Welcome!
-          <p className="mt-4 text-lg text-primaryColour-600 whitespace-normal text-center">
-            Create a new account
-          </p>
         </h1>
+        <p className="mt-4 text-lg text-primaryColour-600 whitespace-normal text-center font-medium">
+          Create a new account
+        </p>
 
         <Card className="mt-6">
           <CardContent>
