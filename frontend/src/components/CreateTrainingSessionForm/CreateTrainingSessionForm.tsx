@@ -114,7 +114,6 @@ export default function CreateTrainingSessionForm() {
   ] as const;
 
   /** Handle files for file upload in form*/
-  //const [files, setFiles] = useState<File[] | null>([]); //Maintain state of files that can be uploaded in the form
   const dropZoneConfig = {
     //File configurations
     maxFiles: 5,
@@ -163,15 +162,7 @@ export default function CreateTrainingSessionForm() {
         values.attachment.forEach((file) => {
           formData.append("attachments", file);
         });
-      } else {
-        formData.append(
-          "attachments",
-          new Blob([], {
-            type: "application/json",
-          }),
-        );
       }
-      log.info("formData: ", formData);
 
       // API submit form
       setLoading(true);
