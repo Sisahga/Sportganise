@@ -52,7 +52,7 @@ export default function ForgotPassword() {
     } catch (err: unknown) {
       console.error(
         "An error occured during the password recovery attempt:",
-        err
+        err,
       );
       if (err instanceof Error) {
         toast({
