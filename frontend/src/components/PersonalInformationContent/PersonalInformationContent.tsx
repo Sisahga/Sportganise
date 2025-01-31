@@ -65,7 +65,7 @@ const PersonalInformationContent: React.FC = () => {
 
         {/* Edit Profile Button */}
         <Button
-          className="mt-2 px-4 bg-secondaryColour rounded-full"
+          className="mt-2 px-4"
           variant="default"
           onClick={() => navigate("/pages/EditProfilePage")}
         >
@@ -73,7 +73,7 @@ const PersonalInformationContent: React.FC = () => {
           Edit
         </Button>
 
-        <h2 className="mt-4 text-2xl font-light">Personal Information</h2>
+        <h2 className="mt-4 text-2xl font-bold">Personal Information</h2>
 
         <Form {...form}>
           <form className="p-4 space-y-4 mt-1">

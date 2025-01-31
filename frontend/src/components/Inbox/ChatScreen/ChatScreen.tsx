@@ -200,7 +200,7 @@ const ChatScreen: React.FC = () => {
   return (
     <div
       id="chatScreenMainCtn"
-      className={`flex flex-col bg-gradient-to-b from-secondaryColour/20 to-white to-[20%] 
+      className={`flex flex-col
       ${isDragging ? "bg-blue-100" : ""}`}
       style={{ height: "calc(100vh - 7rem)" }}
       onDragEnter={handleDragEnter}

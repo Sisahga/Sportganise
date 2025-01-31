@@ -33,6 +33,8 @@ const fullWidthPaths = [
   "/pages/DirectMessagesDashboard",
   "/pages/DirectMessageChannelPage",
   "/pages/CreateDmChannelPage",
+  "/login",
+  "/signup",
 ]; // Full-width layout on these paths
 
 // Function to check if the current path matches any hide paths
@@ -49,7 +51,7 @@ const Layout = () => {
   const noTopMargin = shouldHide(noTopMarginPaths, location.pathname);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-secondaryColour/30 to-white to-[40%]">
       <Toaster />
       {/* Conditionally render HeaderNav */}
       {!hideHeader && <HeaderNav />}
@@ -58,7 +60,7 @@ const Layout = () => {
       <main
         className={`flex-1 ${
           !hideHeader && !medTopMargin ? "mt-40" : "mt-28"
-        } ${isFullWidth ? "mx-0" : "mx-6"} ${noTopMargin ? "mt-9" : "mt-28"}`}
+        } ${isFullWidth ? "mx-0" : "mx-6"} ${noTopMargin ? "mt-0" : "mt-28"}`}
       >
         <Outlet /> {/* This will render the routed page content */}
       </main>

@@ -264,7 +264,7 @@ const ForumContent: React.FC = () => {
       <Pagination className="mt-6 flex justify-center space-x-2">
         <PaginationPrevious
           onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          className="text-black"
+          className="text-primaryColour"
         >
           Previous
         </PaginationPrevious>
@@ -277,7 +277,7 @@ const ForumContent: React.FC = () => {
                 key={index + 1}
                 onClick={() => handlePageChange(index + 1)}
               >
-                <PaginationLink className="text-black">
+                <PaginationLink className="text-primaryColour">
                   {index + 1}
                 </PaginationLink>
               </PaginationItem>
@@ -290,7 +290,7 @@ const ForumContent: React.FC = () => {
             currentPage < Math.ceil(sessions.length / sessionsPerPage) &&
             handlePageChange(currentPage + 1)
           }
-          className="text-black"
+          className="text-primaryColour"
         >
           Next
         </PaginationNext>
