@@ -1,8 +1,7 @@
 package com.sportganise.dto.programsessions;
 
-import java.util.List;
-
 import io.micrometer.common.lang.Nullable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +24,5 @@ public class ProgramModifyRequestDto {
   private String startTime;
   private String endTime;
   private String location;
-  @Nullable
-  private List<String> attachmentsToRemove;
+  @Nullable private List<String> attachmentsToRemove;
 }

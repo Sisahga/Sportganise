@@ -17,7 +17,6 @@ import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
-
 import io.micrometer.common.lang.Nullable;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -368,7 +367,7 @@ public class ProgramService {
 
     log.debug("PROGRAM ID OF MODIFIED PROGRAM: ", existingProgram.getProgramId());
 
-    if(attachmentsToRemove != null) {
+    if (attachmentsToRemove != null) {
       if (!attachmentsToRemove.isEmpty()) {
         // Delete from repo.
         int rowsAffected =
@@ -383,12 +382,11 @@ public class ProgramService {
         }
       }
     }
-    
 
     List<ProgramAttachment> programAttachments = new ArrayList<>();
     List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
     String s3AttachmentUrl;
-    if(attachmentsToAdd != null){
+    if (attachmentsToAdd != null) {
       if (!attachmentsToAdd.isEmpty()) {
         for (MultipartFile attachment : attachmentsToAdd) {
           s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
@@ -397,14 +395,13 @@ public class ProgramService {
           programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
           programAttachmentDtos.add(
               new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
-              programAttachmentRepository.saveAll(programAttachments);
+          programAttachmentRepository.saveAll(programAttachments);
         }
         log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
       }
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
-    }
-    
+  }
 
   private Program createProgramObject(
       String title,
