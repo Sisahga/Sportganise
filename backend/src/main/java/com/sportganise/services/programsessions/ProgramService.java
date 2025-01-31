@@ -17,6 +17,8 @@ import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
+
+import io.micrometer.common.lang.Nullable;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalTime;
@@ -334,7 +336,7 @@ public class ProgramService {
       String endTime,
       String location,
       List<MultipartFile> attachmentsToAdd,
-      List<String> attachmentsToRemove,
+      @Nullable List<String> attachmentsToRemove,
       Integer accountId)
       throws IOException {
 
@@ -366,38 +368,43 @@ public class ProgramService {
 
     log.debug("PROGRAM ID OF MODIFIED PROGRAM: ", existingProgram.getProgramId());
 
-    if (!attachmentsToRemove.isEmpty()) {
-      // Delete from repo.
-      int rowsAffected =
-          programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
-              programDtoToModify.getProgramId(), attachmentsToRemove);
-      if (rowsAffected != attachmentsToRemove.size()) {
-        throw new RuntimeException("Could not delete all attachments.");
-      }
-      // Delete from S3 bucket.
-      for (String attachment : attachmentsToRemove) {
-        this.blobService.deleteFile(attachment);
+    if(attachmentsToRemove != null) {
+      if (!attachmentsToRemove.isEmpty()) {
+        // Delete from repo.
+        int rowsAffected =
+            programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+                programDtoToModify.getProgramId(), attachmentsToRemove);
+        if (rowsAffected != attachmentsToRemove.size()) {
+          throw new RuntimeException("Could not delete all attachments.");
+        }
+        // Delete from S3 bucket.
+        for (String attachment : attachmentsToRemove) {
+          this.blobService.deleteFile(attachment);
+        }
       }
     }
+    
 
     List<ProgramAttachment> programAttachments = new ArrayList<>();
     List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
     String s3AttachmentUrl;
-    if (!attachmentsToAdd.isEmpty()) {
-      for (MultipartFile attachment : attachmentsToAdd) {
-        s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
-        ProgramAttachmentCompositeKey programAttachmentCompositeKey =
-            new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
-        programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
-        programAttachmentDtos.add(
-            new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+    if(attachmentsToAdd != null){
+      if (!attachmentsToAdd.isEmpty()) {
+        for (MultipartFile attachment : attachmentsToAdd) {
+          s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+          ProgramAttachmentCompositeKey programAttachmentCompositeKey =
+              new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
+          programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
+          programAttachmentDtos.add(
+              new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+              programAttachmentRepository.saveAll(programAttachments);
+        }
+        log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
       }
-      programAttachmentRepository.saveAll(programAttachments);
-
-      log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
-  }
+    }
+    
 
   private Program createProgramObject(
       String title,

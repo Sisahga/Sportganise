@@ -105,9 +105,9 @@ public class ProgramController {
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
-      @RequestParam("attachments") List<MultipartFile> attachments) {
+      @RequestParam(value="attachments", required=false) List<MultipartFile> attachments) {
 
-    log.debug("ATTACHMENTS COUNT: {}", attachments.size());
+    //log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
     Account user =
         getAccount(accountId)
@@ -170,7 +170,7 @@ public class ProgramController {
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
       @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
-      @RequestParam("attachments") List<MultipartFile> attachments) {
+      @RequestParam(value="attachments", required=false) List<MultipartFile> attachments) {
 
     Account user =
         getAccount(accountId)
