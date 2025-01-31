@@ -15,6 +15,7 @@ import com.sportganise.exceptions.channelexceptions.ChannelNotFoundException;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberNotFoundException;
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelApproverException;
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
+import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
 import com.sportganise.repositories.directmessaging.DeleteChannelRequestRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
@@ -35,6 +36,7 @@ public class DeleteChannelRequestServiceUnitTest {
   @Mock private DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
   @Mock private DeleteChannelRequestRepository deleteChannelRequestRepository;
   @Mock private DirectMessageChannelRepository directMessageChannelRepository;
+  @Mock private AccountRepository accountRepository;
   @InjectMocks private DirectMessageChannelService directMessageChannelService;
 
   @BeforeEach
@@ -225,7 +227,8 @@ public class DeleteChannelRequestServiceUnitTest {
 
     DirectMessageChannelService spyService = spy(directMessageChannelService);
 
-    when(deleteChannelRequestApproverRepository.findById(key)).thenReturn(Optional.of(approver));
+    when(deleteChannelRequestApproverRepository.findByKey(deleteRequestId, accountId))
+            .thenReturn(Optional.of(approver));
 
     when(directMessageChannelRepository.existsById(channelId)).thenReturn(true);
 
@@ -259,7 +262,8 @@ public class DeleteChannelRequestServiceUnitTest {
 
     DirectMessageChannelService spyService = spy(directMessageChannelService);
 
-    when(deleteChannelRequestApproverRepository.findById(key)).thenReturn(Optional.of(approver));
+    when(deleteChannelRequestApproverRepository.findByKey(deleteRequestId, accountId))
+            .thenReturn(Optional.of(approver));
 
     when(directMessageChannelRepository.existsById(channelId)).thenReturn(true);
 
