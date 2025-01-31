@@ -30,9 +30,9 @@ export default function HeaderNav() {
   return (
     <div>
       <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="Logo" className="h-20" />
-        </div>
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="Logo" className="h-20 cursor-pointer" />
+        </Link>
 
         <Drawer>
           <DrawerTrigger className="bg-primaryColour hover:outline-none">

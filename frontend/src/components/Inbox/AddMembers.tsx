@@ -168,12 +168,7 @@ export default function AddMembers({
       )}
       {selectedUsers.length > 0 && (
         <div className="mt-4">
-          <Button
-            variant="secondary"
-            className="w-full text-sm text-light font-bold primary-colour
-                  bg-secondaryColour rounded-lg"
-            onClick={createFunction}
-          >
+          <Button className="w-full text-sm" onClick={createFunction}>
             <p className="font-bold">{submitButtonLabel}</p>
             {/*<PenBox className="primary-colour" strokeWidth={2}></PenBox>*/}
           </Button>

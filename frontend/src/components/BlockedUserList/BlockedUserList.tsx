@@ -93,7 +93,7 @@ export default function BlockedUsersList() {
                   <Button
                     variant="destructive"
                     onClick={() => handleUnblockClick(user)}
-                    className="bg-red hover:bg-red/90 text-white px-2 py-1 text-xs sm:px-2 sm:py-1 sm:text-sm"
+                    className="bg-primaryColour hover:bg-primaryColour/70 text-white px-2 py-1 text-xs sm:px-2 sm:py-1 sm:text-sm"
                   >
                     <Ban className="h-4 w-4 mr-2 sm:h-3 sm:w-3 sm:mr-1" />
                     Unblock

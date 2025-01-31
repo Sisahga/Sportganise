@@ -232,8 +232,7 @@ const ChangePasswordContent: React.FC = () => {
               {/* Submit Button */}
               <div className="flex justify-center p-2">
                 <Button
-                  className="w-40 h-10 bg-secondaryColour text-white rounded-xl"
-                  variant="outline"
+                  className="w-40 h-10"
                   type="submit"
                   disabled={isLoading}
                 >

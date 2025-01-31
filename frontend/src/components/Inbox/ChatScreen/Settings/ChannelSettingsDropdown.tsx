@@ -282,18 +282,18 @@ const ChannelSettingsDropdown = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel
-              className="bg-white text-primaryColour hover:bg-fadedPrimaryColour
-                hover:text-white"
-            >
-              Cancel
-            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleBlock}
               className="bg-red text-white hover:bg-red/90"
             >
               Block User
             </AlertDialogAction>
+            <AlertDialogCancel
+              className="bg-white text-primaryColour hover:bg-fadedPrimaryColour
+                hover:text-white"
+            >
+              Cancel
+            </AlertDialogCancel>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

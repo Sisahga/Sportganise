@@ -138,7 +138,7 @@ export function ChangePictureDialog({
               >
                 <span
                   className="bg-primaryColour text-white px-4 py-2 rounded-md text-sm
-                font-semibold hover:bg-primaryColour/80 transition-colors flex items-center gap-2"
+                font-semibold hover:bg-primaryColour/90 transition-colors flex items-center gap-2"
                 >
                   Browse <ImageIcon size={16} />
                 </span>
@@ -153,20 +153,11 @@ export function ChangePictureDialog({
           </div>
         </div>
         <DialogFooter className="flex justify-end space-x-2">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="text-primaryColour bg-white hover:bg-textPlaceholderColour"
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={!selectedFile}
-            className="bg-secondaryColour text-primaryColour font-bold py-2 px-4 rounded mx-force-none
-            hover:bg-textPlaceholderColour disabled:bg-fadedPrimaryColour disabled:text-white"
-          >
+          <Button onClick={handleSave} disabled={!selectedFile}>
             Save
+          </Button>{" "}
+          <Button variant="outline" onClick={onClose}>
+            Cancel
           </Button>
         </DialogFooter>
       </DialogContent>

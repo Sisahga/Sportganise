@@ -45,17 +45,17 @@ export function LeaveGroupDialog({
         </div>
         <DialogFooter className="flex justify-end space-x-2">
           <Button
+            onClick={handleLeave}
+            className="bg-primary-red text-white py-2 px-4 rounded font-bold hover:bg-errorHoverColour mx-force-none"
+          >
+            Leave Group
+          </Button>
+          <Button
             variant="outline"
             onClick={handleCancel}
             className="text-primaryColour bg-white hover:bg-textPlaceholderColour"
           >
             Cancel
-          </Button>
-          <Button
-            onClick={handleLeave}
-            className="bg-primary-red text-white py-2 px-4 rounded font-bold hover:bg-errorHoverColour mx-force-none"
-          >
-            Leave Group
           </Button>
         </DialogFooter>
       </DialogContent>

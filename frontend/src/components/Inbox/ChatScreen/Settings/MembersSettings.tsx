@@ -201,8 +201,8 @@ export function MembersSettingsDialog({
             ))}
           </div>
           <Button
-            className="mt-4 bg-secondaryColour text-primaryColour font-bold
-            py-2 px-4 rounded hover:bg-textPlaceholderColour"
+            className="mt-4 font-bold
+            py-2 px-4"
             onClick={() => {
               setAddMembersIsOpen(true);
             }}
