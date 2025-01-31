@@ -365,10 +365,7 @@ const ChannelSettingsDropdown = ({
       </AlertDialog>
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogContent
-          className="rounded-lg"
-          style={{ maxWidth: "90vw" }}
-        >
+        <AlertDialogContent className="rounded-lg" style={{ maxWidth: "90vw" }}>
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to delete this conversation?
