@@ -81,3 +81,9 @@ export interface ModifyPasswordResponse {
   statusCode: number;
   message: string;
 }
+
+export interface ResetPasswordResponse {
+  statusCode: number;
+  message: string;
+  data: string;
+}
