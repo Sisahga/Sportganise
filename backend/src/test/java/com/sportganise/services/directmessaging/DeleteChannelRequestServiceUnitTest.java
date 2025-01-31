@@ -228,7 +228,7 @@ public class DeleteChannelRequestServiceUnitTest {
     DirectMessageChannelService spyService = spy(directMessageChannelService);
 
     when(deleteChannelRequestApproverRepository.findByKey(deleteRequestId, accountId))
-            .thenReturn(Optional.of(approver));
+        .thenReturn(Optional.of(approver));
 
     when(directMessageChannelRepository.existsById(channelId)).thenReturn(true);
 
@@ -263,7 +263,7 @@ public class DeleteChannelRequestServiceUnitTest {
     DirectMessageChannelService spyService = spy(directMessageChannelService);
 
     when(deleteChannelRequestApproverRepository.findByKey(deleteRequestId, accountId))
-            .thenReturn(Optional.of(approver));
+        .thenReturn(Optional.of(approver));
 
     when(directMessageChannelRepository.existsById(channelId)).thenReturn(true);
 

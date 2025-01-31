@@ -65,9 +65,7 @@ public class DeleteChannelRequestControllerUnitTest {
     assertThat(
         Objects.requireNonNull(response.getBody()).getStatusCode(),
         is(HttpStatus.SEE_OTHER.value()));
-    assertThat(
-        response.getBody().getMessage(),
-        is(nullValue()));
+    assertThat(response.getBody().getMessage(), is(nullValue()));
     assertThat(response.getBody().getData(), is(nullValue()));
   }
 
