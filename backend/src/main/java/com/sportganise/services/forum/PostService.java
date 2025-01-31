@@ -27,6 +27,7 @@ public class PostService {
   @Autowired private PostRepository postRepository;
   @Autowired private LikesRepository likesRepository;
   @Autowired private PostAttachmentRepository attachmentRepository;
+  @Autowired private FeedbackService feedbackService;
   @Autowired private AccountRepository accountRepository;
 
   private static final ZonedDateTime ABSURD_DATE =
@@ -97,7 +98,8 @@ public class PostService {
         posts.stream()
             .map(
                 post -> {
-                  long likeCount = likesRepository.countByPostId(post.getPostId());
+                  long likeCount = countLikesByPostId(post.getPostId());
+                  long feedbackCount = countFeedbackByPostId(post.getPostId());
                   PostDto dto =
                       new PostDto(
                           post.getPostId(),
@@ -106,10 +108,9 @@ public class PostService {
                           post.getType(),
                           post.getOccurrenceDate(),
                           post.getCreationDate(),
-                          likeCount);
-                  dto.setLikeCount(likeCount);
-                  dto.setAttachments(
-                      attachmentRepository.findAttachmentsByPostId(post.getPostId()));
+                          likeCount,
+                          feedbackCount);
+
                   return dto;
                 })
             .collect(Collectors.toList());
@@ -134,6 +135,26 @@ public class PostService {
   public List<String> getAvailableTypes() {
     log.info("Fetching available post types");
     return postRepository.findDistinctTypes();
+  }
+
+  /**
+   * Counts the number of likes for a post.
+   *
+   * @param postId Post id.
+   * @return Number of likes.
+   */
+  private Long countLikesByPostId(Integer postId) {
+    return likesRepository.countByPostId(postId);
+  }
+
+  /**
+   * Counts the number of feedbacks for a post.
+   *
+   * @param postId Post id.
+   * @return Number of feedbacks.
+   */
+  private Long countFeedbackByPostId(Integer postId) {
+    return feedbackService.countFeedbackByPostId(postId);
   }
 
   /**
