@@ -17,7 +17,7 @@ export default function ForgotPassword() {
     sendVerificationCode,
   } = useSendCode();
 
-  // Handle form submission
+  // Handle the form submission
   const handlePasswordRecovery = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -52,7 +52,7 @@ export default function ForgotPassword() {
     } catch (err: unknown) {
       console.error(
         "An error occured during the password recovery attempt:",
-        err,
+        err
       );
       if (err instanceof Error) {
         toast({
