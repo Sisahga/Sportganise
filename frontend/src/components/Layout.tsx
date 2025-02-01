@@ -59,8 +59,14 @@ const Layout = () => {
       {/* Main content area */}
       <main
         className={`flex-1 ${
-          !hideHeader && !medTopMargin ? "mt-40" : "mt-28"
-        } ${isFullWidth ? "mx-0" : "mx-6"} ${noTopMargin ? "mt-0" : "mt-28"}`}
+          noTopMargin
+            ? "mt-0"
+            : medTopMargin
+              ? "mt-28"
+              : !hideHeader
+                ? "mt-40"
+                : "mt-28"
+        } ${isFullWidth ? "mx-0" : "mx-6"}`}
       >
         <Outlet /> {/* This will render the routed page content */}
       </main>

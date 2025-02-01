@@ -26,7 +26,7 @@ export default function LogIn() {
   const handleLogIn = (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Calling loginUser with:", formData); // Debug
+    console.log("Login Request Sent"); // Debug
     loginUser(formData).catch((err) => {
       console.error("Login error:", err); // Debug: Log error
       toast({
