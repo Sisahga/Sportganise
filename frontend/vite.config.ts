@@ -21,4 +21,12 @@ export default defineConfig({
     setupFiles: "./vitest.setup.ts",
     css: true,
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://onibad.sportganise.com',
+        changeOrigin: true
+      }
+    }
+  }
 });
