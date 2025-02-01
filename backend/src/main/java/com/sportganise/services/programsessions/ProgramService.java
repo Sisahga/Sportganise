@@ -37,7 +37,6 @@ public class ProgramService {
 
   private final ProgramRepository programRepository;
   private final AccountService accountService;
-  private final AccountRepository accountRepository;
   private final ProgramAttachmentRepository programAttachmentRepository;
   private final BlobService blobService;
 
@@ -52,11 +51,9 @@ public class ProgramService {
   public ProgramService(
       ProgramRepository programRepository,
       AccountService accountService,
-      AccountRepository accountRepository,
       ProgramAttachmentRepository programAttachmentRepository,
       BlobService blobService) {
     this.programRepository = programRepository;
-    this.accountRepository = accountRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
     this.blobService = blobService;
