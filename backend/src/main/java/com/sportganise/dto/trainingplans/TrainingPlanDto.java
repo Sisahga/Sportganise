@@ -18,7 +18,7 @@ public class TrainingPlanDto {
     @NotNull
     private Integer planId;
     @NotNull
-    private String userId;
+    private Integer userId;
     @NotNull
     private String docUrl;
     @NotNull

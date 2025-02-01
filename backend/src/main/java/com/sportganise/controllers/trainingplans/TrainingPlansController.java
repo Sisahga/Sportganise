@@ -14,11 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
-import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
-import com.sportganise.services.programsessions.ProgramService;
 import com.sportganise.services.trainingplans.TrainingPlansService;
 import com.sportganise.dto.trainingplans.TrainingPlanDto;
 

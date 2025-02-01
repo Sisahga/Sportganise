@@ -1,5 +1,6 @@
 package com.sportganise.services.trainingplans;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.sportganise.dto.trainingplans.TrainingPlanDto;
@@ -23,6 +24,20 @@ public class TrainingPlansService {
         List<TrainingPlan> trainingPlans = trainingPlansRepository.findTrainingPlans();
         log.debug("PROGRAMS COUNT: ", trainingPlans.size());
 
-        
+        List<TrainingPlanDto> trainingPlanDtos = new ArrayList<>();
+
+        for(TrainingPlan trainingPlan : trainingPlans) {
+            trainingPlanDtos.add(
+                new TrainingPlanDto(
+                    trainingPlan.getPlanId(),
+                    trainingPlan.getUserId(),
+                    trainingPlan.getDocUrl(),
+                    trainingPlan.getCreationDate()
+                )
+            );
+        }
+        log.debug("PROGRAM DTOS COUNT: ", trainingPlanDtos.size());
+
+        return trainingPlanDtos;
     }
 }
