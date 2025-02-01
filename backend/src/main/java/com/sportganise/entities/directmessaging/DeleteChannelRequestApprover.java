@@ -1,5 +1,6 @@
 package com.sportganise.entities.directmessaging;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +22,9 @@ import lombok.Setter;
 @Table(name = "delete_channel_request_approver")
 public class DeleteChannelRequestApprover {
   @EmbeddedId DeleteChannelRequestApproverCompositeKey approverCompositeKey;
+
+  @Column(name = "channel_id", updatable = false)
+  private Integer channelId;
 
   @Enumerated(EnumType.STRING)
   private DeleteChannelRequestStatusType status;

@@ -1,6 +1,7 @@
 package com.sportganise.repositories;
 
 import com.sportganise.entities.account.Verification;
+import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,6 +30,7 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
    *
    * @param accountId account id
    */
+  @Transactional
   @Modifying
   @Query("DELETE FROM Verification v WHERE v.account.accountId = :accountId")
   void deleteByAccount_AccountId(int accountId);

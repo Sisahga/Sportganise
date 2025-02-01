@@ -7,5 +7,6 @@ public enum DirectMessageType {
   JOIN,
   BLOCK,
   UNBLOCK,
-  UPDATE
+  UPDATE,
+  DELETE
 }

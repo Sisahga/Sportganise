@@ -66,15 +66,6 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
                     </>
                   }
                 />
-                {/* Optional Delete Button (if onDeleteChannel is provided) */}
-                {/*{onDeleteChannel && (*/}
-                {/*  <button*/}
-                {/*    onClick={() => onDeleteChannel(channel.channelId)}*/}
-                {/*    className="text-sm text-red-500 px-2"*/}
-                {/*  >*/}
-                {/*    Delete*/}
-                {/*  </button>*/}
-                {/*)}*/}
               </div>
             ))}
           </div>

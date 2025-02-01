@@ -30,6 +30,7 @@ import {
   ChannelSettingsDropdownProps,
   GroupChannelMemberRole,
 } from "@/types/dmchannels.ts";
+import { DeleteChannelRequestDto } from "@/types/deleteRequest.ts";
 import useBlockUser from "@/hooks/useBlockUser.ts";
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
@@ -43,6 +44,8 @@ import { LeaveGroupDialog } from "@/components/Inbox/ChatScreen/Settings/LeaveGr
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
 import { useNavigate } from "react-router";
 import { getCookies } from "@/services/cookiesService.ts";
+import useDeleteRequest from "@/hooks/useDeleteRequest.ts";
+import { useToast } from "@/hooks/use-toast.ts";
 
 const ChannelSettingsDropdown = ({
   channelType,
@@ -54,6 +57,7 @@ const ChannelSettingsDropdown = ({
   setCurrentChannelName,
   currentChannelPictureUrl,
   setCurrentChannelPictureUrl,
+  isDeleteRequestActive,
 }: ChannelSettingsDropdownProps) => {
   const cookies = getCookies();
 
@@ -73,6 +77,8 @@ const ChannelSettingsDropdown = ({
   const { blockUser } = useBlockUser();
   const { removeChannelMember } = useRemoveChannelMember();
   const { sendDirectMessage } = useSendMessage();
+  const { sendDeleteRequest } = useDeleteRequest();
+  const { toast } = useToast();
 
   const navigate = useNavigate();
 
@@ -116,12 +122,60 @@ const ChannelSettingsDropdown = ({
     }
     setIsBlockOpen(false);
   };
+  // Creates a delete request.
+  const handleDelete = async () => {
+    const deleteChannelRequestDto: DeleteChannelRequestDto = {
+      deleteRequestId: null,
+      channelId: channelId,
+      creatorId: currentUserId,
+      channelType: channelType,
+      creatorName: null,
+    };
+    const response = await sendDeleteRequest(deleteChannelRequestDto);
+    console.log("Response: ", response);
+    if (response?.statusCode === 200) {
+      toast({
+        title: "Request Sent",
+        description: "Delete request successfully sent.",
+        variant: "success",
+        duration: 3000,
+      });
 
-  const handleDelete = () => {
-    console.log("Conversation deleted");
+      const messagePayload: SendMessageComponent = {
+        senderId: currentUserId,
+        channelId: channelId,
+        messageContent: `DELETE*${currentUserId}*You requested to delete the channel*${cookies.firstName} requested to delete the channel`,
+        attachments: [],
+        sentAt: new Date().toISOString(),
+        type: "DELETE",
+        senderFirstName: cookies.firstName,
+        avatarUrl: cookies.pictureUrl,
+      };
+      log.info("WebSocketRef: ", webSocketRef);
+      log.info("MessagePayload: ", messagePayload);
+      sendDirectMessage(messagePayload, webSocketRef);
+      log.info(`Channel ${channelId} now has a delete request ongoing.`);
+    } else if (response?.statusCode === 204) {
+      toast({
+        title: "Channel Successfully Deleted",
+        description: "The channel and its contents have been deleted.",
+        variant: "success",
+        duration: 3000,
+      });
+      log.info("Channel immediately and successfully deleted.");
+      navigate("/pages/DirectMessagesDashboard");
+    } else {
+      toast({
+        title: "Error",
+        description: "Error deleting channel: " + response?.message,
+        variant: "destructive",
+        duration: 3000,
+      });
+      log.error(`Error requesting to delete channel ${channelId}`);
+    }
     setIsDeleteOpen(false);
   };
-
+  // Leaves group.
   const handleLeaveGroup = async () => {
     const response = await removeChannelMember(channelId, currentUserId);
     if (response?.status === 200) {
@@ -180,6 +234,16 @@ const ChannelSettingsDropdown = ({
                 <span>Block</span>
                 <Ban className="h-4 w-4 ml-2" />
               </DropdownMenuItem>
+              {!isDeleteRequestActive && (
+                <DropdownMenuItem
+                  onSelect={() => setIsDeleteOpen(true)}
+                  className="text-red hover:text-white hover:bg-red cursor-pointer flex
+                  justify-between items-center"
+                >
+                  <span>Delete</span>
+                  <Trash2 className="h-4 w-4 ml-2" />
+                </DropdownMenuItem>
+              )}
             </>
           )}
           {channelType === "GROUP" && (
@@ -215,16 +279,18 @@ const ChannelSettingsDropdown = ({
                 </>
               )}
               {currentMemberRole == GroupChannelMemberRole.ADMIN && (
-                <DropdownMenuSeparator className="bg-primaryColour/20" />
+                <>
+                  <DropdownMenuSeparator className="bg-primaryColour/20" />
+                  <DropdownMenuItem
+                    onSelect={() => setIsDeleteOpen(true)}
+                    className="text-red hover:text-white hover:bg-red cursor-pointer flex
+                  justify-between items-center mt-3"
+                  >
+                    <span>Delete</span>
+                    <Trash2 className="h-4 w-4 ml-2" />
+                  </DropdownMenuItem>
+                </>
               )}
-              <DropdownMenuItem
-                onSelect={() => setIsDeleteOpen(true)}
-                className="text-red hover:text-white hover:bg-red cursor-pointer hidden
-                justify-between items-center"
-              >
-                <span>Delete</span>
-                <Trash2 className="h-4 w-4 ml-2" />
-              </DropdownMenuItem>
               <DropdownMenuItem
                 className="flex items-center justify-between py-3 text-primaryColour
                     bg-white hover:bg-secondaryColour/20 primary-red"
@@ -299,14 +365,29 @@ const ChannelSettingsDropdown = ({
       </AlertDialog>
 
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <AlertDialogContent className="" style={{ maxWidth: "90vw" }}>
+        <AlertDialogContent className="rounded-lg" style={{ maxWidth: "90vw" }}>
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to delete this conversation?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              conversation.
+              {channelType == "SIMPLE" && (
+                <p>
+                  The other member must approve the deletion of the channel.
+                  Once approved, all contents in the channel will be destroyed
+                  permanently.
+                </p>
+              )}
+              {channelType == "GROUP" && (
+                <p>
+                  All other admin members must approve the deletion of the
+                  channel. Once approved, all contents in the channel will be{" "}
+                  <b>destroyed permanently</b>.
+                </p>
+              )}
+              <p>
+                <b>This action cannot be undone.</b>
+              </p>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

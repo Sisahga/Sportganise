@@ -16,10 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DirectMessageChannelMemberRepository
     extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
-  @Transactional
-  @Modifying
-  @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
-  void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
 
   @Query(
       """
@@ -112,4 +108,14 @@ public interface DirectMessageChannelMemberRepository
         AND cm.compositeKey.accountId != :accountId
         """)
   List<Integer> getOtherGroupAdminMemberIds(int channelId, int accountId);
+
+  @Query(
+      """
+          SELECT COUNT(*)
+          FROM DirectMessageChannelMember cm
+          WHERE cm.compositeKey.channelId = :channelId
+            AND cm.compositeKey.accountId != :accountId
+            AND cm.role = 'ADMIN'
+        """)
+  int getAdminChannelMembersCount(int channelId, int accountId);
 }
