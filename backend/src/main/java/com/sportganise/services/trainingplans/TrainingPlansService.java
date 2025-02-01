@@ -2,6 +2,7 @@ package com.sportganise.services.trainingplans;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.sportganise.dto.trainingplans.TrainingPlanDto;
 import com.sportganise.entities.trainingplans.TrainingPlan;
@@ -16,27 +17,47 @@ import org.springframework.stereotype.Service;
 public class TrainingPlansService {
     private final TrainingPlansRepository trainingPlansRepository;
 
+    /**
+     * Constructor for TrainingPlansService.
+     * 
+     * @param trainingPlansRepository Repository for training plans.
+     */
     public TrainingPlansService(TrainingPlansRepository trainingPlansRepository) {
         this.trainingPlansRepository = trainingPlansRepository;
     }
 
-    public List<TrainingPlanDto> getTrainingPlans() {
+    /**
+     * Method to fetch all training Plans.
+     * 
+     * @return List of Training Plan Dtos.
+     */
+    public List<TrainingPlanDto> getTrainingPlans(Integer userId) {
         List<TrainingPlan> trainingPlans = trainingPlansRepository.findTrainingPlans();
         log.debug("PROGRAMS COUNT: ", trainingPlans.size());
 
         List<TrainingPlanDto> trainingPlanDtos = new ArrayList<>();
 
-        for(TrainingPlan trainingPlan : trainingPlans) {
+        for (TrainingPlan trainingPlan : trainingPlans) {
             trainingPlanDtos.add(
-                new TrainingPlanDto(
-                    trainingPlan.getPlanId(),
-                    trainingPlan.getUserId(),
-                    trainingPlan.getDocUrl(),
-                    trainingPlan.getCreationDate()
-                )
-            );
+                    new TrainingPlanDto(
+                            trainingPlan.getPlanId(),
+                            trainingPlan.getUserId(),
+                            trainingPlan.getDocUrl(),
+                            trainingPlan.getCreationDate()));
         }
         log.debug("PROGRAM DTOS COUNT: ", trainingPlanDtos.size());
+
+        /*List<TrainingPlanDto> myPlans = trainingPlanDtos.stream()
+                .filter(tp -> tp.getUserId().equals(userId))
+                .collect(Collectors.toList());
+
+        log.debug("MY PLANS COUNT: {}", myPlans.size());
+
+        List<TrainingPlanDto> sharedWithMe = trainingPlanDtos.stream()
+                .filter(tp -> !tp.getUserId().equals(userId))
+                .collect(Collectors.toList());
+
+        log.debug("SHARED WITH ME COUNT: {}", sharedWithMe.size());*/
 
         return trainingPlanDtos;
     }

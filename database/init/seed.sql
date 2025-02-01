@@ -170,5 +170,5 @@ INSERT INTO feedback (post_id, account_id, content) VALUES
 
 INSERT INTO training_plan (account_id, doc_url) VALUES
 (1, 'training1.doc'),
-(2, 'training1.doc');
+(22, 'training2.doc');
 

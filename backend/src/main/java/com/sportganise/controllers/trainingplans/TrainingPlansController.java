@@ -60,25 +60,25 @@ public class TrainingPlansController {
         Account user = userOptional.get();
         log.debug("USER ID:", user.getAccountId());
 
-        if (hasPermissions(user)) {
-            List<TrainingPlanDto> trainingPlansDtos = trainingPlansService.getTrainingPlans();
-            log.debug("TRAININGPLANSDTO COUNT: ", trainingPlansDtos.size());
-
-            if (trainingPlansDtos.isEmpty()) {
-                responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-                responseDto.setMessage("No program found.");
-                return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-            }
-
-            responseDto.setStatusCode(HttpStatus.OK.value());
-            responseDto.setMessage("Programs successfully fetched.");
-            responseDto.setData(trainingPlansDtos);
-            return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-        } else {
+        if (!hasPermissions(user)) {
             responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
             responseDto.setMessage("Only Coaches and Admins can access this page.");
             return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
         }
+
+        List<TrainingPlanDto> trainingPlansDtos = trainingPlansService.getTrainingPlans(accountId);
+            log.debug("TRAINING PLANS DTO COUNT: ", trainingPlansDtos.size());
+
+            if (trainingPlansDtos.isEmpty()) {
+                responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+                responseDto.setMessage("No training plans found.");
+                return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+            }
+
+            responseDto.setStatusCode(HttpStatus.OK.value());
+            responseDto.setMessage("Training plans successfully fetched.");
+            responseDto.setData(trainingPlansDtos);
+            return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
     /** Helper method to fetch and validate user account based on accountId. */
