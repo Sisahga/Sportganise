@@ -20,7 +20,6 @@ import BlockedUsersListPage from "./pages/BlockedUserListPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
 import NotificationsPage from "./pages/NotificationsPage.tsx";
 import WaitlistTrainingSessionPage from "./pages/WaitlistTrainingSessionPage";
-import WaitlistTrainingSessionList from "@/components/WaitlistTrainingSession/WaitlistedTrainingSessionList";
 import WaitlistDetailsPage from "./pages/WaitlistDetailsPage";
 import ForumPage from "./pages/ForumPage.tsx";
 import PostDetailPage from "./pages/PostDetailPage.tsx";
@@ -51,15 +50,15 @@ function App() {
           <Route path="/" element={<HomePage />} />
           {/*placed route here as it does not use original layout with Nav, bottom
         nav, ...*/}
-            <Route
-              path="/pages/WaitlistTrainingSessionPage"
-              element={<WaitlistTrainingSessionPage />}
-            ></Route>
-            <Route
-              path="/pages/WaitlistDetailsPage"
-              element={<WaitlistDetailsPage />}
-            ></Route>
-            <Route path="/" element={<Layout />}>
+          <Route
+            path="/pages/WaitlistTrainingSessionPage"
+            element={<WaitlistTrainingSessionPage />}
+          ></Route>
+          <Route
+            path="/pages/WaitlistDetailsPage"
+            element={<WaitlistDetailsPage />}
+          ></Route>
+          <Route path="/" element={<Layout />}>
             {/*Place the routes to all your pages nested beneath this Route tag */}
             <Route
               path="/pages/CreateDmChannelPage"
