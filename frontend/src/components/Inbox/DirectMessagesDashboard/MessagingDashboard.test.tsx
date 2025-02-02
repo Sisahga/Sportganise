@@ -5,6 +5,10 @@ import MessagingDashboard from "./MessagingDashboard";
 import { Channel } from "@/types/dmchannels";
 import directMessagingApi from "@/services/api/directMessagingApi";
 
+vi.mock("react-router", () => ({
+  useNavigate: () => vi.fn(),
+}));
+
 vi.mock("@/services/api/directMessagingApi", () => ({
   __esModule: true,
   default: {
@@ -44,6 +48,11 @@ vi.mock("../SimpleMessages/MessagesSection", () => ({
   )),
 }));
 
+vi.mock("@/services/cookiesService.ts", () => ({
+  getCookies: vi.fn(() => ({})),
+  getAccountIdCookie: vi.fn(() => "test-account-id"),
+}));
+
 describe("MessagingDashboard Component", () => {
   const mockChannels: Channel[] = [
     {
@@ -68,11 +77,6 @@ describe("MessagingDashboard Component", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
-  });
-
-  it("renders loading state initially", () => {
-    render(<MessagingDashboard />);
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
   });
 
   it("renders error message when API call fails", async () => {

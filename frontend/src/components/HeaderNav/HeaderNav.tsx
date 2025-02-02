@@ -30,9 +30,9 @@ export default function HeaderNav() {
   return (
     <div>
       <header className="fixed top-0 left-0 right-0 z-10 bg-primaryColour text-white p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img src={logo} alt="Logo" className="h-20" />
-        </div>
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="Logo" className="h-20 cursor-pointer" />
+        </Link>
 
         <Drawer>
           <DrawerTrigger className="bg-primaryColour hover:outline-none">
@@ -47,13 +47,13 @@ export default function HeaderNav() {
             <nav className="flex flex-col gap-4">
               <Link
                 to="/"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Home
               </Link>
               <Link
                 to="/pages/ForumPage"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Forum
               </Link>
@@ -62,13 +62,13 @@ export default function HeaderNav() {
                 <>
                   <Link
                     to="/pages/CreateTrainingSessionPage"
-                    className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
                   >
                     Training Session
                   </Link>
                   <Link
                     to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
-                    className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
                   >
                     Training Plan
                   </Link>
@@ -81,14 +81,14 @@ export default function HeaderNav() {
                 Waitlist
               </Link>
               <Link
-                to="/" //add actual redirect once setting page is set up
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                to="/pages/NotificationSettingsPage" //add actual redirect once setting page is set up
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
-                Setting
+                Settings
               </Link>
               <button
                 onClick={clearCookiesAndNavigate}
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Log Out
               </button>

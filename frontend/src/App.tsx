@@ -20,37 +20,39 @@ import BlockedUsersListPage from "./pages/BlockedUserListPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
 import NotificationsPage from "./pages/NotificationsPage.tsx";
 import WaitlistTrainingSessionPage from "./pages/WaitlistTrainingSessionPage";
-import WaitlistTrainingSessionList from "@/components/WaitlistTrainingSession/WaitlistedTrainingSessionList";
 import WaitlistDetailsPage from "./pages/WaitlistDetailsPage";
 import ForumPage from "./pages/ForumPage.tsx";
 import PostDetailPage from "./pages/PostDetailPage.tsx";
 import ModifyPermissionPage from "./pages/ModifyPermissionPage.tsx";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute.tsx";
 import { PublicRoute } from "./components/PublicRoute/index.tsx";
+import NotificationSettingsPage from "./pages/NotificationSettingsPage.tsx";
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route element={<PublicRoute />}>
-          <Route path="/login" element={<LogInPage />}></Route>
-          <Route path="/signup" element={<SignUpPage />}></Route>
+          <Route element={<Layout />}>
+            <Route path="/login" element={<LogInPage />}></Route>
+            <Route path="/signup" element={<SignUpPage />}></Route>
+            <Route
+              path="/verificationcode"
+              element={<VerificationCodePage />}
+            ></Route>
+            <Route
+              path="/forgotpassword"
+              element={<ForgotPasswordPage />}
+            ></Route>
+          </Route>
         </Route>
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<HomePage />} />
           {/*placed route here as it does not use original layout with Nav, bottom
         nav, ...*/}
           <Route
-            path="/pages/CreateDmChannelPage"
-            element={<CreateDmChannelPage />}
-          ></Route>
-          <Route
             path="/pages/WaitlistTrainingSessionPage"
             element={<WaitlistTrainingSessionPage />}
-          ></Route>
-          <Route
-            path="/waitlist"
-            element={<WaitlistTrainingSessionList />}
           ></Route>
           <Route
             path="/pages/WaitlistDetailsPage"
@@ -58,6 +60,10 @@ function App() {
           ></Route>
           <Route path="/" element={<Layout />}>
             {/*Place the routes to all your pages nested beneath this Route tag */}
+            <Route
+              path="/pages/CreateDmChannelPage"
+              element={<CreateDmChannelPage />}
+            ></Route>
             <Route
               path="/pages/ChangePasswordPage"
               element={<ChangePasswordPage />}
@@ -91,11 +97,6 @@ function App() {
             ></Route>
             <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
             <Route
-              path="/verificationcode"
-              element={<VerificationCodePage />}
-            />
-            <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-            <Route
               path="/pages/ViewTrainingSessionPage"
               element={<ViewTrainingSessionPage />}
             ></Route>
@@ -118,6 +119,10 @@ function App() {
             <Route
               path="/pages/NotificationsPage"
               element={<NotificationsPage />}
+            ></Route>
+            <Route
+              path="/pages/NotificationSettingsPage"
+              element={<NotificationSettingsPage />}
             ></Route>
           </Route>
         </Route>

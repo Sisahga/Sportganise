@@ -177,9 +177,10 @@ public class DirectMessageService {
       directMessageChannelRepository.updateLastMessageId(channelId, directMessage.getMessageId());
       log.debug("Last message updated for channel {}", channelId);
 
-      // Update Read Status in Channel Member Table.
-      directMessageChannelMemberRepository.updateChannelMemberReadStatus(senderId, channelId);
-      log.debug("Read status updated for channel {} and member {}", channelId, senderId);
+      // Update Read Status in Channel Member Table: all other members -> false, sender -> true.
+      int rowsAffected =
+          directMessageChannelMemberRepository.updateChannelMemberReadStatus(senderId, channelId);
+      log.info("Read status updated for {} members in channel {}", rowsAffected, channelId);
 
       DirectMessageDto directMessageDto = new DirectMessageDto();
       directMessageDto.setMessageId(directMessage.getMessageId());

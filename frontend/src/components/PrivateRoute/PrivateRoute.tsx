@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import { getCookies } from "@/services/cookiesService";
+import { clearCookies, getCookies } from "@/services/cookiesService";
 import { getBearerToken } from "@/services/apiHelper.ts";
 /* eslint-disable react/prop-types */
 
@@ -23,6 +23,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     user.accountId === null ||
     user.accountId === undefined
   ) {
+    clearCookies();
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );

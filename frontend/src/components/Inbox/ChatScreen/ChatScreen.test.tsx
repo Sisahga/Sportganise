@@ -141,7 +141,7 @@ describe("ChatScreen", () => {
     render(<ChatScreen />);
     const backButton = screen.getByRole("button", { name: /back/i });
     fireEvent.click(backButton);
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    expect(mockNavigate).toHaveBeenCalledWith("/pages/DirectMessagesDashboard");
   });
 
   it("disables the send button if the message is empty", () => {

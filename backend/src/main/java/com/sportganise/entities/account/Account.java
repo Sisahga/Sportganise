@@ -49,4 +49,7 @@ public class Account {
   private String pictureUrl;
 
   @Embedded private Address address;
+
+  @Column(nullable = false)
+  private Boolean verified = false;
 }

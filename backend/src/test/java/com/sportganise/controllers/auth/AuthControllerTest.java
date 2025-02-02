@@ -21,7 +21,6 @@ import com.sportganise.services.EmailService;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.account.CookiesService;
 import com.sportganise.services.account.auth.VerificationService;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -84,12 +83,7 @@ public class AuthControllerTest {
     accountDto.setFirstName("John");
     accountDto.setLastName("Doe");
 
-    CookiesDto cookiesDto = new CookiesDto();
-    cookiesDto.setJwtToken("dummyToken");
-
     when(accountService.createAccount(accountDto)).thenReturn("auth0Id");
-    when(cookiesService.createCookiesDto(accountDto.getEmail())).thenReturn(cookiesDto);
-    when(userAuthProvider.createToken(accountDto.getEmail())).thenReturn("dummyToken");
 
     mockMvc
         .perform(
@@ -97,8 +91,7 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(accountDto)))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.message").value("User created"))
-        .andExpect(jsonPath("$.data.jwtToken").value("dummyToken"));
+        .andExpect(jsonPath("$.message").value("User created"));
   }
 
   @Test
@@ -167,7 +160,7 @@ public class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(auth0AccountDto)))
         .andExpect(status().isInternalServerError())
-        .andExpect(jsonPath("$.message").value("Error during login: Internal server error"))
+        .andExpect(jsonPath("$.message").value("Internal server error"))
         .andExpect(jsonPath("$.statusCode").value(500));
   }
 
@@ -192,9 +185,12 @@ public class AuthControllerTest {
   @Test
   @Order(7)
   public void verifyCode_shouldCallServices() throws Exception {
+    CookiesDto cookiesDto = new CookiesDto();
+    cookiesDto.setJwtToken("dummyToken");
+
     when(accountService.getAccountByEmail(anyString())).thenReturn(mock(Account.class));
-    when(verificationService.validateCode(Mockito.anyInt(), Mockito.anyInt()))
-        .thenReturn(Optional.ofNullable(mock(Verification.class)));
+    when(cookiesService.createCookiesDto(accountDto.getEmail())).thenReturn(cookiesDto);
+    when(userAuthProvider.createToken(accountDto.getEmail())).thenReturn("dummyToken");
     mockMvc
         .perform(
             post("/api/auth/verify-code")

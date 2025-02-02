@@ -214,7 +214,7 @@ const EditProfileContent: React.FC = () => {
             htmlFor="file-input"
             className="absolute bottom-3 right-3 translate-x-1/2 translate-y-1/2 cursor-pointer rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl transition"
           >
-            <CirclePlus className="rounded-full text-secondaryColour w-10 h-10 hover:scale-110 hover:text-black transition-transform " />
+            <CirclePlus className="rounded-full w-10 h-10 hover:scale-110 hover:text-black transition-transform " />
           </Label>
 
           <Input
@@ -405,11 +405,7 @@ const EditProfileContent: React.FC = () => {
 
             {/* Save Personal Info Button */}
             <div className="flex justify-center pt-1 pb-12">
-              <Button
-                className="w-30 h-10 bg-secondaryColour text-black rounded-full"
-                variant="outline"
-                type="submit"
-              >
+              <Button className="w-30 h-10" type="submit">
                 <Save />
                 Save
               </Button>

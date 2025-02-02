@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useSendCode } from "@/hooks/useSendCode";
 import { useVerifyCode } from "@/hooks/useVerifyCode";
+import { SecondaryHeader } from "../SecondaryHeader";
 
 interface VerificationCodeLocationState {
   email?: string;
@@ -14,11 +15,12 @@ interface VerificationCodeLocationState {
 export default function VerificationCode() {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [verified, setVerified] = useState(false);
 
   const {
     verifyUserCode,
     isLoading: verifyLoading,
-    error: verrifyError,
+    error: verifyError,
   } = useVerifyCode();
   const {
     sendVerificationCode,
@@ -92,6 +94,7 @@ export default function VerificationCode() {
 
       if (response?.statusCode === 201) {
         // Changed 200 to 201
+        setVerified(true);
         toast({
           variant: "success",
           title: "Verification Successful",
@@ -162,11 +165,11 @@ export default function VerificationCode() {
   };
 
   useEffect(() => {
-    if (verrifyError) {
+    if (verifyError) {
       toast({
         variant: "destructive",
         title: "Verification Failed",
-        description: verrifyError,
+        description: verifyError,
       });
     }
     if (sendCodeError) {
@@ -176,10 +179,11 @@ export default function VerificationCode() {
         description: sendCodeError,
       });
     }
-  }, [verrifyError, sendCodeError, toast]);
+  }, [verifyError, sendCodeError, toast]);
 
   return (
     <div className="bg-white min-h-screen overflow-x-hidden">
+      <SecondaryHeader />
       <div className="w-full pt-32">
         <div className="mx-auto max-w-[90%] md:max-w-[80%] lg:max-w-[60%] p-4">
           <h1 className="text-2xl md:text-4xl text-left">
@@ -236,7 +240,7 @@ export default function VerificationCode() {
               <Button
                 className="w-full text-white bg-primaryColour py-2 md:py-3 rounded-lg flex items-center justify-center text-sm md:text-base"
                 onClick={handleVerify}
-                disabled={verifyLoading}
+                disabled={verifyLoading || verified}
               >
                 {verifyLoading ? "Verifying..." : "Verify"}
               </Button>

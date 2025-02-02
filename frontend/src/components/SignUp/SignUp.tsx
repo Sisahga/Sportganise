@@ -7,12 +7,7 @@ import { useToast } from "@/hooks/use-toast"; // Toast hook
 import { useSignUp } from "@/hooks/useSignUp";
 import { useSendCode } from "@/hooks/useSendCode";
 import { SignUpRequest } from "@/types/auth";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { SecondaryHeader } from "../SecondaryHeader";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -89,13 +84,6 @@ export default function SignUp() {
         [name]: value,
       }));
     }
-  };
-
-  const handleAccountTypeChange = (type: "PLAYER" | "COACH" | "ADMIN") => {
-    setFormData((prev) => ({
-      ...prev,
-      type,
-    }));
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -184,14 +172,15 @@ export default function SignUp() {
   }, [signUpError, sendCodeError, toast]);
 
   return (
-    <div className="bg-white min-h-screen flex flex-col items-center justify-center mt-20 px-4 sm:px-6 lg:px-8">
-      <div className="w-[350px] max-w-lg">
-        <h1 className="text-3xl md:text-4xl text-left whitespace-normal">
+    <div className="bg-white min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
+      <SecondaryHeader />
+      <div className="w-[350px] max-w-lg pt-16 pb-8 px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl md:text-4xl font-semibold text-left whitespace-normal text-center">
           Welcome!
-          <p className="mt-4 text-lg text-primaryColour-600 whitespace-normal">
-            Create a new account
-          </p>
         </h1>
+        <p className="mt-4 text-lg text-primaryColour-600 whitespace-normal text-center font-medium">
+          Create a new account
+        </p>
 
         <Card className="mt-6">
           <CardContent>
@@ -270,40 +259,6 @@ export default function SignUp() {
                   value={formData.address.country}
                   onChange={handleInputChange}
                 />
-              </div>
-
-              <div>
-                <label htmlFor="accountType" className="text-sm font-medium">
-                  Account Type
-                </label>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      id="accountType"
-                      variant="outline"
-                      className="w-full mt-2"
-                    >
-                      {formData.type}
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("PLAYER")}
-                    >
-                      Player
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("COACH")}
-                    >
-                      Coach
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => handleAccountTypeChange("ADMIN")}
-                    >
-                      Admin
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </div>
 
               <Button

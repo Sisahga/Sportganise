@@ -40,17 +40,7 @@ export interface SignUpRequest {
 export interface SignUpResponse {
   statusCode: number;
   message: string;
-  data: null | {
-    accountId: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-    pictureUrl: string | null;
-    type: string;
-    phone: string;
-    organisationIds: number[];
-    jwtToken: string | null;
-  };
+  data: null | { email: string };
 }
 
 export interface SendCodeRequest {
@@ -71,7 +61,7 @@ export interface VerifyCodeRequest {
 export interface VerifyCodeResponse {
   statusCode: number;
   message: string;
-  data: string | null;
+  data: null | CookiesDto;
 }
 
 export interface ChangePasswordFormValues {
@@ -90,4 +80,10 @@ export interface ModifyPasswordRequest {
 export interface ModifyPasswordResponse {
   statusCode: number;
   message: string;
+}
+
+export interface ResetPasswordResponse {
+  statusCode: number;
+  message: string;
+  data: string;
 }
