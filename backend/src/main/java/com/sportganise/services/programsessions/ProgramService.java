@@ -44,7 +44,6 @@ public class ProgramService {
    *
    * @param programRepository program repository object.
    * @param accountService account service object.
-   * @param accountRepository account repository object.
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
