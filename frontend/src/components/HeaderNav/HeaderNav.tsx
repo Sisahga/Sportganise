@@ -76,7 +76,7 @@ export default function HeaderNav() {
               )}
               <Link
                 to="/pages/WaitlistTrainingSessionPage"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Waitlist
               </Link>
