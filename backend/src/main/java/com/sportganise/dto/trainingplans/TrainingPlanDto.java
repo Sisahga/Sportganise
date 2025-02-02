@@ -15,12 +15,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TrainingPlanDto {
-    @NotNull
-    private Integer planId;
-    @NotNull
-    private Integer userId;
-    @NotNull
-    private String docUrl;
-    @NotNull
-    private ZonedDateTime creationDate;
+  @NotNull private Integer planId;
+  @NotNull private Integer userId;
+  @NotNull private String docUrl;
+  @NotNull private ZonedDateTime creationDate;
 }

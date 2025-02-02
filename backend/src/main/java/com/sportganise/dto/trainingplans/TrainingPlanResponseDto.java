@@ -1,7 +1,6 @@
 package com.sportganise.dto.trainingplans;
 
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +14,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TrainingPlanResponseDto {
-    private List<TrainingPlanDto> myPlans;
-    private List<TrainingPlanDto> sharedWithMe;
+  private List<TrainingPlanDto> myPlans;
+  private List<TrainingPlanDto> sharedWithMe;
 }

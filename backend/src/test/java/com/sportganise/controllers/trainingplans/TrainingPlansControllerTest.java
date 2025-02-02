@@ -10,7 +10,6 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.trainingplans.TrainingPlansService;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -26,66 +25,70 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 public class TrainingPlansControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @MockBean
-    private TrainingPlansService trainingPlansService;
+  @MockBean private TrainingPlansService trainingPlansService;
 
-    @MockBean
-    private AccountService accountService;
+  @MockBean private AccountService accountService;
 
-    @Test
-    public void testGetTrainingPlans_ForbiddenAccess() throws Exception {
-        Integer accountId = 101;
-        Account user = new Account();
-        user.setAccountId(accountId);
-        user.setType(AccountType.GENERAL);
+  @Test
+  public void testGetTrainingPlans_ForbiddenAccess() throws Exception {
+    Integer accountId = 101;
+    Account user = new Account();
+    user.setAccountId(accountId);
+    user.setType(AccountType.GENERAL);
 
-        Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
-        Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(false);
+    Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
+    Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(false);
 
-        mockMvc.perform(get("/api/training-plans/{accountId}/view-plans", accountId))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("Only Coaches and Admins can access this page."));
-    }
+    mockMvc
+        .perform(get("/api/training-plans/{accountId}/view-plans", accountId))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.message").value("Only Coaches and Admins can access this page."));
+  }
 
-    @Test
-    public void testGetTrainingPlans_NoPlansFound() throws Exception {
-        Integer accountId = 101;
-        Account user = new Account();
-        user.setAccountId(accountId);
-        user.setType(AccountType.COACH);
+  @Test
+  public void testGetTrainingPlans_NoPlansFound() throws Exception {
+    Integer accountId = 101;
+    Account user = new Account();
+    user.setAccountId(accountId);
+    user.setType(AccountType.COACH);
 
-        Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
-        Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(true);
-        Mockito.when(trainingPlansService.getTrainingPlans(accountId)).thenReturn(null);
+    Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
+    Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(true);
+    Mockito.when(trainingPlansService.getTrainingPlans(accountId)).thenReturn(null);
 
-        mockMvc.perform(get("/api/training-plans/{accountId}/view-plans", accountId))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message").value("No training plans found."));
-    }
+    mockMvc
+        .perform(get("/api/training-plans/{accountId}/view-plans", accountId))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.message").value("No training plans found."));
+  }
 
-    @Test
-    public void testGetTrainingPlans_Success() throws Exception {
-        Integer accountId = 101;
-        Account user = new Account();
-        user.setAccountId(accountId);
-        user.setType(AccountType.COACH);
+  @Test
+  public void testGetTrainingPlans_Success() throws Exception {
+    Integer accountId = 101;
+    Account user = new Account();
+    user.setAccountId(accountId);
+    user.setType(AccountType.COACH);
 
-        TrainingPlanResponseDto responseDto = new TrainingPlanResponseDto(
-                List.of(new TrainingPlanDto(1, accountId, "https://example.com/plan1.docx", ZonedDateTime.now())),
-                List.of(new TrainingPlanDto(2, 102, "https://example.com/plan2.docx", ZonedDateTime.now())));
+    TrainingPlanResponseDto responseDto =
+        new TrainingPlanResponseDto(
+            List.of(
+                new TrainingPlanDto(
+                    1, accountId, "https://example.com/plan1.docx", ZonedDateTime.now())),
+            List.of(
+                new TrainingPlanDto(
+                    2, 102, "https://example.com/plan2.docx", ZonedDateTime.now())));
 
-        Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
-        Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(true);
-        Mockito.when(trainingPlansService.getTrainingPlans(accountId)).thenReturn(responseDto);
+    Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
+    Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(true);
+    Mockito.when(trainingPlansService.getTrainingPlans(accountId)).thenReturn(responseDto);
 
-        mockMvc.perform(get("/api/training-plans/{accountId}/view-plans", accountId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Training plans successfully fetched."))
-                .andExpect(jsonPath("$.data.myPlans").isArray())
-                .andExpect(jsonPath("$.data.sharedWithMe").isArray());
-    }
-
+    mockMvc
+        .perform(get("/api/training-plans/{accountId}/view-plans", accountId))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Training plans successfully fetched."))
+        .andExpect(jsonPath("$.data.myPlans").isArray())
+        .andExpect(jsonPath("$.data.sharedWithMe").isArray());
+  }
 }

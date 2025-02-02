@@ -21,17 +21,17 @@ import lombok.Setter;
 @Entity
 public class TrainingPlan {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "plan_id", nullable = false, updatable = false)
-    private Integer planId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "plan_id", nullable = false, updatable = false)
+  private Integer planId;
 
-    @Column(name = "account_id", nullable = false)
-    private Integer userId;
+  @Column(name = "account_id", nullable = false)
+  private Integer userId;
 
-    @Column(name = "doc_url", nullable = false)
-    private String docUrl;
+  @Column(name = "doc_url", nullable = false)
+  private String docUrl;
 
-    @Column(name = "creation_date", nullable = false)
-    private ZonedDateTime creationDate;
+  @Column(name = "creation_date", nullable = false)
+  private ZonedDateTime creationDate;
 }
