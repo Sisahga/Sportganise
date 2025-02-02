@@ -2,7 +2,6 @@ package com.sportganise.controllers.trainingplans;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +16,6 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.trainingplans.TrainingPlansService;
-import com.sportganise.dto.trainingplans.TrainingPlanDto;
 import com.sportganise.dto.trainingplans.TrainingPlanResponseDto;
 
 /**
