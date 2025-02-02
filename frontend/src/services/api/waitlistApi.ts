@@ -1,4 +1,5 @@
 import { WaitlistParticipant } from "@/types/waitlistParticipant";
+import { Program } from "@/types/trainingSessionDetails.ts";
 
 const waitlistApi = {
   getWaitlist: async (programId: number): Promise<WaitlistParticipant[]> => {
@@ -13,6 +14,19 @@ const waitlistApi = {
       return data; // Return waitlist participants
     } catch (error) {
       console.error("Error fetching waitlist:", error);
+      return [];
+    }
+  },
+  getWaitlistPrograms: async (): Promise<Program[]> => {
+    try {
+      const response = await fetch(`/program-participant/waitlist-programs`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch waitlist programs");
+      }
+      const data = await response.json();
+      return data; // Return a list of waitlist programs
+    } catch (error) {
+      console.error("Error fetching waitlist programs:", error);
       return [];
     }
   },

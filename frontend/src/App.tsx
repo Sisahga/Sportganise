@@ -196,6 +196,7 @@ function App() {
             element={<WaitlistDetailsPage />}
           ></Route>
         </Route>
+        </Route>
       </Routes>
     </Router>
   );
