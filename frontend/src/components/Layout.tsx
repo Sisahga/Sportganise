@@ -11,6 +11,14 @@ const hideHeaderPaths = [
   "/verificationcode",
 ]; // Header hidden on all these pages
 
+const medTopMarginPaths = [
+  "/pages/DirectMessagesDashboard",
+  "/pages/DirectMessageChannelPage",
+  "/pages/CreateDmChannelPage",
+];
+
+const noTopMarginPaths = ["/login", "/signup"];
+
 // Paths where the footer should be hidden
 const hideFooterPaths = [
   "/pages/DirectMessageChannelPage",
@@ -24,6 +32,9 @@ const hideFooterPaths = [
 const fullWidthPaths = [
   "/pages/DirectMessagesDashboard",
   "/pages/DirectMessageChannelPage",
+  "/pages/CreateDmChannelPage",
+  "/login",
+  "/signup",
 ]; // Full-width layout on these paths
 
 // Function to check if the current path matches any hide paths
@@ -36,9 +47,11 @@ const Layout = () => {
   const hideHeader = shouldHide(hideHeaderPaths, location.pathname);
   const hideFooter = shouldHide(hideFooterPaths, location.pathname);
   const isFullWidth = shouldHide(fullWidthPaths, location.pathname);
+  const medTopMargin = shouldHide(medTopMarginPaths, location.pathname);
+  const noTopMargin = shouldHide(noTopMarginPaths, location.pathname);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-secondaryColour/30 to-white to-[40%]">
       <Toaster />
       {/* Conditionally render HeaderNav */}
       {!hideHeader && <HeaderNav />}
@@ -46,7 +59,13 @@ const Layout = () => {
       {/* Main content area */}
       <main
         className={`flex-1 ${
-          !hideHeader ? "mt-40" : ""
+          noTopMargin
+            ? "mt-0"
+            : medTopMargin
+              ? "mt-28"
+              : !hideHeader
+                ? "mt-40"
+                : "mt-28"
         } ${isFullWidth ? "mx-0" : "mx-6"}`}
       >
         <Outlet /> {/* This will render the routed page content */}

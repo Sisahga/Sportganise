@@ -37,7 +37,7 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
   log.info(`Rendering MessagesSection with ${messageChannels.length} channels`);
   return (
     <div className="px-4">
-      <div className="py-3 bg-white mt-4 rounded-lg shadow-lg border border-navbar">
+      <div className="py-3 bg-white mt-4 rounded-lg shadow-lg border border-navbar mb-8">
         <div className="flex flex-col">
           <div>
             <h2 className="px-4 text-lg primary-colour font-bold">Messages</h2>
@@ -66,15 +66,6 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
                     </>
                   }
                 />
-                {/* Optional Delete Button (if onDeleteChannel is provided) */}
-                {/*{onDeleteChannel && (*/}
-                {/*  <button*/}
-                {/*    onClick={() => onDeleteChannel(channel.channelId)}*/}
-                {/*    className="text-sm text-red-500 px-2"*/}
-                {/*  >*/}
-                {/*    Delete*/}
-                {/*  </button>*/}
-                {/*)}*/}
               </div>
             ))}
           </div>

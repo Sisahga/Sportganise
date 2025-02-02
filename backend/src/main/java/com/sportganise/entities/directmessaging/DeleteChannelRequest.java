@@ -24,7 +24,7 @@ import lombok.Setter;
 public class DeleteChannelRequest {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "delete_request_id")
+  @Column(name = "delete_request_id", updatable = false)
   private Integer deleteRequestId;
 
   @Column(name = "channel_id")

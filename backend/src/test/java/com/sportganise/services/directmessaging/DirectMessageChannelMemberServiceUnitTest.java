@@ -9,6 +9,7 @@ import com.sportganise.entities.directmessaging.ChannelMemberRoleType;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMember;
 import com.sportganise.entities.directmessaging.DirectMessageChannelMemberCompositeKey;
 import com.sportganise.exceptions.channelmemberexceptions.ChannelMemberSetRoleException;
+import com.sportganise.repositories.directmessaging.DeleteChannelRequestApproverRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageChannelMemberRepository;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.springframework.dao.DataAccessException;
 @ExtendWith(MockitoExtension.class)
 public class DirectMessageChannelMemberServiceUnitTest {
   @Mock private DirectMessageChannelMemberRepository directMessageChannelMemberRepository;
+  @Mock private DeleteChannelRequestApproverRepository deleteChannelRequestApproverRepository;
   @InjectMocks private DirectMessageChannelMemberService directMessageChannelMemberService;
   @Captor private ArgumentCaptor<List<DirectMessageChannelMember>> membersCaptor;
 

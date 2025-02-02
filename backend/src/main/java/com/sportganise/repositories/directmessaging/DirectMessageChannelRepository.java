@@ -91,5 +91,11 @@ public interface DirectMessageChannelRepository
       """)
   String getDirectMessageChannelImageBlob(int channelId);
 
+  @Query(
+      """
+        SELECT dmc.type
+        FROM DirectMessageChannel dmc
+        WHERE dmc.channelId = :channelId
+      """)
   String findTypeByChannelId(Integer channelId);
 }

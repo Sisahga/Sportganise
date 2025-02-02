@@ -1,13 +1,16 @@
-import type React from "react";
-import { useState, useRef, useEffect, type DragEvent } from "react";
-import { useLocation } from "react-router";
-import { Send, FolderOpen, Paperclip } from "lucide-react";
+import React, { type DragEvent, useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
+import { ChevronLeft, FolderOpen, Paperclip, Send } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
-import type { MessageComponent, SendMessageComponent } from "@/types/messaging";
+import type {
+  FileAttachment,
+  MessageComponent,
+  SendMessageComponent,
+} from "@/types/messaging";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages";
 import { Button } from "@/components/ui/Button";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown";
@@ -15,16 +18,18 @@ import useSendMessage from "@/hooks/useSendMessage";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
-import BackButton from "@/components/ui/back-button";
 import {
   FileInput,
   FileUploader,
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
-import { useForm, Controller } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { ChatScreenProps } from "@/types/dmchannels.ts";
+import useGetDeleteChannelRequest from "@/hooks/useGetDeleteChannelRequest.ts";
+import { DeleteRequest } from "@/components/Inbox/ChatScreen/DeleteRequest";
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -32,26 +37,6 @@ const formSchema = z.object({
 });
 
 type FormData = z.infer<typeof formSchema>;
-
-export interface ChatScreenProps {
-  channelId: number;
-  channelName: string;
-  channelImageBlob: string;
-  read: boolean;
-  channelType: string;
-  isBlocked: boolean;
-}
-
-export interface FileAttachment {
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-  fileUrl: string;
-}
-
-export interface SendMessagePayload extends MessageComponent {
-  attachments: FileAttachment[];
-}
 
 const ChatScreen: React.FC = () => {
   const location = useLocation();
@@ -69,6 +54,9 @@ const ChatScreen: React.FC = () => {
   const cookies = getCookies();
   const currentUserId = getAccountIdCookie(cookies);
 
+  const navigate = useNavigate();
+
+  // States
   const [connected, setConnected] = useState<boolean>(false);
   const webSocketServiceRef = useRef<WebSocketService | null>(null);
   const [channelIsBlocked, setChannelIsBlocked] = useState<boolean>(isBlocked);
@@ -79,11 +67,19 @@ const ChatScreen: React.FC = () => {
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
+  // Hooks.
   const { messages, setMessages, loading, error } = useChatMessages(
     channelId,
     read,
-  );
+  ); // Fetch messages.
   const { sendDirectMessage } = useSendMessage();
+  const {
+    deleteRequestActive,
+    deleteRequest,
+    setDeleteRequestActive,
+    setDeleteRequest,
+    currentMemberStatus,
+  } = useGetDeleteChannelRequest(channelId, currentUserId); // Check if a delete request is active.
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -105,6 +101,8 @@ const ChatScreen: React.FC = () => {
       setChannelIsBlocked(true);
     } else if (message.type === "UNBLOCK") {
       setChannelIsBlocked(false);
+    } else if (message.type === "DELETE") {
+      setDeleteRequestActive(true);
     }
   };
 
@@ -136,6 +134,17 @@ const ChatScreen: React.FC = () => {
     }
   };
 
+  const adjustTextAreaHeight = (element: HTMLTextAreaElement) => {
+    if (!element) return;
+    element.style.height = "auto";
+    element.style.height = `${element.scrollHeight}px`;
+  };
+
+  const resetTextAreaHeight = (element: HTMLTextAreaElement) => {
+    if (!element) return;
+    element.style.height = "auto";
+  };
+
   const onSubmit = (data: FormData) => {
     if (
       data.message?.trim() === "" &&
@@ -158,13 +167,15 @@ const ChatScreen: React.FC = () => {
       attachments: fileAttachments,
       sentAt: new Date().toISOString(),
       type: "CHAT",
-      senderFirstName: "Walter", // TODO: Replace with actual first name from cookies
-      avatarUrl:
-        "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
+      senderFirstName: cookies.firstName,
+      avatarUrl: cookies.pictureUrl,
     };
 
     sendDirectMessage(messagePayload, webSocketServiceRef.current);
     form.reset();
+    resetTextAreaHeight(
+      document.getElementById("chatScreenInputArea") as HTMLTextAreaElement,
+    );
   };
 
   useEffect(() => {
@@ -177,11 +188,18 @@ const ChatScreen: React.FC = () => {
         }
       });
     }
-  }, [connected, connectWebSocket]); // Added connectWebSocket to dependencies
+  }, []); // TODO: Add proper dependencies.
 
   useEffect(() => {
     log.debug("Messages fetched:", messages);
   }, [messages]);
+
+  useEffect(() => {
+    if (deleteRequestActive && deleteRequest) {
+      log.info("Delete request active:", deleteRequest);
+      log.info("Current member status:", currentMemberStatus);
+    }
+  }, [deleteRequestActive]);
 
   if (loading) {
     return (
@@ -202,17 +220,32 @@ const ChatScreen: React.FC = () => {
   return (
     <div
       id="chatScreenMainCtn"
-      className={`flex flex-col h-[90vh] -mt-16 ${isDragging ? "bg-blue-100" : ""}`}
+      className={`flex flex-col
+      ${isDragging ? "bg-blue-100" : ""}`}
+      style={{ height: "calc(100vh - 7rem)" }}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
     >
       {/* Header */}
-      <header className="pt-8 flex items-center justify-between px-4 py-3 bg-white shadow gap-4">
-        <div className="flex flex-grow items-center gap-3 place-content-between">
-          <BackButton />
-          <div className="flex items-center gap-3">
+      <header
+        className="flex items-center justify-between p-4 bg-white shadow gap-4"
+        style={{ borderRadius: "0 0 1rem 1rem" }}
+      >
+        <div className="flex flex-grow items-center gap-4">
+          <Button
+            className="rounded-xl font-semibold"
+            variant="outline"
+            onClick={() => {
+              navigate("/pages/DirectMessagesDashboard");
+            }}
+            aria-label="back"
+          >
+            <ChevronLeft />
+            <p className="sm:block hidden">Back</p>
+          </Button>
+          <div className="flex items-center flex-grow gap-3">
             <img
               src={currentChannelImageUrl || "/placeholder.svg"}
               alt={defaultGroupAvatar}
@@ -233,6 +266,7 @@ const ChatScreen: React.FC = () => {
             setCurrentChannelName={setCurrentChannelName}
             currentChannelPictureUrl={currentChannelImageUrl}
             setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
+            isDeleteRequestActive={deleteRequestActive}
           />
         </div>
       </header>
@@ -246,6 +280,19 @@ const ChatScreen: React.FC = () => {
           <p>Web socket connection failed.</p>
         </div>
       </div>
+
+      {/* Don't display to non-admin group members */}
+      {deleteRequestActive && currentMemberStatus !== undefined && (
+        <DeleteRequest
+          deleteRequestActive={deleteRequestActive}
+          deleteRequest={deleteRequest}
+          currentUserId={currentUserId}
+          currentUserApproverStatus={currentMemberStatus}
+          setDeleteRequestActive={setDeleteRequestActive}
+          websocketRef={webSocketServiceRef.current}
+          setDeleteRequest={setDeleteRequest}
+        />
+      )}
 
       {/* Chat Messages */}
       <ChatMessages messages={messages} currentUserId={currentUserId} />
@@ -310,6 +357,10 @@ const ChatScreen: React.FC = () => {
               className={`${channelIsBlocked ? "force-hide" : ""} flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none`}
               style={{ scrollbarWidth: "none" }}
               rows={1}
+              onChange={(e) => {
+                field.onChange(e);
+                adjustTextAreaHeight(e.target);
+              }}
             />
           )}
         />

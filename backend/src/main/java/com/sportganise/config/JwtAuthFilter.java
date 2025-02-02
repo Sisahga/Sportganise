@@ -6,7 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,18 +15,39 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * JwtAuthFilter class is used to filter the request and validate the JWT token. For now we set the
  * websocket endpoint as public, to fix later.
  */
-@RequiredArgsConstructor
 @Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private final UserAuthProvider userAuthProvider;
+  private final String environment;
+
+  public JwtAuthFilter(UserAuthProvider userAuthProvider, String environment) {
+    this.userAuthProvider = userAuthProvider;
+    this.environment = environment;
+  }
+
+  private final String[] publicEndpoints = {
+    "/api/auth/login",
+    "/api/auth/signup",
+    "/api/auth/send-code",
+    "/api/auth/verify-code",
+    "/ws",
+    "/ws/**"
+  };
 
   @Override
   protected void doFilterInternal(
-      HttpServletRequest request,
+      @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
+    log.info("CURRENT ENV: {}", environment);
+    if ("DEV".equalsIgnoreCase(environment)) {
+      log.info("DEV environment.");
+      filterChain.doFilter(request, response);
+      return;
+    }
+
     String header = request.getHeader(HttpHeaders.AUTHORIZATION);
     if (header != null) {
       log.info("Header exists.");
@@ -53,17 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   }
 
   private boolean isPublicEndpoint(HttpServletRequest request) {
-    String[] publicEndpoints = {
-      "/api/**",
-      "/api/auth/login",
-      "/api/auth/signup",
-      "/login",
-      "/signup",
-      "/verificationcode",
-      "/error",
-      "/ws",
-      "/ws/**"
-    };
+    String[] publicEndpoints = this.publicEndpoints;
     String path = request.getRequestURI();
 
     for (String endpoint : publicEndpoints) {

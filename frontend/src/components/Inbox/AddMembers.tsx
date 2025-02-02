@@ -21,10 +21,10 @@ export default function AddMembers({
   currentUserId,
   excludedMembers,
 }: AddMembersDialogProps) {
+  const organizationId = 1; // TODO: Get from cookies once org cookies is properly setup.
   // States.
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const organizationId = 1; // TODO: Replace with actual organization ID from cookies
 
   log.info(
     `AddMembers component initialized for organization ID: ${organizationId}`,
@@ -79,7 +79,7 @@ export default function AddMembers({
         <Input
           type="text"
           placeholder="Search for a player"
-          className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
+          className="pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
           value={searchQuery}
           onChange={(event) => {
             setSearchQuery(event.target.value);
@@ -89,7 +89,7 @@ export default function AddMembers({
       </div>
       {/* once user searches for a player, results will start to show */}
       {(isSearching || selectedUsers.length > 0) && (
-        <ScrollArea className="flex-1 w-full max-h-[400px] rounded-md border overflow-y-auto">
+        <ScrollArea className="flex-1 w-full max-h-[40vh] rounded-md border overflow-y-auto">
           <div className="p-4 space-y-4">
             {/* Render selected players at the top */}
             {selectedUsers.map((user) => (
@@ -106,7 +106,7 @@ export default function AddMembers({
                     />
                     <AvatarFallback>{user.firstName.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <span className="font-medium font-font text-sm">
+                  <span className="font-medium text-sm">
                     {user.firstName + " " + user.lastName}
                   </span>
                 </div>
@@ -140,10 +140,10 @@ export default function AddMembers({
                   </Avatar>
                   <div className="flex justify-between w-full">
                     <div className="flex flex-col items-start gap-1">
-                      <span className="font-medium font-font text-sm">
+                      <span className="font-medium text-sm">
                         {user.firstName + " " + user.lastName}
                       </span>
-                      <span className="text-xs font-font font-light primary-colour">
+                      <span className="text-xs font-light primary-colour">
                         {user.type.toUpperCase()}
                       </span>
                     </div>
@@ -158,7 +158,7 @@ export default function AddMembers({
             ) : (
               <p
                 className={`${searchQuery === "" ? "hidden" : ""} 
-                    text-center font-light font-font primary-colour`}
+                    text-center font-light primary-colour`}
               >
                 No players found
               </p>
@@ -168,12 +168,7 @@ export default function AddMembers({
       )}
       {selectedUsers.length > 0 && (
         <div className="mt-4">
-          <Button
-            variant="secondary"
-            className="w-full font-font text-sm text-light font-bold primary-colour
-                  bg-secondaryColour rounded-lg"
-            onClick={createFunction}
-          >
+          <Button className="w-full text-sm" onClick={createFunction}>
             <p className="font-bold">{submitButtonLabel}</p>
             {/*<PenBox className="primary-colour" strokeWidth={2}></PenBox>*/}
           </Button>

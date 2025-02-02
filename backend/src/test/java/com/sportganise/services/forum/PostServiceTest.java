@@ -42,6 +42,8 @@ public class PostServiceTest {
 
   @Mock private PostAttachmentRepository attachmentRepository;
 
+  @Mock private FeedbackService feedbackService;
+
   @InjectMocks private PostService postService;
 
   @Test

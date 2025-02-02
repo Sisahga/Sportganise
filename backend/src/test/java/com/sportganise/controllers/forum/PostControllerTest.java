@@ -11,7 +11,6 @@ import com.sportganise.dto.forum.PostDto;
 import com.sportganise.entities.forum.PostType;
 import com.sportganise.services.forum.PostService;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,8 +50,8 @@ public class PostControllerTest {
             .type(PostType.FUNDRAISER)
             .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
             .creationDate(ZonedDateTime.parse("2025-01-26T05:05:40.658404Z"))
-            .likeCount(2)
-            .attachments(new ArrayList<>())
+            .likeCount((long) 2)
+            .feedbackCount((long) 1)
             .build();
 
     PostDto post2 =
@@ -63,8 +62,8 @@ public class PostControllerTest {
             .type(PostType.SPECIAL)
             .occurrenceDate(ZonedDateTime.parse("2025-01-20T10:30:00Z"))
             .creationDate(ZonedDateTime.parse("2025-01-26T05:05:40.658404Z"))
-            .likeCount(1)
-            .attachments(new ArrayList<>())
+            .likeCount((long) 2)
+            .feedbackCount((long) 1)
             .build();
 
     List<PostDto> posts = Arrays.asList(post1, post2);
