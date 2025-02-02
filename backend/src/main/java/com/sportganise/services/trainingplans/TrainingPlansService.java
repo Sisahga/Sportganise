@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.sportganise.dto.trainingplans.TrainingPlanDto;
+import com.sportganise.dto.trainingplans.TrainingPlanResponseDto;
 import com.sportganise.entities.trainingplans.TrainingPlan;
 import com.sportganise.repositories.trainingplans.TrainingPlansRepository;
 
@@ -31,7 +32,7 @@ public class TrainingPlansService {
      * 
      * @return List of Training Plan Dtos.
      */
-    public List<TrainingPlanDto> getTrainingPlans(Integer userId) {
+    public TrainingPlanResponseDto getTrainingPlans(Integer userId) {
         List<TrainingPlan> trainingPlans = trainingPlansRepository.findTrainingPlans();
         log.debug("PROGRAMS COUNT: ", trainingPlans.size());
 
@@ -47,7 +48,7 @@ public class TrainingPlansService {
         }
         log.debug("PROGRAM DTOS COUNT: ", trainingPlanDtos.size());
 
-        /*List<TrainingPlanDto> myPlans = trainingPlanDtos.stream()
+        List<TrainingPlanDto> myPlans = trainingPlanDtos.stream()
                 .filter(tp -> tp.getUserId().equals(userId))
                 .collect(Collectors.toList());
 
@@ -57,8 +58,10 @@ public class TrainingPlansService {
                 .filter(tp -> !tp.getUserId().equals(userId))
                 .collect(Collectors.toList());
 
-        log.debug("SHARED WITH ME COUNT: {}", sharedWithMe.size());*/
+        log.debug("SHARED WITH ME COUNT: {}", sharedWithMe.size());
 
-        return trainingPlanDtos;
+        TrainingPlanResponseDto trainingPlanResponseDto = new TrainingPlanResponseDto(myPlans, sharedWithMe);
+
+        return trainingPlanResponseDto;
     }
 }

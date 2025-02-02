@@ -18,6 +18,7 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.trainingplans.TrainingPlansService;
 import com.sportganise.dto.trainingplans.TrainingPlanDto;
+import com.sportganise.dto.trainingplans.TrainingPlanResponseDto;
 
 /**
  * REST Controller for managing 'Training Plans' Entities. Handles HTTP request
@@ -44,10 +45,10 @@ public class TrainingPlansController {
      * @return HTTP ResponseEntity.
      */
     @GetMapping("{accountId}/view-plans")
-    public ResponseEntity<ResponseDto<List<TrainingPlanDto>>> getTrainingPlans(
+    public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> getTrainingPlans(
             @PathVariable Integer accountId) {
 
-        ResponseDto<List<TrainingPlanDto>> responseDto = new ResponseDto<>();
+        ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
 
         Optional<Account> userOptional = getAccount(accountId);
 
@@ -66,19 +67,20 @@ public class TrainingPlansController {
             return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
         }
 
-        List<TrainingPlanDto> trainingPlansDtos = trainingPlansService.getTrainingPlans(accountId);
-            log.debug("TRAINING PLANS DTO COUNT: ", trainingPlansDtos.size());
+        TrainingPlanResponseDto trainingPlanResponseDtos = trainingPlansService.getTrainingPlans(accountId);
 
-            if (trainingPlansDtos.isEmpty()) {
-                responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-                responseDto.setMessage("No training plans found.");
-                return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-            }
-
-            responseDto.setStatusCode(HttpStatus.OK.value());
-            responseDto.setMessage("Training plans successfully fetched.");
-            responseDto.setData(trainingPlansDtos);
+        if (trainingPlanResponseDtos == null) {
+            responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
+            responseDto.setMessage("No training plans found.");
             return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+        }
+
+        log.debug("TRAINING PLANS SHARED WITH ME COUNT: ", trainingPlanResponseDtos.getSharedWithMe());
+
+        responseDto.setStatusCode(HttpStatus.OK.value());
+        responseDto.setMessage("Training plans successfully fetched.");
+        responseDto.setData(trainingPlanResponseDtos);
+        return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
     /** Helper method to fetch and validate user account based on accountId. */
