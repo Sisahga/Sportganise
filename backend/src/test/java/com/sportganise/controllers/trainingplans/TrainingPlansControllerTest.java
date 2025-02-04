@@ -6,13 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sportganise.dto.trainingplans.TrainingPlanDto;
 import com.sportganise.dto.trainingplans.TrainingPlanResponseDto;
-import com.sportganise.entities.account.Account;
-import com.sportganise.entities.account.AccountType;
-import com.sportganise.services.account.AccountService;
+import com.sportganise.exceptions.ForbiddenException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.trainingplans.TrainingPlansService;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +27,12 @@ public class TrainingPlansControllerTest {
 
   @MockBean private TrainingPlansService trainingPlansService;
 
-  @MockBean private AccountService accountService;
-
   @Test
   public void testGetTrainingPlans_ForbiddenAccess() throws Exception {
     Integer accountId = 101;
-    Account user = new Account();
-    user.setAccountId(accountId);
-    user.setType(AccountType.GENERAL);
-
-    Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
-    Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(false);
+    
+    Mockito.when(trainingPlansService.getTrainingPlans(accountId))
+        .thenThrow(new ForbiddenException("Only Coaches and Admins can access this page."));
 
     mockMvc
         .perform(get("/api/training-plans/{accountId}/view-plans", accountId))
@@ -50,14 +43,9 @@ public class TrainingPlansControllerTest {
   @Test
   public void testGetTrainingPlans_NoPlansFound() throws Exception {
     Integer accountId = 101;
-    Account user = new Account();
-    user.setAccountId(accountId);
-    user.setType(AccountType.COACH);
 
-    Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
-    Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(true);
-    Mockito.when(trainingPlansService.getTrainingPlans(accountId)).thenReturn(null);
-
+    Mockito.when(trainingPlansService.getTrainingPlans(accountId))
+        .thenThrow(new ResourceNotFoundException("No training plans found."));
     mockMvc
         .perform(get("/api/training-plans/{accountId}/view-plans", accountId))
         .andExpect(status().isNotFound())
@@ -67,9 +55,6 @@ public class TrainingPlansControllerTest {
   @Test
   public void testGetTrainingPlans_Success() throws Exception {
     Integer accountId = 101;
-    Account user = new Account();
-    user.setAccountId(accountId);
-    user.setType(AccountType.COACH);
 
     TrainingPlanResponseDto responseDto =
         new TrainingPlanResponseDto(
@@ -80,8 +65,6 @@ public class TrainingPlansControllerTest {
                 new TrainingPlanDto(
                     2, 102, "https://example.com/plan2.docx", ZonedDateTime.now())));
 
-    Mockito.when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
-    Mockito.when(accountService.hasPermissions(user.getType())).thenReturn(true);
     Mockito.when(trainingPlansService.getTrainingPlans(accountId)).thenReturn(responseDto);
 
     mockMvc
