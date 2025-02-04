@@ -30,7 +30,7 @@ public class TrainingPlansControllerTest {
   @Test
   public void testGetTrainingPlans_ForbiddenAccess() throws Exception {
     Integer accountId = 101;
-    
+
     Mockito.when(trainingPlansService.getTrainingPlans(accountId))
         .thenThrow(new ForbiddenException("Only Coaches and Admins can access this page."));
 
