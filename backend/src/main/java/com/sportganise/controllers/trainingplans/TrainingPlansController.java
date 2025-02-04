@@ -2,10 +2,7 @@ package com.sportganise.controllers.trainingplans;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.trainingplans.TrainingPlanResponseDto;
-import com.sportganise.entities.account.Account;
-import com.sportganise.services.account.AccountService;
 import com.sportganise.services.trainingplans.TrainingPlansService;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,13 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class TrainingPlansController {
   private final TrainingPlansService trainingPlansService;
-  private final AccountService accountService;
 
   @Autowired
-  public TrainingPlansController(
-      TrainingPlansService trainingPlansService, AccountService accountService) {
+  public TrainingPlansController(TrainingPlansService trainingPlansService) {
     this.trainingPlansService = trainingPlansService;
-    this.accountService = accountService;
   }
 
   /**
@@ -43,49 +37,16 @@ public class TrainingPlansController {
   public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> getTrainingPlans(
       @PathVariable Integer accountId) {
 
-    ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
-
-    Optional<Account> userOptional = getAccount(accountId);
-
-    if (userOptional.isEmpty()) {
-      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-      responseDto.setMessage("User not found.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    }
-
-    Account user = userOptional.get();
-    log.debug("USER ID:", user.getAccountId());
-
-    if (!hasPermissions(user)) {
-      responseDto.setStatusCode(HttpStatus.FORBIDDEN.value());
-      responseDto.setMessage("Only Coaches and Admins can access this page.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    }
-
-    TrainingPlanResponseDto trainingPlanResponseDtos =
+    TrainingPlanResponseDto trainingPlanResponseDto =
         trainingPlansService.getTrainingPlans(accountId);
 
-    if (trainingPlanResponseDtos == null) {
-      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-      responseDto.setMessage("No training plans found.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    }
-
-    log.debug("TRAINING PLANS SHARED WITH ME COUNT: ", trainingPlanResponseDtos.getSharedWithMe());
-
+    ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Training plans successfully fetched.");
-    responseDto.setData(trainingPlanResponseDtos);
+    responseDto.setData(trainingPlanResponseDto);
+
+    log.debug("TRAINING PLANS SHARED WITH ME COUNT: ", trainingPlanResponseDto.getSharedWithMe());
+
     return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-  }
-
-  /** Helper method to fetch and validate user account based on accountId. */
-  private Optional<Account> getAccount(Integer accountId) {
-    return accountService.getAccount(accountId);
-  }
-
-  /** Helper method to check user permissions. */
-  private boolean hasPermissions(Account user) {
-    return accountService.hasPermissions(user.getType());
   }
 }
