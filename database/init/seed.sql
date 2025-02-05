@@ -168,3 +168,7 @@ INSERT INTO feedback (post_id, account_id, content) VALUES
 (1, 2, 'Are cats allowed??'),
 (2, 3, 'It was mediocre. ');
 
+INSERT INTO training_plan (account_id, doc_url) VALUES
+(1, 'training1.doc'),
+(2, 'training2.doc');
+

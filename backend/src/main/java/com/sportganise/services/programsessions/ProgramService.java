@@ -12,7 +12,6 @@ import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
-import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
@@ -37,7 +36,6 @@ public class ProgramService {
 
   private final ProgramRepository programRepository;
   private final AccountService accountService;
-  private final AccountRepository accountRepository;
   private final ProgramAttachmentRepository programAttachmentRepository;
   private final BlobService blobService;
 
@@ -46,17 +44,14 @@ public class ProgramService {
    *
    * @param programRepository program repository object.
    * @param accountService account service object.
-   * @param accountRepository account repository object.
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
       ProgramRepository programRepository,
       AccountService accountService,
-      AccountRepository accountRepository,
       ProgramAttachmentRepository programAttachmentRepository,
       BlobService blobService) {
     this.programRepository = programRepository;
-    this.accountRepository = accountRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
     this.blobService = blobService;

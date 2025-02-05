@@ -249,7 +249,6 @@ public class ProgramServiceTest {
 
   @Test
   void testGetPrograms() {
-    // Arrange
     List<Program> mockPrograms = createMockPrograms();
     when(programRepository.findPrograms()).thenReturn(mockPrograms);
 
@@ -258,10 +257,8 @@ public class ProgramServiceTest {
             when(programAttachmentRepository.findAttachmentsByProgramId(program.getProgramId()))
                 .thenReturn(List.of()));
 
-    // Act
     List<ProgramDto> result = programService.getPrograms();
 
-    // Assert
     assertNotNull(result);
     assertEquals(2, result.size());
 
