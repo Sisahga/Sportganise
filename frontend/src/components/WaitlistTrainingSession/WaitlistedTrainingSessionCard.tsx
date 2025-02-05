@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
