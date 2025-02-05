@@ -3,31 +3,40 @@ import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 import log from "loglevel";
 import useWaitlistPrograms from "@/hooks/useWaitlistPrograms";
+import { Program } from "@/types/trainingSessionDetails";
 
-export default function WaitlistedTrainingSessionsList() {
+interface WaitlistedTrainingSessionListProps {
+  onSelectTraining: (program: Program) => void;
+}
+
+export default function WaitlistedTrainingSessionList({
+  onSelectTraining,
+}: WaitlistedTrainingSessionListProps) {
   const { waitlistPrograms, error, loading } = useWaitlistPrograms();
 
-  // Log the fetched programs
   useEffect(() => {
+    console.log(
+      "WaitlistedTrainingSessionList: Programs fetched:",
+      waitlistPrograms,
+    );
     log.info(
-      "WaitlistedTrainingSessionList : Programs fetched:",
+      "WaitlistedTrainingSessionList: Programs fetched:",
       waitlistPrograms,
     );
   }, [waitlistPrograms]);
 
   return (
     <div className="mb-32 mt-5">
-      {/** List of events */}
       <div>
         <span className="flex mt-8 mx-1">
           <p className="text-lg text-primaryColour text-sec font-semibold">
-            Waitlisted Training Sessions
+            Available Sessions
           </p>
         </span>
 
         {error ? (
           <p className="text-red text-center">
-            Error loading waitlist training sessions
+            Error loading waitlist programs
           </p>
         ) : loading ? (
           <div className="flex justify-center">
@@ -35,14 +44,14 @@ export default function WaitlistedTrainingSessionsList() {
           </div>
         ) : waitlistPrograms.length === 0 ? (
           <p className="text-gray-500 text-center">
-            No waitlisted training sessions available
+            No waitlisted programs available
           </p>
         ) : (
           waitlistPrograms.map((program, index) => (
             <div key={index} className="my-5">
               <WaitlistedTrainingSessionCard
-                programDetails={program.programDetails}
-                attendees={program.attendees}
+                program={{ programDetails: program, attendees: [] }}
+                onSelectTraining={onSelectTraining}
               />
             </div>
           ))

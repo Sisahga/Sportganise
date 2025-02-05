@@ -1,11 +1,14 @@
 import { WaitlistParticipant } from "@/types/waitlistParticipant";
 import { Program } from "@/types/trainingSessionDetails.ts";
 
+const baseMappingUrl =
+  import.meta.env.VITE_API_BASE_URL + "/api/program-participant";
+
 const waitlistApi = {
   getWaitlist: async (programId: number): Promise<WaitlistParticipant[]> => {
     try {
       const response = await fetch(
-        `/program-participant/queue?programId=${programId}`,
+        `${baseMappingUrl}/queue?programId=${programId}`,
       );
       if (!response.ok) {
         throw new Error("Failed to fetch waitlist");
@@ -19,7 +22,7 @@ const waitlistApi = {
   },
   getWaitlistPrograms: async (): Promise<Program[]> => {
     try {
-      const response = await fetch(`/program-participant/waitlist-programs`);
+      const response = await fetch(`${baseMappingUrl}/waitlist-programs`);
       if (!response.ok) {
         throw new Error("Failed to fetch waitlist programs");
       }
