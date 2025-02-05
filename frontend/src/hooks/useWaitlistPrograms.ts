@@ -8,9 +8,16 @@ function useWaitlistPrograms() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log(
+      "useWaitlistPrograms: Retrieved waitlist programs:",
+      waitlistPrograms,
+    );
+  }, [waitlistPrograms]);
+
   const fetchWaitlistPrograms = async () => {
     try {
-      const data = await waitlistApi.getWaitlistPrograms(); // Using the waitlist API now
+      const data = await waitlistApi.getWaitlistPrograms();
       setWaitlistPrograms(data ?? []);
       log.info("useWaitlistPrograms response:", data);
     } catch (err) {

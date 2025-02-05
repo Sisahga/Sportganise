@@ -28,8 +28,6 @@ import NotificationSettingsPage from "./pages/NotificationSettingsPage.tsx";
 import ChangeForgottenPasswordPage from "./pages/ResetPassword.tsx";
 import useFcmNotifications from "@/hooks/useFcmNotifications.ts";
 import WaitlistTrainingSessionPage from "./pages/WaitlistTrainingSessionPage";
-import WaitlistTrainingSessionList from "@/components/WaitlistTrainingSession/WaitlistedTrainingSessionList";
-import WaitlistDetailsPage from "./pages/WaitlistDetailsPage";
 
 function App() {
   useFcmNotifications();
@@ -186,14 +184,6 @@ function App() {
           <Route
             path="/pages/WaitlistTrainingSessionPage"
             element={<WaitlistTrainingSessionPage />}
-          ></Route>
-          <Route
-            path="/waitlist"
-            element={<WaitlistTrainingSessionList />}
-          ></Route>
-          <Route
-            path="/pages/WaitlistDetailsPage"
-            element={<WaitlistDetailsPage />}
           ></Route>
         </Route>
         </Route>

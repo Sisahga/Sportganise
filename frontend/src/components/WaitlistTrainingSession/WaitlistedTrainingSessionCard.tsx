@@ -1,31 +1,26 @@
-/* eslint-disable react/prop-types */
-import { useNavigate } from "react-router";
-
-// Component imports
 import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/EventBadgeType";
-
-// Data structure for data received from API call
 import { Program } from "@/types/trainingSessionDetails";
-
-// Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
 
-const WaitlistedTrainingSessionCard: React.FC<Program> = ({
-  programDetails,
-  attendees,
-}) => {
-  // Handle navigation to training session detail page
-  const navigate = useNavigate();
-  const handleNavigation = (path: string, data: Program) => {
-    navigate(path, { state: data });
-  };
+interface WaitlistedTrainingSessionCardProps {
+  program: Program;
+  onSelectTraining: (program: Program) => void;
+}
 
+const WaitlistedTrainingSessionCard: React.FC<
+  WaitlistedTrainingSessionCardProps
+> = ({ program, onSelectTraining }) => {
+  if (!program || !program.programDetails) {
+    return null; // Prevent rendering if programDetails is missing
+  }
+
+  const { programDetails } = program;
   return (
-    <Card>
+    <Card onClick={() => onSelectTraining(program)} className="cursor-pointer">
       <div className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
         <div className="flex w-full items-center gap-2">
           <Avatar>
@@ -33,7 +28,7 @@ const WaitlistedTrainingSessionCard: React.FC<Program> = ({
               <User2Icon color="#a1a1aa" />
             </AvatarFallback>
           </Avatar>
-          <span>Coach Benjamin Luijan</span>{" "}
+          <span>Coach Benjamin Luijan</span>
           <span className="ml-auto text-xs">
             {new Date(programDetails.occurrenceDate).toDateString()}
           </span>
@@ -53,7 +48,7 @@ const WaitlistedTrainingSessionCard: React.FC<Program> = ({
                   { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
                 )}
               </p>
-              <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
+              <hr className="mx-1 w-1 h-px border-0 bg-gray-500" />
               <p className="text-gray-500 whitespace-break-spaces text-xs">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
@@ -91,14 +86,12 @@ const WaitlistedTrainingSessionCard: React.FC<Program> = ({
         <div className="flex">
           <EventBadgeType programType={programDetails.programType} />
 
-          {/*Click to view details */}
+          {/* View Details Button */}
           <button
-            onClick={() =>
-              handleNavigation("/pages/WaitlistDetailsPage", {
-                programDetails,
-                attendees,
-              })
-            }
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectTraining(program);
+            }}
             className="ml-2 flex items-center bg-transparent"
           >
             <ChevronRight size={17} color="#82DBD8" />
