@@ -6,7 +6,7 @@ import useWaitlistPrograms from "@/hooks/useWaitlistPrograms";
 import { Program } from "@/types/trainingSessionDetails";
 
 interface WaitlistedTrainingSessionListProps {
-  onSelectTraining: (program: Program) => void;
+  onSelectTraining: (programDetails: Program) => void;
 }
 
 export default function WaitlistedTrainingSessionList({
@@ -15,10 +15,6 @@ export default function WaitlistedTrainingSessionList({
   const { waitlistPrograms, error, loading } = useWaitlistPrograms();
 
   useEffect(() => {
-    console.log(
-      "WaitlistedTrainingSessionList: Programs fetched:",
-      waitlistPrograms,
-    );
     log.info(
       "WaitlistedTrainingSessionList: Programs fetched:",
       waitlistPrograms,
@@ -26,7 +22,7 @@ export default function WaitlistedTrainingSessionList({
   }, [waitlistPrograms]);
 
   return (
-    <div className="mb-32 mt-5">
+    <div className="flex flex-col min-h-screen pb-20">
       <div>
         <span className="flex mt-8 mx-1">
           <p className="text-lg text-primaryColour text-sec font-semibold">
@@ -50,8 +46,13 @@ export default function WaitlistedTrainingSessionList({
           waitlistPrograms.map((program, index) => (
             <div key={index} className="my-5">
               <WaitlistedTrainingSessionCard
-                program={{ programDetails: program, attendees: [] }}
-                onSelectTraining={onSelectTraining}
+                programDetails={program.programDetails}
+                onSelectTraining={() =>
+                  onSelectTraining({
+                    programDetails: program.programDetails,
+                    attendees: [],
+                  })
+                }
               />
             </div>
           ))
