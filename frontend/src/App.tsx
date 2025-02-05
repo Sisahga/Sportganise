@@ -20,7 +20,6 @@ import BlockedUsersListPage from "./pages/BlockedUserListPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
 import NotificationsPage from "./pages/NotificationsPage.tsx";
 import WaitlistTrainingSessionPage from "./pages/WaitlistTrainingSessionPage";
-import WaitlistDetailsPage from "./pages/WaitlistDetailsPage";
 import ForumPage from "./pages/ForumPage.tsx";
 import PostDetailPage from "./pages/PostDetailPage.tsx";
 import ModifyPermissionPage from "./pages/ModifyPermissionPage.tsx";
@@ -53,10 +52,6 @@ function App() {
           <Route
             path="/pages/WaitlistTrainingSessionPage"
             element={<WaitlistTrainingSessionPage />}
-          ></Route>
-          <Route
-            path="/pages/WaitlistDetailsPage"
-            element={<WaitlistDetailsPage />}
           ></Route>
           <Route path="/" element={<Layout />}>
             {/*Place the routes to all your pages nested beneath this Route tag */}
