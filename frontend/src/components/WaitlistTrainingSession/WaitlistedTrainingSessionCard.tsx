@@ -4,24 +4,26 @@ import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/EventBadgeType";
-import { Program } from "@/types/trainingSessionDetails";
+import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { calculateEndTime } from "@/utils/calculateEndTime";
 
 interface WaitlistedTrainingSessionCardProps {
-  program: Program;
-  onSelectTraining: (program: Program) => void;
+  programDetails: ProgramDetails;
+  onSelectTraining: (program: ProgramDetails) => void;
 }
 
 const WaitlistedTrainingSessionCard: React.FC<
   WaitlistedTrainingSessionCardProps
-> = ({ program, onSelectTraining }) => {
-  if (!program || !program.programDetails) {
+> = ({ programDetails, onSelectTraining }) => {
+  if (!programDetails) {
     return null; // Prevent rendering if programDetails is missing
   }
 
-  const { programDetails } = program;
   return (
-    <Card onClick={() => onSelectTraining(program)} className="cursor-pointer">
+    <Card
+      onClick={() => onSelectTraining(programDetails)}
+      className="cursor-pointer"
+    >
       <div className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
         <div className="flex w-full items-center gap-2">
           <Avatar>
@@ -91,7 +93,7 @@ const WaitlistedTrainingSessionCard: React.FC<
           <button
             onClick={(e) => {
               e.stopPropagation();
-              onSelectTraining(program);
+              onSelectTraining(programDetails);
             }}
             className="ml-2 flex items-center bg-transparent"
           >
