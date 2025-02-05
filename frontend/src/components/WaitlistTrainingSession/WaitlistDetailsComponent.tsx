@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useWaitlist } from "@/hooks/useWaitlist";
 import useJoinWaitlist from "@/hooks/useJoinWaitlist";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
