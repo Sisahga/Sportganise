@@ -64,6 +64,16 @@ public class DirectMessageController {
     }
   }
 
+  /**
+   * Upload attachments to a message.
+   *
+   * @param attachments List of attachments to upload.
+   * @param messageId ID of the message to upload attachments to.
+   * @param senderId ID of the sender.
+   * @param senderFirstName First name of the sender.
+   * @param senderAvatarUrl URL of the sender's avatar.
+   * @return Response DTO with the update message with attachments.
+   */
   @PostMapping("/upload-attachments")
   public ResponseEntity<ResponseDto<DirectMessageDto>> uploadAttachments(
           @RequestParam("attachments") List<MultipartFile> attachments,
