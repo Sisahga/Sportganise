@@ -24,6 +24,14 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
   List<String> findDistinctTypes();
 
   /**
+   * Fetches post by post id.
+   *
+   * @param postId Post id.
+   * @return Post.
+   */
+  <Optional> Post findByPostId(Integer postId);
+
+  /**
    * Fetches posts based on search criteria.
    *
    * @param searchTerm Search term to filter posts by.
