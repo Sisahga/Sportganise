@@ -6,7 +6,7 @@ export interface MessageComponent {
   senderFirstName: string;
   channelId: number;
   messageContent: string;
-  attachments: FileAttachment[];
+  attachments: File[];
   sentAt: string;
   type: string;
   avatarUrl: string | undefined;
@@ -16,7 +16,7 @@ export interface SendMessageComponent {
   senderId: number;
   channelId: number;
   messageContent: string;
-  attachments: FileAttachment[];
+  attachments: File[];
   sentAt: string;
   type: string;
   senderFirstName: string;

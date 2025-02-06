@@ -1,13 +1,12 @@
 import React, { type DragEvent, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { ChevronLeft, FolderOpen, Paperclip, Send } from "lucide-react";
+import {ChevronLeft, FolderOpen, Paperclip, Send, X} from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
 import type {
-  FileAttachment,
   MessageComponent,
   SendMessageComponent,
 } from "@/types/messaging";
@@ -18,18 +17,15 @@ import useSendMessage from "@/hooks/useSendMessage";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
-import {
-  FileInput,
-  FileUploader,
-  FileUploaderContent,
-  FileUploaderItem,
-} from "@/components/ui/file-upload";
+
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ChatScreenProps } from "@/types/dmchannels.ts";
 import useGetDeleteChannelRequest from "@/hooks/useGetDeleteChannelRequest.ts";
 import { DeleteRequest } from "@/components/Inbox/ChatScreen/DeleteRequest";
+import {toast} from "@/hooks/use-toast.ts";
+import {MAX_GROUP_FILE_SIZE, MAX_SINGLE_FILE_SIZE, MAX_SINGLE_FILE_SIZE_TEXT} from "@/constants/file.constants.ts";
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -66,6 +62,7 @@ const ChatScreen: React.FC = () => {
     channelImageBlob || defaultAvatar,
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [attachments, setAttachments] = useState<File[]>([]);
 
   // Hooks.
   const { messages, setMessages, loading, error } = useChatMessages(
@@ -145,6 +142,58 @@ const ChatScreen: React.FC = () => {
     element.style.height = "auto";
   };
 
+  const handleAddAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      console.log(e.target.files);
+      const files = Array.from(e.target.files);
+      if (attachments.length + files.length > 5) {
+        toast({
+          title: "Error",
+          description: "You can only upload a maximum of 5 files at a time.",
+          variant: "destructive",
+        })
+        e.target.value = "";
+        return;
+      }
+      // Check if any file size exceeds 10MB.
+      if (files.some((file) => file.size > MAX_SINGLE_FILE_SIZE)) {
+        toast({
+          title: "Error",
+          description: `File size should not exceed ${MAX_SINGLE_FILE_SIZE_TEXT}.`,
+          variant: "destructive",
+        })
+        e.target.value = "";
+        return;
+      }
+      // Check if total file size exceeds 25MB.
+      let totalSize = 0;
+      for (let file of files) {
+        totalSize += file.size;
+        if (totalSize > MAX_GROUP_FILE_SIZE) {
+          toast({
+            title: "Error",
+            description: `Total file size should not exceed ${MAX_SINGLE_FILE_SIZE_TEXT}.`,
+            variant: "destructive",
+          })
+          e.target.value = "";
+          return;
+        }
+      }
+      setAttachments((prev) => [...prev, ...files]);
+      form.setValue("attachments", files);
+
+      e.target.value = "";
+    }
+  }
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => {
+      const updatedAttachments = prev.filter((_, i) => i !== index);
+      form.setValue("attachments", updatedAttachments);
+      return updatedAttachments;
+    });
+  }
+
   const onSubmit = (data: FormData) => {
     if (
       data.message?.trim() === "" &&
@@ -152,19 +201,11 @@ const ChatScreen: React.FC = () => {
     )
       return;
 
-    const fileAttachments: FileAttachment[] =
-      data.attachments?.map((file) => ({
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        fileUrl: URL.createObjectURL(file),
-      })) || [];
-
     const messagePayload: SendMessageComponent = {
       senderId: currentUserId,
       channelId: channelId,
       messageContent: data.message || "",
-      attachments: fileAttachments,
+      attachments: attachments,
       sentAt: new Date().toISOString(),
       type: "CHAT",
       senderFirstName: cookies.firstName,
@@ -306,45 +347,41 @@ const ChatScreen: React.FC = () => {
         channelType={channelType}
       />
 
+      {attachments.length > 0 && (
+        <div className="flex flex-wrap mb-1">
+          {attachments.map((file, index) => (
+            <div key={index} className="flex gap-2 items-center justify-center px-2 py-1 rounded shadow text-sm">
+              <Paperclip className="h-4 w-4 stroke-current" />
+              <span>{file.name}</span>
+              <X
+                  className="h-4 w-4 stroke-current"
+                  onClick={() => { handleRemoveAttachment(index) }}>
+              </X>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Message Input Area */}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className={`${channelIsBlocked ? "force-hide" : ""} flex items-end gap-3 px-4 py-3 bg-white shadow`}
       >
-        <Controller
-          name="attachments"
-          control={form.control}
-          render={({ field }) => (
-            <FileUploader
-              className="w-auto"
-              value={field.value || []}
-              onValueChange={field.onChange}
-              dropzoneOptions={{
-                maxFiles: 5,
-                maxSize: 1024 * 1024 * 10, // 10MB
-                multiple: true,
-              }}
-            >
-              <FileInput className="rounded-full bg-white w-10 h-10 flex items-center justify-center">
-                <FolderOpen
-                  className="text-gray-800 folder-size"
-                  size={24}
-                  strokeWidth={1.5}
-                />
-              </FileInput>
-              <FileUploaderContent className="flex-row absolute bottom-[50px] left-0 overflow-auto w-[100vw]">
-                {field.value &&
-                  field.value.length > 0 &&
-                  field.value.map((file, index) => (
-                    <FileUploaderItem key={index} index={index} className="">
-                      <Paperclip className="h-4 w-4 stroke-current" />
-                      <span>{file.name}</span>
-                    </FileUploaderItem>
-                  ))}
-              </FileUploaderContent>
-            </FileUploader>
-          )}
-        />
+        <div className="flex justify-center items-center px-2 h-full">
+          <FolderOpen
+            className="text-gray-800 folder-size"
+            size={24}
+            strokeWidth={1.5}
+            onClick={() => { document.getElementById("fileInput")?.click(); }}
+          />
+          <input
+              id="fileInput"
+              type="file"
+              className="hidden"
+              onChange={handleAddAttachment}
+              multiple={true}
+          />
+        </div>
 
         <Controller
           name="message"
