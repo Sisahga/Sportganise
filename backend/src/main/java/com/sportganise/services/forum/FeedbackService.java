@@ -33,8 +33,8 @@ public class FeedbackService {
    *
    * @param feedbackId Feedback id.
    */
-  public void deleteFeedbackByFeedbackId(Integer feedbackId) {
-    feedbackRepository.deleteByFeedbackId(feedbackId);
+  public void deleteFeedbackByPostIdFeedbackId(Integer postId, Integer feedbackId) {
+    feedbackRepository.deleteByPostIdAndFeedbackId(postId, feedbackId);
   }
 
   /**
@@ -42,10 +42,10 @@ public class FeedbackService {
    *
    * @param createFeedbackDto feedback data
    */
-  public void createFeedback(CreateFeedbackDto createFeedbackDto) {
+  public void createFeedback(CreateFeedbackDto createFeedbackDto, Integer postId) {
     Feedback feedback = new Feedback();
     feedback.setContent(createFeedbackDto.getContent());
-    feedback.setPostId(createFeedbackDto.getPostId());
+    feedback.setPostId(postId);
     feedback.setUserId(createFeedbackDto.getAccountId());
     feedbackRepository.save(feedback);
   }
