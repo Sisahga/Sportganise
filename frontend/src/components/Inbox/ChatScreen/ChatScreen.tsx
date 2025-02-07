@@ -372,7 +372,8 @@ const ChatScreen: React.FC = () => {
             className="text-gray-800 folder-size"
             size={24}
             strokeWidth={1.5}
-            onClick={() => { document.getElementById("fileInput")?.click(); }}
+            onClick={(e) => {e.preventDefault(); alert("Feature coming soon!")}}
+            // onClick={() => { document.getElementById("fileInput")?.click(); }}
           />
           <input
               id="fileInput"
