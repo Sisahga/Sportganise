@@ -110,22 +110,22 @@ button {
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent !important;;
+  background: transparent !important;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.2) !important;;
-  border-radius: 10px !important;;
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 10px !important;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.4) !important;;
+  background: rgba(0, 0, 0, 0.4) !important;
 }
 
 /* Firefox */
 * {
-  scrollbar-width: thin !important;;
-  scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
 }
 
 @media (prefers-color-scheme: light) {

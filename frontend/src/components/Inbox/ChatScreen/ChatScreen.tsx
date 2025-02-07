@@ -1,15 +1,12 @@
 import React, { type DragEvent, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import {ChevronLeft, FolderOpen, Paperclip, Send, X} from "lucide-react";
+import { ChevronLeft, FolderOpen, Paperclip, Send, X } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
-import type {
-  MessageComponent,
-  SendMessageComponent,
-} from "@/types/messaging";
+import type { MessageComponent, SendMessageComponent } from "@/types/messaging";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages";
 import { Button } from "@/components/ui/Button";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown";
@@ -24,8 +21,12 @@ import * as z from "zod";
 import { ChatScreenProps } from "@/types/dmchannels.ts";
 import useGetDeleteChannelRequest from "@/hooks/useGetDeleteChannelRequest.ts";
 import { DeleteRequest } from "@/components/Inbox/ChatScreen/DeleteRequest";
-import {toast} from "@/hooks/use-toast.ts";
-import {MAX_GROUP_FILE_SIZE, MAX_SINGLE_FILE_SIZE, MAX_SINGLE_FILE_SIZE_TEXT} from "@/constants/file.constants.ts";
+import { toast } from "@/hooks/use-toast.ts";
+import {
+  MAX_GROUP_FILE_SIZE,
+  MAX_SINGLE_FILE_SIZE,
+  MAX_SINGLE_FILE_SIZE_TEXT,
+} from "@/constants/file.constants.ts";
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -151,7 +152,7 @@ const ChatScreen: React.FC = () => {
           title: "Error",
           description: "You can only upload a maximum of 5 files at a time.",
           variant: "destructive",
-        })
+        });
         e.target.value = "";
         return;
       }
@@ -161,7 +162,7 @@ const ChatScreen: React.FC = () => {
           title: "Error",
           description: `File size should not exceed ${MAX_SINGLE_FILE_SIZE_TEXT}.`,
           variant: "destructive",
-        })
+        });
         e.target.value = "";
         return;
       }
@@ -174,7 +175,7 @@ const ChatScreen: React.FC = () => {
             title: "Error",
             description: `Total file size should not exceed ${MAX_SINGLE_FILE_SIZE_TEXT}.`,
             variant: "destructive",
-          })
+          });
           e.target.value = "";
           return;
         }
@@ -184,7 +185,7 @@ const ChatScreen: React.FC = () => {
 
       e.target.value = "";
     }
-  }
+  };
 
   const handleRemoveAttachment = (index: number) => {
     setAttachments((prev) => {
@@ -192,7 +193,7 @@ const ChatScreen: React.FC = () => {
       form.setValue("attachments", updatedAttachments);
       return updatedAttachments;
     });
-  }
+  };
 
   const onSubmit = (data: FormData) => {
     if (
@@ -350,13 +351,18 @@ const ChatScreen: React.FC = () => {
       {attachments.length > 0 && (
         <div className="flex flex-wrap mb-1">
           {attachments.map((file, index) => (
-            <div key={index} className="flex gap-2 items-center justify-center px-2 py-1 rounded shadow text-sm">
+            <div
+              key={index}
+              className="flex gap-2 items-center justify-center px-2 py-1 rounded shadow text-sm"
+            >
               <Paperclip className="h-4 w-4 stroke-current" />
               <span>{file.name}</span>
               <X
-                  className="h-4 w-4 stroke-current"
-                  onClick={() => { handleRemoveAttachment(index) }}>
-              </X>
+                className="h-4 w-4 stroke-current"
+                onClick={() => {
+                  handleRemoveAttachment(index);
+                }}
+              ></X>
             </div>
           ))}
         </div>
@@ -372,15 +378,18 @@ const ChatScreen: React.FC = () => {
             className="text-gray-800 folder-size"
             size={24}
             strokeWidth={1.5}
-            onClick={(e) => {e.preventDefault(); alert("Feature coming soon!")}}
+            onClick={(e) => {
+              e.preventDefault();
+              alert("Feature coming soon!");
+            }}
             // onClick={() => { document.getElementById("fileInput")?.click(); }}
           />
           <input
-              id="fileInput"
-              type="file"
-              className="hidden"
-              onChange={handleAddAttachment}
-              multiple={true}
+            id="fileInput"
+            type="file"
+            className="hidden"
+            onChange={handleAddAttachment}
+            multiple={true}
           />
         </div>
 
