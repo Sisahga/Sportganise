@@ -179,9 +179,10 @@ public class DirectMessageService {
       log.info("Read status updated for {} members in channel {}", rowsAffected, channelId);
 
       DirectMessageDto directMessageDto =
-              buildDirectMessageDtoFromMessageRequest(messageId, sendDirectMessageRequestDto);
+          buildDirectMessageDtoFromMessageRequest(messageId, sendDirectMessageRequestDto);
 
-      // Set to empty list by default. Will be updated if there are attachments in a different endpoint.
+      // Set to empty list by default. Will be updated if there are attachments in a different
+      // endpoint.
       directMessageDto.setAttachments(Collections.emptyList());
 
       log.info("Message sent.");
@@ -225,17 +226,17 @@ public class DirectMessageService {
    * @return DTO containing information about the sent message.
    */
   public DirectMessageDto buildDirectMessageDtoFromMessageRequest(
-          int messageId, SendDirectMessageRequestDto sendDirectMessageRequestDto) {
+      int messageId, SendDirectMessageRequestDto sendDirectMessageRequestDto) {
     return DirectMessageDto.builder()
-            .messageId(messageId)
-            .senderId(sendDirectMessageRequestDto.getSenderId())
-            .senderFirstName(sendDirectMessageRequestDto.getSenderFirstName())
-            .channelId(sendDirectMessageRequestDto.getChannelId())
-            .messageContent(sendDirectMessageRequestDto.getMessageContent())
-            .sentAt(sendDirectMessageRequestDto.getSentAt())
-            .type(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()))
-            .avatarUrl(sendDirectMessageRequestDto.getAvatarUrl())
-            .build();
+        .messageId(messageId)
+        .senderId(sendDirectMessageRequestDto.getSenderId())
+        .senderFirstName(sendDirectMessageRequestDto.getSenderFirstName())
+        .channelId(sendDirectMessageRequestDto.getChannelId())
+        .messageContent(sendDirectMessageRequestDto.getMessageContent())
+        .sentAt(sendDirectMessageRequestDto.getSentAt())
+        .type(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()))
+        .avatarUrl(sendDirectMessageRequestDto.getAvatarUrl())
+        .build();
   }
 
   /**
@@ -247,18 +248,18 @@ public class DirectMessageService {
    * @return DTO containing information about the sent message.
    */
   public DirectMessageDto buildDirectMessageDtoForAttachments(
-          List<String> attachments, DirectMessage dm, String senderFirstName, String senderAvatarUrl) {
+      List<String> attachments, DirectMessage dm, String senderFirstName, String senderAvatarUrl) {
     return DirectMessageDto.builder()
-            .messageId(dm.getMessageId())
-            .senderId(dm.getSenderId())
-            .senderFirstName(senderFirstName)
-            .channelId(dm.getChannelId())
-            .messageContent(dm.getContent())
-            .sentAt(dm.getSentAt().toString())
-            .type(dm.getType())
-            .attachments(attachments)
-            .avatarUrl(senderAvatarUrl)
-            .build();
+        .messageId(dm.getMessageId())
+        .senderId(dm.getSenderId())
+        .senderFirstName(senderFirstName)
+        .channelId(dm.getChannelId())
+        .messageContent(dm.getContent())
+        .sentAt(dm.getSentAt().toString())
+        .type(dm.getType())
+        .attachments(attachments)
+        .avatarUrl(senderAvatarUrl)
+        .build();
   }
 
   /**
@@ -272,7 +273,11 @@ public class DirectMessageService {
    * @throws DirectMessageSendException If an error occurs while uploading attachments.
    */
   public DirectMessageDto uploadAttachments(
-          int messageId, List<MultipartFile> files, int senderId, String senderFirstName, String senderAvatarUrl) {
+      int messageId,
+      List<MultipartFile> files,
+      int senderId,
+      String senderFirstName,
+      String senderAvatarUrl) {
     try {
       List<String> attachments = new ArrayList<>();
       for (MultipartFile file : files) {

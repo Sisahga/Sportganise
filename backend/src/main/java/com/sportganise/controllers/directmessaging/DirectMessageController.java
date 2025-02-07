@@ -30,7 +30,7 @@ public class DirectMessageController {
   private final SimpMessagingTemplate simpMessagingTemplate;
 
   public DirectMessageController(
-          DirectMessageService directMessageService, SimpMessagingTemplate simpMessagingTemplate) {
+      DirectMessageService directMessageService, SimpMessagingTemplate simpMessagingTemplate) {
     this.directMessageService = directMessageService;
     this.simpMessagingTemplate = simpMessagingTemplate;
   }
@@ -76,17 +76,19 @@ public class DirectMessageController {
    */
   @PostMapping("/upload-attachments")
   public ResponseEntity<ResponseDto<DirectMessageDto>> uploadAttachments(
-          @RequestParam("attachments") List<MultipartFile> attachments,
-          @RequestParam("messageId") int messageId,
-          @RequestParam("senderId") int senderId,
-          @RequestParam("senderFirstName") String senderFirstName,
-          @RequestParam("senderAvatarUrl") String senderAvatarUrl) {
+      @RequestParam("attachments") List<MultipartFile> attachments,
+      @RequestParam("messageId") int messageId,
+      @RequestParam("senderId") int senderId,
+      @RequestParam("senderFirstName") String senderFirstName,
+      @RequestParam("senderAvatarUrl") String senderAvatarUrl) {
     try {
       log.info("Controller received attachment upload request.");
-      DirectMessageDto updatedMessage = directMessageService
-              .uploadAttachments(messageId, attachments, senderId, senderFirstName, senderAvatarUrl);
+      DirectMessageDto updatedMessage =
+          directMessageService.uploadAttachments(
+              messageId, attachments, senderId, senderFirstName, senderAvatarUrl);
       simpMessagingTemplate.convertAndSend("/directmessage/public", updatedMessage);
-      ResponseDto<DirectMessageDto> response = ResponseDto.<DirectMessageDto>builder()
+      ResponseDto<DirectMessageDto> response =
+          ResponseDto.<DirectMessageDto>builder()
               .statusCode(HttpStatus.OK.value())
               .message("Attachments uploaded successfully.")
               .data(updatedMessage)
