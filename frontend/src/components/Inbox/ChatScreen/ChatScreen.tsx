@@ -168,7 +168,7 @@ const ChatScreen: React.FC = () => {
       }
       // Check if total file size exceeds 25MB.
       let totalSize = 0;
-      for (let file of files) {
+      for (const file of files) {
         totalSize += file.size;
         if (totalSize > MAX_GROUP_FILE_SIZE) {
           toast({
