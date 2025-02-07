@@ -20,15 +20,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 
 @WebMvcTest(controllers = DirectMessageController.class)
 class DirectMessageControllerUnitTest {
-
   @Autowired private DirectMessageController directMessageController;
-
   @MockBean private DirectMessageService directMessageService;
-
+  @MockBean private SimpMessagingTemplate simpMessagingTemplate;
   @MockBean private AccountRepository accountRepository;
 
   private SendDirectMessageRequestDto messageRequestDto;
