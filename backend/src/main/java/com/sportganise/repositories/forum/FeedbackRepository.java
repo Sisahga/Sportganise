@@ -1,8 +1,11 @@
 package com.sportganise.repositories.forum;
 
 import com.sportganise.entities.forum.Feedback;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /** Repository for Feedback entity. */
@@ -38,12 +41,8 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
    *
    * @param postId Post id.
    */
-  void deleteByPostId(Integer postId);
-
-  /**
-   * Deletes feedback by feedback id.
-   *
-   * @param feedbackId Feedback id.
-   */
-  void deleteByFeedbackId(Integer feedbackId);
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM Feedback f WHERE f.postId = :postId AND f.feedbackId = :feedbackId")
+  void deleteByPostIdAndFeedbackId(Integer postId, Integer feedbackId);
 }
