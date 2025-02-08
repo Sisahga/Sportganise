@@ -126,7 +126,7 @@ public class ProgramServiceTest {
     Program mockProgram =
         Program.builder()
             .programId(1)
-            .programType("Training")
+            .programType(ProgramType.TRAINING)
             .title("Training Program")
             .description("This is a training program.")
             .capacity(10)
@@ -207,7 +207,7 @@ public class ProgramServiceTest {
     Program program1 =
         Program.builder()
             .programId(1)
-            .programType("Training")
+            .programType(ProgramType.TRAINING)
             .title("First Program")
             .description("First Description")
             .capacity(10)
@@ -227,7 +227,7 @@ public class ProgramServiceTest {
     Program program2 =
         Program.builder()
             .programId(2)
-            .programType("Event")
+            .programType(ProgramType.FUNDRAISER)
             .title("Second Program")
             .description("Second Description")
             .capacity(20)
@@ -291,7 +291,7 @@ public class ProgramServiceTest {
                 programService.modifyProgram(
                     programDtoToModify,
                     "Updated Title",
-                    "Updated Type",
+                    ProgramType.TOURNAMENT,
                     "2024-01-30T10:00:00Z",
                     "2024-01-30T10:00:00Z",
                     false,
