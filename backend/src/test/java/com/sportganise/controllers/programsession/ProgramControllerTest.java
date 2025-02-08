@@ -82,7 +82,7 @@ public class ProgramControllerTest {
     jsonPayload =
         "{"
             + "\"title\": \"Title\","
-            + "\"type\": \"Type\","
+            + "\"type\": \"TRAINING\","
             + "\"startDate\": \"2024-01-30T10:00:00Z\","
             + "\"endDate\": \"2024-02-01T10:00:00Z\","
             + "\"recurring\": false,"
