@@ -159,7 +159,7 @@ public class ProgramServiceTest {
     assertNotNull(programDto);
 
     assertEquals(1, programDto.getProgramId());
-    assertEquals("Training", programDto.getProgramType());
+    assertEquals(ProgramType.TRAINING, programDto.getProgramType());
     assertEquals("Training Program", programDto.getTitle());
     assertEquals("This is a training program.", programDto.getDescription());
     assertEquals(10, programDto.getCapacity());
@@ -264,13 +264,13 @@ public class ProgramServiceTest {
 
     ProgramDto firstProgram = result.getFirst();
     assertEquals(1, firstProgram.getProgramId());
-    assertEquals("Training", firstProgram.getProgramType());
+    assertEquals(ProgramType.TRAINING, firstProgram.getProgramType());
     assertEquals("First Program", firstProgram.getTitle());
     assertTrue(firstProgram.getProgramAttachments().isEmpty());
 
     ProgramDto secondProgram = result.get(1);
     assertEquals(2, secondProgram.getProgramId());
-    assertEquals("Event", secondProgram.getProgramType());
+    assertEquals(ProgramType.FUNDRAISER, secondProgram.getProgramType());
     assertEquals("Second Program", secondProgram.getTitle());
     assertTrue(secondProgram.getProgramAttachments().isEmpty());
 
