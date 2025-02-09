@@ -166,6 +166,7 @@ export default function UploadTrainingPlanFiles() {
                 </FormControl>
                 <FormDescription>
                   Select a file to upload at a time. Max file size is 4 MB.
+                  Limit of 5 files.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

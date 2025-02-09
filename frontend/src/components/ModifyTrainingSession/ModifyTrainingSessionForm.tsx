@@ -768,7 +768,8 @@ export default function ModifyTrainingSessionForm() {
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Limit of 5 files.
+                  Select a file to upload. Max file size is 4 MB. Limit of 5
+                  files.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
