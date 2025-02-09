@@ -62,12 +62,16 @@ export const columns = [
   },
   {
     accessorKey: "userId",
-    header: () => {
+    header: ({ column }: any) => {
       return (
-        <div className="flex items-center">
+        <Button
+          className="flex items-center"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Author
           <User size={15} className="mx-2" />
-        </div>
+        </Button>
       );
     },
     cell: (props: any) => {
@@ -114,7 +118,7 @@ interface TrainingPlanTableProps {
 
 export default function TrainingPlanTable({ data }: TrainingPlanTableProps) {
   log.info("TrainingPlanTable -> data from TrainingPlanTableProps is", data);
-  const [sorting, setSorting] = useState<SortingState>([]); // Sorting state for column creationDate
+  const [sorting, setSorting] = useState<SortingState>([]); // Sorting State for column creationDate and userId
 
   // Table Definition and Creation
   const table = useReactTable({
@@ -129,6 +133,7 @@ export default function TrainingPlanTable({ data }: TrainingPlanTableProps) {
       sorting,
     },
   });
+
   return (
     <div>
       {/** Search Bar */}
