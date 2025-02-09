@@ -50,6 +50,7 @@ import useModifyTrainingSession from "@/hooks/useModifyProgram";
 import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
+import { getFileName } from "@/utils/getFileName";
 
 /**All select element options */
 const types = [
@@ -143,10 +144,6 @@ export default function ModifyTrainingSessionForm() {
       "application/pdf": [".pdf"],
     },
   };
-
-  function fileName(file: File): string {
-    return file.name.split("_").pop() ?? "fileName"; //pop aws bucket
-  }
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -764,7 +761,7 @@ export default function ModifyTrainingSessionForm() {
                         field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{fileName(file)}</span>
+                            <span>{getFileName(file.name)}</span>
                           </FileUploaderItem>
                         ))}
                     </FileUploaderContent>
