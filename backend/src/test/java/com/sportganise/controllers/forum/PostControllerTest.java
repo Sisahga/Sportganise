@@ -1,14 +1,18 @@
 package com.sportganise.controllers.forum;
 
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.sportganise.dto.forum.LikeRequestDto;
 import com.sportganise.dto.forum.PostDto;
+import com.sportganise.dto.forum.ViewPostDto;
 import com.sportganise.entities.forum.PostType;
+import com.sportganise.services.forum.FeedbackService;
 import com.sportganise.services.forum.PostService;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
@@ -31,6 +35,7 @@ public class PostControllerTest {
   private MockMvc mockMvc;
 
   @Mock private PostService postService;
+  @Mock private FeedbackService feedbackService;
 
   @InjectMocks private PostController postController;
 
@@ -105,5 +110,75 @@ public class PostControllerTest {
         .andExpect(jsonPath("$.data.[0]").value("FUNDRAISER"))
         .andExpect(jsonPath("$.data.[1]").value("SPECIAL"))
         .andExpect(jsonPath("$.data.[2]").value("ANNOUNCEMENT"));
+  }
+
+  @Test
+  public void getPostById_ShouldReturn_Post() throws Exception {
+    ViewPostDto viewPostDto = new ViewPostDto();
+    viewPostDto.setPostId(1);
+    viewPostDto.setTitle("Test Post");
+
+    when(postService.getPostByIdWithFeedBacks(1)).thenReturn(viewPostDto);
+
+    mockMvc
+        .perform(get("/api/forum/posts/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Post fetched successfully"))
+        .andExpect(jsonPath("$.data.postId").value(1))
+        .andExpect(jsonPath("$.data.title").value("Test Post"));
+  }
+
+  @Test
+  public void likePost_ShouldReturn_SuccessMessage() throws Exception {
+    LikeRequestDto likeRequestDto = new LikeRequestDto();
+    likeRequestDto.setAccountId(1);
+
+    doNothing().when(postService).likePost(eq(1), eq(1));
+
+    mockMvc
+        .perform(
+            post("/api/forum/posts/1/like")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"accountId\": 1}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Post liked successfully"));
+  }
+
+  @Test
+  public void unlikePost_ShouldReturn_SuccessMessage() throws Exception {
+    doNothing().when(postService).unlikePost(eq(1), eq(1));
+
+    mockMvc
+        .perform(delete("/api/forum/posts/1/unlike/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Post unliked successfully"));
+  }
+
+  @Test
+  public void createFeedback_ShouldReturn_SuccessMessage() throws Exception {
+    doNothing().when(feedbackService).createFeedback(any(), eq(1));
+
+    mockMvc
+        .perform(
+            post("/api/forum/posts/1/add-feedback")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"content\": \"Great post!\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Feedback added successfully"));
+  }
+
+  @Test
+  public void deleteFeedback_ShouldReturn_SuccessMessage() throws Exception {
+    doNothing().when(feedbackService).deleteFeedbackByPostIdFeedbackId(eq(1), eq(1));
+
+    mockMvc
+        .perform(delete("/api/forum/posts/1/delete-feedback/1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Feedback deleted successfully"));
   }
 }
