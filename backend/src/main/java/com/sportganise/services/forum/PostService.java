@@ -7,6 +7,7 @@ import com.sportganise.entities.forum.Likes;
 import com.sportganise.entities.forum.LikesCompositeKey;
 import com.sportganise.entities.forum.Post;
 import com.sportganise.entities.forum.PostType;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.forum.LikesRepository;
 import com.sportganise.repositories.forum.PostAttachmentRepository;
@@ -200,7 +201,7 @@ public class PostService {
   private Post getPostById(Integer postId) {
     return postRepository
         .findById(postId)
-        .orElseThrow(() -> new RuntimeException("Post not found"));
+        .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
   }
 
   /**
