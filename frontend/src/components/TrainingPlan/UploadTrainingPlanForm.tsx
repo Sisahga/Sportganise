@@ -39,7 +39,7 @@ const formSchema = z.object({
     //array of files
     z.custom<File>((file) => file instanceof File && file.size > 0, {
       message: "Each file must be a valid file and not empty.",
-    }),
+    })
   ),
 });
 
@@ -83,7 +83,7 @@ export default function UploadTrainingPlanFiles() {
       setLoading(true);
       const uploadingTrainingPlanResponse = await uploadTrainingPlans(
         accountId,
-        formData, // FormData[]: File
+        formData // FormData[]: File
       );
 
       // Successfully Uploaded Files
@@ -95,7 +95,7 @@ export default function UploadTrainingPlanFiles() {
         });
       } else {
         throw new Error(
-          `UploadTrainingPlanForm -> Error thrown! ${uploadingTrainingPlanResponse?.message}`,
+          `UploadTrainingPlanForm -> Error thrown! ${uploadingTrainingPlanResponse?.message}`
         );
       }
     } catch (err) {
@@ -165,7 +165,7 @@ export default function UploadTrainingPlanFiles() {
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Accepted max file size is 4 MG.
+                  Select a file to upload. Accepted max file size is 4 MB.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
