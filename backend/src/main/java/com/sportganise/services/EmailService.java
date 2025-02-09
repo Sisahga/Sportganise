@@ -1,12 +1,11 @@
 package com.sportganise.services;
 
+import com.sportganise.entities.programsessions.Program;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-
-import com.sportganise.entities.programsessions.Program;
 
 /** Service for sending emails to users. */
 @Service
@@ -33,6 +32,12 @@ public class EmailService {
     sendEmail(toEmail, "Your Sportganise Verification Code", text);
   }
 
+  /**
+   * Sends an invitation email.
+   *
+   * @param toEmail recipient of the email
+   * @param program program the user was invited to
+   */
   public void sendPrivateProgramInvitation(String toEmail, Program program) {
     // TODO: explain how to confirm one's place in an event
     String text = "You have been invited to the private event " + program.getTitle() + ".";

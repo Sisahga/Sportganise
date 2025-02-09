@@ -20,7 +20,6 @@ import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.EmailService;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -443,11 +442,12 @@ public class WaitlistServiceTest {
       when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
       when(participantRepository.findById(participantId)).thenReturn(Optional.of(participant));
 
-      boolean isNewParticipant = programParticipantService.inviteToPrivateEvent(accountId, programId);
+      boolean isNewParticipant =
+          programParticipantService.inviteToPrivateEvent(accountId, programId);
 
       assertFalse(isNewParticipant);
       verify(participantRepository, times(0)).save(any(ProgramParticipant.class));
-      verify(emailService, times(1)).sendPrivateProgramInvitation(account.getEmail(), program);
+      verify(emailService).sendPrivateProgramInvitation(account.getEmail(), program);
     }
 
     @Test
@@ -455,14 +455,17 @@ public class WaitlistServiceTest {
       when(programRepository.findById(programId)).thenReturn(Optional.of(program));
       when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
       when(participantRepository.findById(participantId)).thenReturn(Optional.empty());
-      when(participantRepository.save(argThat((p) -> p.getProgramParticipantId().equals(participantId)))).thenReturn(participant);
+      when(participantRepository.save(
+              argThat((p) -> p.getProgramParticipantId().equals(participantId))))
+          .thenReturn(participant);
 
-      boolean isNewParticipant = programParticipantService.inviteToPrivateEvent(accountId, programId);
+      boolean isNewParticipant =
+          programParticipantService.inviteToPrivateEvent(accountId, programId);
 
       assertTrue(isNewParticipant);
-      verify(participantRepository, times(1))
+      verify(participantRepository)
           .save(argThat(p -> p.getProgramParticipantId().equals(participantId)));
-      verify(emailService, times(1)).sendPrivateProgramInvitation(account.getEmail(), program);
+      verify(emailService).sendPrivateProgramInvitation(account.getEmail(), program);
     }
   }
 }
