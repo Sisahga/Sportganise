@@ -32,7 +32,7 @@ export default function TrainingPlanContent() {
 
   // Reroute User By Account Type
   useEffect(() => {
-    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
+    if (!cookies || cookies.type !== "COACH") {
       navigate("/");
     }
     log.debug(`TrainingPlanContent -> accountType is ${cookies?.type}`);
@@ -44,7 +44,7 @@ export default function TrainingPlanContent() {
   log.info("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
   log.info(
     "TrainingPlanContent -> sharedTrainingPlans are",
-    sharedTrainingPlans,
+    sharedTrainingPlans
   );
 
   // Block Page for Null AccountId
