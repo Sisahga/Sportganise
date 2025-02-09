@@ -2,8 +2,8 @@
 
 // Table Columns
 import { ColumnDef } from "@tanstack/react-table";
-// Hooks
-import usePersonalInformation from "@/hooks/usePersonalInfromation";
+// Helper Component
+import { ViewAuthor } from "./ViewAuthor";
 // UI Component
 import {
   DropdownMenu,
@@ -15,17 +15,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/Button";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 // Icons
-import {
-  File,
-  User,
-  Calendar,
-  Ellipsis,
-  Trash2,
-  Share,
-  User2Icon,
-} from "lucide-react";
+import { File, User, Calendar, Ellipsis, Trash2, Share } from "lucide-react";
 // Helper Util Functions
 import { getDate } from "@/utils/getDate";
 import { getFileName } from "@/utils/getFileName";
@@ -75,31 +66,10 @@ export const columns: ColumnDef<TrainingPlan>[] = [
         </Button>
       );
     },
-    cell: ({ row }: any) => {
+    cell: ({ row }: any) => (
       // Fetch Person Info of User
-      const { data: accountDetails } = usePersonalInformation(
-        row.getValue("userId"),
-      );
-      return (
-        <div className="capitalize">
-          {accountDetails ? (
-            <div className="flex items-center">
-              <Avatar className="mr-2 self-center w-5 h-5">
-                <AvatarImage src={accountDetails?.pictureUrl} />
-                <AvatarFallback>
-                  <User2Icon color="#a1a1aa" />
-                </AvatarFallback>
-              </Avatar>
-              <p>
-                {`${accountDetails?.firstName} ${accountDetails?.lastName}`}
-              </p>
-            </div>
-          ) : (
-            <span className="text-yellow-600">DNE</span>
-          )}
-        </div>
-      );
-    },
+      <ViewAuthor userId={row.getValue("userId")} />
+    ),
   },
   {
     accessorKey: "creationDate",
