@@ -25,6 +25,17 @@ import {
   ProgramDetails,
 } from "@/types/trainingSessionDetails";
 import log from "loglevel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface DropDownMenuButtonProps {
   accountType: string | null | undefined;
@@ -123,6 +134,29 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <LogOut color="red" />
                 <span className="text-red">Mark as absent</span>
               </DropdownMenuItem>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <LogOut color="green" />
+                    <span className="text-green-500">RSVP</span>
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Would you like to confirm your presence?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      If you cannot attend the event, you will have the option
+                      to mark yourself as absent.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction>Confirm</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </DropdownMenuGroup>
           )}
         </DropdownMenuContent>
