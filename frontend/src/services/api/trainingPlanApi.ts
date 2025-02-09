@@ -17,7 +17,7 @@ const trainingPlanApi = {
   // Upload Training Plan(s)
   uploadTrainingPlans: async (
     accountId: number,
-    trainingPlans: File[]
+    trainingPlans: File[],
   ): Promise<ResponseDto<UploadTrainingPlansDto>> => {
     const response = await fetch(`${API_BASE_URL}/${accountId}/upload`, {
       method: "POST",
@@ -40,7 +40,7 @@ const trainingPlanApi = {
 
   // Fetch Training Plan(s)
   fetchTrainingPlans: async (
-    accountId: number | null | undefined
+    accountId: number | null | undefined,
   ): Promise<ResponseDto<TrainingPlansDto>> => {
     const response = await fetch(`${API_BASE_URL}/${accountId}/view-plans`, {
       headers: {

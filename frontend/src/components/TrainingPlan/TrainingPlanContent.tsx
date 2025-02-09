@@ -56,7 +56,7 @@ export default function TrainingPlanContent() {
   log.info("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
   log.info(
     "TrainingPlanContent -> sharedTrainingPlans are",
-    sharedTrainingPlans
+    sharedTrainingPlans,
   );
 
   return (
