@@ -22,6 +22,11 @@ public class ResponseDto<T> {
     return newResponse(HttpStatus.OK, data, message);
   }
 
+  /** Constructs a ResponseEntity with HTTP status CREATED (201). */
+  public static <U> ResponseEntity<ResponseDto<U>> created(U data, String message) {
+    return newResponse(HttpStatus.CREATED, data, message);
+  }
+
   /** Constructs a ResponseEntity with HTTP status BAD_REQUEST (400). */
   public static <U> ResponseEntity<ResponseDto<U>> badRequest(U data, String message) {
     return newResponse(HttpStatus.BAD_REQUEST, data, message);

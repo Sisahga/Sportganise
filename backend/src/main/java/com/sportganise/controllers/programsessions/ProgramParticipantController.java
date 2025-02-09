@@ -1,5 +1,6 @@
 package com.sportganise.controllers.programsessions;
 
+import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
@@ -193,16 +194,19 @@ public class ProgramParticipantController {
    * @return An empty ResponseDTO.
    */
   @PostMapping("/invite-private")
-  public ResponseEntity<?> inviteToPrivateEvent(
+  public ResponseEntity<ResponseDto<Void>> inviteToPrivateEvent(
       @RequestParam Integer accountId, @RequestParam Integer programId) {
     log.info(
         "Inviting participant to private program: programId: {}, accountId: {}",
         programId,
         accountId);
 
-    this.waitlistService.inviteToPrivateEvent(accountId, programId);
+    boolean isNewParticipant = this.waitlistService.inviteToPrivateEvent(accountId, programId);
 
-    // TODO: implement the controller
-    return null;
+    if (isNewParticipant) {
+      return ResponseDto.created(null, "User successfully invited to event.");
+    } else {
+      return ResponseDto.ok(null, "User successfully re-invited to event.");
+    }
   }
 }
