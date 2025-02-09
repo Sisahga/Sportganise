@@ -15,7 +15,6 @@ import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.EmailService;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
