@@ -77,6 +77,7 @@ export default function TrainingPlanContent() {
               <Loader2
                 className="animate-spin m-5 justify-self-center"
                 color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                size={30}
               />
             ) : error ? (
               <p className="m-5 text-red text-center">

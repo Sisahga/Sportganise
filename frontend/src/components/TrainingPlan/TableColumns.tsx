@@ -15,8 +15,17 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/Button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 // Icons
-import { File, User, Calendar, Ellipsis, Trash2, Share } from "lucide-react";
+import {
+  File,
+  User,
+  Calendar,
+  Ellipsis,
+  Trash2,
+  Share,
+  User2Icon,
+} from "lucide-react";
 // Helper Util Functions
 import { getDate } from "@/utils/getDate";
 import { getFileName } from "@/utils/getFileName";
@@ -74,7 +83,17 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       return (
         <div className="capitalize">
           {accountDetails ? (
-            `${accountDetails?.firstName} ${accountDetails?.lastName}`
+            <div className="flex items-center">
+              <Avatar className="mr-2 self-center w-5 h-5">
+                <AvatarImage src={accountDetails?.pictureUrl} />
+                <AvatarFallback>
+                  <User2Icon color="#a1a1aa" />
+                </AvatarFallback>
+              </Avatar>
+              <p>
+                {`${accountDetails?.firstName} ${accountDetails?.lastName}`}
+              </p>
+            </div>
           ) : (
             <span className="text-yellow-600">DNE</span>
           )}
