@@ -66,15 +66,13 @@ export default function HeaderNav() {
                   >
                     Training Session
                   </Link>
+                  <Link
+                    to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
+                    className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                  >
+                    Training Plan
+                  </Link>
                 </>
-              )}
-              {accountType?.toLowerCase() === "coach" && (
-                <Link
-                  to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
-                  className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
-                >
-                  Training Plan
-                </Link>
               )}
               <Link
                 to="/pages/NotificationSettingsPage" //add actual redirect once setting page is set up
