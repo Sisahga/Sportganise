@@ -231,7 +231,12 @@ export default function CreateTrainingSessionForm() {
               <FormItem>
                 <FormLabel className="font-semibold text-base">Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name the event" type="text" {...field} />
+                  <Input
+                    placeholder="Name the event"
+                    type="text"
+                    className="bg-white"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
