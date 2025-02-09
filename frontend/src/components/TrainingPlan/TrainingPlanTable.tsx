@@ -25,8 +25,17 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 // Icons
-import { Search, File, User, Calendar } from "lucide-react";
+import { Search, File, User, Calendar, Ellipsis, Trash2 } from "lucide-react";
 // Types
 import { TrainingPlan } from "@/types/trainingplans";
 // Helper Util Functions
@@ -108,6 +117,30 @@ export const columns = [
         {getDate(props.getValue("creationDate"))}
       </div>
     ),
+  },
+  {
+    id: "menu",
+    cell: () => {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-6 w-6">
+              <Ellipsis />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuLabel>Options</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => {}}>
+                <Trash2 color="red" />
+                <span className="text-red">Delete</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    },
   },
 ];
 
