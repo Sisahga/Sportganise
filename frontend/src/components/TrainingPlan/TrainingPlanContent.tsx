@@ -17,6 +17,7 @@ import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import log from "loglevel";
 
 export default function TrainingPlanContent() {
+  log.info("Rendered TrainingPlanContent component");
   const navigate = useNavigate();
 
   // Get AccountId From Cookie

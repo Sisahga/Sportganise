@@ -57,7 +57,7 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       return (
         // Sort Button
         <Button
-          className="flex items-center"
+          className="flex items-center bg-transparent"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
@@ -77,7 +77,7 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       return (
         // Sort Button
         <Button
-          className="flex items-center"
+          className="flex items-center bg-transparent"
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
