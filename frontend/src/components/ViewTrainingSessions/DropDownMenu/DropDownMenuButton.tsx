@@ -17,6 +17,8 @@ import {
   UserRound,
   MessageCircle,
   Frown,
+  Smile,
+  LogIn,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import {
@@ -34,7 +36,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
 interface DropDownMenuButtonProps {
@@ -58,6 +59,10 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   //Confirmation of player absence
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [isRSVPConfirmationVisible, setRSVPConfirmationVisible] =
+    useState(false);
 
   // Handle player leaving
   const handleButtonClickPlayer = () => {
@@ -83,9 +88,22 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     setModalVisible(false); // Close the modal without proceeding
   };
 
+  const handleRSVPClick = () => {
+    setDropdownOpen(false); // Close the dropdown immediately
+    setAlertDialogOpen(true); // Open the alert dialog
+  };
+
+  const handleRSVPConfirmation = () => {
+    setRSVPConfirmationVisible(true); // Show RSVP confirmation message
+    setAlertDialogOpen(false);
+    setTimeout(() => {
+      setRSVPConfirmationVisible(false);
+    }, 3000);
+  };
+
   return (
     <div>
-      <DropdownMenu>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <button
             aria-label="Add new item"
@@ -134,33 +152,46 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <LogOut color="red" />
                 <span className="text-red">Mark as absent</span>
               </DropdownMenuItem>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                    <LogOut color="green" />
-                    <span className="text-green-500">RSVP</span>
-                  </DropdownMenuItem>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>
-                      Would you like to confirm your presence?
-                    </AlertDialogTitle>
-                    <AlertDialogDescription>
-                      If you cannot attend the event, you will have the option
-                      to mark yourself as absent.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Confirm</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <DropdownMenuItem onSelect={handleRSVPClick}>
+                <LogIn color="green" />
+                <span className="text-green-500">RSVP</span>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Would you like to confirm your presence?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              If you cannot attend the event anymore, you will have the option
+              to mark yourself as absent.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAlertDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleRSVPConfirmation} className="">
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* RSVP confirmation message */}
+      {isRSVPConfirmationVisible && (
+        <div className="fixed inset-0 flex items-center justify-center">
+          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+            <Smile className="w-12 h-12" />
+            <p>Your presence is noted. Can't wait to see you!!!</p>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       {isModalVisible && (
