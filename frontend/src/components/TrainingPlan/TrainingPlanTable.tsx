@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+// Hooks
+import usePersonalInformation from "@/hooks/usePersonalInfromation";
+// Table
 import {
   getCoreRowModel,
   useReactTable,
@@ -7,7 +9,7 @@ import {
   flexRender,
   getFilteredRowModel,
 } from "@tanstack/react-table";
-import { useState } from "react";
+// UI Components
 import {
   Table,
   TableBody,
@@ -17,82 +19,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/input";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+// Icons
 import { Search, File, User, Calendar } from "lucide-react";
+// Types
+import { TrainingPlan } from "@/types/trainingplans";
+// Helper Util Functions
+import { getDate } from "@/utils/getDate";
+import { getFileName } from "@/utils/getFileName";
+// Logs
+import log from "loglevel";
 
-const MockData = [
-  {
-    trainingPlan: "Document1.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "ShuttleCock_techniques.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "Document1.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "ShuttleCock_techniques.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "Document1.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "badminton_pro.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "paymentPlan.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "ShuttleCock_techniques.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-];
-
-interface ColumnTypes {
-  trainingPlan: string; //change to File
-  author: string;
-  date: Date;
-}
-
+// Table Column Definitions
+// ... follows type TrainingPlan
 export const columns = [
   {
-    accessorKey: "trainingPlan",
+    accessorKey: "docUrl",
     header: () => {
       return (
         <div className="flex items-center">
@@ -109,12 +52,12 @@ export const columns = [
         rel="noopener noreferrer"
         download
       >
-        {props.getValue("trainingPlan")}
+        {getFileName(props.getValue("docUrl"))}
       </a>
     ),
   },
   {
-    accessorKey: "author",
+    accessorKey: "userId",
     header: () => {
       return (
         <div className="flex items-center">
@@ -123,12 +66,23 @@ export const columns = [
         </div>
       );
     },
-    cell: (props: any) => (
-      <div className="capitalize">{props.getValue("author")}</div>
-    ),
+    cell: (props: any) => {
+      const { data: accountDetails } = usePersonalInformation(
+        props.getValue("userId")
+      );
+      return (
+        <div className="capitalize">
+          {accountDetails ? (
+            `${accountDetails?.firstName} ${accountDetails?.lastName}`
+          ) : (
+            <span className="text-yellow-600">"DNE"</span>
+          )}
+        </div>
+      );
+    },
   },
   {
-    accessorKey: "date",
+    accessorKey: "creationDate",
     header: () => {
       return (
         <div className="flex items-center">
@@ -138,37 +92,46 @@ export const columns = [
       );
     },
     cell: (props: any) => (
-      <div className="capitalize">{props.getValue("date").toDateString()}</div>
+      <div className="capitalize">
+        {getDate(props.getValue("creationDate"))}
+      </div>
     ),
   },
 ];
 
-export default function TrainingPlanTable() {
-  const [data /*setData*/] = useState<ColumnTypes[]>(MockData);
+// Props
+interface TrainingPlanTableProps {
+  data: TrainingPlan[]; // Table accepts only 'data', in this case of type TrainingPlan
+}
 
+export default function TrainingPlanTable({ data }: TrainingPlanTableProps) {
+  log.info("TrainingPlanTable -> data from TrainingPlanTableProps is", data);
+
+  // Table Definition and Creation
   const table = useReactTable({
-    data, //needs to be date
-    columns, //needs to be column
+    data, // Component Prop - NOTE: must be 'data'
+    columns, // Column definition - NOTE: must be 'column'
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
   return (
     <div>
+      {/** Search Bar */}
       <div className="relative w-full px-4 sm:px-0 mb-4 mx-auto max-w-5xl">
         <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <Input
           type="text"
           placeholder="Search by file name"
           className="pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
-          value={
-            (table.getColumn("trainingPlan")?.getFilterValue() as string) ?? ""
-          }
+          value={(table.getColumn("docUrl")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("trainingPlan")?.setFilterValue(event.target.value)
+            table.getColumn("docUrl")?.setFilterValue(event.target.value)
           }
         />
       </div>
+
+      {/** Table */}
       <Table className="table">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -178,7 +141,7 @@ export default function TrainingPlanTable() {
                   <TableHead key={header.id}>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext(),
+                      header.getContext()
                     )}
                   </TableHead>
                 );
@@ -196,7 +159,7 @@ export default function TrainingPlanTable() {
                     <div className="overflow-x-scroll max-w-[150px]">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext(),
+                        cell.getContext()
                       )}
                     </div>
                   </TableCell>
@@ -213,6 +176,8 @@ export default function TrainingPlanTable() {
         </TableBody>
         <TableCaption>A list of all your training plans.</TableCaption>
       </Table>
+
+      {/** Pagination */}
       <div className="flex space-x-2 justify-center my-5">
         <div>
           <Button

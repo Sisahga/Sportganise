@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
+import { getFileName } from "@/utils/getFileName";
 
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
@@ -124,14 +125,14 @@ const TrainingSessionContent = () => {
               <p className="text-sm text-gray-500">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-sm text-gray-500">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
+                  programDetails.durationMins
                 )}
               </p>
             </span>
@@ -153,7 +154,7 @@ const TrainingSessionContent = () => {
             <p className="text-sm text-gray-500">
               {programDetails.frequency || "one time"} on{" "}
               {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                new Date(programDetails.occurrenceDate),
+                new Date(programDetails.occurrenceDate)
               )}
             </p>
           </div>
@@ -199,11 +200,7 @@ const TrainingSessionContent = () => {
                       rel="noopener noreferrer"
                       download
                     >
-                      {attachment.attachmentUrl
-                        .split("/")
-                        .pop()
-                        ?.split("_")
-                        .pop()}
+                      {getFileName(attachment.attachmentUrl)}
                     </a>
                   </div>
                 </div>
