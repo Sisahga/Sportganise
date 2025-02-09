@@ -5,6 +5,8 @@
  * @return fileName
  */
 export function getFileName(fileUrl: string) {
-  const fileName = fileUrl.substring(fileUrl.indexOf("_") + 1);
+  const fileName = fileUrl
+    .substring(fileUrl.indexOf("_") + 1)
+    .replace(/\+/g, " ");
   return fileName;
 }
