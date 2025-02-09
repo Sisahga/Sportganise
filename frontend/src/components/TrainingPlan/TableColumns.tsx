@@ -67,7 +67,7 @@ export const columns: ColumnDef<TrainingPlan>[] = [
     cell: ({ row }: any) => {
       // Fetch Person Info of User
       const { data: accountDetails } = usePersonalInformation(
-        row.getValue("userId")
+        row.getValue("userId"),
       );
       return (
         <div className="capitalize">
