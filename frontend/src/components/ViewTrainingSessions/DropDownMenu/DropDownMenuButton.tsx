@@ -58,16 +58,17 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
   //Confirmation of player absence
   const [isNotificationVisible, setNotificationVisible] = useState(false);
-  const [isModalVisible, setModalVisible] = useState(false);
+  //const [isModalVisible, setModalVisible] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [isAlertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [isRSVPDialogOpen, setRSVPDialogOpen] = useState(false);
   const [isRSVPConfirmationVisible, setRSVPConfirmationVisible] =
     useState(false);
+  const [isAbsentDialogOpen, setAbsentDialogOpen] = useState(false);
 
   // Handle player leaving
-  const handleButtonClickPlayer = () => {
-    setModalVisible(true); // Show the modal on button click
-  };
+  // const handleButtonClickPlayer = () => {
+  //   setModalVisible(true); // Show the modal on button click
+  // };
 
   // Handle waitlisted joining
   /*
@@ -76,28 +77,42 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   };
   */
 
-  const handleLeave = () => {
-    setModalVisible(false); // Close the modal
-    setNotificationVisible(true); // Show the notification
-    setTimeout(() => {
-      setNotificationVisible(false); // Hide the notification after 3 seconds
-    }, 3000);
-  };
+  // const handleLeave = () => {
+  //   setModalVisible(false); // Close the modal
+  //   setNotificationVisible(true); // Show the notification
+  //   setTimeout(() => {
+  //     setNotificationVisible(false); // Hide the notification after 3 seconds
+  //   }, 3000);
+  // };
 
-  const handleCancel = () => {
-    setModalVisible(false); // Close the modal without proceeding
-  };
+  // const handleCancel = () => {
+  //   setModalVisible(false); // Close the modal without proceeding
+  // };
 
   const handleRSVPClick = () => {
     setDropdownOpen(false); // Close the dropdown immediately
-    setAlertDialogOpen(true); // Open the alert dialog
+    setRSVPDialogOpen(true); // Open the alert dialog
   };
 
   const handleRSVPConfirmation = () => {
+    setRSVPDialogOpen(false);
     setRSVPConfirmationVisible(true); // Show RSVP confirmation message
-    setAlertDialogOpen(false);
+
     setTimeout(() => {
       setRSVPConfirmationVisible(false);
+    }, 3000);
+  };
+
+  const handleAbsentClick = () => {
+    setDropdownOpen(false); // Close the dropdown immediately
+    setAbsentDialogOpen(true); // Open the alert dialog
+  };
+
+  const handleAbsentConfirmation = () => {
+    setAbsentDialogOpen(false);
+    setNotificationVisible(true);
+    setTimeout(() => {
+      setNotificationVisible(false);
     }, 3000);
   };
 
@@ -148,7 +163,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <UserRound />
                 <span>Contact Member</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleButtonClickPlayer}>
+              <DropdownMenuItem onSelect={handleAbsentClick}>
                 <LogOut color="red" />
                 <span className="text-red">Mark as absent</span>
               </DropdownMenuItem>
@@ -161,7 +176,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <AlertDialog open={isAlertDialogOpen} onOpenChange={setAlertDialogOpen}>
+      <AlertDialog open={isRSVPDialogOpen} onOpenChange={setRSVPDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -173,10 +188,28 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setAlertDialogOpen(false)}>
+            <AlertDialogCancel onClick={() => setRSVPDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleRSVPConfirmation} className="">
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={isAbsentDialogOpen} onOpenChange={setAbsentDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to mark yourself as absent?
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAbsentDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleAbsentConfirmation}>
               Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -194,7 +227,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       )}
 
       {/* Confirmation Modal */}
-      {isModalVisible && (
+      {/* {isModalVisible && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
             <p className="text-lg font-semibold mb-4">Are you sure?</p>
@@ -214,7 +247,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Notification */}
       {isNotificationVisible && (
