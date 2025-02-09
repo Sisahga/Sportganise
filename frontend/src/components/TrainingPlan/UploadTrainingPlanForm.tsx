@@ -1,10 +1,18 @@
-import { useState } from "react";
+// React
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+// Zod
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+// Hooks
 import useUploadTrainingPlan from "@/hooks/useUploadTrainingPlan";
+// Services
+import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+// Logs
 import log from "loglevel";
-
+// Types
+import { dropZoneConfig } from "./DropZoneConfig";
+// UI Components
 import { Button } from "@/components/ui/Button";
 import {
   Form,
@@ -22,8 +30,10 @@ import {
   FileUploaderItem,
 } from "@/components/ui/file-upload";
 import { useToast } from "@/hooks/use-toast";
+// Icons
 import { CloudUpload, Paperclip, Loader2 } from "lucide-react";
 
+// Form Schema Definition with Zod
 const formSchema = z.object({
   trainingPlans: z.array(
     //array of files
@@ -34,65 +44,71 @@ const formSchema = z.object({
 });
 
 export default function UploadTrainingPlanFiles() {
-  const accountId = 2; //replace with cookies
+  log.info("Rendered UploadTrainingPlanForm");
+  // Local States
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>("");
+
+  // Cookies
+  const cookies = getCookies();
+  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  useEffect(() => {
+    if (!accountId) {
+      log.debug("UploadTrainingPlanForm -> No accountId found");
+    }
+    log.info(`UploadTrainingPlanForm -> accountId is ${accountId}`);
+  }, [accountId]);
+
+  // API Hook for Form Submission
   const { uploadTrainingPlans } = useUploadTrainingPlan();
 
-  const dropZoneConfig = {
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-    accept: {
-      "application/msword": [".doc", ".dot"],
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        [".docx"],
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.template":
-        [".dotx"],
-      "application/vnd.ms-word.document.macroEnabled.12": [".docm"],
-      "application/vnd.ms-word.template.macroEnabled.12": [".dotm"],
-    },
-  };
-
+  // Initialize and Wrap React-Hook-Form with Zod Validation
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      console.log(values);
-      log.info(values);
+      log.info("UploadTrainingPlanForm -> form submission values are", values);
 
+      // Prepare API Body
+      const formData = new FormData();
+      if (values.trainingPlans && values.trainingPlans.length > 0) {
+        values.trainingPlans.forEach((file: File) => {
+          formData.append("trainingPlan", file);
+        });
+      } // BE handles null List<MultiPartFile>
+
+      // Call API Submit Form
       setLoading(true);
       const uploadingTrainingPlanResponse = await uploadTrainingPlans(
         accountId,
-        values.trainingPlans, //this way File[] is sent and not { trainingPlans: File[] } (object)
+        formData, // FormData[]: File
       );
+
+      // Successfully Uploaded Files
       if (uploadingTrainingPlanResponse?.statusCode === 201) {
-        // Successfully uploaded files
-        setLoading(false); //premature load to false just in case it would look weird with the toast
+        setLoading(false); // Premature load to false just in case it would look weird with the toast
         toast({
           title: "File(s) uploaded successfully ✔",
           description: "File(s) were added to your Training Plan",
         });
       } else {
         throw new Error(
-          "Error thrown from UploadTrainingPlanForm. File(s) could not be uploaded.",
+          `UploadTrainingPlanForm -> Error thrown! ${uploadingTrainingPlanResponse?.message}`,
         );
       }
     } catch (err) {
-      console.log("UploadFile form error: ", err);
-      log.error("UploadFile form error: ", err);
-      setError("An error occured! The file(s) could not be uploaded.");
+      // Handle Error
+      log.error(err);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description: "An error occured! The file(s) could not be uploaded.",
       });
-      log.error(error);
     } finally {
-      form.reset();
+      // Reset Form
+      form.reset(); // Do not allow accidental form re-submission
       setLoading(false);
     }
   };
