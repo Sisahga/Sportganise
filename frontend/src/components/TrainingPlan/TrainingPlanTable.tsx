@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// React
+import { useState } from "react";
 // Hooks
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 // Table
@@ -8,6 +10,8 @@ import {
   getPaginationRowModel,
   flexRender,
   getFilteredRowModel,
+  SortingState,
+  getSortedRowModel,
 } from "@tanstack/react-table";
 // UI Components
 import {
@@ -83,12 +87,16 @@ export const columns = [
   },
   {
     accessorKey: "creationDate",
-    header: () => {
+    header: ({ column }: any) => {
       return (
-        <div className="flex items-center">
+        <Button
+          className="flex items-center"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
           Date
           <Calendar size={15} className="mx-2" />
-        </div>
+        </Button>
       );
     },
     cell: (props: any) => (
@@ -106,6 +114,7 @@ interface TrainingPlanTableProps {
 
 export default function TrainingPlanTable({ data }: TrainingPlanTableProps) {
   log.info("TrainingPlanTable -> data from TrainingPlanTableProps is", data);
+  const [sorting, setSorting] = useState<SortingState>([]); // Sorting state for column creationDate
 
   // Table Definition and Creation
   const table = useReactTable({
@@ -114,6 +123,11 @@ export default function TrainingPlanTable({ data }: TrainingPlanTableProps) {
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
   });
   return (
     <div>

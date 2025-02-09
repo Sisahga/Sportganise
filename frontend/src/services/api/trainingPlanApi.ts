@@ -52,7 +52,7 @@ const trainingPlanApi = {
       throw new Error("Error thrown in trainingPlanApi.fetchTrainingPlans.");
     }
     const data: ResponseDto<TrainingPlansDto> = await response.json();
-    log.info(`trainingPlanApi.fetchTrainingPlans -> response is ${data}`);
+    log.info("trainingPlanApi.fetchTrainingPlans -> response is", data);
     return data;
   },
 };
