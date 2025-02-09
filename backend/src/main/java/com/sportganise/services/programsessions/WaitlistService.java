@@ -2,11 +2,16 @@ package com.sportganise.services.programsessions;
 
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.entities.account.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.ParticipantNotFoundException;
+import com.sportganise.exceptions.ProgramNotFoundException;
 import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
+import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import java.time.ZonedDateTime;
@@ -23,6 +28,7 @@ public class WaitlistService {
 
   private final ProgramParticipantRepository participantRepository;
   private final ProgramRepository programRepository;
+  private final AccountRepository accountRepository;
 
   /**
    * Constructor for WaitlistService.
@@ -30,9 +36,12 @@ public class WaitlistService {
    * @param participantRepository Repository for managing program participants.
    */
   public WaitlistService(
-      ProgramParticipantRepository participantRepository, ProgramRepository programRepository) {
+      ProgramParticipantRepository participantRepository,
+      ProgramRepository programRepository,
+      AccountRepository accountRepository) {
     this.participantRepository = participantRepository;
     this.programRepository = programRepository;
+    this.accountRepository = accountRepository;
   }
 
   /**
@@ -235,5 +244,59 @@ public class WaitlistService {
               return Stream.of(new ProgramDto(program, null));
             })
         .toList();
+  }
+
+  /**
+   * Invites a user to a private event.
+   *
+   * <p>Adds the user to the list of invited participants, and sends them an invitation email.
+   *
+   * @param accountId The user to invite
+   * @param programId The program to invite the user to
+   */
+  public void inviteToPrivateEvent(Integer accountId, Integer programId) {
+    Program program =
+        programRepository
+            .findById(programId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Program not found with id " + programId);
+                  return new ProgramNotFoundException("Program not found");
+                });
+
+    // Direct user invitation is only supported for private events
+    if (program.getVisibility() != "private") {
+      throw new ProgramInvitationiException("User invitation only supported for private programs");
+    }
+
+    Account account =
+        this.accountRepository
+            .findById(accountId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Account not found with id " + accountId);
+                  return new AccountNotFoundException("Account not found with id " + accountId);
+                });
+
+    ProgramParticipant programParticipant =
+        this.participantRepository
+            .findById(new ProgramParticipantId(programId, accountId))
+            .orElseGet(
+                () -> {
+                  // Register new program participant
+                  return this.participantRepository.save(
+                      ProgramParticipant.builder()
+                          .programParticipantId(new ProgramParticipantId(programId, accountId))
+                          .participantType(account.getType().name())
+                          .build());
+                });
+
+    // Participant should not be confirmed yet
+    if (programParticipant != null && programParticipant.isConfirmed()) {
+      log.warn("Participant already confirmed to program");
+      throw new ProgramInvitationiException("Participant already confirmed to program");
+    }
+
+    // TODO: send email
   }
 }

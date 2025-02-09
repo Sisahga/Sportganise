@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -182,5 +183,26 @@ public class ProgramParticipantController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body("Error fetching waitlist programs");
     }
+  }
+
+  /**
+   * Invites a user to a private program.
+   *
+   * @param accountId The user to invite
+   * @param programId The program to invite the user to
+   * @return An empty ResponseDTO.
+   */
+  @PostMapping("/invite-private")
+  public ResponseEntity<?> inviteToPrivateEvent(
+      @RequestParam Integer accountId, @RequestParam Integer programId) {
+    log.info(
+        "Inviting participant to private program: programId: {}, accountId: {}",
+        programId,
+        accountId);
+
+    this.waitlistService.inviteToPrivateEvent(accountId, programId);
+
+    // TODO: implement the controller
+    return null;
   }
 }
