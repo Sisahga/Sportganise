@@ -22,6 +22,8 @@ import { getDate } from "@/utils/getDate";
 import { getFileName } from "@/utils/getFileName";
 // Types
 import { TrainingPlan } from "@/types/trainingplans";
+// Logging
+import log from "loglevel";
 
 // Table Column Definitions
 // ... follows type TrainingPlan
@@ -39,7 +41,7 @@ export const columns: ColumnDef<TrainingPlan>[] = [
     cell: ({ row }: any) => (
       // Downloadable File
       <a
-        className="miniscule underline text-gray-600 hover:text-cyan-300"
+        className="lowercase underline text-gray-600 hover:text-cyan-300"
         href={row.getValue("docUrl")}
         target="_blank"
         rel="noopener noreferrer"
@@ -67,7 +69,7 @@ export const columns: ColumnDef<TrainingPlan>[] = [
     cell: ({ row }: any) => {
       // Fetch Person Info of User
       const { data: accountDetails } = usePersonalInformation(
-        row.getValue("userId"),
+        row.getValue("userId")
       );
       return (
         <div className="capitalize">
@@ -102,8 +104,9 @@ export const columns: ColumnDef<TrainingPlan>[] = [
   },
   {
     id: "menu",
-    cell: () => {
+    cell: ({ row }: any) => {
       // Menu Options: share, delete
+      const fileUrl = row.original.docUrl; // Access docUrl cell row from outside its scope
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -115,11 +118,19 @@ export const columns: ColumnDef<TrainingPlan>[] = [
             <DropdownMenuLabel>Options</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => {}}>
+              <DropdownMenuItem
+                onClick={() => {
+                  log.debug("TableColumns -> Sharing fileUrl", fileUrl);
+                }}
+              >
                 <Share />
                 <span>Share</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => {}}>
+              <DropdownMenuItem
+                onClick={() => {
+                  log.debug("TableColumns -> Deleting fileUrl", fileUrl);
+                }}
+              >
                 <Trash2 color="red" />
                 <span className="text-red">Delete</span>
               </DropdownMenuItem>
