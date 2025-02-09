@@ -29,7 +29,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
    * @param postId Post id.
    * @return Post.
    */
-  <Optional> Post findByPostId(Integer postId);
+  Post findByPostId(Integer postId);
 
   /**
    * Fetches posts based on search criteria.

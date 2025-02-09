@@ -26,7 +26,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
    * @param feedbackId Feedback id.
    * @return Feedback.
    */
-  <Optional> Feedback findByFeedbackId(Integer feedbackId);
+  Feedback findByFeedbackId(Integer feedbackId);
 
   /**
    * Fetches feedbacks by post id.
@@ -34,7 +34,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
    * @param postId Post id.
    * @return List of feedbacks.
    */
-  <Optional> List<Feedback> findFeedbacksByPostId(Integer postId);
+  List<Feedback> findFeedbacksByPostId(Integer postId);
 
   /**
    * Deletes feedback by post id.

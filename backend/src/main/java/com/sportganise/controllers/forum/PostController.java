@@ -12,7 +12,14 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /** REST Controller for handling HTTP requests related to Posts. */
 @RestController
@@ -105,9 +112,9 @@ public class PostController {
   /**
    * Like a post.
    *
-   * @param postId Post Id.
+   * @param postId Post id.
    * @param likeRequestDto Like request data.
-   * @return
+   * @return ResponseDto .
    */
   @PostMapping("/{postId}/like")
   public ResponseDto<String> likePost(
@@ -125,7 +132,7 @@ public class PostController {
    *
    * @param postId Post Id.
    * @param accountId Account Id.
-   * @return
+   * @return ResponseDto .
    */
   @DeleteMapping("/{postId}/unlike/{accountId}")
   public ResponseDto<String> unlikePost(
@@ -143,7 +150,7 @@ public class PostController {
    *
    * @param postId Post Id.
    * @param feedback Feedback data.
-   * @return
+   * @return ResponseDto .
    */
   @PostMapping("/{postId}/add-feedback")
   public ResponseDto<String> createFeedback(
