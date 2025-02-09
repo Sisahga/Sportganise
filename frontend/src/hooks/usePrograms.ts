@@ -35,7 +35,7 @@ function usePrograms(accountId: number | null | undefined) {
     fetchPrograms().then(() => {
       setLoading(false);
     });
-  }, [fetchPrograms]);
+  }, []);
 
   return {
     programs, //returns Program[] or empty array []

@@ -37,6 +37,15 @@ export default function TrainingPlanContent() {
     log.debug(`TrainingPlanContent -> accountType is ${cookies?.type}`);
   }, [navigate, cookies]);
 
+  // Fetch Training Plans Created By and Shared With Current User
+  const { myTrainingPlans, sharedTrainingPlans, loading, error } =
+    useTrainingPlans(accountId); // myTrainingPlans, sharedTrainingPlans = [] can be passed to <TrainingPlanTable />
+  log.info("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
+  log.info(
+    "TrainingPlanContent -> sharedTrainingPlans are",
+    sharedTrainingPlans
+  );
+
   // Block Page for Null AccountId
   if (!accountId) {
     return (
@@ -49,15 +58,6 @@ export default function TrainingPlanContent() {
       </div>
     );
   }
-
-  // Fetch Training Plans Created By and Shared With Current User
-  const { myTrainingPlans, sharedTrainingPlans, loading, error } =
-    useTrainingPlans(accountId); // myTrainingPlans, sharedTrainingPlans = [] can be passed to <TrainingPlanTable />
-  log.info("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
-  log.info(
-    "TrainingPlanContent -> sharedTrainingPlans are",
-    sharedTrainingPlans,
-  );
 
   return (
     <div className="mt-5 mb-32 ">

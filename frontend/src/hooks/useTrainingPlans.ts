@@ -53,7 +53,7 @@ function useTrainingPlans(accountId: number | null | undefined) {
     fetchTrainingPlans().then(() => {
       setLoading(false);
     });
-  }, [fetchTrainingPlans]);
+  }, []);
   return {
     myTrainingPlans,
     sharedTrainingPlans,
