@@ -40,7 +40,12 @@ export default function TrainingPlanTable({
   columns,
   data,
 }: TrainingPlanTableProps) {
+  log.info("Rendered TrainingPlanTable component");
   log.info("TrainingPlanTable -> data from TrainingPlanTableProps is", data);
+  log.info(
+    "TrainingPlanTable -> columns from TrainingPlanTableProps is",
+    columns,
+  );
   const [sorting, setSorting] = useState<SortingState>([]); // Sorting State for column creationDate and userId
 
   // Table Definition and Creation
