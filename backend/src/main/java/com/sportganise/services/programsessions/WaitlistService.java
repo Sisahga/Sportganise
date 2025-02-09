@@ -14,8 +14,11 @@ import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.services.EmailService;
+
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +32,7 @@ public class WaitlistService {
   private final ProgramParticipantRepository participantRepository;
   private final ProgramRepository programRepository;
   private final AccountRepository accountRepository;
+  private final EmailService emailService;
 
   /**
    * Constructor for WaitlistService.
@@ -38,10 +42,12 @@ public class WaitlistService {
   public WaitlistService(
       ProgramParticipantRepository participantRepository,
       ProgramRepository programRepository,
-      AccountRepository accountRepository) {
+      AccountRepository accountRepository,
+      EmailService emailService) {
     this.participantRepository = participantRepository;
     this.programRepository = programRepository;
     this.accountRepository = accountRepository;
+    this.emailService = emailService;
   }
 
   /**
@@ -253,8 +259,11 @@ public class WaitlistService {
    *
    * @param accountId The user to invite
    * @param programId The program to invite the user to
+   * @return True if the user is newly registered as a participant, false otherwise.
    */
-  public void inviteToPrivateEvent(Integer accountId, Integer programId) {
+  public boolean inviteToPrivateEvent(Integer accountId, Integer programId) {
+    AtomicBoolean isNewParticipant = new AtomicBoolean(false);
+
     Program program =
         programRepository
             .findById(programId)
@@ -265,7 +274,7 @@ public class WaitlistService {
                 });
 
     // Direct user invitation is only supported for private events
-    if (program.getVisibility() != "private") {
+    if (!program.getVisibility().equals("private")) {
       throw new ProgramInvitationiException("User invitation only supported for private programs");
     }
 
@@ -284,19 +293,24 @@ public class WaitlistService {
             .orElseGet(
                 () -> {
                   // Register new program participant
+                  isNewParticipant.set(true);
                   return this.participantRepository.save(
                       ProgramParticipant.builder()
                           .programParticipantId(new ProgramParticipantId(programId, accountId))
                           .participantType(account.getType().name())
+                          .isConfirmed(false)
                           .build());
                 });
 
     // Participant should not be confirmed yet
-    if (programParticipant != null && programParticipant.isConfirmed()) {
+    if (programParticipant.isConfirmed()) {
       log.warn("Participant already confirmed to program");
       throw new ProgramInvitationiException("Participant already confirmed to program");
     }
 
-    // TODO: send email
+    // Send invitation email
+    this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
+
+    return isNewParticipant.get();
   }
 }

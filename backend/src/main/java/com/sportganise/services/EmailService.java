@@ -6,6 +6,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import com.sportganise.entities.programsessions.Program;
+
 /** Service for sending emails to users. */
 @Service
 public class EmailService {
@@ -28,13 +30,33 @@ public class EmailService {
    */
   public void sendVerificationCode(String toEmail, int code) {
     String text = "Your verification code is: " + code + " . It will expire in 10 minutes.";
-    String sender = "Sportganise";
-    sendEmail(sender, toEmail, "Your Sportganise Verification Code", text);
+    sendEmail(toEmail, "Your Sportganise Verification Code", text);
+  }
+
+  public void sendPrivateProgramInvitation(String toEmail, Program program) {
+    // TODO: explain how to confirm one's place in an event
+    String text = "You have been invited to the private event " + program.getTitle() + ".";
+    /* + "Please navigate to ... to confirm your place in the program." */
+
+    String subject = "Sportganise Program Invitation";
+    sendEmail(toEmail, subject, text);
   }
 
   /**
    * Send an email.
    *
+   * @param toEmail email to send to
+   * @param subject email subject
+   * @param text email text
+   */
+  public void sendEmail(String toEmail, String subject, String text) {
+    this.sendEmail("Sportganise", toEmail, subject, text);
+  }
+
+  /**
+   * Send an email.
+   *
+   * @param sender recipient of the email
    * @param toEmail email to send to
    * @param subject email subject
    * @param text email text

@@ -19,6 +19,8 @@ import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.services.EmailService;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -34,6 +36,7 @@ public class WaitlistServiceTest {
   @Mock private ProgramParticipantRepository participantRepository;
   @Mock private ProgramRepository programRepository;
   @Mock private AccountRepository accountRepository;
+  @Mock private EmailService emailService;
 
   @InjectMocks private WaitlistService programParticipantService;
 
@@ -395,6 +398,7 @@ public class WaitlistServiceTest {
       assertThrows(
           ProgramNotFoundException.class,
           () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
+      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
     }
 
     @Test
@@ -406,6 +410,7 @@ public class WaitlistServiceTest {
       assertThrows(
           ProgramInvitationiException.class,
           () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
+      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
     }
 
     @Test
@@ -416,6 +421,7 @@ public class WaitlistServiceTest {
       assertThrows(
           AccountNotFoundException.class,
           () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
+      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
     }
 
     @Test
@@ -428,18 +434,7 @@ public class WaitlistServiceTest {
       assertThrows(
           ProgramInvitationiException.class,
           () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
-    }
-
-    @Test
-    public void successfullyInviteNewParticipant() {
-      when(programRepository.findById(programId)).thenReturn(Optional.of(program));
-      when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
-      when(participantRepository.findById(participantId)).thenReturn(Optional.empty());
-
-      programParticipantService.inviteToPrivateEvent(accountId, programId);
-
-      verify(participantRepository, times(1))
-          .save(argThat(p -> p.getProgramParticipantId().equals(participantId)));
+      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
     }
 
     @Test
@@ -448,9 +443,26 @@ public class WaitlistServiceTest {
       when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
       when(participantRepository.findById(participantId)).thenReturn(Optional.of(participant));
 
-      programParticipantService.inviteToPrivateEvent(accountId, programId);
+      boolean isNewParticipant = programParticipantService.inviteToPrivateEvent(accountId, programId);
 
+      assertFalse(isNewParticipant);
       verify(participantRepository, times(0)).save(any(ProgramParticipant.class));
+      verify(emailService, times(1)).sendPrivateProgramInvitation(account.getEmail(), program);
+    }
+
+    @Test
+    public void successfullyInviteNewParticipant() {
+      when(programRepository.findById(programId)).thenReturn(Optional.of(program));
+      when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+      when(participantRepository.findById(participantId)).thenReturn(Optional.empty());
+      when(participantRepository.save(argThat((p) -> p.getProgramParticipantId().equals(participantId)))).thenReturn(participant);
+
+      boolean isNewParticipant = programParticipantService.inviteToPrivateEvent(accountId, programId);
+
+      assertTrue(isNewParticipant);
+      verify(participantRepository, times(1))
+          .save(argThat(p -> p.getProgramParticipantId().equals(participantId)));
+      verify(emailService, times(1)).sendPrivateProgramInvitation(account.getEmail(), program);
     }
   }
 }
