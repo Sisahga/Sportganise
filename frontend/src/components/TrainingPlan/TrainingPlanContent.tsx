@@ -32,7 +32,7 @@ export default function TrainingPlanContent() {
 
   // Reroute User By Account Type
   useEffect(() => {
-    if (!cookies || cookies.type !== "COACH") {
+    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
       navigate("/");
     }
     log.debug(`TrainingPlanContent -> accountType is ${cookies?.type}`);
