@@ -26,7 +26,7 @@ function useTrainingPlans(accountId: number | null | undefined) {
       // Check Status Code
       if (response.statusCode !== 200) {
         throw new Error(
-          `Could not fetch training plan(s). Status code ${response.statusCode}`
+          `Could not fetch training plan(s). Status code ${response.statusCode}`,
         );
       }
       // If Response.ok, Initialize States
@@ -35,11 +35,11 @@ function useTrainingPlans(accountId: number | null | undefined) {
       // Log Info
       log.info(
         "useTrainingPlans.fetchTrainingPlans -> Fetched my training plans:",
-        myTrainingPlans
+        myTrainingPlans,
       );
       log.info(
         "useTrainingPlans.fetchTrainingPlans -> Fetched training plans shared with me:",
-        sharedTrainingPlans
+        sharedTrainingPlans,
       );
     } catch (err) {
       // Handle Error
