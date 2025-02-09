@@ -22,7 +22,7 @@ function usePrograms(accountId: number | null | undefined) {
       log.info("usePrograms message:", response.message);
       console.log(
         "usePrograms : const programs = useState<Program[]> => ",
-        programs,
+        programs
       );
     } catch (err) {
       console.error("Error fetching all programs:", err);
@@ -35,7 +35,7 @@ function usePrograms(accountId: number | null | undefined) {
     fetchPrograms().then(() => {
       setLoading(false);
     });
-  }, []);
+  }, [fetchPrograms]);
 
   return {
     programs, //returns Program[] or empty array []
