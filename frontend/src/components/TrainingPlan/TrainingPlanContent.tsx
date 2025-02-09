@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 // Components
+import { columns } from "./TableColumns.tsx";
 import TrainingPlanTable from "./TrainingPlanTable";
 import { AddTrainingPlanButton } from "@/components/TrainingPlan";
 // UI Components
@@ -82,7 +83,7 @@ export default function TrainingPlanContent() {
                 Error! Could not get training plans.
               </p>
             ) : (
-              <TrainingPlanTable data={myTrainingPlans} />
+              <TrainingPlanTable columns={columns} data={myTrainingPlans} />
             )}
           </TabsContent>
           <TabsContent value="shared">
@@ -96,7 +97,7 @@ export default function TrainingPlanContent() {
                 Error! Could not get training plans.
               </p>
             ) : (
-              <TrainingPlanTable data={sharedTrainingPlans} />
+              <TrainingPlanTable columns={columns} data={sharedTrainingPlans} />
             )}
           </TabsContent>
         </Tabs>
