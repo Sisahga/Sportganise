@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
+import { getFileName } from "@/utils/getFileName";
 
 // Data structure for data received from API call
 import { ProgramDetails } from "@/types/trainingSessionDetails";
@@ -199,11 +200,7 @@ const TrainingSessionContent = () => {
                       rel="noopener noreferrer"
                       download
                     >
-                      {attachment.attachmentUrl
-                        .split("/")
-                        .pop()
-                        ?.split("_")
-                        .pop()}
+                      {getFileName(attachment.attachmentUrl)}
                     </a>
                   </div>
                 </div>

@@ -1,13 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
+// React
+import { useState } from "react";
+// Table
 import {
   getCoreRowModel,
   useReactTable,
   getPaginationRowModel,
   flexRender,
   getFilteredRowModel,
+  SortingState,
+  getSortedRowModel,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { ColumnDef } from "@tanstack/react-table";
+// UI Components
 import {
   Table,
   TableBody,
@@ -17,158 +21,64 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "../ui/Button";
-import { Input } from "../ui/input";
-import { Search, File, User, Calendar } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/input";
+// Icons
+import { Search } from "lucide-react";
+// Types
+import { TrainingPlan } from "@/types/trainingplans";
+// Logs
+import log from "loglevel";
 
-const MockData = [
-  {
-    trainingPlan: "Document1.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "ShuttleCock_techniques.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "Document1.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "ShuttleCock_techniques.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "Document1.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "badminton_pro.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "paymentPlan.doc",
-    author: "Coach Steven",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "ShuttleCock_techniques.doc",
-    author: "Coach Micheal",
-    date: new Date(),
-  },
-  {
-    trainingPlan: "TrainingSessionNotes.dox",
-    author: "Benjamin",
-    date: new Date(),
-  },
-];
-
-interface ColumnTypes {
-  trainingPlan: string; //change to File
-  author: string;
-  date: Date;
+// Props
+interface TrainingPlanTableProps {
+  columns: ColumnDef<TrainingPlan>[]; // Table accepts only 'columns', column definition is of type TrainingPlan
+  data: TrainingPlan[]; // Table accepts only 'data', in this case of type TrainingPlan
 }
 
-export const columns = [
-  {
-    accessorKey: "trainingPlan",
-    header: () => {
-      return (
-        <div className="flex items-center">
-          Attachment
-          <File size={15} className="mx-2" />
-        </div>
-      );
-    },
-    cell: (props: any) => (
-      <a
-        className="miniscule underline text-gray-600 hover:text-cyan-300"
-        href={props.getValue("trainingPlan")}
-        target="_blank"
-        rel="noopener noreferrer"
-        download
-      >
-        {props.getValue("trainingPlan")}
-      </a>
-    ),
-  },
-  {
-    accessorKey: "author",
-    header: () => {
-      return (
-        <div className="flex items-center">
-          Author
-          <User size={15} className="mx-2" />
-        </div>
-      );
-    },
-    cell: (props: any) => (
-      <div className="capitalize">{props.getValue("author")}</div>
-    ),
-  },
-  {
-    accessorKey: "date",
-    header: () => {
-      return (
-        <div className="flex items-center">
-          Date
-          <Calendar size={15} className="mx-2" />
-        </div>
-      );
-    },
-    cell: (props: any) => (
-      <div className="capitalize">{props.getValue("date").toDateString()}</div>
-    ),
-  },
-];
+export default function TrainingPlanTable({
+  columns,
+  data,
+}: TrainingPlanTableProps) {
+  log.info("Rendered TrainingPlanTable component");
+  log.info("TrainingPlanTable -> data from TrainingPlanTableProps is", data);
+  log.info(
+    "TrainingPlanTable -> columns from TrainingPlanTableProps is",
+    columns,
+  );
+  const [sorting, setSorting] = useState<SortingState>([]); // Sorting State for column creationDate and userId
 
-export default function TrainingPlanTable() {
-  const [data /*setData*/] = useState<ColumnTypes[]>(MockData);
-
+  // Table Definition and Creation
   const table = useReactTable({
-    data, //needs to be date
-    columns, //needs to be column
+    data, // Component Prop - NOTE: must be 'data'
+    columns, // Column definition - NOTE: must be 'column'
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
   });
+
   return (
     <div>
+      {/** Search Bar */}
       <div className="relative w-full px-4 sm:px-0 mb-4 mx-auto max-w-5xl">
         <Search className="absolute left-7 sm:left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
         <Input
           type="text"
           placeholder="Search by file name"
           className="pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
-          value={
-            (table.getColumn("trainingPlan")?.getFilterValue() as string) ?? ""
-          }
+          value={(table.getColumn("docUrl")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("trainingPlan")?.setFilterValue(event.target.value)
+            table.getColumn("docUrl")?.setFilterValue(event.target.value)
           }
         />
       </div>
+
+      {/** Table */}
       <Table className="table">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -213,6 +123,8 @@ export default function TrainingPlanTable() {
         </TableBody>
         <TableCaption>A list of all your training plans.</TableCaption>
       </Table>
+
+      {/** Pagination */}
       <div className="flex space-x-2 justify-center my-5">
         <div>
           <Button
