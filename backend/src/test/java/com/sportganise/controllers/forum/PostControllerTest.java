@@ -142,7 +142,7 @@ public class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"accountId\": 1}"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.statusCode").value(201))
         .andExpect(jsonPath("$.message").value("Post liked successfully"));
   }
 
@@ -153,7 +153,7 @@ public class PostControllerTest {
     mockMvc
         .perform(delete("/api/forum/posts/1/unlike/1"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.statusCode").value(204))
         .andExpect(jsonPath("$.message").value("Post unliked successfully"));
   }
 
@@ -167,7 +167,7 @@ public class PostControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"content\": \"Great post!\"}"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.statusCode").value(201))
         .andExpect(jsonPath("$.message").value("Feedback added successfully"));
   }
 
@@ -178,7 +178,7 @@ public class PostControllerTest {
     mockMvc
         .perform(delete("/api/forum/posts/1/delete-feedback/1"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.statusCode").value(204))
         .andExpect(jsonPath("$.message").value("Feedback deleted successfully"));
   }
 }
