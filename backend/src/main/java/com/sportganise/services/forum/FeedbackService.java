@@ -71,7 +71,7 @@ public class FeedbackService {
         .feedbackId(feedback.getFeedbackId())
         .description(feedback.getContent())
         .author(this.getAuthorName(feedback.getUserId()))
-            .creationDate(feedback.getCreationDate())
+        .creationDate(feedback.getCreationDate())
         .build();
   }
 
