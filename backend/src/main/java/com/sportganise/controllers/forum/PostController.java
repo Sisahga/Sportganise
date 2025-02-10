@@ -139,7 +139,7 @@ public class PostController {
       @PathVariable Integer postId, @PathVariable Integer accountId) {
     postService.unlikePost(postId, accountId);
     ResponseDto<String> responseDto = new ResponseDto<>();
-    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
     responseDto.setMessage("Post unliked successfully");
 
     return responseDto;
@@ -174,7 +174,7 @@ public class PostController {
       @PathVariable Integer postId, @PathVariable Integer feedbackId) {
     feedbackService.deleteFeedbackByPostIdFeedbackId(postId, feedbackId);
     ResponseDto<String> responseDto = new ResponseDto<>();
-    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
     responseDto.setMessage("Feedback deleted successfully");
 
     return responseDto;

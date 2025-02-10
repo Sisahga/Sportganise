@@ -153,7 +153,7 @@ public class PostControllerTest {
     mockMvc
         .perform(delete("/api/forum/posts/1/unlike/1"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.statusCode").value(204))
         .andExpect(jsonPath("$.message").value("Post unliked successfully"));
   }
 
@@ -178,7 +178,7 @@ public class PostControllerTest {
     mockMvc
         .perform(delete("/api/forum/posts/1/delete-feedback/1"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.statusCode").value(204))
         .andExpect(jsonPath("$.message").value("Feedback deleted successfully"));
   }
 }
