@@ -57,7 +57,7 @@ public class FeedbackService {
    * @return List of feedbacks.
    */
   public List<FeedbackDto> getFeedbacksByPostId(Integer postId) {
-    List<Feedback> feedbacks = feedbackRepository.findFeedbacksByPostId(postId);
+    List<Feedback> feedbacks = feedbackRepository.findFeedbacksByPostIdOrderByCreationDateDesc(postId);
     return feedbacks.stream().map(this::convertFeedbackToDto).collect(Collectors.toList());
   }
 
