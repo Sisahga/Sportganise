@@ -12,6 +12,8 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.entities.forum.Feedback;
 import com.sportganise.repositories.forum.FeedbackRepository;
 import com.sportganise.services.account.AccountService;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -60,26 +62,42 @@ public class FeedbackServiceTest {
 
   @Test
   public void getFeedbacksByPostId_ShouldReturnFeedbackDtos() {
+    ZonedDateTime date1 = ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
+    ZonedDateTime date2 = ZonedDateTime.of(2022, 1, 2, 0, 0, 0, 0, ZoneId.of("UTC"));
     Feedback feedback1 =
-        Feedback.builder().feedbackId(1).content("Nice post!").postId(1).userId(2).build();
+        Feedback.builder()
+            .feedbackId(1)
+            .content("Nice post!")
+            .postId(1)
+            .userId(2)
+            .creationDate(date1)
+            .build();
     Feedback feedback2 =
-        Feedback.builder().feedbackId(2).content("Interesting!").postId(1).userId(3).build();
+        Feedback.builder()
+            .feedbackId(2)
+            .content("Interesting!")
+            .postId(1)
+            .userId(3)
+            .creationDate(date2)
+            .build();
 
-    List<Feedback> feedbacks = Arrays.asList(feedback1, feedback2);
+    List<Feedback> feedbacks = Arrays.asList(feedback2, feedback1);
     Account account1 = Account.builder().accountId(2).firstName("John").lastName("Doe").build();
     Account account2 = Account.builder().accountId(3).firstName("Jane").lastName("Smith").build();
 
-    when(feedbackRepository.findFeedbacksByPostId(1)).thenReturn(feedbacks);
+    when(feedbackRepository.findFeedbacksByPostIdOrderByCreationDateDesc(1)).thenReturn(feedbacks);
     when(accountService.getAccountById(2)).thenReturn(account1);
     when(accountService.getAccountById(3)).thenReturn(account2);
 
     List<FeedbackDto> result = feedbackService.getFeedbacksByPostId(1);
 
     assertEquals(2, result.size());
-    assertEquals("Nice post!", result.get(0).getDescription());
-    assertEquals("John Doe", result.get(0).getAuthor());
-    assertEquals("Interesting!", result.get(1).getDescription());
-    assertEquals("Jane Smith", result.get(1).getAuthor());
+
+    assertEquals("Interesting!", result.get(0).getDescription());
+    assertEquals("Jane Smith", result.get(0).getAuthor());
+
+    assertEquals("Nice post!", result.get(1).getDescription());
+    assertEquals("John Doe", result.get(1).getAuthor());
   }
 
   @Test
