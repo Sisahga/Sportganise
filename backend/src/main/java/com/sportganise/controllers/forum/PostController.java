@@ -121,7 +121,7 @@ public class PostController {
       @PathVariable Integer postId, @RequestBody LikeRequestDto likeRequestDto) {
     postService.likePost(postId, likeRequestDto.getAccountId());
     ResponseDto<String> responseDto = new ResponseDto<>();
-    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setStatusCode(HttpStatus.CREATED.value());
     responseDto.setMessage("Post liked successfully");
 
     return responseDto;
@@ -157,7 +157,7 @@ public class PostController {
       @PathVariable Integer postId, @RequestBody CreateFeedbackDto feedback) {
     feedbackService.createFeedback(feedback, postId);
     ResponseDto<String> responseDto = new ResponseDto<>();
-    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setStatusCode(HttpStatus.CREATED.value());
     responseDto.setMessage("Feedback added successfully");
 
     return responseDto;
