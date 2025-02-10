@@ -1,5 +1,6 @@
 package com.sportganise.dto.programsessions;
 
+import com.sportganise.entities.programsessions.ProgramType;
 import io.micrometer.common.lang.Nullable;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -14,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProgramModifyRequestDto {
   private String title;
-  private String type;
+  private ProgramType type;
   private String startDate;
   private String endDate;
   private Boolean recurring;

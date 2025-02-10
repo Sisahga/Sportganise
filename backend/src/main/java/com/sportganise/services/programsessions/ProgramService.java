@@ -9,6 +9,7 @@ import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -240,7 +241,7 @@ public class ProgramService {
   @Transactional
   public ProgramDto createProgramDto(
       String title,
-      String programType,
+      ProgramType programType,
       String startDate,
       String endDate,
       Boolean isRecurring,
@@ -319,7 +320,7 @@ public class ProgramService {
   public ProgramDto modifyProgram(
       ProgramDto programDtoToModify,
       String title,
-      String programType,
+      ProgramType programType,
       String startDate,
       String endDate,
       Boolean isRecurring,
@@ -400,7 +401,7 @@ public class ProgramService {
 
   private Program createProgramObject(
       String title,
-      String programType,
+      ProgramType programType,
       String startDate,
       String endDate,
       Boolean isRecurring,
