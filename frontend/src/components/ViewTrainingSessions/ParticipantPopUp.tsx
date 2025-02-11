@@ -27,6 +27,7 @@ import {
     isOpen,
     onClose,
   }) => {
+    log.debug("ParticipantPopUp component initialized with accountId:", accountId);
     const {
       data: accountDetails,
       loading,
