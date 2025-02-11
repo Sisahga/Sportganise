@@ -7,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.sportganise.dto.forum.CreateFeedbackDto;
-import com.sportganise.dto.forum.FeedbackAuthorDto;
 import com.sportganise.dto.forum.FeedbackDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
@@ -62,59 +61,60 @@ public class FeedbackServiceTest {
     verify(feedbackRepository, times(1)).save(any(Feedback.class));
   }
 
-    @Test
-    public void getFeedbacksByPostId_ShouldReturnFeedbackDtos() {
-        ZonedDateTime date1 = ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
-        ZonedDateTime date2 = ZonedDateTime.of(2022, 1, 2, 0, 0, 0, 0, ZoneId.of("UTC"));
-        Feedback feedback1 =
-                Feedback.builder()
-                        .feedbackId(1)
-                        .content("Nice post!")
-                        .postId(1)
-                        .userId(2)
-                        .creationDate(date1)
-                        .build();
-        Feedback feedback2 =
-                Feedback.builder()
-                        .feedbackId(2)
-                        .content("Interesting!")
-                        .postId(1)
-                        .userId(3)
-                        .creationDate(date2)
-                        .build();
-        Account account1 =
-                Account.builder()
-                        .accountId(2)
-                        .firstName("John")
-                        .lastName("Doe")
-                        .type(AccountType.valueOf("COACH"))
-                        .pictureUrl("url")
-                        .build();
-        Account account2 =
-                Account.builder()
-                        .accountId(3)
-                        .firstName("Jane")
-                        .lastName("Smith")
-                        .type(AccountType.valueOf("ADMIN"))
-                        .pictureUrl("url")
-                        .build();
+  @Test
+  public void getFeedbacksByPostId_ShouldReturnFeedbackDtos() {
+    ZonedDateTime date1 = ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
+    ZonedDateTime date2 = ZonedDateTime.of(2022, 1, 2, 0, 0, 0, 0, ZoneId.of("UTC"));
+    Feedback feedback1 =
+        Feedback.builder()
+            .feedbackId(1)
+            .content("Nice post!")
+            .postId(1)
+            .userId(2)
+            .creationDate(date1)
+            .build();
+    Feedback feedback2 =
+        Feedback.builder()
+            .feedbackId(2)
+            .content("Interesting!")
+            .postId(1)
+            .userId(3)
+            .creationDate(date2)
+            .build();
+    Account account1 =
+        Account.builder()
+            .accountId(2)
+            .firstName("John")
+            .lastName("Doe")
+            .type(AccountType.valueOf("COACH"))
+            .pictureUrl("url")
+            .build();
+    Account account2 =
+        Account.builder()
+            .accountId(3)
+            .firstName("Jane")
+            .lastName("Smith")
+            .type(AccountType.valueOf("ADMIN"))
+            .pictureUrl("url")
+            .build();
 
-        List<Feedback> feedbacks = Arrays.asList(feedback2, feedback1);
+    List<Feedback> feedbacks = Arrays.asList(feedback2, feedback1);
 
-        when(feedbackRepository.findFeedbacksByPostIdOrderByCreationDateDesc(1)).thenReturn(feedbacks);
-        when(accountService.getAccountById(2)).thenReturn(account1);
-        when(accountService.getAccountById(3)).thenReturn(account2);
+    when(feedbackRepository.findFeedbacksByPostIdOrderByCreationDateDesc(1)).thenReturn(feedbacks);
+    when(accountService.getAccountById(2)).thenReturn(account1);
+    when(accountService.getAccountById(3)).thenReturn(account2);
 
-        List<FeedbackDto> result = feedbackService.getFeedbacksByPostId(1);
+    List<FeedbackDto> result = feedbackService.getFeedbacksByPostId(1);
 
-        assertEquals(2, result.size());
+    assertEquals(2, result.size());
 
-        assertEquals("Interesting!", result.get(0).getDescription());
-        assertEquals("Jane Smith", result.get(0).getAuthor().getName());
+    assertEquals("Interesting!", result.get(0).getDescription());
+    assertEquals("Jane Smith", result.get(0).getAuthor().getName());
 
-        assertEquals("Nice post!", result.get(1).getDescription());
-        assertEquals("John Doe", result.get(1).getAuthor().getName());
-    }
+    assertEquals("Nice post!", result.get(1).getDescription());
+    assertEquals("John Doe", result.get(1).getAuthor().getName());
+  }
+
   @Test
   public void deleteFeedbackByPostIdFeedbackId_ShouldCallRepositoryDelete() {
     feedbackService.deleteFeedbackByPostIdFeedbackId(1, 2);
