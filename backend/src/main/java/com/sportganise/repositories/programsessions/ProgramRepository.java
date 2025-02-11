@@ -34,4 +34,6 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
   List<ProgramParticipant> findParticipantsByProgramId(@Param("programId") Integer programId);
 
   List<Program> findByProgramType(String type);
+
+  void deleteProgramByProgramId(Integer programId);
 }
