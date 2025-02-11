@@ -69,4 +69,14 @@ public interface ProgramParticipantRepository
       AND pp.isConfirmed = TRUE
       """)
   int countConfirmedParticipants(@Param("programId") Integer programId);
+
+    @Query("""
+      SELECT la.labelAccountsId.accountId
+      FROM LabelProgram lp
+      JOIN LabelAccount la
+      ON lp.labelProgramCompositeKey.labelId = la.labelAccountsId.labelId
+      WHERE lp.labelProgramCompositeKey.programId = :programId
+      AND la.role = 'Coach'
+      """)
+  int findCoachIdByProgramId(Integer programId);
 }

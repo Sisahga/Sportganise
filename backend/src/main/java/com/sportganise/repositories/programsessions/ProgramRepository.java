@@ -3,7 +3,10 @@ package com.sportganise.repositories.programsessions;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -35,5 +38,7 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
 
   List<Program> findByProgramType(String type);
 
+  @Modifying
+  @Transactional
   void deleteProgramByProgramId(Integer programId);
 }
