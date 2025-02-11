@@ -219,10 +219,10 @@ public class ProgramController {
     }
   }
 
-  @DeleteMapping("/delete-program/{programId}")
-    public ResponseEntity<ResponseDto<String>> deleteProgram(@PathVariable Integer programId) {
+  @DeleteMapping("/{accountId}/delete-program/{programId}")
+    public ResponseEntity<ResponseDto<String>> deleteProgram(@PathVariable Integer accountId,@PathVariable Integer programId) {
         ResponseDto<String> responseDto = new ResponseDto<>();
-        programService.deleteProgram(programId);
+        programService.deleteProgram(accountId,programId);
         responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
         responseDto.setMessage("Program deleted successfully.");
         return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
