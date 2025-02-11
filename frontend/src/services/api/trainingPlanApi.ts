@@ -1,7 +1,7 @@
 import log from "loglevel";
 import ResponseDto from "@/types/response";
 import {
-  UploadTrainingPlansDto,
+  UploadTrainingPlansDto, // trainingPlan: string[];
   TrainingPlansDto,
 } from "@/types/trainingplans";
 import { getBearerToken } from "@/services/apiHelper.ts";
@@ -16,25 +16,27 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api/training-plans";
 const trainingPlanApi = {
   // Upload Training Plan(s)
   uploadTrainingPlans: async (
-    accountId: number,
-    trainingPlans: File[],
+    accountId: number | null | undefined,
+    trainingPlans: FormData,
   ): Promise<ResponseDto<UploadTrainingPlansDto>> => {
     const response = await fetch(`${API_BASE_URL}/${accountId}/upload`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: getBearerToken(),
       },
-      body: JSON.stringify(trainingPlans),
+      body: trainingPlans,
     });
 
     if (!response.ok) {
-      throw new Error("Error thrown in trainingPlanApi.uploadTrainingPlans.");
+      log.error("trainingPlanApi.uploadTrainingPlans -> Error thrown!");
+      throw new Error("trainingPlanApi.uploadTrainingPlans -> Error thrown!");
     }
 
-    const data = await response.json();
-    console.log("Upload training plan(s) response:", data);
-    log.info("Upload training plan(s) response:", data);
+    const data: ResponseDto<UploadTrainingPlansDto> = await response.json();
+    log.info(
+      "trainingPlanApi.uploadTrainingPlans -> Upload training plan(s) response:",
+      data,
+    );
     return data;
   },
 
@@ -47,10 +49,12 @@ const trainingPlanApi = {
         Authorization: getBearerToken(),
       },
     });
+
     if (!response.ok) {
       log.error("Error thrown in trainingPlanApi.fetchTrainingPlans.");
       throw new Error("Error thrown in trainingPlanApi.fetchTrainingPlans.");
     }
+
     const data: ResponseDto<TrainingPlansDto> = await response.json();
     log.info("trainingPlanApi.fetchTrainingPlans -> response is", data);
     return data;

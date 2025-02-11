@@ -1,8 +1,14 @@
-// FormData
+/**
+ * Upload Training Plans
+ */
+// API Response
 export interface UploadTrainingPlansDto {
   trainingPlans: string[];
 }
 
+/**
+ * View Training Plans
+ */
 // Individual Training Plan
 export interface TrainingPlan {
   planId: number;
