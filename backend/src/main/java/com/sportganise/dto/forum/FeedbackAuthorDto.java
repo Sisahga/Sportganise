@@ -7,14 +7,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Data Transfer Object for FeedbackAuthor. */
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeedbackAuthorDto {
-    private Integer accountId;
-    private String name;
-    private AccountType type;
-    private String avatarUrl;
+  private Integer accountId;
+  private String name;
+  private AccountType type;
+  private String pictureUrl;
 }

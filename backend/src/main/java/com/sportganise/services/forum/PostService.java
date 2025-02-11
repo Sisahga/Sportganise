@@ -152,24 +152,15 @@ public class PostService {
     List<FeedbackDto> feedbacks = feedbackService.getFeedbacksByPostId(postId);
     Long likeCount = countLikesByPostId(postId);
     Post post = getPostById(postId);
-    PostDto postDto =
-        new PostDto(
-            post.getPostId(),
-            post.getTitle(),
-            post.getDescription(),
-            post.getType(),
-            post.getOccurrenceDate(),
-            post.getCreationDate(),
-            countLikesByPostId(postId),
-            (long) (feedbacks.size()));
     return new ViewPostDto(
-        postDto.getPostId(),
-        postDto.getTitle(),
-        postDto.getDescription(),
-        postDto.getType(),
-        postDto.getOccurrenceDate(),
-        postDto.getCreationDate(),
+        post.getPostId(),
+        post.getTitle(),
+        post.getDescription(),
+        post.getType(),
+        post.getOccurrenceDate(),
+        post.getCreationDate(),
         likeCount,
+        feedbacks.size(),
         feedbacks);
   }
 
