@@ -8,19 +8,15 @@ function useDeleteTrainingPlan() {
     userId: number | null | undefined,
     planId: number
   ) => {
-    try {
-      const data: ResponseDto<DeleteTrainingPlanDto> =
-        await trainingPlanApi.deleteTrainingPlan(userId, planId);
-      if (data.statusCode !== 200) {
-        log.error(
-          `useDeleteTrainingPlan.deleteTrainingPlan -> Errow thrown! ${data.message}`
-        );
-        throw new Error(data.message);
-      }
-      return data;
-    } catch (err) {
-      throw err;
+    const data: ResponseDto<DeleteTrainingPlanDto> =
+      await trainingPlanApi.deleteTrainingPlan(userId, planId);
+    if (data.statusCode !== 200) {
+      log.error(
+        `useDeleteTrainingPlan.deleteTrainingPlan -> Errow thrown! ${data.message}`
+      );
+      throw new Error(data.message);
     }
+    return data;
   };
   return {
     deleteTrainingPlan,
