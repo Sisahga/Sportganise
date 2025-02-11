@@ -448,4 +448,8 @@ public class ProgramService {
         location,
         visibility);
   }
+
+    public void deleteProgram(Integer programId) {
+        programRepository.deleteProgramByProgramId(programId);
+    }
 }
