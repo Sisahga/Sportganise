@@ -1,6 +1,7 @@
 package com.sportganise.services.forum;
 
 import com.sportganise.dto.forum.CreateFeedbackDto;
+import com.sportganise.dto.forum.FeedbackAuthorDto;
 import com.sportganise.dto.forum.FeedbackDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.forum.Feedback;
@@ -57,7 +58,8 @@ public class FeedbackService {
    * @return List of feedbacks.
    */
   public List<FeedbackDto> getFeedbacksByPostId(Integer postId) {
-    List<Feedback> feedbacks = feedbackRepository.findFeedbacksByPostId(postId);
+    List<Feedback> feedbacks =
+        feedbackRepository.findFeedbacksByPostIdOrderByCreationDateDesc(postId);
     return feedbacks.stream().map(this::convertFeedbackToDto).collect(Collectors.toList());
   }
 
@@ -67,10 +69,17 @@ public class FeedbackService {
    * @param feedback Feedback entity.
    */
   private FeedbackDto convertFeedbackToDto(Feedback feedback) {
+    Account account = accountService.getAccountById(feedback.getUserId());
     return FeedbackDto.builder()
         .feedbackId(feedback.getFeedbackId())
         .description(feedback.getContent())
-        .author(this.getAuthorName(feedback.getUserId()))
+        .author(
+            FeedbackAuthorDto.builder()
+                .accountId(account.getAccountId())
+                .name(getAuthorName(account.getAccountId()))
+                .type(account.getType())
+                .pictureUrl(account.getPictureUrl())
+                .build())
         .creationDate(feedback.getCreationDate())
         .build();
   }

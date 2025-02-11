@@ -34,7 +34,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
    * @param postId Post id.
    * @return List of feedbacks.
    */
-  List<Feedback> findFeedbacksByPostId(Integer postId);
+  List<Feedback> findFeedbacksByPostIdOrderByCreationDateDesc(Integer postId);
 
   /**
    * Deletes feedback by post id.

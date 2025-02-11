@@ -24,5 +24,6 @@ public class ViewPostDto {
   private ZonedDateTime occurrenceDate;
   @NotNull private ZonedDateTime creationDate;
   @NotNull private Long likeCount;
+  @NotNull private Integer feedbackCount;
   @NotNull private List<FeedbackDto> feedbackList;
 }

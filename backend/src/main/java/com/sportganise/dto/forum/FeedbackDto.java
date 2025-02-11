@@ -16,6 +16,6 @@ import lombok.Setter;
 public class FeedbackDto {
   private Integer feedbackId;
   private String description;
-  private String author;
+  private FeedbackAuthorDto author;
   private ZonedDateTime creationDate;
 }
