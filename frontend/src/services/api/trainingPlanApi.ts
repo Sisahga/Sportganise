@@ -79,7 +79,8 @@ const trainingPlanApi = {
 
     if (!response.ok) {
       log.error("trainingPlanApi.deleteTrainingPlan -> Error thrown!");
-      throw new Error("trainingPlanApi.deleteTrainingPlan -> Error thrown!");
+      const data: ResponseDto<DeleteTrainingPlanDto> = await response.json();
+      throw new Error(data.message);
     }
 
     const data: ResponseDto<DeleteTrainingPlanDto> = await response.json();
