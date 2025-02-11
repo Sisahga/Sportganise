@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Entity Model for LabelProgram table. */
 @Setter
 @Getter
 @NoArgsConstructor
@@ -19,9 +20,8 @@ import lombok.Setter;
 @Table(name = "label_program")
 public class LabelProgram {
 
-    @EmbeddedId
-    private LabelProgramCompositeKey labelProgramCompositeKey;
+  @EmbeddedId private LabelProgramCompositeKey labelProgramCompositeKey;
 
-    @Column(name = "type")
-    private LabelProgramType labelProgramType;
+  @Column(name = "type")
+  private LabelProgramType labelProgramType;
 }

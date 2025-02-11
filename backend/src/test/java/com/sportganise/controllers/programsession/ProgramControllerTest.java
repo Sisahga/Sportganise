@@ -457,9 +457,11 @@ public class ProgramControllerTest {
 
     doNothing().when(programService).deleteProgram(accountId, programId);
 
-    mockMvc.perform(delete("/api/programs/{accountId}/delete-program/{programId}", accountId, programId))
-            .andExpect(status().isNoContent())
-            .andExpect(jsonPath("$.message").value("Program deleted successfully."));
+    mockMvc
+        .perform(
+            delete("/api/programs/{accountId}/delete-program/{programId}", accountId, programId))
+        .andExpect(status().isNoContent())
+        .andExpect(jsonPath("$.message").value("Program deleted successfully."));
   }
 
   @Test
@@ -468,12 +470,15 @@ public class ProgramControllerTest {
     Integer programId = 100;
 
     doThrow(new ForbiddenException("This user does not have permission to delete the program."))
-            .when(programService).deleteProgram(accountId, programId);
+        .when(programService)
+        .deleteProgram(accountId, programId);
 
-    mockMvc.perform(delete("/api/programs/{accountId}/delete-program/{programId}", accountId, programId))
-            .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.message").value("This user does not have permission to delete the program."));
+    mockMvc
+        .perform(
+            delete("/api/programs/{accountId}/delete-program/{programId}", accountId, programId))
+        .andExpect(status().isForbidden())
+        .andExpect(
+            jsonPath("$.message")
+                .value("This user does not have permission to delete the program."));
   }
-
-
 }

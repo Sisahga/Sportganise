@@ -4,7 +4,6 @@ import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
-import com.sportganise.entities.Label;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.Program;
@@ -53,10 +52,11 @@ public class ProgramService {
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
-          ProgramRepository programRepository,
-          AccountService accountService,
-          ProgramAttachmentRepository programAttachmentRepository,
-          BlobService blobService, ProgramParticipantRepository programParticipantRepository) {
+      ProgramRepository programRepository,
+      AccountService accountService,
+      ProgramAttachmentRepository programAttachmentRepository,
+      BlobService blobService,
+      ProgramParticipantRepository programParticipantRepository) {
     this.programRepository = programRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
@@ -455,37 +455,55 @@ public class ProgramService {
         visibility);
   }
 
-    public void deleteProgram(Integer accountId, Integer programId) {
-        if(!isOwner(accountId, programId)) {
-          log.debug("USER DOES NOT HAVE PERMISSION TO DELETE PROGRAM- ID: {}", programId);
-          log.debug("USER ID: {}", accountId);
-            throw new ForbiddenException("This user does not have permission to delete the program.");
-        }
-        programRepository.deleteProgramByProgramId(programId);
+  /**
+   * Method to delete a program.
+   *
+   * @param accountId Id of the user making the request.
+   * @param programId Id of the program to be deleted.
+   */
+  public void deleteProgram(Integer accountId, Integer programId) {
+    if (!isOwner(accountId, programId)) {
+      log.debug("USER DOES NOT HAVE PERMISSION TO DELETE PROGRAM- ID: {}", programId);
+      log.debug("USER ID: {}", accountId);
+      throw new ForbiddenException("This user does not have permission to delete the program.");
     }
+    programRepository.deleteProgramByProgramId(programId);
+  }
 
-    /**
-     * Method to check if the user is the program's coach or an ADMIN
-     *
-     * @param accountId Id of the user.
-     * @return Boolean for whether the user is an admin or the program owner.
-     */
-    private boolean isOwner(Integer accountId, Integer programId) {
-      getProgram(programId);
-      return ( accountId.equals(getCoachID(programId))|| accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN));
+  /**
+   * Method to check if the user is the program's coach or an ADMIN.
+   *
+   * @param accountId Id of the user.
+   * @return Boolean for whether the user is an admin or the program owner.
+   */
+  private boolean isOwner(Integer accountId, Integer programId) {
+    getProgramById(programId);
+    return (accountId.equals(getCoachId(programId))
+        || accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN));
+  }
+
+  /**
+   * Method to get the coach id of a program.
+   *
+   * @param programId Id of the program.
+   * @return Id of the coach of the program.
+   */
+  private Integer getCoachId(Integer programId) {
+    return programParticipantRepository.findCoachIdByProgramId(programId);
+  }
+
+  /**
+   * Method to get a program by its id.
+   *
+   * @param programId Id of the program.
+   * @return Program object.
+   */
+  private Program getProgramById(Integer programId) {
+    Program program = programRepository.findProgramById(programId);
+    if (program == null) {
+      log.debug("PROGRAM DOES NOT EXIST- ID: {}", programId);
+      throw new EntityNotFoundException("Program not found");
     }
-
-    private Integer getCoachID(Integer programId) {
-        return programParticipantRepository.findCoachIdByProgramId(programId);
-    }
-
-    private Program getProgram(Integer programId) {
-        Program program=programRepository.findProgramById(programId);
-        if(program==null) {
-          log.debug("PROGRAM DOES NOT EXIST- ID: {}", programId);
-            throw new EntityNotFoundException("Program not found");
-        }
-        return program;
-    }
-
+    return program;
+  }
 }

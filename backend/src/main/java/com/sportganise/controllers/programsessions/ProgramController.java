@@ -19,7 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -219,14 +226,22 @@ public class ProgramController {
     }
   }
 
+  /**
+   * DELETE mapping for deleting a program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programId Id of the program that we wish to delete.
+   * @return HTTP Response for deleted program.
+   */
   @DeleteMapping("/{accountId}/delete-program/{programId}")
-    public ResponseEntity<ResponseDto<String>> deleteProgram(@PathVariable Integer accountId,@PathVariable Integer programId) {
-        ResponseDto<String> responseDto = new ResponseDto<>();
-        programService.deleteProgram(accountId,programId);
-        responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
-        responseDto.setMessage("Program deleted successfully.");
-        return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    }
+  public ResponseEntity<ResponseDto<String>> deleteProgram(
+      @PathVariable Integer accountId, @PathVariable Integer programId) {
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    programService.deleteProgram(accountId, programId);
+    responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
+    responseDto.setMessage("Program deleted successfully.");
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+  }
 
   /** Helper method to fetch and validate user account based on accountId. */
   private Optional<Account> getAccount(Integer accountId) {

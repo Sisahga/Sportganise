@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
+/** Composite Key for LabelProgram. */
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,9 +16,9 @@ import lombok.Setter;
 @Embeddable
 @EqualsAndHashCode
 public class LabelProgramCompositeKey {
-    @Column(name = "program_id")
-    private Integer programId;
+  @Column(name = "program_id")
+  private Integer programId;
 
-    @Column(name = "label_id")
-    private Integer labelId;
+  @Column(name = "label_id")
+  private Integer labelId;
 }

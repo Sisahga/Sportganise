@@ -70,7 +70,8 @@ public interface ProgramParticipantRepository
       """)
   int countConfirmedParticipants(@Param("programId") Integer programId);
 
-    @Query("""
+  @Query(
+      """
       SELECT la.labelAccountsId.accountId
       FROM LabelProgram lp
       JOIN LabelAccount la

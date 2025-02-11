@@ -92,7 +92,7 @@ INSERT INTO program_participants (program_id, account_id, type, is_confirmed, co
 
 INSERT INTO label_program (label_id, program_id, type) VALUES
 (1, 1, 'Private'),
-(1, 2, 'Public');
+(2, 2, 'Public');
 
 INSERT INTO channel (name, type, image_blob, channel_hash) VALUES
 ('Badmintinors', 'GROUP',

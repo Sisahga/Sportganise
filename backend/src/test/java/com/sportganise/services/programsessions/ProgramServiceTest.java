@@ -314,59 +314,72 @@ public class ProgramServiceTest {
     Mockito.verifyNoInteractions(programAttachmentRepository);
   }
 
-    @Test
-    void deleteProgram_ShouldDelete_WhenUserIsCoach() {
-      Integer accountId = 1;
-      Integer programId = 100;
+  @Test
+  void deleteProgram_ShouldDelete_WhenUserIsCoach() {
+    Integer accountId = 1;
+    Integer programId = 100;
 
+    when(programRepository.findProgramById(programId)).thenReturn(new Program());
+    when(programParticipantRepository.findCoachIdByProgramId(programId)).thenReturn(accountId);
 
-      when(programRepository.findProgramById(programId)).thenReturn(new Program());
-      when(programParticipantRepository.findCoachIdByProgramId(programId)).thenReturn(accountId);
+    programService.deleteProgram(accountId, programId);
+    verify(programRepository, times(1)).deleteProgramByProgramId(programId);
+  }
 
-      programService.deleteProgram(accountId, programId);
-      verify(programRepository, times(1)).deleteProgramByProgramId(programId);
-    }
+  @Test
+  void deleteProgram_ShouldDelete_WhenUserIsAdmin() {
+    Integer accountId = 2;
+    Integer programId = 200;
 
-    @Test
-    void deleteProgram_ShouldDelete_WhenUserIsAdmin() {
-      Integer accountId = 2;
-      Integer programId = 200;
+    when(programRepository.findProgramById(programId)).thenReturn(new Program());
 
-      when(programRepository.findProgramById(programId)).thenReturn(new Program());
+    when(programParticipantRepository.findCoachIdByProgramId(programId)).thenReturn(3);
+    when(accountService.getAccountById(accountId))
+        .thenReturn(
+            Account.builder()
+                .accountId(accountId)
+                .firstName("Admin")
+                .lastName("User")
+                .type(AccountType.ADMIN)
+                .build());
 
-      when(programParticipantRepository.findCoachIdByProgramId(programId)).thenReturn(3);
-      when(accountService.getAccountById(accountId)).thenReturn(Account.builder().accountId(accountId).firstName("Admin").lastName("User").type(AccountType.ADMIN).build());
+    programService.deleteProgram(accountId, programId);
 
-      programService.deleteProgram(accountId, programId);
+    verify(programRepository, times(1)).deleteProgramByProgramId(programId);
+  }
 
-      verify(programRepository, times(1)).deleteProgramByProgramId(programId);
-    }
+  @Test
+  void deleteProgram_ShouldThrowForbiddenException_WhenUserIsNotCoachOrAdmin() {
+    Integer accountId = 3;
+    Integer programId = 300;
 
-    @Test
-    void deleteProgram_ShouldThrowForbiddenException_WhenUserIsNotCoachOrAdmin() {
-      Integer accountId = 3;
-      Integer programId = 300;
+    when(programRepository.findProgramById(programId)).thenReturn(new Program());
+    when(programParticipantRepository.findCoachIdByProgramId(programId)).thenReturn(1);
+    when(accountService.getAccountById(accountId))
+        .thenReturn(
+            Account.builder()
+                .accountId(accountId)
+                .firstName("Regular")
+                .lastName("User")
+                .type(AccountType.PLAYER)
+                .build());
 
-      when(programRepository.findProgramById(programId)).thenReturn(new Program());
-      when(programParticipantRepository.findCoachIdByProgramId(programId)).thenReturn(1);
-      when(accountService.getAccountById(accountId)).thenReturn(Account.builder().accountId(accountId).firstName("Regular").lastName("User").type(AccountType.PLAYER).build());
+    assertThrows(
+        ForbiddenException.class, () -> programService.deleteProgram(accountId, programId));
+    verify(programRepository, never()).deleteProgramByProgramId(any());
+  }
 
-      assertThrows(ForbiddenException.class, () -> programService.deleteProgram(accountId, programId));
-      verify(programRepository, never()).deleteProgramByProgramId(any());
-    }
+  @Test
+  void deleteProgram_ShouldThrowEntityNotFoundException_WhenProgramDoesNotExist() {
+    // Given
+    Integer accountId = 4;
+    Integer programId = 400;
 
-    @Test
-    void deleteProgram_ShouldThrowEntityNotFoundException_WhenProgramDoesNotExist() {
-      // Given
-      Integer accountId = 4;
-      Integer programId = 400;
+    when(programRepository.findProgramById(programId)).thenReturn(null);
 
-      when(programRepository.findProgramById(programId)).thenReturn(null);
-
-      // When & Then
-      assertThrows(EntityNotFoundException.class, () -> programService.deleteProgram(accountId, programId));
-      verify(programRepository, never()).deleteProgramByProgramId(any());
-    }
-
-
+    // When & Then
+    assertThrows(
+        EntityNotFoundException.class, () -> programService.deleteProgram(accountId, programId));
+    verify(programRepository, never()).deleteProgramByProgramId(any());
+  }
 }
