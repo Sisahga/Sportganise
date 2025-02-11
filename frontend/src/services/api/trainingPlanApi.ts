@@ -19,7 +19,7 @@ const trainingPlanApi = {
   // Upload Training Plan(s)
   uploadTrainingPlans: async (
     accountId: number | null | undefined,
-    trainingPlans: FormData
+    trainingPlans: FormData,
   ): Promise<ResponseDto<UploadTrainingPlansDto>> => {
     const response = await fetch(`${API_BASE_URL}/${accountId}/upload`, {
       method: "POST",
@@ -37,14 +37,14 @@ const trainingPlanApi = {
     const data: ResponseDto<UploadTrainingPlansDto> = await response.json();
     log.info(
       "trainingPlanApi.uploadTrainingPlans -> Upload training plan(s) response:",
-      data
+      data,
     );
     return data;
   },
 
   // Fetch Training Plan(s)
   fetchTrainingPlans: async (
-    accountId: number | null | undefined
+    accountId: number | null | undefined,
   ): Promise<ResponseDto<TrainingPlansDto>> => {
     const response = await fetch(`${API_BASE_URL}/${accountId}/view-plans`, {
       headers: {
@@ -65,7 +65,7 @@ const trainingPlanApi = {
   // Delete Training Plan
   deleteTrainingPlan: async (
     userId: number | null | undefined,
-    planId: number
+    planId: number,
   ): Promise<ResponseDto<DeleteTrainingPlanDto>> => {
     const response = await fetch(
       `${API_BASE_URL}/${userId}/${planId}/delete-plan`,
@@ -74,13 +74,13 @@ const trainingPlanApi = {
         headers: {
           Authorization: getBearerToken(),
         },
-      }
+      },
     );
 
     if (!response.ok) {
       log.error("trainingPlanApi.deleteTrainingPlan -> Error thrown!");
       const data: ResponseDto<DeleteTrainingPlanDto> = await response.json();
-      throw new Error(data.message);
+      throw new Error(data.message); // Throw specific HTTP dto message, to be caught at ConfirmationDialog
     }
 
     const data: ResponseDto<DeleteTrainingPlanDto> = await response.json();
