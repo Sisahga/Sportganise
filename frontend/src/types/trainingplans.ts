@@ -22,3 +22,10 @@ export interface TrainingPlansDto {
   myPlans: TrainingPlan[];
   sharedWithMe: TrainingPlan[];
 }
+
+/**
+ * Delete a Training Plan
+ */
+export interface DeleteTrainingPlanDto {
+  trainingPlan: boolean;
+}
