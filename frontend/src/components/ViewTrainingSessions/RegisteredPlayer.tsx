@@ -24,7 +24,17 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
 
   return (
     <div>
-      <div onClick={() => setIsModalOpen(true)} className="cursor-pointer">
+      <div
+        onClick={() => setIsModalOpen(true)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            setIsModalOpen(true);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        className="cursor-pointer"
+      >
         <div className="flex my-2">
           <div className="mr-4 self-center">
             <Avatar>
