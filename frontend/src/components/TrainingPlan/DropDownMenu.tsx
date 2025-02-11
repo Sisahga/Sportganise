@@ -21,6 +21,7 @@ import { Ellipsis, Share, Trash2 } from "lucide-react";
 // Logs
 import log from "loglevel";
 
+// Component Props
 interface DropDownMenuProps {
   userId: number;
   planId: number;
@@ -30,6 +31,8 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
   userId,
   planId,
 }: DropDownMenuProps) => {
+  log.info("Rendered DropDownMenu");
+
   // State Management
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState(false); // Handle dialog open, close set by dialog component
@@ -67,8 +70,8 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
             {accountId === userId && (
               <DropdownMenuItem
                 onClick={() => {
-                  setIsConfirmationDialogOpen(true);
                   log.debug("TableColumns -> Deleting planId", planId);
+                  setIsConfirmationDialogOpen(true);
                 }}
               >
                 <Trash2 color="red" />
