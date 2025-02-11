@@ -31,7 +31,7 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
   // Handle Navigation (to Messages page)
   const navigate = useNavigate();
   return (
-    <div className="capitalize">
+    <div>
       {accountDetails ? (
         <HoverCard>
           <HoverCardTrigger asChild>
