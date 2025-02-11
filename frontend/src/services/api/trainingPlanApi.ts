@@ -70,7 +70,7 @@ const trainingPlanApi = {
     const response = await fetch(
       `${API_BASE_URL}/${userId}/${planId}/delete-plan`,
       {
-        method: "POST",
+        method: "DELETE",
         headers: {
           Authorization: getBearerToken(),
         },
