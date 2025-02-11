@@ -1,5 +1,8 @@
 package com.sportganise.controllers.programsession;
 
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,6 +13,7 @@ import com.sportganise.dto.programsessions.*;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.ProgramType;
+import com.sportganise.exceptions.ForbiddenException;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 import java.nio.charset.StandardCharsets;
@@ -445,4 +449,31 @@ public class ProgramControllerTest {
                 .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isNotFound());
   }
+
+  @Test
+  public void deleteProgram_ShouldReturnNoContent_WhenUserIsAuthorized() throws Exception {
+    Integer accountId = 1;
+    Integer programId = 100;
+
+    doNothing().when(programService).deleteProgram(accountId, programId);
+
+    mockMvc.perform(delete("/api/programs/{accountId}/delete-program/{programId}", accountId, programId))
+            .andExpect(status().isNoContent())
+            .andExpect(jsonPath("$.message").value("Program deleted successfully."));
+  }
+
+  @Test
+  public void deleteProgram_ShouldReturnForbidden_WhenUserIsNotOwner() throws Exception {
+    Integer accountId = 1;
+    Integer programId = 100;
+
+    doThrow(new ForbiddenException("This user does not have permission to delete the program."))
+            .when(programService).deleteProgram(accountId, programId);
+
+    mockMvc.perform(delete("/api/programs/{accountId}/delete-program/{programId}", accountId, programId))
+            .andExpect(status().isForbidden())
+            .andExpect(jsonPath("$.message").value("This user does not have permission to delete the program."));
+  }
+
+
 }
