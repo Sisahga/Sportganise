@@ -14,7 +14,7 @@ function useDeleteTrainingPlan() {
   // Delete A Selected Training Plan
   const deleteTrainingPlan = async (
     userId: number | null | undefined,
-    planId: number
+    planId: number,
   ) => {
     // Call Api Endpoint
     const data: ResponseDto<DeleteTrainingPlanDto> =
@@ -22,7 +22,7 @@ function useDeleteTrainingPlan() {
     // Handle HTTP StatusCode
     if (data.statusCode !== 200) {
       log.error(
-        `useDeleteTrainingPlan.deleteTrainingPlan -> Errow thrown! ${data.message}`
+        `useDeleteTrainingPlan.deleteTrainingPlan -> Errow thrown! ${data.message}`,
       );
       throw new Error(data.message); // Throw Dto message to error toast in ConfirmationDialog
     }

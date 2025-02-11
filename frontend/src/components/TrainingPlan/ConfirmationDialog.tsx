@@ -43,20 +43,20 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       // Check That userId = accountId
       if (accountId && accountId === userId) {
         log.info(
-          `${userId} deleting the file is userId and planId to delete is ${planId}`
+          `${userId} deleting the file is userId and planId to delete is ${planId}`,
         );
         // Call API
         const data = await deleteTrainingPlan(userId, planId);
         // Check For Null Response
         if (!data) {
           log.error(
-            "ConfirmationDialog -> 'data' is null. The training plan was not removed."
+            "ConfirmationDialog -> 'data' is null. The training plan was not removed.",
           );
           throw new Error("The training plan was not removed.");
         }
         // Success
         log.info(
-          "ConfirmationDialog -> Success. The training plan was removed."
+          "ConfirmationDialog -> Success. The training plan was removed.",
         );
         toast({
           title: "Successfully deleted file ✔",
