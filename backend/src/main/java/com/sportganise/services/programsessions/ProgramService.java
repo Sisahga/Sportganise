@@ -4,7 +4,9 @@ import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.entities.Label;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
@@ -12,8 +14,10 @@ import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.ForbiddenException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
+import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
@@ -39,6 +43,7 @@ public class ProgramService {
   private final AccountService accountService;
   private final ProgramAttachmentRepository programAttachmentRepository;
   private final BlobService blobService;
+  private final ProgramParticipantRepository programParticipantRepository;
 
   /**
    * Constructor for ProgramService.
@@ -48,14 +53,15 @@ public class ProgramService {
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
-      ProgramRepository programRepository,
-      AccountService accountService,
-      ProgramAttachmentRepository programAttachmentRepository,
-      BlobService blobService) {
+          ProgramRepository programRepository,
+          AccountService accountService,
+          ProgramAttachmentRepository programAttachmentRepository,
+          BlobService blobService, ProgramParticipantRepository programParticipantRepository) {
     this.programRepository = programRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
     this.blobService = blobService;
+    this.programParticipantRepository = programParticipantRepository;
   }
 
   public Optional<Program> getSessionById(Integer id) {
@@ -449,7 +455,37 @@ public class ProgramService {
         visibility);
   }
 
-    public void deleteProgram(Integer programId) {
+    public void deleteProgram(Integer accountId, Integer programId) {
+        if(!isOwner(accountId, programId)) {
+          log.debug("USER DOES NOT HAVE PERMISSION TO DELETE PROGRAM- ID: {}", programId);
+          log.debug("USER ID: {}", accountId);
+            throw new ForbiddenException("This user does not have permission to delete the program.");
+        }
         programRepository.deleteProgramByProgramId(programId);
     }
+
+    /**
+     * Method to check if the user is the program's coach or an ADMIN
+     *
+     * @param accountId Id of the user.
+     * @return Boolean for whether the user is an admin or the program owner.
+     */
+    private boolean isOwner(Integer accountId, Integer programId) {
+      getProgram(programId);
+      return ( accountId.equals(getCoachID(programId))|| accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN));
+    }
+
+    private Integer getCoachID(Integer programId) {
+        return programParticipantRepository.findCoachIdByProgramId(programId);
+    }
+
+    private Program getProgram(Integer programId) {
+        Program program=programRepository.findProgramById(programId);
+        if(program==null) {
+          log.debug("PROGRAM DOES NOT EXIST- ID: {}", programId);
+            throw new EntityNotFoundException("Program not found");
+        }
+        return program;
+    }
+
 }
