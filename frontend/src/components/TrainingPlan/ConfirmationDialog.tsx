@@ -1,5 +1,6 @@
 // Hooks
 import { useToast } from "@/hooks/use-toast";
+import useDeleteTrainingPlan from "@/hooks/useDeleteTrainingPlan";
 // UI Components
 import {
   AlertDialog,
@@ -29,9 +30,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }: ConfirmationDialogProps) => {
   // States
   const { toast } = useToast();
+  const { deleteTrainingPlan } = useDeleteTrainingPlan();
 
   // TODO: Call API hook outside of Delete to obtain function to send request
-  function handleDelete() {
+  async function handleDelete() {
     try {
       // Check That userId = accountId
       if (accountId && accountId === userId) {
@@ -42,6 +44,11 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           ", planId to delete: ",
           planId
         );
+        const data = await deleteTrainingPlan(userId, planId);
+        console.warn(data);
+        if (!data) {
+          throw new Error("The training plan was not removed.");
+        }
         toast({
           title: "Successfully deleted file ✔",
           description: "The training plan was removed.",
