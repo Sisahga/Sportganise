@@ -1,6 +1,7 @@
 import trainingPlanApi from "@/services/api/trainingPlanApi";
 import ResponseDto from "@/types/response";
 import { DeleteTrainingPlanDto } from "@/types/trainingplans";
+import log from "loglevel";
 
 function useDeleteTrainingPlan() {
   const deleteTrainingPlan = async (
@@ -11,13 +12,14 @@ function useDeleteTrainingPlan() {
       const data: ResponseDto<DeleteTrainingPlanDto> =
         await trainingPlanApi.deleteTrainingPlan(userId, planId);
       if (data.statusCode !== 200) {
-        throw new Error(
-          "useDeleteTrainingPlan.deleteTrainingPlan -> Errow thrown!"
+        log.error(
+          `useDeleteTrainingPlan.deleteTrainingPlan -> Errow thrown! ${data.message}`
         );
+        throw new Error(data.message);
       }
       return data;
     } catch (err) {
-      return null;
+      throw err;
     }
   };
   return {
