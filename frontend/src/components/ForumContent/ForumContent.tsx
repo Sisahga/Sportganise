@@ -1,7 +1,5 @@
-/**TODO: Connect and fetch from real API endpoint. Navigate to PostDetail with correct sessionID**/
-
 import React, { useState, useEffect } from "react";
-import { CalendarIcon, ThumbsUp, MessageSquare, Filter } from "lucide-react";
+import { CalendarIcon, ThumbsUp, MessageSquare, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -30,125 +28,78 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 import "react-day-picker/dist/style.css";
 import BackButton from "../ui/back-button";
+import usePosts from "@/hooks/usePosts";
 
-interface TrainingSession {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  likes: number;
-  comments: number;
-}
 
 const ForumContent: React.FC = () => {
-  const [likedSessions, setLikedSessions] = useState<Set<number>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
-  const sessionsPerPage = 3;
-  const [loading, setLoading] = useState<boolean>(true);
+
   const navigate = useNavigate();
 
-  //MOCK DATA
-  const sessions: TrainingSession[] = [
-    {
-      id: 1,
-      title: "Badminton Basics",
-      description:
-        "Badminton basics include learning the fundamental skills and techniques required to play the game.",
-      date: "2024-12-29",
-      likes: 25,
-      comments: 5,
-    },
-    {
-      id: 2,
-      title: "Advanced Badminton Strategies",
-      description: "Master advanced strategies for badminton matches.",
-      date: "2024-12-05",
-      likes: 100,
-      comments: 20,
-    },
-    {
-      id: 3,
-      title: "Badminton Footwork",
-      description: "Improve your footwork and agility on the court.",
-      date: "2024-12-10",
-      likes: 50,
-      comments: 15,
-    },
-    {
-      id: 4,
-      title: "Badminton for Beginners",
-      description: "A beginner-friendly session focusing on basic skills.",
-      date: "2024-10-30",
-      likes: 30,
-      comments: 10,
-    },
-    {
-      id: 5,
-      title: "Badminton Smash Techniques",
-      description: "Learn powerful smash techniques for aggressive play.",
-      date: "2024-12-20",
-      likes: 70,
-      comments: 25,
-    },
-    {
-      id: 6,
-      title: "Badminton Fitness Training",
-      description: "Focus on fitness training for badminton players.",
-      date: "2024-09-15",
-      likes: 10,
-      comments: 3,
-    },
-  ];
+  const [likedposts, setLikedposts] = useState<Set<number>>(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage, setPostsPerPage] = useState(10);
+  
+  //State for Filters
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [occurrenceDate, setOccurrenceDate] = useState<string | undefined>(undefined);
+  const [type, setType] = useState("");
+  const[limit, setLimit] = useState();
+  const[page, setPage] = useState();
+  const [sortBy, setSortBy] = useState("");
+  const [sortDir, setSortDir] = useState("");
+  const [sortOption, setSortOption] = useState('latest');
+  const [selectedLabel] = useState<string>("");
 
-  const handleLike = (sessionId: number) => {
-    setLikedSessions((prev) => {
-      const newLikedSessions = new Set(prev);
-      if (newLikedSessions.has(sessionId)) {
-        newLikedSessions.delete(sessionId);
+
+  const { posts, loading, error, fetchPostsData, resetFilters } = usePosts();
+
+
+  const fetchData = () => {
+    fetchPostsData(
+      searchTerm, occurrenceDate, type, selectedLabel, limit, page, sortBy, sortDir
+    );
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchData();
+    }, searchTerm ? 500 : 0);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, currentPage]);
+
+
+
+
+  const handleLike = (postId: number) => {
+    setLikedposts((prev) => {
+      const newLikedposts = new Set(prev);
+      if (newLikedposts.has(postId)) {
+        newLikedposts.delete(postId);
       } else {
-        newLikedSessions.add(sessionId);
+        newLikedposts.add(postId);
       }
-      return newLikedSessions;
+      return newLikedposts;
     });
   };
 
-  // Pagination logic
-  const indexOfLastSession = currentPage * sessionsPerPage;
-  const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
-  const currentSessions = sessions.slice(
-    indexOfFirstSession,
-    indexOfLastSession,
-  );
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
+  const navigatePostDetail = (postId: number) => {
+    navigate(`/pages/PostDetailPage`, { state: { postId }});
   };
 
-  const navigatePostDetail = () => {
-    navigate(`/pages/PostDetailPage`);
-  };
-
-  // Simulate API call
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    };
-
-    fetchData();
-  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+
 
   return (
     <div className="min-h-screen pb-20">
@@ -214,33 +165,33 @@ const ForumContent: React.FC = () => {
         <Input placeholder="Search..." className="w-full flex-grow" />
       </div>
 
-      {/* Sessions Cards */}
+      {/* posts Cards */}
       <div className="flex flex-col space-y-4 lg:mx-24">
-        {currentSessions.map((session) => (
+        {posts.map((post) => (
           <Card
-            key={session.id}
-            onClick={() => navigatePostDetail()}
+            key={post.postId}
+            onClick={() => navigatePostDetail(post.postId)}
             className="cursor-pointer"
           >
             <CardHeader>
-              <CardTitle>{session.title}</CardTitle>
-              <div className="mt-4 text-xs">{session.date}</div>
+              <CardTitle>{post.title}</CardTitle>
+              <div className="mt-4 text-xs">{post.occurrenceDate}</div>
             </CardHeader>
             <CardContent>
-              <CardDescription>{session.description}</CardDescription>
+              <CardDescription>{post.description}</CardDescription>
             </CardContent>
             <CardFooter className="flex space-x-2">
               <Button
                 variant="outline"
-                className={`flex items-center space-x-1 ${likedSessions.has(session.id) ? "text-secondaryColour" : "text-primaryColour"}`}
+                className={`flex items-center space-x-1 ${likedposts.has(post.postId) ? "text-secondaryColour" : "text-primaryColour"}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleLike(session.id);
+                  handleLike(post.postId);
                 }}
               >
                 <ThumbsUp className="w-4 h-4" />
                 <span>
-                  {session.likes + (likedSessions.has(session.id) ? 1 : 0)}
+                  {post.likeCount + (likedposts.has(post.postId) ? 1 : 0)}
                 </span>
               </Button>
 
@@ -249,11 +200,11 @@ const ForumContent: React.FC = () => {
                 className="flex items-center space-x-1"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigatePostDetail();
+                  navigatePostDetail(post.postId);
                 }}
               >
                 <MessageSquare className="w-4 h-4" />
-                <span>{session.comments}</span>
+                <span>{post.feedbackCount}</span>
               </Button>
             </CardFooter>
           </Card>
@@ -261,40 +212,44 @@ const ForumContent: React.FC = () => {
       </div>
 
       {/* Pagination UI */}
-      <Pagination className="mt-6 flex justify-center space-x-2">
-        <PaginationPrevious
-          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          className="text-primaryColour"
-        >
-          Previous
-        </PaginationPrevious>
+        {/* Pagination */}
+        <div className="mt-4">
+        <Pagination>
+          <PaginationContent>
+            <Button
+              onClick={() => {
+                if (currentPage > 1) {
+                  setCurrentPage((prev) => prev - 1);
 
-        <PaginationContent className="flex space-x-2">
-          {Array.from(
-            { length: Math.ceil(sessions.length / sessionsPerPage) },
-            (_, index) => (
-              <PaginationItem
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                <PaginationLink className="text-primaryColour">
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ),
-          )}
-        </PaginationContent>
+                }
+              }}
+              className="text-primaryColour"
+              disabled={currentPage === 1}
+              variant="outline"
+            >
+              <ChevronLeft></ChevronLeft>
+            </Button>
+            <PaginationItem className="m-3">
+              <span>Page {currentPage}</span>
+            </PaginationItem>
 
-        <PaginationNext
-          onClick={() =>
-            currentPage < Math.ceil(sessions.length / sessionsPerPage) &&
-            handlePageChange(currentPage + 1)
-          }
-          className="text-primaryColour"
-        >
-          Next
-        </PaginationNext>
-      </Pagination>
+            <Button
+              onClick={() => {
+                if (posts.length >= postsPerPage) {
+                  setCurrentPage((prev) => prev + 1);
+
+                }
+              }}
+              className="text-primaryColour"
+              disabled={posts.length < postsPerPage}
+              variant="outline"
+            >
+              <ChevronRight></ChevronRight>
+            </Button>
+          </PaginationContent>
+        </Pagination>
+
+      </div>
     </div>
   );
 };
