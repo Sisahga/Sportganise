@@ -33,7 +33,7 @@ public class EmailService {
   }
 
   /**
-   * Send an email.
+   * Send an email with the default sender.
    *
    * @param toEmail email to send to
    * @param subject email subject
