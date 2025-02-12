@@ -1,5 +1,4 @@
 //TODO: Connect and fetch from sessionId
-
 import React, { useState, useEffect } from "react";
 import { ThumbsUp, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -11,115 +10,72 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 import BackButton from "../ui/back-button";
+import { useNavigate, useLocation } from "react-router";
+import { getBearerToken } from "@/services/apiHelper";
+import { Feedback, Post, ApiResponse } from "@/types/postdetail";
 
-// Define the types for Post and Comment
-interface Comment {
-  id: number;
-  username: string;
-  role: string;
-  content: string;
-  date: Date;
-}
-
-interface Post {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  likes: number;
-  comments: Comment[];
-}
+const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/forum";
 
 const PostsContent: React.FC = () => {
-  const [newComment, setNewComment] = useState<string>("");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const postId = location.state?.postId;
 
+  const [isFocused, setIsFocused] = useState(false);
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [liked, setLiked] = useState<boolean>(false);
-  const [isFocused, setIsFocused] = useState(false);
+  const [newComment, setNewComment] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 5;
 
-  // MOCK DATA
-  const dummyPost: Post = {
-    id: 1,
-    title: "Training Session Forum Example",
-    date: "2024-12-05T12:30:00",
-    description:
-      "This is a sample description for the session. It contains details about the event or post.",
-    likes: 23,
-    comments: [
-      {
-        id: 1,
-        username: "User1",
-        role: "Player",
-        content: "This is a sample comment.",
-        date: new Date("2024-12-29T12:30:00"),
-      },
-      {
-        id: 2,
-        username: "User2",
-        role: "Player",
-        content: "Another comment here, really like this post!",
-        date: new Date("2024-12-29T13:00:00"),
-      },
-    ],
-  };
-
   useEffect(() => {
     const fetchPost = async () => {
-      setLoading(true);
-      setTimeout(() => {
-        setPost(dummyPost);
+      try {
+        setLoading(true);
+        const response = await fetch(`${baseMappingUrl}/posts/${postId}`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${getBearerToken()}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        const data: ApiResponse = await response.json();
+
+        // Ensure postId is defined before updating state
+        if (data.statusCode === 200 && data.data?.postId) {
+          setPost(data.data);
+        } else {
+          console.error("Post data is incomplete or invalid");
+        }
+
+        console.log("Post data set:", data);
+      } catch (error) {
+        console.error("Error fetching post:", error);
+      } finally {
         setLoading(false);
-      });
+      }
     };
 
     fetchPost();
   }, []);
 
-  const handleAddComment = async () => {
-    if (newComment.trim() && post) {
-      const newCommentObj: Comment = {
-        id: post.comments.length + 1,
-        username: "CurrentUser",
-        role: "Player",
-        content: newComment,
-        date: new Date(),
-      };
-
-      const updatedPost = {
-        ...post,
-        comments: [...post.comments, newCommentObj],
-      };
-      setPost(updatedPost);
-      setNewComment("");
-    }
-  };
+  const handleAddComment = async () => {};
 
   const toggleLike = async () => {
     if (post) {
-      const updatedLikes = liked ? post.likes - 1 : post.likes + 1;
+      const updatedLikes = liked ? post.likeCount - 1 : post.likeCount + 1;
       const updatedPost = {
         ...post,
-        likes: updatedLikes,
+        likeCount: updatedLikes, // Correct the property name
       };
 
       setPost(updatedPost);
       setLiked(!liked);
     }
   };
-
-  const indexOfLastComment = currentPage * commentsPerPage;
-  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-  const currentComments = post?.comments.slice(
-    indexOfFirstComment,
-    indexOfLastComment,
-  );
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
@@ -129,6 +85,15 @@ const PostsContent: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(post.feedbackList.length / commentsPerPage);
+
+  // Slice the comments based on the current page
+  const currentComments = post.feedbackList.slice(
+    (currentPage - 1) * commentsPerPage,
+    currentPage * commentsPerPage
+  );
+
   return (
     <div className="py-4 min-h-screen pb-20">
       <BackButton />
@@ -137,19 +102,15 @@ const PostsContent: React.FC = () => {
         <Card className="w-full mx-auto">
           <CardHeader>
             <div className="my-4">
-              <h1 className="font-bold text-lg text-primaryColour">
-                {post.title}
-              </h1>
+              <h1 className="font-bold text-lg text-primaryColour">{post.title}</h1>
               <p className="text-sm text-primaryColour">
-                {formatDistanceToNow(new Date(post.date), { addSuffix: true })}
+                {formatDistanceToNow(new Date(post.creationDate), { addSuffix: true })}
               </p>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              <p className="font-light text-sm text-primaryColour">
-                {post.description}
-              </p>
+              <p className="font-light text-sm text-primaryColour">{post.description}</p>
 
               <div className="flex space-x-4">
                 <Button
@@ -158,15 +119,12 @@ const PostsContent: React.FC = () => {
                   onClick={toggleLike}
                 >
                   <ThumbsUp className="w-4 h-4" />
-                  <span>{post.likes}</span>
+                  <span>{post.likeCount}</span>
                 </Button>
 
-                <Button
-                  variant="outline"
-                  className="flex items-center space-x-1"
-                >
+                <Button variant="outline" className="flex items-center space-x-1">
                   <MessageCircle className="w-4 h-4" />
-                  <span>{post.comments.length}</span>
+                  <span>{post.feedbackCount}</span>
                 </Button>
               </div>
             </div>
@@ -203,27 +161,23 @@ const PostsContent: React.FC = () => {
           )}
         </div>
 
-        {/* Comments Section with Pagination */}
+        {/* Comments Section */}
         <div className="mt-6 space-y-4 font">
-          {currentComments?.map((comment: Comment) => (
-            <div key={comment.id} className="p-4 bg-white rounded-lg shadow-sm">
+          {currentComments.map((comment: Feedback) => (
+            <div key={comment.feedbackId} className="p-4 bg-white rounded-lg shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-light">
-                  {comment.username}{" "}
-                  <span className="text-secondaryColour font-bold">
-                    {comment.role}
-                  </span>
+                  {comment.author.name}{" "}
+                  <span className="text-secondaryColour font-bold">{comment.author.type}</span>
                 </div>
 
                 <div className="text-xs text-gray-500">
-                  {formatDistanceToNow(new Date(comment.date), {
-                    addSuffix: true,
-                  })}
+                  {formatDistanceToNow(new Date(comment.creationDate), { addSuffix: true })}
                 </div>
               </div>
 
               <div className="mt-2">
-                <p className="text-sm font-light">{comment.content}</p>
+                <p className="text-sm font-light">{comment.description}</p>
               </div>
             </div>
           ))}
@@ -231,32 +185,31 @@ const PostsContent: React.FC = () => {
 
         {/* Pagination Controls */}
         <Pagination className="mt-6 flex justify-center space-x-2">
-          <PaginationPrevious
+          <Button
+            variant= "outline"
             onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
           >
             Previous
-          </PaginationPrevious>
+          </Button>
           <PaginationContent>
-            {Array.from(
-              { length: Math.ceil(post.comments.length / commentsPerPage) },
-              (_, index) => (
-                <PaginationItem
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  <PaginationLink>{index + 1}</PaginationLink>
-                </PaginationItem>
-              ),
-            )}
+            {Array.from({ length: totalPages }, (_, index) => (
+              <PaginationItem
+                key={index + 1}
+                onClick={() => handlePageChange(index + 1)}
+                className={currentPage === index + 1 ? "text-white" : ""}
+              >
+                <PaginationLink>{index + 1}</PaginationLink>
+              </PaginationItem>
+            ))}
           </PaginationContent>
-          <PaginationNext
-            onClick={() =>
-              currentPage < Math.ceil(post.comments.length / commentsPerPage) &&
-              handlePageChange(currentPage + 1)
-            }
+          <Button
+            variant= "outline"
+            onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
           >
             Next
-          </PaginationNext>
+          </Button>
         </Pagination>
       </div>
     </div>
