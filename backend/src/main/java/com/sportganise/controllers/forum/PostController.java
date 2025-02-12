@@ -1,14 +1,22 @@
 package com.sportganise.controllers.forum;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.forum.CreateFeedbackDto;
+import com.sportganise.dto.forum.LikeRequestDto;
 import com.sportganise.dto.forum.PostDto;
+import com.sportganise.dto.forum.ViewPostDto;
 import com.sportganise.entities.forum.PostType;
+import com.sportganise.services.forum.FeedbackService;
 import com.sportganise.services.forum.PostService;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
   @Autowired private PostService postService;
+  @Autowired private FeedbackService feedbackService;
 
   /**
    * Fetches posts based on search criteria.
@@ -79,6 +88,94 @@ public class PostController {
     responseDto.setData(types);
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Post types fetched successfully");
+
+    return responseDto;
+  }
+
+  /**
+   * Fetches a post by post id.
+   *
+   * @param postId Post id.
+   * @return ResponseDto containing the fetched post.
+   */
+  @GetMapping("/{postId}")
+  public ResponseDto<ViewPostDto> getPostById(@PathVariable Integer postId) {
+    ViewPostDto viewPostDto = postService.getPostByIdWithFeedBacks(postId);
+    ResponseDto<ViewPostDto> responseDto = new ResponseDto<>();
+    responseDto.setData(viewPostDto);
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Post fetched successfully");
+
+    return responseDto;
+  }
+
+  /**
+   * Like a post.
+   *
+   * @param postId Post id.
+   * @param likeRequestDto Like request data.
+   * @return ResponseDto .
+   */
+  @PostMapping("/{postId}/like")
+  public ResponseDto<String> likePost(
+      @PathVariable Integer postId, @RequestBody LikeRequestDto likeRequestDto) {
+    postService.likePost(postId, likeRequestDto.getAccountId());
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.CREATED.value());
+    responseDto.setMessage("Post liked successfully");
+
+    return responseDto;
+  }
+
+  /**
+   * Unlike a post.
+   *
+   * @param postId Post Id.
+   * @param accountId Account Id.
+   * @return ResponseDto .
+   */
+  @DeleteMapping("/{postId}/unlike/{accountId}")
+  public ResponseDto<String> unlikePost(
+      @PathVariable Integer postId, @PathVariable Integer accountId) {
+    postService.unlikePost(postId, accountId);
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
+    responseDto.setMessage("Post unliked successfully");
+
+    return responseDto;
+  }
+
+  /**
+   * Create a feedback instance.
+   *
+   * @param postId Post Id.
+   * @param feedback Feedback data.
+   * @return ResponseDto .
+   */
+  @PostMapping("/{postId}/add-feedback")
+  public ResponseDto<String> createFeedback(
+      @PathVariable Integer postId, @RequestBody CreateFeedbackDto feedback) {
+    feedbackService.createFeedback(feedback, postId);
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.CREATED.value());
+    responseDto.setMessage("Feedback added successfully");
+
+    return responseDto;
+  }
+
+  /**
+   * Fetches feedbacks by post id.
+   *
+   * @param postId Post id.
+   * @return ResponseDto containing the fetched feedbacks.
+   */
+  @DeleteMapping("/{postId}/delete-feedback/{feedbackId}")
+  public ResponseDto<String> deleteFeedback(
+      @PathVariable Integer postId, @PathVariable Integer feedbackId) {
+    feedbackService.deleteFeedbackByPostIdFeedbackId(postId, feedbackId);
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
+    responseDto.setMessage("Feedback deleted successfully");
 
     return responseDto;
   }

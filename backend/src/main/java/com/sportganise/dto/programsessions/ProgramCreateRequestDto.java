@@ -1,5 +1,6 @@
 package com.sportganise.dto.programsessions;
 
+import com.sportganise.entities.programsessions.ProgramType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProgramCreateRequestDto {
   private String title;
-  private String type;
+  private ProgramType type;
   private String startDate;
   private String endDate;
   private Boolean recurring;

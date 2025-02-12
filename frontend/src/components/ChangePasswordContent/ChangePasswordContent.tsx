@@ -21,6 +21,7 @@ import { ChangePasswordFormValues } from "@/types/auth";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
 import { KeyRound } from "lucide-react";
+import { Separator } from "../ui/separator";
 
 const ChangePasswordContent: React.FC = () => {
   const navigate = useNavigate();
@@ -81,8 +82,24 @@ const ChangePasswordContent: React.FC = () => {
     if (password) calculatePasswordStrength(password);
   }, [password]);
 
-  const handleChecklistChange = (isValid: boolean) => {
-    setIsChecklistValid(isValid);
+  const validatePassword = (
+    password: string,
+    passwordAgain: string,
+  ): boolean => {
+    const hasMinLength = password.length >= 8;
+    const passwordsMatch = password === passwordAgain;
+
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*]/.test(password);
+    const hasNumber = /\d/.test(password);
+
+    return (
+      hasMinLength &&
+      passwordsMatch &&
+      [hasUpperCase, hasLowerCase, hasSpecialChar, hasNumber].filter(Boolean)
+        .length >= 3
+    );
   };
 
   const onSubmit: SubmitHandler<ChangePasswordFormValues> = async (data) => {
@@ -209,24 +226,48 @@ const ChangePasswordContent: React.FC = () => {
                 </div>
               )}
 
-              {/* Password Checklist */}
               <div className="m-4 mb-2">
-                <PasswordChecklist
-                  validColor="#82DBD8"
-                  invalidColor="#383C42"
-                  rules={[
-                    "minLength",
-                    "capital",
-                    "lowercase",
-                    "number",
-                    "specialChar",
-                    "match",
-                  ]}
-                  minLength={8}
-                  value={password}
-                  valueAgain={passwordAgain}
-                  onChange={handleChecklistChange}
-                />
+                {/* Mandatory checks for length and password match*/}
+                <div className="mandatory-rules mb-4">
+                  <PasswordChecklist
+                    className="text-xs"
+                    validColor="#82DBD8"
+                    invalidColor="#383C42"
+                    rules={["minLength", "match"]}
+                    minLength={8}
+                    value={password}
+                    valueAgain={passwordAgain}
+                    onChange={() => {
+                      setIsChecklistValid(
+                        validatePassword(password, passwordAgain),
+                      );
+                    }}
+                  />
+                </div>
+
+                <Separator></Separator>
+
+                {/* 3/4 types of characters checks */}
+                <div className="optional-rules flex flex-col gap-1 mt-2">
+                  <p className="font-semibold ">
+                    Check at least 3 from the folowing:
+                  </p>
+
+                  <PasswordChecklist
+                    className="text-xs"
+                    validColor="#82DBD8"
+                    invalidColor="#383C42"
+                    rules={["capital", "lowercase", "number", "specialChar"]} // Only optional rules
+                    minLength={8}
+                    value={password}
+                    valueAgain={passwordAgain}
+                    onChange={() => {
+                      setIsChecklistValid(
+                        validatePassword(password, passwordAgain),
+                      );
+                    }}
+                  />
+                </div>
               </div>
 
               {/* Submit Button */}
