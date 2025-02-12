@@ -205,7 +205,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         <div className="fixed inset-0 flex items-center justify-center">
           <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
             <Smile className="w-12 h-12" />
-            <p>Your presence is noted. Can't wait to see you!!!</p>
+            <p>Your presence is noted. Can&#39;t wait to see you!!!</p>
           </div>
         </div>
       )}
