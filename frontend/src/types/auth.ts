@@ -82,8 +82,19 @@ export interface ModifyPasswordResponse {
   message: string;
 }
 
+export interface ResetPasswordRequest {
+  email: string;
+  newPassword: string;
+}
+
 export interface ResetPasswordResponse {
   statusCode: number;
   message: string;
   data: string;
+}
+
+export interface ResetPasswordFormValues {
+  email: string;
+  password: string;
+  passwordAgain: string;
 }

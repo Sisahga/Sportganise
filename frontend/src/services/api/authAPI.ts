@@ -12,12 +12,12 @@ import {
   VerifyCodeRequest,
   VerifyCodeResponse,
   ResetPasswordResponse,
+  ResetPasswordRequest,
 } from "@/types/auth";
 import { isCookiesDto, setCookies } from "@/services/cookiesService";
 import { setAuthToken } from "@/services/apiHelper.ts";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
     method: "POST",
@@ -28,8 +28,12 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
   });
 
   if (!response.ok) {
-    const errorResponse = await response.text(); // Read error response
-    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+    // Try parsing the error response as JSON
+    const errorResponse = await response.json().catch(() => null);
+
+    const errorMessage =
+      errorResponse?.message || `HTTP error! status: ${response.status}`;
+    throw new Error(errorMessage);
   }
 
   const loginResponse: LoginResponse = await response.json();
@@ -41,7 +45,7 @@ export const login = async (data: LoginRequest): Promise<LoginResponse> => {
     log.warn("No cookies data found in login response");
   }
 
-  return loginResponse; // Parse response as JSON
+  return loginResponse;
 };
 
 export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
@@ -116,19 +120,21 @@ export const verifyCode = async (
 };
 
 export const resetPassword = async (
-  email: string,
+  data: ResetPasswordRequest,
 ): Promise<ResetPasswordResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(data),
   });
 
   if (!response.ok) {
-    const errorResponse = await response.text();
-    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+    const errorResponse = await response.json();
+    throw new Error(
+      errorResponse.message || `HTTP error! status: ${response.status}`,
+    );
   }
 
   return await response.json();

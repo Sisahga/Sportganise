@@ -25,6 +25,7 @@ import ModifyPermissionPage from "./pages/ModifyPermissionPage.tsx";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute.tsx";
 import { PublicRoute } from "./components/PublicRoute/index.tsx";
 import NotificationSettingsPage from "./pages/NotificationSettingsPage.tsx";
+import ChangeForgottenPasswordPage from "./pages/ChangeForgottenPasswordPage.tsx";
 
 function App() {
   return (
@@ -41,6 +42,10 @@ function App() {
             <Route
               path="/forgotpassword"
               element={<ForgotPasswordPage />}
+            ></Route>
+            <Route
+              path="/pages/ChangeForgottenPasswordPage"
+              element={<ChangeForgottenPasswordPage />}
             ></Route>
           </Route>
         </Route>

@@ -9,6 +9,7 @@ const hideHeaderPaths = [
   "/signup",
   "/forgotpassword",
   "/verificationcode",
+  "/pages/ChangeForgottenPasswordPage",
 ]; // Header hidden on all these pages
 
 const medTopMarginPaths = [
@@ -17,7 +18,13 @@ const medTopMarginPaths = [
   "/pages/CreateDmChannelPage",
 ];
 
-const noTopMarginPaths = ["/login", "/signup"];
+const noTopMarginPaths = [
+  "/login",
+  "/signup",
+  "/forgotpassword",
+  "/verificationcode",
+  "/pages/ChangeForgottenPasswordPage",
+];
 
 // Paths where the footer should be hidden
 const hideFooterPaths = [
@@ -26,6 +33,7 @@ const hideFooterPaths = [
   "/signup",
   "/forgotpassword",
   "/verificationcode",
+  "/pages/ChangeForgottenPasswordPage",
 ]; // Footer hidden on /chat, login and signup pages
 
 // Define paths where you don't want horizontal margins (like full-width pages)
@@ -35,6 +43,8 @@ const fullWidthPaths = [
   "/pages/CreateDmChannelPage",
   "/login",
   "/signup",
+  "/forgotpassword",
+  "/verificationcode",
 ]; // Full-width layout on these paths
 
 // Function to check if the current path matches any hide paths
