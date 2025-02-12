@@ -21,6 +21,19 @@ const accountApi = {
     const data: AccountDetailsDirectMessaging[] = await response.json();
     return data;
   },
+  getAllAccountsWithRoles: async () => {
+    const response = await fetch(`${baseMappingUrl}/permissions`, {
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    return await response.json();
+  },
 
   //Function to get account by id
   getAccountById: async (accountId: number): Promise<Account> => {
