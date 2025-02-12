@@ -1,26 +1,46 @@
 import { useState } from "react";
-import { resetPassword as resetPasswordService } from "@/services/api/authAPI";
+import { resetPassword } from "@/services/api/authAPI";
+import { ResetPasswordRequest } from "@/types/auth";
+import log from "loglevel";
 
-export const useResetPassword = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+const useResetPassword = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
-  const resetPassword = async (email: string) => {
+  const resetPasswordHandler = async (data: ResetPasswordRequest) => {
+    log.debug("Starting password reset with data:", data);
     setIsLoading(true);
-    setError(null);
+    setError(false);
+    setSuccess(false);
+    setMessage(null);
 
     try {
-      const response = await resetPasswordService(email);
-      return response;
+      const result = await resetPassword(data);
+      setSuccess(true);
+      setMessage(result.message);
+      log.info("Password reset successful:", result.message);
     } catch (err) {
-      const errorMessage =
-        (err as Error).message || "An unexpected error occurred.";
-
-      setError(errorMessage);
+      log.error("Error during password reset:", err);
+      setError(true);
+      if (err instanceof Error) {
+        setMessage(err.message);
+      } else {
+        setMessage("Failed to reset password. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { resetPassword, isLoading, error };
+  return {
+    isLoading,
+    message,
+    success,
+    error,
+    resetPassword: resetPasswordHandler,
+  };
 };
+
+export default useResetPassword;
