@@ -1,8 +1,13 @@
 package com.sportganise.services.forum;
 
+import com.sportganise.dto.forum.FeedbackDto;
 import com.sportganise.dto.forum.PostDto;
+import com.sportganise.dto.forum.ViewPostDto;
+import com.sportganise.entities.forum.Likes;
+import com.sportganise.entities.forum.LikesCompositeKey;
 import com.sportganise.entities.forum.Post;
 import com.sportganise.entities.forum.PostType;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.forum.LikesRepository;
 import com.sportganise.repositories.forum.PostAttachmentRepository;
@@ -135,6 +140,59 @@ public class PostService {
   public List<String> getAvailableTypes() {
     log.info("Fetching available post types");
     return postRepository.findDistinctTypes();
+  }
+
+  /**
+   * Fetches a post by its id.
+   *
+   * @param postId Post id.
+   * @return PostDto.
+   */
+  public ViewPostDto getPostByIdWithFeedBacks(Integer postId) {
+    List<FeedbackDto> feedbacks = feedbackService.getFeedbacksByPostId(postId);
+    Long likeCount = countLikesByPostId(postId);
+    Post post = getPostById(postId);
+    return new ViewPostDto(
+        post.getPostId(),
+        post.getTitle(),
+        post.getDescription(),
+        post.getType(),
+        post.getOccurrenceDate(),
+        post.getCreationDate(),
+        likeCount,
+        feedbacks.size(),
+        feedbacks);
+  }
+
+  /**
+   * Likes a post.
+   *
+   * @param postId Post id.
+   * @param accountId Account id.
+   */
+  public void likePost(Integer postId, Integer accountId) {
+    Likes like = new Likes();
+    LikesCompositeKey likesCompositeKey = new LikesCompositeKey();
+    likesCompositeKey.setAccountId(accountId);
+    likesCompositeKey.setPostId(postId);
+    like.setLikeCompositeKey(likesCompositeKey);
+    likesRepository.save(like);
+  }
+
+  public void unlikePost(Integer postId, Integer accountId) {
+    likesRepository.deleteByPostIdAndAccountId(postId, accountId);
+  }
+
+  /**
+   * Fetches a post by its id.
+   *
+   * @param postId Post id.
+   * @return Post entity.
+   */
+  private Post getPostById(Integer postId) {
+    return postRepository
+        .findById(postId)
+        .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
   }
 
   /**

@@ -81,9 +81,13 @@ CREATE TABLE account_settings (
 	PRIMARY KEY(account_id)
 );
 
+CREATE TYPE program_type as ENUM('TRAINING', 'SPECIALTRAINING', 'FUNDRAISER', 'TOURNAMENT');
+
+CREATE CAST (varchar AS program_type) WITH INOUT AS IMPLICIT; 	
+
 CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
-	type VARCHAR(20),
+	type program_type,
 	title VARCHAR(30) NOT NULL,
 	description VARCHAR(100),
 	capacity INTEGER,

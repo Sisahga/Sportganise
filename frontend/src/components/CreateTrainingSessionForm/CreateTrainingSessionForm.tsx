@@ -68,14 +68,14 @@ export default function CreateTrainingSessionForm() {
     if (!accountId) {
       log.debug("No accountId found");
     }
-    log.info(`TrainingSessionList accountId is ${accountId}`);
+    log.info(`CreateTrainingSessionForm accountId is ${accountId}`);
   }, [accountId]);
 
   useEffect(() => {
     if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
       navigate("/");
     }
-    log.debug(`Modify Training Session Form accountId : ${accountId}`);
+    log.debug(`CreateTrainingSessionForm accountId : ${accountId}`);
   }, [accountId, navigate, cookies]);
 
   const types = [
@@ -231,7 +231,12 @@ export default function CreateTrainingSessionForm() {
               <FormItem>
                 <FormLabel className="font-semibold text-base">Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name the event" type="text" {...field} />
+                  <Input
+                    placeholder="Name the event"
+                    type="text"
+                    className="bg-white"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
@@ -667,7 +672,8 @@ export default function CreateTrainingSessionForm() {
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Limit of 5 files.
+                  Select a file to upload. Max file size is 4 MB. Limit of 5
+                  files.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

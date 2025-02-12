@@ -126,7 +126,7 @@ public class ProgramServiceTest {
     Program mockProgram =
         Program.builder()
             .programId(1)
-            .programType("Training")
+            .programType(ProgramType.TRAINING)
             .title("Training Program")
             .description("This is a training program.")
             .capacity(10)
@@ -159,7 +159,7 @@ public class ProgramServiceTest {
     assertNotNull(programDto);
 
     assertEquals(1, programDto.getProgramId());
-    assertEquals("Training", programDto.getProgramType());
+    assertEquals(ProgramType.TRAINING, programDto.getProgramType());
     assertEquals("Training Program", programDto.getTitle());
     assertEquals("This is a training program.", programDto.getDescription());
     assertEquals(10, programDto.getCapacity());
@@ -207,7 +207,7 @@ public class ProgramServiceTest {
     Program program1 =
         Program.builder()
             .programId(1)
-            .programType("Training")
+            .programType(ProgramType.TRAINING)
             .title("First Program")
             .description("First Description")
             .capacity(10)
@@ -227,7 +227,7 @@ public class ProgramServiceTest {
     Program program2 =
         Program.builder()
             .programId(2)
-            .programType("Event")
+            .programType(ProgramType.FUNDRAISER)
             .title("Second Program")
             .description("Second Description")
             .capacity(20)
@@ -264,13 +264,13 @@ public class ProgramServiceTest {
 
     ProgramDto firstProgram = result.getFirst();
     assertEquals(1, firstProgram.getProgramId());
-    assertEquals("Training", firstProgram.getProgramType());
+    assertEquals(ProgramType.TRAINING, firstProgram.getProgramType());
     assertEquals("First Program", firstProgram.getTitle());
     assertTrue(firstProgram.getProgramAttachments().isEmpty());
 
     ProgramDto secondProgram = result.get(1);
     assertEquals(2, secondProgram.getProgramId());
-    assertEquals("Event", secondProgram.getProgramType());
+    assertEquals(ProgramType.FUNDRAISER, secondProgram.getProgramType());
     assertEquals("Second Program", secondProgram.getTitle());
     assertTrue(secondProgram.getProgramAttachments().isEmpty());
 
@@ -291,7 +291,7 @@ public class ProgramServiceTest {
                 programService.modifyProgram(
                     programDtoToModify,
                     "Updated Title",
-                    "Updated Type",
+                    ProgramType.TOURNAMENT,
                     "2024-01-30T10:00:00Z",
                     "2024-01-30T10:00:00Z",
                     false,
