@@ -1,4 +1,4 @@
-import { ChangeForgottenPasswordContent } from "@/components/ChangeForgottenPasswordContent";
+import { ChangeForgottenPasswordContent } from "@/components/ResetPasswordContent";
 
 export default function ChangeForgottenPasswordPage() {
   return (

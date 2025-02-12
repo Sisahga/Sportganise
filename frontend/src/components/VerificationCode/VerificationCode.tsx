@@ -187,9 +187,7 @@ export default function VerificationCode() {
         log.info("Full state:", state);
         // Check the flow property passed in the location state
         if (state?.flow === "forgot") {
-          log.info(
-            "Verification successful, navigating to ChangeForgottenPasswordPage",
-          );
+          log.info("Verification successful, navigating to ResetPasswordPage");
           log.info("Flow is 'forgot', should redirect to change password");
           toast({
             variant: "success",
@@ -198,11 +196,11 @@ export default function VerificationCode() {
           });
           setTimeout(() => {
             log.info(
-              "Navigating to ChangeForgottenPasswordPage with email:",
+              "Navigating to ResetPasswordPage with email:",
               state.email,
             );
             clearCookies();
-            navigate("/pages/ChangeForgottenPasswordPage", {
+            navigate("/pages/ResetPasswordPage", {
               replace: true,
               state: { email: state.email, fromVerification: true },
             });

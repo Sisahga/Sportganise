@@ -140,7 +140,7 @@ const ChangeForgottenPasswordContent: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex justify-center text-2xl font-bold items-center justify-center gap-2">
             <KeyRound className="h-6 w-6" />
-            Change Password
+            Reset Password
           </CardTitle>
         </CardHeader>
         <CardContent>
