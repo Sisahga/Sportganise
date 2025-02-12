@@ -35,6 +35,7 @@ public class Feedback {
   @Column(name = "content", nullable = false)
   private String content;
 
-  @Column(name = "creation_date", nullable = false)
-  private ZonedDateTime creationDate;
+  @Column(name = "creation_date", nullable = false, updatable = false)
+  @Builder.Default
+  private ZonedDateTime creationDate = ZonedDateTime.now();
 }

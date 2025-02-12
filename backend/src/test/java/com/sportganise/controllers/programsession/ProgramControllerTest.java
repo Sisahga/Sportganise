@@ -9,6 +9,7 @@ import com.sportganise.controllers.programsessions.ProgramController;
 import com.sportganise.dto.programsessions.*;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 import java.nio.charset.StandardCharsets;
@@ -58,7 +59,7 @@ public class ProgramControllerTest {
         new ProgramAttachmentDto(111, "https://example.com/program-guide.pdf");
 
     mockProgramDto.setProgramId(111);
-    mockProgramDto.setProgramType("Training");
+    mockProgramDto.setProgramType(ProgramType.TRAINING);
     mockProgramDto.setTitle("Training Program");
     mockProgramDto.setDescription("This is a training program.");
     mockProgramDto.setCapacity(10);
@@ -81,7 +82,7 @@ public class ProgramControllerTest {
     jsonPayload =
         "{"
             + "\"title\": \"Title\","
-            + "\"type\": \"Type\","
+            + "\"type\": \"TRAINING\","
             + "\"startDate\": \"2024-01-30T10:00:00Z\","
             + "\"endDate\": \"2024-02-01T10:00:00Z\","
             + "\"recurring\": false,"
@@ -188,7 +189,7 @@ public class ProgramControllerTest {
 
     ProgramModifyRequestDto mockProgramModifyRequestDto = new ProgramModifyRequestDto();
     mockProgramModifyRequestDto.setTitle("Updated Training Program");
-    mockProgramModifyRequestDto.setType("Training");
+    mockProgramModifyRequestDto.setType(ProgramType.TRAINING);
     mockProgramModifyRequestDto.setStartDate("2024-02-01");
     mockProgramModifyRequestDto.setEndDate("2024-02-10");
     mockProgramModifyRequestDto.setRecurring(false);
@@ -218,7 +219,7 @@ public class ProgramControllerTest {
     Mockito.when(
             programService.createProgramDto(
                 Mockito.anyString(),
-                Mockito.anyString(),
+                Mockito.any(ProgramType.class),
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyBoolean(),
@@ -287,7 +288,7 @@ public class ProgramControllerTest {
 
     ProgramModifyRequestDto mockProgramModifyRequestDto = new ProgramModifyRequestDto();
     mockProgramModifyRequestDto.setTitle("Title");
-    mockProgramModifyRequestDto.setType("Type");
+    mockProgramModifyRequestDto.setType(ProgramType.SPECIALTRAINING);
     mockProgramModifyRequestDto.setStartDate("2024-01-30T10:00:00Z");
     mockProgramModifyRequestDto.setEndDate("2024-02-01T10:00:00Z");
     mockProgramModifyRequestDto.setRecurring(false);

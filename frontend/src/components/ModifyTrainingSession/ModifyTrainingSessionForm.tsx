@@ -50,6 +50,7 @@ import useModifyTrainingSession from "@/hooks/useModifyProgram";
 import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
+import { getFileName } from "@/utils/getFileName";
 
 /**All select element options */
 const types = [
@@ -143,10 +144,6 @@ export default function ModifyTrainingSessionForm() {
       "application/pdf": [".pdf"],
     },
   };
-
-  function fileName(file: File): string {
-    return file.name.split("_").pop() ?? "fileName"; //pop aws bucket
-  }
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -330,7 +327,12 @@ export default function ModifyTrainingSessionForm() {
               <FormItem>
                 <FormLabel className="font-semibold text-base">Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name the event" type="text" {...field} />
+                  <Input
+                    placeholder="Name the event"
+                    type="text"
+                    className="bg-white"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
@@ -759,14 +761,15 @@ export default function ModifyTrainingSessionForm() {
                         field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{fileName(file)}</span>
+                            <span>{getFileName(file.name)}</span>
                           </FileUploaderItem>
                         ))}
                     </FileUploaderContent>
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Limit of 5 files.
+                  Select a file to upload. Max file size is 4 MB. Limit of 5
+                  files.
                 </FormDescription>
                 <FormMessage />
               </FormItem>

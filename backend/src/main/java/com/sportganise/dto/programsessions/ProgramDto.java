@@ -1,6 +1,7 @@
 package com.sportganise.dto.programsessions;
 
 import com.sportganise.entities.programsessions.Program;
+import com.sportganise.entities.programsessions.ProgramType;
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProgramDto {
   private Integer programId;
-  private String programType;
+  private ProgramType programType;
   private String title;
   private String description;
   private Integer capacity;
