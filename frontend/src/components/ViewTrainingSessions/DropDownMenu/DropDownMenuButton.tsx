@@ -60,7 +60,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isRSVPDialogOpen, setRSVPDialogOpen] = useState(false);
-  const [isRSVPConfirmationVisible, setRSVPConfirmationVisible] = useState(false);
+  const [isRSVPConfirmationVisible, setRSVPConfirmationVisible] =
+    useState(false);
   const [isAbsentDialogOpen, setAbsentDialogOpen] = useState(false);
 
   // Handle waitlisted joining
@@ -144,13 +145,13 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <UserRound />
                 <span>Contact Member</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleAbsentClick}>
-                <LogOut color="red" />
-                <span className="text-red">Mark as absent</span>
-              </DropdownMenuItem>
               <DropdownMenuItem onSelect={handleRSVPClick}>
                 <LogIn color="green" />
                 <span className="text-green-500">RSVP</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleAbsentClick}>
+                <LogOut color="red" />
+                <span className="text-red">Mark as absent</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           )}
