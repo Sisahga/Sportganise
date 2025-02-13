@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/pagination";
 import "react-day-picker/dist/style.css";
 import BackButton from "../ui/back-button";
-import usePosts from "@/hooks/usePosts";
+import useForumPosts from "@/hooks/useForumPosts";
 
 
 const ForumContent: React.FC = () => {
@@ -54,7 +54,7 @@ const ForumContent: React.FC = () => {
   const [selectedLabel] = useState<string>("");
 
 
-  const { posts, loading, error, fetchPostsData, resetFilters } = usePosts();
+  const { posts, loading, error, fetchPostsData, resetFilters } = useForumPosts();
 
 
   const fetchData = () => {
