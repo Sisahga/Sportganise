@@ -2,7 +2,7 @@ import { useState} from "react";
 import { fetchPosts } from "@/services/api/forumApi";
 import { PostDto } from "@/types/forum";
 
-const usePosts = () => {
+const useForumPosts = () => {
   const [posts, setPosts] = useState<PostDto[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -79,4 +79,4 @@ const usePosts = () => {
   };
 };
 
-export default usePosts;
+export default useForumPosts;

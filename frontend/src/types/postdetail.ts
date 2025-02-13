@@ -26,8 +26,8 @@ export interface Post {
     feedbackList: Feedback[]; 
   }
   
-export interface ApiResponse {
+  export interface ApiResponse<T> {
     statusCode: number;
     message: string;
-    data: Post;
-  }
+    data: T;
+}
