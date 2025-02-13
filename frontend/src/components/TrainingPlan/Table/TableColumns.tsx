@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-// React
-import { useEffect } from "react";
 // Table Columns
 import { ColumnDef } from "@tanstack/react-table";
 // Helper Component
@@ -18,18 +16,6 @@ import { getFileName } from "@/utils/getFileName";
 import { TrainingPlan } from "@/types/trainingplans";
 // Services
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
-// Logs
-import log from "loglevel";
-
-function getAccountId() {
-  // Get AccountId From Cookie
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
-  useEffect(() => {
-    log.info("TableColumns -> accountId from cookie is ", accountId);
-  });
-  return accountId;
-}
 
 // Table Column Definitions
 // ... follows type TrainingPlan
@@ -103,11 +89,12 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       // Menu Options: share, delete
       const planId = row.original.planId; // Access planId from outside its scope
       const userId = row.original.userId;
-      const accountid = getAccountId();
+      const cookies = getCookies();
+      const accountId = cookies ? getAccountIdCookie(cookies) : null;
       // Display The Drop Down Menu only for the files that belong to the current logged in user
       // A user cannot share or delete files that do no belong to them
       return (
-        accountid === userId && (
+        accountId === userId && (
           <div>
             <DropDownMenu planId={planId} userId={userId} />
           </div>
