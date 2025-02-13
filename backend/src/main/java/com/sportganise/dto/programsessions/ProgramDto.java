@@ -19,6 +19,7 @@ public class ProgramDto {
   private ProgramType programType;
   private String title;
   private String description;
+  private String author;
   private Integer capacity;
   private ZonedDateTime occurrenceDate;
   private Integer durationMins;
