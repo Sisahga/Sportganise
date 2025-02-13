@@ -6,7 +6,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sportganise.dto.forum.FeedbackDto;
 import com.sportganise.dto.forum.PostDto;
+import com.sportganise.dto.forum.ViewPostDto;
+import com.sportganise.entities.forum.Likes;
 import com.sportganise.entities.forum.Post;
 import com.sportganise.entities.forum.PostType;
 import com.sportganise.repositories.AccountRepository;
@@ -152,6 +155,55 @@ public class PostServiceTest {
     postService.searchAndFilterPosts(null, null, null, null, 10, 0, "creationDate", "desc", 1L, 1L);
 
     verify(accountRepository, times(1)).getLabelIdsByAccountIdAndOrgId(1L, 1L);
+  }
+
+  @Test
+  public void getPostByIdWithFeedBacks_ShouldReturn_CorrectPostDto() {
+    Integer postId = 1;
+    Post post =
+        Post.builder()
+            .postId(postId)
+            .title("Test Post")
+            .description("This is a test post.")
+            .type(PostType.TOURNAMENT)
+            .occurrenceDate(ZonedDateTime.now())
+            .creationDate(ZonedDateTime.now())
+            .build();
+
+    List<FeedbackDto> feedbacks = Arrays.asList(new FeedbackDto(), new FeedbackDto());
+    Long likeCount = 5L;
+
+    when(postRepository.findById(postId)).thenReturn(java.util.Optional.of(post));
+    when(feedbackService.getFeedbacksByPostId(postId)).thenReturn(feedbacks);
+    when(likesRepository.countByPostId(postId)).thenReturn(likeCount);
+
+    ViewPostDto result = postService.getPostByIdWithFeedBacks(postId);
+
+    assertEquals(postId, result.getPostId());
+    assertEquals("Test Post", result.getTitle());
+    assertEquals("This is a test post.", result.getDescription());
+    assertEquals(likeCount, result.getLikeCount());
+    assertEquals(2, result.getFeedbackList().size());
+  }
+
+  @Test
+  public void likePost_ShouldSaveLikeInRepository() {
+    Integer postId = 1;
+    Integer accountId = 2;
+
+    postService.likePost(postId, accountId);
+
+    verify(likesRepository, times(1)).save(any(Likes.class));
+  }
+
+  @Test
+  public void unlikePost_ShouldDeleteLikeFromRepository() {
+    Integer postId = 1;
+    Integer accountId = 2;
+
+    postService.unlikePost(postId, accountId);
+
+    verify(likesRepository, times(1)).deleteByPostIdAndAccountId(postId, accountId);
   }
 
   @Test

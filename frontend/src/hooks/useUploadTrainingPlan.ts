@@ -1,29 +1,45 @@
 import { useState } from "react";
 import ResponseDto from "@/types/response";
-import { UploadTrainingPlansDto } from "@/types/trainingplans"; //trainingPlans: string[]
+import { UploadTrainingPlansDto } from "@/types/trainingplans"; // trainingPlans?: string[];
 import trainingPlanApi from "@/services/api/trainingPlanApi";
 import log from "loglevel";
 
 function useUploadTrainingPlan() {
+  // States
   const [uploadingTrainingPlanResponse, setUploadingTrainingPlanResponse] =
-    useState<ResponseDto<UploadTrainingPlansDto> | null>(null);
+    useState<ResponseDto<UploadTrainingPlansDto> | null>();
+
+  // Upload Training Plans
   const uploadTrainingPlans = async (
-    accountId: number,
-    trainingPlans: File[],
+    accountId: number | null | undefined,
+    trainingPlans: FormData,
   ) => {
     try {
-      const data = await trainingPlanApi.uploadTrainingPlans(
+      // API Call
+      const response = await trainingPlanApi.uploadTrainingPlans(
         accountId,
         trainingPlans,
       );
-      setUploadingTrainingPlanResponse(data);
-      return data;
+
+      // Set State
+      setUploadingTrainingPlanResponse(response);
+      log.info(
+        "useUploadTrainingPlan.uploadTrainingPlans -> response",
+        response,
+      );
+
+      return response;
     } catch (err) {
-      console.error("Error uploading training plan(s)", err);
-      log.error("Error uploading training plan(s)", err);
+      // Handle Error
+      log.error(
+        "useUploadTrainingPlan.uploadTrainingPlans -> Error thrown!",
+        err,
+      );
+
       return null;
     }
   };
+  // Return function and Dto
   return {
     uploadTrainingPlans,
     uploadingTrainingPlanResponse,

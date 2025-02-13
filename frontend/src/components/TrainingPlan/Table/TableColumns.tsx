@@ -1,0 +1,98 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+// Table Columns
+import { ColumnDef } from "@tanstack/react-table";
+// Helper Component
+import { ViewAuthor } from "./ViewAuthor";
+import { DropDownMenu } from "./DropDownMenu";
+// UI Component
+import { Button } from "@/components/ui/Button";
+// Icons
+import { File, User, Calendar } from "lucide-react";
+// Helper Util Functions
+import { getDate } from "@/utils/getDate";
+import { getFileName } from "@/utils/getFileName";
+// Types
+import { TrainingPlan } from "@/types/trainingplans";
+// Logging
+
+// Table Column Definitions
+// ... follows type TrainingPlan
+export const columns: ColumnDef<TrainingPlan>[] = [
+  {
+    accessorKey: "docUrl",
+    header: () => {
+      return (
+        <div className="flex items-center">
+          Attachment
+          <File size={15} className="mx-2" />
+        </div>
+      );
+    },
+    cell: ({ row }: any) => (
+      // Downloadable File
+      <a
+        className="lowercase underline text-gray-600 hover:text-cyan-300"
+        href={row.getValue("docUrl")}
+        target="_blank"
+        rel="noopener noreferrer"
+        download
+      >
+        {getFileName(row.getValue("docUrl"))}
+      </a>
+    ),
+  },
+  {
+    accessorKey: "userId",
+    header: ({ column }: any) => {
+      return (
+        // Sort Button
+        <Button
+          className="flex items-center bg-transparent"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Author
+          <User size={15} className="mx-2" />
+        </Button>
+      );
+    },
+    cell: ({ row }: any) => (
+      // Fetch Person Info of User
+      <ViewAuthor userId={row.getValue("userId")} />
+    ),
+  },
+  {
+    accessorKey: "creationDate",
+    header: ({ column }: any) => {
+      return (
+        // Sort Button
+        <Button
+          className="flex items-center bg-transparent"
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          <Calendar size={15} className="mx-2" />
+        </Button>
+      );
+    },
+    cell: ({ row }: any) => (
+      // Format Date
+      <div className="capitalize">{getDate(row.getValue("creationDate"))}</div>
+    ),
+  },
+  {
+    id: "menu",
+    cell: ({ row }: any) => {
+      // Menu Options: share, delete
+      const planId = row.original.planId; // Access planId from outside its scope
+      const userId = row.original.userId;
+      return (
+        <div>
+          <DropDownMenu planId={planId} userId={userId} />
+        </div>
+      );
+    },
+  },
+];
