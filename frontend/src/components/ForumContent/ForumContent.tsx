@@ -31,6 +31,16 @@ import {
 } from "@/components/ui/pagination";
 import "react-day-picker/dist/style.css";
 import BackButton from "../ui/back-button";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+
 import useForumPosts from "@/hooks/useForumPosts";
 
 
@@ -40,8 +50,7 @@ const ForumContent: React.FC = () => {
 
   const [likedposts, setLikedposts] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setPostsPerPage] = useState(10);
-  
+  const [postsPerPage, setpostsPerPage] = useState(10);
   //State for Filters
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [occurrenceDate, setOccurrenceDate] = useState<string | undefined>(undefined);
@@ -65,7 +74,7 @@ const ForumContent: React.FC = () => {
     );
   };
 
-   useEffect(() => {
+  useEffect(() => {
     if (inputRef.current && searchTerm != "") {
       inputRef.current.focus();
     }
@@ -101,16 +110,26 @@ const ForumContent: React.FC = () => {
     navigate(`/pages/PostDetailPage`, { state: { postId }});
   };
 
-
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  if (error) {
-    return <div>{error}</div>;
-  }
+  const handleApplyFilters = () => {
+    fetchData();
+  };
 
+  // Utility function to format the occurrence date
+  const formatOccurrenceDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const hours = date.getHours() % 12 || 12; 
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const amPm = date.getHours() >= 12 ? 'PM' : 'AM';
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${hours}:${minutes} ${amPm}`;
+  };
 
+  const handleClearFilters = () => {
+    resetFilters(searchTerm, setOccurrenceDate, setType, setSortBy, setSortOption, setSortDir, setCurrentPage, setpostsPerPage);
+  };
 
   return (
     <div className="min-h-screen pb-20">
@@ -122,59 +141,110 @@ const ForumContent: React.FC = () => {
 
       <div className="mt-4 mb-2 flex items-center lg:mx-24">
         {/* Menu Bar with Filters */}
-        <div className="mr-2">
-          <Popover>
-            <PopoverTrigger asChild>
+        <div className="mr-1">
+          <Drawer direction="left">
+            <DrawerTrigger asChild>
               <Button
                 variant="outline"
                 className="w-auto justify-start text-left font-normal flex items-center"
               >
                 <Filter className="w-4 h-4" />
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <div className="space-y-2 p-2">
-                {/* Date Picker */}
+            </DrawerTrigger>
+            <DrawerContent className="md:w-1/4 lg:w-1/4 pt-10">
+              <DrawerHeader className="flex flex-col items-center text-center">
+                <DrawerTitle>Filter Options</DrawerTitle>
+                <DrawerDescription>Customize your filter options</DrawerDescription>
+              </DrawerHeader>
+
+              <div className="flex flex-col items-center w-full sm:w-3/4 space-y-4 p-2 mt-3 mx-auto">
                 <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline">
+                  <PopoverTrigger className="text-xs" asChild>
+                    <Button variant="outline" className="w-full">
                       <CalendarIcon className="w-4 h-4" />
-                      Select Date
+                      {occurrenceDate ? new Date(occurrenceDate).toLocaleDateString() : "Select Date"}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="p-2 border rounded-sm shadow-md ">
                     <Calendar
-                      mode="range"
+                      mode="single"
                       numberOfMonths={1}
+                      selected={occurrenceDate ? new Date(occurrenceDate) : undefined}
+                      onSelect={(date) => setOccurrenceDate(date ? date.toISOString() : undefined)}
                       className="border rounded-sm"
                     />
-                    <Button variant="outline" className="w-full">
-                      Clear
-                    </Button>
                   </PopoverContent>
                 </Popover>
 
-                {/* Sort Options */}
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sort by" />
+                <Select
+                  onValueChange={(value) => {
+                    setSortOption(value); 
+                    if (value === 'latest') {
+                      setSortDir('desc');
+                      setSortBy(""); 
+                    } else if (value === 'oldest') {
+                      setSortDir('asc');
+                      setSortBy("");  
+                    } else if (value === 'likeCount') {
+                      setSortBy('likeCount');
+                      setSortDir("");
+                    }
+                  }}
+                  value={sortOption} 
+                >
+                  <SelectTrigger className="text-xs">
+                    <SelectValue placeholder={sortOption || 'Sort by'} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="latest">Sort by Latest</SelectItem>
-                    <SelectItem value="oldest">Sort by Oldest</SelectItem>
-                    <SelectItem value="most-likes">
-                      Sort by Most Likes
-                    </SelectItem>
+                    <SelectItem value="latest">Latest</SelectItem>
+                    <SelectItem value="oldest">Oldest</SelectItem>
+                    <SelectItem value="likeCount">Most Likes</SelectItem>
                   </SelectContent>
                 </Select>
+
+                <Select onValueChange={(value) => setType(value)} value={type}>
+                  <SelectTrigger className="text-xs">
+                    <SelectValue placeholder="Type of event" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value=" ">All</SelectItem>
+                    <SelectItem value="TRAINING">Training</SelectItem>
+                    <SelectItem value="FUNDRAISER">Fundraiser</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {/* posts per page */}
+                <div className="flex flex-col w-full items-center ">
+                  <span className="mt-2 text-xs w-full ">Show per page</span>
+                  <Select onValueChange={(value) => setpostsPerPage(Number(value))} value={postsPerPage.toString()}>
+                    <SelectTrigger className="text-xs ">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="5">
+                        <span>5</span> <span className="text-fadedPrimaryColour">(default)</span>
+                      </SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="15">15</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </PopoverContent>
-          </Popover>
+
+              <div className="mt-5 flex justify-center items-center gap-2 px-2">
+                <Button onClick={handleClearFilters} variant="default" className="w-auto">
+                  Clear
+                </Button>
+                <Button onClick={handleApplyFilters} variant="outline" className="w-auto text-white bg-secondaryColour">
+                  Apply Filters
+                </Button>
+              </div>
+            </DrawerContent>
+          </Drawer>
         </div>
 
-        {/* Search bar */}
-        {/* <Input placeholder="Search..." className="w-full flex-grow" /> */}
-        <Input
+       {/* Search Bar */}
+       <Input
           ref={inputRef}
           placeholder="Search..."
           className="w-full flex-grow"
@@ -193,8 +263,16 @@ const ForumContent: React.FC = () => {
             className="cursor-pointer"
           >
             <CardHeader>
-              <CardTitle>{post.title}</CardTitle>
-              <div className="mt-4 text-xs">{post.occurrenceDate}</div>
+              <CardTitle>
+                {post.title}
+                <span className="text-xs font-light text-secondaryColour ml-2 px-2 py-1 border border-secondaryColour rounded-full">
+                  {post.type}
+                </span>
+              </CardTitle>
+
+              <div className="mt-2 text-xs">
+                {formatOccurrenceDate(post.occurrenceDate)}
+              </div>
             </CardHeader>
             <CardContent>
               <CardDescription>{post.description}</CardDescription>
@@ -209,9 +287,7 @@ const ForumContent: React.FC = () => {
                 }}
               >
                 <ThumbsUp className="w-4 h-4" />
-                <span>
-                  {post.likeCount + (likedposts.has(post.postId) ? 1 : 0)}
-                </span>
+                <span>{post.likeCount + (likedposts.has(post.postId) ? 1 : 0)}</span>
               </Button>
 
               <Button
@@ -219,7 +295,7 @@ const ForumContent: React.FC = () => {
                 className="flex items-center space-x-1"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigatePostDetail(post.postId);
+                  navigate(`/pages/PostDetailPage`, { state: { postId: post.postId } });
                 }}
               >
                 <MessageSquare className="w-4 h-4" />
@@ -230,7 +306,7 @@ const ForumContent: React.FC = () => {
         ))}
       </div>
 
-      {/* Pagination UI */}
+        {/* Pagination */}
         <div className="mt-4">
         <Pagination>
           <PaginationContent>
