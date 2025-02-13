@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef} from "react";
 import { CalendarIcon, ThumbsUp, MessageSquare, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/calendar";
@@ -52,6 +52,8 @@ const ForumContent: React.FC = () => {
   const [sortDir, setSortDir] = useState("");
   const [sortOption, setSortOption] = useState('latest');
   const [selectedLabel] = useState<string>("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
 
 
   const { posts, loading, error, fetchPostsData, resetFilters } = useForumPosts();
@@ -63,6 +65,12 @@ const ForumContent: React.FC = () => {
     );
   };
 
+   useEffect(() => {
+    if (inputRef.current && searchTerm != "") {
+      inputRef.current.focus();
+    }
+  });
+
   useEffect(() => {
     const timer = setTimeout(() => {
       fetchData();
@@ -72,7 +80,10 @@ const ForumContent: React.FC = () => {
   }, [searchTerm, currentPage]);
 
 
-
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+    setSearchTerm(searchTerm)
+  }
 
   const handleLike = (postId: number) => {
     setLikedposts((prev) => {
@@ -162,7 +173,15 @@ const ForumContent: React.FC = () => {
         </div>
 
         {/* Search bar */}
-        <Input placeholder="Search..." className="w-full flex-grow" />
+        {/* <Input placeholder="Search..." className="w-full flex-grow" /> */}
+        <Input
+          ref={inputRef}
+          placeholder="Search..."
+          className="w-full flex-grow"
+          value={searchTerm}
+          onChange={handleInputChange}
+
+        />
       </div>
 
       {/* posts Cards */}
@@ -212,7 +231,6 @@ const ForumContent: React.FC = () => {
       </div>
 
       {/* Pagination UI */}
-        {/* Pagination */}
         <div className="mt-4">
         <Pagination>
           <PaginationContent>
