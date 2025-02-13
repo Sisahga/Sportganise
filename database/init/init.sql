@@ -89,6 +89,7 @@ CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
 	type program_type,
 	title VARCHAR(30) NOT NULL,
+	author VARCHAR(20) NOT NULL,
 	description VARCHAR(100),
 	capacity INTEGER,
 	occurence_date TIMESTAMPTZ,
