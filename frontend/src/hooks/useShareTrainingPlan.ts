@@ -25,11 +25,11 @@ function useShareTrainingPlan() {
       log.error(
         `useShareTrainingPlan.shareTrainingPlan -> Errow thrown! ${data.message}`,
       );
-      throw new Error(data.message); // Throw Dto message to error toast in ConfirmationDialog
+      throw new Error(data.message); // Throw Dto message to error toast
     }
 
     log.info("useShareTrainingPlan.shareTrainingPlan -> data is", data);
-    return data; // Return sucess
+    return data; // Return success
   };
   return {
     shareTrainingPlan, // Accessable outside top level
