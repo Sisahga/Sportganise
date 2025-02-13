@@ -92,6 +92,7 @@ export default function InviteModal({
                 <tr key={member.id} className="hover:bg-gray-100">
                   <td className="p-2">
                     <Checkbox
+                      aria-label={`Invite ${member.name}`}
                       checked={selectedMembers.includes(member.id)}
                       onCheckedChange={() => toggleMember(member.id)}
                     />
