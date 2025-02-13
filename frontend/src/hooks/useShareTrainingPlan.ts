@@ -14,7 +14,7 @@ function useShareTrainingPlan() {
   // Delete A Selected Training Plan
   const shareTrainingPlan = async (
     accountId: number | null | undefined,
-    planId: number
+    planId: number,
   ) => {
     // Call Api Endpoint
     const data: ResponseDto<ShareTrainingPlanDto> =
@@ -23,7 +23,7 @@ function useShareTrainingPlan() {
     // Handle HTTP StatusCode
     if (data.statusCode !== 200) {
       log.error(
-        `useShareTrainingPlan.shareTrainingPlan -> Errow thrown! ${data.message}`
+        `useShareTrainingPlan.shareTrainingPlan -> Errow thrown! ${data.message}`,
       );
       throw new Error(data.message); // Throw Dto message to error toast in ConfirmationDialog
     }
