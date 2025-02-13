@@ -20,6 +20,8 @@ import { ConfirmationDialog } from "./ConfirmationDialog";
 import { Ellipsis, Share, Trash2 } from "lucide-react";
 // Logs
 import log from "loglevel";
+import useShareTrainingPlan from "@/hooks/useShareTrainingPlan";
+import { useToast } from "@/hooks/use-toast";
 
 // Component Props
 interface DropDownMenuProps {
@@ -32,6 +34,8 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
   planId,
 }: DropDownMenuProps) => {
   log.info("Rendered DropDownMenu");
+  const { shareTrainingPlan } = useShareTrainingPlan();
+  const { toast } = useToast();
 
   // State Management
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
@@ -46,6 +50,30 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
     }
     log.info(`TrainingPlanContent -> accountId is ${accountId}`);
   }, [accountId]);
+
+  // Share a Training Plan
+  async function handleShare(userId: number, planId: number) {
+    try {
+      // Call API
+      const data = await shareTrainingPlan(userId, planId);
+      // Check For Null Response
+      if (!data) {
+        throw new Error("The training plan was not shared.");
+      }
+      // Success
+      toast({
+        title: "Successfully shared file ✔",
+        description: "The training plan was shared with all coaches.",
+        variant: "success",
+      });
+    } catch (err) {
+      toast({
+        title: "Training plan could not be deleted ✖",
+        description: String(err),
+        variant: "destructive",
+      });
+    }
+  }
 
   return (
     <div>
@@ -62,6 +90,7 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
             <DropdownMenuItem
               onClick={() => {
                 log.debug("TableColumns -> Sharing planId", planId);
+                handleShare(userId, planId);
               }}
             >
               <Share />
