@@ -1,4 +1,4 @@
-import React, { useState, useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { CalendarIcon, ThumbsUp, MessageSquare, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/calendar";
@@ -40,6 +40,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { Badge } from "../ui/badge";
 
 import useForumPosts from "@/hooks/useForumPosts";
 
@@ -50,19 +51,16 @@ const ForumContent: React.FC = () => {
 
   const [likedposts, setLikedposts] = useState<Set<number>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage, setpostsPerPage] = useState(10);
-  //State for Filters
+  const [postsPerPage, setPostsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [occurrenceDate, setOccurrenceDate] = useState<string | undefined>(undefined);
   const [type, setType] = useState("");
-  const[limit, setLimit] = useState();
-  const[page, setPage] = useState();
+  const [selectedLabel] = useState<string>("");
   const [sortBy, setSortBy] = useState("");
   const [sortDir, setSortDir] = useState("");
   const [sortOption, setSortOption] = useState('latest');
-  const [selectedLabel] = useState<string>("");
-  const inputRef = useRef<HTMLInputElement>(null);
 
+  const inputRef = useRef<HTMLInputElement>(null);
 
 
   const { posts, loading, error, fetchPostsData, resetFilters } = useForumPosts();
@@ -70,7 +68,7 @@ const ForumContent: React.FC = () => {
 
   const fetchData = () => {
     fetchPostsData(
-      searchTerm, occurrenceDate, type, selectedLabel, limit, page, sortBy, sortDir
+      searchTerm, occurrenceDate, type, selectedLabel, postsPerPage, currentPage, sortBy, sortDir
     );
   };
 
@@ -107,29 +105,51 @@ const ForumContent: React.FC = () => {
   };
 
   const navigatePostDetail = (postId: number) => {
-    navigate(`/pages/PostDetailPage`, { state: { postId }});
+    navigate(`/pages/PostDetailPage`, { state: { postId } });
   };
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
+  if (error) {
+    return <div>{error}</div>;
+  }
+
   const handleApplyFilters = () => {
     fetchData();
   };
 
+  const handleClearFilters = () => {
+    resetFilters(searchTerm, setOccurrenceDate, setType, setSortBy, setSortOption, setSortDir, setCurrentPage, setPostsPerPage);
+  };
+
+
   // Utility function to format the occurrence date
   const formatOccurrenceDate = (dateString: string): string => {
     const date = new Date(dateString);
-    const hours = date.getHours() % 12 || 12; 
+    const hours = date.getHours() % 12 || 12;
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const amPm = date.getHours() >= 12 ? 'PM' : 'AM';
     return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${hours}:${minutes} ${amPm}`;
   };
 
-  const handleClearFilters = () => {
-    resetFilters(searchTerm, setOccurrenceDate, setType, setSortBy, setSortOption, setSortDir, setCurrentPage, setpostsPerPage);
+  const getBadgeVariant = (programType: string) => {
+    switch (programType.toLowerCase()) {
+      case "training":
+        return { variant: "default" } as const;
+      case "fundraiser":
+        return { variant: "secondary" } as const;
+      case "tournament":
+        return { className: "bg-teal-300" };
+      case "special":
+        return { className: "bg-lime-300" };
+      default:
+        return { variant: "outline" } as const;
+    }
   };
+
+
 
   return (
     <div className="min-h-screen pb-20">
@@ -178,19 +198,19 @@ const ForumContent: React.FC = () => {
 
                 <Select
                   onValueChange={(value) => {
-                    setSortOption(value); 
+                    setSortOption(value);
                     if (value === 'latest') {
                       setSortDir('desc');
-                      setSortBy(""); 
+                      setSortBy("");
                     } else if (value === 'oldest') {
                       setSortDir('asc');
-                      setSortBy("");  
+                      setSortBy("");
                     } else if (value === 'likeCount') {
                       setSortBy('likeCount');
                       setSortDir("");
                     }
                   }}
-                  value={sortOption} 
+                  value={sortOption}
                 >
                   <SelectTrigger className="text-xs">
                     <SelectValue placeholder={sortOption || 'Sort by'} />
@@ -216,15 +236,15 @@ const ForumContent: React.FC = () => {
                 {/* posts per page */}
                 <div className="flex flex-col w-full items-center ">
                   <span className="mt-2 text-xs w-full ">Show per page</span>
-                  <Select onValueChange={(value) => setpostsPerPage(Number(value))} value={postsPerPage.toString()}>
+                  <Select onValueChange={(value) => setPostsPerPage(Number(value))} value={postsPerPage.toString()}>
                     <SelectTrigger className="text-xs ">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="5">
-                        <span>5</span> <span className="text-fadedPrimaryColour">(default)</span>
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">
+                        <span>10</span> <span className="text-fadedPrimaryColour">(default)</span>
                       </SelectItem>
-                      <SelectItem value="10">10</SelectItem>
                       <SelectItem value="15">15</SelectItem>
                     </SelectContent>
                   </Select>
@@ -243,8 +263,8 @@ const ForumContent: React.FC = () => {
           </Drawer>
         </div>
 
-       {/* Search Bar */}
-       <Input
+        {/* Search Bar */}
+        <Input
           ref={inputRef}
           placeholder="Search..."
           className="w-full flex-grow"
@@ -265,9 +285,9 @@ const ForumContent: React.FC = () => {
             <CardHeader>
               <CardTitle>
                 {post.title}
-                <span className="text-xs font-light text-secondaryColour ml-2 px-2 py-1 border border-secondaryColour rounded-full">
-                  {post.type}
-                </span>
+                <Badge {...getBadgeVariant(post.type)} className="ml-2 h-5">
+                  {post.type.toLowerCase()}
+                </Badge>
               </CardTitle>
 
               <div className="mt-2 text-xs">
@@ -306,8 +326,8 @@ const ForumContent: React.FC = () => {
         ))}
       </div>
 
-        {/* Pagination */}
-        <div className="mt-4">
+      {/* Pagination */}
+      <div className="mt-4">
         <Pagination>
           <PaginationContent>
             <Button
