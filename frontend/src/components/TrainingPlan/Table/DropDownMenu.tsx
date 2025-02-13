@@ -3,6 +3,9 @@ import { useState } from "react";
 import { useEffect } from "react";
 // Services
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+// Hooks
+import useShareTrainingPlan from "@/hooks/useShareTrainingPlan";
+import { useToast } from "@/hooks/use-toast";
 // UI Components
 import {
   DropdownMenu,
@@ -20,8 +23,6 @@ import { ConfirmationDialog } from "./ConfirmationDialog";
 import { Ellipsis, Share, Trash2 } from "lucide-react";
 // Logs
 import log from "loglevel";
-import useShareTrainingPlan from "@/hooks/useShareTrainingPlan";
-import { useToast } from "@/hooks/use-toast";
 
 // Component Props
 interface DropDownMenuProps {
@@ -34,6 +35,7 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
   planId,
 }: DropDownMenuProps) => {
   log.info("Rendered DropDownMenu");
+  // Hooks
   const { shareTrainingPlan } = useShareTrainingPlan();
   const { toast } = useToast();
 
@@ -68,12 +70,12 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
       });
     } catch (err) {
       toast({
-        title: "Training plan could not be deleted ✖",
+        title: "Training plan could not be shared ✖",
         description: String(err),
         variant: "destructive",
       });
     }
-  }
+  } // Deleting training plan is in separate component
 
   return (
     <div>
@@ -96,7 +98,7 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
               <Share />
               <span>Share</span>
             </DropdownMenuItem>
-            {accountId === userId && (
+            {accountId && accountId === userId && (
               <DropdownMenuItem
                 onClick={() => {
                   log.debug("TableColumns -> Deleting planId", planId);
