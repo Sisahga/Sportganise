@@ -29,3 +29,10 @@ export interface TrainingPlansDto {
 export interface DeleteTrainingPlanDto {
   trainingPlan: boolean;
 }
+
+/**
+ * Share a Training Plan
+ */
+export interface ShareTrainingPlanDto {
+  trainingPlan: boolean;
+}
