@@ -14,15 +14,15 @@ import { getDate } from "@/utils/getDate";
 import { getFileName } from "@/utils/getFileName";
 // Types
 import { TrainingPlan } from "@/types/trainingplans";
+// Services
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
-
-// Table Column Definitions
-// ... follows type TrainingPlan
 
 // Get AccountId From Cookie
 const cookies = getCookies();
 const accountId = cookies ? getAccountIdCookie(cookies) : null;
 
+// Table Column Definitions
+// ... follows type TrainingPlan
 export const columns: ColumnDef<TrainingPlan>[] = [
   {
     accessorKey: "docUrl",
@@ -93,6 +93,8 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       // Menu Options: share, delete
       const planId = row.original.planId; // Access planId from outside its scope
       const userId = row.original.userId;
+      // Display The Drop Down Menu only for the files that belong to the current logged in user
+      // A user cannot share or delete files that do no belong to them
       return (
         accountId === userId && (
           <div>
