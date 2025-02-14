@@ -258,10 +258,10 @@ public class ProgramService {
       Integer accountId) {
 
     Account user = accountService.getAccountById(accountId);
-    if (user == null){
+    if (user == null) {
       throw new ResourceNotFoundException("User with ID: " + accountId + " not found.");
     }
-    
+
     String author = user.getFirstName() + " " + user.getLastName();
 
     Program savedProgram =
