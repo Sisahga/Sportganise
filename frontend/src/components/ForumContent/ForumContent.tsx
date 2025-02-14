@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { CalendarIcon, ThumbsUp, MessageSquare, Filter, ChevronLeft, ChevronRight } from "lucide-react";
+import { ThumbsUp, MessageSquare,ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useNavigate } from "react-router";
 import {
