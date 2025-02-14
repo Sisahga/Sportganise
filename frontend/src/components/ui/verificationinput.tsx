@@ -1,34 +1,41 @@
 import React from "react";
 
 interface VerificationInputProps {
-  id: string;
-  nextInputId?: string;
+  id: number;
   handleInput: (
     e: React.ChangeEvent<HTMLInputElement>,
     nextInputId: string | undefined,
+  ) => void;
+  handleKeyDown: (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    prevInputId: string | undefined,
   ) => void;
 }
 
 const VerificationInput: React.FC<VerificationInputProps> = ({
   id,
-  nextInputId,
   handleInput,
+  handleKeyDown,
 }) => {
+  const nextInputId = id < 6 ? `code-${id + 1}` : undefined;
+  const prevInputId = id > 1 ? `code-${id - 1}` : undefined;
   return (
     <div>
-      <label htmlFor={id} className="sr-only">
+      <label htmlFor={`code-${id}`} className="sr-only">
         Verification Code
       </label>
       <input
         type="text"
+        inputMode="numeric"
+        pattern="\d*"
         maxLength={1}
-        id={id}
+        id={`code-${id}`}
         onChange={(e) => handleInput(e, nextInputId)}
-        className="block w-10 h-10 text-3xl font-bold text-center text-gray-500 bg-gray-300 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
+        onKeyDown={(e) => handleKeyDown(e, prevInputId)}
+        className="w-full aspect-square text-3xl font-bold text-center text-gray-500 bg-gray-300 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500"
         required
       />
     </div>
   );
 };
-
 export { VerificationInput };
