@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     Filter,
     X,
@@ -68,7 +68,7 @@ const Filters: React.FC<FilterProps> = ({
 
     return (
 
-        <Drawer direction= {direction}>
+        <Drawer direction={direction}>
             <DrawerTrigger asChild>
                 <Button variant="outline" className="w-6">
                     <Filter className="text-secondaryColour w-3 h-3" />
@@ -76,8 +76,8 @@ const Filters: React.FC<FilterProps> = ({
             </DrawerTrigger>
             <DrawerContent className="lg:w-[30vw] md:w-[40vw] ">
                 <DrawerHeader className="flex flex-col items-center text-center relative">
-                       
-                        {/* Close button*/}
+
+                    {/* Close button*/}
                     {direction === 'bottom' && (
                         <DrawerClose asChild>
                             <Button variant="ghost" className="text-fadedPrimaryColour rounded-full absolute top-5 left-4 w-2">
@@ -86,7 +86,7 @@ const Filters: React.FC<FilterProps> = ({
                         </DrawerClose>
                     )}
 
-                    
+
                     <DrawerTitle>Filter Options</DrawerTitle>
                     <DrawerDescription>Customize your filters</DrawerDescription>
 
@@ -98,7 +98,16 @@ const Filters: React.FC<FilterProps> = ({
                 <ScrollArea className="h-[80vh]">
 
                     <div className="px-6 mb-2 mt-8 space-y-4">
-                    <div className="flex justify-center items-center">
+                        <div className="flex h-10 space-x-1">
+                            <Select
+                                value={occurrenceDate ? new Date(occurrenceDate).toLocaleDateString() : " "}
+                                onValueChange={(value) => setOccurrenceDate(value ? new Date(value).toISOString() : undefined)}
+                            >
+                                <SelectTrigger className="h-7 mb-8 flex items-center justify-between px-3 py-1">
+                                    <SelectValue>{occurrenceDate ? new Date(occurrenceDate).toLocaleDateString() : "Select Date"}</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <div className="flex justify-center items-center">
                                         <Calendar
                                             mode="single"
                                             numberOfMonths={1}
@@ -116,10 +125,20 @@ const Filters: React.FC<FilterProps> = ({
                                         />
                                     </div>
 
-                        <div className="flex h-10 space-x-1">
-                          
-                        </div> 
-                        
+                          </SelectContent>
+                            </Select>
+
+                            {/* Clear Button for Date picker */}
+                            <Button
+                                variant="outline"
+                                className="h-7 w-2 bg-transparent rounded-md"
+                                onClick={() => setOccurrenceDate(undefined)}
+                                aria-label="Clear date"
+                            >
+                                <X color="#383C42" />
+                            </Button>
+                        </div>
+
                         <Separator></Separator>
 
 
@@ -178,7 +197,7 @@ const Filters: React.FC<FilterProps> = ({
                                     <label htmlFor="fundraiser" className="text-xs">Fundraiser</label>
                                     <RadioGroupItem value="FUNDRAISER" id="fundraiser" checked={type === "FUNDRAISER"} />
 
-                                </div> 
+                                </div>
                                 <div className="flex justify-between items-center w-full">
                                     <label htmlFor="tournament" className="text-xs">Tournament</label>
                                     <RadioGroupItem value="TOURNAMENT" id="tournament" checked={type === "TOURNAMENT"} />
@@ -212,14 +231,12 @@ const Filters: React.FC<FilterProps> = ({
 
                     </div>
 
-                    <div className=" p-4 mt-6 mb-4 flex flex-col justify-center items-center gap-2">
-
-
-                        <Button onClick={handleApplyFilters} variant="outline" className="w-full  shadow-lg text-white bg-secondaryColour">
-                            Apply filter
-                        </Button>
-                        <Button onClick={handleClearFilters} variant="default" className="w-full shadow-lg ">
+                    <div className=" px-12 mt-8 mb-8 flex flex-row justify-between items-center gap-2">
+                        <Button onClick={handleClearFilters} variant="default" className="w-full shadow-lg">
                             Clear all
+                        </Button>
+                        <Button onClick={handleApplyFilters} variant="outline" className="w-full shadow-lg text-white bg-secondaryColour">
+                            Apply filter
                         </Button>
                     </div>
 
