@@ -4,26 +4,18 @@
 import { ColumnDef } from "@tanstack/react-table";
 // Helper Component
 import { ViewAuthor } from "./ViewAuthor";
+import { DropDownMenu } from "./DropDownMenu";
 // UI Component
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/Button";
 // Icons
-import { File, User, Calendar, Ellipsis, Trash2, Share } from "lucide-react";
+import { File, User, Calendar } from "lucide-react";
 // Helper Util Functions
 import { getDate } from "@/utils/getDate";
 import { getFileName } from "@/utils/getFileName";
 // Types
 import { TrainingPlan } from "@/types/trainingplans";
-// Logging
-import log from "loglevel";
+// Services
+import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 
 // Table Column Definitions
 // ... follows type TrainingPlan
@@ -95,37 +87,18 @@ export const columns: ColumnDef<TrainingPlan>[] = [
     id: "menu",
     cell: ({ row }: any) => {
       // Menu Options: share, delete
-      const fileUrl = row.original.docUrl; // Access docUrl cell row from outside its scope
+      const planId = row.original.planId; // Access planId from outside its scope
+      const userId = row.original.userId;
+      const cookies = getCookies();
+      const accountId = cookies ? getAccountIdCookie(cookies) : null;
+      // Display The Drop Down Menu only for the files that belong to the current logged in user
+      // A user cannot share or delete files that do no belong to them
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-6 w-6">
-              <Ellipsis />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel>Options</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                onClick={() => {
-                  log.debug("TableColumns -> Sharing fileUrl", fileUrl);
-                }}
-              >
-                <Share />
-                <span>Share</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  log.debug("TableColumns -> Deleting fileUrl", fileUrl);
-                }}
-              >
-                <Trash2 color="red" />
-                <span className="text-red">Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        accountId === userId && (
+          <div>
+            <DropDownMenu planId={planId} userId={userId} />
+          </div>
+        )
       );
     },
   },
