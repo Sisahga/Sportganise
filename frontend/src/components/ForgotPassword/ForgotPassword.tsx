@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useSendCode } from "@/hooks/useSendCode";
+import { SecondaryHeader } from "../SecondaryHeader";
 
 export default function ForgotPassword() {
   const { toast } = useToast(); // Toast notifications
@@ -44,7 +45,9 @@ export default function ForgotPassword() {
         setIsCodeSent(true);
 
         setTimeout(() => {
-          navigate("/verificationcode", { state: { email } });
+          navigate("/verificationcode", {
+            state: { email: email, flow: "forgot" },
+          });
         }, 2000);
       } else {
         throw new Error("Failed to send verification code.");
@@ -81,15 +84,22 @@ export default function ForgotPassword() {
   }, [sendCodeError, toast]);
 
   return (
-    <div className="mt-36 px-4 md:mt-36 md:px-8 lg:px-16">
-      <h1 className="text-4xl">Forgot Password</h1>
+    <div className="relative flex flex-col items-center justify-center min-h-screen">
+      <SecondaryHeader />
+      <h1 className="text-4xl md:text-4xl">Forgot Password</h1>
       <div className="mt-4 md:pr-4">
-        <p> Enter the email associated to your account.</p>
-        <p>
+        <p className="text-center md:text-xl">
+          {" "}
+          Enter the email associated to your account.
+        </p>
+        <p className="text-center md:text-xl">
           We will send you an email with instructions for the password reset.
         </p>
-        <div className="px-8 pt-16">
-          <form className="grid gap-4 mt-5" onSubmit={handlePasswordRecovery}>
+        <div className="px-8 pt-10">
+          <form
+            className="grid gap-4 mt-5 max-w-xl"
+            onSubmit={handlePasswordRecovery}
+          >
             <FormField
               id="Email"
               label="Email"
