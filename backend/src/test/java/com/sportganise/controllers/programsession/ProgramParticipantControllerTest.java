@@ -265,4 +265,32 @@ public class ProgramParticipantControllerTest {
 
     verify(waitlistService).allOptedParticipants(programId);
   }
+
+  @Test
+  public void testInviteToPrivateEvent_NewParticipant() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    when(waitlistService.inviteToPrivateEvent(accountId, programId)).thenReturn(true);
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/program-participant/invite-private")
+                .param("accountId", accountId.toString())
+                .param("programId", programId.toString()))
+        .andExpect(status().isCreated());
+
+    verify(waitlistService).inviteToPrivateEvent(accountId, programId);
+  }
+
+  @Test
+  public void testInviteToPrivateEvent_ExistingParticipant() throws Exception {
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    when(waitlistService.inviteToPrivateEvent(accountId, programId)).thenReturn(false);
+    mockMvc
+        .perform(
+            MockMvcRequestBuilders.post("/api/program-participant/invite-private")
+                .param("accountId", accountId.toString())
+                .param("programId", programId.toString()))
+        .andExpect(status().isOk());
+
+    verify(waitlistService).inviteToPrivateEvent(accountId, programId);
+  }
 }

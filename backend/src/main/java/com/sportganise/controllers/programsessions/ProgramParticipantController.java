@@ -1,5 +1,6 @@
 package com.sportganise.controllers.programsessions;
 
+import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -181,6 +183,30 @@ public class ProgramParticipantController {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body("Error fetching waitlist programs");
+    }
+  }
+
+  /**
+   * Invites a user to a private program.
+   *
+   * @param accountId The user to invite
+   * @param programId The program to invite the user to
+   * @return An empty ResponseDTO.
+   */
+  @PostMapping("/invite-private")
+  public ResponseEntity<ResponseDto<Void>> inviteToPrivateEvent(
+      @RequestParam Integer accountId, @RequestParam Integer programId) {
+    log.info(
+        "Inviting participant to private program: programId: {}, accountId: {}",
+        programId,
+        accountId);
+
+    boolean isNewParticipant = this.waitlistService.inviteToPrivateEvent(accountId, programId);
+
+    if (isNewParticipant) {
+      return ResponseDto.created(null, "User successfully invited to event.");
+    } else {
+      return ResponseDto.ok(null, "User successfully re-invited to event.");
     }
   }
 }
