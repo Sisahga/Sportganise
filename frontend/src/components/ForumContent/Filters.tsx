@@ -1,6 +1,7 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {
     Filter,
+    X,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Calendar } from "@/components/ui/calendar";
@@ -45,12 +46,29 @@ const Filters: React.FC<FilterProps> = ({
     handleApplyFilters,
 }) => {
 
-  
+    const [direction, setDirection] = useState<'top' | 'right' | 'bottom' | 'left'>('bottom');
 
+
+    useEffect(() => {
+        const updateDirection = () => {
+            if (window.innerWidth >= 1024) {
+                setDirection('left');
+            } else if (window.innerWidth >= 768) {
+                setDirection('left');
+            } else {
+                setDirection('bottom');
+            }
+        };
+        updateDirection();
+        window.addEventListener('resize', updateDirection);
+        return () => {
+            window.removeEventListener('resize', updateDirection);
+        };
+    }, []);
 
     return (
 
-        <Drawer direction= "left">
+        <Drawer direction= {direction}>
             <DrawerTrigger asChild>
                 <Button variant="outline" className="w-6">
                     <Filter className="text-secondaryColour w-3 h-3" />
@@ -58,6 +76,15 @@ const Filters: React.FC<FilterProps> = ({
             </DrawerTrigger>
             <DrawerContent className="lg:w-[30vw] md:w-[40vw] ">
                 <DrawerHeader className="flex flex-col items-center text-center relative">
+                       
+                        {/* Close button*/}
+                    {direction === 'bottom' && (
+                        <DrawerClose asChild>
+                            <Button variant="ghost" className="text-fadedPrimaryColour rounded-full absolute top-5 left-4 w-2">
+                                <X></X>
+                            </Button>
+                        </DrawerClose>
+                    )}
 
                     
                     <DrawerTitle>Filter Options</DrawerTitle>
@@ -91,7 +118,10 @@ const Filters: React.FC<FilterProps> = ({
 
                         <div className="flex h-10 space-x-1">
                           
-                        </div>
+                        </div> 
+                        
+                        <Separator></Separator>
+
 
                         {/* Sort By */}
                         <RadioGroup
@@ -130,7 +160,7 @@ const Filters: React.FC<FilterProps> = ({
                             </div>
                         </RadioGroup>
 
-
+                        <Separator></Separator>
 
                         {/* Type of Event */}
                         <RadioGroup value={type} onValueChange={(value) => setType(value)}>
@@ -161,6 +191,8 @@ const Filters: React.FC<FilterProps> = ({
                             </div>
                         </RadioGroup>
 
+                        <Separator></Separator>
+
                         {/* Show Per Page */}
                         <div>
                             <h3 className="text-sm font-semibold mb-1">Show per page</h3>
@@ -180,16 +212,14 @@ const Filters: React.FC<FilterProps> = ({
 
                     </div>
 
-
-
                     <div className=" p-4 mt-6 mb-4 flex flex-col justify-center items-center gap-2">
 
 
                         <Button onClick={handleApplyFilters} variant="outline" className="w-full  shadow-lg text-white bg-secondaryColour">
-                            Apply Filters
+                            Apply filter
                         </Button>
                         <Button onClick={handleClearFilters} variant="default" className="w-full shadow-lg ">
-                            Reset
+                            Clear all
                         </Button>
                     </div>
 
