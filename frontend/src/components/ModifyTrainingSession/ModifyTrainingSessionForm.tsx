@@ -62,6 +62,14 @@ const types = [
     label: "Fundraiser",
     value: "Fundraiser",
   },
+  {
+    label: "Tournament",
+    value: "Tournament",
+  },
+  {
+    label: "Special Training",
+    value: "Special Training",
+  },
 ] as const;
 const visibilities = [
   {
@@ -314,7 +322,7 @@ export default function ModifyTrainingSessionForm() {
               <span className="text-secondaryColour">
                 {programDetails.title}
               </span>{" "}
-              Event
+              Program
             </h2>
             <h2>Edit fields and update the form</h2>
           </div>
@@ -328,7 +336,7 @@ export default function ModifyTrainingSessionForm() {
                 <FormLabel className="font-semibold text-base">Title</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Name the event"
+                    placeholder="Name the program"
                     type="text"
                     className="bg-white"
                     {...field}
@@ -347,7 +355,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Type of Event
+                  Type of Program
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -442,8 +450,8 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the first date of the event. Applies for recurring and
-                  non recurring events. If recurring, this day will be the
+                  Enter the first date of the program. Applies for recurring and
+                  non recurring programs. If recurring, this day will be the
                   assumed repeat day in the future.
                 </FormDescription>
                 <FormMessage />
@@ -489,7 +497,7 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the last day of a recurring event.
+                  Enter the last day of a recurring program.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -511,7 +519,7 @@ export default function ModifyTrainingSessionForm() {
                     <Input type="time" className="w-full" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Select the time the event starts.
+                    Select the time the program starts.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -531,7 +539,7 @@ export default function ModifyTrainingSessionForm() {
                     <Input type="time" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Select the time the event ends.
+                    Select the time the program ends.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -621,10 +629,10 @@ export default function ModifyTrainingSessionForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-semibold">
-                    Recurring event
+                    Recurring program
                   </FormLabel>
                   <FormDescription>
-                    The event recurs on the day and at the times entered.
+                    The program recurs on the day and at the times entered.
                   </FormDescription>
                   <FormMessage />
                 </div>
@@ -692,7 +700,7 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Select who can view the event in their dashboard.
+                  Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -710,7 +718,7 @@ export default function ModifyTrainingSessionForm() {
                 </FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Add description of the event here ..."
+                    placeholder="Add description of the program here ..."
                     className="resize-none"
                     {...field}
                   />
@@ -839,11 +847,11 @@ export default function ModifyTrainingSessionForm() {
           {loading ? (
             <Button disabled className="w-full">
               <Loader2 className="animate-spin" />
-              Updating Event
+              Updating Program
             </Button>
           ) : (
             <Button type="submit" className="w-full font-semibold">
-              Update Event
+              Update Program
             </Button>
           )}
           <div className="justify-self-center">
