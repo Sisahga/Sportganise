@@ -12,6 +12,7 @@ import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
@@ -119,6 +120,7 @@ public class ProgramService {
         program.getProgramType(),
         program.getTitle(),
         program.getDescription(),
+        program.getAuthor(),
         program.getCapacity(),
         program.getOccurrenceDate(),
         program.getDurationMins(),
@@ -179,6 +181,7 @@ public class ProgramService {
               program.getProgramType(),
               program.getTitle(),
               program.getDescription(),
+              program.getAuthor(),
               program.getCapacity(),
               program.getOccurrenceDate(),
               program.getDurationMins(),
@@ -254,9 +257,17 @@ public class ProgramService {
       List<MultipartFile> attachments,
       Integer accountId) {
 
+    Account user = accountService.getAccountById(accountId);
+    if (user == null){
+      throw new ResourceNotFoundException("User with ID: " + accountId + " not found.");
+    }
+    
+    String author = user.getFirstName() + " " + user.getLastName();
+
     Program savedProgram =
         createProgramObject(
             title,
+            author,
             programType,
             startDate,
             endDate,
@@ -348,6 +359,7 @@ public class ProgramService {
     Program updatedProgram =
         createProgramObject(
             title,
+            existingProgram.getAuthor(),
             programType,
             startDate,
             endDate,
@@ -401,6 +413,7 @@ public class ProgramService {
 
   private Program createProgramObject(
       String title,
+      String author,
       ProgramType programType,
       String startDate,
       String endDate,
@@ -439,6 +452,7 @@ public class ProgramService {
         programType,
         title,
         description,
+        author,
         capacity,
         occurrenceDate,
         durationMins,
