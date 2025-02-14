@@ -41,6 +41,7 @@ public class ProgramDto {
     this.programType = program.getProgramType();
     this.title = program.getTitle();
     this.description = program.getDescription();
+    this.author = program.getAuthor();
     this.capacity = program.getCapacity();
     this.occurrenceDate = program.getOccurrenceDate();
     this.durationMins = program.getDurationMins();
