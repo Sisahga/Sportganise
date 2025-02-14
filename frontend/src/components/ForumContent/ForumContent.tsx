@@ -1,20 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CalendarIcon, ThumbsUp, MessageSquare, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
 import { useNavigate } from "react-router";
 import {
   Card,
@@ -29,21 +15,12 @@ import {
   PaginationContent,
   PaginationItem,
 } from "@/components/ui/pagination";
-import "react-day-picker/dist/style.css";
+import { Input } from "../ui/input";
+import Filters from "./Filters";
 import BackButton from "../ui/back-button";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { Badge } from "../ui/badge";
 
 import useForumPosts from "@/hooks/useForumPosts";
-
+import { Badge } from "../ui/badge";
 
 const ForumContent: React.FC = () => {
 
@@ -59,7 +36,7 @@ const ForumContent: React.FC = () => {
   const [sortBy, setSortBy] = useState("");
   const [sortDir, setSortDir] = useState("");
   const [sortOption, setSortOption] = useState('latest');
-
+  
   const inputRef = useRef<HTMLInputElement>(null);
 
 
@@ -107,7 +84,7 @@ const ForumContent: React.FC = () => {
   const navigatePostDetail = (postId: number) => {
     navigate(`/pages/PostDetailPage`, { state: { postId } });
   };
-
+  
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -125,14 +102,14 @@ const ForumContent: React.FC = () => {
   };
 
 
-  // Utility function to format the occurrence date
-  const formatOccurrenceDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    const hours = date.getHours() % 12 || 12;
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const amPm = date.getHours() >= 12 ? 'PM' : 'AM';
-    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${hours}:${minutes} ${amPm}`;
-  };
+// Utility function to format the occurrence date
+const formatOccurrenceDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  const hours = date.getHours() % 12 || 12;
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const amPm = date.getHours() >= 12 ? 'PM' : 'AM';
+  return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${hours}:${minutes} ${amPm}`;
+};
 
   const getBadgeVariant = (programType: string) => {
     switch (programType.toLowerCase()) {
@@ -154,115 +131,26 @@ const ForumContent: React.FC = () => {
   return (
     <div className="min-h-screen pb-20">
       <BackButton />
+      <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-4">Forum</h2>
 
-      <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-8">
-        Forum
-      </h2>
-
-      <div className="mt-4 mb-2 flex items-center lg:mx-24">
-        {/* Menu Bar with Filters */}
-        <div className="mr-1">
-          <Drawer direction="left">
-            <DrawerTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-auto justify-start text-left font-normal flex items-center"
-              >
-                <Filter className="w-4 h-4" />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="md:w-1/4 lg:w-1/4 pt-10">
-              <DrawerHeader className="flex flex-col items-center text-center">
-                <DrawerTitle>Filter Options</DrawerTitle>
-                <DrawerDescription>Customize your filter options</DrawerDescription>
-              </DrawerHeader>
-
-              <div className="flex flex-col items-center w-full sm:w-3/4 space-y-4 p-2 mt-3 mx-auto">
-                <Popover>
-                  <PopoverTrigger className="text-xs" asChild>
-                    <Button variant="outline" className="w-full">
-                      <CalendarIcon className="w-4 h-4" />
-                      {occurrenceDate ? new Date(occurrenceDate).toLocaleDateString() : "Select Date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-2 border rounded-sm shadow-md ">
-                    <Calendar
-                      mode="single"
-                      numberOfMonths={1}
-                      selected={occurrenceDate ? new Date(occurrenceDate) : undefined}
-                      onSelect={(date) => setOccurrenceDate(date ? date.toISOString() : undefined)}
-                      className="border rounded-sm"
-                    />
-                  </PopoverContent>
-                </Popover>
-
-                <Select
-                  onValueChange={(value) => {
-                    setSortOption(value);
-                    if (value === 'latest') {
-                      setSortDir('desc');
-                      setSortBy("");
-                    } else if (value === 'oldest') {
-                      setSortDir('asc');
-                      setSortBy("");
-                    } else if (value === 'likeCount') {
-                      setSortBy('likeCount');
-                      setSortDir("");
-                    }
-                  }}
-                  value={sortOption}
-                >
-                  <SelectTrigger className="text-xs">
-                    <SelectValue placeholder={sortOption || 'Sort by'} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="latest">Latest</SelectItem>
-                    <SelectItem value="oldest">Oldest</SelectItem>
-                    <SelectItem value="likeCount">Most Likes</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select onValueChange={(value) => setType(value)} value={type}>
-                  <SelectTrigger className="text-xs">
-                    <SelectValue placeholder="Type of event" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value=" ">All</SelectItem>
-                    <SelectItem value="TRAINING">Training</SelectItem>
-                    <SelectItem value="FUNDRAISER">Fundraiser</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                {/* posts per page */}
-                <div className="flex flex-col w-full items-center ">
-                  <span className="mt-2 text-xs w-full ">Show per page</span>
-                  <Select onValueChange={(value) => setPostsPerPage(Number(value))} value={postsPerPage.toString()}>
-                    <SelectTrigger className="text-xs ">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="5">5</SelectItem>
-                      <SelectItem value="10">
-                        <span>10</span> <span className="text-fadedPrimaryColour">(default)</span>
-                      </SelectItem>
-                      <SelectItem value="15">15</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="mt-5 flex justify-center items-center gap-2 px-2">
-                <Button onClick={handleClearFilters} variant="default" className="w-auto">
-                  Clear
-                </Button>
-                <Button onClick={handleApplyFilters} variant="outline" className="w-auto text-white bg-secondaryColour">
-                  Apply Filters
-                </Button>
-              </div>
-            </DrawerContent>
-          </Drawer>
-        </div>
-
+      {/* Filter Component */}
+      <div className="mt-4 mb-2 flex items-center gap-x-1 lg:mx-24">
+        <Filters
+          occurrenceDate={occurrenceDate}
+          setOccurrenceDate={setOccurrenceDate}
+          type={type}
+          setType={setType}
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+          sortDir={sortDir}
+          setSortDir={setSortDir}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          postsPerPage={postsPerPage}
+          setPostsPerPage={setPostsPerPage}
+          handleClearFilters={handleClearFilters}
+          handleApplyFilters={handleApplyFilters}
+        />
         {/* Search Bar */}
         <Input
           ref={inputRef}
@@ -283,12 +171,12 @@ const ForumContent: React.FC = () => {
             className="cursor-pointer"
           >
             <CardHeader>
-              <CardTitle>
-                {post.title}
-                <Badge {...getBadgeVariant(post.type)} className="ml-2 h-5">
-                  {post.type.toLowerCase()}
-                </Badge>
-              </CardTitle>
+            <CardTitle className="flex">
+  {post.title}
+  <Badge {...getBadgeVariant(post.type)} className="ml-2 h-5">
+    {post.type.toLowerCase()}
+  </Badge>
+</CardTitle>
 
               <div className="mt-2 text-xs">
                 {formatOccurrenceDate(post.occurrenceDate)}
@@ -300,19 +188,21 @@ const ForumContent: React.FC = () => {
             <CardFooter className="flex space-x-2">
               <Button
                 variant="outline"
-                className={`flex items-center space-x-1 ${likedposts.has(post.postId) ? "text-secondaryColour" : "text-primaryColour"}`}
+                className={`flex items-center rounded-full ${likedposts.has(post.postId) ? "text-secondaryColour" : "text-primaryColour"}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleLike(post.postId);
                 }}
               >
                 <ThumbsUp className="w-4 h-4" />
-                <span>{post.likeCount + (likedposts.has(post.postId) ? 1 : 0)}</span>
+                <span>
+                  {post.likeCount + (likedposts.has(post.postId) ? 1 : 0)}
+                </span>
               </Button>
 
               <Button
                 variant="outline"
-                className="flex items-center space-x-1"
+                className=" flex items-center rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/pages/PostDetailPage`, { state: { postId: post.postId } });
