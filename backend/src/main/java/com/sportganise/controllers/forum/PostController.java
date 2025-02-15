@@ -100,7 +100,8 @@ public class PostController {
    * @return ResponseDto containing the fetched post.
    */
   @GetMapping("/{postId}/{accountId}")
-  public ResponseEntity<ResponseDto<ViewPostDto>> getPostById(@PathVariable Integer postId, @PathVariable Integer accountId) {
+  public ResponseEntity<ResponseDto<ViewPostDto>> getPostById(
+      @PathVariable Integer postId, @PathVariable Integer accountId) {
     ViewPostDto viewPostDto = postService.getPostByIdWithFeedBacks(postId, accountId);
     ResponseDto<ViewPostDto> responseDto = new ResponseDto<>();
     responseDto.setData(viewPostDto);
