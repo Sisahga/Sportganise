@@ -62,8 +62,8 @@ public class PostService {
       int page,
       String sortBy,
       String sortDirection,
-      Long orgId,
-      Long accountId) {
+      Integer orgId,
+      Integer accountId) {
 
     log.info("Fetching posts with search criteria");
 
@@ -105,6 +105,7 @@ public class PostService {
                 post -> {
                   long likeCount = countLikesByPostId(post.getPostId());
                   long feedbackCount = countFeedbackByPostId(post.getPostId());
+                  boolean liked = likedPost(post.getPostId(), accountId);
                   PostDto dto =
                       new PostDto(
                           post.getPostId(),
@@ -114,6 +115,7 @@ public class PostService {
                           post.getOccurrenceDate(),
                           post.getCreationDate(),
                           likeCount,
+                          liked,
                           feedbackCount);
 
                   return dto;

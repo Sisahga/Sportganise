@@ -82,7 +82,7 @@ public class PostServiceTest {
 
     List<PostDto> result =
         postService.searchAndFilterPosts(
-            null, null, null, null, 10, 0, "creationDate", "desc", 1L, 1L);
+            null, null, null, null, 10, 0, "creationDate", "desc", 1, 1);
 
     assertEquals(2, result.size());
     assertEquals("Fundraiser for OniBad", result.get(0).getTitle());
@@ -118,7 +118,7 @@ public class PostServiceTest {
 
     List<PostDto> result =
         postService.searchAndFilterPosts(
-            null, null, null, null, 10, 0, "likeCount", "desc", 1L, 1L);
+            null, null, null, null, 10, 0, "likeCount", "desc", 1, 1);
 
     assertEquals(2, result.size());
     assertEquals("Fundraiser for OniBad", result.get(0).getTitle());
@@ -152,14 +152,15 @@ public class PostServiceTest {
             any(), any(), any(), any(), any(), any(), any(), any(), any(Pageable.class)))
         .thenReturn(postPage);
 
-    postService.searchAndFilterPosts(null, null, null, null, 10, 0, "creationDate", "desc", 1L, 1L);
+    postService.searchAndFilterPosts(null, null, null, null, 10, 0, "creationDate", "desc", 1, 1);
 
-    verify(accountRepository, times(1)).getLabelIdsByAccountIdAndOrgId(1L, 1L);
+    verify(accountRepository, times(1)).getLabelIdsByAccountIdAndOrgId(1, 1);
   }
 
   @Test
   public void getPostByIdWithFeedBacks_ShouldReturn_CorrectPostDto() {
     Integer postId = 1;
+    Integer accountId = 1;
     Post post =
         Post.builder()
             .postId(postId)
@@ -177,7 +178,7 @@ public class PostServiceTest {
     when(feedbackService.getFeedbacksByPostId(postId)).thenReturn(feedbacks);
     when(likesRepository.countByPostId(postId)).thenReturn(likeCount);
 
-    ViewPostDto result = postService.getPostByIdWithFeedBacks(postId);
+    ViewPostDto result = postService.getPostByIdWithFeedBacks(postId,accountId);
 
     assertEquals(postId, result.getPostId());
     assertEquals("Test Post", result.getTitle());
