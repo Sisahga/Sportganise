@@ -171,7 +171,7 @@ public class AccountController {
    */
   @GetMapping("/{accountId}/{orgId}/labels")
   public ResponseDto<List<LabelDto>> getLabelsByAccountIdAndOrgId(
-      @PathVariable Long accountId, @PathVariable Long orgId) {
+      @PathVariable Integer accountId, @PathVariable Integer orgId) {
     List<LabelDto> labels = accountService.getLabelsByAccountIdAndOrgId(accountId, orgId);
     ResponseDto<List<LabelDto>> responseDto = new ResponseDto<>();
     responseDto.setData(labels);

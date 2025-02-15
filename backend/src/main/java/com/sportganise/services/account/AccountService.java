@@ -326,7 +326,7 @@ public class AccountService {
    * @param orgId ID of the organization.
    * @return List of labels.
    */
-  public List<LabelDto> getLabelsByAccountIdAndOrgId(Long accountId, Long orgId) {
+  public List<LabelDto> getLabelsByAccountIdAndOrgId(Integer accountId, Integer orgId) {
     log.info("Fetching labels by account ID and organization ID");
     List<Integer> labelIds = accountRepository.getLabelIdsByAccountIdAndOrgId(accountId, orgId);
     return labelIds.stream().map(this::getLabelById).collect(Collectors.toList());

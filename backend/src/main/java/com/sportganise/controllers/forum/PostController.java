@@ -44,7 +44,7 @@ public class PostController {
    * @param accountId ID of the account.
    * @return ResponseDto containing the fetched posts.
    */
-  @GetMapping("/search")
+  @GetMapping("/search/{orgId}/{accountId}")
   public ResponseDto<List<PostDto>> searchAndFilterPosts(
       @RequestParam(required = false) String searchTerm,
       @RequestParam(required = false) ZonedDateTime occurrenceDate,
@@ -54,8 +54,8 @@ public class PostController {
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "occurrenceDate") String sortBy,
       @RequestParam(defaultValue = "desc") String sortDir,
-      @RequestParam Long orgId,
-      @RequestParam Long accountId) {
+      @PathVariable Integer orgId,
+      @PathVariable Integer accountId) {
     List<PostDto> postDtos =
         postService.searchAndFilterPosts(
             searchTerm,
