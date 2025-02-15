@@ -32,7 +32,7 @@ export default function LogIn() {
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid Credentials",
+        description: err.message,
       });
     });
   };
@@ -46,11 +46,16 @@ export default function LogIn() {
 
     if (error) {
       console.log("Error:", error); // Debug
+      if (error == "Account not verified") {
+        navigate("/verificationcode", {
+          state: { email: formData.email },
+        });
+      }
       // Show toast for invalid credentials or errors
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid Credentials",
+        description: error,
       });
     }
   }, [data, error, navigate, toast]);

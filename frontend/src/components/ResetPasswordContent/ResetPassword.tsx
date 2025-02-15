@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
@@ -15,32 +14,32 @@ import PasswordChecklist from "react-password-checklist";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCookies, getEmailCookie } from "@/services/cookiesService";
-import useModifyPassword from "@/hooks/useModifyPassword";
-import { ChangePasswordFormValues } from "@/types/auth";
+import { ResetPasswordFormValues } from "@/types/auth";
 import log from "loglevel";
-import BackButton from "../ui/back-button";
 import { KeyRound } from "lucide-react";
+import { SecondaryHeader } from "../SecondaryHeader";
 import { Separator } from "../ui/separator";
+import useResetPassword from "@/hooks/useResetPassword";
+import { useLocation, useNavigate } from "react-router";
 
-const ChangePasswordContent: React.FC = () => {
-  const navigate = useNavigate();
+interface ChangeForgottenPasswordState {
+  email?: string;
+  flow?: string;
+}
+
+const ChangeForgottenPasswordContent: React.FC = () => {
   const { toast } = useToast();
 
-  const cookies = getCookies();
-  const email = cookies ? getEmailCookie(cookies) : null;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as ChangeForgottenPasswordState | undefined;
 
-  useEffect(() => {
-    if (!cookies || !email) {
-      log.warn("No valid session. Redirecting to login.");
-      navigate("/login");
-    }
-  }, [cookies, email, navigate]);
+  // Retrieve email from location state and trimming it
+  const email = state?.email?.trim() || "";
 
-  const form = useForm<ChangePasswordFormValues>({
+  const form = useForm<ResetPasswordFormValues>({
     defaultValues: {
       email: email || "",
-      oldPassword: "",
       password: "",
       passwordAgain: "",
     },
@@ -58,8 +57,8 @@ const ChangePasswordContent: React.FC = () => {
   const [isChecklistValid, setIsChecklistValid] = useState(false);
   const password = watch("password");
   const passwordAgain = watch("passwordAgain");
-  const { isLoading, success, Message, error, modifyPassword } =
-    useModifyPassword();
+  const { resetPassword, isLoading, message, success, error } =
+    useResetPassword();
 
   useEffect(() => {
     if (email) {
@@ -102,52 +101,46 @@ const ChangePasswordContent: React.FC = () => {
     );
   };
 
-  const onSubmit: SubmitHandler<ChangePasswordFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<ResetPasswordFormValues> = async (data) => {
     log.debug("Form submitted with data:", data);
 
     if (!isChecklistValid) {
       log.warn("Form submission blocked due to invalid password checklist");
       toast({
-        title: "Password change unsuccessful!",
+        title: "Password reset unsuccessful!",
         description: "Please ensure the checklist is fulfilled.",
         variant: "destructive",
       });
       return;
     }
-
-    modifyPassword({
-      email: data.email,
-      oldPassword: data.oldPassword,
-      newPassword: data.password,
-    });
+    resetPassword({ email: data.email, newPassword: data.password });
   };
 
   useEffect(() => {
     if (success) {
+      navigate("/login");
       toast({
         title: "Success!",
-        description: Message,
+        description: message,
         variant: "success",
       });
     } else if (error) {
       toast({
         title: "Error!",
-        description: Message,
+        description: message,
         variant: "destructive",
       });
     }
-  }, [Message, error, toast]);
+  }, [message, error, toast]);
 
   return (
-    <div className="">
-      <BackButton />
-
-      {/* Card for the entire form */}
-      <Card className="shadow-md mb-24 mt-4 mx-auto max-w-2xl">
+    <div className="relative flex flex-col items-center justify-center min-h-screen">
+      <SecondaryHeader />
+      <Card className="shadow-md mb-8 mt-4 mx-auto w-full max-w-sm sm:max-w-xs md:max-w-lg lg:max-w-xl xl:max-w-3xl max-w-3xl">
         <CardHeader>
           <CardTitle className="flex justify-center text-2xl font-bold items-center justify-center gap-2">
             <KeyRound className="h-6 w-6" />
-            Change Password
+            Reset Password
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -156,28 +149,6 @@ const ChangePasswordContent: React.FC = () => {
               onSubmit={handleSubmit(onSubmit)}
               className="text-sm space-y-4"
             >
-              {/* Old Password Field */}
-              <FormField
-                name="oldPassword"
-                control={control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Label>Current password</Label>
-                    <FormControl>
-                      <Input
-                        className="text-sm"
-                        {...field}
-                        type="password"
-                        placeholder="Enter your current password"
-                        required
-                      />
-                    </FormControl>
-                    <FormMessage>{errors.oldPassword?.message}</FormMessage>
-                  </FormItem>
-                )}
-              />
-
-              {/* New Password Field */}
               <FormField
                 name="password"
                 control={control}
@@ -198,7 +169,6 @@ const ChangePasswordContent: React.FC = () => {
                 )}
               />
 
-              {/* Confirm New Password Field */}
               <FormField
                 name="passwordAgain"
                 control={control}
@@ -219,7 +189,6 @@ const ChangePasswordContent: React.FC = () => {
                 )}
               />
 
-              {/* Progress Bar */}
               {password && (
                 <div className="m-4 mb-2">
                   <Progress value={progress} max={100} />
@@ -227,7 +196,6 @@ const ChangePasswordContent: React.FC = () => {
               )}
 
               <div className="m-4 mb-2">
-                {/* Mandatory checks for length and password match*/}
                 <div className="mandatory-rules mb-4">
                   <PasswordChecklist
                     className="text-xs"
@@ -247,7 +215,6 @@ const ChangePasswordContent: React.FC = () => {
 
                 <Separator></Separator>
 
-                {/* 3/4 types of characters checks */}
                 <div className="optional-rules flex flex-col gap-1 mt-2">
                   <p className="font-semibold ">
                     Check at least 3 from the following:
@@ -257,7 +224,7 @@ const ChangePasswordContent: React.FC = () => {
                     className="text-xs"
                     validColor="#82DBD8"
                     invalidColor="#383C42"
-                    rules={["capital", "lowercase", "number", "specialChar"]} // Only optional rules
+                    rules={["capital", "lowercase", "number", "specialChar"]}
                     minLength={8}
                     value={password}
                     valueAgain={passwordAgain}
@@ -270,14 +237,13 @@ const ChangePasswordContent: React.FC = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <div className="flex justify-center p-2">
                 <Button
                   className="w-40 h-10"
                   type="submit"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Changing Password..." : "Change Password"}
+                  {isLoading ? "Resetting Password..." : "Reset Password"}
                 </Button>
               </div>
             </form>
@@ -288,4 +254,4 @@ const ChangePasswordContent: React.FC = () => {
   );
 };
 
-export default ChangePasswordContent;
+export default ChangeForgottenPasswordContent;

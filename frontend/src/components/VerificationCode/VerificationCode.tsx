@@ -6,10 +6,12 @@ import { useNavigate, useLocation } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useSendCode } from "@/hooks/useSendCode";
 import { useVerifyCode } from "@/hooks/useVerifyCode";
-import { SecondaryHeader } from "../SecondaryHeader";
+import log from "loglevel";
+import { clearCookies } from "@/services/cookiesService";
 
 interface VerificationCodeLocationState {
   email?: string;
+  flow?: string;
 }
 
 export default function VerificationCode() {
@@ -60,20 +62,105 @@ export default function VerificationCode() {
     e: React.ChangeEvent<HTMLInputElement>,
     nextInputId: string | undefined,
   ) => {
-    const value = e.target.value;
-    const index = parseInt(e.target.id.split("-")[1]) - 1;
+    const target = e.target;
+    const value = target.value;
+    const index = parseInt(target.id.split("-")[1]) - 1;
 
-    // Update code array
+    // Handle pasting
+    if (value.length > 1) {
+      e.preventDefault();
+      const pastedValue = value.replace(/\D/g, "").slice(0, 6).split("");
+      const newCode = [...code];
+
+      // Fill in the values
+      pastedValue.forEach((char, i) => {
+        if (i < 6) newCode[i] = char;
+      });
+
+      setCode(newCode);
+      return;
+    }
+
+    // Handle single character input
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
 
-    if (value.length === e.target.maxLength && nextInputId) {
+    // Move to next input if value is entered
+    if (value && nextInputId) {
       const nextInput = document.getElementById(
         nextInputId,
       ) as HTMLInputElement;
-      if (nextInput) {
-        nextInput.focus();
+      if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData
+      .getData("text")
+      .replace(/\D/g, "")
+      .slice(0, 6);
+    const newCode = Array(6).fill("");
+
+    pastedData.split("").forEach((char, i) => {
+      if (i < 6) newCode[i] = char;
+    });
+
+    // Update all inputs with the pasted values
+    newCode.forEach((value, index) => {
+      const input = document.getElementById(
+        `code-${index + 1}`,
+      ) as HTMLInputElement;
+      if (input) input.value = value;
+    });
+
+    setCode(newCode);
+
+    // Focus the last filled input or the last input if all are filled
+    const lastFilledIndex = Math.min(pastedData.length + 1, 6);
+    const lastInput = document.getElementById(
+      `code-${lastFilledIndex}`,
+    ) as HTMLInputElement;
+    if (lastInput) {
+      lastInput.focus();
+    }
+  };
+
+  // Add a new handler for keydown events
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    prevInputId?: string,
+  ) => {
+    const target = e.target as HTMLInputElement;
+    const index = parseInt(target.id.split("-")[1]) - 1;
+    const allowedKeys = ["Backspace", "ArrowLeft", "ArrowRight", "Tab", "v"]; // 'v' for paste shortcuts
+
+    if (!/^\d$/.test(e.key) && !allowedKeys.includes(e.key)) {
+      e.preventDefault(); // Block non-numeric input
+    }
+
+    // Handle backspace
+    if (e.key === "Backspace") {
+      const newCode = [...code];
+
+      if (newCode[index] === "") {
+        // If current input is empty, move to previous input
+        if (prevInputId) {
+          const prevInput = document.getElementById(
+            prevInputId,
+          ) as HTMLInputElement;
+          if (prevInput) {
+            prevInput.focus();
+            // Clear the previous input's value
+            newCode[index - 1] = "";
+            setCode(newCode);
+          }
+        }
+      } else {
+        // Clear current input
+        newCode[index] = "";
+        setCode(newCode);
       }
     }
   };
@@ -81,6 +168,7 @@ export default function VerificationCode() {
   const handleVerify = async () => {
     // const codeString = code.join(""); // To combine code into a string
     const codeString = code.map((char) => char.trim()).join(""); // Ensure no spaces
+    log.info("Verifying code for email:", email, "with code:", codeString);
 
     // Log the API URL and the request data being sent
     console.log(
@@ -93,18 +181,45 @@ export default function VerificationCode() {
       const response = await verifyUserCode({ email, code: codeString });
 
       if (response?.statusCode === 201) {
-        // Changed 200 to 201
         setVerified(true);
-        toast({
-          variant: "success",
-          title: "Verification Successful",
-          description: "You will be redirected to the home page shortly",
-        });
 
-        // Redirect to home page
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
+        log.info("Current flow:", state?.flow);
+        log.info("Full state:", state);
+        // Check the flow property passed in the location state
+        if (state?.flow === "forgot") {
+          log.info("Verification successful, navigating to ResetPasswordPage");
+          log.info("Flow is 'forgot', should redirect to change password");
+          toast({
+            variant: "success",
+            title: "Verification Successful",
+            description: "Redirecting to password reset page",
+          });
+          setTimeout(() => {
+            log.info(
+              "Navigating to ResetPasswordPage with email:",
+              state.email,
+            );
+            clearCookies();
+            navigate("/pages/ResetPasswordPage", {
+              replace: true,
+              state: { email: state.email, fromVerification: true },
+            });
+          });
+        } else {
+          log.info(
+            "Flow is not 'forgot', redirecting to home. Current flow:",
+            state?.flow,
+          );
+          // Default behavior (e.g., sign-up flow)
+          toast({
+            variant: "success",
+            title: "Verification Successful",
+            description: "You will be redirected to the home page shortly",
+          });
+          setTimeout(() => {
+            navigate("/");
+          }, 2000);
+        }
       } else {
         throw new Error("Verification failed. Invalid code or expired.");
       }
@@ -182,13 +297,12 @@ export default function VerificationCode() {
   }, [verifyError, sendCodeError, toast]);
 
   return (
-    <div className="bg-white min-h-screen overflow-x-hidden">
-      <SecondaryHeader />
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
       <div className="w-full pt-32">
         <div className="mx-auto max-w-[90%] md:max-w-[80%] lg:max-w-[60%] p-4">
-          <h1 className="text-2xl md:text-4xl text-left">
+          <h1 className="text-2xl md:text-4xl text-center">
             Email Verification
-            <p className="mt-4 text-sm md:text-lg text-primaryColour-600">
+            <p className="mt-4 text-sm md:text-lg text-primaryColour-600 text-center">
               Please enter the verification code that was sent to your email
               address.
             </p>
@@ -196,35 +310,25 @@ export default function VerificationCode() {
         </div>
         <div className="mx-4 md:mx-8 lg:mx-16 mt-10 md:mt-20 p-5 md:p-10">
           <form className="max-w-full sm:max-w-md mx-auto">
-            <p className="text-sm md:text-lg mb-4">Enter Verification Code</p>
-            <div className="flex mb-2 space-x-4 sm:space-x-10">
-              <VerificationInput
-                id="code-1"
-                nextInputId="code-2"
-                handleInput={handleInput}
-              />
-              <VerificationInput
-                id="code-2"
-                nextInputId="code-3"
-                handleInput={handleInput}
-              />
-              <VerificationInput
-                id="code-3"
-                nextInputId="code-4"
-                handleInput={handleInput}
-              />
-              <VerificationInput
-                id="code-4"
-                nextInputId="code-5"
-                handleInput={handleInput}
-              />
-              <VerificationInput
-                id="code-5"
-                nextInputId="code-6"
-                handleInput={handleInput}
-              />
-              <VerificationInput id="code-6" handleInput={handleInput} />
-            </div>
+            <fieldset className="flex mb-2 gap-2 w-full">
+              <legend className="text-sm md:text-lg mb-4">
+                Enter Verification Code
+              </legend>
+
+              <div
+                onPaste={handlePaste}
+                className="flex flex-row gap-3 justify-center"
+              >
+                {[1, 2, 3, 4, 5, 6].map((num) => (
+                  <VerificationInput
+                    key={num}
+                    id={num}
+                    handleInput={handleInput}
+                    handleKeyDown={handleKeyDown}
+                  />
+                ))}
+              </div>
+            </fieldset>
             <p className="my-2 text-xs md:text-sm text-black">
               Did not receive a code?
               <Button

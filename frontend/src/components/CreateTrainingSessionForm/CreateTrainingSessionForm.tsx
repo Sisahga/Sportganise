@@ -2,11 +2,11 @@ import { useNavigate } from "react-router";
 import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
 import log from "loglevel";
 import { useEffect, useState } from "react";
-
+import InviteModal, { Member } from "./InviteModal";
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
-
+import usePlayers from "@/hooks/usePlayers";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/hooks/use-toast";
@@ -60,7 +60,20 @@ export default function CreateTrainingSessionForm() {
   const { form } = useFormHandler();
   const { createTrainingSession, error } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
+  const {
+    players,
+    loading: playersLoading,
+    error: playersError,
+  } = usePlayers();
 
+  const members: Member[] = players.map((player) => ({
+    id: player.accountId.toString(),
+    name: `${player.firstName} ${player.lastName}`,
+    email: player.email,
+    role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"
+  }));
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
   // AccountId from cookies
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
@@ -86,20 +99,6 @@ export default function CreateTrainingSessionForm() {
     {
       label: "Fundraiser",
       value: "Fundraiser",
-    },
-  ] as const;
-  const visibilities = [
-    {
-      label: "Public",
-      value: "public",
-    },
-    {
-      label: "Members only",
-      value: "members",
-    },
-    {
-      label: "Private",
-      value: "private",
     },
   ] as const;
   const locations = [
@@ -204,9 +203,24 @@ export default function CreateTrainingSessionForm() {
       setLoading(false);
     }
   };
+  console.log("members in form:", members);
 
   return (
     <>
+      {playersLoading ? (
+        <div>Loading players...</div>
+      ) : playersError ? (
+        <div>Error loading players</div>
+      ) : (
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
+          >
+            {/* form fields */}
+          </form>
+        </Form>
+      )}
       {/** Create Training Session Form */}
       <Form {...form}>
         <form
@@ -552,15 +566,11 @@ export default function CreateTrainingSessionForm() {
                         variant="outline"
                         role="combobox"
                         className={cn(
+                          !field.value ? "text-muted-foreground" : "",
                           "justify-between",
-                          !field.value && "text-muted-foreground",
                         )}
                       >
-                        {field.value
-                          ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
-                            )?.label
-                          : "Select visibility"}
+                        {field.value ? field.value : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </FormControl>
@@ -571,23 +581,30 @@ export default function CreateTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No visibility found.</CommandEmpty>
                         <CommandGroup>
-                          {visibilities.map((visibility) => (
+                          {[
+                            { label: "Public", value: "public" },
+                            { label: "Members only", value: "members" },
+                            { label: "Private", value: "private" },
+                          ].map((v) => (
                             <CommandItem
-                              value={visibility.label}
-                              key={visibility.value}
+                              key={v.value}
+                              value={v.label}
                               onSelect={() => {
-                                form.setValue("visibility", visibility.value);
+                                form.setValue("visibility", v.value);
+                                if (v.value === "private") {
+                                  setShowInviteModal(true);
+                                }
                               }}
                             >
                               <Check
                                 className={cn(
                                   "mr-2 h-4 w-4",
-                                  visibility.value === field.value
+                                  v.value === field.value
                                     ? "opacity-100"
                                     : "opacity-0",
                                 )}
                               />
-                              {visibility.label}
+                              {v.label}
                             </CommandItem>
                           ))}
                         </CommandGroup>
@@ -672,8 +689,7 @@ export default function CreateTrainingSessionForm() {
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Max file size is 4 MB. Limit of 5
-                  files.
+                  Select a file to upload. Limit of 5 files.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -756,6 +772,14 @@ export default function CreateTrainingSessionForm() {
           </div>
         </form>
       </Form>
+      {/* Invite Modal */}
+      <InviteModal
+        open={showInviteModal}
+        onClose={() => setShowInviteModal(false)}
+        members={members}
+        selectedMembers={selectedMembers}
+        setSelectedMembers={setSelectedMembers}
+      />
     </>
   );
 }
