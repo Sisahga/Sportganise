@@ -98,9 +98,9 @@ public class PostController {
    * @param postId Post id.
    * @return ResponseDto containing the fetched post.
    */
-  @GetMapping("/{postId}")
-  public ResponseDto<ViewPostDto> getPostById(@PathVariable Integer postId) {
-    ViewPostDto viewPostDto = postService.getPostByIdWithFeedBacks(postId);
+  @GetMapping("/{postId}/{accountId}")
+  public ResponseDto<ViewPostDto> getPostById(@PathVariable Integer postId, @PathVariable Integer accountId) {
+    ViewPostDto viewPostDto = postService.getPostByIdWithFeedBacks(postId, accountId);
     ResponseDto<ViewPostDto> responseDto = new ResponseDto<>();
     responseDto.setData(viewPostDto);
     responseDto.setStatusCode(HttpStatus.OK.value());
