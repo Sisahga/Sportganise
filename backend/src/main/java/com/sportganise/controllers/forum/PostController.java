@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,7 +46,7 @@ public class PostController {
    * @return ResponseDto containing the fetched posts.
    */
   @GetMapping("/search/{orgId}/{accountId}")
-  public ResponseDto<List<PostDto>> searchAndFilterPosts(
+  public ResponseEntity<ResponseDto<List<PostDto>>> searchAndFilterPosts(
       @RequestParam(required = false) String searchTerm,
       @RequestParam(required = false) ZonedDateTime occurrenceDate,
       @RequestParam(required = false) PostType type,
@@ -73,7 +74,7 @@ public class PostController {
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Posts fetched successfully");
 
-    return responseDto;
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**
@@ -99,14 +100,14 @@ public class PostController {
    * @return ResponseDto containing the fetched post.
    */
   @GetMapping("/{postId}/{accountId}")
-  public ResponseDto<ViewPostDto> getPostById(@PathVariable Integer postId, @PathVariable Integer accountId) {
+  public ResponseEntity<ResponseDto<ViewPostDto>> getPostById(@PathVariable Integer postId, @PathVariable Integer accountId) {
     ViewPostDto viewPostDto = postService.getPostByIdWithFeedBacks(postId, accountId);
     ResponseDto<ViewPostDto> responseDto = new ResponseDto<>();
     responseDto.setData(viewPostDto);
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Post fetched successfully");
 
-    return responseDto;
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**
