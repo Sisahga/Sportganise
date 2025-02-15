@@ -82,12 +82,12 @@ public class PostControllerTest {
             eq(0),
             eq("occurrenceDate"),
             eq("desc"),
-            eq(1L),
-            eq(1L)))
+            eq(1),
+            eq(1)))
         .thenReturn(posts);
 
     mockMvc
-        .perform(get("/api/forum/posts/search").param("orgId", "1").param("accountId", "1"))
+        .perform(get("/api/forum/posts/search/1/1"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.data.[0].title").value("Fundraiser for OniBad"))
@@ -118,10 +118,10 @@ public class PostControllerTest {
     viewPostDto.setPostId(1);
     viewPostDto.setTitle("Test Post");
 
-    when(postService.getPostByIdWithFeedBacks(1)).thenReturn(viewPostDto);
+    when(postService.getPostByIdWithFeedBacks(1, 1)).thenReturn(viewPostDto);
 
     mockMvc
-        .perform(get("/api/forum/posts/1"))
+        .perform(get("/api/forum/posts/1/1"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.statusCode").value(200))
         .andExpect(jsonPath("$.message").value("Post fetched successfully"))
