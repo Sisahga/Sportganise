@@ -117,8 +117,7 @@ public class PostServiceTest {
         .thenReturn(postPage);
 
     List<PostDto> result =
-        postService.searchAndFilterPosts(
-            null, null, null, null, 10, 0, "likeCount", "desc", 1, 1);
+        postService.searchAndFilterPosts(null, null, null, null, 10, 0, "likeCount", "desc", 1, 1);
 
     assertEquals(2, result.size());
     assertEquals("Fundraiser for OniBad", result.get(0).getTitle());
@@ -178,7 +177,7 @@ public class PostServiceTest {
     when(feedbackService.getFeedbacksByPostId(postId)).thenReturn(feedbacks);
     when(likesRepository.countByPostId(postId)).thenReturn(likeCount);
 
-    ViewPostDto result = postService.getPostByIdWithFeedBacks(postId,accountId);
+    ViewPostDto result = postService.getPostByIdWithFeedBacks(postId, accountId);
 
     assertEquals(postId, result.getPostId());
     assertEquals("Test Post", result.getTitle());

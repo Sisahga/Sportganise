@@ -118,7 +118,7 @@ public class PostControllerTest {
     viewPostDto.setPostId(1);
     viewPostDto.setTitle("Test Post");
 
-    when(postService.getPostByIdWithFeedBacks(1,1)).thenReturn(viewPostDto);
+    when(postService.getPostByIdWithFeedBacks(1, 1)).thenReturn(viewPostDto);
 
     mockMvc
         .perform(get("/api/forum/posts/1/1"))

@@ -42,18 +42,18 @@ public interface LikesRepository extends JpaRepository<Likes, Integer> {
         """)
   void deleteByPostIdAndAccountId(Integer postId, Integer accountId);
 
-    /**
-     * Finds a like by post id and account id.
-     *
-     * @param postId Post id.
-     * @param accountId Account id.
-     * @return Like entity.
-     */
-    @Query(
-        """
+  /**
+   * Finds a like by post id and account id.
+   *
+   * @param postId Post id.
+   * @param accountId Account id.
+   * @return Like entity.
+   */
+  @Query(
+      """
         SELECT l
         FROM Likes l
         WHERE l.likeCompositeKey.postId = :postId AND l.likeCompositeKey.accountId = :accountId
         """)
-    Likes findByPostIdAndAccountId(Integer postId, Integer accountId);
+  Likes findByPostIdAndAccountId(Integer postId, Integer accountId);
 }
