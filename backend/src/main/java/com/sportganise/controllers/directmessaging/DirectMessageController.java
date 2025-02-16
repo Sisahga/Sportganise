@@ -7,6 +7,7 @@ import com.sportganise.services.directmessaging.DirectMessageService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -74,7 +75,7 @@ public class DirectMessageController {
    * @param senderAvatarUrl URL of the sender's avatar.
    * @return Response DTO with the update message with attachments.
    */
-  @PostMapping("/upload-attachments")
+  @PostMapping(value = "/upload-attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ResponseDto<DirectMessageDto>> uploadAttachments(
       @RequestParam("attachments") List<MultipartFile> attachments,
       @RequestParam("messageId") int messageId,
@@ -83,6 +84,7 @@ public class DirectMessageController {
       @RequestParam("senderAvatarUrl") String senderAvatarUrl) {
     try {
       log.info("Controller received attachment upload request.");
+      log.debug("Attachments to upload: {}", attachments.size());
       DirectMessageDto updatedMessage =
           directMessageService.uploadAttachments(
               messageId, attachments, senderId, senderFirstName, senderAvatarUrl);
