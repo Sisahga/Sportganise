@@ -103,6 +103,20 @@ button {
   transition: border-color 0.25s;
 }
 
+@keyframes skeleton-loading {
+  0% {
+    background-color: var(--primary-navbar-colour);
+  }
+  100% {
+    background-color: var(--faded-primary-colour);
+  }
+}
+
+.animate-skeleton {
+  opacity: 0.7;
+  animation: skeleton-loading 1s infinite linear alternate;
+}
+
 /* WebKit Browsers */
 ::-webkit-scrollbar {
   width: 6px !important;
