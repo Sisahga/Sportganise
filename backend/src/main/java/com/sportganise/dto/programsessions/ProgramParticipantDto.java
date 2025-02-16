@@ -25,7 +25,7 @@ public class ProgramParticipantDto {
     this.accountId = programParticipant.getAccountId();
     this.programId = programParticipant.getProgramId();
     this.rank = programParticipant.getRank();
-    this.participantType = programParticipant.getParticipantType();
+    this.participantType = programParticipant.getType();
     this.isConfirmed = programParticipant.isConfirmed();
     this.confirmedDate = programParticipant.getConfirmedDate();
   }
