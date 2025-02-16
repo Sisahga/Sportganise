@@ -14,7 +14,6 @@ import com.sportganise.repositories.directmessaging.DirectMessageRepository;
 import com.sportganise.services.BlobService;
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +39,6 @@ public class DirectMessageServiceUnitTest {
     sendDirectMessageRequestDto.setSenderId(2);
     sendDirectMessageRequestDto.setMessageContent("Hello, World!");
     sendDirectMessageRequestDto.setSentAt(ZonedDateTime.now().toString());
-    sendDirectMessageRequestDto.setAttachments(Collections.emptyList());
     sendDirectMessageRequestDto.setType("CHAT");
 
     // Mock DirectMessageRepository save method
@@ -62,7 +60,6 @@ public class DirectMessageServiceUnitTest {
     assertEquals(1, response.getChannelId());
     assertEquals(2, response.getSenderId());
     assertEquals("Hello, World!", response.getMessageContent());
-    assertTrue(response.getAttachments().isEmpty());
 
     verify(directMessageRepository, times(1)).save(any(DirectMessage.class));
     verify(directMessageChannelRepository, times(1)).updateLastMessageId(1, 1);
