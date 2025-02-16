@@ -100,13 +100,12 @@ const ChannelSettingsDropdown = ({
         senderId: currentUserId,
         channelId: channelId,
         messageContent: `BLOCK*${currentUserId}*You blocked this user*You have been blocked by this user`,
-        attachments: [],
         sentAt: new Date().toISOString(),
         type: "BLOCK",
         senderFirstName: cookies.firstName,
         avatarUrl: cookies.pictureUrl,
       };
-      sendDirectMessage(messagePayload, webSocketRef);
+      await sendDirectMessage(messagePayload, webSocketRef);
 
       const chatScreenInputArea = document.getElementById(
         "chatScreenInputArea",
@@ -145,7 +144,6 @@ const ChannelSettingsDropdown = ({
         senderId: currentUserId,
         channelId: channelId,
         messageContent: `DELETE*${currentUserId}*You requested to delete the channel*${cookies.firstName} requested to delete the channel`,
-        attachments: [],
         sentAt: new Date().toISOString(),
         type: "DELETE",
         senderFirstName: cookies.firstName,
@@ -153,7 +151,7 @@ const ChannelSettingsDropdown = ({
       };
       log.info("WebSocketRef: ", webSocketRef);
       log.info("MessagePayload: ", messagePayload);
-      sendDirectMessage(messagePayload, webSocketRef);
+      await sendDirectMessage(messagePayload, webSocketRef);
       log.info(`Channel ${channelId} now has a delete request ongoing.`);
     } else if (response?.statusCode === 204) {
       toast({
@@ -186,13 +184,12 @@ const ChannelSettingsDropdown = ({
         senderId: currentUserId,
         channelId: channelId,
         messageContent: `LEAVE*${currentUserId}*${leaveMessageRemoverViewContent}*${leaveMessageContent}`,
-        attachments: [],
         sentAt: new Date().toISOString(),
         type: "LEAVE",
         senderFirstName: cookies.firstName,
         avatarUrl: cookies.pictureUrl,
       };
-      sendDirectMessage(messagePayload, webSocketRef);
+      await sendDirectMessage(messagePayload, webSocketRef);
       setIsLeaveGroupOpen(false);
       navigate("/pages/DirectMessagesDashboard");
     } else {
