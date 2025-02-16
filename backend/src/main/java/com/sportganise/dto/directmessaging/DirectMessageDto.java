@@ -20,7 +20,7 @@ public class DirectMessageDto {
   private String senderFirstName;
   private Integer channelId;
   private String messageContent;
-  private List<String> attachments;
+  private List<DmAttachmentDto> attachments;
   private String sentAt;
   private DirectMessageType type;
   private String avatarUrl;
