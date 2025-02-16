@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Direct message attachment DTO.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
