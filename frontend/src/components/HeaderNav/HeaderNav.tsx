@@ -64,10 +64,10 @@ export default function HeaderNav() {
                     to="/pages/CreateTrainingSessionPage"
                     className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
                   >
-                    Training Session
+                    Create Program
                   </Link>
                   <Link
-                    to="/pages/TrainingPlanPage" //add actual redirect once training plan page is set up
+                    to="/pages/TrainingPlanPage"
                     className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
                   >
                     Training Plan
@@ -75,7 +75,7 @@ export default function HeaderNav() {
                 </>
               )}
               <Link
-                to="/pages/NotificationSettingsPage" //add actual redirect once setting page is set up
+                to="/pages/NotificationSettingsPage"
                 className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Settings
