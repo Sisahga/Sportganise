@@ -9,9 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * DirectMessageBlobCompositeKey.
- */
+/** DirectMessageBlobCompositeKey. */
 @Getter
 @Setter
 @NoArgsConstructor
