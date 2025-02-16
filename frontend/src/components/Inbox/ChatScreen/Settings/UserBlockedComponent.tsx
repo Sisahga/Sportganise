@@ -51,13 +51,12 @@ const UserBlockedComponent = ({
           senderId: currentUserId,
           channelId: channelId,
           messageContent: `UNBLOCK*${currentUserId}*You unblocked this user*You have been unblocked by this user`,
-          attachments: [],
           sentAt: new Date().toISOString(),
           type: "UNBLOCK",
           senderFirstName: cookies.firstName,
           avatarUrl: cookies.pictureUrl,
         };
-        sendDirectMessage(messagePayload, webSocketRef);
+        await sendDirectMessage(messagePayload, webSocketRef);
         setShowComponent(false);
       }
     }

@@ -52,13 +52,16 @@ public class FeedbackServiceTest {
   public void createFeedback_ShouldSaveFeedback() {
     CreateFeedbackDto createFeedbackDto = new CreateFeedbackDto(1, "Great post!");
     Feedback feedback = new Feedback();
+    feedback.setFeedbackId(1);
     feedback.setContent(createFeedbackDto.getContent());
     feedback.setPostId(2);
     feedback.setUserId(createFeedbackDto.getAccountId());
+    when(feedbackRepository.save(any(Feedback.class))).thenReturn(feedback);
 
-    feedbackService.createFeedback(createFeedbackDto, 2);
+    Integer feedbackId = feedbackService.createFeedback(createFeedbackDto, 2);
 
     verify(feedbackRepository, times(1)).save(any(Feedback.class));
+    assertEquals(1, feedbackId);
   }
 
   @Test

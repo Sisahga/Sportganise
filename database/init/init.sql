@@ -89,6 +89,7 @@ CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
 	type program_type,
 	title VARCHAR(30) NOT NULL,
+	author VARCHAR(20) NOT NULL,
 	description VARCHAR(100),
 	capacity INTEGER,
 	occurence_date TIMESTAMPTZ,
@@ -161,7 +162,9 @@ CREATE TABLE message (
 CREATE TABLE message_blob (
     message_id INTEGER NOT NULL REFERENCES message(message_id) ON DELETE SET NULL,
     blob_url VARCHAR(255) NOT NULL,
-    PRIMARY KEY (message_id)
+    file_type VARCHAR(10) NOT NULL,
+    PRIMARY KEY (message_id, blob_url),
+    CONSTRAINT valid_blob CHECK (file_type IN ('IMAGE', 'VIDEO', 'FILE'))
 );
 
 ALTER TABLE channel

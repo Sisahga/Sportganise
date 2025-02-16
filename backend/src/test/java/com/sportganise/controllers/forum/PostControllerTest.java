@@ -159,16 +159,17 @@ public class PostControllerTest {
 
   @Test
   public void createFeedback_ShouldReturn_SuccessMessage() throws Exception {
-    doNothing().when(feedbackService).createFeedback(any(), eq(1));
+    when((feedbackService).createFeedback(any(), eq(1))).thenReturn(1);
 
     mockMvc
         .perform(
             post("/api/forum/posts/1/add-feedback")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"content\": \"Great post!\"}"))
-        .andExpect(status().isOk())
+        .andExpect(status().isCreated())
         .andExpect(jsonPath("$.statusCode").value(201))
-        .andExpect(jsonPath("$.message").value("Feedback added successfully"));
+        .andExpect(jsonPath("$.message").value("Feedback added successfully"))
+        .andExpect(jsonPath("$.data.feedbackId").value(1));
   }
 
   @Test

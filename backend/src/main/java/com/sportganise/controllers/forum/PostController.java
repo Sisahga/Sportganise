@@ -2,6 +2,7 @@ package com.sportganise.controllers.forum;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.forum.CreateFeedbackDto;
+import com.sportganise.dto.forum.FeedbackIdDto;
 import com.sportganise.dto.forum.LikeRequestDto;
 import com.sportganise.dto.forum.PostDto;
 import com.sportganise.dto.forum.ViewPostDto;
@@ -155,14 +156,16 @@ public class PostController {
    * @return ResponseDto .
    */
   @PostMapping("/{postId}/add-feedback")
-  public ResponseDto<String> createFeedback(
+  public ResponseEntity<ResponseDto<FeedbackIdDto>> createFeedback(
       @PathVariable Integer postId, @RequestBody CreateFeedbackDto feedback) {
-    feedbackService.createFeedback(feedback, postId);
-    ResponseDto<String> responseDto = new ResponseDto<>();
+    FeedbackIdDto feedbackIdDto =
+        new FeedbackIdDto(feedbackService.createFeedback(feedback, postId));
+    ResponseDto<FeedbackIdDto> responseDto = new ResponseDto<>();
+    responseDto.setData(feedbackIdDto);
     responseDto.setStatusCode(HttpStatus.CREATED.value());
     responseDto.setMessage("Feedback added successfully");
 
-    return responseDto;
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**

@@ -2,6 +2,8 @@ package com.sportganise.services;
 
 import com.sportganise.entities.Blob;
 import com.sportganise.entities.directmessaging.DirectMessageBlob;
+import com.sportganise.entities.directmessaging.DirectMessageBlobCompositeKey;
+import com.sportganise.entities.directmessaging.DirectMessageBlobType;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.repositories.BlobRepository;
 import com.sportganise.repositories.directmessaging.DirectMessageBlobRepository;
@@ -81,7 +83,6 @@ public class BlobService {
       MultipartFile file, boolean isMessageFile, String messageId, Integer accountId)
       throws FileProcessingException {
     String fileName = file.getOriginalFilename();
-    // TODO: set proper key for file (accountId/uuid+filename)
     String uniqueFileName = UUID.randomUUID() + "_" + fileName;
     String s3Key = accountId + "/" + uniqueFileName;
 
@@ -100,10 +101,20 @@ public class BlobService {
         blob.setBlobUrl(s3Url);
         blobRepository.save(blob);
       } else { // Case where it is a message file.
-        DirectMessageBlob directMessageBlob = new DirectMessageBlob();
-        directMessageBlob.setMessageId(Integer.parseInt(messageId));
-        directMessageBlob.setBlobUrl(s3Url);
+        DirectMessageBlobCompositeKey compositeKey = new DirectMessageBlobCompositeKey();
+        compositeKey.setMessageId(Integer.parseInt(messageId));
+        compositeKey.setBlobUrl(s3Url);
+        DirectMessageBlob directMessageBlob =
+            DirectMessageBlob.builder().compositeKey(compositeKey).build();
+        if (file.getContentType() != null && file.getContentType().startsWith("image/")) {
+          directMessageBlob.setFileType(DirectMessageBlobType.IMAGE);
+        } else if (file.getContentType() != null && file.getContentType().startsWith("video/")) {
+          directMessageBlob.setFileType(DirectMessageBlobType.VIDEO);
+        } else {
+          directMessageBlob.setFileType(DirectMessageBlobType.FILE);
+        }
         directMessageBlobRepository.save(directMessageBlob);
+        log.info("File uploaded successfully and saved as message_blob: {}", s3Url);
       }
       return s3Url;
     } catch (S3Exception | IOException e) {

@@ -43,12 +43,14 @@ public class FeedbackService {
    *
    * @param createFeedbackDto feedback data
    */
-  public void createFeedback(CreateFeedbackDto createFeedbackDto, Integer postId) {
+  public Integer createFeedback(CreateFeedbackDto createFeedbackDto, Integer postId) {
     Feedback feedback = new Feedback();
     feedback.setContent(createFeedbackDto.getContent());
     feedback.setPostId(postId);
     feedback.setUserId(createFeedbackDto.getAccountId());
-    feedbackRepository.save(feedback);
+    Feedback savedFeedback = feedbackRepository.save(feedback);
+
+    return savedFeedback.getFeedbackId();
   }
 
   /**

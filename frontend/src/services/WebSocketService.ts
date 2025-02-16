@@ -46,23 +46,44 @@ export default class WebSocketService {
     }
   }
 
-  sendMessage(msgPayload: SendMessageComponent) {
-    if (this.stompClient) {
-      try {
-        this.stompClient.publish({
-          destination: "/app/chat.send-message",
-          body: JSON.stringify(msgPayload),
-        });
-        console.log("Message sent successfully");
-      } catch (error) {
-        console.error("Error sending message:", error);
+  sendMessage(msgPayload: SendMessageComponent): Promise<MessageComponent> {
+    return new Promise((resolve, reject) => {
+      if (this.stompClient) {
+        try {
+          const subscription = this.stompClient.subscribe(
+            "/directmessage/public",
+            (payload) => {
+              const message = JSON.parse(payload.body);
+              if (
+                message.senderId === msgPayload.senderId &&
+                message.messageContent === msgPayload.messageContent &&
+                message.sentAt === msgPayload.sentAt
+              ) {
+                subscription.unsubscribe();
+                resolve(message);
+              }
+            },
+          );
+
+          this.stompClient.publish({
+            destination: "/app/chat.send-message",
+            body: JSON.stringify(msgPayload),
+          });
+          console.log("Message sent successfully");
+        } catch (error) {
+          console.error("Error sending message:", error);
+          reject(error);
+        }
+      } else {
+        console.error("WebSocket not connected");
+        reject("WebSocket not connected");
       }
-    }
+    });
   }
 
   private onMessageReceived = (payload: any) => {
     console.log("Message received:", payload);
-    const message = JSON.parse(payload.body);
+    const message: MessageComponent = JSON.parse(payload.body);
     this.onMessageReceivedCallback(message);
   };
 
