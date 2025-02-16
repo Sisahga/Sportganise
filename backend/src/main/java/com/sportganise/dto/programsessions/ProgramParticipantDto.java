@@ -16,6 +16,7 @@ public class ProgramParticipantDto {
   private Integer accountId;
   private Integer programId;
   private Integer rank;
+  private String participantType;
   private boolean isConfirmed;
   private ZonedDateTime confirmedDate;
 
@@ -24,6 +25,7 @@ public class ProgramParticipantDto {
     this.accountId = programParticipant.getAccountId();
     this.programId = programParticipant.getProgramId();
     this.rank = programParticipant.getRank();
+    this.participantType = programParticipant.getParticipantType();
     this.isConfirmed = programParticipant.isConfirmed();
     this.confirmedDate = programParticipant.getConfirmedDate();
   }
