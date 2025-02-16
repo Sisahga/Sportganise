@@ -50,6 +50,38 @@ public class WaitlistService {
   }
 
   /**
+   * Fetchs a waitlisted participant.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A programParticipantDto.
+   * @throws ParticipantNotFoundException whenever participant can't be found
+   */
+  public ProgramParticipant getWaitlistedParticipant(Integer programId, Integer accountId) {
+    log.debug("opt-in participant (programId={}, accountId={})", programId, accountId);
+    log.debug("{}", programId);
+    ProgramParticipant participant =
+        participantRepository.findWaitlistParticipant(programId, accountId);
+    if (participant == null) {
+      log.error(
+          "Participant not found on waitlist for program={}, account={}", programId, accountId);
+      throw new ParticipantNotFoundException(
+          "Participant not found on waitlist for program: "
+              + programId
+              + ", account: "
+              + accountId);
+    }
+
+    return participant;
+  }
+
+  public ProgramParticipantDto fetchParticipant(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+    ProgramParticipant participant = getWaitlistedParticipant(programId, accountId);
+    return new ProgramParticipantDto(participant);
+  }
+
+  /**
    * Adds a participant to the waitlist for a program and assigns them a rank.
    *
    * @param programId The ID of the program.
@@ -59,21 +91,12 @@ public class WaitlistService {
    */
   public Integer optProgramParticipantDto(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
-    log.debug("opt-in participant (programId={}, accountId={})", programId, accountId);
+
     Integer maxRank = participantRepository.findMaxRank(programId);
     int newRank = (maxRank == null) ? 1 : maxRank + 1;
 
-    ProgramParticipant optedParticipant =
-        participantRepository.findWaitlistParticipant(programId, accountId);
-    if (optedParticipant == null) {
-      log.error(
-          "Participant not found on waitlist for program={}, account={}", programId, accountId);
-      throw new ParticipantNotFoundException(
-          "Participant not found on waitlist for program: "
-              + programId
-              + ", account: "
-              + accountId);
-    }
+    ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
+
     if (optedParticipant.isConfirmed() == true || optedParticipant.getRank() != null) {
       log.warn("Participant already confirmed");
       return null;
@@ -135,20 +158,7 @@ public class WaitlistService {
         programId,
         accountId);
 
-    ProgramParticipant optedParticipant =
-        participantRepository.findWaitlistParticipant(programId, accountId);
-
-    if (optedParticipant == null) {
-      log.error(
-          "Participant not found removal/confirmation (programId={}, accountId={})",
-          programId,
-          accountId);
-      throw new ParticipantNotFoundException(
-          "Participant not found on waitlist for program: "
-              + programId
-              + ", account: "
-              + accountId);
-    }
+    ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
 
     if (confirmParticipant == true) {
       // Confirm participant

@@ -42,6 +42,31 @@ public class ProgramParticipantController {
    * @param accountId The ID of the participant's account.
    * @return The rank assigned to the participant.
    */
+  @GetMapping("/get-participant")
+  public ResponseEntity<?> fetchProgramParticipant(
+      @RequestParam Integer programId, @RequestParam Integer accountId) {
+    log.info("Fetchin participant: programId: {}, accountId: {}", programId, accountId);
+    try {
+      ProgramParticipantDto participant = waitlistService.fetchParticipant(programId, accountId);
+      log.info("Fetched participant. programId: {}, accountId: {}", programId, accountId);
+      return ResponseEntity.ok(participant);
+    } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant not found for opt-in. programId: {}, accountId: {}. Error: {}",
+          programId,
+          accountId,
+          e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+  }
+
+  /**
+   * Adds a participant to a program's waitlist and assigns them a rank.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return The rank assigned to the participant.
+   */
   @PatchMapping("/opt-participant")
   public ResponseEntity<?> optProgramParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
