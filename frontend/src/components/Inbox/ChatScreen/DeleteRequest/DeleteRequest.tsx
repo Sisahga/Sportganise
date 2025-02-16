@@ -85,13 +85,12 @@ export default function DeleteRequest({
         senderId: currentUserId,
         channelId: deleteRequest?.deleteChannelRequestDto.channelId || 0,
         messageContent: `DELETE*${currentUserId}*You ${denyMessage}*${cookies.firstName} ${denyMessage}`,
-        attachments: [],
         sentAt: new Date().toISOString(),
         type: "DELETE",
         senderFirstName: cookies.firstName,
         avatarUrl: cookies.pictureUrl,
       };
-      sendDirectMessage(messagePayload, websocketRef);
+      await sendDirectMessage(messagePayload, websocketRef);
       setDeleteRequestActive(false);
     } else if (response.statusCode === 200) {
       // 200 if status was successfully set without altering channel state.
