@@ -1,10 +1,8 @@
 package com.sportganise.services.directmessaging;
 
-import com.sportganise.dto.directmessaging.DirectMessageDto;
-import com.sportganise.dto.directmessaging.LastMessageDto;
-import com.sportganise.dto.directmessaging.MemberDetailsDto;
-import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
+import com.sportganise.dto.directmessaging.*;
 import com.sportganise.entities.directmessaging.DirectMessage;
+import com.sportganise.entities.directmessaging.DirectMessageBlobType;
 import com.sportganise.entities.directmessaging.DirectMessageType;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
@@ -78,7 +76,7 @@ public class DirectMessageService {
       }
       log.info("Received member details for channel.");
       List<DirectMessageDto> messages = new ArrayList<>();
-      List<String> attachments;
+      List<DmAttachmentDto> attachments;
       DirectMessageDto messageDto;
       for (DirectMessage message : messagesNoAttachments) {
         log.info("Sender ID: {}", message.getSenderId());
@@ -101,6 +99,7 @@ public class DirectMessageService {
           continue;
         }
         attachments = directMessageRepository.getMessageAttachments(message.getMessageId());
+        Collections.reverse(attachments);
         messageDto =
             DirectMessageDto.builder()
                 .messageId(message.getMessageId())
@@ -248,7 +247,7 @@ public class DirectMessageService {
    * @return DTO containing information about the sent message.
    */
   public DirectMessageDto buildDirectMessageDtoForAttachments(
-      List<String> attachments, DirectMessage dm, String senderFirstName, String senderAvatarUrl) {
+      List<DmAttachmentDto> attachments, DirectMessage dm, String senderFirstName, String senderAvatarUrl) {
     return DirectMessageDto.builder()
         .messageId(dm.getMessageId())
         .senderId(dm.getSenderId())
@@ -279,10 +278,16 @@ public class DirectMessageService {
       String senderFirstName,
       String senderAvatarUrl) {
     try {
-      List<String> attachments = new ArrayList<>();
+      List<DmAttachmentDto> attachments = new ArrayList<>();
+      log.debug("Attempting to upload {} attachments...", files.size());
       for (MultipartFile file : files) {
         String blobUrl = blobService.uploadFile(file, true, String.valueOf(messageId), senderId);
-        attachments.add(blobUrl);
+        DirectMessageBlobType fileType = getFileType(file);
+        DmAttachmentDto dmAttachmentDto = DmAttachmentDto.builder()
+                .attachmentUrl(blobUrl)
+                .fileType(fileType)
+                .build();
+        attachments.add(dmAttachmentDto);
       }
       DirectMessage dm = getDirectMessageById(messageId);
       return buildDirectMessageDtoForAttachments(attachments, dm, senderFirstName, senderAvatarUrl);
@@ -352,6 +357,16 @@ public class DirectMessageService {
       log.error("Error fetching last message.");
       throw new DirectMessageFetchException(
           "An unexpected error occured when trying to fetch last message.");
+    }
+  }
+
+  public DirectMessageBlobType getFileType(MultipartFile file) {
+    if (file.getContentType() != null && file.getContentType().startsWith("image/")) {
+      return DirectMessageBlobType.IMAGE;
+    } else if (file.getContentType() != null && file.getContentType().startsWith("video/")) {
+      return DirectMessageBlobType.VIDEO;
+    } else {
+      return DirectMessageBlobType.FILE;
     }
   }
 }
