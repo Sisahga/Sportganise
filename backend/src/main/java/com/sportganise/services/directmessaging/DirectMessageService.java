@@ -1,6 +1,10 @@
 package com.sportganise.services.directmessaging;
 
-import com.sportganise.dto.directmessaging.*;
+import com.sportganise.dto.directmessaging.DirectMessageDto;
+import com.sportganise.dto.directmessaging.DmAttachmentDto;
+import com.sportganise.dto.directmessaging.LastMessageDto;
+import com.sportganise.dto.directmessaging.MemberDetailsDto;
+import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
 import com.sportganise.entities.directmessaging.DirectMessageBlobType;
 import com.sportganise.entities.directmessaging.DirectMessageType;
@@ -361,6 +365,12 @@ public class DirectMessageService {
     }
   }
 
+  /**
+   * Gets the last message in a channel.
+   *
+   * @param file The file to get the type of.
+   * @return The type of the file.
+   */
   public DirectMessageBlobType getFileType(MultipartFile file) {
     if (file.getContentType() != null && file.getContentType().startsWith("image/")) {
       return DirectMessageBlobType.IMAGE;
