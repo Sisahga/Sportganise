@@ -58,5 +58,5 @@ export interface UserBlockedComponentProps {
 }
 
 export interface ChatImageDialogProps {
-  attachment: Attachment,
+  attachment: Attachment;
 }

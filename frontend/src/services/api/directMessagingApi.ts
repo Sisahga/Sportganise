@@ -249,16 +249,19 @@ const directMessagingApi = {
     }
   },
   uploadAttachments: async (formData: FormData) => {
-    const response = await fetch(`${baseMappingUrl}/directmessage/upload-attachments`, {
-      method: "POST",
-      headers: {
-        Authorization: getBearerToken(),
+    const response = await fetch(
+      `${baseMappingUrl}/directmessage/upload-attachments`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: getBearerToken(),
+        },
+        body: formData,
       },
-      body: formData,
-    });
+    );
     const data: ResponseDto<MessageComponent> = await response.json();
     return data;
-  }
+  },
 };
 
 export default directMessagingApi;

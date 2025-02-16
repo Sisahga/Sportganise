@@ -50,15 +50,20 @@ export default class WebSocketService {
     return new Promise((resolve, reject) => {
       if (this.stompClient) {
         try {
-          const subscription = this.stompClient.subscribe("/directmessage/public", (payload) => {
-            const message = JSON.parse(payload.body);
-            if (message.senderId === msgPayload.senderId &&
+          const subscription = this.stompClient.subscribe(
+            "/directmessage/public",
+            (payload) => {
+              const message = JSON.parse(payload.body);
+              if (
+                message.senderId === msgPayload.senderId &&
                 message.messageContent === msgPayload.messageContent &&
-                message.sentAt === msgPayload.sentAt) {
-              subscription.unsubscribe();
-              resolve(message);
-            }
-          });
+                message.sentAt === msgPayload.sentAt
+              ) {
+                subscription.unsubscribe();
+                resolve(message);
+              }
+            },
+          );
 
           this.stompClient.publish({
             destination: "/app/chat.send-message",
