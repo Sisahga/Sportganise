@@ -27,7 +27,7 @@ public class ProgramParticipant {
   private Integer rank;
 
   @Column(name = "type")
-  private String participantType;
+  private String type;
 
   @Column(name = "is_confirmed")
   private boolean isConfirmed;

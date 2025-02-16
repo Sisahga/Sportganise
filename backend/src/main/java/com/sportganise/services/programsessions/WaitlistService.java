@@ -296,7 +296,7 @@ public class WaitlistService {
                   return this.participantRepository.save(
                       ProgramParticipant.builder()
                           .programParticipantId(new ProgramParticipantId(programId, accountId))
-                          .participantType(account.getType().name())
+                          .type(account.getType().name())
                           .isConfirmed(false)
                           .build());
                 });
