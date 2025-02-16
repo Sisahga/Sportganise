@@ -37,7 +37,10 @@ const ChatMessageAttachments = ({
       <Dialog open={imageOpen} onOpenChange={setImageOpen}>
         <DialogPortal>
           <DialogOverlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[999]" />
-          <DialogContent className="fixed inset-0 border-none bg-transparent p-0 max-w-none z-[999]">
+          <DialogContent
+            title={extractFileName(selectedAttachment?.attachmentUrl || "")}
+            className="fixed inset-0 border-none bg-transparent p-0 max-w-none z-[999]"
+          >
             <div className="relative w-full h-full flex items-center justify-center">
               <DialogClose className="absolute right-4 top-4 z-[999] focus:outline-none focus-visible:outline-none">
                 <div className="rounded-full p-2">
@@ -64,19 +67,24 @@ const ChatMessageAttachments = ({
               .filter((att) => att.fileType === AttachmentType.IMAGE)
               .map((attachment) => (
                 <div key={attachment.attachmentUrl} className="shadow-lg h-fit">
-                  <img
-                    src={attachment.attachmentUrl}
-                    alt={attachment.attachmentUrl}
-                    className={`
-                                min-w-20 min-h-20 max-w-28 max-h-36 rounded object-cover cursor-pointer
-                                ${isLoaded ? "" : "animate-skeleton"}
-                              `}
+                  <button
+                    className="p-0 border-0 bg-transparent"
                     onClick={() => {
                       handleImageClicked(attachment);
                     }}
-                    onLoad={() => setIsLoaded(true)}
-                    loading={"lazy"}
-                  />
+                    aria-label={`View ${extractFileName(attachment.attachmentUrl)}`}
+                  >
+                    <img
+                      src={attachment.attachmentUrl}
+                      alt={attachment.attachmentUrl}
+                      className={`
+                                  min-w-20 min-h-20 max-w-28 max-h-36 rounded object-cover cursor-pointer
+                                  ${isLoaded ? "" : "animate-skeleton"}
+                                `}
+                      onLoad={() => setIsLoaded(true)}
+                      loading={"lazy"}
+                    />
+                  </button>
                 </div>
               ))}
           </div>
@@ -94,7 +102,16 @@ const ChatMessageAttachments = ({
                   src={attachment.attachmentUrl}
                   className="min-w-20 min-h-20 max-w-28 max-h-36 rounded object-cover cursor-pointer"
                   controls
-                />
+                >
+                  <track
+                    kind="captions"
+                    src=""
+                    label="English"
+                    srcLang="en"
+                    default
+                  />
+                  Your browser does not support the video tag.
+                </video>
               </div>
             ))}
         </div>
