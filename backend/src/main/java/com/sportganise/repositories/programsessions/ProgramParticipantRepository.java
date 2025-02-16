@@ -18,12 +18,12 @@ public interface ProgramParticipantRepository
   /** Find a participant who is waitlisted for a specific program. */
   @Query(
       """
-    SELECT pp
-    FROM ProgramParticipant pp
-    WHERE pp.programParticipantId.programId = :programId
-    AND pp.programParticipantId.accountId = :accountId
-    AND pp.type = 'Waitlisted'
-    """)
+      SELECT pp
+      FROM ProgramParticipant pp
+      WHERE pp.programParticipantId.programId = :programId
+      AND pp.programParticipantId.accountId = :accountId
+      AND pp.type = 'Waitlisted'
+      """)
   ProgramParticipant findWaitlistParticipant(
       @Param("programId") Integer programId, @Param("accountId") Integer accountId);
 
