@@ -53,14 +53,13 @@ export function RenameGroupDialog({
           senderId: currentUserId,
           channelId: channelId,
           messageContent: `UPDATE*${currentUserId}*${updaterMessageView}*${otherMessageView}`,
-          attachments: [],
           sentAt: new Date().toISOString(),
           type: "UPDATE",
           senderFirstName: cookies.firstName,
           avatarUrl:
             "https://sportganise-bucket.s3.us-east-2.amazonaws.com/walter_white_avatar.jpg",
         };
-        sendDirectMessage(messagePayload, webSocketRef);
+        await sendDirectMessage(messagePayload, webSocketRef);
         setCurrentName(newName);
         setNewName("");
         setCurrentChannelName(newName);

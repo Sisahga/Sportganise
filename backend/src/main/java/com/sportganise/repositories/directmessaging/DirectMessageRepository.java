@@ -1,5 +1,6 @@
 package com.sportganise.repositories.directmessaging;
 
+import com.sportganise.dto.directmessaging.DmAttachmentDto;
 import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
 import java.util.List;
@@ -22,11 +23,14 @@ public interface DirectMessageRepository extends JpaRepository<DirectMessage, In
 
   @Query(
       """
-          SELECT dmb.blobUrl
-          FROM DirectMessageBlob dmb
-          WHERE dmb.messageId = :messageId
-         """)
-  List<String> getMessageAttachments(int messageId);
+              SELECT new com.sportganise.dto.directmessaging.DmAttachmentDto(
+                  dmb.compositeKey.blobUrl,
+                  dmb.fileType
+              )
+              FROM DirectMessageBlob dmb
+              WHERE dmb.compositeKey.messageId = :messageId
+          """)
+  List<DmAttachmentDto> getMessageAttachments(int messageId);
 
   @Query(
       """

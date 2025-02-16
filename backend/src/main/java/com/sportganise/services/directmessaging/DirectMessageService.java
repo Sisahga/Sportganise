@@ -1,10 +1,12 @@
 package com.sportganise.services.directmessaging;
 
 import com.sportganise.dto.directmessaging.DirectMessageDto;
+import com.sportganise.dto.directmessaging.DmAttachmentDto;
 import com.sportganise.dto.directmessaging.LastMessageDto;
 import com.sportganise.dto.directmessaging.MemberDetailsDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.entities.directmessaging.DirectMessage;
+import com.sportganise.entities.directmessaging.DirectMessageBlobType;
 import com.sportganise.entities.directmessaging.DirectMessageType;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
@@ -78,7 +80,7 @@ public class DirectMessageService {
       }
       log.info("Received member details for channel.");
       List<DirectMessageDto> messages = new ArrayList<>();
-      List<String> attachments;
+      List<DmAttachmentDto> attachments;
       DirectMessageDto messageDto;
       for (DirectMessage message : messagesNoAttachments) {
         log.info("Sender ID: {}", message.getSenderId());
@@ -101,6 +103,7 @@ public class DirectMessageService {
           continue;
         }
         attachments = directMessageRepository.getMessageAttachments(message.getMessageId());
+        Collections.reverse(attachments);
         messageDto =
             DirectMessageDto.builder()
                 .messageId(message.getMessageId())
@@ -165,16 +168,12 @@ public class DirectMessageService {
     try {
       int channelId = sendDirectMessageRequestDto.getChannelId();
       int senderId = sendDirectMessageRequestDto.getSenderId();
-      DirectMessage directMessage = new DirectMessage();
-      directMessage.setSenderId(senderId);
-      directMessage.setChannelId(channelId);
-      directMessage.setContent(sendDirectMessageRequestDto.getMessageContent());
-      directMessage.setSentAt(ZonedDateTime.parse(sendDirectMessageRequestDto.getSentAt()));
-      directMessage.setType(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()));
-      directMessageRepository.save(directMessage);
+
+      // Save DM in DB.
+      int messageId = saveDirectMessage(sendDirectMessageRequestDto);
 
       // Update Last Message in Channel Table.
-      directMessageChannelRepository.updateLastMessageId(channelId, directMessage.getMessageId());
+      directMessageChannelRepository.updateLastMessageId(channelId, messageId);
       log.debug("Last message updated for channel {}", channelId);
 
       // Update Read Status in Channel Member Table: all other members -> false, sender -> true.
@@ -182,25 +181,12 @@ public class DirectMessageService {
           directMessageChannelMemberRepository.updateChannelMemberReadStatus(senderId, channelId);
       log.info("Read status updated for {} members in channel {}", rowsAffected, channelId);
 
-      DirectMessageDto directMessageDto = new DirectMessageDto();
-      directMessageDto.setMessageId(directMessage.getMessageId());
-      directMessageDto.setSenderId(senderId);
-      directMessageDto.setSenderFirstName(sendDirectMessageRequestDto.getSenderFirstName());
-      directMessageDto.setChannelId(channelId);
-      directMessageDto.setMessageContent(sendDirectMessageRequestDto.getMessageContent());
-      directMessageDto.setSentAt(sendDirectMessageRequestDto.getSentAt());
-      directMessageDto.setType(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()));
-      directMessageDto.setAvatarUrl(sendDirectMessageRequestDto.getAvatarUrl());
+      DirectMessageDto directMessageDto =
+          buildDirectMessageDtoFromMessageRequest(messageId, sendDirectMessageRequestDto);
 
-      // Upload Attachments to Blob Storage and Persist Message-Attachment relationship in DB.
-      List<String> attachments = new ArrayList<>();
-      for (int i = 0; i < sendDirectMessageRequestDto.getAttachments().size(); i++) {
-        MultipartFile file = sendDirectMessageRequestDto.getAttachments().get(i);
-        String blobUrl =
-            blobService.uploadFile(file, true, directMessage.getMessageId().toString(), senderId);
-        attachments.add(blobUrl);
-      }
-      directMessageDto.setAttachments(attachments);
+      // Set to empty list by default. Will be updated if there are attachments in a different
+      // endpoint.
+      directMessageDto.setAttachments(Collections.emptyList());
 
       log.info("Message sent.");
 
@@ -215,6 +201,116 @@ public class DirectMessageService {
       throw new DirectMessageSendException(
           "An unexpected error occured when trying to send a message.");
     }
+  }
+
+  /**
+   * Saves a Direct Message in the Database.
+   *
+   * @param sendDirectMessageRequestDto DTO containing the message details.
+   * @return The ID of the saved message.
+   */
+  public int saveDirectMessage(SendDirectMessageRequestDto sendDirectMessageRequestDto) {
+    DirectMessage directMessage = new DirectMessage();
+    directMessage.setSenderId(sendDirectMessageRequestDto.getSenderId());
+    directMessage.setChannelId(sendDirectMessageRequestDto.getChannelId());
+    directMessage.setContent(sendDirectMessageRequestDto.getMessageContent());
+    directMessage.setSentAt(ZonedDateTime.parse(sendDirectMessageRequestDto.getSentAt()));
+    directMessage.setType(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()));
+    directMessageRepository.save(directMessage);
+
+    return directMessage.getMessageId();
+  }
+
+  /**
+   * Builds a DirectMessageDto from a SendDirectMessageRequestDto.
+   *
+   * @param messageId The ID of the message.
+   * @param sendDirectMessageRequestDto DTO containing the message details.
+   * @return DTO containing information about the sent message.
+   */
+  public DirectMessageDto buildDirectMessageDtoFromMessageRequest(
+      int messageId, SendDirectMessageRequestDto sendDirectMessageRequestDto) {
+    return DirectMessageDto.builder()
+        .messageId(messageId)
+        .senderId(sendDirectMessageRequestDto.getSenderId())
+        .senderFirstName(sendDirectMessageRequestDto.getSenderFirstName())
+        .channelId(sendDirectMessageRequestDto.getChannelId())
+        .messageContent(sendDirectMessageRequestDto.getMessageContent())
+        .sentAt(sendDirectMessageRequestDto.getSentAt())
+        .type(DirectMessageType.valueOf(sendDirectMessageRequestDto.getType()))
+        .avatarUrl(sendDirectMessageRequestDto.getAvatarUrl())
+        .build();
+  }
+
+  /**
+   * Builds a DirectMessageDto for a message with attachments.
+   *
+   * @param attachments List of attachment URLs.
+   * @param dm The DirectMessage.
+   * @param senderFirstName The first name of the sender.
+   * @return DTO containing information about the sent message.
+   */
+  public DirectMessageDto buildDirectMessageDtoForAttachments(
+      List<DmAttachmentDto> attachments,
+      DirectMessage dm,
+      String senderFirstName,
+      String senderAvatarUrl) {
+    return DirectMessageDto.builder()
+        .messageId(dm.getMessageId())
+        .senderId(dm.getSenderId())
+        .senderFirstName(senderFirstName)
+        .channelId(dm.getChannelId())
+        .messageContent(dm.getContent())
+        .sentAt(dm.getSentAt().toString())
+        .type(dm.getType())
+        .attachments(attachments)
+        .avatarUrl(senderAvatarUrl)
+        .build();
+  }
+
+  /**
+   * Uploads attachments to Blob Storage.
+   *
+   * @param messageId The ID of the message.
+   * @param files List of files to upload.
+   * @param senderId The ID of the sender.
+   * @param senderFirstName The first name of the sender.
+   * @return DM DTO of the updated message with attachments.
+   * @throws DirectMessageSendException If an error occurs while uploading attachments.
+   */
+  public DirectMessageDto uploadAttachments(
+      int messageId,
+      List<MultipartFile> files,
+      int senderId,
+      String senderFirstName,
+      String senderAvatarUrl) {
+    try {
+      List<DmAttachmentDto> attachments = new ArrayList<>();
+      log.debug("Attempting to upload {} attachments...", files.size());
+      for (MultipartFile file : files) {
+        String blobUrl = blobService.uploadFile(file, true, String.valueOf(messageId), senderId);
+        DirectMessageBlobType fileType = getFileType(file);
+        DmAttachmentDto dmAttachmentDto =
+            DmAttachmentDto.builder().attachmentUrl(blobUrl).fileType(fileType).build();
+        attachments.add(dmAttachmentDto);
+      }
+      DirectMessage dm = getDirectMessageById(messageId);
+      return buildDirectMessageDtoForAttachments(attachments, dm, senderFirstName, senderAvatarUrl);
+    } catch (Exception e) {
+      log.error("Error uploading attachments to blob storage.");
+      throw new DirectMessageSendException(
+          "An unexpected error occured when trying to upload attachments.");
+    }
+  }
+
+  /**
+   * Gets a Direct Message by its ID.
+   *
+   * @param messageId The ID of the message.
+   * @return The Direct Message.
+   */
+  public DirectMessage getDirectMessageById(int messageId) {
+    return directMessageRepository.findById(messageId).orElse(null);
   }
 
   /**
@@ -254,54 +350,6 @@ public class DirectMessageService {
   }
 
   /**
-   * (WIP, next sprint) Notifies a channel that a new member has been added (acts a JOIN message).
-   *
-   * @param sendDirectMessageRequestDto DTO containing the channel's added member's ID in the
-   *     message's content.
-   * @return DTO containing the name of the newly added member to a channel.
-   */
-  public DirectMessageDto addMember(SendDirectMessageRequestDto sendDirectMessageRequestDto) {
-    try {
-      int channelId = sendDirectMessageRequestDto.getChannelId();
-      int senderId = sendDirectMessageRequestDto.getSenderId();
-      DirectMessage directMessage = new DirectMessage();
-      directMessage.setSenderId(senderId);
-      directMessage.setChannelId(channelId);
-      directMessage.setContent(sendDirectMessageRequestDto.getMessageContent());
-      directMessage.setSentAt(ZonedDateTime.parse(sendDirectMessageRequestDto.getSentAt()));
-      directMessage.setType(DirectMessageType.JOIN);
-      directMessageRepository.save(directMessage);
-
-      // Update Last Message in Channel Table.
-      directMessageChannelRepository.updateLastMessageId(channelId, directMessage.getMessageId());
-
-      // Update Read Status in Channel Member Table.
-      directMessageChannelMemberRepository.updateChannelMemberReadStatus(senderId, channelId);
-
-      Map<Integer, MemberDetailsDto> memberDetails = getChannelMembersDetails(channelId);
-
-      DirectMessageDto directMessageDto = new DirectMessageDto();
-      directMessageDto.setMessageId(directMessage.getMessageId());
-      directMessageDto.setSenderId(senderId);
-      directMessageDto.setSenderFirstName(memberDetails.get(senderId).getFirstName());
-      directMessageDto.setChannelId(channelId);
-      directMessageDto.setMessageContent(sendDirectMessageRequestDto.getMessageContent());
-      directMessageDto.setSentAt(sendDirectMessageRequestDto.getSentAt());
-      directMessageDto.setType(DirectMessageType.JOIN);
-      directMessageDto.setAvatarUrl(memberDetails.get(senderId).getAvatarUrl());
-
-      return directMessageDto;
-    } catch (DataAccessException e) {
-      log.error("Database error occured while adding member.");
-      throw new DirectMessageSendException("Database error occured while adding member.");
-    } catch (Exception e) {
-      log.error("Error adding member.");
-      throw new DirectMessageSendException(
-          "An unexpected error occured when trying to add a member.");
-    }
-  }
-
-  /**
    * Gets the last message in a channel.
    *
    * @param channelId The ID of the channel.
@@ -314,6 +362,22 @@ public class DirectMessageService {
       log.error("Error fetching last message.");
       throw new DirectMessageFetchException(
           "An unexpected error occured when trying to fetch last message.");
+    }
+  }
+
+  /**
+   * Gets the last message in a channel.
+   *
+   * @param file The file to get the type of.
+   * @return The type of the file.
+   */
+  public DirectMessageBlobType getFileType(MultipartFile file) {
+    if (file.getContentType() != null && file.getContentType().startsWith("image/")) {
+      return DirectMessageBlobType.IMAGE;
+    } else if (file.getContentType() != null && file.getContentType().startsWith("video/")) {
+      return DirectMessageBlobType.VIDEO;
+    } else {
+      return DirectMessageBlobType.FILE;
     }
   }
 }
