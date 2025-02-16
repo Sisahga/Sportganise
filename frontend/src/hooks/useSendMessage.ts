@@ -1,4 +1,4 @@
-import {MessageComponent, SendMessageComponent} from "@/types/messaging.ts";
+import { MessageComponent, SendMessageComponent } from "@/types/messaging.ts";
 import WebSocketService from "@/services/WebSocketService.ts";
 
 function useSendMessage() {
@@ -6,7 +6,9 @@ function useSendMessage() {
     messagePayload: SendMessageComponent,
     webSocketServiceRef: WebSocketService | null,
   ): Promise<MessageComponent | undefined> => {
-    if (!webSocketServiceRef) { return undefined; }
+    if (!webSocketServiceRef) {
+      return undefined;
+    }
     return webSocketServiceRef.sendMessage(messagePayload);
   };
   return {
