@@ -82,13 +82,12 @@ export function MembersSettingsDialog({
           senderId: currentUserId,
           channelId: channelId,
           messageContent: `LEAVE*${currentUserId}*${leaveMessageRemoverViewContent}*${leaveMessageContent}`,
-          attachments: [],
           sentAt: new Date().toISOString(),
           type: "LEAVE",
           senderFirstName: userFirstName,
           avatarUrl: cookies.pictureUrl,
         };
-        sendDirectMessage(messagePayload, websocketRef);
+        await sendDirectMessage(messagePayload, websocketRef);
         setAlertDialogOpen(false);
         setSelectedMember(null);
         onClose();
@@ -124,13 +123,12 @@ export function MembersSettingsDialog({
         senderId: currentUserId,
         channelId: channelId,
         messageContent: `JOIN*${currentUserId}*You added ${newMemberNames} to the group.*Walter added ${newMemberNames} to the group.`,
-        attachments: [],
         sentAt: new Date().toISOString(),
         type: "JOIN",
         senderFirstName: userFirstName,
         avatarUrl: cookies.pictureUrl,
       };
-      sendDirectMessage(messagePayload, websocketRef);
+      await sendDirectMessage(messagePayload, websocketRef);
 
       setMembers([
         ...members,

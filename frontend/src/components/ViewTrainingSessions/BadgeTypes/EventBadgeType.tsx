@@ -8,11 +8,11 @@ const getBadgeProps = (programType: string): BadgeProps => {
     case "fundraiser":
       return { variant: "secondary" };
     case "tournament":
-      return { className: "gb-teal-300" };
+      return { className: "bg-teal-400" };
     case "inter-club meeting":
       return { className: "bg-indigo-300" };
-    case "special":
-      return { className: "bg-lime-300" };
+    case "special training":
+      return { className: "bg-slate-400" };
     case "cancelled":
       return { variant: "destructive" };
     default:

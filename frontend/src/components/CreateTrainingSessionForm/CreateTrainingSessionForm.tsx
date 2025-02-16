@@ -100,6 +100,14 @@ export default function CreateTrainingSessionForm() {
       label: "Fundraiser",
       value: "Fundraiser",
     },
+    {
+      label: "Tournament",
+      value: "Tournament",
+    },
+    {
+      label: "Special Training",
+      value: "Special Training",
+    },
   ] as const;
   const locations = [
     {
@@ -230,7 +238,7 @@ export default function CreateTrainingSessionForm() {
           {/*Form Title*/}
           <div className="text-center">
             <h2 className="font-semibold text-3xl text-secondaryColour text-center">
-              Create New Event
+              Create New Program
             </h2>
             <h2 className="text-fadedPrimaryColour text-center">
               Complete the form and submit
@@ -246,7 +254,7 @@ export default function CreateTrainingSessionForm() {
                 <FormLabel className="font-semibold text-base">Title</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Name the event"
+                    placeholder="Name the program"
                     type="text"
                     className="bg-white"
                     {...field}
@@ -265,7 +273,7 @@ export default function CreateTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Type of Event
+                  Type of Program
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -359,8 +367,8 @@ export default function CreateTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the first date of the event. Applies for recurring and
-                  non recurring events. If recurring, this day will be the
+                  Enter the first date of the program. Applies for recurring and
+                  non recurring programs. If recurring, this day will be the
                   assumed repeat day in the future.
                 </FormDescription>
                 <FormMessage />
@@ -406,8 +414,8 @@ export default function CreateTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the last day of a recurring event. If same-day event,
-                  pick the day entered for start date.
+                  Enter the last day of a recurring program. If same-day
+                  program, pick the day entered for start date.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -429,7 +437,7 @@ export default function CreateTrainingSessionForm() {
                     <Input type="time" className="w-full" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Select the time the event starts.
+                    Select the time the program starts.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -449,7 +457,7 @@ export default function CreateTrainingSessionForm() {
                     <Input type="time" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Select the time the event ends.
+                    Select the time the program ends.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -539,10 +547,10 @@ export default function CreateTrainingSessionForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-semibold">
-                    Recurring event
+                    Recurring program
                   </FormLabel>
                   <FormDescription>
-                    The event recurs on the day and at the times entered.
+                    The program recurs on the day and at the times entered.
                   </FormDescription>
                   <FormMessage />
                 </div>
@@ -613,7 +621,7 @@ export default function CreateTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Select who can view the event in their dashboard.
+                  Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -631,7 +639,7 @@ export default function CreateTrainingSessionForm() {
                 </FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Add description of the event here ..."
+                    placeholder="Add description of the program here ..."
                     className="resize-none"
                     {...field}
                   />
@@ -758,11 +766,11 @@ export default function CreateTrainingSessionForm() {
           {loading ? (
             <Button disabled className="w-full">
               <Loader2 className="animate-spin" />
-              Creating Event
+              Creating Program
             </Button>
           ) : (
             <Button type="submit" className="w-full font-semibold">
-              Create new Event
+              Create new Program
             </Button>
           )}
           <div className="justify-self-center">

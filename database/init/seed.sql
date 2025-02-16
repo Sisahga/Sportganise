@@ -22,7 +22,7 @@ INSERT INTO account (
  '789 70e Papino', 'New York', 'New York', 'United States', '90210-1234',
  '444-444-4444', 'Jesse', 'Pinkman',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/jesse_pinkman_avatar.jpg',true),
-('GENERAL', 'waitlist@example.com', 'auth0|6743f6b2f0ab0e76ba3d7cee',
+('PLAYER', 'waitlist@example.com', 'auth0|6743f6b2f0ab0e76ba3d7cee',
  '79 Rue Marie', 'Paris', 'France', 'France', '123-12345',
  '555-555-5555', 'Saul', 'Goodman',
  'https://sportganise-bucket.s3.us-east-2.amazonaws.com/saul_goodman_avatar.png',true),
@@ -48,9 +48,9 @@ INSERT INTO sport (name) VALUES
 ('Basketball'),
 ('Badminton');
 
-INSERT INTO program (type, title, description, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility) VALUES
-    ('TRAINING', 'Advanced Group', 'Intensive training camp for badminton pros', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public'),
-    ('FUNDRAISER', 'Basketball Clinic', 'Skill enhancement clinic', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public');
+INSERT INTO program (type, title, description, author, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility) VALUES
+    ('TRAINING', 'Advanced Group', 'Intensive training camp for badminton pros', 'John Doe', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public'),
+    ('FUNDRAISER', 'Basketball Clinic', 'Skill enhancement clinic', 'Jane Doe', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public');
 
 
 INSERT INTO blocklist (account_id, blocked_id) VALUES
@@ -85,9 +85,10 @@ INSERT INTO program_attachments (program_id, attachment_url) VALUES
 (1, 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png');
 
 INSERT INTO program_participants (program_id, account_id, type, is_confirmed, confirm_date) VALUES
-(1, 3, 'Player', TRUE, '2024-06-20 10:30:00'),
-(1, 4, 'Player', FALSE, null),
-(1, 5, 'Player', FALSE, null);
+(1, 3, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
+(1, 4, 'Subscribed', FALSE, null),
+(1, 5, 'Waitlisted', FALSE, null),
+(1,2, 'Coach', FALSE, null);
 
 
 INSERT INTO label_program (label_id, program_id, type) VALUES

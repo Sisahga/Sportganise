@@ -20,11 +20,9 @@ public interface ProgramParticipantRepository
       """
       SELECT pp
       FROM ProgramParticipant pp
-      JOIN LabelAccount la
-      ON pp.programParticipantId.accountId = la.labelAccountsId.accountId
       WHERE pp.programParticipantId.programId = :programId
       AND pp.programParticipantId.accountId = :accountId
-      AND la.role = 'Waitlisted'
+      AND pp.type = 'Waitlisted'
       """)
   ProgramParticipant findWaitlistParticipant(
       @Param("programId") Integer programId, @Param("accountId") Integer accountId);

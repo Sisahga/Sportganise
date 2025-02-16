@@ -1,18 +1,26 @@
 import { ChatMessageProps } from "@/types/messaging.ts";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import {
+  differenceInDays,
+  differenceInMinutes,
   format,
   isToday,
   parseISO,
-  differenceInMinutes,
-  differenceInDays,
 } from "date-fns";
 import { toZonedTime } from "date-fns-tz";
 import log from "loglevel";
+import ChatMessageAttachments from "@/components/Inbox/ChatScreen/ChatMessageAttachments.tsx";
 
 log.setLevel("info");
 
-const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
+const ChatMessages = ({
+  messages,
+  currentUserId,
+  activateSkeleton,
+  skeletonId,
+  skeletonCount,
+  status,
+}: ChatMessageProps) => {
   const formatSentAt = (
     sentAt: string,
     timeZone: string = "America/New_York",
@@ -31,7 +39,7 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
   };
 
   return (
-    <div className="flex flex-col justify-end flex-1 overflow-y-scroll px-4 py-4">
+    <div className="flex flex-col justify-end overflow-y-scroll scroll-smooth px-4 pt-4 pb-2 w-full min-h-full">
       {messages.map((message, index) => {
         const showTimestamp =
           index === 0 || // Always show the timestamp for the first message
@@ -50,13 +58,17 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
           }
         }
         return (
-          <div key={message.messageId} className="mb-4">
+          <div
+            id={message.messageId.toString()}
+            key={message.messageId}
+            className="mb-4"
+          >
             {/* Regular Chat Message */}
             {message.type == "CHAT" && (
               <>
                 {/* Timestamp */}
                 {showTimestamp && (
-                  <div className="text-xs text-gray-500 text-center mb-2">
+                  <div className="text-xs text-gray-500 text-center mb-2 mt-2">
                     {formatSentAt(message.sentAt)}
                   </div>
                 )}
@@ -81,20 +93,59 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
                   >
                     {message.senderId !== currentUserId && (
                       <div className="px-3">
-                        <p className="text-xs font-extralight">
+                        <p className="text-xs font-extralight rounded">
                           {message.senderFirstName}
                         </p>
                       </div>
                     )}
-                    {/* Message Content */}
                     <div
-                      className={`px-3 py-2 rounded-2xl shadow-lg  ${
-                        message.senderId === currentUserId
-                          ? "bg-secondaryColour-msg-gradient text-gray-800"
-                          : "bg-gray-200 text-gray-800"
-                      }`}
+                      id={`msg-status-${message.messageId}`}
+                      className="flex flex-col gap-2 items-end max-w-full relative"
                     >
-                      <p className="text-sm">{message.messageContent}</p>
+                      {activateSkeleton && skeletonId === message.messageId && (
+                        <div className="overflow-x-auto w-full">
+                          <div className="flex gap-2 min-w-min">
+                            {Array.from({ length: skeletonCount }).map(
+                              (_, index) => (
+                                <div
+                                  key={index}
+                                  className="animate-skeleton rounded"
+                                  style={{
+                                    width: "7rem",
+                                    height: "7rem",
+                                  }}
+                                ></div>
+                              ),
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {/* Grouped Attachments */}
+                      {message.attachments.length > 0 && (
+                        <ChatMessageAttachments
+                          attachments={message.attachments}
+                        />
+                      )}
+
+                      {/* Message Content */}
+                      {message.messageContent !== "" && (
+                        <div
+                          className={`px-3 py-2 rounded-2xl shadow-lg w-fit  ${
+                            message.senderId === currentUserId
+                              ? "bg-secondaryColour-msg-gradient text-gray-800"
+                              : "bg-gray-200 text-gray-800"
+                          }`}
+                        >
+                          <p className="text-sm">{message.messageContent}</p>
+                        </div>
+                      )}
+
+                      {index === messages.length - 1 &&
+                        message.senderId === currentUserId && (
+                          <p className="secondary-colour text-xs">
+                            <b>{status}</b>
+                          </p>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -112,57 +163,13 @@ const ChatMessages = ({ messages, currentUserId }: ChatMessageProps) => {
                 </div>
               )}
             </div>
-            {/* BLOCK Message (SIMPLE channels only) */}
+            {/* BLOCK, UNBLOCK, LEAVE, UPDATE, DELETE Messages */}
             <div>
-              {message.type == "BLOCK" && (
-                <div className="text-center faded-primary-colour font-light text-sm">
-                  {message.senderId === currentUserId ? (
-                    <p>{message.messageContent.split("*")[2]}</p>
-                  ) : (
-                    <p>{message.messageContent.split("*")[3]}</p>
-                  )}
-                </div>
-              )}
-            </div>
-            {/* UNBLOCK Message (SIMPLE channels only) */}
-            <div>
-              {message.type == "UNBLOCK" && (
-                <div className="text-center faded-primary-colour font-light text-sm">
-                  {message.senderId === currentUserId ? (
-                    <p>{message.messageContent.split("*")[2]}</p>
-                  ) : (
-                    <p>{message.messageContent.split("*")[3]}</p>
-                  )}
-                </div>
-              )}
-            </div>
-            {/* LEAVE Message (Player/coach leaves from channel or gets removed) */}
-            <div>
-              {message.type == "LEAVE" && (
-                <div className="text-center faded-primary-colour font-light text-sm">
-                  {message.senderId === currentUserId ? (
-                    <p>{message.messageContent.split("*")[2]}</p>
-                  ) : (
-                    <p>{message.messageContent.split("*")[3]}</p>
-                  )}
-                </div>
-              )}
-            </div>
-            {/* LEAVE Message (Player/coach leaves from channel or gets removed) */}
-            <div>
-              {message.type == "UPDATE" && (
-                <div className="text-center faded-primary-colour font-light text-sm">
-                  {message.senderId === currentUserId ? (
-                    <p>{message.messageContent.split("*")[2]}</p>
-                  ) : (
-                    <p>{message.messageContent.split("*")[3]}</p>
-                  )}
-                </div>
-              )}
-            </div>
-            {/* DELETE message (Delete Requests) */}
-            <div>
-              {message.type == "DELETE" && (
+              {(message.type == "BLOCK" ||
+                message.type == "UNBLOCK" ||
+                message.type == "LEAVE" ||
+                message.type == "UPDATE" ||
+                message.type == "DELETE") && (
                 <div className="text-center faded-primary-colour font-light text-sm">
                   {message.senderId === currentUserId ? (
                     <p>{message.messageContent.split("*")[2]}</p>

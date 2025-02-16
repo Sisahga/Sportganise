@@ -14,6 +14,7 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRe
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
+import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingPathVariableException;
@@ -277,6 +278,21 @@ public class GlobalExceptionHandler {
     return ResponseDto.builder()
         .statusCode(HttpStatus.BAD_REQUEST.value())
         .message("Program modification failed: " + e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle exceptions when inviting users to private events.
+   *
+   * @param e exception
+   * @return Response DTO with status 400.
+   */
+  @ExceptionHandler(ProgramInvitationiException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleProgramInvitationException(ProgramInvitationiException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message("Program invitation failed: " + e.getMessage())
         .build();
   }
 
