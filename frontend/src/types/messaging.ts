@@ -1,12 +1,18 @@
 import WebSocketService from "@/services/WebSocketService.ts";
 
+export enum AttachmentType {
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
+  FILE = "FILE",
+}
+
 export interface MessageComponent {
   messageId: number;
   senderId: number;
   senderFirstName: string;
   channelId: number;
   messageContent: string;
-  attachments: File[];
+  attachments: Attachment[];
   sentAt: string;
   type: string;
   avatarUrl: string | undefined;
@@ -16,7 +22,6 @@ export interface SendMessageComponent {
   senderId: number;
   channelId: number;
   messageContent: string;
-  attachments: File[];
   sentAt: string;
   type: string;
   senderFirstName: string;
@@ -26,13 +31,15 @@ export interface SendMessageComponent {
 export interface ChatMessageProps {
   messages: MessageComponent[];
   currentUserId: number;
+  activateSkeleton: boolean;
+  skeletonId: number;
+  skeletonCount: number;
+  status: string;
 }
 
-export interface FileAttachment {
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-  fileUrl: string;
+export interface Attachment {
+  attachmentUrl: string;
+  fileType: AttachmentType;
 }
 
 export interface LastMessageComponent {
@@ -48,4 +55,8 @@ export interface UserBlockedComponentProps {
   webSocketRef: WebSocketService | null;
   channelId: number;
   channelType: string;
+}
+
+export interface ChatImageDialogProps {
+  attachment: Attachment,
 }

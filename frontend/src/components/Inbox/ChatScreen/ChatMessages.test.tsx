@@ -43,7 +43,14 @@ describe("ChatMessages", () => {
       },
     ];
 
-    render(<ChatMessages messages={messages} currentUserId={100} />);
+    render(<ChatMessages
+        messages={messages}
+        currentUserId={100}
+        activateSkeleton={false}
+        skeletonId={0}
+        skeletonCount={0}
+        status={""}
+    />);
 
     expect(screen.getByText("Hello!")).toBeInTheDocument();
     expect(
@@ -69,7 +76,14 @@ describe("ChatMessages", () => {
       },
     ];
 
-    render(<ChatMessages messages={messages} currentUserId={100} />);
+    render(<ChatMessages
+        messages={messages}
+        currentUserId={100}
+        activateSkeleton={false}
+        skeletonId={0}
+        skeletonCount={0}
+        status={""}
+    />);
     expect(screen.getByText(/from the user/i)).toBeInTheDocument();
   });
 
@@ -101,7 +115,14 @@ describe("ChatMessages", () => {
       },
     ];
 
-    render(<ChatMessages messages={messages} currentUserId={100} />);
+    render(<ChatMessages
+        messages={messages}
+        currentUserId={100}
+        activateSkeleton={false}
+        skeletonId={0}
+        skeletonCount={0}
+        status={""}
+    />);
     expect(inputArea).toHaveClass("pointer-events-none", "opacity-70");
   });
 
@@ -131,7 +152,14 @@ describe("ChatMessages", () => {
       },
     ];
 
-    render(<ChatMessages messages={messages} currentUserId={100} />);
+    render(<ChatMessages
+        messages={messages}
+        currentUserId={100}
+        activateSkeleton={false}
+        skeletonId={0}
+        skeletonCount={0}
+        status={""}
+    />);
 
     const timeStamps = screen.queryAllByText((_content, element) => {
       if (!element) return false;
@@ -171,7 +199,14 @@ describe("ChatMessages", () => {
       },
     ];
 
-    render(<ChatMessages messages={messages} currentUserId={100} />);
+    render(<ChatMessages
+        messages={messages}
+        currentUserId={100}
+        activateSkeleton={false}
+        skeletonId={0}
+        skeletonCount={0}
+        status={""}
+    />);
 
     const timeStamps = screen.queryAllByText((_content, element) => {
       if (!element) return false;
