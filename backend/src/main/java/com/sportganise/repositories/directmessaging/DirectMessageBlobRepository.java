@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 /** Repository for DirectMessageBlob entity. */
 @Repository
-public interface DirectMessageBlobRepository extends
-        JpaRepository<DirectMessageBlob, DirectMessageBlobCompositeKey> {}
+public interface DirectMessageBlobRepository
+    extends JpaRepository<DirectMessageBlob, DirectMessageBlobCompositeKey> {}

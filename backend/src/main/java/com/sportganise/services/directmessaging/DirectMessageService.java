@@ -247,7 +247,10 @@ public class DirectMessageService {
    * @return DTO containing information about the sent message.
    */
   public DirectMessageDto buildDirectMessageDtoForAttachments(
-      List<DmAttachmentDto> attachments, DirectMessage dm, String senderFirstName, String senderAvatarUrl) {
+      List<DmAttachmentDto> attachments,
+      DirectMessage dm,
+      String senderFirstName,
+      String senderAvatarUrl) {
     return DirectMessageDto.builder()
         .messageId(dm.getMessageId())
         .senderId(dm.getSenderId())
@@ -283,10 +286,8 @@ public class DirectMessageService {
       for (MultipartFile file : files) {
         String blobUrl = blobService.uploadFile(file, true, String.valueOf(messageId), senderId);
         DirectMessageBlobType fileType = getFileType(file);
-        DmAttachmentDto dmAttachmentDto = DmAttachmentDto.builder()
-                .attachmentUrl(blobUrl)
-                .fileType(fileType)
-                .build();
+        DmAttachmentDto dmAttachmentDto =
+            DmAttachmentDto.builder().attachmentUrl(blobUrl).fileType(fileType).build();
         attachments.add(dmAttachmentDto);
       }
       DirectMessage dm = getDirectMessageById(messageId);

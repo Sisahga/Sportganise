@@ -22,7 +22,7 @@ public interface DirectMessageRepository extends JpaRepository<DirectMessage, In
   List<DirectMessage> getMessagesByChannelId(int channelId);
 
   @Query(
-          """
+      """
               SELECT new com.sportganise.dto.directmessaging.DmAttachmentDto(
                   dmb.compositeKey.blobUrl,
                   dmb.fileType

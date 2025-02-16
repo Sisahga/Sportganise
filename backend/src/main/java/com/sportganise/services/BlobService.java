@@ -104,12 +104,11 @@ public class BlobService {
         DirectMessageBlobCompositeKey compositeKey = new DirectMessageBlobCompositeKey();
         compositeKey.setMessageId(Integer.parseInt(messageId));
         compositeKey.setBlobUrl(s3Url);
-        DirectMessageBlob directMessageBlob = DirectMessageBlob.builder()
-                .compositeKey(compositeKey)
-                .build();
-        if (file.getContentType() != null && file.getContentType().startsWith("image/")){
+        DirectMessageBlob directMessageBlob =
+            DirectMessageBlob.builder().compositeKey(compositeKey).build();
+        if (file.getContentType() != null && file.getContentType().startsWith("image/")) {
           directMessageBlob.setFileType(DirectMessageBlobType.IMAGE);
-        } else if (file.getContentType() != null && file.getContentType().startsWith("video/")){
+        } else if (file.getContentType() != null && file.getContentType().startsWith("video/")) {
           directMessageBlob.setFileType(DirectMessageBlobType.VIDEO);
         } else {
           directMessageBlob.setFileType(DirectMessageBlobType.FILE);
