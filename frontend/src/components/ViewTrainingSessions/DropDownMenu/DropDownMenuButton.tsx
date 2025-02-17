@@ -202,7 +202,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         open={isPostponeDialogOpen}
         onOpenChange={setPostponeDialogOpen}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Would you like to postpone this event?
@@ -224,7 +224,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Pop up when coach/admin deletes an event*/}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Would you like to delete this event?
@@ -246,7 +246,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Pop up when player RSVP's to event */}
       <AlertDialog open={isRSVPDialogOpen} onOpenChange={setRSVPDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Would you like to confirm your presence?
@@ -269,7 +269,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Pop up when player wants to leave an event */}
       <AlertDialog open={isAbsentDialogOpen} onOpenChange={setAbsentDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to mark yourself as absent?
@@ -288,7 +288,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Postpone event confirmation message */}
       {isPostponeConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
             <Frown className="w-12 h-12" />
             <p>
@@ -301,7 +301,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Postpone event confirmation message */}
       {isDeleteConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
             <Frown className="w-12 h-12" />
             <p>
@@ -314,7 +314,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* RSVP confirmation message */}
       {isRSVPConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
             <Smile className="w-12 h-12" />
             <p>Your presence is noted. Can&#39;t wait to see you!!!</p>
@@ -324,7 +324,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Notification when player confirms absence */}
       {isNotificationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg shadow-lg flex flex-col items-center space-y-2">
             <Frown className="w-12 h-12" />
             <p>Your absence is noted</p>
