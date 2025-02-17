@@ -15,4 +15,6 @@ public interface TrainingPlansRepository extends JpaRepository<TrainingPlan, Int
             FROM TrainingPlan tp
             """)
   List<TrainingPlan> findTrainingPlans();
+
+  
 }
