@@ -19,6 +19,7 @@ import {
   Frown,
   Smile,
   LogIn,
+  Ban,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import {
@@ -63,6 +64,12 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const [isRSVPConfirmationVisible, setRSVPConfirmationVisible] =
     useState(false);
   const [isAbsentDialogOpen, setAbsentDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isPostponeDialogOpen, setPostponeDialogOpen] = useState(false);
+  const [isPostponeConfirmationVisible, setPostponeConfirmationVisible] =
+    useState(false);
+  const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] =
+    useState(false);
 
   // Handle waitlisted joining
   /*
@@ -70,6 +77,34 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     setModalVisible(true); // Show the modal on button click
   };
   */
+
+  const handleDeleteClick = () => {
+    setDropdownOpen(false); //Close the dropdown
+    setDeleteDialogOpen(true); // Open the alert dialog
+  };
+
+  const handleDeleteConfirmation = () => {
+    setDeleteDialogOpen(false);
+    setDeleteConfirmationVisible(true);
+
+    setTimeout(() => {
+      setDeleteConfirmationVisible(false);
+    }, 3000);
+  };
+
+  const handlePostponeClick = () => {
+    setDropdownOpen(false); //Close the dropdown
+    setPostponeDialogOpen(true); // Open the alert dialog
+  };
+
+  const handlePostponeConfirmation = () => {
+    setPostponeDialogOpen(false);
+    setPostponeConfirmationVisible(true); // Show postpone confirmation message
+
+    setTimeout(() => {
+      setPostponeConfirmationVisible(false);
+    }, 3000);
+  };
 
   const handleRSVPClick = () => {
     setDropdownOpen(false); // Close the dropdown immediately
@@ -130,9 +165,13 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <UsersRound />
                 <span>Message all Members</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleDeleteClick}>
                 <Trash2 color="red" />
                 <span className="text-red">Delete Event</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handlePostponeClick}>
+                <Ban color="gray" />
+                <span>Postpone Event</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           ) : (
@@ -158,9 +197,56 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Pop up when coach/admin postpones an event*/}
+      <AlertDialog
+        open={isPostponeDialogOpen}
+        onOpenChange={setPostponeDialogOpen}
+      >
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Would you like to postpone this event?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This event will be postponed until you decide to reinstate it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPostponeDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handlePostponeConfirmation}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Pop up when coach/admin deletes an event*/}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Would you like to delete this event?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This event will be deleted permanently.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirmation}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Pop up when player RSVP's to event */}
       <AlertDialog open={isRSVPDialogOpen} onOpenChange={setRSVPDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Would you like to confirm your presence?
@@ -174,7 +260,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             <AlertDialogCancel onClick={() => setRSVPDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleRSVPConfirmation} className="">
+            <AlertDialogAction onClick={handleRSVPConfirmation}>
               Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -183,7 +269,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Pop up when player wants to leave an event */}
       <AlertDialog open={isAbsentDialogOpen} onOpenChange={setAbsentDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to mark yourself as absent?
@@ -200,9 +286,35 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Postpone event confirmation message */}
+      {isPostponeConfirmationVisible && (
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
+          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+            <Frown className="w-12 h-12" />
+            <p>
+              You have successfully postponed the event. The participants will
+              be notified.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Postpone event confirmation message */}
+      {isDeleteConfirmationVisible && (
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
+          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+            <Frown className="w-12 h-12" />
+            <p>
+              You have successfully deleted the event. The participants will be
+              notified.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* RSVP confirmation message */}
       {isRSVPConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
             <Smile className="w-12 h-12" />
             <p>Your presence is noted. Can&#39;t wait to see you!!!</p>
@@ -212,7 +324,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Notification when player confirms absence */}
       {isNotificationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg shadow-lg flex flex-col items-center space-y-2">
             <Frown className="w-12 h-12" />
             <p>Your absence is noted</p>
