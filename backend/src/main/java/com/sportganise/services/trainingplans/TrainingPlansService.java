@@ -97,6 +97,11 @@ public class TrainingPlansService {
    * @param userId Id of the user sending the request.
    */
   public void deleteTrainingPlan(Integer userId) {
+    Account user = getUser(userId);
+
+    if (!hasPermissions(user)) {
+      throw new ForbiddenException("Only Coaches and Admins can access this page.");
+    }
 
   }
 
