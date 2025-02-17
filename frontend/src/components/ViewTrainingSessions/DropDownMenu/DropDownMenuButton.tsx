@@ -12,9 +12,7 @@ import {
   EllipsisVertical,
   Pencil,
   Trash2,
-  UsersRound,
   LogOut,
-  UserRound,
   MessageCircle,
   Frown,
   Smile,
@@ -161,17 +159,13 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <Pencil />
                 <span>Edit Event</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <UsersRound />
-                <span>Message all Members</span>
+              <DropdownMenuItem onSelect={handlePostponeClick}>
+                <Ban color="gray" />
+                <span>Postpone Event</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={handleDeleteClick}>
                 <Trash2 color="red" />
                 <span className="text-red">Delete Event</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handlePostponeClick}>
-                <Ban color="gray" />
-                <span>Postpone Event</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
           ) : (
@@ -179,10 +173,6 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
               <DropdownMenuItem>
                 <MessageCircle />
                 <span>Message Host</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <UserRound />
-                <span>Contact Member</span>
               </DropdownMenuItem>
               <DropdownMenuItem onSelect={handleRSVPClick}>
                 <LogIn color="green" />
@@ -224,7 +214,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Pop up when coach/admin deletes an event*/}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Would you like to delete this event?
@@ -246,7 +236,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Pop up when player RSVP's to event */}
       <AlertDialog open={isRSVPDialogOpen} onOpenChange={setRSVPDialogOpen}>
-        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Would you like to confirm your presence?
@@ -269,7 +259,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Pop up when player wants to leave an event */}
       <AlertDialog open={isAbsentDialogOpen} onOpenChange={setAbsentDialogOpen}>
-        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>
               Are you sure you want to mark yourself as absent?

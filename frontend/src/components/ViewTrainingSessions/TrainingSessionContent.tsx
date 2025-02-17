@@ -15,7 +15,6 @@ import {
   MapPin,
   CircleUserRound,
   FileText,
-  User2Icon,
   Hourglass,
   Repeat,
 } from "lucide-react";
@@ -56,6 +55,7 @@ const TrainingSessionContent = () => {
     programAttachments: [],
     frequency: "",
     visibility: "",
+    author: "",
   });
   useEffect(() => {
     // Update state safely using useEffect
@@ -81,8 +81,8 @@ const TrainingSessionContent = () => {
       {/**Event title */}
       <div className="flex items-center gap-3 my-5">
         <Avatar className="w-16 h-16">
-          <AvatarFallback>
-            <User2Icon color="#a1a1aa" />
+          <AvatarFallback className="bg-primaryColour">
+            <img src="/src/assets/Logo.png" alt="organisation" />
           </AvatarFallback>
         </Avatar>
         <div className="space-y-2">
@@ -125,14 +125,14 @@ const TrainingSessionContent = () => {
               <p className="text-sm text-gray-500">
                 {new Date(programDetails.occurrenceDate).toLocaleTimeString(
                   "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                 )}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-sm text-gray-500">
                 {calculateEndTime(
                   new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
+                  programDetails.durationMins
                 )}
               </p>
             </span>
@@ -154,7 +154,7 @@ const TrainingSessionContent = () => {
             <p className="text-sm text-gray-500">
               {programDetails.frequency || "one time"} on{" "}
               {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                new Date(programDetails.occurrenceDate),
+                new Date(programDetails.occurrenceDate)
               )}
             </p>
           </div>
@@ -163,7 +163,7 @@ const TrainingSessionContent = () => {
               size={15}
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
-            <p className="text-sm text-gray-500">Coach Benjamin Luijin</p>
+            <p className="text-sm text-gray-500">{programDetails.author}</p>
           </div>
           <div className="flex items-center gap-2">
             <MapPin
@@ -210,8 +210,11 @@ const TrainingSessionContent = () => {
         </div>
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
-        {(accountType?.toLowerCase() === "coach" ||
-          accountType?.toLowerCase() === "admin") && (
+        {!(
+          (accountType?.toLowerCase() === "general" ||
+            accountType?.toLowerCase() === "player") &&
+          programDetails.programType.toLowerCase() === "training"
+        ) && (
           <>
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">Attendees</h2>

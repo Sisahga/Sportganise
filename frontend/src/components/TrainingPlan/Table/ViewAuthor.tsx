@@ -2,6 +2,8 @@
 import { useNavigate } from "react-router";
 // Hooks
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
+// Services
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 // Custom Components
 import AttendeeBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/AttendeeBadgeType";
 // UI Components
@@ -30,11 +32,26 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
   const { data: accountDetails } = usePersonalInformation(userId);
   // Handle Navigation (to Messages page)
   const navigate = useNavigate();
+  const cookies = getCookies();
+  const currentUserId = getAccountIdCookie(cookies);
+
   return (
     <div>
       {accountDetails ? (
         <HoverCard>
-          <HoverCardTrigger asChild>
+          {currentUserId !== userId ? (
+            <HoverCardTrigger asChild>
+              <div className="flex items-center">
+                <Avatar className="mr-2 self-center w-5 h-5">
+                  <AvatarImage src={accountDetails?.pictureUrl} />
+                  <AvatarFallback>
+                    <User2Icon color="#a1a1aa" />
+                  </AvatarFallback>
+                </Avatar>
+                <p>{`${accountDetails?.firstName} ${accountDetails?.lastName}`}</p>
+              </div>
+            </HoverCardTrigger>
+          ) : (
             <div className="flex items-center">
               <Avatar className="mr-2 self-center w-5 h-5">
                 <AvatarImage src={accountDetails?.pictureUrl} />
@@ -44,7 +61,7 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
               </Avatar>
               <p>{`${accountDetails?.firstName} ${accountDetails?.lastName}`}</p>
             </div>
-          </HoverCardTrigger>
+          )}
           <HoverCardContent className="w-60">
             <div className="flex justify-space-between space-x-4">
               <div>
