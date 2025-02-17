@@ -91,8 +91,13 @@ public class TrainingPlansService {
     return new TrainingPlanResponseDto(myPlans, sharedWithMe);
   }
 
+  /**
+   * Method to delete a training plan.
+   * 
+   * @param userId Id of the user sending the request.
+   */
   public void deleteTrainingPlan(Integer userId) {
-    
+
   }
 
   /**
