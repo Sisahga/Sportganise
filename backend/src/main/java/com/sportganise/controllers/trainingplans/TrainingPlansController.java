@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -52,6 +53,26 @@ public class TrainingPlansController {
     responseDto.setData(trainingPlanResponseDto);
 
     log.debug("TRAINING PLANS SHARED WITH ME COUNT: {}", trainingPlanResponseDto.getSharedWithMe());
+
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+  }
+
+  /**
+
+   Method to delete training plans.*
+   @param accountId parameter for Id of the user sending the request.
+   @param planId parameter for the Id of the plan that is to be deleted.
+   @return HTTP response.*/
+  @DeleteMapping("{accountId}/{planId}/delete-plan")
+  public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> deleteTrainingPlans(@PathVariable Integer accountId, @PathVariable Integer planId) {
+
+    trainingPlansService.deleteTrainingPlan(accountId, planId);
+
+    ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Training plan successfully deleted.");
+
+    log.debug("TRAINING PLAN SUCCESSFULLY DELETED.");
 
     return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
