@@ -86,7 +86,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 
   return (
     <AlertDialog open={open} onOpenChange={setIsOpen}>
-      <AlertDialogContent>
+      <AlertDialogContent className="rounded-lg">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete selected training plan?</AlertDialogTitle>
           <AlertDialogDescription>
