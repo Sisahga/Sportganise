@@ -162,7 +162,9 @@ CREATE TABLE message (
 CREATE TABLE message_blob (
     message_id INTEGER NOT NULL REFERENCES message(message_id) ON DELETE SET NULL,
     blob_url VARCHAR(255) NOT NULL,
-    PRIMARY KEY (message_id)
+    file_type VARCHAR(10) NOT NULL,
+    PRIMARY KEY (message_id, blob_url),
+    CONSTRAINT valid_blob CHECK (file_type IN ('IMAGE', 'VIDEO', 'FILE'))
 );
 
 ALTER TABLE channel

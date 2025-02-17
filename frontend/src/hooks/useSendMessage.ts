@@ -1,12 +1,15 @@
-import { SendMessageComponent } from "@/types/messaging.ts";
+import { MessageComponent, SendMessageComponent } from "@/types/messaging.ts";
 import WebSocketService from "@/services/WebSocketService.ts";
 
 function useSendMessage() {
-  const sendDirectMessage = (
+  const sendDirectMessage = async (
     messagePayload: SendMessageComponent,
     webSocketServiceRef: WebSocketService | null,
-  ) => {
-    webSocketServiceRef?.sendMessage(messagePayload);
+  ): Promise<MessageComponent | undefined> => {
+    if (!webSocketServiceRef) {
+      return undefined;
+    }
+    return webSocketServiceRef.sendMessage(messagePayload);
   };
   return {
     sendDirectMessage,

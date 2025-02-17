@@ -79,13 +79,12 @@ export function ChangePictureDialog({
           senderId: currentUserId,
           channelId: currentChannelId,
           messageContent: `UPDATE*${currentUserId}*${updaterMessageView}*${otherMessageView}`,
-          attachments: [],
           sentAt: new Date().toISOString(),
           type: "UPDATE",
           senderFirstName: cookies.firstName,
           avatarUrl: cookies.pictureUrl,
         };
-        sendDirectMessage(messagePayload, webSocketRef);
+        await sendDirectMessage(messagePayload, webSocketRef);
 
         setPopupChannelPicture(response.data?.channelImageUrl || "");
         document.body.classList.remove("pointer-events-none");

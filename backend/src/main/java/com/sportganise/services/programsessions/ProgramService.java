@@ -94,6 +94,7 @@ public class ProgramService {
                   account.getAccountId(),
                   programId,
                   participant.getRank(),
+                  participant.getType(),
                   participant.isConfirmed(),
                   participant.getConfirmedDate());
             })

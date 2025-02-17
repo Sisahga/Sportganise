@@ -36,7 +36,7 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
 
   log.info(`Rendering MessagesSection with ${messageChannels.length} channels`);
   return (
-    <div className="px-4">
+    <div className="px-4 relative max-w-screen-lg left-1/2 -translate-x-1/2">
       <div className="py-3 bg-white mt-4 rounded-lg shadow-lg border border-navbar mb-8">
         <div className="flex flex-col">
           <div>
