@@ -86,7 +86,7 @@ public class TrainingPlansController {
    * @param planId Id for the plan to be shared.
    * @return HTTP Response.
    */
-  @GetMapping("{accountId}/{planId}/share-plan")
+  @PostMapping("{accountId}/{planId}/share-plan")
   public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> shareTrainingPlans(
       @PathVariable Integer accountId, @PathVariable Integer planId) {
 
@@ -96,7 +96,7 @@ public class TrainingPlansController {
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Training plans successfully shared.");
 
-    log.debug("TRAINING PLAN SHARED");
+    log.debug("TRAINING PLAN SHARED.");
 
     return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
