@@ -70,6 +70,7 @@ public class TrainingPlansService {
               trainingPlan.getPlanId(),
               trainingPlan.getUserId(),
               trainingPlan.getDocUrl(),
+              trainingPlan.getShared(),
               trainingPlan.getCreationDate()));
     }
     log.debug("PLAN DTOS COUNT: ", trainingPlanDtos.size());
@@ -124,16 +125,15 @@ public class TrainingPlansService {
     if (trainingPlan == null) {
       throw new ResourceNotFoundException("Training plan not found.");
     }
-    log.debug("PLAN ID: ", trainingPlan.getPlanId());
+    log.debug("PLAN ID: {}", trainingPlan.getPlanId());
 
     if (!isAuthor(user, trainingPlan.getUserId())) {
       throw new ForbiddenException("You are not the author of this training plan.");
     }
 
-    TrainingPlanDto trainingPlanDto = new TrainingPlanDto(trainingPlan.getPlanId(),
-        trainingPlan.getUserId(),
-        trainingPlan.getDocUrl(),
-        trainingPlan.getCreationDate());
+    Boolean isShared = trainingPlan.getShared();
+    trainingPlan.setShared(!isShared);
+    trainingPlansRepository.save(trainingPlan);
   }
 
   /**
