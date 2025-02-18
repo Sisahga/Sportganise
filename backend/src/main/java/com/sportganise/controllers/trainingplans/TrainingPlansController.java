@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * REST Controller for managing 'Training Plans' Entities. Handles HTTP request and routes them to
+ * REST Controller for managing 'Training Plans' Entities. Handles HTTP request
+ * and routes them to
  * appropriate services.
  */
 @RestController
@@ -44,8 +45,7 @@ public class TrainingPlansController {
   public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> getTrainingPlans(
       @PathVariable Integer accountId) {
 
-    TrainingPlanResponseDto trainingPlanResponseDto =
-        trainingPlansService.getTrainingPlans(accountId);
+    TrainingPlanResponseDto trainingPlanResponseDto = trainingPlansService.getTrainingPlans(accountId);
 
     ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
     responseDto.setStatusCode(HttpStatus.OK.value());
@@ -83,22 +83,20 @@ public class TrainingPlansController {
    * Method to share training plan with other coaches and admins.
    * 
    * @param accountId Id for account of the user sending the request.
-   * @param planId Id for the plan to be shared.
+   * @param planId    Id for the plan to be shared.
    * @return HTTP Response.
    */
   @GetMapping("{accountId}/{planId}/share-plan")
   public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> shareTrainingPlans(
       @PathVariable Integer accountId, @PathVariable Integer planId) {
 
-    TrainingPlanResponseDto trainingPlanResponseDto =
-        trainingPlansService.getTrainingPlans(accountId);
+    trainingPlansService.shareTrainingPlan(accountId, planId);
 
     ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
     responseDto.setStatusCode(HttpStatus.OK.value());
-    responseDto.setMessage("Training plans successfully fetched.");
-    responseDto.setData(trainingPlanResponseDto);
+    responseDto.setMessage("Training plans successfully shared.");
 
-    log.debug("TRAINING PLANS SHARED WITH ME COUNT: ", trainingPlanResponseDto.getSharedWithMe());
+    log.debug("TRAINING PLAN SHARED");
 
     return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
