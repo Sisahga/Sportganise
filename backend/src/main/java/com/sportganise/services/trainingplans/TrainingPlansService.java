@@ -82,7 +82,7 @@ public class TrainingPlansService {
     log.debug("MY PLANS COUNT: {}", myPlans.size());
 
     List<TrainingPlanDto> sharedWithMe = trainingPlanDtos.stream()
-        .filter(tp -> !tp.getUserId().equals(userId))
+        .filter(tp -> !tp.getUserId().equals(userId) && tp.getShared() == true)
         .collect(Collectors.toList());
 
     log.debug("SHARED WITH ME COUNT: {}", sharedWithMe.size());
