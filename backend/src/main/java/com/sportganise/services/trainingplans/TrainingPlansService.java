@@ -114,6 +114,26 @@ public class TrainingPlansService {
   }
 
   /**
+   * Method for sharing a training plan.
+   * 
+   * @param userId Id of the user making the request.
+   * @param planId Id of the plan to be shared.
+   */
+  public void shareTrainingPlan(Integer userId, Integer planId) {
+    Account user = getUser(userId);
+
+    TrainingPlan trainingPlan = trainingPlansRepository.findTrainingPlan(planId);
+    if (trainingPlan == null) {
+      throw new ResourceNotFoundException("Training plan not found.");
+    }
+    log.debug("PLAN ID: ", trainingPlan.getPlanId());
+
+    if (!isAuthor(user, trainingPlan.getUserId())) {
+      throw new ForbiddenException("You are not the author of this training plan.");
+    }
+  }
+
+  /**
    * Helper method to get user Account object.
    *
    * @param accountId Id of user account.
