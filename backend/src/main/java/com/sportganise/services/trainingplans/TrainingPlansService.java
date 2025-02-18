@@ -60,7 +60,7 @@ public class TrainingPlansService {
     if (trainingPlans.isEmpty()) {
       throw new ResourceNotFoundException("No training plans found.");
     }
-    log.debug("PLANS COUNT: ", trainingPlans.size());
+    log.debug("PROGRAMS COUNT: {}", trainingPlans.size());
 
     List<TrainingPlanDto> trainingPlanDtos = new ArrayList<>();
 
@@ -73,7 +73,7 @@ public class TrainingPlansService {
               trainingPlan.getShared(),
               trainingPlan.getCreationDate()));
     }
-    log.debug("PLAN DTOS COUNT: ", trainingPlanDtos.size());
+    log.debug("PROGRAM DTOS COUNT: {}", trainingPlanDtos.size());
 
     List<TrainingPlanDto> myPlans = trainingPlanDtos.stream()
         .filter(tp -> tp.getUserId().equals(userId))
