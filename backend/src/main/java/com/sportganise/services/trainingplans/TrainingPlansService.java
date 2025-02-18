@@ -120,7 +120,7 @@ public class TrainingPlansService {
    * @param userId Id of the user making the request.
    * @param planId Id of the plan to be shared.
    */
-  public void shareTrainingPlan(Integer userId, Integer planId) {
+  public boolean shareTrainingPlan(Integer userId, Integer planId) {
     Account user = getUser(userId);
 
     TrainingPlan trainingPlan = trainingPlansRepository.findTrainingPlan(planId);
@@ -136,6 +136,8 @@ public class TrainingPlansService {
     Boolean isShared = trainingPlan.getShared();
     trainingPlan.setShared(!isShared);
     trainingPlansRepository.save(trainingPlan);
+
+    return trainingPlan.getShared();
   }
 
   /**
