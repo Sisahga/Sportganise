@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -108,11 +107,10 @@ public class TrainingPlansService {
     log.debug("PLAN ID: ", trainingPlan.getPlanId());
 
     if (!isAuthor(user, trainingPlan.getUserId())) {
-      throw new ForbiddenException("Only the person who uploaded this training plan can delete it.");
+      throw new ForbiddenException("You are not the author of this training plan.");
     }
 
-
-
+    trainingPlansRepository.deleteById(planId);
   }
 
   /**
@@ -229,6 +227,6 @@ public class TrainingPlansService {
    * @return boolean of whether the person deleting the plan is the author.
    */
   private boolean isAuthor(Account user, Integer authorId) {
-    return accountService.hasPermissions(user.getType()) && Objects.equals(user.getAccountId(), authorId);
+    return accountService.hasPermissions(user.getType()) && user.getAccountId().equals(authorId);
   }
 }
