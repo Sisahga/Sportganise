@@ -51,13 +51,16 @@ public class TrainingPlansServiceTest {
     user.setAccountId(userId);
     user.setType(AccountType.COACH);
 
-    TrainingPlan plan1 = new TrainingPlan(1, userId, "url1", true, ZonedDateTime.now().minusDays(1));
-    TrainingPlan plan2 = new TrainingPlan(1, userId, "url1.1", false, ZonedDateTime.now().minusDays(1));
+    TrainingPlan plan1 =
+        new TrainingPlan(1, userId, "url1", true, ZonedDateTime.now().minusDays(1));
+    TrainingPlan plan2 =
+        new TrainingPlan(1, userId, "url1.1", false, ZonedDateTime.now().minusDays(1));
     TrainingPlan plan3 = new TrainingPlan(2, 2, "url2", true, ZonedDateTime.now());
 
     when(accountService.getAccount(userId)).thenReturn(Optional.of(user));
     when(accountService.hasPermissions(user.getType())).thenReturn(true);
-    when(trainingPlansRepository.findTrainingPlans()).thenReturn(Arrays.asList(plan1, plan2, plan3));
+    when(trainingPlansRepository.findTrainingPlans())
+        .thenReturn(Arrays.asList(plan1, plan2, plan3));
 
     TrainingPlanResponseDto result = trainingPlansService.getTrainingPlans(userId);
 
