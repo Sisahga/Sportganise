@@ -104,7 +104,7 @@ public class TrainingPlansService {
     if (trainingPlan == null) {
       throw new ResourceNotFoundException("Training plan not found.");
     }
-    log.debug("PLAN ID: ", trainingPlan.getPlanId());
+    log.debug("PLAN ID: {}", trainingPlan.getPlanId());
 
     if (!isAuthor(user, trainingPlan.getUserId())) {
       throw new ForbiddenException("You are not the author of this training plan.");
