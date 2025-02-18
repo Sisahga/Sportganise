@@ -74,17 +74,15 @@ public class TrainingPlansService {
     }
     log.debug("PLAN DTOS COUNT: ", trainingPlanDtos.size());
 
-    List<TrainingPlanDto> myPlans =
-        trainingPlanDtos.stream()
-            .filter(tp -> tp.getUserId().equals(userId))
-            .collect(Collectors.toList());
+    List<TrainingPlanDto> myPlans = trainingPlanDtos.stream()
+        .filter(tp -> tp.getUserId().equals(userId))
+        .collect(Collectors.toList());
 
     log.debug("MY PLANS COUNT: {}", myPlans.size());
 
-    List<TrainingPlanDto> sharedWithMe =
-        trainingPlanDtos.stream()
-            .filter(tp -> !tp.getUserId().equals(userId))
-            .collect(Collectors.toList());
+    List<TrainingPlanDto> sharedWithMe = trainingPlanDtos.stream()
+        .filter(tp -> !tp.getUserId().equals(userId))
+        .collect(Collectors.toList());
 
     log.debug("SHARED WITH ME COUNT: {}", sharedWithMe.size());
 
@@ -131,6 +129,11 @@ public class TrainingPlansService {
     if (!isAuthor(user, trainingPlan.getUserId())) {
       throw new ForbiddenException("You are not the author of this training plan.");
     }
+
+    TrainingPlanDto trainingPlanDto = new TrainingPlanDto(trainingPlan.getPlanId(),
+        trainingPlan.getUserId(),
+        trainingPlan.getDocUrl(),
+        trainingPlan.getCreationDate());
   }
 
   /**
@@ -239,7 +242,8 @@ public class TrainingPlansService {
   }
 
   /**
-   * Helper method to check if user is author of the training plan. User must also be a coach or
+   * Helper method to check if user is author of the training plan. User must also
+   * be a coach or
    * admin.
    *
    * @param user Account object of the user making the request.
