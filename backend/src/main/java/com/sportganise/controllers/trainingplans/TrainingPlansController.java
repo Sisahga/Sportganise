@@ -90,11 +90,12 @@ public class TrainingPlansController {
   public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> shareTrainingPlans(
       @PathVariable Integer accountId, @PathVariable Integer planId) {
 
-    trainingPlansService.shareTrainingPlan(accountId, planId);
+    boolean isShared = trainingPlansService.shareTrainingPlan(accountId, planId);
+    String message = "Training plans successfully " + (isShared ? "shared." : "un-shared.");
 
     ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
     responseDto.setStatusCode(HttpStatus.OK.value());
-    responseDto.setMessage("Training plans successfully shared.");
+    responseDto.setMessage(message);
 
     log.debug("TRAINING PLAN SHARED.");
 
