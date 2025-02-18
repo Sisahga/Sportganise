@@ -80,6 +80,30 @@ public class TrainingPlansController {
   }
 
   /**
+   * Method to share training plan with other coaches and admins.
+   * 
+   * @param accountId Id for account of the user sending the request.
+   * @param planId Id for the plan to be shared.
+   * @return HTTP Response.
+   */
+  @GetMapping("{accountId}/{planId}/share-plan")
+  public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> shareTrainingPlans(
+      @PathVariable Integer accountId, @PathVariable Integer planId) {
+
+    TrainingPlanResponseDto trainingPlanResponseDto =
+        trainingPlansService.getTrainingPlans(accountId);
+
+    ResponseDto<TrainingPlanResponseDto> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Training plans successfully fetched.");
+    responseDto.setData(trainingPlanResponseDto);
+
+    log.debug("TRAINING PLANS SHARED WITH ME COUNT: ", trainingPlanResponseDto.getSharedWithMe());
+
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+  }
+
+  /**
    * POST mapping for uploading training plans.
    *
    * @param trainingPlans List of training plans to be uploaded.
