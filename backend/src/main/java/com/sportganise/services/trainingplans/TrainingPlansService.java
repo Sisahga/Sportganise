@@ -75,15 +75,17 @@ public class TrainingPlansService {
     }
     log.debug("PROGRAM DTOS COUNT: {}", trainingPlanDtos.size());
 
-    List<TrainingPlanDto> myPlans = trainingPlanDtos.stream()
-        .filter(tp -> tp.getUserId().equals(userId))
-        .collect(Collectors.toList());
+    List<TrainingPlanDto> myPlans =
+        trainingPlanDtos.stream()
+            .filter(tp -> tp.getUserId().equals(userId))
+            .collect(Collectors.toList());
 
     log.debug("MY PLANS COUNT: {}", myPlans.size());
 
-    List<TrainingPlanDto> sharedWithMe = trainingPlanDtos.stream()
-        .filter(tp -> !tp.getUserId().equals(userId) && tp.getShared() == true)
-        .collect(Collectors.toList());
+    List<TrainingPlanDto> sharedWithMe =
+        trainingPlanDtos.stream()
+            .filter(tp -> !tp.getUserId().equals(userId) && tp.getShared() == true)
+            .collect(Collectors.toList());
 
     log.debug("SHARED WITH ME COUNT: {}", sharedWithMe.size());
 
@@ -114,7 +116,7 @@ public class TrainingPlansService {
 
   /**
    * Method for sharing a training plan.
-   * 
+   *
    * @param userId Id of the user making the request.
    * @param planId Id of the plan to be shared.
    */
