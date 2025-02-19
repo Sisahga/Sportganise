@@ -22,8 +22,9 @@ import BackButton from "@/components/ui/back-button";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { calculateEndTime } from "@/utils/calculateEndTime";
-import { useToast } from "@/hooks/use-toast";
-import { ToastAction } from "@/components/ui/toast";
+import useConfirmParticipant from "@/hooks/useConfirmParticipant";
+import useRejectParticipant from "@/hooks/useRejectParticipant";
+import { WaitlistButton } from "@/components/WaitlistTrainingSession/index.tsx";
 
 interface WaitlistDetailsProps {
   programDetails: ProgramDetails;
@@ -35,7 +36,6 @@ const WaitlistDetailsComponent: React.FC<WaitlistDetailsProps> = ({
   const [accountId, setAccountId] = useState<number | null>(null);
   const [accountType, setAccountType] = useState<string | null>(null);
   const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
-  const { toast } = useToast();
 
   useEffect(() => {
     log.debug("Fetching account details from cookies...");
@@ -52,11 +52,11 @@ const WaitlistDetailsComponent: React.FC<WaitlistDetailsProps> = ({
   const { joinQueue, joining, userRank, error: joinError } = useJoinWaitlist();
 
   const handleJoinQueue = async () => {
-    if (accountId) {
-      await joinQueue(programId, accountId);
-    } else {
-      log.error("Account ID is missing!");
+    if (!accountId || !programId) {
+      log.error("Missing required parameters: accountId or programId.");
+      return;
     }
+    await joinQueue(programId, accountId);
   };
 
   const handlePlayerSelect = (playerId: number) => {
@@ -67,20 +67,44 @@ const WaitlistDetailsComponent: React.FC<WaitlistDetailsProps> = ({
     );
   };
 
-  const confirmPlayers = () => {
+  const { confirmParticipant } = useConfirmParticipant();
+
+  const confirmPlayers = async () => {
     if (selectedPlayers.length === 0) {
-      toast({
-        title: "No Players Selected",
-        description: "Please select at least one player before confirming.",
-        variant: "destructive",
-        action: <ToastAction altText="Ok">Ok</ToastAction>,
-      });
+      log.warn("No players selected for confirmation.");
       return;
     }
 
-    log.info("Confirmed Players:", selectedPlayers);
-    alert(`Confirmed Players: ${selectedPlayers.join(", ")}`);
-    setSelectedPlayers([]);
+    try {
+      for (const playerId of selectedPlayers) {
+        await confirmParticipant(programId, playerId);
+      }
+
+      log.info("Confirmed Players:", selectedPlayers);
+      setSelectedPlayers([]);
+    } catch (error) {
+      log.error("Error confirming players:", error);
+    }
+  };
+
+  const { rejectParticipant } = useRejectParticipant();
+
+  const rejectPlayers = async () => {
+    if (selectedPlayers.length === 0) {
+      log.warn("No players selected for rejection.");
+      return;
+    }
+
+    try {
+      for (const playerId of selectedPlayers) {
+        await rejectParticipant(programId, playerId);
+      }
+
+      log.info("Rejected Players:", selectedPlayers);
+      setSelectedPlayers([]);
+    } catch (error) {
+      log.error("Error rejecting players:", error);
+    }
   };
 
   return (
@@ -250,26 +274,17 @@ const WaitlistDetailsComponent: React.FC<WaitlistDetailsProps> = ({
         </Button>
       )}
 
-      {!isCoachOrAdmin && (
-        <Button
-          onClick={handleJoinQueue}
-          disabled={joining || userRank !== null}
-          className={`text-white font-medium rounded-full px-6 py-2 shadow-md flex justify-center items-center mx-auto pt-4px mt-2 gap-2 ${
-            joining || userRank !== null
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-secondaryColour hover:bg-primaryHoverColour"
-          }`}
-        >
-          {joining
-            ? "Joining..."
-            : userRank !== null
-              ? `Your Rank: ${userRank}`
-              : "Join Queue"}
-          <ChevronRight size={16} />
-        </Button>
-      )}
-
-      {joinError && <p className="text-red-500 text-sm mt-3">{joinError}</p>}
+      {/* Use the new WaitlistButton component */}
+      <WaitlistButton
+        isCoachOrAdmin={isCoachOrAdmin}
+        waitlistLength={waitlist.length}
+        joining={joining}
+        userRank={userRank}
+        handleJoinQueue={handleJoinQueue}
+        confirmPlayers={confirmPlayers}
+        rejectPlayers={rejectPlayers}
+        joinError={joinError}
+      />
     </div>
   );
 };
