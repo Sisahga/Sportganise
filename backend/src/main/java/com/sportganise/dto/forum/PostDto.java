@@ -23,5 +23,6 @@ public class PostDto {
   private ZonedDateTime occurrenceDate;
   @NotNull private ZonedDateTime creationDate;
   @NotNull private Long likeCount;
+  @NotNull private boolean liked;
   @NotNull private Long feedbackCount;
 }

@@ -5,7 +5,7 @@ import log from "loglevel";
 import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { User2Icon, Hourglass } from "lucide-react";
+import { Hourglass } from "lucide-react";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
 
 // Data structure for data received from API call
@@ -39,11 +39,11 @@ const TrainingSessionCard: React.FC<Program> = ({
       <div className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
         <div className="flex w-full items-center gap-2">
           <Avatar>
-            <AvatarFallback>
-              <User2Icon color="#a1a1aa" />
+            <AvatarFallback className="bg-primaryColour">
+              <img src="/src/assets/Logo.png" alt="organisation" />
             </AvatarFallback>
           </Avatar>
-          <span>Coach Benjamin Luijan</span>{" "}
+          <span>{programDetails.author}</span>{" "}
           <span className="ml-auto text-xs">
             {new Date(programDetails.occurrenceDate).toDateString()}
           </span>

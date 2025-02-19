@@ -62,8 +62,8 @@ public class PostService {
       int page,
       String sortBy,
       String sortDirection,
-      Long orgId,
-      Long accountId) {
+      Integer orgId,
+      Integer accountId) {
 
     log.info("Fetching posts with search criteria");
 
@@ -105,6 +105,7 @@ public class PostService {
                 post -> {
                   long likeCount = countLikesByPostId(post.getPostId());
                   long feedbackCount = countFeedbackByPostId(post.getPostId());
+                  boolean liked = likedPost(post.getPostId(), accountId);
                   PostDto dto =
                       new PostDto(
                           post.getPostId(),
@@ -114,6 +115,7 @@ public class PostService {
                           post.getOccurrenceDate(),
                           post.getCreationDate(),
                           likeCount,
+                          liked,
                           feedbackCount);
 
                   return dto;
@@ -148,10 +150,11 @@ public class PostService {
    * @param postId Post id.
    * @return PostDto.
    */
-  public ViewPostDto getPostByIdWithFeedBacks(Integer postId) {
+  public ViewPostDto getPostByIdWithFeedBacks(Integer postId, Integer accountId) {
     List<FeedbackDto> feedbacks = feedbackService.getFeedbacksByPostId(postId);
     Long likeCount = countLikesByPostId(postId);
     Post post = getPostById(postId);
+    boolean liked = likedPost(postId, accountId);
     return new ViewPostDto(
         post.getPostId(),
         post.getTitle(),
@@ -160,6 +163,7 @@ public class PostService {
         post.getOccurrenceDate(),
         post.getCreationDate(),
         likeCount,
+        liked,
         feedbacks.size(),
         feedbacks);
   }
@@ -181,6 +185,10 @@ public class PostService {
 
   public void unlikePost(Integer postId, Integer accountId) {
     likesRepository.deleteByPostIdAndAccountId(postId, accountId);
+  }
+
+  private boolean likedPost(Integer postId, Integer accountId) {
+    return likesRepository.findByPostIdAndAccountId(postId, accountId) != null;
   }
 
   /**

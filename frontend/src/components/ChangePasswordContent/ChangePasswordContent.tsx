@@ -250,7 +250,7 @@ const ChangePasswordContent: React.FC = () => {
                 {/* 3/4 types of characters checks */}
                 <div className="optional-rules flex flex-col gap-1 mt-2">
                   <p className="font-semibold ">
-                    Check at least 3 from the folowing:
+                    Check at least 3 from the following:
                   </p>
 
                   <PasswordChecklist

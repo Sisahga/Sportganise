@@ -1,16 +1,12 @@
 import React, { type DragEvent, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { ChevronLeft, FolderOpen, Paperclip, Send } from "lucide-react";
+import { ChevronLeft, FolderOpen, Paperclip, Send, X } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
-import type {
-  FileAttachment,
-  MessageComponent,
-  SendMessageComponent,
-} from "@/types/messaging";
+import type { MessageComponent, SendMessageComponent } from "@/types/messaging";
 import ChatMessages from "@/components/Inbox/ChatScreen/ChatMessages";
 import { Button } from "@/components/ui/Button";
 import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown";
@@ -18,18 +14,21 @@ import useSendMessage from "@/hooks/useSendMessage";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
-import {
-  FileInput,
-  FileUploader,
-  FileUploaderContent,
-  FileUploaderItem,
-} from "@/components/ui/file-upload";
+
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { ChatScreenProps } from "@/types/dmchannels.ts";
 import useGetDeleteChannelRequest from "@/hooks/useGetDeleteChannelRequest.ts";
 import { DeleteRequest } from "@/components/Inbox/ChatScreen/DeleteRequest";
+import { toast } from "@/hooks/use-toast.ts";
+import {
+  MAX_GROUP_FILE_SIZE,
+  MAX_SINGLE_FILE_SIZE,
+  MAX_SINGLE_FILE_SIZE_TEXT,
+} from "@/constants/file.constants.ts";
+import useUploadAttachments from "@/hooks/useUploadAttachments.ts";
+import ResponseDto from "@/types/response.ts";
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -66,6 +65,11 @@ const ChatScreen: React.FC = () => {
     channelImageBlob || defaultAvatar,
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [activateSkeleton, setActivateSkeleton] = useState<boolean>(false);
+  const [skeletonId, setSkeletonId] = useState<number>(0);
+  const [skeletonCount, setSkeletonCount] = useState<number>(0);
+  const [messageStatus, setMessageStatus] = useState<string>("Delivered");
 
   // Hooks.
   const { messages, setMessages, loading, error } = useChatMessages(
@@ -73,6 +77,7 @@ const ChatScreen: React.FC = () => {
     read,
   ); // Fetch messages.
   const { sendDirectMessage } = useSendMessage();
+  const { uploadAttachments } = useUploadAttachments();
   const {
     deleteRequestActive,
     deleteRequest,
@@ -80,6 +85,8 @@ const ChatScreen: React.FC = () => {
     setDeleteRequest,
     currentMemberStatus,
   } = useGetDeleteChannelRequest(channelId, currentUserId); // Check if a delete request is active.
+
+  const chatScrollRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -103,6 +110,16 @@ const ChatScreen: React.FC = () => {
       setChannelIsBlocked(false);
     } else if (message.type === "DELETE") {
       setDeleteRequestActive(true);
+    }
+    if (message.attachments.length !== 0) {
+      const dupMessage = document.getElementById(message.messageId.toString());
+      if (dupMessage) {
+        log.info("Removing duplicate message container...");
+        dupMessage.remove();
+      }
+    }
+    if (message.senderId !== currentUserId) {
+      setMessageStatus("");
     }
   };
 
@@ -145,37 +162,133 @@ const ChatScreen: React.FC = () => {
     element.style.height = "auto";
   };
 
-  const onSubmit = (data: FormData) => {
+  const handleAddAttachment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      console.log(e.target.files);
+      const files = Array.from(e.target.files);
+      if (attachments.length + files.length > 5) {
+        toast({
+          title: "Error",
+          description: "You can only upload a maximum of 5 files at a time.",
+          variant: "destructive",
+        });
+        e.target.value = "";
+        return;
+      }
+      // Check if any file size exceeds 10MB.
+      if (files.some((file) => file.size > MAX_SINGLE_FILE_SIZE)) {
+        toast({
+          title: "Error",
+          description: `File size should not exceed ${MAX_SINGLE_FILE_SIZE_TEXT}.`,
+          variant: "destructive",
+        });
+        e.target.value = "";
+        return;
+      }
+      // Check if total file size exceeds 25MB.
+      let totalSize = 0;
+      for (const file of files) {
+        totalSize += file.size;
+        if (totalSize > MAX_GROUP_FILE_SIZE) {
+          toast({
+            title: "Error",
+            description: `Total file size should not exceed ${MAX_SINGLE_FILE_SIZE_TEXT}.`,
+            variant: "destructive",
+          });
+          e.target.value = "";
+          return;
+        }
+      }
+      setAttachments((prev) => {
+        const newAttachments = [...prev, ...files];
+        form.setValue("attachments", newAttachments);
+        return newAttachments;
+      });
+      e.target.value = "";
+    }
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => {
+      const updatedAttachments = prev.filter((_, i) => i !== index);
+      form.setValue("attachments", updatedAttachments);
+      return updatedAttachments;
+    });
+  };
+
+  const onSubmit = async (data: FormData) => {
     if (
       data.message?.trim() === "" &&
       (!data.attachments || data.attachments.length === 0)
     )
       return;
 
-    const fileAttachments: FileAttachment[] =
-      data.attachments?.map((file) => ({
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type,
-        fileUrl: URL.createObjectURL(file),
-      })) || [];
-
     const messagePayload: SendMessageComponent = {
       senderId: currentUserId,
       channelId: channelId,
       messageContent: data.message || "",
-      attachments: fileAttachments,
       sentAt: new Date().toISOString(),
       type: "CHAT",
       senderFirstName: cookies.firstName,
       avatarUrl: cookies.pictureUrl,
     };
+    setMessageStatus("Sending...");
+    const response = await sendDirectMessage(
+      messagePayload,
+      webSocketServiceRef.current,
+    );
+    if (!response) {
+      setMessageStatus("");
+    }
 
-    sendDirectMessage(messagePayload, webSocketServiceRef.current);
+    form.setValue("message", ""); // Clear message input.
+    setAttachments([]); // Clear attachments so they get out of view.
+
+    // Send attachments if any.
+    if (data.attachments && data.attachments.length > 0 && response) {
+      setActivateSkeleton(true);
+      setSkeletonId(response.messageId);
+      setSkeletonCount(data.attachments.length);
+
+      log.info("Uploading {} attachments", data.attachments.length);
+      const formData = new FormData();
+      data.attachments.forEach((file) => {
+        formData.append("attachments", file);
+      });
+      formData.append("messageId", response.messageId.toString());
+      formData.append("senderId", currentUserId.toString());
+      formData.append("senderFirstName", cookies.firstName);
+      formData.append("senderAvatarUrl", cookies.pictureUrl || "");
+      const uploadResponse: ResponseDto<MessageComponent> =
+        await uploadAttachments(formData);
+      if (uploadResponse.statusCode === 200) {
+        log.info("Attachments uploaded successfully.");
+      } else {
+        log.error("Error uploading attachments:", uploadResponse.message);
+        toast({
+          title: "Error",
+          description: "Error uploading attachments. Try reuploading them.",
+          variant: "destructive",
+        });
+        setMessageStatus("");
+      }
+      setActivateSkeleton(false);
+      setSkeletonId(0);
+      setSkeletonCount(0);
+    }
+
+    setMessageStatus("Delivered");
+
     form.reset();
     resetTextAreaHeight(
       document.getElementById("chatScreenInputArea") as HTMLTextAreaElement,
     );
+  };
+
+  const scrollChatScreenToBottom = () => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -192,7 +305,12 @@ const ChatScreen: React.FC = () => {
 
   useEffect(() => {
     log.debug("Messages fetched:", messages);
+    scrollChatScreenToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    scrollChatScreenToBottom();
+  }, [attachments]);
 
   useEffect(() => {
     if (deleteRequestActive && deleteRequest) {
@@ -230,7 +348,7 @@ const ChatScreen: React.FC = () => {
     >
       {/* Header */}
       <header
-        className="flex items-center justify-between p-4 bg-white shadow gap-4"
+        className="flex items-center justify-between p-4 bg-white shadow gap-4 flex-shrink-0"
         style={{ borderRadius: "0 0 1rem 1rem" }}
       >
         <div className="flex flex-grow items-center gap-4">
@@ -295,7 +413,16 @@ const ChatScreen: React.FC = () => {
       )}
 
       {/* Chat Messages */}
-      <ChatMessages messages={messages} currentUserId={currentUserId} />
+      <div ref={chatScrollRef} className="overflow-y-auto flex-1 mt-4 relative">
+        <ChatMessages
+          messages={messages}
+          currentUserId={currentUserId}
+          activateSkeleton={activateSkeleton}
+          skeletonId={skeletonId}
+          skeletonCount={skeletonCount}
+          status={messageStatus}
+        />
+      </div>
 
       {/* Show blocked component if channel is blocked */}
       <UserBlockedComponent
@@ -306,45 +433,90 @@ const ChatScreen: React.FC = () => {
         channelType={channelType}
       />
 
+      {attachments.length > 0 && (
+        <div className="flex flex-col">
+          {/* Image Attachments Row */}
+          {attachments.some((file) => file.type.startsWith("image/")) && (
+            <div className="flex overflow-x-scroll gap-1 mb-1 px-2">
+              {attachments
+                .filter((file) => file.type.startsWith("image/"))
+                .map((file, index) => (
+                  <div
+                    key={`img-${index}`}
+                    className="flex gap-2 items-center justify-center px-2 py-1 rounded-lg text-sm relative shadow-lg bg-gradient-to-br from-white to-secondaryColour/40"
+                  >
+                    <X
+                      className="h-4 w-4 stroke-current absolute top-0 right-0 mt-1 mr-1"
+                      onClick={() =>
+                        handleRemoveAttachment(attachments.indexOf(file))
+                      }
+                    />
+                    <div className="flex flex-col items-center pt-3.5 pb-1 max-w-20">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        className="h-16 w-16 object-cover rounded-sm"
+                      />
+                      <span
+                        className="truncate w-20 text-center"
+                        title={file.name}
+                      >
+                        {file.name}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+          {/* Non-Image Attachments Row */}
+          {attachments.some((file) => !file.type.startsWith("image/")) && (
+            <div className="flex overflow-x-scroll gap-1 mb-2 px-2">
+              {attachments
+                .filter((file) => !file.type.startsWith("image/"))
+                .map((file, index) => (
+                  <div
+                    key={`file-${index}`}
+                    className={`flex gap-2 items-center justify-center px-2 py-1 rounded-lg text-sm relative shadow bg-gradient-to-br from-white to-secondaryColour/20`}
+                  >
+                    <Paperclip className="h-4 w-4 stroke-current" />
+                    <span className="text-nowrap" title={file.name}>
+                      {file.name}
+                    </span>
+                    <X
+                      className="h-4 w-4 stroke-current"
+                      onClick={() =>
+                        handleRemoveAttachment(attachments.indexOf(file))
+                      }
+                    />
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Message Input Area */}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={`${channelIsBlocked ? "force-hide" : ""} flex items-end gap-3 px-4 py-3 bg-white shadow`}
+        className={`${channelIsBlocked ? "force-hide" : ""} flex items-end gap-3 px-4 py-3 bg-white shadow flex-shrink-0`}
       >
-        <Controller
-          name="attachments"
-          control={form.control}
-          render={({ field }) => (
-            <FileUploader
-              className="w-auto"
-              value={field.value || []}
-              onValueChange={field.onChange}
-              dropzoneOptions={{
-                maxFiles: 5,
-                maxSize: 1024 * 1024 * 10, // 10MB
-                multiple: true,
-              }}
-            >
-              <FileInput className="rounded-full bg-white w-10 h-10 flex items-center justify-center">
-                <FolderOpen
-                  className="text-gray-800 folder-size"
-                  size={24}
-                  strokeWidth={1.5}
-                />
-              </FileInput>
-              <FileUploaderContent className="flex-row absolute bottom-[50px] left-0 overflow-auto w-[100vw]">
-                {field.value &&
-                  field.value.length > 0 &&
-                  field.value.map((file, index) => (
-                    <FileUploaderItem key={index} index={index} className="">
-                      <Paperclip className="h-4 w-4 stroke-current" />
-                      <span>{file.name}</span>
-                    </FileUploaderItem>
-                  ))}
-              </FileUploaderContent>
-            </FileUploader>
-          )}
-        />
+        <div className="flex justify-center items-center px-2 h-full">
+          <FolderOpen
+            className="text-gray-800 folder-size cursor-pointer"
+            size={24}
+            strokeWidth={1.5}
+            onClick={() => {
+              document.getElementById("fileInput")?.click();
+            }}
+          />
+          <input
+            id="fileInput"
+            type="file"
+            className="hidden"
+            onChange={handleAddAttachment}
+            multiple={true}
+          />
+        </div>
 
         <Controller
           name="message"

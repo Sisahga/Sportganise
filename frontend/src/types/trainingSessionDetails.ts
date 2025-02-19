@@ -21,6 +21,7 @@ export interface ProgramDetails {
   location: string;
   visibility: string;
   recurring: boolean;
+  author: string;
 }
 
 export interface ProgramAttachments {

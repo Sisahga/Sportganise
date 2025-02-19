@@ -2,6 +2,7 @@ package com.sportganise.controllers.forum;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.forum.CreateFeedbackDto;
+import com.sportganise.dto.forum.FeedbackIdDto;
 import com.sportganise.dto.forum.LikeRequestDto;
 import com.sportganise.dto.forum.PostDto;
 import com.sportganise.dto.forum.ViewPostDto;
@@ -12,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,8 +46,8 @@ public class PostController {
    * @param accountId ID of the account.
    * @return ResponseDto containing the fetched posts.
    */
-  @GetMapping("/search")
-  public ResponseDto<List<PostDto>> searchAndFilterPosts(
+  @GetMapping("/search/{orgId}/{accountId}")
+  public ResponseEntity<ResponseDto<List<PostDto>>> searchAndFilterPosts(
       @RequestParam(required = false) String searchTerm,
       @RequestParam(required = false) ZonedDateTime occurrenceDate,
       @RequestParam(required = false) PostType type,
@@ -54,8 +56,8 @@ public class PostController {
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "occurrenceDate") String sortBy,
       @RequestParam(defaultValue = "desc") String sortDir,
-      @RequestParam Long orgId,
-      @RequestParam Long accountId) {
+      @PathVariable Integer orgId,
+      @PathVariable Integer accountId) {
     List<PostDto> postDtos =
         postService.searchAndFilterPosts(
             searchTerm,
@@ -73,7 +75,7 @@ public class PostController {
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Posts fetched successfully");
 
-    return responseDto;
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**
@@ -98,15 +100,16 @@ public class PostController {
    * @param postId Post id.
    * @return ResponseDto containing the fetched post.
    */
-  @GetMapping("/{postId}")
-  public ResponseDto<ViewPostDto> getPostById(@PathVariable Integer postId) {
-    ViewPostDto viewPostDto = postService.getPostByIdWithFeedBacks(postId);
+  @GetMapping("/{postId}/{accountId}")
+  public ResponseEntity<ResponseDto<ViewPostDto>> getPostById(
+      @PathVariable Integer postId, @PathVariable Integer accountId) {
+    ViewPostDto viewPostDto = postService.getPostByIdWithFeedBacks(postId, accountId);
     ResponseDto<ViewPostDto> responseDto = new ResponseDto<>();
     responseDto.setData(viewPostDto);
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Post fetched successfully");
 
-    return responseDto;
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**
@@ -153,14 +156,16 @@ public class PostController {
    * @return ResponseDto .
    */
   @PostMapping("/{postId}/add-feedback")
-  public ResponseDto<String> createFeedback(
+  public ResponseEntity<ResponseDto<FeedbackIdDto>> createFeedback(
       @PathVariable Integer postId, @RequestBody CreateFeedbackDto feedback) {
-    feedbackService.createFeedback(feedback, postId);
-    ResponseDto<String> responseDto = new ResponseDto<>();
+    FeedbackIdDto feedbackIdDto =
+        new FeedbackIdDto(feedbackService.createFeedback(feedback, postId));
+    ResponseDto<FeedbackIdDto> responseDto = new ResponseDto<>();
+    responseDto.setData(feedbackIdDto);
     responseDto.setStatusCode(HttpStatus.CREATED.value());
     responseDto.setMessage("Feedback added successfully");
 
-    return responseDto;
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /**

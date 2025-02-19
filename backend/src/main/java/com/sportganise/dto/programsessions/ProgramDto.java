@@ -19,6 +19,7 @@ public class ProgramDto {
   private ProgramType programType;
   private String title;
   private String description;
+  private String author;
   private Integer capacity;
   private ZonedDateTime occurrenceDate;
   private Integer durationMins;
@@ -40,6 +41,7 @@ public class ProgramDto {
     this.programType = program.getProgramType();
     this.title = program.getTitle();
     this.description = program.getDescription();
+    this.author = program.getAuthor();
     this.capacity = program.getCapacity();
     this.occurrenceDate = program.getOccurrenceDate();
     this.durationMins = program.getDurationMins();

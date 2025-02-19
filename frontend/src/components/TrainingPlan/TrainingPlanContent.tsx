@@ -2,8 +2,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 // Components
-import { columns } from "./TableColumns.tsx";
-import TrainingPlanTable from "./TrainingPlanTable";
+import { columns } from "./Table/TableColumns.tsx";
+import TrainingPlanTable from "./Table/TrainingPlanTable.tsx";
 import { AddTrainingPlanButton } from "@/components/TrainingPlan";
 // UI Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,11 +41,13 @@ export default function TrainingPlanContent() {
   // Fetch Training Plans Created By and Shared With Current User
   const { myTrainingPlans, sharedTrainingPlans, loading, error } =
     useTrainingPlans(accountId); // myTrainingPlans, sharedTrainingPlans = [] can be passed to <TrainingPlanTable />
-  log.info("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
-  log.info(
-    "TrainingPlanContent -> sharedTrainingPlans are",
-    sharedTrainingPlans,
-  );
+  useEffect(() => {
+    log.info("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
+    log.info(
+      "TrainingPlanContent -> sharedTrainingPlans are",
+      sharedTrainingPlans,
+    );
+  });
 
   // Block Page for Null AccountId
   if (!accountId) {

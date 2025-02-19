@@ -12,11 +12,12 @@ import {
   EllipsisVertical,
   Pencil,
   Trash2,
-  UsersRound,
   LogOut,
-  UserRound,
   MessageCircle,
   Frown,
+  Smile,
+  LogIn,
+  Ban,
 } from "lucide-react";
 import { useNavigate } from "react-router";
 import {
@@ -25,6 +26,16 @@ import {
   ProgramDetails,
 } from "@/types/trainingSessionDetails";
 import log from "loglevel";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface DropDownMenuButtonProps {
   accountType: string | null | undefined;
@@ -46,12 +57,17 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
   //Confirmation of player absence
   const [isNotificationVisible, setNotificationVisible] = useState(false);
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  // Handle player leaving
-  const handleButtonClickPlayer = () => {
-    setModalVisible(true); // Show the modal on button click
-  };
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isRSVPDialogOpen, setRSVPDialogOpen] = useState(false);
+  const [isRSVPConfirmationVisible, setRSVPConfirmationVisible] =
+    useState(false);
+  const [isAbsentDialogOpen, setAbsentDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isPostponeDialogOpen, setPostponeDialogOpen] = useState(false);
+  const [isPostponeConfirmationVisible, setPostponeConfirmationVisible] =
+    useState(false);
+  const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] =
+    useState(false);
 
   // Handle waitlisted joining
   /*
@@ -60,21 +76,64 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   };
   */
 
-  const handleLeave = () => {
-    setModalVisible(false); // Close the modal
-    setNotificationVisible(true); // Show the notification
+  const handleDeleteClick = () => {
+    setDropdownOpen(false); //Close the dropdown
+    setDeleteDialogOpen(true); // Open the alert dialog
+  };
+
+  const handleDeleteConfirmation = () => {
+    setDeleteDialogOpen(false);
+    setDeleteConfirmationVisible(true);
+
     setTimeout(() => {
-      setNotificationVisible(false); // Hide the notification after 3 seconds
+      setDeleteConfirmationVisible(false);
     }, 3000);
   };
 
-  const handleCancel = () => {
-    setModalVisible(false); // Close the modal without proceeding
+  const handlePostponeClick = () => {
+    setDropdownOpen(false); //Close the dropdown
+    setPostponeDialogOpen(true); // Open the alert dialog
+  };
+
+  const handlePostponeConfirmation = () => {
+    setPostponeDialogOpen(false);
+    setPostponeConfirmationVisible(true); // Show postpone confirmation message
+
+    setTimeout(() => {
+      setPostponeConfirmationVisible(false);
+    }, 3000);
+  };
+
+  const handleRSVPClick = () => {
+    setDropdownOpen(false); // Close the dropdown immediately
+    setRSVPDialogOpen(true); // Open the alert dialog
+  };
+
+  const handleRSVPConfirmation = () => {
+    setRSVPDialogOpen(false);
+    setRSVPConfirmationVisible(true); // Show RSVP confirmation message
+
+    setTimeout(() => {
+      setRSVPConfirmationVisible(false);
+    }, 3000);
+  };
+
+  const handleAbsentClick = () => {
+    setDropdownOpen(false); // Close the dropdown immediately
+    setAbsentDialogOpen(true); // Open the alert dialog
+  };
+
+  const handleAbsentConfirmation = () => {
+    setAbsentDialogOpen(false);
+    setNotificationVisible(true);
+    setTimeout(() => {
+      setNotificationVisible(false);
+    }, 3000);
   };
 
   return (
     <div>
-      <DropdownMenu>
+      <DropdownMenu open={isDropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <button
             aria-label="Add new item"
@@ -100,11 +159,11 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <Pencil />
                 <span>Edit Event</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <UsersRound />
-                <span>Message all Members</span>
+              <DropdownMenuItem onSelect={handlePostponeClick}>
+                <Ban color="gray" />
+                <span>Postpone Event</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleDeleteClick}>
                 <Trash2 color="red" />
                 <span className="text-red">Delete Event</span>
               </DropdownMenuItem>
@@ -115,11 +174,11 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <MessageCircle />
                 <span>Message Host</span>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <UserRound />
-                <span>Contact Member</span>
+              <DropdownMenuItem onSelect={handleRSVPClick}>
+                <LogIn color="green" />
+                <span className="text-green-500">RSVP</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleButtonClickPlayer}>
+              <DropdownMenuItem onSelect={handleAbsentClick}>
                 <LogOut color="red" />
                 <span className="text-red">Mark as absent</span>
               </DropdownMenuItem>
@@ -128,35 +187,139 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Confirmation Modal */}
-      {isModalVisible && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80 text-center">
-            <p className="text-lg font-semibold mb-4">Are you sure?</p>
-            <div className="flex justify-around">
-              <button
-                onClick={handleCancel}
-                className="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-full"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleLeave}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-2 px-4 rounded-full"
-              >
-                Leave
-              </button>
-            </div>
+      {/* Pop up when coach/admin postpones an event*/}
+      <AlertDialog
+        open={isPostponeDialogOpen}
+        onOpenChange={setPostponeDialogOpen}
+      >
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Would you like to postpone this event?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This event will be postponed until you decide to reinstate it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPostponeDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handlePostponeConfirmation}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Pop up when coach/admin deletes an event*/}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Would you like to delete this event?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This event will be deleted permanently.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirmation}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Pop up when player RSVP's to event */}
+      <AlertDialog open={isRSVPDialogOpen} onOpenChange={setRSVPDialogOpen}>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Would you like to confirm your presence?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              If you cannot attend the event anymore, you will have the option
+              to mark yourself as absent.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setRSVPDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleRSVPConfirmation}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Pop up when player wants to leave an event */}
+      <AlertDialog open={isAbsentDialogOpen} onOpenChange={setAbsentDialogOpen}>
+        <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want to mark yourself as absent?
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setAbsentDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleAbsentConfirmation}>
+              Confirm
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Postpone event confirmation message */}
+      {isPostponeConfirmationVisible && (
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
+          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+            <Frown className="w-12 h-12" />
+            <p className="text-center">
+              You have successfully postponed the event. The participants will
+              be notified.
+            </p>
           </div>
         </div>
       )}
 
-      {/* Notification */}
+      {/* Postpone event confirmation message */}
+      {isDeleteConfirmationVisible && (
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
+          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+            <Frown className="w-12 h-12" />
+            <p className="text-center">
+              You have successfully deleted the event. The participants will be
+              notified.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* RSVP confirmation message */}
+      {isRSVPConfirmationVisible && (
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
+          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+            <Smile className="w-12 h-12" />
+            <p className="text-center">
+              Your presence is noted. Can&#39;t wait to see you!
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Notification when player confirms absence */}
       {isNotificationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg shadow-lg flex flex-col items-center space-y-2">
             <Frown className="w-12 h-12" />
-            <p>Your absence is noted</p>
+            <p className="text-center">Your absence is noted.</p>
           </div>
         </div>
       )}
