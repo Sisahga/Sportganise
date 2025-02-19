@@ -17,12 +17,13 @@ function useWaitlistPrograms() {
 
   const fetchWaitlistPrograms = async () => {
     try {
-      const data = await waitlistApi.getWaitlistPrograms();
-      setWaitlistPrograms(data ?? []);
-      log.info("useWaitlistPrograms response:", data);
+      const response = await waitlistApi.getWaitlistPrograms();
+      console.log("Raw response from getWaitlistPrograms:", response);
+      setWaitlistPrograms(response ?? []);
+      log.info("useWaitlistPrograms response:", response);
     } catch (err) {
       console.error("Error fetching waitlist programs:", err);
-      setError("Failed to fetch waitlist programs.");
+      setError(`Failed to fetch waitlist programs: ${err}`);
     } finally {
       setLoading(false);
     }

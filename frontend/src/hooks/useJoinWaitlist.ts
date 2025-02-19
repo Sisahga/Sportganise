@@ -1,4 +1,5 @@
 import { useState } from "react";
+import waitlistApi from "@/services/api/waitlistApi";
 
 const useJoinWaitlist = () => {
   const [joining, setJoining] = useState(false);
@@ -10,25 +11,13 @@ const useJoinWaitlist = () => {
     setError(null);
 
     try {
-      const response = await fetch(`/program-participant/opt-participant`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ programId, accountId }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to join queue: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      setUserRank(data.rank);
+      const rank = await waitlistApi.joinQueue(programId, accountId);
+      setUserRank(rank);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message); // Extract the error message
+        setError(err.message);
       } else {
-        setError("An unknown error occurred."); // Handle cases where err is not an Error instance
+        setError("An unknown error occurred.");
       }
     } finally {
       setJoining(false);
