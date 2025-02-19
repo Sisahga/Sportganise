@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Button } from "@/components/ui/Button";
 import { ChevronRight, XCircle } from "lucide-react";
 
