@@ -17,7 +17,8 @@ public interface TrainingPlansRepository extends JpaRepository<TrainingPlan, Int
             """)
   List<TrainingPlan> findTrainingPlans();
 
-  @Query("""
+  @Query(
+      """
             SELECT tp
             FROM TrainingPlan tp
             WHERE tp.planId = :planId
