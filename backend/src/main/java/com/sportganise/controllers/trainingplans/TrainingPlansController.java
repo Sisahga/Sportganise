@@ -2,15 +2,21 @@ package com.sportganise.controllers.trainingplans;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.trainingplans.TrainingPlanResponseDto;
+import com.sportganise.dto.trainingplans.UploadTrainingPlansResponseDto;
 import com.sportganise.services.trainingplans.TrainingPlansService;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * REST Controller for managing 'Training Plans' Entities. Handles HTTP request and routes them to
@@ -45,8 +51,38 @@ public class TrainingPlansController {
     responseDto.setMessage("Training plans successfully fetched.");
     responseDto.setData(trainingPlanResponseDto);
 
-    log.debug("TRAINING PLANS SHARED WITH ME COUNT: ", trainingPlanResponseDto.getSharedWithMe());
+    log.debug("TRAINING PLANS SHARED WITH ME COUNT: {}", trainingPlanResponseDto.getSharedWithMe());
 
     return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+  }
+
+  /**
+   * POST mapping for uploading training plans.
+   *
+   * @param trainingPlans List of training plans to be uploaded.
+   * @param accountId Id of the account uploading the training plans.
+   * @return HTTP ResponseEntity CREATED if successful along with S3 blobs of training plans.
+   */
+  @PostMapping(value = "{accountId}/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<ResponseDto<UploadTrainingPlansResponseDto>> uploadTrainingPlans(
+      @RequestParam(value = "trainingPlan", required = false) List<MultipartFile> trainingPlans,
+      @PathVariable Integer accountId) {
+    // Validate # of training plans uploaded.
+    if (trainingPlans == null || trainingPlans.size() > 5) {
+      ResponseDto<UploadTrainingPlansResponseDto> responseDto = new ResponseDto<>();
+      responseDto.setStatusCode(HttpStatus.BAD_REQUEST.value());
+      responseDto.setMessage("0 or 5+ files uploaded, bad request. Expected 1-5 files.");
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+    } else {
+      UploadTrainingPlansResponseDto trainingPlanBlobs =
+          trainingPlansService.uploadTrainingPlans(trainingPlans, accountId);
+      ResponseDto<UploadTrainingPlansResponseDto> responseDto =
+          ResponseDto.<UploadTrainingPlansResponseDto>builder()
+              .statusCode(HttpStatus.CREATED.value())
+              .message("Training plans uploaded successfully.")
+              .data(trainingPlanBlobs)
+              .build();
+      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+    }
   }
 }
