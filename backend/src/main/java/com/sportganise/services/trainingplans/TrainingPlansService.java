@@ -91,6 +91,10 @@ public class TrainingPlansService {
     return new TrainingPlanResponseDto(myPlans, sharedWithMe);
   }
 
+  public void deleteTrainingPlan(Integer userId) {
+    
+  }
+
   /**
    * Helper method to get user Account object.
    *
