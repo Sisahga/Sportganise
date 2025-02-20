@@ -58,11 +58,12 @@ public class TrainingPlansController {
   }
 
   /**
-
-   Method to delete training plans.*
-   @param accountId parameter for Id of the user sending the request.
-   @param planId parameter for the Id of the plan that is to be deleted.
-   @return HTTP response.*/
+   * Method to delete training plans.
+   *
+   * @param accountId parameter for Id of the user sending the request.
+   * @param planId parameter for the Id of the plan that is to be deleted.
+   * @return HTTP response.
+   */
   @DeleteMapping("{accountId}/{planId}/delete-plan")
   public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> deleteTrainingPlans(
           @PathVariable Integer accountId, @PathVariable Integer planId) {

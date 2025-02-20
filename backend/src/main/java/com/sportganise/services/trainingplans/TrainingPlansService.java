@@ -95,11 +95,16 @@ public class TrainingPlansService {
    * Method to delete a training plan.
    * 
    * @param userId Id of the user sending the request.
+   * @param planId Id of the plan to be deleted.
    */
-  public void deleteTrainingPlan(Integer userId) {
+  public void deleteTrainingPlan(Integer userId, Integer planId) {
     Account user = getUser(userId);
 
-
+    TrainingPlan trainingPlan = trainingPlansRepository.findTrainingPlan(planId);
+    if (trainingPlan == null) {
+      throw new ResourceNotFoundException("Training plan not found.");
+    }
+    log.debug("PLAN ID: ", trainingPlan.getPlanId());
 
     if (!isAuthor(user)) {
       throw new ForbiddenException("Only the coach who uploaded this training plan can delete it.");
