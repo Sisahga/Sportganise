@@ -99,9 +99,13 @@ public class TrainingPlansService {
   public void deleteTrainingPlan(Integer userId) {
     Account user = getUser(userId);
 
-    if (!hasPermissions(user)) {
-      throw new ForbiddenException("Only Coaches and Admins can access this page.");
+
+
+    if (!isAuthor(user)) {
+      throw new ForbiddenException("Only the coach who uploaded this training plan can delete it.");
     }
+
+
 
   }
 
@@ -208,5 +212,10 @@ public class TrainingPlansService {
       log.error("Error deleting training plans: {}", e.getMessage());
       throw new FileProcessingException("Error deleting training plans.");
     }
+  }
+
+  private boolean isAuthor(Account user) {
+
+    return true;
   }
 }
