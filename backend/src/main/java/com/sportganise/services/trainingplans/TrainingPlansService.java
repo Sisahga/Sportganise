@@ -219,8 +219,8 @@ public class TrainingPlansService {
   }
 
   /**
-   * Helper method to check if user is author of the training plan.
-   * User must also be a coach or admin.
+   * Helper method to check if user is author of the training plan. User must also be a coach or
+   * admin.
    *
    * @param user Account object of the user making the request.
    * @param authorId Id of the author of the training plan.

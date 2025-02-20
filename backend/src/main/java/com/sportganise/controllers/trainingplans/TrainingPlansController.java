@@ -3,7 +3,7 @@ package com.sportganise.controllers.trainingplans;
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.trainingplans.TrainingPlanResponseDto;
 import com.sportganise.dto.trainingplans.UploadTrainingPlansResponseDto;
- import com.sportganise.services.trainingplans.TrainingPlansService;
+import com.sportganise.services.trainingplans.TrainingPlansService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +66,7 @@ public class TrainingPlansController {
    */
   @DeleteMapping("{accountId}/{planId}/delete-plan")
   public ResponseEntity<ResponseDto<TrainingPlanResponseDto>> deleteTrainingPlans(
-          @PathVariable Integer accountId, @PathVariable Integer planId) {
+      @PathVariable Integer accountId, @PathVariable Integer planId) {
 
     trainingPlansService.deleteTrainingPlan(accountId, planId);
 
