@@ -93,7 +93,7 @@ public class TrainingPlansService {
 
   /**
    * Method to delete a training plan.
-   * 
+   *
    * @param userId Id of the user sending the request.
    * @param planId Id of the plan to be deleted.
    */
