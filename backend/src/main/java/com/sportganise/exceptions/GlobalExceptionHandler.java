@@ -390,6 +390,21 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * Handle notification not sent exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(NotificationNotSentException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleNotificationNotSentException(NotificationNotSentException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
    * Handle invalid credentials exception.
    *
    * @param e exception
