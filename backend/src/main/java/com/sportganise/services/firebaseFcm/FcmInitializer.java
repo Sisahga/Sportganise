@@ -19,10 +19,16 @@ public class FcmInitializer {
 
   @PostConstruct
   public void initialize() {
+    log.info("Initializing Firebase with config path: {}", firebaseConfigPath);
     try {
+      ClassPathResource resource = new ClassPathResource(firebaseConfigPath);
+      if (!resource.exists()) {
+        log.error("Firebase configuration file not found: {}", firebaseConfigPath);
+        return;
+      }
+
       FirebaseOptions options = FirebaseOptions.builder()
-          .setCredentials(GoogleCredentials.fromStream(new ClassPathResource(firebaseConfigPath).getInputStream()))
-          .build();
+          .setCredentials(GoogleCredentials.fromStream(resource.getInputStream())).build();
       if (FirebaseApp.getApps().isEmpty()) {
         FirebaseApp.initializeApp(options);
         log.info("Firebase application has been initialized.");
