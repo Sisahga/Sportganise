@@ -7,7 +7,6 @@ const useFetchUserPermissions = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -27,7 +26,7 @@ const useFetchUserPermissions = () => {
     fetchData();
   }, []);
 
-  return { data, loading, error, setData }; 
+  return { data, loading, error, setData };
 };
 
 export default useFetchUserPermissions;

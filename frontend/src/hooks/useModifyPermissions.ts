@@ -4,11 +4,17 @@ import accountApi from "@/services/api/accountApi";
 import { AccountPermissions } from "@/types/account";
 import log from "loglevel";
 
-const useUpdateRole = (data: AccountPermissions[], setData: React.Dispatch<React.SetStateAction<AccountPermissions[]>>) => {
+const useUpdateRole = (
+  data: AccountPermissions[],
+  setData: React.Dispatch<React.SetStateAction<AccountPermissions[]>>,
+) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const updateUserRole = async (selectedUser: AccountPermissions, newRole: string) => {
+  const updateUserRole = async (
+    selectedUser: AccountPermissions,
+    newRole: string,
+  ) => {
     if (selectedUser) {
       setLoading(true);
       try {
@@ -17,7 +23,7 @@ const useUpdateRole = (data: AccountPermissions[], setData: React.Dispatch<React
         const updatedUsers = data.map((user) =>
           user.accountId === selectedUser.accountId
             ? { ...user, type: newRole }
-            : user
+            : user,
         );
         setData(updatedUsers);
 
@@ -27,10 +33,11 @@ const useUpdateRole = (data: AccountPermissions[], setData: React.Dispatch<React
           variant: "success",
         });
       } catch (error) {
-        log.error("Error updating role", error)
+        log.error("Error updating role", error);
         toast({
           title: "Error",
-          description: "There was an error updating the role. Please try again.",
+          description:
+            "There was an error updating the role. Please try again.",
           variant: "destructive",
         });
       } finally {
@@ -39,7 +46,7 @@ const useUpdateRole = (data: AccountPermissions[], setData: React.Dispatch<React
     }
   };
 
-  return { updateUserRole,loading };
+  return { updateUserRole, loading };
 };
 
 export default useUpdateRole;

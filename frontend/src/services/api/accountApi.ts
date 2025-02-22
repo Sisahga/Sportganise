@@ -116,8 +116,8 @@ const accountApi = {
     };
   },
 
-//Function to get user permissions
-  fetchUserPermissions :  async (): Promise<AccountPermissions[]> => {
+  //Function to get user permissions
+  fetchUserPermissions: async (): Promise<AccountPermissions[]> => {
     const response = await fetch(`${baseMappingUrl}/permissions`, {
       method: "GET",
       headers: {
@@ -125,19 +125,16 @@ const accountApi = {
         Authorization: getBearerToken(),
       },
     });
-  
+
     if (!response.ok) {
       throw new Error("Failed to fetch permissions from backend");
     }
-  
+
     return response.json();
   },
 
-//Function to update user role
-  updateUserRole: async (
-    accountId: number,
-    newRole: string
-  ): Promise<void> => {
+  //Function to update user role
+  updateUserRole: async (accountId: number, newRole: string): Promise<void> => {
     const response = await fetch(`${baseMappingUrl}/${accountId}/type`, {
       method: "PUT",
       headers: {
@@ -146,12 +143,11 @@ const accountApi = {
       },
       body: JSON.stringify({ type: newRole }),
     });
-  
+
     if (!response.ok) {
       throw new Error("Failed to update the role");
     }
   },
-
 };
 
 export default accountApi;

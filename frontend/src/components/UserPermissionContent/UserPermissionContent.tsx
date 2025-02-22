@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
 import { useNavigate } from "react-router";
-import { FileKey2} from "lucide-react";
+import { FileKey2 } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -40,7 +40,12 @@ import { AccountPermissions } from "@/types/account";
 import BackButton from "../ui/back-button";
 import useFetchUserPermissions from "@/hooks/useFetchPermissions";
 import useUpdateRole from "@/hooks/useModifyPermissions";
-import { Dialog, DialogContent, DialogTrigger, DialogClose } from "../ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+  DialogClose,
+} from "../ui/dialog";
 
 const UserPermissionContent: React.FC = () => {
   const itemsPerPage = 5;
@@ -52,10 +57,11 @@ const UserPermissionContent: React.FC = () => {
   const { toast } = useToast();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [selectedUser, setSelectedUser] = useState<AccountPermissions | null>(null);
+  const [selectedUser, setSelectedUser] = useState<AccountPermissions | null>(
+    null,
+  );
   const [newRole, setNewRole] = useState<string>("");
   const [openAlertDialog, setOpenAlertDialog] = useState<boolean>(false);
-
 
   useEffect(() => {
     const user = getCookies();
@@ -63,7 +69,6 @@ const UserPermissionContent: React.FC = () => {
       navigate("/");
     }
   }, [navigate]);
-
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -103,7 +108,6 @@ const UserPermissionContent: React.FC = () => {
     setOpenAlertDialog(false);
   };
 
-
   //Pagination logic
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
@@ -129,7 +133,6 @@ const UserPermissionContent: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
-
             {/* SEARCH BAR --will implement after backend user search is ready */}
 
             {/* <div className="relative ">
@@ -141,85 +144,82 @@ const UserPermissionContent: React.FC = () => {
 
             {/* Display user data */}
 
-              {paginatedData.length > 0 ? (
-                paginatedData.map((user) => (
-                  <Card key={user.accountId} className="w-full border-0">
-                    <div className="flex items-center gap-2 p-2 pb-0">
-                      <img
-                        src={
-                          user.pictureUrl || "https://via.placeholder.com/150"
-                        }
-                        alt={user.firstName}
-                        className="h-12 w-12 rounded-full"
-                      />
-                      <div>
-                        <p className="text-sm font-bold text-primaryColour">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        <p className="text-xs text-gray">
-                          <span className="font-bold text-gray-500">
-                            Email:
-                          </span>{" "}
-                          {user.email}
-                        </p>
-                        <p className="text-xs text-gray">
-                          <span className="font-bold text-secondaryColour">
-                            Role:
-                          </span>{" "}
-                          {user.type}
-                        </p>
-                      </div>
+            {paginatedData.length > 0 ? (
+              paginatedData.map((user) => (
+                <Card key={user.accountId} className="w-full border-0">
+                  <div className="flex items-center gap-2 p-2 pb-0">
+                    <img
+                      src={user.pictureUrl || "https://via.placeholder.com/150"}
+                      alt={user.firstName}
+                      className="h-12 w-12 rounded-full"
+                    />
+                    <div>
+                      <p className="text-sm font-bold text-primaryColour">
+                        {user.firstName} {user.lastName}
+                      </p>
+                      <p className="text-xs text-gray">
+                        <span className="font-bold text-gray-500">Email:</span>{" "}
+                        {user.email}
+                      </p>
+                      <p className="text-xs text-gray">
+                        <span className="font-bold text-secondaryColour">
+                          Role:
+                        </span>{" "}
+                        {user.type}
+                      </p>
                     </div>
-                    <CardFooter className="justify-end p-0 pb-2 pr-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            className="w-20 h-7"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openDialog(user)}
-                          >
-                            Modify
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="rounded-lg w-[90vw]">
-                          <p className="text-sm">
-                            Modify permissions for {user.firstName} {user.lastName}
-                          </p>
-                          <Select value={newRole} onValueChange={handleRoleChange}>
-                            <SelectTrigger>
-                              <SelectValue  placeholder="Select Role" />
-                            </SelectTrigger>
-                            <SelectContent >
-                              <SelectItem value="ADMIN">Admin</SelectItem>
-                              <SelectItem value="COACH">Coach</SelectItem>
-                              <SelectItem value="PLAYER">Player</SelectItem>
-                              <SelectItem value="GENERAL">General</SelectItem>
-                            </SelectContent>
-                          </Select>
+                  </div>
+                  <CardFooter className="justify-end p-0 pb-2 pr-2">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          className="w-20 h-7"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openDialog(user)}
+                        >
+                          Modify
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="rounded-lg w-[90vw]">
+                        <p className="text-sm">
+                          Modify permissions for {user.firstName}{" "}
+                          {user.lastName}
+                        </p>
+                        <Select
+                          value={newRole}
+                          onValueChange={handleRoleChange}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ADMIN">Admin</SelectItem>
+                            <SelectItem value="COACH">Coach</SelectItem>
+                            <SelectItem value="PLAYER">Player</SelectItem>
+                            <SelectItem value="GENERAL">General</SelectItem>
+                          </SelectContent>
+                        </Select>
 
-
-                          <DialogClose asChild>
-                            <div className="text-center mt-2">
-                              <Button
-                                onClick={saveRoleChanges}
-                                variant="default"
-                                size="sm"
-                              >
-                                Save Changes
-                              </Button>
-                            </div>
-                          </DialogClose>
-
-                        </DialogContent>
-                      </Dialog>
-
-                    </CardFooter>
-                  </Card>
-                ))
-              ) : (
-                <div>No users found.</div>
-              )}
+                        <DialogClose asChild>
+                          <div className="text-center mt-2">
+                            <Button
+                              onClick={saveRoleChanges}
+                              variant="default"
+                              size="sm"
+                            >
+                              Save Changes
+                            </Button>
+                          </div>
+                        </DialogClose>
+                      </DialogContent>
+                    </Dialog>
+                  </CardFooter>
+                </Card>
+              ))
+            ) : (
+              <div>No users found.</div>
+            )}
             {/* </div> */}
           </CardContent>
         </Card>
@@ -244,7 +244,9 @@ const UserPermissionContent: React.FC = () => {
             ))}
             <PaginationNext
               className="text-primaryColour"
-              onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+              onClick={() =>
+                handlePageChange(Math.min(currentPage + 1, totalPages))
+              }
             />
           </PaginationContent>
         </Pagination>
@@ -255,15 +257,18 @@ const UserPermissionContent: React.FC = () => {
             <AlertDialogHeader>
               <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
               <AlertDialogDescription className="text-xs">
-
                 Are you sure you want to change the role for{" "}
-                {selectedUser?.firstName}{" "}
-                {selectedUser?.lastName} to {newRole}?
+                {selectedUser?.firstName} {selectedUser?.lastName} to {newRole}?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel onClick={cancelRoleChange}> Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmRoleChange}>Yes</AlertDialogAction>
+              <AlertDialogCancel onClick={cancelRoleChange}>
+                {" "}
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={confirmRoleChange}>
+                Yes
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
