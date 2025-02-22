@@ -26,7 +26,9 @@ const useUpdateRole = (
             : user,
         );
         setData(updatedUsers);
-
+        log.info(
+          `Successfully updated ${selectedUser.firstName} ${selectedUser.lastName}'s role to ${newRole}`,
+        );
         toast({
           title: "Role Updated Successfully",
           description: `${selectedUser.firstName} ${selectedUser.lastName}'s role has been updated to ${newRole}.`,
