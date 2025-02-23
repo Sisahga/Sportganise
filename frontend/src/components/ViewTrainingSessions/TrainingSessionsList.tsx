@@ -41,18 +41,24 @@ export default function TrainingSessionsList() {
   }, [programs]); // update page if changes in programs occur
 
   // Date Range For This Week
-  const today = new Date();
-  const todayStartDate = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
+  const today = new Date(); // get today's date
+  const todayDayIndex = today.getDay(); // index of today's day of the week
+  const startOfWeek = new Date(today); // same day as today
+  log.debug(
+    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`
   );
+  startOfWeek.setDate(today.getDate() - todayDayIndex); // start of the week date = today's date - day of week
+  const endOfWeek = new Date(today); // same day as today
+  log.debug(
+    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`
+  );
+  endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
   // Start Date Range
   const [dateRange, setDateRange] = useState([
     {
-      startDate: todayStartDate, // today's date
-      endDate: addDays(new Date(), 7), // upcoming programs for next 7 days
+      startDate: startOfWeek, // this week
+      endDate: endOfWeek,
       key: "selection",
     },
   ]);
@@ -60,6 +66,7 @@ export default function TrainingSessionsList() {
   // Filter Programs by Date Range
   const filteredPrograms: Program[] = programs.filter((program) => {
     const programDate = new Date(program.programDetails.occurrenceDate);
+    programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
     return (
       programDate >= dateRange[0].startDate &&
       programDate <= dateRange[0].endDate
