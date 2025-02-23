@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { DateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { addDays } from "date-fns";
 import TrainingSessionCard from "./TrainingSessionCard";
 import usePrograms from "@/hooks/usePrograms";
 import { Program } from "@/types/trainingSessionDetails";
@@ -16,9 +15,11 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetFooter,
 } from "@/components/ui/sheet";
 import { Filter, Loader2 } from "lucide-react";
 import log from "loglevel";
+import { Button } from "../ui/Button";
 
 export default function TrainingSessionsList() {
   log.debug("Rendering TrainingSessionList");
@@ -73,6 +74,17 @@ export default function TrainingSessionsList() {
     );
   });
 
+  // Handle Cancel
+  function handleCancel() {
+    setDateRange([
+      {
+        startDate: startOfWeek,
+        endDate: endOfWeek,
+        key: "selection",
+      },
+    ]);
+  }
+
   return (
     <div className="mt-5 lg:mx-24">
       {/**List of events */}
@@ -106,6 +118,11 @@ export default function TrainingSessionsList() {
                   ranges={dateRange}
                 />
               </div>
+              <SheetFooter>
+                <Button variant="outline" onClick={handleCancel}>
+                  Cancel
+                </Button>
+              </SheetFooter>
             </SheetContent>
           </Sheet>
         </span>

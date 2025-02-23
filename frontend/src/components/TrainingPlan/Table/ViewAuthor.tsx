@@ -1,23 +1,16 @@
 // React
-import { useNavigate } from "react-router";
+import { useState } from "react";
 // Hooks
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 // Services
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
-// Custom Components
-import AttendeeBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/AttendeeBadgeType";
 // UI Components
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { Button } from "@/components/ui/Button";
 // Icons
-import { User2Icon, MessageCirclePlus } from "lucide-react";
+import { User2Icon } from "lucide-react";
 // Log
 import log from "loglevel";
+import ParticipantPopUp from "@/components/ViewTrainingSessions/ParticipantPopUp";
 
 // Display Author Personal Details in Table Row
 interface ViewAuthorProps {
@@ -31,16 +24,26 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
   // Fetch Person Details
   const { data: accountDetails } = usePersonalInformation(userId);
   // Handle Navigation (to Messages page)
-  const navigate = useNavigate();
   const cookies = getCookies();
   const currentUserId = getAccountIdCookie(cookies);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div>
       {accountDetails ? (
-        <HoverCard>
+        <div>
           {currentUserId !== userId ? (
-            <HoverCardTrigger asChild>
+            <div
+              onClick={() => setIsModalOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  setIsModalOpen(true);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+              className="cursor-pointer"
+            >
               <div className="flex items-center">
                 <Avatar className="mr-2 self-center w-5 h-5">
                   <AvatarImage src={accountDetails?.pictureUrl} />
@@ -50,7 +53,12 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
                 </Avatar>
                 <p>{`${accountDetails?.firstName} ${accountDetails?.lastName}`}</p>
               </div>
-            </HoverCardTrigger>
+              <ParticipantPopUp
+                accountId={userId}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+              />
+            </div>
           ) : (
             <div className="flex items-center">
               <Avatar className="mr-2 self-center w-5 h-5">
@@ -62,40 +70,7 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
               <p>{`${accountDetails?.firstName} ${accountDetails?.lastName}`}</p>
             </div>
           )}
-          <HoverCardContent className="w-60">
-            <div className="flex justify-space-between space-x-4">
-              <div>
-                <Avatar>
-                  <AvatarImage src={accountDetails?.pictureUrl} />
-                  <AvatarFallback>
-                    <User2Icon color="#a1a1aa" />
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <div className="flex flex-col space-y-1 justify-self-start">
-                <p className="font-semibold text-sm">{`${accountDetails?.firstName} ${accountDetails?.lastName}`}</p>
-                <p className="text-sm text-gray-500">{accountDetails?.email}</p>
-                <div className="flex items-center gap-1 pt-1">
-                  <AttendeeBadgeType accountType={accountDetails?.type} />
-                  <Button
-                    variant="outline"
-                    className="rounded-full w-16 h-6"
-                    onClick={() => navigate("/pages/DirectMessagesDashboard")}
-                  >
-                    <span className="flex items-center">
-                      <p className="text-gray-500 text-xs">chat</p>
-                      <MessageCirclePlus
-                        className="border-spacing-5 border-slate-400 ml-1"
-                        size={14}
-                        color="gray"
-                      />
-                    </span>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </HoverCardContent>
-        </HoverCard>
+        </div>
       ) : (
         <span className="text-yellow-600">DNE</span>
       )}
