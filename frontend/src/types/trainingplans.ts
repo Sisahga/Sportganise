@@ -14,6 +14,7 @@ export interface TrainingPlan {
   planId: number;
   userId: number;
   docUrl: string; // AWS Bucket
+  shared: boolean;
   creationDate: Date;
 }
 

@@ -20,19 +20,22 @@ import { Button } from "@/components/ui/Button";
 // Custom Components
 import { ConfirmationDialog } from "./ConfirmationDialog";
 // Icons
-import { Ellipsis, Share, Trash2 } from "lucide-react";
+import { CircleDotDashed, Ellipsis, Share, Trash2 } from "lucide-react";
 // Logs
 import log from "loglevel";
+import { getBearerToken } from "@/services/apiHelper.ts";
 
 // Component Props
 interface DropDownMenuProps {
   userId: number;
   planId: number;
+  shared: boolean;
 }
 
 export const DropDownMenu: React.FC<DropDownMenuProps> = ({
   userId,
   planId,
+  shared,
 }: DropDownMenuProps) => {
   log.info("Rendered DropDownMenu");
   // Hooks
@@ -77,6 +80,38 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
     }
   } // Deleting training plan is in separate component
 
+  // Unshare Training Plan
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL + "/api/training-plans";
+  async function handleUnshare(userId: number, planId: number) {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/${userId}/${planId}/unshare-plan`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: getBearerToken(),
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("The training plan could not be unshared.");
+      }
+      // Success
+      toast({
+        title: "Successfully unshared file ✔",
+        description: "The training plan was unshared from all coaches",
+        variant: "success",
+      });
+    } catch (err) {
+      toast({
+        title: "Training plan could not be unshared ✖",
+        description: String(err),
+        variant: "destructive",
+      });
+    }
+  }
+
   return (
     <div>
       <DropdownMenu>
@@ -89,15 +124,28 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
           <DropdownMenuLabel>Options</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => {
-                log.debug("TableColumns -> Sharing planId", planId);
-                handleShare(userId, planId);
-              }}
-            >
-              <Share />
-              <span>Share</span>
-            </DropdownMenuItem>
+            {shared ? (
+              <DropdownMenuItem
+                onClick={() => {
+                  log.debug("TableColumns -> Unshare planId", planId);
+                  handleUnshare(userId, planId);
+                }}
+              >
+                <CircleDotDashed />
+                <span>Unshare</span>
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                onClick={() => {
+                  log.debug("TableColumns -> Sharing planId", planId);
+                  handleShare(userId, planId);
+                }}
+              >
+                <Share />
+                <span>Share</span>
+              </DropdownMenuItem>
+            )}
+
             {accountId && accountId === userId && (
               <DropdownMenuItem
                 onClick={() => {
