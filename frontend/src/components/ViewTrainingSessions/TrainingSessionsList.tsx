@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/sheet";
 import { Filter, Loader2 } from "lucide-react";
 import log from "loglevel";
-import { Button } from "../ui/Button";
+import { Button } from "@/components/ui/Button";
 
 export default function TrainingSessionsList() {
   log.debug("Rendering TrainingSessionList");
