@@ -113,14 +113,20 @@ export default function TrainingSessionsList() {
             There are no programs for the current dates.
           </p>
         ) : (
-          filteredPrograms.reverse().map((program, index) => (
-            <div key={index} className="my-5">
-              <TrainingSessionCard
-                programDetails={program.programDetails}
-                attendees={program.attendees}
-              />
-            </div>
-          ))
+          filteredPrograms
+            .sort(
+              (a, b) =>
+                new Date(a.programDetails.occurrenceDate).getTime() -
+                new Date(b.programDetails.occurrenceDate).getTime()
+            )
+            .map((program, index) => (
+              <div key={index} className="my-5">
+                <TrainingSessionCard
+                  programDetails={program.programDetails}
+                  attendees={program.attendees}
+                />
+              </div>
+            ))
         )}
       </div>
     </div>
