@@ -46,12 +46,12 @@ export default function TrainingSessionsList() {
   const todayDayIndex = today.getDay(); // index of today's day of the week
   const startOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`
+    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`,
   );
   startOfWeek.setDate(today.getDate() - todayDayIndex); // start of the week date = today's date - day of week
   const endOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`
+    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`,
   );
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
@@ -141,7 +141,7 @@ export default function TrainingSessionsList() {
             .sort(
               (a, b) =>
                 new Date(a.programDetails.occurrenceDate).getTime() -
-                new Date(b.programDetails.occurrenceDate).getTime()
+                new Date(b.programDetails.occurrenceDate).getTime(),
             )
             .map((program, index) => (
               <div key={index} className="my-5">

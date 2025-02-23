@@ -13,7 +13,6 @@ import {
   Pencil,
   Trash2,
   LogOut,
-  MessageCircle,
   Frown,
   Smile,
   LogIn,

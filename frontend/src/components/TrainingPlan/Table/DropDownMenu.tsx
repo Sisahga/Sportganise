@@ -92,7 +92,7 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
           headers: {
             Authorization: getBearerToken(),
           },
-        }
+        },
       );
       if (!response.ok) {
         throw new Error("The training plan could not be unshared.");
