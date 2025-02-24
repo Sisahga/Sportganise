@@ -23,7 +23,7 @@ public class TrainingPlan {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "plan_id", nullable = false, updatable = false)
+  @Column(name = "plan_id", updatable = false)
   private Integer planId;
 
   @Column(name = "account_id", nullable = false)
