@@ -13,7 +13,6 @@ import {
   Pencil,
   Trash2,
   LogOut,
-  MessageCircle,
   Frown,
   Smile,
   LogIn,
@@ -170,10 +169,6 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             </DropdownMenuGroup>
           ) : (
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <MessageCircle />
-                <span>Message Host</span>
-              </DropdownMenuItem>
               <DropdownMenuItem onSelect={handleRSVPClick}>
                 <LogIn color="green" />
                 <span className="text-green-500">RSVP</span>

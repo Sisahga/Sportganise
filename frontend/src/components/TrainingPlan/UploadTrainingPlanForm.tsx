@@ -93,6 +93,10 @@ export default function UploadTrainingPlanFiles() {
           title: "File(s) uploaded successfully ✔",
           description: "File(s) were added to your Training Plan",
         });
+        // Reload page to see changes
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
       } else {
         throw new Error(
           `UploadTrainingPlanForm -> Error thrown! ${uploadingTrainingPlanResponse?.message}`,
