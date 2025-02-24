@@ -129,6 +129,7 @@ export default function ModifyTrainingSessionForm() {
     programAttachments: [],
     frequency: "",
     visibility: "",
+    author: "",
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
 

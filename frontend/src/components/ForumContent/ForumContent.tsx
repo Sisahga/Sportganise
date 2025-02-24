@@ -1,22 +1,11 @@
-/**TODO: Connect and fetch from real API endpoint. Navigate to PostDetail with correct sessionID**/
-
-import React, { useState, useEffect } from "react";
-import { CalendarIcon, ThumbsUp, MessageSquare, Filter } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  ThumbsUp,
+  MessageCircle,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
 import { useNavigate } from "react-router";
 import {
   Card,
@@ -30,271 +19,285 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
-import "react-day-picker/dist/style.css";
+import { Input } from "../ui/input";
+import Filters from "./Filters";
 import BackButton from "../ui/back-button";
 
-interface TrainingSession {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  likes: number;
-  comments: number;
-}
+import useForumPosts from "@/hooks/useForumPosts";
+import { Badge } from "../ui/badge";
+import { PostDto } from "@/types/forum";
+import { usePostLike } from "@/hooks/usePostLike";
+import { getCookies } from "@/services/cookiesService";
 
 const ForumContent: React.FC = () => {
-  const [likedSessions, setLikedSessions] = useState<Set<number>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
-  const sessionsPerPage = 3;
-  const [loading, setLoading] = useState<boolean>(true);
+  const user = getCookies();
   const navigate = useNavigate();
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  //MOCK DATA
-  const sessions: TrainingSession[] = [
-    {
-      id: 1,
-      title: "Badminton Basics",
-      description:
-        "Badminton basics include learning the fundamental skills and techniques required to play the game.",
-      date: "2024-12-29",
-      likes: 25,
-      comments: 5,
-    },
-    {
-      id: 2,
-      title: "Advanced Badminton Strategies",
-      description: "Master advanced strategies for badminton matches.",
-      date: "2024-12-05",
-      likes: 100,
-      comments: 20,
-    },
-    {
-      id: 3,
-      title: "Badminton Footwork",
-      description: "Improve your footwork and agility on the court.",
-      date: "2024-12-10",
-      likes: 50,
-      comments: 15,
-    },
-    {
-      id: 4,
-      title: "Badminton for Beginners",
-      description: "A beginner-friendly session focusing on basic skills.",
-      date: "2024-10-30",
-      likes: 30,
-      comments: 10,
-    },
-    {
-      id: 5,
-      title: "Badminton Smash Techniques",
-      description: "Learn powerful smash techniques for aggressive play.",
-      date: "2024-12-20",
-      likes: 70,
-      comments: 25,
-    },
-    {
-      id: 6,
-      title: "Badminton Fitness Training",
-      description: "Focus on fitness training for badminton players.",
-      date: "2024-09-15",
-      likes: 10,
-      comments: 3,
-    },
-  ];
+  const { posts, loading, error, fetchPostsData, resetFilters } =
+    useForumPosts();
+  const { likePost, unlikePost } = usePostLike();
 
-  const handleLike = (sessionId: number) => {
-    setLikedSessions((prev) => {
-      const newLikedSessions = new Set(prev);
-      if (newLikedSessions.has(sessionId)) {
-        newLikedSessions.delete(sessionId);
-      } else {
-        newLikedSessions.add(sessionId);
-      }
-      return newLikedSessions;
-    });
-  };
+  const [post, setPost] = useState<PostDto[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage, setPostsPerPage] = useState(10);
 
-  // Pagination logic
-  const indexOfLastSession = currentPage * sessionsPerPage;
-  const indexOfFirstSession = indexOfLastSession - sessionsPerPage;
-  const currentSessions = sessions.slice(
-    indexOfFirstSession,
-    indexOfLastSession,
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [occurrenceDate, setOccurrenceDate] = useState<string | undefined>(
+    undefined,
   );
 
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+  const [type, setType] = useState("");
+  const [sortBy, setSortBy] = useState("");
+  const [sortDir, setSortDir] = useState("");
+  const [sortOption, setSortOption] = useState("latest");
 
-  const navigatePostDetail = () => {
-    navigate(`/pages/PostDetailPage`);
-  };
-
-  // Simulate API call
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
-    };
+    if (posts) {
+      setPost(posts);
+    }
+  }, [posts]);
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    if (inputRef.current && searchTerm != "") {
+      inputRef.current.focus();
+    }
+  });
+
+  useEffect(() => {
+    const timer = setTimeout(
+      () => {
+        fetchPostsData(
+          searchTerm,
+          occurrenceDate,
+          type,
+          postsPerPage,
+          currentPage,
+          sortBy,
+          sortDir,
+        );
+      },
+      searchTerm ? 500 : 0,
+    );
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, currentPage]);
+
+  const navigatePostDetail = (postId: number) => {
+    navigate(`/pages/PostDetailPage`, { state: { postId } });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const searchTerm = e.target.value;
+    setSearchTerm(searchTerm);
+  };
+
+  const handleLike = (postId: number) => {
+    setPost((prevPosts) =>
+      prevPosts.map((post) => {
+        if (post.postId === postId) {
+          const Liked = !post.liked;
+          const newLikeCount = Liked ? post.likeCount + 1 : post.likeCount - 1;
+
+          if (Liked) {
+            likePost(postId, user.accountId);
+          } else {
+            unlikePost(postId, user.accountId);
+          }
+
+          return {
+            ...post,
+            liked: Liked,
+            likeCount: newLikeCount,
+          };
+        }
+        return post;
+      }),
+    );
+  };
+
+  const handleApplyFilters = () => {
+    fetchPostsData(
+      searchTerm,
+      occurrenceDate,
+      type,
+      postsPerPage,
+      currentPage,
+      sortBy,
+      sortDir,
+    );
+  };
+
+  const handleClearFilters = () => {
+    resetFilters(
+      searchTerm,
+      setOccurrenceDate,
+      setType,
+      setSortBy,
+      setSortOption,
+      setSortDir,
+      setCurrentPage,
+      setPostsPerPage,
+    );
+  };
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
+  if (error) {
+    return <div>{error}</div>;
+  }
+
+  // Utility function to format the occurrence date
+  const formatOccurrenceDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    const hours = date.getHours() % 12 || 12;
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const amPm = date.getHours() >= 12 ? "PM" : "AM";
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()} ${hours}:${minutes} ${amPm}`;
+  };
+
+  const getBadgeVariant = (programType: string) => {
+    switch (programType.toLowerCase()) {
+      case "training":
+        return { variant: "default" } as const;
+      case "fundraiser":
+        return { variant: "secondary" } as const;
+      case "tournament":
+        return { className: "bg-teal-300" };
+      case "special":
+        return { className: "bg-lime-300" };
+      default:
+        return { variant: "outline" } as const;
+    }
+  };
+
   return (
     <div className="min-h-screen pb-20">
       <BackButton />
-
-      <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-8">
+      <h2 className="font-semibold text-3xl text-secondaryColour text-center mb-4">
         Forum
       </h2>
 
-      <div className="mt-4 mb-2 flex items-center lg:mx-24">
-        {/* Menu Bar with Filters */}
-        <div className="mr-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className="w-auto justify-start text-left font-normal flex items-center"
-              >
-                <Filter className="w-4 h-4" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <div className="space-y-2 p-2">
-                {/* Date Picker */}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline">
-                      <CalendarIcon className="w-4 h-4" />
-                      Select Date
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="range"
-                      numberOfMonths={1}
-                      className="border rounded-sm"
-                    />
-                    <Button variant="outline" className="w-full">
-                      Clear
-                    </Button>
-                  </PopoverContent>
-                </Popover>
-
-                {/* Sort Options */}
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sort by" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="latest">Sort by Latest</SelectItem>
-                    <SelectItem value="oldest">Sort by Oldest</SelectItem>
-                    <SelectItem value="most-likes">
-                      Sort by Most Likes
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        {/* Search bar */}
-        <Input placeholder="Search..." className="w-full flex-grow" />
+      {/* Filter Component */}
+      <div className="mt-4 mb-2 flex items-center gap-x-1 lg:mx-24">
+        <Filters
+          occurrenceDate={occurrenceDate}
+          setOccurrenceDate={setOccurrenceDate}
+          type={type}
+          setType={setType}
+          sortOption={sortOption}
+          setSortOption={setSortOption}
+          sortDir={sortDir}
+          setSortDir={setSortDir}
+          sortBy={sortBy}
+          setSortBy={setSortBy}
+          postsPerPage={postsPerPage}
+          setPostsPerPage={setPostsPerPage}
+          handleClearFilters={handleClearFilters}
+          handleApplyFilters={handleApplyFilters}
+        />
+        {/* Search Bar */}
+        <Input
+          ref={inputRef}
+          placeholder="Search..."
+          className="w-full flex-grow"
+          value={searchTerm}
+          onChange={handleInputChange}
+        />
       </div>
 
-      {/* Sessions Cards */}
+      {/* Posts */}
       <div className="flex flex-col space-y-4 lg:mx-24">
-        {currentSessions.map((session) => (
+        {post.map((post) => (
           <Card
-            key={session.id}
-            onClick={() => navigatePostDetail()}
+            key={post.postId}
+            onClick={() => navigatePostDetail(post.postId)}
             className="cursor-pointer"
           >
             <CardHeader>
-              <CardTitle>{session.title}</CardTitle>
-              <div className="mt-4 text-xs">{session.date}</div>
+              <CardTitle className="flex">
+                {post.title}
+                <Badge {...getBadgeVariant(post.type)} className="ml-2 h-5">
+                  {post.type.toLowerCase()}
+                </Badge>
+              </CardTitle>
+
+              <div className="mt-2 text-xs">
+                {formatOccurrenceDate(post.occurrenceDate)}
+              </div>
             </CardHeader>
             <CardContent>
-              <CardDescription>{session.description}</CardDescription>
+              <CardDescription>{post.description}</CardDescription>
             </CardContent>
             <CardFooter className="flex space-x-2">
               <Button
                 variant="outline"
-                className={`flex items-center space-x-1 ${likedSessions.has(session.id) ? "text-secondaryColour" : "text-primaryColour"}`}
+                className={`flex items-center rounded-full ${post.liked ? "text-secondaryColour" : "text-primaryColour"}`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleLike(session.id);
+                  handleLike(post.postId);
                 }}
               >
                 <ThumbsUp className="w-4 h-4" />
-                <span>
-                  {session.likes + (likedSessions.has(session.id) ? 1 : 0)}
-                </span>
+                <span>{post.likeCount}</span>
               </Button>
 
               <Button
                 variant="outline"
-                className="flex items-center space-x-1"
+                className=" flex items-center rounded-full"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigatePostDetail();
+                  navigate(`/pages/PostDetailPage`, {
+                    state: { postId: post.postId },
+                  });
                 }}
               >
-                <MessageSquare className="w-4 h-4" />
-                <span>{session.comments}</span>
+                <MessageCircle className="w-4 h-4" />
+                <span>{post.feedbackCount}</span>
               </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
 
-      {/* Pagination UI */}
-      <Pagination className="mt-6 flex justify-center space-x-2">
-        <PaginationPrevious
-          onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          className="text-primaryColour"
-        >
-          Previous
-        </PaginationPrevious>
+      {/* Pagination */}
+      <div className="mt-4 pb-4">
+        <Pagination>
+          <PaginationContent>
+            <Button
+              onClick={() => {
+                if (currentPage > 1) {
+                  setCurrentPage((prev) => prev - 1);
+                }
+              }}
+              className="text-primaryColour"
+              disabled={currentPage === 1}
+              variant="outline"
+            >
+              <ChevronLeft></ChevronLeft>
+            </Button>
+            <PaginationItem className="m-3">
+              <span>Page {currentPage}</span>
+            </PaginationItem>
 
-        <PaginationContent className="flex space-x-2">
-          {Array.from(
-            { length: Math.ceil(sessions.length / sessionsPerPage) },
-            (_, index) => (
-              <PaginationItem
-                key={index + 1}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                <PaginationLink className="text-primaryColour">
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ),
-          )}
-        </PaginationContent>
-
-        <PaginationNext
-          onClick={() =>
-            currentPage < Math.ceil(sessions.length / sessionsPerPage) &&
-            handlePageChange(currentPage + 1)
-          }
-          className="text-primaryColour"
-        >
-          Next
-        </PaginationNext>
-      </Pagination>
+            <Button
+              onClick={() => {
+                if (posts.length >= postsPerPage) {
+                  setCurrentPage((prev) => prev + 1);
+                }
+              }}
+              className="text-primaryColour"
+              disabled={posts.length < postsPerPage}
+              variant="outline"
+            >
+              <ChevronRight></ChevronRight>
+            </Button>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 };
