@@ -134,6 +134,14 @@ export default function CreateTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (values.visibility === "private" && selectedMembers.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description: "Please select at least one member for a private event.",
+      });
+      return;
+    }
     try {
       const jsonPayload = {
         ...values,
@@ -599,6 +607,7 @@ export default function CreateTrainingSessionForm() {
                               value={v.label}
                               onSelect={() => {
                                 form.setValue("visibility", v.value);
+                                // Open the invite modal when selecting "private"
                                 if (v.value === "private") {
                                   setShowInviteModal(true);
                                 }
@@ -624,6 +633,34 @@ export default function CreateTrainingSessionForm() {
                   Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
+                {field.value === "private" && (
+                  <div className="mt-2 border p-2 rounded">
+                    <div className="mb-2 font-medium">Selected Attendees:</div>
+                    {selectedMembers.length > 0 ? (
+                      <ul className="list-disc pl-5">
+                        {selectedMembers.map((memberId) => {
+                          const member = members.find((m) => m.id === memberId);
+                          return (
+                            <li key={memberId}>
+                              {member ? member.name : "Unknown member"}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No attendees selected.
+                      </p>
+                    )}
+                    <Button
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setShowInviteModal(true)}
+                    >
+                      Add Attendees
+                    </Button>
+                  </div>
+                )}
               </FormItem>
             )}
           />

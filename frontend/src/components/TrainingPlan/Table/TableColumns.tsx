@@ -89,6 +89,7 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       // Menu Options: share, delete
       const planId = row.original.planId; // Access planId from outside its scope
       const userId = row.original.userId;
+      const shared = row.original.shared;
       const cookies = getCookies();
       const accountId = cookies ? getAccountIdCookie(cookies) : null;
       // Display The Drop Down Menu only for the files that belong to the current logged in user
@@ -96,7 +97,7 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       return (
         accountId === userId && (
           <div>
-            <DropDownMenu planId={planId} userId={userId} />
+            <DropDownMenu planId={planId} userId={userId} shared={shared} />
           </div>
         )
       );
