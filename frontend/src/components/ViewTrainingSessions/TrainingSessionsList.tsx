@@ -17,9 +17,10 @@ import {
   SheetTrigger,
   SheetFooter,
 } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/Button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2 } from "lucide-react";
 import log from "loglevel";
-import { Button } from "@/components/ui/Button";
 
 export default function TrainingSessionsList() {
   log.debug("Rendering TrainingSessionList");
@@ -64,14 +65,24 @@ export default function TrainingSessionsList() {
     },
   ]);
 
+  // Handle Selected Program Type
+  const [selectedProgramType, setSelectedProgramType] = useState<string[]>([]);
+  // List of programDetails.programTypes For Check
+  const programTypes = Array.from(
+    new Set(programs.map((program) => program.programDetails.programType)),
+  );
+
   // Filter Programs by Date Range
   const filteredPrograms: Program[] = programs.filter((program) => {
     const programDate = new Date(program.programDetails.occurrenceDate);
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
-    return (
+    const dateFilter =
       programDate >= dateRange[0].startDate &&
-      programDate <= dateRange[0].endDate
-    );
+      programDate <= dateRange[0].endDate;
+    const typeFilter =
+      selectedProgramType.length === 0 ||
+      selectedProgramType.includes(program.programDetails.programType);
+    return dateFilter && typeFilter;
   });
 
   // Handle Cancel
@@ -82,7 +93,8 @@ export default function TrainingSessionsList() {
         endDate: endOfWeek,
         key: "selection",
       },
-    ]);
+    ]); // reset date range
+    setSelectedProgramType([]); // reset selected program type state
   }
 
   return (
@@ -107,9 +119,10 @@ export default function TrainingSessionsList() {
             </SheetTrigger>
             <SheetContent side="bottom">
               <SheetHeader>
-                <SheetTitle>Filter Programs by date</SheetTitle>
-                <SheetDescription>Select a date range.</SheetDescription>
+                <SheetTitle>Filter Programs</SheetTitle>
+                <SheetDescription>Select to filter programs.</SheetDescription>
               </SheetHeader>
+              <p className="font-semibold my-3">Filter by date</p>
               <div className="flex overflow-auto my-5">
                 <DateRangePicker
                   editableDateInputs={true}
@@ -117,6 +130,27 @@ export default function TrainingSessionsList() {
                   moveRangeOnFirstSelection={false}
                   ranges={dateRange}
                 />
+              </div>
+              <div className="flex flex-col gap-1 my-4">
+                <p className="font-semibold mb-3">Filter by type</p>
+                {programTypes.map((type, index) => (
+                  <label
+                    key={index}
+                    className="font-medium flex gap-2 items-center"
+                  >
+                    <Checkbox
+                      checked={selectedProgramType.includes(type)}
+                      onCheckedChange={(checked) => {
+                        setSelectedProgramType((prev) =>
+                          checked
+                            ? [...prev, type]
+                            : prev.filter((t) => t !== type),
+                        );
+                      }}
+                    />
+                    {type}
+                  </label>
+                ))}
               </div>
               <SheetFooter>
                 <Button variant="outline" onClick={handleCancel}>
