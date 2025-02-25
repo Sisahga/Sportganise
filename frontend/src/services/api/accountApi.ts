@@ -2,6 +2,7 @@ import {
   AccountDetailsDirectMessaging,
   Account,
   UpdateAccountPayload,
+  AccountPermissions,
 } from "@/types/account.ts";
 import { getBearerToken } from "@/services/apiHelper.ts";
 import { setCookies, getCookies } from "@/services/cookiesService";
@@ -113,6 +114,39 @@ const accountApi = {
       success: true,
       message: "Your profile picture has been successfully updated.",
     };
+  },
+
+  //Function to get user permissions
+  fetchUserPermissions: async (): Promise<AccountPermissions[]> => {
+    const response = await fetch(`${baseMappingUrl}/permissions`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getBearerToken(),
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch permissions from backend");
+    }
+
+    return response.json();
+  },
+
+  //Function to update user role
+  updateUserRole: async (accountId: number, newRole: string): Promise<void> => {
+    const response = await fetch(`${baseMappingUrl}/${accountId}/type`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getBearerToken(),
+      },
+      body: JSON.stringify({ type: newRole }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update the role");
+    }
   },
 };
 
