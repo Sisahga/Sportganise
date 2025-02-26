@@ -1,7 +1,8 @@
 package com.sportganise.controllers;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.firebaseFcm.NotificationRequest;
+import com.sportganise.dto.fcm.NotificationRequestDto;
+import com.sportganise.dto.fcm.StoreFcmTokenDto;
 import com.sportganise.services.firebaseFcm.FcmService;
 import jakarta.validation.constraints.Null;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,20 @@ public class NotificationsController {
    * @return a response entity with a success message.
    */
   @PostMapping("/send")
-  public ResponseEntity<ResponseDto<Null>> sendNotification(@RequestBody NotificationRequest request) {
+  public ResponseEntity<ResponseDto<Null>> sendNotification(@RequestBody NotificationRequestDto request) {
     fcmService.sendMessageToToken(request);
+    return ResponseEntity.ok(new ResponseDto<>());
+  }
+
+  /**
+   * Store the FCM token of a device.
+   *
+   * @param fcmTokenDto contains the account ID & the FCM token.
+   * @return a response entity with a success message.
+   */
+  @PostMapping("/store-token")
+  public ResponseEntity<ResponseDto<Null>> storeFcmToken(@RequestBody StoreFcmTokenDto fcmTokenDto) {
+    fcmService.storeFcmToken(fcmTokenDto);
     return ResponseEntity.ok(new ResponseDto<>());
   }
 }
