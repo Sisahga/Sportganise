@@ -1,4 +1,4 @@
-package com.sportganise.dto.firebaseFcm;
+package com.sportganise.dto.fcm;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NotificationResponse {
+public class NotificationResponseDto {
   private int status;
   private String message;
 }
