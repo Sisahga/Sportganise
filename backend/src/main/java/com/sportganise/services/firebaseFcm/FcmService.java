@@ -3,8 +3,12 @@ package com.sportganise.services.firebaseFcm;
 import com.google.firebase.messaging.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sportganise.dto.firebaseFcm.NotificationRequest;
+import com.sportganise.dto.fcm.NotificationRequestDto;
+import com.sportganise.dto.fcm.StoreFcmTokenDto;
+import com.sportganise.entities.FcmToken;
 import com.sportganise.exceptions.NotificationNotSentException;
+import com.sportganise.exceptions.fcmexceptions.StoreFcmTokenException;
+import com.sportganise.repositories.FcmTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -12,19 +16,23 @@ import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Service class for sending messages to devices via Firebase FCM.
+ * Service class for managing Firebase FCM notitifications.
  */
 @Slf4j
 @Service
 public class FcmService {
+  private final FcmTokenRepository fcmTokenRepository;
+
+  public FcmService(FcmTokenRepository fcmTokenRepository) {
+    this.fcmTokenRepository = fcmTokenRepository;
+  }
+
   /**
    * Send a notification to specific device(s).
    *
    * @param request contains the notification title & message, optional topic, & the target device token.
-   * @throws InterruptedException if the request is interrupted.
-   * @throws ExecutionException if the request fails.
    */
-  public void sendMessageToToken(NotificationRequest request) {
+  public void sendMessageToToken(NotificationRequestDto request) {
     Message message = getPreconfiguredMessageToToken(request);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String jsonOutput = gson.toJson(message);
@@ -34,6 +42,23 @@ public class FcmService {
     } catch (InterruptedException | ExecutionException e) {
       log.error("Error sending notification message to token. Device token: {}, {}", request.getToken(), jsonOutput);
       throw new NotificationNotSentException("Error sending notification message to token: " + request.getToken());
+    }
+  }
+
+  /**
+   * Store the FCM token of a device in DB.
+   *
+   * @param fcmTokenDto contains the account ID & the FCM token.
+   */
+  public void storeFcmToken(StoreFcmTokenDto fcmTokenDto) {
+    try {
+      FcmToken fcmToken = FcmToken.builder()
+              .accountId(fcmTokenDto.getAccountId())
+              .token(fcmTokenDto.getToken())
+              .build();
+      this.fcmTokenRepository.save(fcmToken);
+    } catch (Exception e) {
+      throw new StoreFcmTokenException("Unexpected error storing FCM token in DB: " + fcmTokenDto.getToken());
     }
   }
 
@@ -54,12 +79,12 @@ public class FcmService {
             .setAps(Aps.builder().setCategory(topic).setThreadId(topic).build()).build();
   }
 
-  private Message getPreconfiguredMessageToToken(NotificationRequest request) {
+  private Message getPreconfiguredMessageToToken(NotificationRequestDto request) {
     return getPreconfiguredMessageBuilder(request).setToken(request.getToken())
             .build();
   }
 
-  private Message.Builder getPreconfiguredMessageBuilder(NotificationRequest request) {
+  private Message.Builder getPreconfiguredMessageBuilder(NotificationRequestDto request) {
     AndroidConfig androidConfig = getAndroidConfig(request.getTopic());
     ApnsConfig apnsConfig = getApnsConfig(request.getTopic());
     Notification notification = Notification.builder()

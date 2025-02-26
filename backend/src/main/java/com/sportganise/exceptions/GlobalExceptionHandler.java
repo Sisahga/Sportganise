@@ -13,6 +13,7 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelAp
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
+import com.sportganise.exceptions.fcmexceptions.StoreFcmTokenException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
@@ -298,6 +299,16 @@ public class GlobalExceptionHandler {
 
   // </editor-fold>
 
+  // <editor-fold desc="Region: Program Exceptions">
+  @ExceptionHandler(StoreFcmTokenException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleStoreFcmTokenException(StoreFcmTokenException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+  // </editor-fold>
   /**
    * Handle file processing exception.
    *
