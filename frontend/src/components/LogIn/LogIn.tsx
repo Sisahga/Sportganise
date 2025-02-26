@@ -3,14 +3,14 @@ import { FormField } from "@/components/ui/formfield";
 import logo from "../../assets/Logo.png";
 import { Link, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast"; // Toast hook
-import { useLogin } from "@/hooks/useLogin"; // Custom hook
+import { useToast } from "@/hooks/use-toast"; 
+import { useLogin } from "@/hooks/useLogin"; 
 import { useSendCode } from "@/hooks/useSendCode";
 
 export default function LogIn() {
   const navigate = useNavigate();
   const { toast } = useToast(); // Toast function
-  const { isLoading, error, data, loginUser } = useLogin(); // Hook state and function
+  const { isLoading, error, data, loginUser } = useLogin(); 
   const { sendVerificationCode } = useSendCode();
 
   const [formData, setFormData] = useState({
@@ -27,9 +27,9 @@ export default function LogIn() {
   // Handle login submission
   const handleLogIn = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login Request Sent"); // Debug
+    console.log("Login Request Sent");
     loginUser(formData).catch((err) => {
-      console.error("Login error:", err); // Debug: Log error
+      console.error("Login error:", err); 
       toast({
         variant: "destructive",
         title: "Login Failed",
@@ -38,16 +38,21 @@ export default function LogIn() {
     });
   };
 
-  // Handle login success or error by listening to changes in data
-  useEffect(() => {
-    if (data?.statusCode === 200) {
-      console.log("Login successful, redirecting..."); // Debug
-      navigate("/");
-    } else if (data?.message === "Account not verified") {
-      console.log("Account not verified, sending code...");
+// Handle login success or error
+useEffect(() => {
+  if (data?.statusCode === 200) {
+    console.log("Login successful, redirecting..."); 
+    navigate("/");
+  }
+
+  if (error) {
+    console.log("Error:", error); 
+    if (error == "Account not verified") {
       navigate("/verificationcode", {
         state: { email: formData.email },
       });
+      
+      // Send verification code when account is not verified
       sendVerificationCode(formData.email.trim()).then((codeResponse) => {
         if (codeResponse?.statusCode === 201) {
           toast({
@@ -58,18 +63,14 @@ export default function LogIn() {
         }
       });
     }
-  }, [data, navigate, sendVerificationCode, formData.email, toast]);
+    toast({
+      variant: "destructive",
+      title: "Login Failed",
+      description: error,
+    });
+  }
+}, [data, error, navigate, toast]);
 
-  useEffect(() => {
-    if (error) {
-      console.error("Login error:", error); // Debug
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: error,
-      });
-    }
-  }, [data, error, navigate, toast]);
 
   return (
     <div className="relative flex flex-col items-center justify-center min-h-screen bg-white bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
