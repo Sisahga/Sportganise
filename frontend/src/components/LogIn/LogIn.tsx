@@ -12,8 +12,6 @@ export default function LogIn() {
   const { toast } = useToast(); // Toast function
   const { isLoading, error, data, loginUser } = useLogin(); // Hook state and function
   const {
-    isLoading: sendCodeLoading,
-    error: sendCodeError,
     sendVerificationCode,
   } = useSendCode();
 
