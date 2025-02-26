@@ -5,11 +5,17 @@ import { Link, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast"; // Toast hook
 import { useLogin } from "@/hooks/useLogin"; // Custom hook
+import { useSendCode } from "@/hooks/useSendCode";
 
 export default function LogIn() {
   const navigate = useNavigate();
   const { toast } = useToast(); // Toast function
   const { isLoading, error, data, loginUser } = useLogin(); // Hook state and function
+  const {
+    isLoading: sendCodeLoading,
+    error: sendCodeError,
+    sendVerificationCode,
+  } = useSendCode();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -25,7 +31,6 @@ export default function LogIn() {
   // Handle login submission
   const handleLogIn = (e: React.FormEvent) => {
     e.preventDefault();
-
     console.log("Login Request Sent"); // Debug
     loginUser(formData).catch((err) => {
       console.error("Login error:", err); // Debug: Log error
@@ -42,16 +47,26 @@ export default function LogIn() {
     if (data?.statusCode === 200) {
       console.log("Login successful, redirecting..."); // Debug
       navigate("/");
+    } else if (data?.message === "Account not verified") {
+      console.log("Account not verified, sending code...");
+      navigate("/verificationcode", {
+        state: { email: formData.email },
+      });
+      sendVerificationCode(formData.email.trim()).then((codeResponse) => {
+        if (codeResponse?.statusCode === 201) {
+          toast({
+            variant: "success",
+            title: "Verification Code Sent",
+            description: "A verification code has been sent to your email.",
+          });
+        }
+      });
     }
+  }, [data, navigate, sendVerificationCode, formData.email, toast]);
 
+  useEffect(() => {
     if (error) {
-      console.log("Error:", error); // Debug
-      if (error == "Account not verified") {
-        navigate("/verificationcode", {
-          state: { email: formData.email },
-        });
-      }
-      // Show toast for invalid credentials or errors
+      console.error("Login error:", error); // Debug
       toast({
         variant: "destructive",
         title: "Login Failed",
