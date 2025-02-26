@@ -233,4 +233,11 @@ CREATE TABLE training_plan(
 	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
+-- PRIMARY KEY is a composite key: case where user has browser and app listening for notifications at the same time.
+CREATE TABLE fcm_token(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL,
+    PRIMARY KEY (token)
+);
+
 SET TIME ZONE 'America/New_York';
