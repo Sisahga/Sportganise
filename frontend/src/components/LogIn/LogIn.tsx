@@ -11,9 +11,7 @@ export default function LogIn() {
   const navigate = useNavigate();
   const { toast } = useToast(); // Toast function
   const { isLoading, error, data, loginUser } = useLogin(); // Hook state and function
-  const {
-    sendVerificationCode,
-  } = useSendCode();
+  const { sendVerificationCode } = useSendCode();
 
   const [formData, setFormData] = useState({
     email: "",
