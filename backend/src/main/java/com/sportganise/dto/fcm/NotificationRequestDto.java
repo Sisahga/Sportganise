@@ -1,4 +1,4 @@
-package com.sportganise.dto.firebaseFcm;
+package com.sportganise.dto.fcm;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NotificationRequest {
+public class NotificationRequestDto {
   private String title;
   private String body;
   private String topic; // Optional topic to send the notification to a group of people.
