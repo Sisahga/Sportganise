@@ -47,7 +47,7 @@ export default function SignUp() {
   });
 
   const formatPhoneNumber = (value: string) => {
-    const cleaned = value.replace(/\D/g, ""); 
+    const cleaned = value.replace(/\D/g, "");
     const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
     return match ? `(${match[1]}) ${match[2]}-${match[3]}` : cleaned;
   };
@@ -207,14 +207,18 @@ export default function SignUp() {
                 value={formData.email}
                 onChange={handleInputChange}
               />
-               <FormField
+              <FormField
                 id="phone"
                 label="Phone"
                 placeholder="(123) 456-7890"
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
-                inputProps={{ type: "tel", maxLength: 14, pattern: "\\(\\d{3}\\) \\d{3}-\\d{4}" }}
+                inputProps={{
+                  type: "tel",
+                  maxLength: 14,
+                  pattern: "\\(\\d{3}\\) \\d{3}-\\d{4}",
+                }}
               />
               <FormField
                 id="Password"
