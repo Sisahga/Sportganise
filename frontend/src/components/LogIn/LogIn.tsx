@@ -3,13 +3,15 @@ import { FormField } from "@/components/ui/formfield";
 import logo from "../../assets/Logo.png";
 import { Link, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast"; // Toast hook
-import { useLogin } from "@/hooks/useLogin"; // Custom hook
+import { useToast } from "@/hooks/use-toast";
+import { useLogin } from "@/hooks/useLogin";
+import { useSendCode } from "@/hooks/useSendCode";
 
 export default function LogIn() {
   const navigate = useNavigate();
   const { toast } = useToast(); // Toast function
-  const { isLoading, error, data, loginUser } = useLogin(); // Hook state and function
+  const { isLoading, error, data, loginUser } = useLogin();
+  const { sendVerificationCode } = useSendCode();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -25,10 +27,9 @@ export default function LogIn() {
   // Handle login submission
   const handleLogIn = (e: React.FormEvent) => {
     e.preventDefault();
-
-    console.log("Login Request Sent"); // Debug
+    console.log("Login Request Sent");
     loginUser(formData).catch((err) => {
-      console.error("Login error:", err); // Debug: Log error
+      console.error("Login error:", err);
       toast({
         variant: "destructive",
         title: "Login Failed",
@@ -37,21 +38,31 @@ export default function LogIn() {
     });
   };
 
-  // Handle login success or error by listening to changes in data
+  // Handle login success or error
   useEffect(() => {
     if (data?.statusCode === 200) {
-      console.log("Login successful, redirecting..."); // Debug
+      console.log("Login successful, redirecting...");
       navigate("/");
     }
 
     if (error) {
-      console.log("Error:", error); // Debug
+      console.log("Error:", error);
       if (error == "Account not verified") {
         navigate("/verificationcode", {
           state: { email: formData.email },
         });
+
+        // Send verification code when account is not verified
+        sendVerificationCode(formData.email.trim()).then((codeResponse) => {
+          if (codeResponse?.statusCode === 201) {
+            toast({
+              variant: "success",
+              title: "Verification Code Sent",
+              description: "A verification code has been sent to your email.",
+            });
+          }
+        });
       }
-      // Show toast for invalid credentials or errors
       toast({
         variant: "destructive",
         title: "Login Failed",

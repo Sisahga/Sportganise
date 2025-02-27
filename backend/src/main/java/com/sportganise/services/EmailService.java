@@ -67,7 +67,7 @@ public class EmailService {
    * @param text email text
    */
   public void sendEmail(String sender, String toEmail, String subject, String text) {
-    String footer = "\n\n" + sender + ",\nSportganise\nwww.sportganise.com";
+    String footer = "\n\n" + sender + ",\nSportganise\nhttps://onibad.sportganise.com/";
     String messageText = text + footer;
 
     SimpleMailMessage message = new SimpleMailMessage();
