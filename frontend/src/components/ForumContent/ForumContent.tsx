@@ -203,7 +203,7 @@ const ForumContent: React.FC = () => {
         <Input
           ref={inputRef}
           placeholder="Search..."
-          className="w-full flex-grow"
+          className="w-full flex-grow bg-white"
           value={searchTerm}
           onChange={handleInputChange}
         />
