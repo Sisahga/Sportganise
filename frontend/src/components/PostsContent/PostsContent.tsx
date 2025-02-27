@@ -241,7 +241,7 @@ const PostsContent: React.FC = () => {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               rows={1}
-              className="w-full border p-3 rounded-full resize-none min-h-[40px] focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+              className="w-full border p-3 rounded-md resize-none min-h-[40px] focus:ring-2 focus:ring-blue-400 transition-all duration-300"
               placeholder="Leave a feedback..."
             />
           </div>
@@ -263,7 +263,8 @@ const PostsContent: React.FC = () => {
         </div>
 
         {/* COMMENTS SECTION */}
-        <div className="mt-6 space-y-4 font">
+        <div className="mt-8 space-y-4 font">
+        <h2 className="text-lg font-semibold">Community Feedbacks</h2>
           {currentComments.map((comment: Feedback) => (
             <Card
               key={comment.feedbackId}
