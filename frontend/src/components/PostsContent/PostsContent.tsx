@@ -264,7 +264,7 @@ const PostsContent: React.FC = () => {
 
         {/* COMMENTS SECTION */}
         <div className="mt-8 space-y-4 font">
-        <h2 className="text-lg font-semibold">Community Feedbacks</h2>
+          <h2 className="text-lg font-semibold">Community Feedbacks</h2>
           {currentComments.map((comment: Feedback) => (
             <Card
               key={comment.feedbackId}
