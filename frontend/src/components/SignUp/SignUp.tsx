@@ -8,8 +8,6 @@ import { useSignUp } from "@/hooks/useSignUp";
 import { useSendCode } from "@/hooks/useSendCode";
 import { SignUpRequest } from "@/types/auth";
 import { SecondaryHeader } from "../SecondaryHeader";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { Country, State } from "country-state-city";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -48,6 +46,12 @@ export default function SignUp() {
     lastName: "",
   });
 
+  const formatPhoneNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, ""); 
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    return match ? `(${match[1]}) ${match[2]}-${match[3]}` : cleaned;
+  };
+
   // Password validation logic
   const validatePassword = (password: string): boolean => {
     const hasMinLength = password.length >= 8;
@@ -64,6 +68,14 @@ export default function SignUp() {
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    if (name === "phone") {
+      setFormData((prev) => ({
+        ...prev,
+        phone: formatPhoneNumber(value),
+      }));
+      return;
+    }
 
     if (name.includes(".")) {
       // Handle nested fields like 'address.line'
@@ -195,6 +207,15 @@ export default function SignUp() {
                 value={formData.email}
                 onChange={handleInputChange}
               />
+               <FormField
+                id="phone"
+                label="Phone"
+                placeholder="(123) 456-7890"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                inputProps={{ type: "tel", maxLength: 14, pattern: "\\(\\d{3}\\) \\d{3}-\\d{4}" }}
+              />
               <FormField
                 id="Password"
                 label="Password"
@@ -245,75 +266,22 @@ export default function SignUp() {
                   value={formData.address.city}
                   onChange={handleInputChange}
                 />
-                <div className="space-y-2">
-                  <label htmlFor="country" className="text-sm font-medium">
-                    Country
-                  </label>
-                  <Select
-                    value={formData.address.country}
-                    onValueChange={(value) => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        address: {
-                          ...prev.address,
-                          country: value,
-                          // Reset province when country changes
-                          province: value === "Canada" ? prev.address.province : "",
-                        },
-                      }))
-                    }}
-                  >
-                    <SelectTrigger id="country">
-                      <SelectValue placeholder="Select country" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Country.getAllCountries().map((country) => (
-                        <SelectItem key={country.isoCode} value={country.isoCode}>
-                          {country.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {State.getStatesOfCountry(formData.address.country).length > 0 ? (
-                  <div className="space-y-2">
-                    <label htmlFor="province" className="text-sm font-medium">
-                      Province/State
-                    </label>
-                    <Select
-                      value={formData.address.province}
-                      onValueChange={(value) => {
-                        setFormData((prev) => ({
-                          ...prev,
-                          address: {
-                            ...prev.address,
-                            province: value,
-                          },
-                        }))
-                      }}
-                    >
-                      <SelectTrigger id="province">
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {State.getStatesOfCountry(formData.address.country).map((state) => (
-                          <SelectItem key={state.isoCode} value={state.isoCode}>
-                            {state.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ) : (
-                  <FormField
-                    id="Province"
-                    label="Province/State"
-                    placeholder="Province/State"
-                    name="address.province"
-                    value={formData.address.province}
-                    onChange={handleInputChange}
-                  />
-                )}
+                <FormField
+                  id="Province"
+                  label="Province"
+                  placeholder="Prov"
+                  name="address.province"
+                  value={formData.address.province}
+                  onChange={handleInputChange}
+                />
+                <FormField
+                  id="Country"
+                  label="Country"
+                  placeholder="Country"
+                  name="address.country"
+                  value={formData.address.country}
+                  onChange={handleInputChange}
+                />
               </div>
 
               <Button
