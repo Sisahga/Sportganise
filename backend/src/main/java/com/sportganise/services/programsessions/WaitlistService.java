@@ -75,10 +75,35 @@ public class WaitlistService {
     return participant;
   }
 
+  /**
+   * Fetches a confirmed program participant by their program ID and account ID.
+   *
+   * @param programId The ID of the program to search for (must not be null)
+   * @param accountId The ID of the account to search for (must not be null)
+   * @return If a confirmed participant is found, {@code null} if participant exists but is not
+   *     confirmed
+   * @throws ParticipantNotFoundException if no participant is found with the specified program ID
+   *     and account ID combination
+   * @throws IllegalArgumentException if either programId or accountId is null
+   */
   public ProgramParticipantDto fetchParticipant(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
-    ProgramParticipant participant = getWaitlistedParticipant(programId, accountId);
-    return new ProgramParticipantDto(participant);
+    ProgramParticipant programParticipant =
+        participantRepository
+            .findById(new ProgramParticipantId(programId, accountId))
+            .orElseThrow(
+                () ->
+                    new ParticipantNotFoundException(
+                        "Participant not found on waitlist for program: "
+                            + programId
+                            + ", account: "
+                            + accountId));
+
+    if (programParticipant.isConfirmed() == false) {
+      return null;
+    }
+
+    return new ProgramParticipantDto(programParticipant);
   }
 
   /**
