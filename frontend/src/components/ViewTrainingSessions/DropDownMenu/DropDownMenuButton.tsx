@@ -177,6 +177,15 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <LogOut color="red" />
                 <span className="text-red">Mark as absent</span>
               </DropdownMenuItem>
+              {/* Here instead I want to check if a player is of role waitlisted */}
+              {(accountAttendee?.participantType?.toLowerCase() !=
+                "waitlisted" ||
+                accountAttendee.confirmed === true) && (
+                <DropdownMenuItem onSelect={handleAbsentClick}>
+                  <LogOut color="red" />
+                  <span className="text-red"> Mark absent </span>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
           )}
         </DropdownMenuContent>
