@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User2Icon } from "lucide-react";
 import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
@@ -6,53 +6,29 @@ import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import ParticipantPopUp from "./ParticipantPopUp";
 import log from "loglevel";
 import { Badge } from "../ui/badge";
-import { useLocation } from "react-router";
 import { Attendees } from "@/types/trainingSessionDetails";
-import waitlistParticipantsApi from "@/services/api/waitlistParticipantsApi";
 
 interface RegisteredPlayerProps {
-  accountId: number;
+  accountAttendee: Attendees;
 }
 
 const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
-  accountId,
+  accountAttendee,
 }: RegisteredPlayerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const location = useLocation();
 
-  useEffect(() => {
-    //TODO: define a useHook instead of all this code, who knows
-    const fetchParticipantType = async () => {
-      const programId = location.state?.programDetails?.programId;
-      console.log("ProgramID:", programId);
-      if (programId) {
-        try {
-          const accountAttendee: Attendees =
-            await waitlistParticipantsApi.getProgramParticipant(
-              programId,
-              accountId,
-            );
-          setIsConfirmed(accountAttendee.confirmed);
-          console.log(accountAttendee.participantType);
-          console.log(accountAttendee);
-        } catch (error) {
-          log.error("Failed to fetch program participant:", error);
-        }
-      }
-    };
-    fetchParticipantType();
-  }, [location.state.programDetailsprogramId, accountId]);
+  console.log(accountAttendee.confirmed)
+  const [isConfirmed, setIsConfirmed] = useState(accountAttendee.confirmed);
 
-  const [isConfirmed, setIsConfirmed] = useState(false);
-
-  console.log("Confirmation, accountID ", isConfirmed, accountId);
+  console.log("The account is ", accountAttendee)
+  console.log("Confirmation, accountID ", isConfirmed, accountAttendee?.accountId);
 
   const {
     data: accountDetails,
     loading,
     error,
-  } = usePersonalInformation(accountId);
+  } = usePersonalInformation(accountAttendee?.accountId);
   log.debug("Rendering RegisteredPlayer");
 
   return (
@@ -98,7 +74,7 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
         <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
       </div>
       <ParticipantPopUp
-        accountId={accountId}
+        accountId={accountAttendee?.accountId}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAbsentMarked={() => setIsConfirmed(false)}

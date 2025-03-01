@@ -99,10 +99,6 @@ public class WaitlistService {
                             + ", account: "
                             + accountId));
 
-    if (programParticipant.isConfirmed() == false) {
-      return null;
-    }
-
     return new ProgramParticipantDto(programParticipant);
   }
 
