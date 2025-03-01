@@ -29,6 +29,7 @@ import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
+import waitlistParticipantsApi from "@/services/api/waitlistParticipantsApi";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -75,6 +76,29 @@ const TrainingSessionContent = () => {
     }
     log.info("Attendees in training session content: ", attendees);
   }, [location.state]);
+
+  useEffect(() => {
+    //TODO: define a useHook instead of all this code, who knows
+    const fetchParticipant = async () => {
+      const programId = location.state?.programDetails?.programId;
+      console.log("ProgramID:", programId, user?.accountId);
+      if (programId && user?.accountId) {
+        try {
+          const accountAttendee: Attendees =
+            await waitlistParticipantsApi.getProgramParticipant(
+              programId,
+              user?.accountId,
+            );
+          setAccountAttendee(accountAttendee);
+          console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
+          console.log(accountAttendee);
+        } catch (error) {
+          log.error("Failed to fetch program participant:", error);
+        }
+      }
+    };
+    fetchParticipant();
+  }, [location.state.programDetails.programId, user?.accountId]);
 
   return (
     <div className="mb-32 mt-5">
@@ -235,7 +259,7 @@ const TrainingSessionContent = () => {
                   return attendee.participantType?.toLowerCase() ===
                     "subscribed" || attendee.confirmed ? (
                     <div key={index}>
-                      <RegisteredPlayer {...attendee} />
+                      <RegisteredPlayer accountAttendee={attendee} />
                     </div>
                   ) : null;
                 })
