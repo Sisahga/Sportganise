@@ -17,12 +17,15 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
 }: RegisteredPlayerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
-  console.log(accountAttendee.confirmed)
+  console.log(accountAttendee.confirmed);
   const [isConfirmed, setIsConfirmed] = useState(accountAttendee.confirmed);
 
-  console.log("The account is ", accountAttendee)
-  console.log("Confirmation, accountID ", isConfirmed, accountAttendee?.accountId);
+  console.log("The account is ", accountAttendee);
+  console.log(
+    "Confirmation, accountID ",
+    isConfirmed,
+    accountAttendee?.accountId,
+  );
 
   const {
     data: accountDetails,
