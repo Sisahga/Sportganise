@@ -5,6 +5,7 @@ export interface Attendees {
   confirmedDate: Date;
   confirmed: boolean;
   rank: string | null;
+  participantType: string | null;
 }
 
 export interface ProgramDetails {
