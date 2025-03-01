@@ -18,8 +18,6 @@ import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 import useCreateChannel from "@/hooks/useCreateChannel";
 import useAbsent from "@/hooks/useAbsent";
 import { useEffect } from "react";
-import waitlistParticipantsApi from "@/services/api/waitlistParticipantsApi";
-import { Attendees } from "@/types/trainingSessionDetails";
 
 interface ParticipantPopUpProps {
   accountId: number;
@@ -104,7 +102,7 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
       console.log("error maybe", absentError);
       if (onAbsentMarked) onAbsentMarked();
       onClose();
-    } catch (err) {
+    } catch {
       console.log("programID", location.state.programDetails.programId);
       console.log(
         "Error marking the user as absent in DropDownMenuButton",

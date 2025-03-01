@@ -20,8 +20,15 @@ const useAbsent = () => {
         setData(dataAbsent);
         log.info("Participant marked absent successfully.");
         console.log("Participant information: ", dataAbsent);
-      } catch (err: any) {
-        setError(err.message); // Set error state
+      } catch (err) {
+        let errorMessage =
+          "An error occurred while marking participant absent.";
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        } else if (typeof err === "string") {
+          errorMessage = err;
+        }
+        setError(errorMessage);
         log.error("Error marking participant absent:", err);
       } finally {
         setLoading(false);
