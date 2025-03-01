@@ -59,11 +59,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
 
   //Confirmation of player absence
-  const {
-    markAbsent,
-    loading: absentLoading,
-    error: absentError,
-  } = useAbsent();
+  const { markAbsent, error: absentError } = useAbsent();
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isRSVPDialogOpen, setRSVPDialogOpen] = useState(false);
@@ -139,7 +135,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       setTimeout(() => {
         setNotificationVisible(false);
       }, 3000);
-    } catch (err) {
+    } catch {
       console.log("Error marking the user as absent in DropDownMenuButton");
     }
   };

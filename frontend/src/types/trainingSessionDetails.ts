@@ -2,7 +2,7 @@
 export interface Attendees {
   accountId: number;
   programId: number;
-  confirmedDate: Date;
+  confirmedDate: Date | null;
   confirmed: boolean;
   rank: string | null;
   participantType: string | null;
