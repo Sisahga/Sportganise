@@ -98,11 +98,20 @@ CREATE TABLE program (
 	expiry_date TIMESTAMPTZ,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10)
+	visibility VARCHAR(10),
+    cancelled BOOLEAN DEFAULT FALSE
 	CONSTRAINT check_recurrence
 		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
 		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
     )
+);
+
+CREATE TABLE program_recurrence (
+    recurrence_id SERIAL PRIMARY KEY,
+    program_id INT REFERENCES program(program_id) ON DELETE CASCADE,
+    occurence_date TIMESTAMPTZ NOT NULL,
+    location VARCHAR(50),
+    cancelled BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE program_attachments (
