@@ -234,7 +234,6 @@ public class ProgramService {
                 visibility,
                 programAttachments));
       }
-
     }
 
     log.debug("PROGRAM DTOS COUNT: ", programDtos.size());
@@ -413,12 +412,13 @@ public class ProgramService {
     log.debug("Modifying recurrences for recurring programs");
     if (existingProgram.isRecurring()) {
       if (existingProgram.getExpiryDate().isBefore(ZonedDateTime.parse(endDate))) {
-        ZonedDateTime lastOccurrence = getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
+        ZonedDateTime lastOccurrence =
+            getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
         ZonedDateTime expiryDate = ZonedDateTime.parse(endDate);
         String frequency = existingProgram.getFrequency();
-        createProgramRecurrences(lastOccurrence, expiryDate, frequency, existingProgram.getProgramId());
-      }
-      else if (existingProgram.getOccurrenceDate().isAfter(ZonedDateTime.parse(endDate))) {
+        createProgramRecurrences(
+            lastOccurrence, expiryDate, frequency, existingProgram.getProgramId());
+      } else if (existingProgram.getOccurrenceDate().isAfter(ZonedDateTime.parse(endDate))) {
         deleteExpiredRecurrences(ZonedDateTime.parse(endDate), existingProgram.getProgramId());
       }
     }
@@ -477,8 +477,6 @@ public class ProgramService {
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
   }
-
-
 
   private Program createProgramObject(
       String title,
@@ -567,7 +565,9 @@ public class ProgramService {
   }
 
   public ProgramRecurrence getLastProgramRecurrence(Integer programId) {
-    return programRecurrenceRepository.findLastRecurrenceByProgramId(programId).orElseThrow(()->new ProgramNotFoundException("Recurrence Not Found"));
+    return programRecurrenceRepository
+        .findLastRecurrenceByProgramId(programId)
+        .orElseThrow(() -> new ProgramNotFoundException("Recurrence Not Found"));
   }
 
   public void deleteExpiredRecurrences(ZonedDateTime expiryDate, Integer programId) {

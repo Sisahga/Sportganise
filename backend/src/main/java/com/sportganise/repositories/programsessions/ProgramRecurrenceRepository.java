@@ -5,7 +5,6 @@ import jakarta.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +25,7 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
 
   List<ProgramRecurrence> findProgramRecurrenceByProgramId(Integer programId);
 
-  @Query("SELECT pr FROM ProgramRecurrence pr WHERE pr.programId = :programId ORDER BY pr.occurrenceDate DESC")
+  @Query(
+      "SELECT pr FROM ProgramRecurrence pr WHERE pr.programId = :programId ORDER BY pr.occurrenceDate DESC")
   Optional<ProgramRecurrence> findLastRecurrenceByProgramId(@Param("programId") Integer programId);
 }
