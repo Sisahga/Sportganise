@@ -110,7 +110,6 @@ CREATE TABLE program_recurrence (
     recurrence_id SERIAL PRIMARY KEY,
     program_id INT REFERENCES program(program_id) ON DELETE CASCADE,
     occurence_date TIMESTAMPTZ NOT NULL,
-    location VARCHAR(50),
     cancelled BOOLEAN DEFAULT FALSE
 );
 
