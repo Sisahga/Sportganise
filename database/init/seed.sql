@@ -52,7 +52,7 @@ INSERT INTO program (type, title, description, author, capacity, occurence_date,
     ('TRAINING', 'Advanced Group', 'Intensive training camp for badminton pros', 'John Doe', 1, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public', false),
     ('FUNDRAISER', 'Basketball Clinic', 'Skill enhancement clinic', 'Jane Doe', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public', false);
 
-INSERT INTO program_recurrence(program_id,occurence_date,cancelled) VALUES
+INSERT INTO program_recurrence(program_id,occurrence_date,cancelled) VALUES
 (1, '2024-07-08 10:00:00', true),
 (1, '2024-07-15 10:00:00', false),
 (1, '2024-07-22 10:00:00', false),
