@@ -437,32 +437,44 @@ public class ProgramService {
 
     ZonedDateTime expiryDate = null;
     String frequency = null;
+    Program program;
 
     if (isRecurring != null && isRecurring) {
       ZonedDateTime currentOccurrence = occurrenceDate;
       frequency = "weekly";
       expiryDate = ZonedDateTime.parse(endDate);
-
-      while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
-
-        currentOccurrence = currentOccurrence.plusDays(7);
-        log.debug("nextOccurrence: ", currentOccurrence);
-      }
+      program= new Program(
+          programType,
+          title,
+          description,
+          author,
+          capacity,
+          occurrenceDate,
+          durationMins,
+          true,
+          expiryDate,
+          frequency,
+          location,
+          visibility);
+      createProgramRecurrences(currentOccurrence, expiryDate, frequency, program.getProgramId());
     }
 
-    return new Program(
-        programType,
-        title,
-        description,
-        author,
-        capacity,
-        occurrenceDate,
-        durationMins,
-        isRecurring,
-        expiryDate,
-        frequency,
-        location,
-        visibility);
+    else {
+      program=new Program(
+              programType,
+              title,
+              description,
+              author,
+              capacity,
+              occurrenceDate,
+              durationMins,
+              isRecurring,
+              expiryDate,
+              frequency,
+              location,
+              visibility);
+    }
+    return program;
   }
 
   public void createProgramRecurrences(
