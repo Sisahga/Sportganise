@@ -5,16 +5,14 @@ import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
-import com.sportganise.entities.programsessions.Program;
-import com.sportganise.entities.programsessions.ProgramAttachment;
-import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
-import com.sportganise.entities.programsessions.ProgramParticipant;
-import com.sportganise.entities.programsessions.ProgramType;
+import com.sportganise.entities.programsessions.*;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
+import com.sportganise.repositories.programsessions.ProgramRecurrenceRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
@@ -39,6 +37,7 @@ public class ProgramService {
   private final ProgramRepository programRepository;
   private final AccountService accountService;
   private final ProgramAttachmentRepository programAttachmentRepository;
+  private final ProgramRecurrenceRepository programRecurrenceRepository;
   private final BlobService blobService;
 
   /**
@@ -52,10 +51,12 @@ public class ProgramService {
       ProgramRepository programRepository,
       AccountService accountService,
       ProgramAttachmentRepository programAttachmentRepository,
+      ProgramRecurrenceRepository programRecurrenceRepository,
       BlobService blobService) {
     this.programRepository = programRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
+    this.programRecurrenceRepository = programRecurrenceRepository;
     this.blobService = blobService;
   }
 
@@ -462,5 +463,31 @@ public class ProgramService {
         frequency,
         location,
         visibility);
+  }
+
+  public void createProgramRecurrences(
+      ZonedDateTime occurrenceDate, ZonedDateTime expiryDate, String frequency, Integer programId) {
+    ZonedDateTime currentOccurrence = occurrenceDate;
+    while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
+      ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
+      programRecurrenceRepository.save(recurrence);
+      if (frequency.equalsIgnoreCase("daily")) {
+        currentOccurrence = currentOccurrence.plusDays(1);
+      } else if (frequency.equalsIgnoreCase("weekly")) {
+        currentOccurrence = currentOccurrence.plusDays(7);
+      } else if (frequency.equalsIgnoreCase("monthly")) {
+        currentOccurrence = currentOccurrence.plusMonths(1);
+      } else {
+        throw new InvalidFrequencyException("Invalid frequency: " + frequency);
+      }
+    }
+  }
+
+  public void deleteExpiredRecurrences(ZonedDateTime expiryDate, Integer programId) {
+    programRecurrenceRepository.deleteExpiredRecurrences(expiryDate, programId);
+  }
+
+  public void deleteProgramRecurrence(Integer recurrenceId) {
+    programRecurrenceRepository.deleteProgramRecurrenceByRecurrenceId(recurrenceId);
   }
 }
