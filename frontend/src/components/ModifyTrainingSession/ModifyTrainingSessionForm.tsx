@@ -51,6 +51,8 @@ import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
 import { getFileName } from "@/utils/getFileName";
+import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
+import usePlayers from "@/hooks/usePlayers";
 
 /**All select element options */
 const types = [
@@ -132,6 +134,28 @@ export default function ModifyTrainingSessionForm() {
     author: "",
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
+  // State for selected participant IDs (existing attendees)
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  // State to control the InviteModal's visibility
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const { players } = usePlayers();
+  const members: Member[] = players.map((player) => ({
+    id: player.accountId.toString(),
+    name: `${player.firstName} ${player.lastName}`,
+    email: player.email,
+    role: player.type,
+  }));
+  useEffect(() => {
+    if (location.state && location.state.attendees) {
+      const attendeeIds = (location.state.attendees as Attendees[]).map((att) =>
+        att.accountId.toString(),
+      );
+      setSelectedMembers(attendeeIds);
+    }
+    if (location.state && location.state.programDetails) {
+      setProgramDetails(location.state.programDetails);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const user = getCookies();
@@ -212,6 +236,15 @@ export default function ModifyTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (values.visibility === "private" && selectedMembers.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description:
+          "Please select at least one participant for a private event.",
+      });
+      return;
+    }
     try {
       const json_payload = {
         ...values,
@@ -259,6 +292,7 @@ export default function ModifyTrainingSessionForm() {
         endTime: values.endTime,
         location: values.location,
         attachmentsToRemove: attachmentsToRemove ?? [],
+        attendees: values.visibility === "private" ? selectedMembers : [],
       };
       formData.append(
         "programData",
@@ -682,6 +716,9 @@ export default function ModifyTrainingSessionForm() {
                               key={visibility.value}
                               onSelect={() => {
                                 form.setValue("visibility", visibility.value);
+                                if (visibility.value === "private") {
+                                  setShowInviteModal(true);
+                                }
                               }}
                             >
                               <Check
@@ -704,8 +741,45 @@ export default function ModifyTrainingSessionForm() {
                   Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
+                {field.value === "private" && (
+                  <div className="mt-2 border p-2 rounded">
+                    <div className="mb-2 font-medium">
+                      Selected Participants:
+                    </div>
+                    {selectedMembers.length > 0 ? (
+                      <ul className="list-disc pl-5">
+                        {selectedMembers.map((memberId) => {
+                          const member = members.find((m) => m.id === memberId);
+                          return (
+                            <li key={memberId}>
+                              {member ? member.name : "Unknown member"}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No participants selected.
+                      </p>
+                    )}
+                    <Button
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setShowInviteModal(true)}
+                    >
+                      Edit Participants
+                    </Button>
+                  </div>
+                )}
               </FormItem>
             )}
+          />
+          <InviteModal
+            open={showInviteModal}
+            onClose={() => setShowInviteModal(false)}
+            members={members}
+            selectedMembers={selectedMembers}
+            setSelectedMembers={setSelectedMembers}
           />
 
           {/** Description */}
