@@ -8,6 +8,7 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.entities.programsessions.*;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.ProgramNotFoundException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -409,6 +410,19 @@ public class ProgramService {
 
     log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: ", existingProgram.getProgramId());
 
+    log.debug("Modifying recurrences for recurring programs");
+    if (existingProgram.isRecurring()) {
+      if (existingProgram.getExpiryDate().isBefore(ZonedDateTime.parse(endDate))) {
+        ZonedDateTime lastOccurrence = getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
+        ZonedDateTime expiryDate = ZonedDateTime.parse(endDate);
+        String frequency = existingProgram.getFrequency();
+        createProgramRecurrences(lastOccurrence, expiryDate, frequency, existingProgram.getProgramId());
+      }
+      else if (existingProgram.getOccurrenceDate().isAfter(ZonedDateTime.parse(endDate))) {
+        deleteExpiredRecurrences(ZonedDateTime.parse(endDate), existingProgram.getProgramId());
+      }
+    }
+
     Program updatedProgram =
         createProgramObject(
             title,
@@ -463,6 +477,8 @@ public class ProgramService {
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
   }
+
+
 
   private Program createProgramObject(
       String title,
@@ -548,6 +564,10 @@ public class ProgramService {
 
   public List<ProgramRecurrence> getProgramRecurrences(Integer programId) {
     return programRecurrenceRepository.findProgramRecurrenceByProgramId(programId);
+  }
+
+  public ProgramRecurrence getLastProgramRecurrence(Integer programId) {
+    return programRecurrenceRepository.findLastRecurrenceByProgramId(programId).orElseThrow(()->new ProgramNotFoundException("Recurrence Not Found"));
   }
 
   public void deleteExpiredRecurrences(ZonedDateTime expiryDate, Integer programId) {
