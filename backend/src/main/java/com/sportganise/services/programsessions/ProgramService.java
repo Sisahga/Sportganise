@@ -480,8 +480,8 @@ public class ProgramService {
   }
 
   public void createProgramRecurrences(
-      ZonedDateTime occurrenceDate, ZonedDateTime expiryDate, String frequency, Integer programId) {
-    ZonedDateTime currentOccurrence = occurrenceDate;
+      ZonedDateTime startDate, ZonedDateTime expiryDate, String frequency, Integer programId) {
+    ZonedDateTime currentOccurrence = startDate;
     while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
       ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
       programRecurrenceRepository.save(recurrence);
@@ -496,6 +496,7 @@ public class ProgramService {
       }
     }
   }
+
 
   public void deleteExpiredRecurrences(ZonedDateTime expiryDate, Integer programId) {
     programRecurrenceRepository.deleteExpiredRecurrences(expiryDate, programId);
