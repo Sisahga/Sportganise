@@ -13,6 +13,7 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelAp
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
+import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
 import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
 import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadException;
@@ -78,71 +79,6 @@ public class GlobalExceptionHandler {
         .build();
   }
 
-  // <editor-fold desc="Region: Auth Exceptions">
-
-  /**
-   * Handle expired code exception.
-   *
-   * @param e exception
-   * @return response dto with status 400.
-   */
-  @ExceptionHandler(InvalidCodeException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
-    return ResponseDto.builder()
-        .statusCode(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build();
-  }
-
-  /**
-   * Handle expired code exception.
-   *
-   * @param e exception
-   * @return response dto with status 400.
-   */
-  @ExceptionHandler(ExpiredCodeException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
-    return ResponseDto.builder()
-        .statusCode(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build();
-  }
-
-  /**
-   * Handle account not verified exception.
-   *
-   * @param e exception
-   * @return response dto with status 401.
-   */
-  @ExceptionHandler(AccountNotVerifiedException.class)
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
-    return ResponseDto.builder()
-        .statusCode(HttpStatus.UNAUTHORIZED.value())
-        .message(e.getMessage())
-        .build();
-  }
-
-  /**
-   * Handle invalid credentials exception.
-   *
-   * @param e exception
-   * @return response dto with status 401.
-   */
-  @ExceptionHandler(InvalidCredentialsException.class)
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
-    return ResponseDto.builder()
-        .statusCode(HttpStatus.UNAUTHORIZED.value())
-        .message(e.getMessage())
-        .build();
-  }
-
-  // </editor-fold>
-
-  // <editor-fold desc="Region: Channel Exceptions">
   /**
    * Handle bad request exception for channel creation.
    *
@@ -539,6 +475,75 @@ public class GlobalExceptionHandler {
         .statusCode(HttpStatus.BAD_REQUEST.value())
         .message(e.getMessage())
         .build();
+  }
+
+  /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(InvalidCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(ExpiredCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle account not verified exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(AccountNotVerifiedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle invalid credentials exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(InvalidCredentialsException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  @ExceptionHandler(InvalidFrequencyException.class)
+  @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+  public ResponseDto<?> handleInvalidFrequencyException(InvalidFrequencyException e) {
+    return ResponseDto.builder()
+            .statusCode(HttpStatus.EXPECTATION_FAILED.value())
+            .message(e.getMessage())
+            .build();
   }
 
   /**
