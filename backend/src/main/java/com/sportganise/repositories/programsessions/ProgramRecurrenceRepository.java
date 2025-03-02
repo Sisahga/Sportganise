@@ -3,6 +3,7 @@ package com.sportganise.repositories.programsessions;
 import com.sportganise.entities.programsessions.ProgramRecurrence;
 import jakarta.transaction.Transactional;
 import java.time.ZonedDateTime;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,6 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
       "DELETE FROM ProgramRecurrence rp WHERE rp.programId = :programId AND rp.occurrenceDate <= :expiryDate")
   void deleteExpiredRecurrences(
       @Param("expiryDate") ZonedDateTime expiryDate, @Param("programId") Integer programId);
+
+  List<ProgramRecurrence> findProgramRecurrenceByProgramId(Integer programId);
 }
