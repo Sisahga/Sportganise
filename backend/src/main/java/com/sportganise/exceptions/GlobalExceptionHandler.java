@@ -525,9 +525,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
   public ResponseDto<?> handleInvalidFrequencyException(InvalidFrequencyException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.EXPECTATION_FAILED.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.EXPECTATION_FAILED.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
