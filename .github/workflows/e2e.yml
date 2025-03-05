@@ -21,7 +21,7 @@ jobs:
     # Start backend
     - uses: hoverkraft-tech/compose-action@v2.0.1
       with:
-        cwd: "../"
+        # cwd: "../"
         services: |
           database
           backend
