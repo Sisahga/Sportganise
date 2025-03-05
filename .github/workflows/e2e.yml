@@ -21,10 +21,7 @@ jobs:
     # Start backend
     - uses: hoverkraft-tech/compose-action@v2.0.1
       with:
-        # cwd: "../"
-        services: |
-          database
-          backend
+        compose-file: ./docker-compose.e2e.yml
       env:
         POSTGRES_URL: "jdbc:postgresql://localhost:5432/sportganise"
         POSTGRES_DB: "sportganise"
