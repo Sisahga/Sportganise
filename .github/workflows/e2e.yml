@@ -44,6 +44,8 @@ jobs:
     # Run Playwright tests
     - name: Run Playwright tests
       run: pnpm e2e
+      env:
+        VITE_API_BASE_URL: "localhost:8080"
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
