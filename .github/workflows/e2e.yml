@@ -1,0 +1,51 @@
+name: E2E Tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+    # Checkout the code
+    - uses: actions/checkout@v4
+
+    # Start backend
+    - uses: hoverkraft-tech/compose-action@v2.0.1
+      with:
+        cwd: "../"
+        services: |
+          database
+          backend
+      env:
+        POSTGRES_URL: "jdbc:postgresql://localhost:5432/sportganise"
+        POSTGRES_DB: "sportganise"
+        POSTGRES_USER: "sportganise"
+        POSTGRES_PASSWORD: "capstone-sportganise"
+
+    # Install pnpm
+    - uses: pnpm/action-setup@v4
+      with:
+        run_install: true
+
+    # Setup node
+    - uses: actions/setup-node@v4
+
+    # Setup Playwright
+    - name: Install Playwright Browsers
+      run: pnpm exec playwright install --with-deps
+
+    # Run Playwright tests
+    - name: Run Playwright tests
+      run: pnpm e2e
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
