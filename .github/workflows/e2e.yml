@@ -4,11 +4,42 @@ on:
     branches:
       - main
   pull_request:
-    # # TODO: run only on PRs to main
+    # # TODO: uncomment run only on PRs to main
     # branches:
     #   - main
+
+env:
+  # Frontend
+  VITE_API_BASE_URL: localhost:8080
+
+  # Postgres
+  POSTGRES_DB: secrets.POSTGRES_DB
+  POSTGRES_USER: secrets.POSTGRES_USER
+  POSTGRES_PASSWORD: secrets.POSTGRES_PASSWORD
+  POSTGRES_URL: secrets.POSTGRES_URL
+  
+  # Auth0
+  AUTH0_DOMAIN: secrets.AUTH0_DOMAIN
+  AUTH0_AUDIENCE: secrets.AUTH0_AUDIENCE
+  AUTH0_CLIENT_ID: secrets.AUTH0_CLIENT_ID
+  AUTH0_CLIENT_SECRET: secrets.AUTH0_CLIENT_SECRET
+  
+  JWT_SECRET_KEY: secrets.JWT_SECRET_KEY
+  
+  # AWS S3
+  AWS_ACCESS_KEY_ID: secrets.AWS_ACCESS_KEY_ID
+  AWS_SECRET_ACCESS_KEY: secrets.AWS_SECRET_ACCESS_KEY
+  AWS_S3_BUCKET_NAME: secrets.AWS_S3_BUCKET_NAME
+  AWS_S3_REGION: secrets.AWS_S3_REGION
+  
+  # Email server
+  COMPANY_EMAIL: secrets.COMPANY_EMAIL
+  COMPANY_EMAIL_PASSWORD: secrets.COMPANY_EMAIL_PASSWORD
+
+  ENV: DEV
+
 jobs:
-  test:
+  e2e:
     defaults:
       run:
         working-directory: ./frontend
@@ -22,11 +53,12 @@ jobs:
     - uses: hoverkraft-tech/compose-action@v2.0.1
       with:
         compose-file: ./docker-compose.e2e.yml
-      env:
-        POSTGRES_URL: "jdbc:postgresql://localhost:5432/sportganise"
-        POSTGRES_DB: "sportganise"
-        POSTGRES_USER: "sportganise"
-        POSTGRES_PASSWORD: "capstone-sportganise"
+
+    # DEBUG
+    - name: Debug
+      run: |
+        echo $VITE_API_BASE_URL
+        wget localhost:8080
 
     # Install pnpm
     - uses: pnpm/action-setup@v4
@@ -43,12 +75,7 @@ jobs:
 
     # Run Playwright tests
     - name: Run Playwright tests
-      run: |
-        echo $VITE_API_BASE_URL
-        wget localhost:8080
-        pnpm e2e
-      env:
-        VITE_API_BASE_URL: "localhost:8080"
+      run: pnpm e2e
 
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
