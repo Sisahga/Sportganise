@@ -18,6 +18,12 @@ jobs:
     # Checkout the code
     - uses: actions/checkout@v4
 
+    # Debug
+    - name: debug
+      run: |
+        cat package.json
+        exit 1
+
     # Start backend
     - uses: hoverkraft-tech/compose-action@v2.0.1
       with:
@@ -27,10 +33,6 @@ jobs:
         POSTGRES_DB: "sportganise"
         POSTGRES_USER: "sportganise"
         POSTGRES_PASSWORD: "capstone-sportganise"
-
-    # Debug
-    - name: debug pwd
-      run: pwd
 
     # Install pnpm
     - uses: pnpm/action-setup@v4
