@@ -28,6 +28,10 @@ jobs:
         POSTGRES_USER: "sportganise"
         POSTGRES_PASSWORD: "capstone-sportganise"
 
+    # Debug
+    - name: debug pwd
+      run: pwd
+
     # Install pnpm
     - uses: pnpm/action-setup@v4
       with:
