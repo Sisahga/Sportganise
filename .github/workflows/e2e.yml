@@ -9,6 +9,9 @@ on:
     #   - main
 jobs:
   test:
+    defaults:
+      run:
+        working-directory: "frontend/"
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
