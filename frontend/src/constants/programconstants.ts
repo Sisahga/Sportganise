@@ -1,0 +1,4 @@
+export const TRAINING = "TRAINING";
+export const SPECIALTRAINING = "SPECIALTRAINING";
+export const FUNDRAISER = "FUNDRAISER";
+export const TOURNAMENT = "TOURNAMENT";
