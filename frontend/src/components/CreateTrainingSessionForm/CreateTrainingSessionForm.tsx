@@ -52,11 +52,13 @@ import {
   Loader2,
 } from "lucide-react";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
-// Import constants for program types
+// Import constants for select fields
 import { TRAINING } from "@/constants/programconstants";
 import { SPECIALTRAINING } from "@/constants/programconstants";
 import { TOURNAMENT } from "@/constants/programconstants";
 import { FUNDRAISER } from "@/constants/programconstants";
+import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
+import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -116,11 +118,11 @@ export default function CreateTrainingSessionForm() {
   const locations = [
     {
       label: "Centre de loisirs St-Denis",
-      value: "Centre-de-loisirs-St-Denis",
+      value: CENTRE_DE_LOISIRS_ST_DENIS,
     },
     {
       label: "Collège de Maisonnneuve",
-      value: "Collège-de-Maisonnneuve",
+      value: COLLEGE_DE_MAISONNEUVE,
     },
   ] as const;
 
