@@ -214,6 +214,7 @@ public class TrainingPlansService {
             TrainingPlan.builder()
                 .userId(accountId)
                 .docUrl(s3Url)
+                .shared(false)
                 .creationDate(createdDate)
                 .build();
         trainingPlansRepository.save(tp); // Save training plan in DB.
