@@ -59,6 +59,9 @@ import { TOURNAMENT } from "@/constants/programconstants";
 import { FUNDRAISER } from "@/constants/programconstants";
 import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
 import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
+import { PUBLIC } from "@/constants/programconstants";
+import { MEMBERS_ONLY } from "@/constants/programconstants";
+import { PRIVATE } from "@/constants/programconstants";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -598,9 +601,9 @@ export default function CreateTrainingSessionForm() {
                           <CommandEmpty>No visibility found.</CommandEmpty>
                           <CommandGroup>
                             {[
-                              { label: "Public", value: "public" },
-                              { label: "Members only", value: "members" },
-                              { label: "Private", value: "private" },
+                              { label: "Public", value: PUBLIC },
+                              { label: "Members only", value: MEMBERS_ONLY },
+                              { label: "Private", value: PRIVATE },
                             ].map((v) => (
                               <CommandItem
                                 key={v.value}

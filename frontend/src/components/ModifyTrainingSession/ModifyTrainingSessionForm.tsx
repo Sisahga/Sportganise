@@ -60,6 +60,9 @@ import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
 import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { MAIN_STREET } from "@/constants/programconstants";
 import { TEST_WATER_ROAD } from "@/constants/programconstants";
+import { PUBLIC } from "@/constants/programconstants";
+import { MEMBERS_ONLY } from "@/constants/programconstants";
+import { PRIVATE } from "@/constants/programconstants";
 
 /**All select element options */
 const types = [
@@ -83,15 +86,15 @@ const types = [
 const visibilities = [
   {
     label: "Public",
-    value: "public",
+    value: PUBLIC,
   },
   {
     label: "Members only",
-    value: "members",
+    value: MEMBERS_ONLY,
   },
   {
     label: "Private",
-    value: "private",
+    value: PRIVATE,
   },
 ] as const;
 const locations = [
