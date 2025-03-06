@@ -44,7 +44,6 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
-
 import {
   Check,
   ChevronsUpDown,
@@ -53,6 +52,11 @@ import {
   Loader2,
 } from "lucide-react";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+// Import constants for program types
+import { TRAINING } from "@/constants/programconstants";
+import { SPECIALTRAINING } from "@/constants/programconstants";
+import { TOURNAMENT } from "@/constants/programconstants";
+import { FUNDRAISER } from "@/constants/programconstants";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -94,19 +98,19 @@ export default function CreateTrainingSessionForm() {
   const types = [
     {
       label: "Training Session",
-      value: "Training",
+      value: TRAINING,
     },
     {
       label: "Fundraiser",
-      value: "Fundraiser",
+      value: FUNDRAISER,
     },
     {
       label: "Tournament",
-      value: "Tournament",
+      value: TOURNAMENT,
     },
     {
       label: "Special Training",
-      value: "Special Training",
+      value: SPECIALTRAINING,
     },
   ] as const;
   const locations = [
@@ -171,7 +175,7 @@ export default function CreateTrainingSessionForm() {
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
-        }),
+        })
       );
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
@@ -188,7 +192,7 @@ export default function CreateTrainingSessionForm() {
       log.info("create", create);
       if (create === null) {
         throw new Error(
-          "Error from useCreateTrainingSession.createTrainingSession!",
+          "Error from useCreateTrainingSession.createTrainingSession!"
         );
       }
       console.log("loading", loading);
@@ -205,7 +209,7 @@ export default function CreateTrainingSessionForm() {
     } catch (err) {
       console.error(
         "Create training session form submission error (error)",
-        err,
+        err
       );
       log.error("Create training session form submission error (error)", err);
       toast({
@@ -285,7 +289,7 @@ export default function CreateTrainingSessionForm() {
                           role="combobox"
                           className={cn(
                             "justify-between",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
@@ -315,7 +319,7 @@ export default function CreateTrainingSessionForm() {
                                     "mr-2 h-4 w-4",
                                     type.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {type.label}
@@ -347,7 +351,7 @@ export default function CreateTrainingSessionForm() {
                           variant={"outline"}
                           className={cn(
                             "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
@@ -394,7 +398,7 @@ export default function CreateTrainingSessionForm() {
                           variant={"outline"}
                           className={cn(
                             "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
@@ -484,12 +488,12 @@ export default function CreateTrainingSessionForm() {
                           role="combobox"
                           className={cn(
                             "justify-between",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
                             ? locations.find(
-                                (location) => location.value === field.value,
+                                (location) => location.value === field.value
                               )?.label
                             : "Select location"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -515,7 +519,7 @@ export default function CreateTrainingSessionForm() {
                                     "mr-2 h-4 w-4",
                                     location.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {location.label}
@@ -577,7 +581,7 @@ export default function CreateTrainingSessionForm() {
                           role="combobox"
                           className={cn(
                             !field.value ? "text-muted-foreground" : "",
-                            "justify-between",
+                            "justify-between"
                           )}
                         >
                           {field.value ? field.value : "Select visibility"}
@@ -612,7 +616,7 @@ export default function CreateTrainingSessionForm() {
                                     "mr-2 h-4 w-4",
                                     v.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {v.label}
@@ -636,7 +640,7 @@ export default function CreateTrainingSessionForm() {
                         <ul className="list-disc pl-5">
                           {selectedMembers.map((memberId) => {
                             const member = members.find(
-                              (m) => m.id === memberId,
+                              (m) => m.id === memberId
                             );
                             return (
                               <li key={memberId}>
@@ -759,7 +763,7 @@ export default function CreateTrainingSessionForm() {
                       {...field}
                       onChange={(e) =>
                         field.onChange(
-                          e.target.value ? Number(e.target.value) : undefined,
+                          e.target.value ? Number(e.target.value) : undefined
                         )
                       }
                     />
