@@ -317,7 +317,7 @@ export default function ModifyTrainingSessionForm() {
       toast({
         variant: "success",
         title: "Form updated successfully ✔",
-        description: "Event was updated in your calendar.",
+        description: "Program was updated in your calendar.",
       });
 
       // If successful, navigate back to calendar page
@@ -328,7 +328,7 @@ export default function ModifyTrainingSessionForm() {
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description:
-          "There was a problem with your request. Event was not updated.",
+          "There was a problem with your request. Program was not updated.",
       });
     } finally {
       form.reset();
