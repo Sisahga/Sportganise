@@ -54,12 +54,6 @@ jobs:
       with:
         compose-file: ./docker-compose.e2e.yml
 
-    # DEBUG
-    - name: Debug
-      run: |
-        echo $VITE_API_BASE_URL
-        wget localhost:8080
-
     # Install pnpm
     - uses: pnpm/action-setup@v4
       with:
