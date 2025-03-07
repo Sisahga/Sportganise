@@ -66,6 +66,8 @@ import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
+// Import dropZoneConfig for files
+import { dropZoneConfig } from "@/constants/drop.zone.config";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
