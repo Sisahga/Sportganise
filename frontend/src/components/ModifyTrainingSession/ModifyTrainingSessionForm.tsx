@@ -534,6 +534,70 @@ export default function ModifyTrainingSessionForm() {
             )}
           />
 
+          {/** Frequency */}
+          <FormField
+            control={form.control}
+            name="frequency"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="font-semibold text-base">
+                  Frequency of Program
+                </FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value
+                          ? frequencies.find(
+                              (frequency) => frequency.value === field.value
+                            )?.label
+                          : "Select frequency"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search type..." />
+                      <CommandList>
+                        <CommandEmpty>No frequency found.</CommandEmpty>
+                        <CommandGroup>
+                          {frequencies.map((frequency) => (
+                            <CommandItem
+                              value={frequency.label}
+                              key={frequency.value}
+                              onSelect={() => {
+                                form.setValue("frequency", frequency.value);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  frequency.value === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {frequency.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/** Time */}
           <div className="flex gap-2">
             {/**Start Time */}
