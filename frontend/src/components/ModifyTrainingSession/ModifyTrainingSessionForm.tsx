@@ -315,6 +315,7 @@ export default function ModifyTrainingSessionForm() {
 
       // Toast popup for user to say form submitted successfully
       toast({
+        variant: "success",
         title: "Form updated successfully ✔",
         description: "Event was updated in your calendar.",
       });
