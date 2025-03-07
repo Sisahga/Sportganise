@@ -66,6 +66,8 @@ import { PRIVATE } from "@/constants/programconstants";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
+// Import dropZoneConfig for files
+import { dropZoneConfig } from "@/constants/drop.zone.config";
 
 /**All select element options */
 const types = [
@@ -170,18 +172,6 @@ export default function ModifyTrainingSessionForm() {
     setAccountId(user?.accountId);
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
   }, [accountId, navigate]);
-
-  /** Handle files for file upload in form*/
-  const dropZoneConfig = {
-    //File configurations
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg"],
-      "application/pdf": [".pdf"],
-    },
-  };
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
