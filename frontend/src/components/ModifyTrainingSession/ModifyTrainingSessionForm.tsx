@@ -347,7 +347,7 @@ export default function ModifyTrainingSessionForm() {
   };
 
   return (
-    <div>
+    <div className="mb-32">
       {/** Navigate to previous page */}
       <BackButton />
 
@@ -355,7 +355,7 @@ export default function ModifyTrainingSessionForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
+          className="space-y-8 max-w-3xl mx-auto pt-10"
         >
           {/*Form Title*/}
           <div>
@@ -928,13 +928,13 @@ export default function ModifyTrainingSessionForm() {
               Update Program
             </Button>
           )}
-          <div className="justify-self-center">
-            <button className=" bg-transparent" onClick={() => navigate(-1)}>
-              <p className="text-center underline text-neutral-400">Cancel</p>
-            </button>
-          </div>
         </form>
       </Form>
+      <div className="justify-self-center mt-8">
+        <button className=" bg-transparent" onClick={() => navigate(-1)}>
+          <p className="text-center underline text-neutral-400">Cancel</p>
+        </button>
+      </div>
     </div>
   );
 }
