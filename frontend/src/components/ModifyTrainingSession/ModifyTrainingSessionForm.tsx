@@ -204,12 +204,22 @@ export default function ModifyTrainingSessionForm() {
     // Set form defaults and update field values
     form.setValue("title", programDetails.title);
     form.setValue("capacity", programDetails.capacity);
-    form.setValue("type", programDetails.programType);
+    form.setValue("type", programDetails.programType.toUpperCase());
     form.setValue("startDate", new Date(programDetails.occurrenceDate));
-    if (programDetails.frequency === null) {
+    // TODO: HANDLE FREQUENCY CHANGES, NEW OCCURENCE DATES AND EXPIRY DATES
+    if (
+      programDetails.frequency === null ||
+      programDetails.frequency.toLowerCase() === "daily"
+    ) {
       form.setValue("endDate", new Date(programDetails.occurrenceDate));
     } else {
       form.setValue("endDate", new Date(programDetails.expiryDate));
+    }
+    if (programDetails.frequency) {
+      // right now, it's possible for frequency to be null
+      form.setValue("frequency", programDetails.frequency);
+    } else {
+      form.setValue("frequency", "DAILY");
     }
     form.setValue("recurring", programDetails.recurring);
     form.setValue("visibility", programDetails.visibility);
