@@ -244,7 +244,7 @@ export default function CreateTrainingSessionForm() {
       toast({
         variant: "success",
         title: "Form submitted successfully ✔",
-        description: "Event was added to your calendar.",
+        description: "Program was added to your calendar.",
       });
 
       // Navigate to home page
@@ -259,7 +259,7 @@ export default function CreateTrainingSessionForm() {
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description:
-          "There was a problem with your request. Event was not created.",
+          "There was a problem with your request. Program was not created.",
       });
     } finally {
       form.reset();
