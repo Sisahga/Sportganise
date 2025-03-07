@@ -86,6 +86,20 @@ const types = [
     value: SPECIALTRAINING,
   },
 ] as const;
+const frequencies = [
+  {
+    label: "Daily",
+    value: DAILY,
+  },
+  {
+    label: "Weekly",
+    value: WEEKLY,
+  },
+  {
+    label: "Monthly",
+    value: MONTHLY,
+  },
+] as const;
 const visibilities = [
   {
     label: "Public",
