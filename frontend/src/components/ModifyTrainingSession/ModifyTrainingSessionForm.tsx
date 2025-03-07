@@ -280,6 +280,7 @@ export default function ModifyTrainingSessionForm() {
         type: values.type,
         startDate: values.startDate.toISOString(),
         endDate: values.endDate.toISOString(),
+        frequency: values.frequency,
         recurring: values.recurring.toString(),
         visibility: values.visibility,
         description: values.description,
