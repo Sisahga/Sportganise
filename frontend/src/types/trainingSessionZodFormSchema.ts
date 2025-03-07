@@ -15,7 +15,7 @@ export const formSchema = z
         //array of files
         z.custom<File>((file) => file instanceof File && file.size > 0, {
           message: "Each file must be a valid file and not empty.",
-        }),
+        })
       )
       .optional(),
     capacity: z.number().min(0),
@@ -40,11 +40,21 @@ export const formSchema = z
       !(data.startDate.getTime() === data.endDate.getTime() && data.recurring),
     {
       message:
-        "Event start and end dates are the same and therefore cannot reccur.",
+        "Program start and end dates are the same and therefore cannot reccur.",
       path: ["recurring"],
-    },
+    }
+  )
+  .refine(
+    (data) =>
+      data.startDate.getTime() === data.endDate.getTime() &&
+      data.frequency == "DAILY",
+    {
+      message:
+        "Program start and end dates are the same and therefore can only occur once.",
+      path: ["frequency"],
+    }
   );
-/* .refine(
+/*  .refine(
     (data) =>
       data.startDate.getDay() === data.endDate.getDay() &&
       data.type === "Training",
@@ -53,4 +63,4 @@ export const formSchema = z
         "The day of the week for training session start and end dates must be the same.",
       path: ["endDate"],
     }
-  ) */
+  ); */
