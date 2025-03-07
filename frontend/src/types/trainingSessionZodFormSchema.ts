@@ -46,11 +46,25 @@ export const formSchema = z
   )
   .refine(
     (data) =>
-      data.startDate.getTime() === data.endDate.getTime() &&
-      data.frequency == "DAILY",
+      !(
+        data.startDate.getDate() === data.endDate.getDate() &&
+        data.frequency !== "DAILY"
+      ),
     {
       message:
         "Program start and end dates are the same and therefore can only occur once.",
+      path: ["frequency"],
+    }
+  )
+  .refine(
+    (data) =>
+      !(
+        data.frequency === "WEEKLY" &&
+        data.endDate.getDay() !== data.startDate.getDay()
+      ),
+    {
+      message:
+        "Program start and end dates must be at least a week apart and fall on the same day.",
       path: ["frequency"],
     }
   );
