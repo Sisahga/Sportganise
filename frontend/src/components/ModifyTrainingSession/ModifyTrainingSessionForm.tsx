@@ -917,38 +917,6 @@ export default function ModifyTrainingSessionForm() {
             )}
           />
 
-          {/** Notify All Players */}
-          {/* <div>
-            <FormField
-              control={form.control}
-              name="notify"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel className="font-semibold">
-                      Notify all players
-                    </FormLabel>
-                    <FormDescription>
-                      Notifies all subscribed members.
-                    </FormDescription>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <div className="mt-2">
-              <a href="../" className=" underline text-neutral-400">
-                Customize attendance list
-              </a>
-            </div>
-          </div> */}
-
           {/** Submit Button */}
           {loading ? (
             <Button disabled className="w-full">
