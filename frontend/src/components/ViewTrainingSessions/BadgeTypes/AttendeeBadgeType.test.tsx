@@ -20,6 +20,7 @@ vi.mock("../../ui/badge", () => ({
 }));
 
 import AttendeeBadgeType from "./AttendeeBadgeType"; // Adjust the import path as needed
+import { AccountType } from "@/types/account";
 
 describe("AttendeeBadgeType component", () => {
   it("renders a destructive badge when accountType is undefined", () => {
@@ -58,8 +59,11 @@ describe("AttendeeBadgeType component", () => {
   });
 
   it("renders a badge with a custom class for unknown account types", () => {
-    // Force an unknown account type by casting as any
-    render(<AttendeeBadgeType accountType={"UNKNOWN" as any} />);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    render(
+      <AttendeeBadgeType accountType={"UNKNOWN" as unknown as AccountType} />,
+    );
+
     const badge = screen.getByText(/unknown/i);
     expect(badge).toBeInTheDocument();
     expect(badge).toHaveClass("bg-amber-400");
