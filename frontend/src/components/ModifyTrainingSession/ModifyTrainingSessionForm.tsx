@@ -53,56 +53,68 @@ import BackButton from "../ui/back-button";
 import { getFileName } from "@/utils/getFileName";
 import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
 import usePlayers from "@/hooks/usePlayers";
+// Import constants for select fields
+import { TRAINING } from "@/constants/programconstants";
+import { SPECIALTRAINING } from "@/constants/programconstants";
+import { TOURNAMENT } from "@/constants/programconstants";
+import { FUNDRAISER } from "@/constants/programconstants";
+import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
+import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
+import { MAIN_STREET } from "@/constants/programconstants";
+import { TEST_WATER_ROAD } from "@/constants/programconstants";
+import { PUBLIC } from "@/constants/programconstants";
+import { MEMBERS_ONLY } from "@/constants/programconstants";
+import { PRIVATE } from "@/constants/programconstants";
 
 /**All select element options */
 const types = [
   {
     label: "Training Session",
-    value: "Training",
+    value: TRAINING,
   },
   {
     label: "Fundraiser",
-    value: "Fundraiser",
+    value: FUNDRAISER,
   },
   {
     label: "Tournament",
-    value: "Tournament",
+    value: TOURNAMENT,
   },
   {
     label: "Special Training",
-    value: "Special Training",
+    value: SPECIALTRAINING,
   },
 ] as const;
 const visibilities = [
   {
     label: "Public",
-    value: "public",
+    value: PUBLIC,
   },
   {
     label: "Members only",
-    value: "members",
+    value: MEMBERS_ONLY,
   },
   {
     label: "Private",
-    value: "private",
+    value: PRIVATE,
   },
 ] as const;
 const locations = [
   {
     label: "Centre de loisirs St-Denis",
-    value: "Centre-de-loisirs-St-Denis",
+    value: CENTRE_DE_LOISIRS_ST_DENIS,
   },
   {
     label: "Collège de Maisonnneuve",
-    value: "Collège-de-Maisonnneuve",
+    value: COLLEGE_DE_MAISONNEUVE,
   },
   {
     label: "123 test water rd.",
-    value: "123 test water rd.",
+    value: TEST_WATER_ROAD,
   },
   {
     label: "123 Main st",
-    value: "123 Main St",
+    value: MAIN_STREET,
   },
 ] as const;
 

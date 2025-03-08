@@ -32,6 +32,9 @@ public class TrainingPlan {
   @Column(name = "doc_url", nullable = false)
   private String docUrl;
 
+  @Column(name = "shared", nullable = false)
+  private Boolean shared;
+
   @Column(name = "creation_date", nullable = false)
   private ZonedDateTime creationDate;
 }
