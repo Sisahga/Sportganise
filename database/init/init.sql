@@ -229,6 +229,7 @@ CREATE TABLE training_plan(
 	plan_id SERIAL PRIMARY KEY,
 	account_id INTEGER NOT NULL REFERENCES account (account_id) ON DELETE CASCADE,
 	doc_url VARCHAR(255) NOT NULL,
+	shared BOOLEAN,
 	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 

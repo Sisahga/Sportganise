@@ -46,6 +46,12 @@ export default function SignUp() {
     lastName: "",
   });
 
+  const formatPhoneNumber = (value: string) => {
+    const cleaned = value.replace(/\D/g, "");
+    const match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
+    return match ? `(${match[1]}) ${match[2]}-${match[3]}` : cleaned;
+  };
+
   // Password validation logic
   const validatePassword = (password: string): boolean => {
     const hasMinLength = password.length >= 8;
@@ -62,6 +68,14 @@ export default function SignUp() {
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
+    if (name === "phone") {
+      setFormData((prev) => ({
+        ...prev,
+        phone: formatPhoneNumber(value),
+      }));
+      return;
+    }
 
     if (name.includes(".")) {
       // Handle nested fields like 'address.line'
@@ -192,6 +206,19 @@ export default function SignUp() {
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
+              />
+              <FormField
+                id="phone"
+                label="Phone"
+                placeholder="(123) 456-7890"
+                name="phone"
+                value={formData.phone}
+                onChange={handleInputChange}
+                inputProps={{
+                  type: "tel",
+                  maxLength: 14,
+                  pattern: "\\(\\d{3}\\) \\d{3}-\\d{4}",
+                }}
               />
               <FormField
                 id="Password"

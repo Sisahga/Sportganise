@@ -18,5 +18,6 @@ public class TrainingPlanDto {
   @NotNull private Integer planId;
   @NotNull private Integer userId;
   @NotNull private String docUrl;
+  @NotNull private Boolean shared;
   @NotNull private ZonedDateTime creationDate;
 }
