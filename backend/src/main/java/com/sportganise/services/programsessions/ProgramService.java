@@ -423,22 +423,19 @@ public class ProgramService {
       }
     }
 
-    Program updatedProgram =
-        createProgramObject(
-            title,
-            existingProgram.getAuthor(),
-            programType,
-            startDate,
-            endDate,
-            isRecurring,
-            visibility,
-            description,
-            capacity,
-            startTime,
-            endTime,
-            location);
-    updatedProgram.setProgramId(existingProgram.getProgramId());
-    programRepository.save(updatedProgram);
+
+    existingProgram.setTitle(title);
+    existingProgram.setProgramType(programType);
+    existingProgram.setOccurrenceDate(parsedStartDateTime);
+    existingProgram.setExpiryDate(endDate != null ? ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime)) : null);
+    existingProgram.setRecurring(isRecurring);
+    existingProgram.setVisibility(visibility);
+    existingProgram.setDescription(description);
+    existingProgram.setCapacity(capacity);
+    existingProgram.setLocation(location);
+    existingProgram.setFrequency(frequency);
+
+    programRepository.save(existingProgram);
 
     log.debug("PROGRAM ID OF MODIFIED PROGRAM: ", existingProgram.getProgramId());
 
