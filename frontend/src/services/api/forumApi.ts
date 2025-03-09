@@ -47,7 +47,7 @@ const fetchPosts = async (
   const response = await fetch(url, {
     method: "GET",
     headers: {
-      Authorization: `Bearer ${getBearerToken()}`,
+      Authorization: getBearerToken(),
       "Content-Type": "application/json",
     },
   });
