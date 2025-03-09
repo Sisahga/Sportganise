@@ -23,9 +23,22 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
   void deleteExpiredRecurrences(
       @Param("expiryDate") ZonedDateTime expiryDate, @Param("programId") Integer programId);
 
+  @Query("SELECT pr FROM ProgramRecurrence pr WHERE pr.programId = :programId ORDER BY pr.occurrenceDate")
   List<ProgramRecurrence> findProgramRecurrenceByProgramId(Integer programId);
 
   @Query(
       "SELECT pr FROM ProgramRecurrence pr WHERE pr.programId = :programId ORDER BY pr.occurrenceDate DESC")
   Optional<ProgramRecurrence> findLastRecurrenceByProgramId(@Param("programId") Integer programId);
+
+  void deleteProgramRecurrenceByProgramId(Integer programId);
+
+  @Transactional
+  @Modifying
+  @Query("DELETE FROM ProgramRecurrence pr WHERE pr.programId = :programId " +
+          "AND pr.occurrenceDate BETWEEN :firstDate AND :secondDate")
+  void deleteMiddleRecurrences(@Param("programId") Integer programId,
+                               @Param("firstDate") ZonedDateTime firstDate,
+                               @Param("secondDate") ZonedDateTime secondDate);
+
+  List<ProgramRecurrence> findByProgramIdAndOccurrenceDateBetween(Integer programId, ZonedDateTime newStartDate, ZonedDateTime newEndDate);
 }
