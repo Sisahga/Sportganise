@@ -239,7 +239,7 @@ const TrainingSessionContent = () => {
         {/**Conditionally render subscribed players only to Admin or Coach */}
         {!(
           (user?.type?.toLowerCase() === "general" ||
-          user?.type?.toLowerCase() === "player") &&
+            user?.type?.toLowerCase() === "player") &&
           programDetails.programType.toLowerCase() === "training"
         ) && (
           <>
