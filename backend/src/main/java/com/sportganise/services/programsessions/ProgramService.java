@@ -472,7 +472,7 @@ public class ProgramService {
         log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
       }
     }
-    return new ProgramDto(updatedProgram, programAttachmentDtos);
+    return new ProgramDto(existingProgram, programAttachmentDtos);
   }
 
   private Program createProgramObject(
