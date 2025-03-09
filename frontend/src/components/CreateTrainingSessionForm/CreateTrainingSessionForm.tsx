@@ -44,7 +44,6 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
-
 import {
   Check,
   ChevronsUpDown,
@@ -53,6 +52,16 @@ import {
   Loader2,
 } from "lucide-react";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+// Import constants for select fields
+import { TRAINING } from "@/constants/programconstants";
+import { SPECIALTRAINING } from "@/constants/programconstants";
+import { TOURNAMENT } from "@/constants/programconstants";
+import { FUNDRAISER } from "@/constants/programconstants";
+import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
+import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
+import { PUBLIC } from "@/constants/programconstants";
+import { MEMBERS_ONLY } from "@/constants/programconstants";
+import { PRIVATE } from "@/constants/programconstants";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -94,29 +103,29 @@ export default function CreateTrainingSessionForm() {
   const types = [
     {
       label: "Training Session",
-      value: "Training",
+      value: TRAINING,
     },
     {
       label: "Fundraiser",
-      value: "Fundraiser",
+      value: FUNDRAISER,
     },
     {
       label: "Tournament",
-      value: "Tournament",
+      value: TOURNAMENT,
     },
     {
       label: "Special Training",
-      value: "Special Training",
+      value: SPECIALTRAINING,
     },
   ] as const;
   const locations = [
     {
       label: "Centre de loisirs St-Denis",
-      value: "Centre-de-loisirs-St-Denis",
+      value: CENTRE_DE_LOISIRS_ST_DENIS,
     },
     {
       label: "Collège de Maisonnneuve",
-      value: "Collège-de-Maisonnneuve",
+      value: COLLEGE_DE_MAISONNEUVE,
     },
   ] as const;
 
@@ -592,9 +601,9 @@ export default function CreateTrainingSessionForm() {
                           <CommandEmpty>No visibility found.</CommandEmpty>
                           <CommandGroup>
                             {[
-                              { label: "Public", value: "public" },
-                              { label: "Members only", value: "members" },
-                              { label: "Private", value: "private" },
+                              { label: "Public", value: PUBLIC },
+                              { label: "Members only", value: MEMBERS_ONLY },
+                              { label: "Private", value: PRIVATE },
                             ].map((v) => (
                               <CommandItem
                                 key={v.value}

@@ -70,10 +70,10 @@ public class TrainingPlansControllerTest {
         new TrainingPlanResponseDto(
             List.of(
                 new TrainingPlanDto(
-                    1, accountId, "https://example.com/plan1.docx", ZonedDateTime.now())),
+                    1, accountId, "https://example.com/plan1.docx", true, ZonedDateTime.now())),
             List.of(
                 new TrainingPlanDto(
-                    2, 102, "https://example.com/plan2.docx", ZonedDateTime.now())));
+                    2, 102, "https://example.com/plan2.docx", true, ZonedDateTime.now())));
 
     when(trainingPlansService.getTrainingPlans(accountId)).thenReturn(responseDto);
 

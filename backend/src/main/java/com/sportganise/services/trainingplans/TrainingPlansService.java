@@ -60,7 +60,7 @@ public class TrainingPlansService {
     if (trainingPlans.isEmpty()) {
       throw new ResourceNotFoundException("No training plans found.");
     }
-    log.debug("PLANS COUNT: ", trainingPlans.size());
+    log.debug("PROGRAMS COUNT: {}", trainingPlans.size());
 
     List<TrainingPlanDto> trainingPlanDtos = new ArrayList<>();
 
@@ -70,9 +70,10 @@ public class TrainingPlansService {
               trainingPlan.getPlanId(),
               trainingPlan.getUserId(),
               trainingPlan.getDocUrl(),
+              trainingPlan.getShared(),
               trainingPlan.getCreationDate()));
     }
-    log.debug("PLAN DTOS COUNT: ", trainingPlanDtos.size());
+    log.debug("PROGRAM DTOS COUNT: {}", trainingPlanDtos.size());
 
     List<TrainingPlanDto> myPlans =
         trainingPlanDtos.stream()
@@ -83,7 +84,7 @@ public class TrainingPlansService {
 
     List<TrainingPlanDto> sharedWithMe =
         trainingPlanDtos.stream()
-            .filter(tp -> !tp.getUserId().equals(userId))
+            .filter(tp -> !tp.getUserId().equals(userId) && tp.getShared() == true)
             .collect(Collectors.toList());
 
     log.debug("SHARED WITH ME COUNT: {}", sharedWithMe.size());
@@ -111,6 +112,32 @@ public class TrainingPlansService {
     }
 
     trainingPlansRepository.deleteById(planId);
+  }
+
+  /**
+   * Method for sharing a training plan.
+   *
+   * @param userId Id of the user making the request.
+   * @param planId Id of the plan to be shared.
+   */
+  public boolean shareTrainingPlan(Integer userId, Integer planId) {
+    Account user = getUser(userId);
+
+    TrainingPlan trainingPlan = trainingPlansRepository.findTrainingPlan(planId);
+    if (trainingPlan == null) {
+      throw new ResourceNotFoundException("Training plan not found.");
+    }
+    log.debug("PLAN ID: {}", trainingPlan.getPlanId());
+
+    if (!isAuthor(user, trainingPlan.getUserId())) {
+      throw new ForbiddenException("You are not the author of this training plan.");
+    }
+
+    Boolean isShared = trainingPlan.getShared();
+    trainingPlan.setShared(!isShared);
+    trainingPlansRepository.save(trainingPlan);
+
+    return trainingPlan.getShared();
   }
 
   /**
@@ -187,6 +214,7 @@ public class TrainingPlansService {
             TrainingPlan.builder()
                 .userId(accountId)
                 .docUrl(s3Url)
+                .shared(false)
                 .creationDate(createdDate)
                 .build();
         trainingPlansRepository.save(tp); // Save training plan in DB.

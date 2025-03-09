@@ -28,7 +28,7 @@ const postApi = {
     const response = await fetch(url, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${getBearerToken()}`,
+        Authorization: getBearerToken(),
         "Content-Type": "application/json",
       },
     });
@@ -60,7 +60,7 @@ const postApi = {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${getBearerToken()}`,
+        Authorization: getBearerToken(),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ accountId }),
@@ -87,7 +87,7 @@ const postApi = {
     const response = await fetch(url, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${getBearerToken()}`,
+        Authorization: getBearerToken(),
       },
     });
 
@@ -124,7 +124,7 @@ const postApi = {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${getBearerToken()}`,
+        Authorization: getBearerToken(),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ accountId, content }),
@@ -159,7 +159,7 @@ const postApi = {
     const response = await fetch(url, {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${getBearerToken()}`,
+        Authorization: getBearerToken(),
       },
     });
 
