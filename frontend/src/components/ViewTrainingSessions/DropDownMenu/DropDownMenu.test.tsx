@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import "@testing-library/jest-dom";
+import { CookiesDto } from "@/types/auth";
 
 // Mock useNavigate from react-router
 vi.mock("react-router", () => ({
@@ -102,11 +103,40 @@ import { ProgramDetails, Attendees } from "@/types/trainingSessionDetails";
 const programDetails: ProgramDetails = {} as ProgramDetails;
 const attendees: Attendees[] = [];
 
+// Create dummy user objects that fully satisfy CookiesDto.
+const coachUser: CookiesDto = {
+  accountId: 123,
+  firstName: "Coach",
+  lastName: "User",
+  email: "coach@example.com",
+  pictureUrl: "http://example.com/coach.png",
+  type: "coach",
+  phone: "1234567890",
+  organisationIds: [1, 2],
+  jwtToken: "dummyJwtToken",
+};
+
+const playerUser: CookiesDto = {
+  accountId: 456,
+  firstName: "Player",
+  lastName: "User",
+  email: "player@example.com",
+  pictureUrl: "http://example.com/player.png",
+  type: "player",
+  phone: "0987654321",
+  organisationIds: [1],
+  jwtToken: "dummyJwtToken",
+};
+
+// Optionally provide an accountAttendee if needed (for now, undefined)
+const accountAttendee: Attendees | undefined = undefined;
+
 describe("DropDownMenuButton component", () => {
-  it("renders coach/admin options when accountType is 'coach'", () => {
+  it("renders coach/admin options when user type is 'coach'", () => {
     render(
       <DropDownMenuButton
-        accountType="coach"
+        user={coachUser}
+        accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
       />,
@@ -125,10 +155,11 @@ describe("DropDownMenuButton component", () => {
     expect(screen.getByText(/Delete Event/i)).toBeInTheDocument();
   });
 
-  it("renders non-coach options when accountType is 'player'", () => {
+  it("renders non-coach options when user type is 'player'", () => {
     render(
       <DropDownMenuButton
-        accountType="player"
+        user={playerUser}
+        accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
       />,
@@ -143,13 +174,14 @@ describe("DropDownMenuButton component", () => {
 
     // Check that dropdown content contains non-coach options
     expect(screen.getByText(/RSVP/i)).toBeInTheDocument();
-    expect(screen.getByText(/Mark as absent/i)).toBeInTheDocument();
+    expect(screen.getByText(/Mark absent/i)).toBeInTheDocument();
   });
 
   it("handles postpone event flow for coach/admin", async () => {
     render(
       <DropDownMenuButton
-        accountType="coach"
+        user={coachUser}
+        accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
       />,
@@ -181,7 +213,8 @@ describe("DropDownMenuButton component", () => {
   it("handles RSVP flow for non-coach", async () => {
     render(
       <DropDownMenuButton
-        accountType="player"
+        user={playerUser}
+        accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
       />,
