@@ -10,18 +10,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-/**
- * This class initializes the Firebase application with the configuration file path.
- */
+/** This class initializes the Firebase application with the configuration file path. */
 @Slf4j
 @Service
 public class FcmInitializer {
   @Value("${app.firebase-configuration-file}")
   private String firebaseConfigPath;
 
-  /**
-   * Initialize the Firebase application with the configuration file path.
-   */
+  /** Initialize the Firebase application with the configuration file path. */
   @PostConstruct
   public void initialize() {
     log.info("Initializing Firebase with config path: {}", firebaseConfigPath);
