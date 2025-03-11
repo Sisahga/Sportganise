@@ -1,4 +1,4 @@
-package com.sportganise.services.firebaseFcm;
+package com.sportganise.services.firebasefcm;
 
 import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.NotificationRequestDto;

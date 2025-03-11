@@ -11,6 +11,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * This class represents the FCM token entity that will be stored in the database.
+ */
 @Getter
 @Setter
 @NoArgsConstructor
