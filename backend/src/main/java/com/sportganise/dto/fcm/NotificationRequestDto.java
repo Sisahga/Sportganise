@@ -19,5 +19,4 @@ public class NotificationRequestDto {
   private String title;
   private String body;
   private String topic; // Optional topic to send the notification to a group of people.
-  private String token; // The firebase token of the device to send the notification to.
 }
