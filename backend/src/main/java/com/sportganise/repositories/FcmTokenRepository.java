@@ -1,10 +1,10 @@
 package com.sportganise.repositories;
 
 import com.sportganise.entities.FcmToken;
-import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /** Repository interface for FcmToken entity. */
@@ -14,7 +14,7 @@ public interface FcmTokenRepository extends JpaRepository<FcmToken, String> {
       """
         SELECT token
         FROM FcmToken
-        WHERE accountId = :accountId
+        WHERE accountId = :ids
         """)
-  List<String> findTokensByAccountId(@NotNull Integer accountId);
+  List<String> findTokensByAccountId(@Param("ids") List<Integer> ids);
 }
