@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * This class represents the notification response that will be received from the Firebase Cloud Messaging
- * server after sending a notification to devices.
+ * This class represents the notification response that will be received from the Firebase Cloud
+ * Messaging server after sending a notification to devices.
  */
 @Getter
 @Setter
