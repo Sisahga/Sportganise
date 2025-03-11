@@ -7,7 +7,6 @@ import com.sportganise.services.firebasefcm.FcmService;
 import com.sportganise.services.firebasefcm.NotificationsService;
 import jakarta.validation.constraints.Null;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,17 +25,16 @@ public class NotificationsController {
   }
 
   /**
-   * Send a notification to a specific device.
+   * Send a notification to specific devices or a specific device.
    *
-   * @param request contains the notification title & message, optional topic, & the target device
-   *     token.
-   * @param userId the ID of the user to send the notification to.
+   * @param request contains the notification title & message, optional topic, & the users
+   *     to notify.
    * @return a response entity with a success message.
    */
-  @PostMapping("/send/{userId}")
+  @PostMapping("/send")
   public ResponseEntity<ResponseDto<Null>> sendNotificationToUser(
-      @RequestBody NotificationRequestDto request, @PathVariable String userId) {
-    notificationsService.sendNotificationToUser(request, Integer.parseInt(userId));
+      @RequestBody NotificationRequestDto request) {
+    notificationsService.sendNotificationToUser(request);
     return ResponseEntity.ok(new ResponseDto<>());
   }
 

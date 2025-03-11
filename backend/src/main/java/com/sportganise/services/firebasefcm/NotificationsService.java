@@ -22,13 +22,12 @@ public class NotificationsService {
   /**
    * Send a notification to a specific user.
    *
-   * @param notificationRequestDto contains the notification title & message.
-   * @param userId the ID of the user to send the notification to.
+   * @param notificationRequestDto contains the notification title & message, with ids of users to notify.
    */
   public void sendNotificationToUser(
-      NotificationRequestDto notificationRequestDto, Integer userId) {
+      NotificationRequestDto notificationRequestDto) {
     try {
-      List<String> fcmTokens = fcmTokenRepository.findTokensByAccountId(userId);
+      List<String> fcmTokens = fcmTokenRepository.findTokensByAccountId(notificationRequestDto.getUserIds());
       for (String token : fcmTokens) {
         NotificationFcmRequestDto request =
             NotificationFcmRequestDto.builder()

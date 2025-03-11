@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * This class represents the notification request that will be sent to the Firebase Cloud Messaging
  * server to send a notification to devices.
@@ -19,4 +21,5 @@ public class NotificationRequestDto {
   private String title;
   private String body;
   private String topic; // Optional topic to send the notification to a group of people.
+  private List<Integer> userIds; // Ids of the users to notify.
 }
