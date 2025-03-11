@@ -27,8 +27,8 @@ public class NotificationsController {
   /**
    * Send a notification to specific devices or a specific device.
    *
-   * @param request contains the notification title & message, optional topic, & the users
-   *     to notify.
+   * @param request contains the notification title & message, optional topic, & the users to
+   *     notify.
    * @return a response entity with a success message.
    */
   @PostMapping("/send")

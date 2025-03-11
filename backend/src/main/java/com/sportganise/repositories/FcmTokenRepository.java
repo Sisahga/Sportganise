@@ -10,8 +10,7 @@ import org.springframework.stereotype.Repository;
 /** Repository interface for FcmToken entity. */
 @Repository
 public interface FcmTokenRepository extends JpaRepository<FcmToken, String> {
-  @Query(
-      """
+  @Query("""
         SELECT token
         FROM FcmToken
         WHERE accountId = :ids

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 /**
  * This class represents the notification request that will be sent to the Firebase Cloud Messaging
  * server to send a notification to devices.
