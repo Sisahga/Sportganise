@@ -8,18 +8,21 @@ import { Capacitor } from "@capacitor/core";
 const Main = () => {
   useEffect(() => {
     const initializeFcm = async () => {
-      if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
+      if (
+        typeof Capacitor !== "undefined" &&
+        Capacitor.getPlatform() === "web"
+      ) {
         await requestNotificationPermission();
       } else {
         console.warn("Mobile app suspected.");
       }
-    }
+    };
 
-    initializeFcm().then(r => r);
+    initializeFcm().then((r) => r);
   }, []);
 
   return <App />;
-}
+};
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

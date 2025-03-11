@@ -5,3 +5,10 @@ export interface Notification {
   isRead: boolean;
   sender: string;
 }
+
+export interface NotificationRequest {
+  title: string;
+  body: string;
+  topic: string | null;
+  notifiees: number[]; // Ids of users to notify.
+}

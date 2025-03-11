@@ -23,18 +23,20 @@ const requestNotificationPermission = async () => {
           toast({
             variant: "default",
             title: "Warning",
-            description: "Your browser doesn't support or has Google services for push messaging disabled.",
-          })
-          console.warn("This browser doesn't support or has Google services for push messaging disabled.");
+            description:
+              "Your browser doesn't support or has Google services for push messaging disabled.",
+          });
+          console.warn(
+            "This browser doesn't support or has Google services for push messaging disabled.",
+          );
         }
-      }
-      else {
+      } else {
         console.error("Error requesting notification permission:", error);
       }
     }
   } else if (typeof Capacitor !== "undefined") {
     // TODO: Implementation for mobile notifications
   }
-}
+};
 
 export default requestNotificationPermission;

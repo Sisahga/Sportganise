@@ -29,6 +29,9 @@ import {
 } from "@/constants/file.constants.ts";
 import useUploadAttachments from "@/hooks/useUploadAttachments.ts";
 import ResponseDto from "@/types/response.ts";
+import useSendNotification from "@/hooks/useSendNotification.ts";
+import { NotificationRequest } from "@/types/notifications.ts";
+import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -85,6 +88,7 @@ const ChatScreen: React.FC = () => {
     setDeleteRequest,
     currentMemberStatus,
   } = useGetDeleteChannelRequest(channelId, currentUserId); // Check if a delete request is active.
+  const { sendNotification } = useSendNotification();
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
@@ -275,6 +279,22 @@ const ChatScreen: React.FC = () => {
       setActivateSkeleton(false);
       setSkeletonId(0);
       setSkeletonCount(0);
+    } else {
+      const notifTitle =
+        channelType === "GROUP"
+          ? `${cookies.firstName} sent a message in ${currentChannelName}`
+          : `${cookies.firstName} sent you a message`;
+      const notifBody =
+        data.message !== undefined && data.message.length > MAX_BODY_LENGTH
+          ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
+          : data.message || "";
+      const notifRequest: NotificationRequest = {
+        title: notifTitle,
+        body: notifBody,
+        topic: null, // No topic to assign here.
+        notifiees: [],
+      };
+      sendNotification(notifRequest);
     }
 
     setMessageStatus("Delivered");

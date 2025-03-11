@@ -10,7 +10,7 @@ const firebaseConfig = {
   storageBucket: "sportganise-notification-f7c40.firebasestorage.app",
   messagingSenderId: "586630744689",
   appId: "1:586630744689:web:25e075590badb2f09269d0",
-  measurementId: "G-QWBV9P289D"
+  measurementId: "G-QWBV9P289D",
 };
 
 // Initialize Firebase.
