@@ -3,7 +3,7 @@ package com.sportganise.services.firebaseFcm;
 import com.google.firebase.messaging.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sportganise.dto.fcm.NotificationRequestDto;
+import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.StoreFcmTokenDto;
 import com.sportganise.entities.FcmToken;
 import com.sportganise.exceptions.NotificationNotSentException;
@@ -32,7 +32,7 @@ public class FcmService {
    *
    * @param request contains the notification title & message, optional topic, & the target device token.
    */
-  public void sendMessageToToken(NotificationRequestDto request) {
+  public void sendMessageToToken(NotificationFcmRequestDto request) {
     Message message = getPreconfiguredMessageToToken(request);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
     String jsonOutput = gson.toJson(message);
@@ -79,12 +79,12 @@ public class FcmService {
             .setAps(Aps.builder().setCategory(topic).setThreadId(topic).build()).build();
   }
 
-  private Message getPreconfiguredMessageToToken(NotificationRequestDto request) {
+  private Message getPreconfiguredMessageToToken(NotificationFcmRequestDto request) {
     return getPreconfiguredMessageBuilder(request).setToken(request.getToken())
             .build();
   }
 
-  private Message.Builder getPreconfiguredMessageBuilder(NotificationRequestDto request) {
+  private Message.Builder getPreconfiguredMessageBuilder(NotificationFcmRequestDto request) {
     AndroidConfig androidConfig = getAndroidConfig(request.getTopic());
     ApnsConfig apnsConfig = getApnsConfig(request.getTopic());
     Notification notification = Notification.builder()

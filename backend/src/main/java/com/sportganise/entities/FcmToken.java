@@ -20,10 +20,10 @@ import lombok.Setter;
 @Table(name = "fcm_token")
 public class FcmToken {
   @NotNull
-  @Column(name = "account_id")
+  @Column(name = "account_id", nullable = false)
   private Integer accountId;
 
-  @NotNull
   @Id
+  @Column(nullable = false, unique = true, name = "token")
   private String token;
 }
