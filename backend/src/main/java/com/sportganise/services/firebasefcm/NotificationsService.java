@@ -28,7 +28,7 @@ public class NotificationsService {
   public void sendNotificationToUser(NotificationRequestDto notificationRequestDto) {
     try {
       List<String> fcmTokens =
-          fcmTokenRepository.findTokensByAccountId(notificationRequestDto.getUserIds());
+          fcmTokenRepository.findTokensByAccountId(notificationRequestDto.getRecipients());
       for (String token : fcmTokens) {
         NotificationFcmRequestDto request =
             NotificationFcmRequestDto.builder()
