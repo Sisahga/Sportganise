@@ -20,5 +20,5 @@ public class NotificationRequestDto {
   private String title;
   private String body;
   private String topic; // Optional topic to send the notification to a group of people.
-  private List<Integer> userIds; // Ids of the users to notify.
+  private List<Integer> notifiees; // Ids of the users to notify.
 }
