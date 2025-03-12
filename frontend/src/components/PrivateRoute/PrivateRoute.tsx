@@ -18,9 +18,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const user = getCookies();
   const token = getBearerToken();
 
-  const initializeFcm = async () => {
+  const initializeFcm = async (userId: number) => {
     if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
-      await requestNotificationPermission();
+      await requestNotificationPermission(userId);
     } else {
       console.warn("Mobile app suspected.");
     }
@@ -38,7 +38,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );
   } else {
-    initializeFcm().then((r) => r);
+    initializeFcm(user.accountId).then((r) => r);
   }
 
   if (requiredRole && user.type !== requiredRole && user.type !== "ADMIN") {

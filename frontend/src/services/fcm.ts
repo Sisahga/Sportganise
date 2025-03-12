@@ -2,8 +2,12 @@ import { messaging } from "../lib/firebaseFcmConfig.ts";
 import { getToken } from "firebase/messaging";
 import { Capacitor } from "@capacitor/core";
 import { toast } from "@/hooks/use-toast.ts";
+import useStoreFcmToken from "@/hooks/useStoreFcmToken.ts";
+import { FcmTokenDto } from "@/types/notifications.ts";
 
-const requestNotificationPermission = async () => {
+const requestNotificationPermission = async (userId: number) => {
+  const { storeFcmToken } = useStoreFcmToken();
+
   if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
     try {
       const permission = await Notification.requestPermission();
@@ -12,7 +16,12 @@ const requestNotificationPermission = async () => {
         await getToken(messaging, {
           vapidKey: import.meta.env.FCM_KEY_PAIR,
         }).then((token) => {
-          console.log("FCM token:", token);
+          console.log("Storing token in DB:", token);
+          const fcmTokenDto: FcmTokenDto = {
+            accountId: userId,
+            token: token,
+          };
+          storeFcmToken(fcmTokenDto);
         });
       } else {
         console.warn("Web notification permission denied.");
