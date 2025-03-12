@@ -1,6 +1,8 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 import { clearCookies, getCookies } from "@/services/cookiesService";
 import { getBearerToken } from "@/services/apiHelper.ts";
+import { Capacitor } from "@capacitor/core";
+import requestNotificationPermission from "@/services/fcm.ts";
 /* eslint-disable react/prop-types */
 
 interface PrivateRouteProps {
@@ -16,6 +18,14 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const user = getCookies();
   const token = getBearerToken();
 
+  const initializeFcm = async () => {
+    if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
+      await requestNotificationPermission();
+    } else {
+      console.warn("Mobile app suspected.");
+    }
+  };
+
   if (
     token === null ||
     token === "" ||
@@ -27,6 +37,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );
+  } else {
+    initializeFcm().then((r) => r);
   }
 
   if (requiredRole && user.type !== requiredRole && user.type !== "ADMIN") {
