@@ -1,4 +1,4 @@
-package com.sportganise.services.firebasefcm;
+package com.sportganise.services.notifications;
 
 import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.NotificationRequestDto;
@@ -27,21 +27,26 @@ public class NotificationsService {
    *     notify.
    */
   public void sendNotificationToUser(NotificationRequestDto notificationRequestDto) {
-    try {
-      List<String> fcmTokens =
-          fcmTokenRepository.findTokensByAccountId(notificationRequestDto.getRecipients());
-      for (String token : fcmTokens) {
-        NotificationFcmRequestDto request =
-            NotificationFcmRequestDto.builder()
-                .title(notificationRequestDto.getTitle())
-                .body(notificationRequestDto.getBody())
-                .token(token)
-                .build();
-        fcmService.sendMessageToToken(request);
+    List<Integer> userIds = notificationRequestDto.getRecipients();
+
+    // TODO - Setup DB table for user notification preferences.
+    for (Integer id : userIds) {
+      try {
+        List<String> fcmTokens =
+                fcmTokenRepository.findTokensByAccountId(notificationRequestDto.getRecipients());
+        for (String token : fcmTokens) {
+          NotificationFcmRequestDto request =
+                  NotificationFcmRequestDto.builder()
+                          .title(notificationRequestDto.getTitle())
+                          .body(notificationRequestDto.getBody())
+                          .token(token)
+                          .build();
+          fcmService.sendMessageToToken(request);
+        }
+      } catch (DataAccessException e) {
+        // Don't throw an exception here, just log. We still want to notify other devices.
+        log.warn("Stale token deleted or failed to delete.");
       }
-    } catch (DataAccessException e) {
-      // Don't throw an exception here, just log. We still want to notify other devices.
-      log.warn("Stale token deleted or failed to delete.");
     }
   }
 }
