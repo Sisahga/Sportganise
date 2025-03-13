@@ -3,6 +3,8 @@
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.13.2/firebase-messaging-compat.js')
 
+console.log("Initializing firebase fcm for web...");
+
 // Base Firebase app configuration.
 firebase.initializeApp({
   apiKey: "AIzaSyBhikg7e3foOJVa2rXUQV0KcjEfYfI9olM",
