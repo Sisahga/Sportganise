@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router";
 import { clearCookies, getCookies } from "@/services/cookiesService";
 import { getBearerToken } from "@/services/apiHelper.ts";
 import { Capacitor } from "@capacitor/core";
-import requestNotificationPermission from "@/services/fcm.ts";
+import RequestNotificationPermission from "@/services/fcm.ts";
 /* eslint-disable react/prop-types */
 
 interface PrivateRouteProps {
@@ -22,7 +22,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   // If user already granted permission, it won't do anything.
   const initializeFcm = async (userId: number) => {
     if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
-      await requestNotificationPermission(userId);
+      await RequestNotificationPermission(userId);
     } else {
       console.warn("Mobile app suspected.");
     }

@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast.ts";
 import useStoreFcmToken from "@/hooks/useStoreFcmToken.ts";
 import { StoreFcmTokenDto } from "@/types/notifications.ts";
 
-const requestNotificationPermission = async (userId: number) => {
+const RequestNotificationPermission = async (userId: number) => {
   const { toast } = useToast();
   const { storeFcmToken } = useStoreFcmToken();
 
@@ -62,4 +62,4 @@ const requestNotificationPermission = async (userId: number) => {
   }
 };
 
-export default requestNotificationPermission;
+export default RequestNotificationPermission;
