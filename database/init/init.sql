@@ -243,7 +243,8 @@ CREATE TABLE fcm_token(
 -- Notification preferences for each user.
 CREATE TABLE notification_preference(
     account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-    type VARCHAR(2) NOT NULL CHECK (type IN ('P', 'E', 'B', 'N')) DEFAULT 'P', -- P: Push (Phone/Browser), E: Email, B: Both, N: None
+    push_notifications BOOLEAN DEFAULT TRUE,
+    email_notifications BOOLEAN DEFAULT FALSE,
     events BOOLEAN DEFAULT TRUE,
     messaging BOOLEAN DEFAULT TRUE,
     training_sessions BOOLEAN DEFAULT TRUE,
