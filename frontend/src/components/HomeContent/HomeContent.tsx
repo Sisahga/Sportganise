@@ -74,15 +74,15 @@ export default function HomeContent() {
         onClick={() => {
           navigate(link);
         }}
-        className={`group p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg active:scale-95 ${linkText !== "" ? "cursor-pointer" : ""}`}
+        className={`group p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg active:scale-95 ${linkText !== "" ? "cursor-pointer" : ""} h-32`}
       >
         <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-lg bg-textPlaceholderColour/70 group-hover:bg-secondaryColour/10 transition-colors duration-300">
             {icon}
           </div>
-          <h3 className="font-semibold text-nowrap text-xl">{title}</h3>
+          <h3 className="font-semibold text-nowrap xl:text-xl md:text-xl lg:text-sm sm:text-lg text-md">{title}</h3>
         </div>
-        <p className="text-primaryColour/90 md:min-h-[3lh] lg:min-h-[5lh] xl:min-h-[4lh]">
+        <p className="text-primaryColour/90">
           {description}
         </p>
         {linkText != "" && (
@@ -132,10 +132,10 @@ export default function HomeContent() {
             icon: (
               <Share2 className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
             ),
-            title: "Create Trainings, Events...",
+            title: "Create Trainings & Events",
             description: "",
             linkText: "Create a Program",
-            link: "/pages/DirectMessagesDashboard",
+            link: "/pages/CreateTrainingSessionPage",
           },
           {
             icon: (
@@ -170,7 +170,7 @@ export default function HomeContent() {
               <h2 className="text-2xl text-primaryColour text-sec font-semibold mb-4">
                 Hello {firstName}!
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 min-h-[3lh]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
                 {features.map((feature, index) => (
                   <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}
