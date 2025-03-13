@@ -41,6 +41,7 @@ export default function LogIn() {
   // Handle login success or error
   useEffect(() => {
     if (data?.statusCode === 200) {
+      localStorage.removeItem("pushNotifications");
       console.log("Login successful, redirecting...");
       navigate("/");
     }
