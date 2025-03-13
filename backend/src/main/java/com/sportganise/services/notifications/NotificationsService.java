@@ -19,6 +19,13 @@ public class NotificationsService {
   private final FcmTokenRepository fcmTokenRepository;
   private final NotificationPreferenceRepository notificationPreferenceRepository;
 
+  /**
+   * Constructor for Notifications Service.
+   *
+   * @param fcmService FcmService
+   * @param fcmTokenRepository FcmTokenRepository
+   * @param notificationPreferenceRepository NotificationPreferenceRepository
+   */
   public NotificationsService(
       FcmService fcmService,
       FcmTokenRepository fcmTokenRepository,
