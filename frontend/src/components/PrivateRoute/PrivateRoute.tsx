@@ -20,9 +20,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const notified = localStorage.getItem("pushNotifications");
 
   // If user already granted permission, it won't do anything.
-  const initializeFcm = async (userId: number) => {
+  const initializeFcm = (userId: number) => {
     if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
-      await RequestNotificationPermission(userId);
+      RequestNotificationPermission(userId);
     } else {
       console.warn("Mobile app suspected.");
     }
@@ -41,7 +41,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     );
   } else {
     if (notified === undefined || notified === null) {
-      initializeFcm(user.accountId).then((r) => r);
+      initializeFcm(user.accountId);
     }
   }
 
