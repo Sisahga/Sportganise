@@ -2,14 +2,15 @@ package com.sportganise.services.firebasefcm;
 
 import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.NotificationRequestDto;
-import com.sportganise.exceptions.fcmexceptions.GetFcmTokenException;
 import com.sportganise.repositories.FcmTokenRepository;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 /** Service class for sending notifications to devices (works with FcmService). */
 @Service
+@Slf4j
 public class NotificationsService {
   private final FcmService fcmService;
   private final FcmTokenRepository fcmTokenRepository;
@@ -39,7 +40,8 @@ public class NotificationsService {
         fcmService.sendMessageToToken(request);
       }
     } catch (DataAccessException e) {
-      throw new GetFcmTokenException("Error getting FCM token from DB: " + e.getMessage());
+      // Don't throw an exception here, just log. We still want to notify other devices.
+      log.warn("Stale token deleted or failed to delete.");
     }
   }
 }
