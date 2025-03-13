@@ -6,19 +6,29 @@ import com.sportganise.exceptions.ExpiredCodeException;
 import com.sportganise.exceptions.InvalidCodeException;
 import com.sportganise.repositories.VerificationRepository;
 import com.sportganise.services.account.AccountService;
+import com.sportganise.services.notifications.NotificationsService;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /** Service for handling verification codes. */
 @Service
 public class VerificationService {
 
-  @Autowired private VerificationRepository verificationRepository;
-  @Autowired private AccountService accountService;
+  private final VerificationRepository verificationRepository;
+  private final AccountService accountService;
+  private final NotificationsService notificationService;
+
+  public VerificationService(
+      VerificationRepository verificationRepository,
+      AccountService accountService,
+      NotificationsService notificationService) {
+    this.accountService = accountService;
+    this.verificationRepository = verificationRepository;
+    this.notificationService = notificationService;
+  }
 
   /**
    * Generate a 6 digit integer.
@@ -73,6 +83,7 @@ public class VerificationService {
     }
     accountService.updateAccountVerificationStatus(accountId);
     this.deleteVerificationForAccount(accountId);
+    notificationService.initNotificationPreferences(accountId);
   }
 
   /**
