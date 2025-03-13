@@ -1,4 +1,4 @@
-package com.sportganise.services.firebasefcm;
+package com.sportganise.services.notifications;
 
 import com.google.firebase.messaging.AndroidConfig;
 import com.google.firebase.messaging.AndroidNotification;

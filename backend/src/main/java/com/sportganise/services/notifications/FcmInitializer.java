@@ -1,4 +1,4 @@
-package com.sportganise.services.firebasefcm;
+package com.sportganise.services.notifications;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
