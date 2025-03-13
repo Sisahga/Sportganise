@@ -21,6 +21,13 @@ public class VerificationService {
   private final AccountService accountService;
   private final NotificationsService notificationService;
 
+  /**
+   * Constructor for VerificationService.
+   *
+   * @param verificationRepository VerificationRepository
+   * @param accountService AccountService
+   * @param notificationService NotificationsService
+   */
   public VerificationService(
       VerificationRepository verificationRepository,
       AccountService accountService,
