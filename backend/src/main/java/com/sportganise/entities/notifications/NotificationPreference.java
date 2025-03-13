@@ -23,7 +23,10 @@ public class NotificationPreference {
   @Column(name = "account_id", nullable = false)
   private Integer accountId;
 
-  private String type = "P"; // Default push notifications.
+  @Column(name = "push_notifications", nullable = false)
+  private Boolean pushNotifications = true;
+  @Column(name = "email_notifications", nullable = false)
+  private Boolean emailNotifications = false;
   // Defaulting to true for all notification types.
   private Boolean events = true;
   private Boolean messaging = true;
