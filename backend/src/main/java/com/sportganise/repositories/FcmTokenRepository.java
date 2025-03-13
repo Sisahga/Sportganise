@@ -1,6 +1,6 @@
 package com.sportganise.repositories;
 
-import com.sportganise.entities.FcmToken;
+import com.sportganise.entities.notifications.FcmToken;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
