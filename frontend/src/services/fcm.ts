@@ -14,29 +14,27 @@ const RequestNotificationPermission = async (userId: number) => {
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         console.log("Notification permission granted.");
-        await getToken(messaging, {
+        const token = await getToken(messaging, {
           vapidKey: import.meta.env.FCM_KEY_PAIR,
-        }).then((token) => {
-          console.log("Storing token: ", token);
-          const fcmTokenDto: StoreFcmTokenDto = {
-            accountId: userId,
-            token: token,
-          };
-          storeFcmToken(fcmTokenDto).then((response) => {
-            if (response.status != 200) {
-              toast({
-                title: "Notification Setup Failure",
-                description:
-                  "We weren't able to setup push notifications for your device. Please try again later",
-                variant: "destructive",
-              });
-              localStorage.setItem("pushNotifications", "disabled");
-            } else {
-              console.log("Notification setup successful.");
-              localStorage.setItem("pushNotifications", "enabled");
-            }
-          });
         });
+        console.log("Storing token: ", token);
+        const fcmTokenDto: StoreFcmTokenDto = {
+          accountId: userId,
+          token: token,
+        };
+        const response = await storeFcmToken(fcmTokenDto);
+        if (response.status != 200) {
+          toast({
+            title: "Notification Setup Failure",
+            description:
+              "We weren't able to setup push notifications for your device. Please try again later",
+            variant: "destructive",
+          });
+          localStorage.setItem("pushNotifications", "disabled");
+        } else {
+          console.log("Notification setup successful.");
+          localStorage.setItem("pushNotifications", "enabled");
+        }
       } else {
         console.warn("Web notification permission denied.");
       }

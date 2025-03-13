@@ -26,6 +26,11 @@ const mockGetCookies = vi.fn();
 const mockClearCookies = vi.fn();
 const mockGetBearerToken = vi.fn();
 
+// Mock the Firebase messaging module
+vi.mock("firebase/messaging", () => ({
+  getMessaging: vi.fn(() => ({})), // Return a mocked empty object or a mock function
+}));
+
 vi.mock("@/services/cookiesService", () => ({
   getCookies: () => mockGetCookies(),
   clearCookies: () => mockClearCookies(),
