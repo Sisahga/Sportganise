@@ -12,9 +12,9 @@ import com.google.gson.GsonBuilder;
 import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.StoreFcmTokenDto;
 import com.sportganise.entities.FcmToken;
-import com.sportganise.exceptions.NotificationNotSentException;
 import com.sportganise.exceptions.fcmexceptions.StoreFcmTokenException;
 import com.sportganise.repositories.FcmTokenRepository;
+import jakarta.transaction.Transactional;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
@@ -31,11 +31,13 @@ public class FcmService {
   }
 
   /**
-   * Send a notification to specific device(s).
+   * Send a notification to specific device(s). If the device token doesn't exist in Firebase, it
+   * will be deleted from the DB and not raise any error.
    *
    * @param request contains the notification title & message, optional topic, & the target device
    *     token.
    */
+  @Transactional
   public void sendMessageToToken(NotificationFcmRequestDto request) {
     Message message = getPreconfiguredMessageToToken(request);
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -48,12 +50,9 @@ public class FcmService {
           response,
           jsonOutput);
     } catch (InterruptedException | ExecutionException e) {
-      log.error(
-          "Error sending notification message to token. Device token: {}, {}",
-          request.getToken(),
-          jsonOutput);
-      throw new NotificationNotSentException(
-          "Error sending notification message to token: " + request.getToken());
+      log.debug("Deleting stale token from DB: {}", request.getToken());
+      deleteFcmToken(request.getToken());
+      log.debug("Deleted stale fcm token.");
     }
   }
 
@@ -73,6 +72,19 @@ public class FcmService {
     } catch (Exception e) {
       throw new StoreFcmTokenException(
           "Unexpected error storing FCM token in DB: " + fcmTokenDto.getToken());
+    }
+  }
+
+  /**
+   * Delete a FCM token from DB.
+   *
+   * @param fcmToken the FCM token to delete.
+   */
+  public void deleteFcmToken(String fcmToken) {
+    try {
+      this.fcmTokenRepository.deleteFcmToken(fcmToken);
+    } catch (Exception e) {
+      log.error("Error deleting FCM token from DB: {}", fcmToken);
     }
   }
 
