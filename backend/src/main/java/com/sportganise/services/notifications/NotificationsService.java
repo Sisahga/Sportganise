@@ -1,7 +1,7 @@
 package com.sportganise.services.notifications;
 
-import com.sportganise.dto.fcm.NotificationFcmRequestDto;
-import com.sportganise.dto.fcm.NotificationRequestDto;
+import com.sportganise.dto.notifications.NotificationFcmRequestDto;
+import com.sportganise.dto.notifications.NotificationRequestDto;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.repositories.notifications.FcmTokenRepository;
