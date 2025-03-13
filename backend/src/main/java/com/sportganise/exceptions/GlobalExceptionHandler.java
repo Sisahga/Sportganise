@@ -14,6 +14,7 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRe
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
@@ -405,6 +406,22 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(GetFcmTokenException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleGetFcmTokenException(GetFcmTokenException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle save notification preference exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(SaveNotificationPrefereceException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleSaveNotificationPrefereceException(
+      SaveNotificationPrefereceException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .message(e.getMessage())
