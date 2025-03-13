@@ -1,4 +1,4 @@
-package com.sportganise.exceptions.fcmexceptions;
+package com.sportganise.exceptions.notificationexceptions;
 
 /** Exception thrown when an error occurs while storing an FCM token in DB. */
 public class StoreFcmTokenException extends RuntimeException {

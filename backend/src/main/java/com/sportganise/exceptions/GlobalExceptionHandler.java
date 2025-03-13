@@ -13,8 +13,8 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelAp
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
-import com.sportganise.exceptions.fcmexceptions.GetFcmTokenException;
-import com.sportganise.exceptions.fcmexceptions.StoreFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;

@@ -12,7 +12,7 @@ import com.google.gson.GsonBuilder;
 import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.StoreFcmTokenDto;
 import com.sportganise.entities.notifications.FcmToken;
-import com.sportganise.exceptions.fcmexceptions.StoreFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
 import com.sportganise.repositories.notifications.FcmTokenRepository;
 import jakarta.transaction.Transactional;
 import java.time.Duration;
