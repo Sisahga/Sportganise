@@ -240,4 +240,14 @@ CREATE TABLE fcm_token(
     PRIMARY KEY (token)
 );
 
+-- Notification preferences for each user.
+CREATE TABLE notification_preference(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    type VARCHAR(2) NOT NULL CHECK (type IN ('P', 'E', 'B', 'N')) DEFAULT 'P', -- P: Push (Phone/Browser), E: Email, B: Both, N: None
+    events BOOLEAN DEFAULT TRUE,
+    messaging BOOLEAN DEFAULT TRUE,
+    training_sessions BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (account_id)
+);
+
 SET TIME ZONE 'America/New_York';
