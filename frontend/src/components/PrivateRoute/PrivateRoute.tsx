@@ -17,7 +17,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const location = useLocation();
   const user = getCookies();
   const token = getBearerToken();
+  const notified = localStorage.getItem("pushNotifications");
 
+  // If user already granted permission, it won't do anything.
   const initializeFcm = async (userId: number) => {
     if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
       await requestNotificationPermission(userId);
@@ -38,7 +40,9 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );
   } else {
-    initializeFcm(user.accountId).then((r) => r);
+    if (notified === undefined || notified === null) {
+      initializeFcm(user.accountId).then((r) => r);
+    }
   }
 
   if (requiredRole && user.type !== requiredRole && user.type !== "ADMIN") {

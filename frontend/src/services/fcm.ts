@@ -1,11 +1,12 @@
 import { messaging } from "../lib/firebaseFcmConfig.ts";
 import { getToken } from "firebase/messaging";
 import { Capacitor } from "@capacitor/core";
-import { toast } from "@/hooks/use-toast.ts";
+import { useToast } from "@/hooks/use-toast.ts";
 import useStoreFcmToken from "@/hooks/useStoreFcmToken.ts";
-import { FcmTokenDto } from "@/types/notifications.ts";
+import { StoreFcmTokenDto } from "@/types/notifications.ts";
 
 const requestNotificationPermission = async (userId: number) => {
+  const { toast } = useToast();
   const { storeFcmToken } = useStoreFcmToken();
 
   if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
@@ -16,12 +17,25 @@ const requestNotificationPermission = async (userId: number) => {
         await getToken(messaging, {
           vapidKey: import.meta.env.FCM_KEY_PAIR,
         }).then((token) => {
-          console.log("Storing token in DB:", token);
-          const fcmTokenDto: FcmTokenDto = {
+          console.log("Storing token: ", token);
+          const fcmTokenDto: StoreFcmTokenDto = {
             accountId: userId,
             token: token,
           };
-          storeFcmToken(fcmTokenDto);
+          storeFcmToken(fcmTokenDto).then((response) => {
+            if (response.status != 200) {
+              toast({
+                title: "Notification Setup Failure",
+                description:
+                  "We weren't able to setup push notifications for your device. Please try again later",
+                variant: "destructive",
+              });
+              localStorage.setItem("pushNotifications", "disabled");
+            } else {
+              console.log("Notification setup successful.");
+              localStorage.setItem("pushNotifications", "enabled");
+            }
+          });
         });
       } else {
         console.warn("Web notification permission denied.");
