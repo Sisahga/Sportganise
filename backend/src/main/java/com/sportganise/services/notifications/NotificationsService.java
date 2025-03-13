@@ -59,13 +59,14 @@ public class NotificationsService {
   }
 
   /**
-   * Intended to initialize notification preferences for a user on sign up.
+   * Intended to initialize notification preferences for a user on sign up (upon verification).
    *
    * @param accountId Id of the account to initialize notifications for.
    */
   public void initNotificationPreferences(int accountId) {
     try {
       notificationPreferenceRepository.save(new NotificationPreference(accountId));
+      log.info("Notification preferences initialized.");
     } catch (DataAccessException e) {
       log.error("DB error when saving notification preferences.");
       throw new SaveNotificationPrefereceException(
