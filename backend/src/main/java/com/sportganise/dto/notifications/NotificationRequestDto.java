@@ -1,5 +1,6 @@
-package com.sportganise.dto.fcm;
+package com.sportganise.dto.notifications;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,9 +16,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NotificationFcmRequestDto {
+public class NotificationRequestDto {
   private String title;
   private String body;
   private String topic; // Optional topic to send the notification to a group of people.
-  private String token; // The firebase token of the device to send the notification to.
+  private List<Integer> recipients; // Ids of the users to notify.
 }

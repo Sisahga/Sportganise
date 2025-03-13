@@ -1,4 +1,4 @@
-package com.sportganise.dto.fcm;
+package com.sportganise.dto.notifications;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
