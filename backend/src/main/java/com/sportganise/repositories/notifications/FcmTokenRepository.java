@@ -1,4 +1,4 @@
-package com.sportganise.repositories;
+package com.sportganise.repositories.notifications;
 
 import com.sportganise.entities.notifications.FcmToken;
 import java.util.List;

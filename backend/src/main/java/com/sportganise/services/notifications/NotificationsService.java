@@ -2,7 +2,7 @@ package com.sportganise.services.notifications;
 
 import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.NotificationRequestDto;
-import com.sportganise.repositories.FcmTokenRepository;
+import com.sportganise.repositories.notifications.FcmTokenRepository;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
