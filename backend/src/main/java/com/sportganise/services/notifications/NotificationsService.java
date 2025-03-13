@@ -3,6 +3,7 @@ package com.sportganise.services.notifications;
 import com.sportganise.dto.fcm.NotificationFcmRequestDto;
 import com.sportganise.dto.fcm.NotificationRequestDto;
 import com.sportganise.entities.notifications.NotificationPreference;
+import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.repositories.notifications.FcmTokenRepository;
 import com.sportganise.repositories.notifications.NotificationPreferenceRepository;
 import java.util.List;
@@ -63,6 +64,12 @@ public class NotificationsService {
    * @param accountId Id of the account to initialize notifications for.
    */
   public void initNotificationPreferences(int accountId) {
-    notificationPreferenceRepository.save(new NotificationPreference(accountId));
+    try {
+      notificationPreferenceRepository.save(new NotificationPreference(accountId));
+    } catch (DataAccessException e) {
+      log.error("DB error when saving notification preferences.");
+      throw new SaveNotificationPrefereceException(
+          "DB error occured when saving notification preferences for a user.");
+    }
   }
 }
