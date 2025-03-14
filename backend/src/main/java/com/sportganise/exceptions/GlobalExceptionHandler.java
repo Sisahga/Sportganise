@@ -16,6 +16,7 @@ import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendExcep
 import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
@@ -56,6 +57,21 @@ public class GlobalExceptionHandler {
   public ResponseDto<?> handleResourceNotFoundException(ResourceNotFoundException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.NOT_FOUND.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle general bad request exceptions.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleIllegalArgumentException(IllegalArgumentException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
         .message(e.getMessage())
         .build();
   }
@@ -422,6 +438,22 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleSaveNotificationPrefereceException(
       SaveNotificationPrefereceException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle update notification permission exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(UpdateNotificationPermissionException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleUpdateNotificationPermissionException(
+      UpdateNotificationPermissionException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .message(e.getMessage())
