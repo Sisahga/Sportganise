@@ -40,7 +40,10 @@ export default function HeaderNav() {
         </Link>
 
         <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-          <DrawerTrigger className="bg-primaryColour hover:outline-none" onClick={() => setIsDrawerOpen(true)}>
+          <DrawerTrigger
+            className="bg-primaryColour hover:outline-none"
+            onClick={() => setIsDrawerOpen(true)}
+          >
             <Menu className="h-10 w-10" />
           </DrawerTrigger>
           <DrawerContent className="md:w-[20%] w-[50%]">
