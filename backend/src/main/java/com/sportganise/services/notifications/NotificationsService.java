@@ -63,6 +63,9 @@ public class NotificationsService {
     NotificationPreference np;
     for (Integer id : userIds) {
       np = notificationPreferenceRepository.findByAccountId(id);
+      log.debug("Found notification preference for user with id {}", id);
+      log.debug("Push enabled: {}", np.getPushNotifications());
+      log.debug("Email enabled: {}", np.getEmailNotifications());
       // Send push notification if enabled.
       if (np.getPushNotifications()) {
         try {
