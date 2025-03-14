@@ -43,6 +43,9 @@ jobs:
     # Checkout the code
     - uses: actions/checkout@v4
 
+    - name: Debug
+      run: echo $POSTGRES_PASSWORD
+
     # Start backend
     - uses: hoverkraft-tech/compose-action@v2.0.1
       with:
