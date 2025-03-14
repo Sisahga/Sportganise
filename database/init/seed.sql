@@ -174,3 +174,11 @@ INSERT INTO training_plan (account_id, doc_url, shared) VALUES
 (1, 'training1.2.doc', false),
 (2, 'training2.doc', true);
 
+INSERT INTO notification_preference(account_id) VALUES
+(1),
+(2),
+(3),
+(4),
+(5),
+(6),
+(7);
