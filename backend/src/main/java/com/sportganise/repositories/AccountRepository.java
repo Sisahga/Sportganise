@@ -91,4 +91,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
    */
   @Query("SELECT l FROM Label l WHERE l.labelId = :labelId")
   Label getLabelById(@Param("labelId") Integer labelId);
+
+  @Query("SELECT email FROM Account WHERE  accountId = :id")
+  String getEmailByAccountId(int id);
 }

@@ -9,9 +9,12 @@ import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
+import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.notifications.FcmTokenRepository;
 import com.sportganise.repositories.notifications.NotificationPreferenceRepository;
 import java.util.List;
+
+import com.sportganise.services.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ public class NotificationsService {
   private final FcmService fcmService;
   private final FcmTokenRepository fcmTokenRepository;
   private final NotificationPreferenceRepository notificationPreferenceRepository;
+  private final AccountRepository accountRepository;
+  private final EmailService emailService;
 
   /**
    * Constructor for Notifications Service.
@@ -30,14 +35,20 @@ public class NotificationsService {
    * @param fcmService FcmService
    * @param fcmTokenRepository FcmTokenRepository
    * @param notificationPreferenceRepository NotificationPreferenceRepository
+   * @param accountRepository AccountRepository
+   * @param emailService EmailService
    */
   public NotificationsService(
       FcmService fcmService,
       FcmTokenRepository fcmTokenRepository,
-      NotificationPreferenceRepository notificationPreferenceRepository) {
+      NotificationPreferenceRepository notificationPreferenceRepository,
+      AccountRepository accountRepository,
+      EmailService emailService) {
     this.fcmService = fcmService;
     this.fcmTokenRepository = fcmTokenRepository;
     this.notificationPreferenceRepository = notificationPreferenceRepository;
+    this.accountRepository = accountRepository;
+    this.emailService = emailService;
   }
 
   /**
@@ -52,6 +63,7 @@ public class NotificationsService {
     NotificationPreference np;
     for (Integer id : userIds) {
       np = notificationPreferenceRepository.findByAccountId(id);
+      // Send push notification if enabled.
       if (np.getPushNotifications()) {
         try {
           List<String> fcmTokens =
@@ -70,8 +82,11 @@ public class NotificationsService {
           log.warn("Stale token deleted or failed to delete.");
         }
       }
+      // Send email notification if enabled.
       if (np.getEmailNotifications()) {
-        // TODO - Send email notification
+        String email = accountRepository.getEmailByAccountId(id);
+        String subject = "New Notification - " + notificationRequestDto.getTitle();
+        emailService.sendEmail(email, subject, notificationRequestDto.getBody());
       }
     }
   }
