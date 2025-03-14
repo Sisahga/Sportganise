@@ -57,7 +57,7 @@ public class NotificationsController {
    * Update the notification permission of a user.
    *
    * @param updateNotificationPermissionDto contains the account ID, the notification type, and the
-   *                                        permission status (enabled/disabled).
+   *     permission status (enabled/disabled).
    * @return a response entity with 200 OK if successful.
    */
   @PostMapping("/update-notification-permission")

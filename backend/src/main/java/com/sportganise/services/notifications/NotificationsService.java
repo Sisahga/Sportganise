@@ -44,23 +44,29 @@ public class NotificationsService {
   public void sendNotificationToUser(NotificationRequestDto notificationRequestDto) {
     List<Integer> userIds = notificationRequestDto.getRecipients();
 
-    // TODO - Setup DB table for user notification preferences.
+    NotificationPreference np;
     for (Integer id : userIds) {
-      try {
-        List<String> fcmTokens =
-            fcmTokenRepository.findTokensByAccountId(notificationRequestDto.getRecipients());
-        for (String token : fcmTokens) {
-          NotificationFcmRequestDto request =
-              NotificationFcmRequestDto.builder()
-                  .title(notificationRequestDto.getTitle())
-                  .body(notificationRequestDto.getBody())
-                  .token(token)
-                  .build();
-          fcmService.sendMessageToToken(request);
+      np = notificationPreferenceRepository.findByAccountId(id);
+      if (np.getPushNotifications()) {
+        try {
+          List<String> fcmTokens =
+              fcmTokenRepository.findTokensByAccountId(notificationRequestDto.getRecipients());
+          for (String token : fcmTokens) {
+            NotificationFcmRequestDto request =
+                NotificationFcmRequestDto.builder()
+                    .title(notificationRequestDto.getTitle())
+                    .body(notificationRequestDto.getBody())
+                    .token(token)
+                    .build();
+            fcmService.sendMessageToToken(request);
+          }
+        } catch (DataAccessException e) {
+          // Don't throw an exception here, just log. We still want to notify other devices.
+          log.warn("Stale token deleted or failed to delete.");
         }
-      } catch (DataAccessException e) {
-        // Don't throw an exception here, just log. We still want to notify other devices.
-        log.warn("Stale token deleted or failed to delete.");
+      }
+      if (np.getEmailNotifications()) {
+        // TODO - Send email notification
       }
     }
   }
@@ -85,7 +91,7 @@ public class NotificationsService {
    * Enable/Disable single notification type for a user.
    *
    * @param updateNotificationPermissionDto DTO containing the account ID, notification type, and
-   *                                        permission status (enabled/disabled).
+   *     permission status (enabled/disabled).
    */
   public void updateNotificationPermission(
       UpdateNotificationPermissionDto updateNotificationPermissionDto) {
@@ -122,7 +128,7 @@ public class NotificationsService {
    * Enable/Disable notification method for a user (PUSH or EMAIL).
    *
    * @param updateNotificationMethodDto DTO containing the account ID, notification method and
-   *                                    permission status (enabled/disabled).
+   *     permission status (enabled/disabled).
    */
   public void updateNotificationMethod(UpdateNotificationMethodDto updateNotificationMethodDto) {
     try {
