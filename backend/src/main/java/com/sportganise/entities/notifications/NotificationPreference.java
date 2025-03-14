@@ -15,7 +15,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "notification_preference")
 public class NotificationPreference {
