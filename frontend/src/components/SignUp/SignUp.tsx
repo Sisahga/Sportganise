@@ -258,7 +258,7 @@ export default function SignUp() {
                 />
                 <button
                   type="button"
-                  className= "absolute right-3 top-1/2 transform -translate-y-1/10 text-sm text-secondaryColour"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/10 text-sm text-secondaryColour"
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
