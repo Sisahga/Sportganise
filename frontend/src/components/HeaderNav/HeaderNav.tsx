@@ -86,7 +86,7 @@ export default function HeaderNav() {
                   </Link>
                 </>
               )}
-                  {(accountType?.toLowerCase() === "admin") && (
+              {accountType?.toLowerCase() === "admin" && (
                 <>
                   <Link
                     to="/pages/ModifyPermissionPage"
@@ -95,7 +95,6 @@ export default function HeaderNav() {
                   >
                     User Permissions
                   </Link>
-        
                 </>
               )}
               <Link
