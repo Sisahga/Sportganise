@@ -89,7 +89,7 @@ export default function SignUp() {
     );
   };
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -249,7 +249,7 @@ export default function SignUp() {
               <div className="relative">
                 <FormField
                   id="Password"
-                  label="Password"
+                  label="Create a Password"
                   placeholder="Password"
                   name="password"
                   inputProps={{ type: showPassword ? "password" : "text" }}
