@@ -86,6 +86,18 @@ export default function HeaderNav() {
                   </Link>
                 </>
               )}
+                  {(accountType?.toLowerCase() === "admin") && (
+                <>
+                  <Link
+                    to="/pages/ModifyPermissionPage"
+                    className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    onClick={closeDrawer}
+                  >
+                    User Permissions
+                  </Link>
+        
+                </>
+              )}
               <Link
                 to="/pages/NotificationSettingsPage"
                 className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
