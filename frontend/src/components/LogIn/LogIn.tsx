@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useLogin } from "@/hooks/useLogin";
 import { useSendCode } from "@/hooks/useSendCode";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LogIn() {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ export default function LogIn() {
     email: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState(true);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,15 +96,24 @@ export default function LogIn() {
               value={formData.email}
               onChange={handleInputChange}
             />
+                 <div className="relative">
             <FormField
               id="Password"
               label="Password"
               placeholder="Password"
               name="password"
-              inputProps={{ type: "password" }}
+              inputProps={{ type: showPassword ? "password" : "text" }}
               value={formData.password}
               onChange={handleInputChange}
             />
+            <button
+                  type="button"
+                  className= "absolute right-3 top-1/2 transform -translate-y-1/10 text-sm text-secondaryColour"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             <button
               type="submit"
               className="w-full text-white bg-primaryColour py-2 md:py-3 rounded-lg flex items-center justify-center text-sm md:text-base"
