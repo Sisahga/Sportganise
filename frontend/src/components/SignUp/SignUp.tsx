@@ -8,10 +8,10 @@ import { useSignUp } from "@/hooks/useSignUp";
 import { useSendCode } from "@/hooks/useSendCode";
 import { SignUpRequest } from "@/types/auth";
 import { SecondaryHeader } from "../SecondaryHeader";
-import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import PasswordChecklist from "react-password-checklist";
 import { Separator } from "../ui/separator";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ export default function SignUp() {
   const [progress, setProgress] = useState(0);
   const [isChecklistValid, setIsChecklistValid] = useState(false);
 
-const calculatePasswordStrength = (password: string) => {
+  const calculatePasswordStrength = (password: string) => {
     let strength = 0;
     if (password.length >= 8) strength += 20;
     if (/[A-Z]/.test(password)) strength += 20;
@@ -74,9 +74,7 @@ const calculatePasswordStrength = (password: string) => {
     if (formData.password) calculatePasswordStrength(formData.password);
   }, [formData.password]);
 
-  const validatePassword = (
-    password: string,
-  ): boolean => {
+  const validatePassword = (password: string): boolean => {
     const hasMinLength = password.length >= 8;
 
     const hasUpperCase = /[A-Z]/.test(password);
@@ -91,6 +89,7 @@ const calculatePasswordStrength = (password: string) => {
     );
   };
 
+  const [showPassword, setShowPassword] = useState(false);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,15 +246,24 @@ const calculatePasswordStrength = (password: string) => {
                   pattern: "\\(\\d{3}\\) \\d{3}-\\d{4}",
                 }}
               />
-              <FormField
-                id="Password"
-                label="Password"
-                placeholder="Password"
-                name="password"
-                inputProps={{ type: "password" }}
-                value={formData.password}
-                onChange={handleInputChange}
-              />
+              <div className="relative">
+                <FormField
+                  id="Password"
+                  label="Password"
+                  placeholder="Password"
+                  name="password"
+                  inputProps={{ type: showPassword ? "password" : "text" }}
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
+                <button
+                  type="button"
+                  className= "absolute right-3 top-1/2 transform -translate-y-1/10 text-sm text-secondaryColour"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
               {/* Progress Bar */}
               {formData.password && (
                 <div className="m-4 mb-2">
@@ -274,9 +282,7 @@ const calculatePasswordStrength = (password: string) => {
                     minLength={8}
                     value={formData.password}
                     onChange={() => {
-                      setIsChecklistValid(
-                        validatePassword(formData.password),
-                      );
+                      setIsChecklistValid(validatePassword(formData.password));
                     }}
                   />
                 </div>
@@ -297,9 +303,7 @@ const calculatePasswordStrength = (password: string) => {
                     minLength={8}
                     value={formData.password}
                     onChange={() => {
-                      setIsChecklistValid(
-                        validatePassword(formData.password),
-                      );
+                      setIsChecklistValid(validatePassword(formData.password));
                     }}
                   />
                 </div>

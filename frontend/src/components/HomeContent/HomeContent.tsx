@@ -12,7 +12,7 @@ import log from "loglevel";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
 import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { getCookies,getAccountIdCookie } from "@/services/cookiesService";
+import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { useState, useEffect } from "react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 
@@ -28,11 +28,11 @@ interface FeatureCardProps {
 }
 
 export default function HomeContent() {
-    const [accountType, setAccountType] = useState<string | null | undefined>();
-    useEffect(() => {
-      const user = getCookies();
-      setAccountType(user?.type);
-    }, [accountType]);
+  const [accountType, setAccountType] = useState<string | null | undefined>();
+  useEffect(() => {
+    const user = getCookies();
+    setAccountType(user?.type);
+  }, [accountType]);
 
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState<string | null>(null);
@@ -42,7 +42,7 @@ export default function HomeContent() {
 
   useEffect(() => {
     if (data) {
-      setFirstName(data.firstName); 
+      setFirstName(data.firstName);
     }
   }, [data]);
 
@@ -53,7 +53,6 @@ export default function HomeContent() {
   if (error) {
     return <div className="text-red">{error}</div>;
   }
-
 
   const FeatureCard: React.FC<FeatureCardProps> = ({
     icon,
@@ -80,11 +79,11 @@ export default function HomeContent() {
           <div className="p-2 rounded-lg bg-textPlaceholderColour/70 group-hover:bg-secondaryColour/10 transition-colors duration-300">
             {icon}
           </div>
-          <h3 className="font-semibold text-nowrap xl:text-xl md:text-xl lg:text-sm sm:text-lg text-md">{title}</h3>
+          <h3 className="font-semibold text-nowrap xl:text-xl md:text-xl lg:text-sm sm:text-lg text-md">
+            {title}
+          </h3>
         </div>
-        <p className="text-primaryColour/90">
-          {description}
-        </p>
+        <p className="text-primaryColour/90">{description}</p>
         {linkText != "" && (
           <Link
             to={{ pathname: link }}
@@ -158,14 +157,12 @@ export default function HomeContent() {
       link: "/pages/NotificationsPage",
     },
   ];
-  
 
   return (
     <div className="bg-primaryColour w-screen mt-32 z-40">
       <div className="flex-1 max-w-[100vw] bg-white shadow-md rounded-t-2xl pb-16 bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
         <div className="min-h-screen">
           <div className="p-4 space-y-6">
-
             <div className="lg:mx-24 mb-20 mt-6">
               <h2 className="text-2xl text-primaryColour text-sec font-semibold mb-4">
                 Hello {firstName}!
