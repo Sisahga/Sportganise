@@ -1,6 +1,11 @@
 package com.sportganise.services.notifications;
 
-import com.sportganise.dto.notifications.*;
+import com.sportganise.dto.notifications.NotificationFcmRequestDto;
+import com.sportganise.dto.notifications.NotificationMethodEnum;
+import com.sportganise.dto.notifications.NotificationRequestDto;
+import com.sportganise.dto.notifications.NotificationTypeEnum;
+import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
+import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
@@ -117,10 +122,6 @@ public class NotificationsService {
       log.error("DB error when updating notification permission.");
       throw new UpdateNotificationPermissionException(
           "DB error occured when updating notification permission.");
-    } catch (IllegalArgumentException e) {
-      log.error("Invalid notification type.");
-      throw new UpdateNotificationPermissionException(
-          "Invalid notification type: EVENTS, MESSAGING or TRAINING_SESSIONS required.");
     }
   }
 
@@ -143,15 +144,13 @@ public class NotificationsService {
         case NotificationMethodEnum.EMAIL:
           notificationPreference.setEmailNotifications(updateNotificationMethodDto.getEnabled());
           break;
+        default:
+          throw new UpdateNotificationPermissionException("Invalid notification method.");
       }
     } catch (DataAccessException e) {
       log.error("DB error when updating notification method.");
       throw new UpdateNotificationPermissionException(
           "DB error occured when updating notification method.");
-    } catch (IllegalArgumentException e) {
-      log.error("Invalid notification method.");
-      throw new UpdateNotificationPermissionException(
-          "Invalid notification method: PUSH or EMAIL required.");
     }
   }
 }
