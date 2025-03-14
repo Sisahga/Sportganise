@@ -31,6 +31,8 @@ env:
   # Email server
   COMPANY_EMAIL: ${{ secrets.COMPANY_EMAIL }}
   COMPANY_EMAIL_PASSWORD: ${{ secrets.COMPANY_EMAIL_PASSWORD }}
+  # Firebase FCM
+  FIREBASE_FCM_JSON_FILE: ${{ secrets.FIREBASE_FCM_JSON_FILE }}
 
 jobs:
   e2e:
