@@ -1,9 +1,9 @@
 package com.sportganise.services.notifications;
 
-import com.sportganise.dto.notifications.NotificationFcmRequestDto;
-import com.sportganise.dto.notifications.NotificationRequestDto;
+import com.sportganise.dto.notifications.*;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
+import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
 import com.sportganise.repositories.notifications.FcmTokenRepository;
 import com.sportganise.repositories.notifications.NotificationPreferenceRepository;
 import java.util.List;
@@ -78,6 +78,74 @@ public class NotificationsService {
       log.error("DB error when saving notification preferences.");
       throw new SaveNotificationPrefereceException(
           "DB error occured when saving notification preferences for a user.");
+    }
+  }
+
+  /**
+   * Enable/Disable single notification type for a user.
+   *
+   * @param updateNotificationPermissionDto DTO containing the account ID, notification type, and
+   *                                        permission status (enabled/disabled).
+   */
+  public void updateNotificationPermission(
+      UpdateNotificationPermissionDto updateNotificationPermissionDto) {
+    try {
+      NotificationPreference notificationPreference =
+          notificationPreferenceRepository.findByAccountId(
+              updateNotificationPermissionDto.getAccountId());
+      NotificationTypeEnum notificationType = updateNotificationPermissionDto.getType();
+      switch (notificationType) {
+        case NotificationTypeEnum.EVENTS:
+          notificationPreference.setEvents(updateNotificationPermissionDto.getEnabled());
+          break;
+        case NotificationTypeEnum.MESSAGING:
+          notificationPreference.setMessaging(updateNotificationPermissionDto.getEnabled());
+          break;
+        case NotificationTypeEnum.TRAINING_SESSIONS:
+          notificationPreference.setTrainingSessions(updateNotificationPermissionDto.getEnabled());
+          break;
+        default:
+          throw new UpdateNotificationPermissionException("Invalid notification type.");
+      }
+    } catch (DataAccessException e) {
+      log.error("DB error when updating notification permission.");
+      throw new UpdateNotificationPermissionException(
+          "DB error occured when updating notification permission.");
+    } catch (IllegalArgumentException e) {
+      log.error("Invalid notification type.");
+      throw new UpdateNotificationPermissionException(
+          "Invalid notification type: EVENTS, MESSAGING or TRAINING_SESSIONS required.");
+    }
+  }
+
+  /**
+   * Enable/Disable notification method for a user (PUSH or EMAIL).
+   *
+   * @param updateNotificationMethodDto DTO containing the account ID, notification method and
+   *                                    permission status (enabled/disabled).
+   */
+  public void updateNotificationMethod(UpdateNotificationMethodDto updateNotificationMethodDto) {
+    try {
+      NotificationPreference notificationPreference =
+          notificationPreferenceRepository.findByAccountId(
+              updateNotificationMethodDto.getAccountId());
+      NotificationMethodEnum notificationMethod = updateNotificationMethodDto.getMethod();
+      switch (notificationMethod) {
+        case NotificationMethodEnum.PUSH:
+          notificationPreference.setPushNotifications(updateNotificationMethodDto.getEnabled());
+          break;
+        case NotificationMethodEnum.EMAIL:
+          notificationPreference.setEmailNotifications(updateNotificationMethodDto.getEnabled());
+          break;
+      }
+    } catch (DataAccessException e) {
+      log.error("DB error when updating notification method.");
+      throw new UpdateNotificationPermissionException(
+          "DB error occured when updating notification method.");
+    } catch (IllegalArgumentException e) {
+      log.error("Invalid notification method.");
+      throw new UpdateNotificationPermissionException(
+          "Invalid notification method: PUSH or EMAIL required.");
     }
   }
 }

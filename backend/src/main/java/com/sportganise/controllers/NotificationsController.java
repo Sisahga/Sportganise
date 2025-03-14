@@ -1,8 +1,10 @@
 package com.sportganise.controllers;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.fcm.NotificationRequestDto;
-import com.sportganise.dto.fcm.StoreFcmTokenDto;
+import com.sportganise.dto.notifications.NotificationRequestDto;
+import com.sportganise.dto.notifications.StoreFcmTokenDto;
+import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
+import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
 import com.sportganise.services.notifications.FcmService;
 import com.sportganise.services.notifications.NotificationsService;
 import jakarta.validation.constraints.Null;
@@ -48,6 +50,33 @@ public class NotificationsController {
   public ResponseEntity<ResponseDto<Null>> storeFcmToken(
       @RequestBody StoreFcmTokenDto fcmTokenDto) {
     fcmService.storeFcmToken(fcmTokenDto);
+    return ResponseEntity.ok(new ResponseDto<>());
+  }
+
+  /**
+   * Update the notification permission of a user.
+   *
+   * @param updateNotificationPermissionDto contains the account ID, the notification type, and the
+   *                                        permission status (enabled/disabled).
+   * @return a response entity with 200 OK if successful.
+   */
+  @PostMapping("/update-notification-permission")
+  public ResponseEntity<ResponseDto<Null>> updateNotificationPermission(
+      @RequestBody UpdateNotificationPermissionDto updateNotificationPermissionDto) {
+    notificationsService.updateNotificationPermission(updateNotificationPermissionDto);
+    return ResponseEntity.ok(new ResponseDto<>());
+  }
+
+  /**
+   * Update the notification method of a user.
+   *
+   * @param updateNotificationMethodDto contains the account ID and the notification method.
+   * @return a response entity with 200 OK if successful.
+   */
+  @PostMapping("/update-notification-method")
+  public ResponseEntity<ResponseDto<Null>> updateNotificationMethod(
+      @RequestBody UpdateNotificationMethodDto updateNotificationMethodDto) {
+    notificationsService.updateNotificationMethod(updateNotificationMethodDto);
     return ResponseEntity.ok(new ResponseDto<>());
   }
 }
