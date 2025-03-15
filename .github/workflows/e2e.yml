@@ -57,6 +57,8 @@ jobs:
         ${{ secrets.FIREBASE_CONFIGURATION_FILE }}
         EOF
         cat ../backend/src/main/resources/firebase-configuration-file.json
+        wc -l ../backend/src/main/resources/firebase-configuration-file.json
+        echo done
         exit 1
 
     # Start backend
