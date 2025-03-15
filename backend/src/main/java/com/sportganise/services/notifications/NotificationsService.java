@@ -129,12 +129,15 @@ public class NotificationsService {
       switch (notificationType) {
         case NotificationTypeEnum.EVENTS:
           notificationPreference.setEvents(updateNotificationPermissionDto.getEnabled());
+          notificationPreferenceRepository.save(notificationPreference);
           break;
         case NotificationTypeEnum.MESSAGING:
           notificationPreference.setMessaging(updateNotificationPermissionDto.getEnabled());
+          notificationPreferenceRepository.save(notificationPreference);
           break;
         case NotificationTypeEnum.TRAINING_SESSIONS:
           notificationPreference.setTrainingSessions(updateNotificationPermissionDto.getEnabled());
+          notificationPreferenceRepository.save(notificationPreference);
           break;
         default:
           throw new UpdateNotificationPermissionException("Invalid notification type.");
@@ -162,9 +165,11 @@ public class NotificationsService {
       switch (notificationMethod) {
         case NotificationMethodEnum.PUSH:
           notificationPreference.setPushNotifications(updateNotificationMethodDto.getEnabled());
+          notificationPreferenceRepository.save(notificationPreference);
           break;
         case NotificationMethodEnum.EMAIL:
           notificationPreference.setEmailNotifications(updateNotificationMethodDto.getEnabled());
+          notificationPreferenceRepository.save(notificationPreference);
           break;
         default:
           throw new UpdateNotificationPermissionException("Invalid notification method.");
