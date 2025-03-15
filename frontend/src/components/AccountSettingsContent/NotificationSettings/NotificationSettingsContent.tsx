@@ -16,9 +16,12 @@ import {
   NotificationMethodEnum,
   NotificationPreference,
   NotificationTypeEnum,
+  UpdateNotificationMethodRequestDto,
 } from "@/types/notifications.ts";
 import useGetNotificationSettings from "@/hooks/useGetNotificationSettings.ts";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import useUpdateNotificationMethod from "@/hooks/useUpdateNotificationMethod.ts";
+import { toast } from "@/hooks/use-toast.ts";
 
 export default function NotificationSettings() {
   const cookies = getCookies();
@@ -47,8 +50,9 @@ export default function NotificationSettings() {
 
   // Hooks.
   const { getNotificationSettings } = useGetNotificationSettings();
+  const { updateNotificationMethod } = useUpdateNotificationMethod();
 
-  const handleChannelToggle = (method: NotificationMethodEnum) => {
+  const handleChannelToggle = async (method: NotificationMethodEnum) => {
     setNotificationMethods((prev) =>
       prev.map((item) =>
         item.notificationMethod === method
@@ -56,6 +60,35 @@ export default function NotificationSettings() {
           : item,
       ),
     );
+    const request: UpdateNotificationMethodRequestDto = {
+      accountId: userId,
+      method: method,
+      enabled: !notificationMethods.find(
+        (item) => item.notificationMethod === method,
+      )?.enabled,
+    };
+    console.log("Method: ", request.method);
+    const response = await updateNotificationMethod(request);
+    if (response.statusCode === 200) {
+      toast({
+        title: "Success",
+        description: "Notification method updated successfully",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: response.message,
+        variant: "destructive",
+      });
+      setNotificationMethods((prev) =>
+        prev.map((item) =>
+          item.notificationMethod === method
+            ? { ...item, enabled: !item.enabled }
+            : item,
+        ),
+      );
+    }
   };
 
   const handleToggleNotification = (
