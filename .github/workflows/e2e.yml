@@ -50,14 +50,7 @@ jobs:
 
     # Create config files required by backend
     - name: Create backend config files
-      run: |
-        pwd
-        ls ../backend/src/main/resources
-        echo '${{ secrets.FIREBASE_CONFIGURATION_FILE }}' > ../backend/src/main/resources/firebase-configuration-file.json
-        cat ../backend/src/main/resources/firebase-configuration-file.json
-        wc -l ../backend/src/main/resources/firebase-configuration-file.json
-        echo done
-        exit 1
+      run: echo '${{ secrets.FIREBASE_CONFIGURATION_FILE }}' > ../backend/src/main/resources/firebase-configuration-file.json
 
     # Start backend
     - uses: hoverkraft-tech/compose-action@v2.0.1
