@@ -44,3 +44,15 @@ export interface NotificationSettings {
   notificationMethods: NotificationMethod[];
   notificationComponents: NotificationPreference[];
 }
+
+export interface UpdateNotificationMethodRequestDto {
+  accountId: number;
+  method: NotificationMethodEnum;
+  enabled: boolean;
+}
+
+export interface UpdateNotificationPermissionRequestDto {
+  accountId: number;
+  type: NotificationTypeEnum;
+  enabled: boolean;
+}
