@@ -1,19 +1,18 @@
 package com.sportganise.dto.notifications;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/** Data transfer object for notification settings. */
+/** Data transfer object for notification methods. */
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class NotificationSettingsDto {
-  private List<NotificationMethodDto> notificationMethods;
-  private List<NotificationComponentDto> notificationComponents;
+public class NotificationMethodDto {
+  private NotificationMethodEnum notificationMethod;
+  private Boolean enabled;
 }
