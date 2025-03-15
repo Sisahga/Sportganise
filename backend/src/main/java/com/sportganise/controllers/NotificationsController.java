@@ -1,18 +1,13 @@
 package com.sportganise.controllers;
 
 import com.sportganise.dto.ResponseDto;
-import com.sportganise.dto.notifications.NotificationRequestDto;
-import com.sportganise.dto.notifications.StoreFcmTokenDto;
-import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
-import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
+import com.sportganise.dto.notifications.*;
 import com.sportganise.services.notifications.FcmService;
 import com.sportganise.services.notifications.NotificationsService;
 import jakarta.validation.constraints.Null;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /** Controller class for sending notifications to devices. */
 @RestController
@@ -78,5 +73,24 @@ public class NotificationsController {
       @RequestBody UpdateNotificationMethodDto updateNotificationMethodDto) {
     notificationsService.updateNotificationMethod(updateNotificationMethodDto);
     return ResponseEntity.ok(new ResponseDto<>());
+  }
+
+  /**
+   * Get the notification settings of a user.
+   *
+   * @param userId Id of the user to get notification settings for.
+   * @return a response entity with the notification settings and status 200 OK..
+   */
+  @GetMapping("/get-notif-settings/{userId}")
+  public ResponseEntity<ResponseDto<NotificationSettingsDto>> getNotificationSettings(
+      @PathVariable Integer userId) {
+    NotificationSettingsDto notifSettings = notificationsService.getNotificationSettings(userId);
+    ResponseDto<NotificationSettingsDto> response =
+        ResponseDto.<NotificationSettingsDto>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Successfully retrieved notification settings.")
+            .data(notifSettings)
+            .build();
+    return ResponseEntity.ok(response);
   }
 }

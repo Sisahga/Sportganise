@@ -1,12 +1,15 @@
 package com.sportganise.services.notifications;
 
+import com.sportganise.dto.notifications.NotificationComponentDto;
 import com.sportganise.dto.notifications.NotificationFcmRequestDto;
 import com.sportganise.dto.notifications.NotificationMethodEnum;
 import com.sportganise.dto.notifications.NotificationRequestDto;
+import com.sportganise.dto.notifications.NotificationSettingsDto;
 import com.sportganise.dto.notifications.NotificationTypeEnum;
 import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
 import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
 import com.sportganise.entities.notifications.NotificationPreference;
+import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
 import com.sportganise.repositories.AccountRepository;
@@ -168,6 +171,41 @@ public class NotificationsService {
       log.error("DB error when updating notification method.");
       throw new UpdateNotificationPermissionException(
           "DB error occured when updating notification method.");
+    }
+  }
+
+  /**
+   * Get notification settings for a user.
+   *
+   * @param userId Id of the user to get notification settings for.
+   * @return NotificationSettingsDto containing the notification settings.
+   */
+  public NotificationSettingsDto getNotificationSettings(Integer userId) {
+    try {
+      NotificationPreference np = notificationPreferenceRepository.findByAccountId(userId);
+      return NotificationSettingsDto.builder()
+          .notificationComponents(
+              List.of(
+                  NotificationComponentDto.builder()
+                      .notifName("Training Sessions")
+                      .description("Get notified about upcoming training sessions and changes.")
+                      .enabled(np.getTrainingSessions())
+                      .build(),
+                  NotificationComponentDto.builder()
+                      .notifName("Events")
+                      .description("Receive updates about tournaments and special events.")
+                      .enabled(np.getEvents())
+                      .build(),
+                  NotificationComponentDto.builder()
+                      .notifName("Direct Messages")
+                      .description("Get notified when someone sends you a message.")
+                      .enabled(np.getMessaging())
+                      .build()))
+          .build();
+    } catch (DataAccessException e) {
+      log.error("DB error when getting notification settings.");
+      throw new GetNotificationPermissionException(
+          "DB error occured when getting notification settings.");
     }
   }
 }
