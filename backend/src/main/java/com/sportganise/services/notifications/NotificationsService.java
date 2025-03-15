@@ -198,17 +198,17 @@ public class NotificationsService {
           .notificationComponents(
               List.of(
                   NotificationComponentDto.builder()
-                      .notifName("Training Sessions")
+                      .notifName(NotificationTypeEnum.TRAINING_SESSIONS)
                       .description("Get notified about upcoming training sessions and changes.")
                       .enabled(np.getTrainingSessions())
                       .build(),
                   NotificationComponentDto.builder()
-                      .notifName("Events")
+                      .notifName(NotificationTypeEnum.EVENTS)
                       .description("Receive updates about tournaments and special events.")
                       .enabled(np.getEvents())
                       .build(),
                   NotificationComponentDto.builder()
-                      .notifName("Direct Messages")
+                      .notifName(NotificationTypeEnum.MESSAGING)
                       .description("Get notified when someone sends you a message.")
                       .enabled(np.getMessaging())
                       .build()))
