@@ -13,7 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class NotificationComponentDto {
-  private String notifName;
+  private NotificationTypeEnum notifName;
   private String description;
   private Boolean enabled;
 }
