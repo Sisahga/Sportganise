@@ -15,7 +15,7 @@ env:
   # Postgres
   POSTGRES_DB: sportganise
   POSTGRES_USER: sportganise
-  POSTGRES_PASSWORD: capstone-sportganise
+  POSTGRES_PASSWORD: sportganise-e2e
   POSTGRES_URL: jdbc:postgresql://database:5432/sportganise
   # Auth0
   AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
@@ -32,7 +32,7 @@ env:
   COMPANY_EMAIL: ${{ secrets.COMPANY_EMAIL }}
   COMPANY_EMAIL_PASSWORD: ${{ secrets.COMPANY_EMAIL_PASSWORD }}
   # Firebase FCM
-  FIREBASE_FCM_JSON_FILE: ${{ secrets.FIREBASE_FCM_JSON_FILE }}
+  FIREBASE_FCM_JSON_FILE: firebase-configuration-file.json
 
 jobs:
   e2e:
@@ -47,6 +47,15 @@ jobs:
 
     - name: Debug
       run: echo $POSTGRES_PASSWORD
+
+    # Create config files required by backend
+    - name: Create backend config files
+      run: |
+        pwd
+        ls ../backend/src/main/resources
+        echo '{}' > ../backend/src/main/resources/firebase-configuration-file.json
+        cat ../backend/src/main/resources/firebase-configuration-file.json
+        exit 1
 
     # Start backend
     - uses: hoverkraft-tech/compose-action@v2.0.1

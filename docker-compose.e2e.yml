@@ -23,6 +23,8 @@ services:
       AWS_S3_REGION: ${AWS_S3_REGION}
       COMPANY_EMAIL: ${COMPANY_EMAIL}
       COMPANY_EMAIL_PASSWORD: ${COMPANY_EMAIL_PASSWORD}
+    volumes:
+      - /etc/firebase-configuration-file.json:backend/src/main/resources/firebase-configuration-file.json
 
   database:
     image: "postgres:latest"
