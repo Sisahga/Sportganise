@@ -17,11 +17,13 @@ import {
   NotificationPreference,
   NotificationTypeEnum,
   UpdateNotificationMethodRequestDto,
+  UpdateNotificationPermissionRequestDto,
 } from "@/types/notifications.ts";
 import useGetNotificationSettings from "@/hooks/useGetNotificationSettings.ts";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 import useUpdateNotificationMethod from "@/hooks/useUpdateNotificationMethod.ts";
 import { toast } from "@/hooks/use-toast.ts";
+import useUpdateNotificationPermission from "@/hooks/useUpdateNotificationPermission.ts";
 
 export default function NotificationSettings() {
   const cookies = getCookies();
@@ -51,6 +53,7 @@ export default function NotificationSettings() {
   // Hooks.
   const { getNotificationSettings } = useGetNotificationSettings();
   const { updateNotificationMethod } = useUpdateNotificationMethod();
+  const { updateNotificationPermission } = useUpdateNotificationPermission();
 
   const handleChannelToggle = async (method: NotificationMethodEnum) => {
     setNotificationMethods((prev) =>
@@ -67,7 +70,6 @@ export default function NotificationSettings() {
         (item) => item.notificationMethod === method,
       )?.enabled,
     };
-    console.log("Method: ", request.method);
     const response = await updateNotificationMethod(request);
     if (response.statusCode === 200) {
       toast({
@@ -91,7 +93,7 @@ export default function NotificationSettings() {
     }
   };
 
-  const handleToggleNotification = (
+  const handleToggleNotification = async (
     notifName: NotificationTypeEnum,
     checked: boolean,
   ) => {
@@ -100,6 +102,30 @@ export default function NotificationSettings() {
         item.notifName === notifName ? { ...item, enabled: checked } : item,
       ),
     );
+    const request: UpdateNotificationPermissionRequestDto = {
+      accountId: userId,
+      type: notifName,
+      enabled: checked,
+    };
+    const response = await updateNotificationPermission(request);
+    if (response.statusCode === 200) {
+      toast({
+        title: "Success",
+        description: "Notification permission updated successfully",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: response.message,
+        variant: "destructive",
+      });
+      setNotificationTypes((prev) =>
+        prev.map((item) =>
+          item.notifName === notifName ? { ...item, enabled: !checked } : item,
+        ),
+      );
+    }
   };
 
   useEffect(() => {
