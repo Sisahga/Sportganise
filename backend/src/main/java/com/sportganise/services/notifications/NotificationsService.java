@@ -209,7 +209,7 @@ public class NotificationsService {
                       .build(),
                   NotificationComponentDto.builder()
                       .notifName(NotificationTypeEnum.MESSAGING)
-                      .description("Get notified when someone sends you a message.")
+                      .description("Get notified when someone messages you.")
                       .enabled(np.getMessaging())
                       .build()))
           .build();
