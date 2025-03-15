@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,7 +65,7 @@ public class NotificationsController {
    *     permission status (enabled/disabled).
    * @return a response entity with 200 OK if successful.
    */
-  @PostMapping("/update-notification-permission")
+  @PutMapping("/update-notification-permission")
   public ResponseEntity<ResponseDto<Null>> updateNotificationPermission(
       @RequestBody UpdateNotificationPermissionDto updateNotificationPermissionDto) {
     notificationsService.updateNotificationPermission(updateNotificationPermissionDto);
@@ -77,7 +78,7 @@ public class NotificationsController {
    * @param updateNotificationMethodDto contains the account ID and the notification method.
    * @return a response entity with 200 OK if successful.
    */
-  @PostMapping("/update-notification-method")
+  @PutMapping("/update-notification-method")
   public ResponseEntity<ResponseDto<Null>> updateNotificationMethod(
       @RequestBody UpdateNotificationMethodDto updateNotificationMethodDto) {
     notificationsService.updateNotificationMethod(updateNotificationMethodDto);
