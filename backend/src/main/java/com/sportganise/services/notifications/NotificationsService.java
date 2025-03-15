@@ -2,6 +2,7 @@ package com.sportganise.services.notifications;
 
 import com.sportganise.dto.notifications.NotificationComponentDto;
 import com.sportganise.dto.notifications.NotificationFcmRequestDto;
+import com.sportganise.dto.notifications.NotificationMethodDto;
 import com.sportganise.dto.notifications.NotificationMethodEnum;
 import com.sportganise.dto.notifications.NotificationRequestDto;
 import com.sportganise.dto.notifications.NotificationSettingsDto;
@@ -184,6 +185,16 @@ public class NotificationsService {
     try {
       NotificationPreference np = notificationPreferenceRepository.findByAccountId(userId);
       return NotificationSettingsDto.builder()
+          .notificationMethods(
+              List.of(
+                  NotificationMethodDto.builder()
+                      .notificationMethod(NotificationMethodEnum.PUSH)
+                      .enabled(np.getPushNotifications())
+                      .build(),
+                  NotificationMethodDto.builder()
+                      .notificationMethod(NotificationMethodEnum.EMAIL)
+                      .enabled(np.getEmailNotifications())
+                      .build()))
           .notificationComponents(
               List.of(
                   NotificationComponentDto.builder()
