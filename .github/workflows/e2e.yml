@@ -53,7 +53,9 @@ jobs:
       run: |
         pwd
         ls ../backend/src/main/resources
-        echo ${{ secrets.FIREBASE_CONFIGURATION_FILE }} > ../backend/src/main/resources/firebase-configuration-file.json
+        echo <<EOF > ../backend/src/main/resources/firebase-configuration-file.json
+        ${{ secrets.FIREBASE_CONFIGURATION_FILE }}
+        EOF
         cat ../backend/src/main/resources/firebase-configuration-file.json
         exit 1
 
