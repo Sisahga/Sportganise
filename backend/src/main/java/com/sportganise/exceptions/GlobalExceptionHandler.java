@@ -14,6 +14,7 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRe
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
@@ -454,6 +455,22 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleUpdateNotificationPermissionException(
       UpdateNotificationPermissionException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle get notification permission exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(GetNotificationPermissionException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleGetNotificationPermissionException(
+      GetNotificationPermissionException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .message(e.getMessage())
