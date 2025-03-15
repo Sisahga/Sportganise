@@ -42,9 +42,10 @@ public class NotificationsController {
   public ResponseEntity<ResponseDto<Null>> sendNotificationToUser(
       @RequestBody NotificationRequestDto request) {
     notificationsService.sendNotificationToUser(request);
-    ResponseDto<Null> responseDto = ResponseDto.<Null>builder()
-        .statusCode(HttpStatus.OK.value())
-        .message("Notification sent successfully.")
+    ResponseDto<Null> responseDto =
+        ResponseDto.<Null>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Notification sent successfully.")
             .build();
     return ResponseEntity.ok(responseDto);
   }
@@ -59,7 +60,8 @@ public class NotificationsController {
   public ResponseEntity<ResponseDto<Null>> storeFcmToken(
       @RequestBody StoreFcmTokenDto fcmTokenDto) {
     fcmService.storeFcmToken(fcmTokenDto);
-    ResponseDto<Null> responseDto = ResponseDto.<Null>builder()
+    ResponseDto<Null> responseDto =
+        ResponseDto.<Null>builder()
             .statusCode(HttpStatus.OK.value())
             .message("Token stored successfully.")
             .build();
@@ -77,7 +79,8 @@ public class NotificationsController {
   public ResponseEntity<ResponseDto<Null>> updateNotificationPermission(
       @RequestBody UpdateNotificationPermissionDto updateNotificationPermissionDto) {
     notificationsService.updateNotificationPermission(updateNotificationPermissionDto);
-    ResponseDto<Null> responseDto = ResponseDto.<Null>builder()
+    ResponseDto<Null> responseDto =
+        ResponseDto.<Null>builder()
             .statusCode(HttpStatus.OK.value())
             .message("Notification permission successfully updated.")
             .build();
@@ -94,7 +97,8 @@ public class NotificationsController {
   public ResponseEntity<ResponseDto<Null>> updateNotificationMethod(
       @RequestBody UpdateNotificationMethodDto updateNotificationMethodDto) {
     notificationsService.updateNotificationMethod(updateNotificationMethodDto);
-    ResponseDto<Null> responseDto = ResponseDto.<Null>builder()
+    ResponseDto<Null> responseDto =
+        ResponseDto.<Null>builder()
             .statusCode(HttpStatus.OK.value())
             .message("Notification method successfully updated.")
             .build();
