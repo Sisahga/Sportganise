@@ -23,6 +23,7 @@ services:
       AWS_S3_REGION: ${AWS_S3_REGION}
       COMPANY_EMAIL: ${COMPANY_EMAIL}
       COMPANY_EMAIL_PASSWORD: ${COMPANY_EMAIL_PASSWORD}
+      FIREBASE_FCM_JSON_FILE: ${FIREBASE_FCM_JSON_FILE}
 
   database:
     image: "postgres:latest"
