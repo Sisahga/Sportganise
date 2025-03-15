@@ -157,6 +157,7 @@ public class NotificationsService {
       NotificationPreference notificationPreference =
           notificationPreferenceRepository.findByAccountId(
               updateNotificationMethodDto.getAccountId());
+      log.debug("METHOD: {}", updateNotificationMethodDto.getMethod());
       NotificationMethodEnum notificationMethod = updateNotificationMethodDto.getMethod();
       switch (notificationMethod) {
         case NotificationMethodEnum.PUSH:
