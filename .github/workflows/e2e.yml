@@ -13,10 +13,10 @@ env:
   # Frontend
   VITE_API_BASE_URL: localhost:8080
   # Postgres
-  POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-  POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-  POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+  POSTGRES_DB: sportganise
+  POSTGRES_USER: sportganise
+  POSTGRES_PASSWORD: capstone-sportganise
+  POSTGRES_URL: jdbc:postgresql://database:5432/sportganise
   # Auth0
   AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
   AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
