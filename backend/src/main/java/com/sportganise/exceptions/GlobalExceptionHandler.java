@@ -537,6 +537,12 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle invalid frequency exception.
+   *
+   * @param e exception
+   * @return response dto with status 417.
+   */
   @ExceptionHandler(InvalidFrequencyException.class)
   @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
   public ResponseDto<?> handleInvalidFrequencyException(InvalidFrequencyException e) {
