@@ -29,6 +29,10 @@ import {
 } from "@/constants/file.constants.ts";
 import useUploadAttachments from "@/hooks/useUploadAttachments.ts";
 import ResponseDto from "@/types/response.ts";
+import useSendNotification from "@/hooks/useSendNotification.ts";
+import { NotificationRequest } from "@/types/notifications.ts";
+import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
+import useChannelMembers from "@/hooks/useChannelMembers.ts";
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -85,6 +89,8 @@ const ChatScreen: React.FC = () => {
     setDeleteRequest,
     currentMemberStatus,
   } = useGetDeleteChannelRequest(channelId, currentUserId); // Check if a delete request is active.
+  const { members } = useChannelMembers(channelId, currentUserId, channelType);
+  const { sendNotification } = useSendNotification();
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
 
@@ -275,6 +281,35 @@ const ChatScreen: React.FC = () => {
       setActivateSkeleton(false);
       setSkeletonId(0);
       setSkeletonCount(0);
+    } else if (response) {
+      // Message sent successfully, no attachments to upload.
+      const notifTitle =
+        channelType === "GROUP"
+          ? `${currentChannelName} - ${cookies.firstName} sent a message`
+          : `${cookies.firstName}`;
+      const notifBody =
+        data.message !== undefined && data.message.length > MAX_BODY_LENGTH
+          ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
+          : data.message || "";
+
+      // Get the notifiees for the notification.
+      const notifiees =
+        channelType === "SIMPLE"
+          ? members.map((member) => member.accountId)
+          : members
+              .filter((member) => member.accountId !== currentUserId)
+              .map((member) => member.accountId);
+
+      log.info("notifiees: ", notifiees);
+
+      const notifRequest: NotificationRequest = {
+        title: notifTitle,
+        body: notifBody,
+        topic: null, // No topic to assign here.
+        recipients: notifiees,
+      };
+
+      await sendNotification(notifRequest);
     }
 
     setMessageStatus("Delivered");

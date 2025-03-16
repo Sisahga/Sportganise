@@ -35,15 +35,19 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import useAbsent from "@/hooks/useAbsent";
+import { CookiesDto } from "@/types/auth";
 
 interface DropDownMenuButtonProps {
-  accountType: string | null | undefined;
+  user: CookiesDto | null | undefined;
+  accountAttendee: Attendees | undefined;
   programDetails: ProgramDetails;
   attendees: Attendees[];
 }
 
 export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
-  accountType,
+  user,
+  accountAttendee,
   programDetails,
   attendees,
 }: DropDownMenuButtonProps) => {
@@ -55,6 +59,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
 
   //Confirmation of player absence
+  const { markAbsent, error: absentError } = useAbsent();
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isRSVPDialogOpen, setRSVPDialogOpen] = useState(false);
@@ -122,12 +127,17 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     setAbsentDialogOpen(true); // Open the alert dialog
   };
 
-  const handleAbsentConfirmation = () => {
-    setAbsentDialogOpen(false);
-    setNotificationVisible(true);
-    setTimeout(() => {
-      setNotificationVisible(false);
-    }, 3000);
+  const handleAbsentConfirmation = async () => {
+    try {
+      await markAbsent(programDetails.programId, user?.accountId);
+      setAbsentDialogOpen(false);
+      setNotificationVisible(true);
+      setTimeout(() => {
+        setNotificationVisible(false);
+      }, 3000);
+    } catch {
+      console.log("Error marking the user as absent in DropDownMenuButton");
+    }
   };
 
   return (
@@ -144,8 +154,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         <DropdownMenuContent className="w-56">
           <DropdownMenuLabel>Options</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {accountType?.toLowerCase() === "coach" ||
-          accountType?.toLowerCase() === "admin" ? (
+          {user?.type?.toLowerCase() === "coach" ||
+          user?.type?.toLowerCase() === "admin" ? (
             <DropdownMenuGroup>
               <DropdownMenuItem
                 onClick={() =>
@@ -173,10 +183,15 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <LogIn color="green" />
                 <span className="text-green-500">RSVP</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleAbsentClick}>
-                <LogOut color="red" />
-                <span className="text-red">Mark as absent</span>
-              </DropdownMenuItem>
+              {/* Here instead I want to check if a player is of role waitlisted */}
+              {(accountAttendee?.participantType?.toLowerCase() !=
+                "waitlisted" ||
+                accountAttendee.confirmed === true) && (
+                <DropdownMenuItem onSelect={handleAbsentClick}>
+                  <LogOut color="red" />
+                  <span className="text-red"> Mark absent </span>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuGroup>
           )}
         </DropdownMenuContent>
@@ -259,6 +274,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             <AlertDialogTitle>
               Are you sure you want to mark yourself as absent?
             </AlertDialogTitle>
+            {absentError && <p className="text-red-500">{absentError}</p>}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setAbsentDialogOpen(false)}>

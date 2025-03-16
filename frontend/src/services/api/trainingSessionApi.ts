@@ -96,11 +96,18 @@ const trainingSessionApi = {
     }
   },
 
+
   getProgramDates: async (accountId?: number | null) => {
     if (!accountId) {
       console.warn("Skipping fetchProgramDates because accountId is null.");
       return [];
     }
+
+    log.info("trainingSessionApi.getPrograms:", response);
+    log.info(
+      "trainingSessionApi.getPrograms: SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOW ME THIS SHSIT ARIGBHASJDFHKSDFHSAJKFHKASDHFKASHDFKHAKSFHDN",
+      data,
+    );
 
     let url = `${baseMappingUrl}/${accountId}/details`; // Calls API only if accountId exists
 
