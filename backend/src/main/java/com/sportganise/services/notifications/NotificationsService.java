@@ -16,7 +16,10 @@ import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermi
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.notifications.FcmTokenRepository;
 import com.sportganise.repositories.notifications.NotificationPreferenceRepository;
+import com.sportganise.repositories.notifications.NotificationRepository;
 import com.sportganise.services.EmailService;
+
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -31,6 +34,7 @@ public class NotificationsService {
   private final NotificationPreferenceRepository notificationPreferenceRepository;
   private final AccountRepository accountRepository;
   private final EmailService emailService;
+  private final NotificationRepository notificationRepository;
 
   /**
    * Constructor for Notifications Service.
@@ -46,12 +50,14 @@ public class NotificationsService {
       FcmTokenRepository fcmTokenRepository,
       NotificationPreferenceRepository notificationPreferenceRepository,
       AccountRepository accountRepository,
-      EmailService emailService) {
+      EmailService emailService,
+      NotificationRepository notificationRepository) {
     this.fcmService = fcmService;
     this.fcmTokenRepository = fcmTokenRepository;
     this.notificationPreferenceRepository = notificationPreferenceRepository;
     this.accountRepository = accountRepository;
     this.emailService = emailService;
+    this.notificationRepository = notificationRepository;
   }
 
   /**
@@ -224,5 +230,18 @@ public class NotificationsService {
       throw new GetNotificationPermissionException(
           "DB error occured when getting notification settings.");
     }
+  }
+
+  /**
+   * Clean up read notifications. Read notifications that are 1 week or older.
+   * Works with NotificationCleanupTask.
+   *
+   * @return int Number of deleted notifications.
+   */
+  public int cleanupOldReadNotifications() {
+    ZonedDateTime retentionTime = ZonedDateTime.now().minusWeeks(1);
+    int deletedCount = notificationRepository.deleteReadNotificationsOlderThanOneWeek(retentionTime);
+    log.info("Cleaned up {} notifications.", deletedCount);
+    return deletedCount;
   }
 }
