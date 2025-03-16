@@ -206,11 +206,10 @@ public class PostService {
       ProgramType programtype,
       Integer programId) {
     PostType postType = programTypeToPostType(programtype);
-  
+
     String metadata = String.format("{\"programID\":%d}", programId);
 
-    Post savedPost =
-        new Post(accountId, title, description, metadata, postType, occurrenceDate);
+    Post savedPost = new Post(accountId, title, description, metadata, postType, occurrenceDate);
     postRepository.save(savedPost);
   }
 
@@ -272,11 +271,11 @@ public class PostService {
 
   /**
    * Helper method to convert a programType enum to a PostType enum value.
-   * 
+   *
    * @param programtype Type of program. Enum.
    * @return Corresponding PostType.
    */
-  private PostType programTypeToPostType(ProgramType programtype){
+  private PostType programTypeToPostType(ProgramType programtype) {
     switch (programtype) {
       case TRAINING:
         return PostType.TRAINING;
