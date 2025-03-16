@@ -1,5 +1,6 @@
 package com.sportganise.repositories.notifications;
 
+import com.sportganise.dto.notifications.NotificationDto;
 import com.sportganise.entities.notifications.Notification;
 import jakarta.transaction.Transactional;
 import java.time.ZonedDateTime;
@@ -12,8 +13,15 @@ import org.springframework.stereotype.Repository;
 /** Repository for Notification entity. */
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
-  @Query("SELECT n FROM Notification n WHERE n.accountId = :userId")
-  List<Notification> findByAccountId(Integer userId);
+  @Query(
+      """
+        SELECT new com.sportganise.dto.notifications.NotificationDto(
+            n.notificationId, n.title, n.body, n.read, n.sentAt
+        )
+        FROM Notification n
+        WHERE n.accountId = :userId
+      """)
+  List<NotificationDto> findByAccountId(Integer userId);
 
   @Modifying
   @Transactional

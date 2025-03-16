@@ -2,6 +2,7 @@ package com.sportganise.services.notifications;
 
 import com.sportganise.dto.notifications.NotificationAlertsDto;
 import com.sportganise.dto.notifications.NotificationComponentDto;
+import com.sportganise.dto.notifications.NotificationDto;
 import com.sportganise.dto.notifications.NotificationFcmRequestDto;
 import com.sportganise.dto.notifications.NotificationMethodDto;
 import com.sportganise.dto.notifications.NotificationMethodEnum;
@@ -10,7 +11,6 @@ import com.sportganise.dto.notifications.NotificationSettingsDto;
 import com.sportganise.dto.notifications.NotificationTypeEnum;
 import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
 import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
-import com.sportganise.entities.notifications.Notification;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
@@ -240,7 +240,7 @@ public class NotificationsService {
    * @return NotificationAlertsDto containing the notifications.
    */
   public NotificationAlertsDto getNotificationAlerts(Integer userId) {
-    List<Notification> notifications = notificationRepository.findByAccountId(userId);
+    List<NotificationDto> notifications = notificationRepository.findByAccountId(userId);
     return NotificationAlertsDto.builder().notifications(notifications).build();
   }
 
