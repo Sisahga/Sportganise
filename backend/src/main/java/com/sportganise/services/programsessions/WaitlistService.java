@@ -294,16 +294,15 @@ public class WaitlistService {
                 });
 
     // Subscribed players for training events
-    final String type = program.getProgramType() == ProgramType.TRAINING
-          ? "Subscribed"
-          : account.getType().name();
+    final String type =
+        program.getProgramType() == ProgramType.TRAINING ? "Subscribed" : account.getType().name();
 
     ProgramParticipant programParticipant =
         this.participantRepository
             .findById(new ProgramParticipantId(programId, accountId))
             .orElseGet(
                 () -> {
-                  // Register new program participant 
+                  // Register new program participant
                   // Confirming them
                   isNewParticipant.set(true);
                   return this.participantRepository.save(
