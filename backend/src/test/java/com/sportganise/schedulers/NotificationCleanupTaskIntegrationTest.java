@@ -1,5 +1,9 @@
 package com.sportganise.schedulers;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.sportganise.services.notifications.NotificationsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,24 +17,17 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-/**
- * Integration test for NotificationCleanupTask.
- */
+/** Integration test for NotificationCleanupTask. */
 @Testcontainers
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class NotificationCleanupTaskIntegrationTest {
-  /**
-   * PostgreSQL test container.
-   */
+  /** PostgreSQL test container. */
   @SuppressWarnings("resource")
   @Container
   static PostgreSQLContainer<?> postgres =
-          new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest")).withInitScript("init.sql");
+      new PostgreSQLContainer<>(DockerImageName.parse("postgres:latest"))
+          .withInitScript("init.sql");
 
   static {
     postgres.start();
@@ -43,11 +40,9 @@ public class NotificationCleanupTaskIntegrationTest {
     dynamicPropertyRegistry.add("spring.datasource.password", postgres::getPassword);
   }
 
-  @Autowired
-  private NotificationCleanupTask cleanupTask;
+  @Autowired private NotificationCleanupTask cleanupTask;
 
-  @MockBean
-  private NotificationsService notificationsService;
+  @MockBean private NotificationsService notificationsService;
 
   @Test
   public void connectionEstablished() {

@@ -18,7 +18,6 @@ import com.sportganise.repositories.notifications.FcmTokenRepository;
 import com.sportganise.repositories.notifications.NotificationPreferenceRepository;
 import com.sportganise.repositories.notifications.NotificationRepository;
 import com.sportganise.services.EmailService;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -233,14 +232,15 @@ public class NotificationsService {
   }
 
   /**
-   * Clean up read notifications. Read notifications that are 1 week or older.
-   * Works with NotificationCleanupTask.
+   * Clean up read notifications. Read notifications that are 1 week or older. Works with
+   * NotificationCleanupTask.
    *
    * @return int Number of deleted notifications.
    */
   public int cleanupOldReadNotifications() {
     ZonedDateTime retentionTime = ZonedDateTime.now().minusWeeks(1);
-    int deletedCount = notificationRepository.deleteReadNotificationsOlderThanOneWeek(retentionTime);
+    int deletedCount =
+        notificationRepository.deleteReadNotificationsOlderThanOneWeek(retentionTime);
     log.info("Cleaned up {} notifications.", deletedCount);
     return deletedCount;
   }
