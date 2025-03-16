@@ -205,24 +205,8 @@ public class PostService {
       ZonedDateTime occurrenceDate,
       ProgramType programtype,
       Integer programId) {
-    PostType postType;
-    switch (programtype) {
-      case TRAINING:
-        postType = PostType.TRAINING;
-        break;
-      case SPECIALTRAINING:
-        postType = PostType.SPECIAL;
-        break;
-      case FUNDRAISER:
-        postType = PostType.FUNDRAISER;
-        break;
-      case TOURNAMENT:
-        postType = PostType.TOURNAMENT;
-        break;
-      default:
-        throw new ResourceNotFoundException("Unsupported ProgramType: " + programtype);
-    }
-
+    PostType postType = programTypeToPostType(programtype);
+  
     String metadata = String.format("{\"programID\":%d}", programId);
 
     Post savedPost =
@@ -284,5 +268,20 @@ public class PostService {
   private ZonedDateTime getYesterday() {
     log.debug("Fetching date yesterday");
     return ZonedDateTime.now().minusDays(1);
+  }
+
+  private PostType programTypeToPostType(ProgramType programtype){
+    switch (programtype) {
+      case TRAINING:
+        return PostType.TRAINING;
+      case SPECIALTRAINING:
+        return PostType.SPECIAL;
+      case FUNDRAISER:
+        return PostType.FUNDRAISER;
+      case TOURNAMENT:
+        return PostType.TOURNAMENT;
+      default:
+        throw new ResourceNotFoundException("Unsupported ProgramType: " + programtype);
+    }
   }
 }
