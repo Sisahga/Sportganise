@@ -16,6 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProgramDto {
   private Integer programId;
+  private Integer recurrenceId = null;
   private ProgramType programType;
   private String title;
   private String description;

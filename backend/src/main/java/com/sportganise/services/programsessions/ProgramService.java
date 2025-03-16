@@ -127,6 +127,7 @@ public class ProgramService {
 
     return new ProgramDto(
         program.getProgramId(),
+        null,
         program.getProgramType(),
         program.getTitle(),
         program.getDescription(),
@@ -205,6 +206,7 @@ public class ProgramService {
           programDtos.add(
               new ProgramDto(
                   programId,
+                  recurrence.getRecurrenceId(),
                   programType,
                   title,
                   description,
@@ -223,6 +225,7 @@ public class ProgramService {
         programDtos.add(
             new ProgramDto(
                 programId,
+                null,
                 programType,
                 title,
                 description,
