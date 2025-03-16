@@ -62,6 +62,7 @@ import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
 import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
+import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -141,6 +142,8 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
+  const { invite, loading: inviteLoading, error: inviteError } = useInviteToPrivateEvent();
+
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (values.visibility === "private" && selectedMembers.length === 0) {
@@ -200,6 +203,22 @@ export default function CreateTrainingSessionForm() {
           "Error from useCreateTrainingSession.createTrainingSession!",
         );
       }
+
+      const programId = create.data.programId
+
+      if (values.visibility === "private" && selectedMembers.length > 0) {
+        await Promise.all(
+          selectedMembers.map(async (accountId) => {
+            try {
+              await invite(accountId, programId!);
+            } catch (error) {
+              console.error(`Failed to invite member ${accountId}:`, error);
+              throw error; // Re-throw to trigger the catch block
+            }
+          })
+        );
+      }
+  
       console.log("loading", loading);
       log.info("createTrainingSession submit success ✔");
 

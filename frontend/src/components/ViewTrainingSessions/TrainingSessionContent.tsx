@@ -29,7 +29,7 @@ import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
-import waitlistParticipantsApi from "@/services/api/waitlistParticipantsApi";
+import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.

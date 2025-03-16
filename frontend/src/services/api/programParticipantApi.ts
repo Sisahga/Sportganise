@@ -5,7 +5,7 @@ import log from "loglevel";
 const baseMappingUrl =
   import.meta.env.VITE_API_BASE_URL + "/api/program-participant";
 
-const waitlistParticipantsApi = {
+const programParticipantApi = {
   getProgramParticipant: async (
     programId: number,
     accountId: number | null | undefined,
@@ -17,10 +17,10 @@ const waitlistParticipantsApi = {
         Authorization: getBearerToken(),
       },
     });
-    console.log("In waitlistParticipantsApi.getProgramParticipant");
-    log.info("------ In waitlistParticipantsApi.getProgramParticipant");
-    console.log("response in waitlistParticipantsApi:", response);
-    log.info("response in waitlistParticipantsApi:", response);
+    console.log("In ProgramParticipantApi.getProgramParticipant");
+    log.info("------ In ProgramParticipantApi.getProgramParticipant");
+    console.log("response in ProgramParticipantApi:", response);
+    log.info("response in ProgramParticipantApi:", response);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -44,10 +44,10 @@ const waitlistParticipantsApi = {
         Authorization: getBearerToken(),
       },
     });
-    console.log("In waitlistParticipantsApi.markAbsent");
-    log.info("------ In waitlistParticipantsApi.markAbsent");
-    console.log("response in waitlistParticipantsApi:", response);
-    log.info("response in waitlistParticipantsApi:", response);
+    console.log("In ProgramParticipantApi.markAbsent");
+    log.info("------ In ProgramParticipantApi.markAbsent");
+    console.log("response in ProgramParticipantApi:", response);
+    log.info("response in ProgramParticipantApi:", response);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -59,6 +59,33 @@ const waitlistParticipantsApi = {
     console.log("Heres the data:", data);
     return data;
   },
+
+  inviteToPrivateEvent: async (
+    accountId: number, 
+    programId: number | null | undefined,
+  ) => {
+    const url = `${baseMappingUrl}/invite-private?programId=${programId}&accountId=${accountId}`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
+    console.log("In ProgramParticipantApi.inviteToPrivateEvent");
+    log.info("------ In ProgramParticipantApi.inviteToPrivateEvent");
+    console.log("response in inviteToPrivateEvent:", response);
+    log.info("response in inviteToPrivateEvent:", response);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      log.error(`Error: ${response.status}`, errorText);
+      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    }
+
+    const data: Attendees = await response.json();
+    console.log("Heres the data:", data);
+    return data;
+  }
 };
 
-export default waitlistParticipantsApi;
+export default programParticipantApi;
