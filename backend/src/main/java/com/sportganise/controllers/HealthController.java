@@ -15,6 +15,6 @@ public class HealthController {
   @GetMapping("/ping")
   public ResponseEntity<ResponseDto<Void>> ping() {
     log.debug("Ping endpoint requested, status OK");
-    return ResponseDto.ok(null, "pong");
+    return ResponseDto.ok(null, "Service is healthy");
   }
 }
