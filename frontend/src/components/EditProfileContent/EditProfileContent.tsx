@@ -259,7 +259,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="firstName"
-                      placeholder={data?.firstName || "First Name"}
+                      placeholder={"First Name"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -275,11 +275,7 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="lastName">Last Name</Label>
                   <FormControl>
-                    <Input
-                      {...field}
-                      id="lastName"
-                      placeholder={data?.lastName || "Last Name"}
-                    />
+                    <Input {...field} id="lastName" placeholder={"Last Name"} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -297,7 +293,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="email"
-                      placeholder={data?.email || "Email"}
+                      placeholder={"example@domain.com"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -313,11 +309,7 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="phone">Phone</Label>
                   <FormControl>
-                    <Input
-                      {...field}
-                      id="phone"
-                      placeholder={data?.phone || "Phone"}
-                    />
+                    <Input {...field} id="phone" placeholder={"111-111-1111"} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -335,7 +327,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="address"
-                      placeholder={data?.address?.line || "Address"}
+                      placeholder={"Street Address"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -354,7 +346,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="postalCode"
-                      placeholder={data?.address?.postalCode || "Postal Code"}
+                      placeholder={"Postal Code"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -371,11 +363,7 @@ const EditProfileContent: React.FC = () => {
                   <FormItem className="flex-1">
                     <Label htmlFor="city">City</Label>
                     <FormControl>
-                      <Input
-                        {...field}
-                        id="city"
-                        placeholder={data?.address?.city || "City"}
-                      />
+                      <Input {...field} id="city" placeholder={"City"} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -391,7 +379,7 @@ const EditProfileContent: React.FC = () => {
                       <Input
                         {...field}
                         id="province"
-                        placeholder={data?.address?.province || "Province"}
+                        placeholder={"Province"}
                       />
                     </FormControl>
                     <FormMessage />
@@ -406,11 +394,7 @@ const EditProfileContent: React.FC = () => {
                   <FormItem className="flex-1">
                     <Label htmlFor="country">Country</Label>
                     <FormControl>
-                      <Input
-                        {...field}
-                        id="country"
-                        placeholder={data?.address?.country || "Country"}
-                      />
+                      <Input {...field} id="country" placeholder={"Country"} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
