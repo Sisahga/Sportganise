@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+/** Repository for Notification entity. */
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
   @Modifying
