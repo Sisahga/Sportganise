@@ -1,27 +1,27 @@
-//package com.sportganise.schedulers;
+// package com.sportganise.schedulers;
 //
-//import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-//import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.when;
+// import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+// import static org.mockito.Mockito.verify;
+// import static org.mockito.Mockito.when;
 //
-//import com.sportganise.services.notifications.NotificationsService;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.mock.mockito.MockBean;
-//import org.springframework.test.context.DynamicPropertyRegistry;
-//import org.springframework.test.context.DynamicPropertySource;
-//import org.testcontainers.containers.PostgreSQLContainer;
-//import org.testcontainers.junit.jupiter.Container;
-//import org.testcontainers.junit.jupiter.Testcontainers;
-//import org.testcontainers.utility.DockerImageName;
+// import com.sportganise.services.notifications.NotificationsService;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.boot.test.mock.mockito.MockBean;
+// import org.springframework.test.context.DynamicPropertyRegistry;
+// import org.springframework.test.context.DynamicPropertySource;
+// import org.testcontainers.containers.PostgreSQLContainer;
+// import org.testcontainers.junit.jupiter.Container;
+// import org.testcontainers.junit.jupiter.Testcontainers;
+// import org.testcontainers.utility.DockerImageName;
 //
-///** Integration test for NotificationCleanupTask. */
-//@Testcontainers
-//@SpringBootTest
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-//public class NotificationCleanupTaskIntegrationTest {
+/// ** Integration test for NotificationCleanupTask. */
+// @Testcontainers
+// @SpringBootTest
+// @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+// public class NotificationCleanupTaskIntegrationTest {
 //  /** PostgreSQL test container. */
 //  @SuppressWarnings("resource")
 //  @Container
@@ -56,4 +56,4 @@
 //    cleanupTask.cleanup();
 //    verify(notificationsService).cleanupOldReadNotifications();
 //  }
-//}
+// }
