@@ -106,7 +106,7 @@ import { CookiesDto } from "@/types/auth";
 
 // Provide minimal valid test data
 const programDetails: ProgramDetails = {
-  programId: "123"
+  programId: "123",
 } as unknown as ProgramDetails;
 
 const attendees: Attendees[] = [];
@@ -176,7 +176,7 @@ describe("DropDownMenuButton component", () => {
 
     const accountAttendee: Attendees = {
       participantType: "player",
-      confirmed: true
+      confirmed: true,
     } as Attendees;
 
     render(
@@ -246,7 +246,7 @@ describe("DropDownMenuButton component", () => {
 
     const accountAttendee: Attendees = {
       participantType: "player",
-      confirmed: true
+      confirmed: true,
     } as Attendees;
 
     render(
