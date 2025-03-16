@@ -1,5 +1,6 @@
 package com.sportganise.services.notifications;
 
+import com.sportganise.dto.notifications.NotificationAlertsDto;
 import com.sportganise.dto.notifications.NotificationComponentDto;
 import com.sportganise.dto.notifications.NotificationFcmRequestDto;
 import com.sportganise.dto.notifications.NotificationMethodDto;
@@ -9,6 +10,7 @@ import com.sportganise.dto.notifications.NotificationSettingsDto;
 import com.sportganise.dto.notifications.NotificationTypeEnum;
 import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
 import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
+import com.sportganise.entities.notifications.Notification;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
@@ -229,6 +231,17 @@ public class NotificationsService {
       throw new GetNotificationPermissionException(
           "DB error occured when getting notification settings.");
     }
+  }
+
+  /**
+   * Get notification alerts for a user.
+   *
+   * @param userId Id of the user to get notification alerts for.
+   * @return NotificationAlertsDto containing the notifications.
+   */
+  public NotificationAlertsDto getNotificationAlerts(Integer userId) {
+    List<Notification> notifications = notificationRepository.findByAccountId(userId);
+    return NotificationAlertsDto.builder().notifications(notifications).build();
   }
 
   /**

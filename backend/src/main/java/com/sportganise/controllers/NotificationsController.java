@@ -1,6 +1,7 @@
 package com.sportganise.controllers;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.notifications.NotificationAlertsDto;
 import com.sportganise.dto.notifications.NotificationRequestDto;
 import com.sportganise.dto.notifications.NotificationSettingsDto;
 import com.sportganise.dto.notifications.StoreFcmTokenDto;
@@ -120,6 +121,25 @@ public class NotificationsController {
             .statusCode(HttpStatus.OK.value())
             .message("Successfully retrieved notification settings.")
             .data(notifSettings)
+            .build();
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * Get the notification alerts of a user.
+   *
+   * @param userId Id of the user to get notification alerts for.
+   * @return a response entity with the notification alerts and status 200 OK.
+   */
+  @GetMapping("/get-notif-alerts/{userId}")
+  public ResponseEntity<ResponseDto<NotificationAlertsDto>> getNotificationAlerts(
+      @PathVariable Integer userId) {
+    NotificationAlertsDto notificationAlerts = notificationsService.getNotificationAlerts(userId);
+    ResponseDto<NotificationAlertsDto> response =
+        ResponseDto.<NotificationAlertsDto>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Successfully retrieved notification alerts.")
+            .data(notificationAlerts)
             .build();
     return ResponseEntity.ok(response);
   }
