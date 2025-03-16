@@ -112,32 +112,32 @@ const programDetails: ProgramDetails = {
 const attendees: Attendees[] = [];
 
 // Create dummy user objects that fully satisfy CookiesDto.
-const coachUser: CookiesDto = {
-  accountId: 123,
-  firstName: "Coach",
-  lastName: "User",
-  email: "coach@example.com",
-  pictureUrl: "http://example.com/coach.png",
-  type: "coach",
-  phone: "1234567890",
-  organisationIds: [1, 2],
-  jwtToken: "dummyJwtToken",
-};
+// const coachUser: CookiesDto = {
+//   accountId: 123,
+//   firstName: "Coach",
+//   lastName: "User",
+//   email: "coach@example.com",
+//   pictureUrl: "http://example.com/coach.png",
+//   type: "coach",
+//   phone: "1234567890",
+//   organisationIds: [1, 2],
+//   jwtToken: "dummyJwtToken",
+// };
 
-const playerUser: CookiesDto = {
-  accountId: 456,
-  firstName: "Player",
-  lastName: "User",
-  email: "player@example.com",
-  pictureUrl: "http://example.com/player.png",
-  type: "player",
-  phone: "0987654321",
-  organisationIds: [1],
-  jwtToken: "dummyJwtToken",
-};
+// const playerUser: CookiesDto = {
+//   accountId: 456,
+//   firstName: "Player",
+//   lastName: "User",
+//   email: "player@example.com",
+//   pictureUrl: "http://example.com/player.png",
+//   type: "player",
+//   phone: "0987654321",
+//   organisationIds: [1],
+//   jwtToken: "dummyJwtToken",
+// };
 
 // Optionally provide an accountAttendee if needed (for now, undefined)
-const accountAttendee: Attendees | undefined = undefined;
+// const accountAttendee: Attendees | undefined = undefined;
 
 describe("DropDownMenuButton component", () => {
   it("renders coach/admin options when user type is 'coach'", () => {
