@@ -547,7 +547,7 @@ export default function CreateTrainingSessionForm() {
                       {selectedFreq === "WEEKLY" &&
                         " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
                       {selectedFreq === "MONTHLY" &&
-                        " Program end date must fall on the same day of the week as the selected start date and be at least one month apart."}
+                        " Program end date must have the same date of the month as the selected start date and be at least one month apart."}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
