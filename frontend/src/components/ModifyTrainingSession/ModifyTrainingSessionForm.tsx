@@ -68,6 +68,7 @@ import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
+import { useWatch } from "react-hook-form";
 
 /**All select element options */
 const types = [
@@ -141,7 +142,7 @@ export default function ModifyTrainingSessionForm() {
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
   let [attachmentsToRemove /* setAttachmentsToRemove */] = useState<string[]>(
-    [],
+    []
   );
   const [loading, setLoading] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
@@ -225,7 +226,7 @@ export default function ModifyTrainingSessionForm() {
     }
     form.setValue(
       "startTime",
-      new Date(programDetails.occurrenceDate).toISOString().slice(11, 16),
+      new Date(programDetails.occurrenceDate).toISOString().slice(11, 16)
     );
     const endTime = new Date(programDetails.occurrenceDate);
     endTime.setMinutes(endTime.getMinutes() + programDetails.durationMins); //REFACTOR
@@ -269,7 +270,7 @@ export default function ModifyTrainingSessionForm() {
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
-            (urlName) => urlName !== file.name,
+            (urlName) => urlName !== file.name
           );
         });
       }
@@ -279,7 +280,7 @@ export default function ModifyTrainingSessionForm() {
         title: values.title,
         type: values.type,
         startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
+        endDate: values.endDate?.toISOString() ?? null,
         frequency: values.frequency,
         recurring: values.recurring.toString(),
         visibility: values.visibility,
@@ -294,7 +295,7 @@ export default function ModifyTrainingSessionForm() {
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
-        }),
+        })
       );
 
       // API call submit form
@@ -302,13 +303,13 @@ export default function ModifyTrainingSessionForm() {
       const modify = await modifyTrainingSession(
         accountId,
         programDetails.programId,
-        formData,
+        formData
       );
       log.info("modify : ", modify);
       setLoading(false);
       if (modify === null) {
         throw new Error(
-          "Error from usemodifyTrainingSession.modifyTrainingSession!",
+          "Error from usemodifyTrainingSession.modifyTrainingSession!"
         );
       }
       log.info("modifyTrainingSession submit success ✔");
@@ -335,6 +336,13 @@ export default function ModifyTrainingSessionForm() {
       setLoading(false);
     }
   };
+
+  // Watch for changes to frequency
+  // ... conditionally display endDate when frequency != "DAILY"
+  const selectedFreq = useWatch({
+    control: form.control,
+    name: "frequency",
+  });
 
   return (
     <div className="mb-32">
@@ -365,7 +373,9 @@ export default function ModifyTrainingSessionForm() {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-semibold text-base">Title</FormLabel>
+                <FormLabel className="font-semibold text-base">
+                  Title*
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Name the program"
@@ -387,7 +397,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Type of Program
+                  Type of Program*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -397,7 +407,7 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
@@ -427,7 +437,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {type.label}
@@ -438,7 +448,7 @@ export default function ModifyTrainingSessionForm() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-
+                <FormDescription>Select the program type.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -451,7 +461,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Start Date
+                  Start Date*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -460,7 +470,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -484,52 +494,7 @@ export default function ModifyTrainingSessionForm() {
                 <FormDescription>
                   Enter the first date of the program. Applies for recurring and
                   non recurring programs. If recurring, this day will be the
-                  assumed repeat day in the future.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** End Date */}
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  End Date
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Enter the last day of a recurring program.
+                  assumed repeat day of the week in the future.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -543,7 +508,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Frequency of Program
+                  Frequency*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -553,12 +518,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? frequencies.find(
-                              (frequency) => frequency.value === field.value,
+                              (frequency) => frequency.value === field.value
                             )?.label
                           : "Select frequency"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -584,7 +549,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   frequency.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {frequency.label}
@@ -595,6 +560,59 @@ export default function ModifyTrainingSessionForm() {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                <FormDescription>
+                  Select the frequency at which you would like the program to
+                  recur.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/** End Date */}
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="font-semibold text-base">
+                  End Date*
+                </FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormDescription>
+                  Enter the last day of a recurring program.
+                  {selectedFreq === "WEEKLY" &&
+                    " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
+                  {selectedFreq === "MONTHLY" &&
+                    " Program end date must fall on the same day of the week as the selected start date and be at least one month apart."}
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -609,7 +627,7 @@ export default function ModifyTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
-                    Start Time
+                    Start Time*
                   </FormLabel>
                   <FormControl>
                     <Input type="time" className="w-full" {...field} />
@@ -629,7 +647,7 @@ export default function ModifyTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
-                    End Time
+                    End Time*
                   </FormLabel>
                   <FormControl>
                     <Input type="time" {...field} />
@@ -650,7 +668,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Location
+                  Location*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -660,12 +678,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value,
+                              (location) => location.value === field.value
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -691,7 +709,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {location.label}
@@ -725,7 +743,7 @@ export default function ModifyTrainingSessionForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-semibold">
-                    Recurring program
+                    Recurring program*
                   </FormLabel>
                   <FormDescription>
                     The program recurs on the day and at the times entered.
@@ -743,7 +761,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Visibility
+                  Visibility*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -753,12 +771,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
+                              (visibility) => visibility.value === field.value
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -784,7 +802,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {visibility.label}
@@ -810,7 +828,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-semibold text-base">
-                  Description
+                  Description*
                 </FormLabel>
                 <FormControl>
                   <Textarea
@@ -872,7 +890,7 @@ export default function ModifyTrainingSessionForm() {
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Max file size is 4 MB. Limit of 5
+                  Select a file to upload. Max file size is 10 MB. Limit of 5
                   files.
                 </FormDescription>
                 <FormMessage />
@@ -887,7 +905,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-semibold text-base">
-                  Attendance Capacity
+                  Attendance Capacity*
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -896,7 +914,7 @@ export default function ModifyTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        e.target.value ? Number(e.target.value) : undefined
                       )
                     }
                   />
