@@ -251,4 +251,13 @@ CREATE TABLE notification_preference(
     PRIMARY KEY (account_id)
 );
 
+CREATE TABLE notification(
+    notification_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    title VARCHAR(30) NOT NULL,
+    body VARCHAR(100) NOT NULL,
+    read BOOLEAN DEFAULT FALSE,
+    sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
 SET TIME ZONE 'America/New_York';
