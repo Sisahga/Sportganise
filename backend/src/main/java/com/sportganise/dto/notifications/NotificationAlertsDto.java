@@ -1,17 +1,14 @@
 package com.sportganise.dto.notifications;
 
 import com.sportganise.entities.notifications.Notification;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
-/**
- * Data transfer object for notification alerts.
- */
+/** Data transfer object for notification alerts. */
 @Getter
 @Setter
 @AllArgsConstructor
