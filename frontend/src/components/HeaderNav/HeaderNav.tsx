@@ -22,6 +22,11 @@ export default function HeaderNav() {
   }, [accountType]);
   const navigate = useNavigate();
 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const closeDrawer = () => {
+    setIsDrawerOpen(false);
+  };
+
   const clearCookiesAndNavigate = () => {
     clearCookies();
     navigate("/login");
@@ -34,8 +39,11 @@ export default function HeaderNav() {
           <img src={logo} alt="Logo" className="h-20 cursor-pointer" />
         </Link>
 
-        <Drawer>
-          <DrawerTrigger className="bg-primaryColour hover:outline-none">
+        <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+          <DrawerTrigger
+            className="bg-primaryColour hover:outline-none"
+            onClick={() => setIsDrawerOpen(true)}
+          >
             <Menu className="h-10 w-10" />
           </DrawerTrigger>
           <DrawerContent className="md:w-[20%] w-[50%]">
@@ -48,12 +56,14 @@ export default function HeaderNav() {
               <Link
                 to="/"
                 className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                onClick={closeDrawer}
               >
                 Home
               </Link>
               <Link
                 to="/pages/ForumPage"
                 className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                onClick={closeDrawer}
               >
                 Forum
               </Link>
@@ -63,20 +73,34 @@ export default function HeaderNav() {
                   <Link
                     to="/pages/CreateTrainingSessionPage"
                     className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    onClick={closeDrawer}
                   >
                     Create Program
                   </Link>
                   <Link
                     to="/pages/TrainingPlanPage"
                     className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    onClick={closeDrawer}
                   >
                     Training Plan
+                  </Link>
+                </>
+              )}
+              {accountType?.toLowerCase() === "admin" && (
+                <>
+                  <Link
+                    to="/pages/ModifyPermissionPage"
+                    className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                    onClick={closeDrawer}
+                  >
+                    User Permissions
                   </Link>
                 </>
               )}
               <Link
                 to="/pages/NotificationSettingsPage"
                 className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                onClick={closeDrawer}
               >
                 Settings
               </Link>
