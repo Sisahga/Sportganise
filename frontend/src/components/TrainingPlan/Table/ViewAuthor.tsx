@@ -72,7 +72,7 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
           )}
         </div>
       ) : (
-        <span className="text-yellow-600">DNE</span>
+        <span className="text-yellow-600">N/A</span>
       )}
     </div>
   );
