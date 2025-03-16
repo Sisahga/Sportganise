@@ -277,7 +277,7 @@ describe("EditProfileContent Component", () => {
       expect(mockToast).toHaveBeenCalledWith({
         title: "Profile Updated",
         description: "Profile updated successfully",
-        variant: "default",
+        variant: "success",
       }),
     );
   });
