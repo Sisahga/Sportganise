@@ -68,6 +68,7 @@ import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
+import { useWatch } from "react-hook-form";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -189,7 +190,7 @@ export default function CreateTrainingSessionForm() {
         title: values.title,
         type: values.type,
         startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
+        endDate: values.endDate?.toISOString() ?? null,
         frequency: values.frequency,
         recurring: values.recurring.toString(),
         visibility: values.visibility,
@@ -270,6 +271,13 @@ export default function CreateTrainingSessionForm() {
   };
   console.log("members in form:", members);
 
+  // Watch for changes to frequency
+  // ... conditionally display endDate when frequency != "DAILY"
+  const selectedFreq = useWatch({
+    control: form.control,
+    name: "frequency",
+  });
+
   return (
     <>
       {playersLoading ? (
@@ -299,7 +307,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-base">
-                    Title
+                    Title*
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -324,7 +332,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Type of Program
+                    Type of Program*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -375,6 +383,7 @@ export default function CreateTrainingSessionForm() {
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  <FormDescription>Select the program type.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -387,7 +396,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Start Date
+                    Start Date*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -420,53 +429,7 @@ export default function CreateTrainingSessionForm() {
                   <FormDescription>
                     Enter the first date of the program. Applies for recurring
                     and non recurring programs. If recurring, this day will be
-                    the assumed repeat day in the future.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/** End Date */}
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel className="font-semibold text-base">
-                    End Date
-                  </FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    Enter the last day of a recurring program. If same-day
-                    program, pick the day entered for start date.
+                    the assumed repeat day of the week in the future.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -480,7 +443,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Frequency of Program
+                    Frequency*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -532,10 +495,65 @@ export default function CreateTrainingSessionForm() {
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  <FormDescription>
+                    Select the frequency at which you would like the program to
+                    recur.
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/** End Date */}
+            {(selectedFreq === "WEEKLY" || selectedFreq === "MONTHLY") && (
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="font-semibold text-base">
+                      End Date*
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      Enter the last day of a recurring program.
+                      {selectedFreq === "WEEKLY" &&
+                        " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
+                      {selectedFreq === "MONTHLY" &&
+                        " Program end date must fall on the same day of the week as the selected start date and be at least one month apart."}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/** Time */}
             <div className="flex gap-2">
@@ -546,7 +564,7 @@ export default function CreateTrainingSessionForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel className="font-semibold text-base">
-                      Start Time
+                      Start Time*
                     </FormLabel>
                     <FormControl>
                       <Input type="time" className="w-full" {...field} />
@@ -566,7 +584,7 @@ export default function CreateTrainingSessionForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel className="font-semibold text-base">
-                      End Time
+                      End Time*
                     </FormLabel>
                     <FormControl>
                       <Input type="time" {...field} />
@@ -587,7 +605,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Location
+                    Location*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -680,7 +698,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Visibility
+                    Visibility*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -783,7 +801,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-base">
-                    Description
+                    Description*
                   </FormLabel>
                   <FormControl>
                     <Textarea
@@ -849,7 +867,8 @@ export default function CreateTrainingSessionForm() {
                     </FileUploader>
                   </FormControl>
                   <FormDescription>
-                    Select a file to upload. Limit of 5 files.
+                    Select a file to upload. Max file size is 10 MB. Limit of 5
+                    files.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -863,7 +882,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-base">
-                    Attendance Capacity
+                    Attendance Capacity*
                   </FormLabel>
                   <FormControl>
                     <Input

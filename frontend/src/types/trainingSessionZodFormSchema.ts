@@ -5,7 +5,7 @@ export const formSchema = z
     title: z.string().max(30, "Only 30 characters accepted."),
     type: z.string(),
     startDate: z.coerce.date(),
-    endDate: z.coerce.date(),
+    endDate: z.coerce.date().optional(),
     frequency: z.string(),
     recurring: z.boolean().default(false),
     visibility: z.string(),
@@ -27,9 +27,18 @@ export const formSchema = z
       .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
     location: z.string(),
   })
-  .refine((data) => data.endDate >= data.startDate, {
+  .superRefine((data, ctx) => {
+    if (data.frequency !== "DAILY" && !data.endDate) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "End date is required for recurring programs.",
+        path: ["endDate"],
+      });
+    }
+  })
+  .refine((data) => !data.endDate || data.endDate >= data.startDate, {
     message: "End date cannot be earlier than the start date.",
-    path: ["endDate"], //points to the end_date field in the error message
+    path: ["endDate"],
   })
   .refine((data) => data.endTime >= data.startTime, {
     message: "End time cannot be earlier than start time.",
@@ -37,17 +46,21 @@ export const formSchema = z
   })
   .refine(
     (data) =>
-      !(data.startDate.getTime() === data.endDate.getTime() && data.recurring),
+      !data.endDate ||
+      data.startDate.getTime() !== data.endDate.getTime() ||
+      !data.recurring,
     {
       message:
-        "Program start and end dates are the same and therefore cannot reccur.",
+        "Program start and end dates are the same and therefore cannot recur.",
       path: ["recurring"],
     }
   )
   .refine(
     (data) =>
+      !data.endDate ||
       !(
         data.startDate.getDate() === data.endDate.getDate() &&
+        data.startDate.getMonth() === data.endDate.getMonth() &&
         data.frequency !== "DAILY"
       ),
     {
@@ -58,13 +71,14 @@ export const formSchema = z
   )
   .refine(
     (data) =>
+      !data.endDate ||
       !(
         data.frequency === "WEEKLY" &&
         data.endDate.getDay() !== data.startDate.getDay()
       ),
     {
       message:
-        "Program start and end dates must be at least a week apart and fall on the same day.",
+        "Program start and end dates must be at least a week apart and fall on the same day of the week.",
       path: ["frequency"],
     }
   );
