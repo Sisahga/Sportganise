@@ -570,53 +570,55 @@ export default function ModifyTrainingSessionForm() {
           />
 
           {/** End Date */}
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  End Date*
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Enter the last day of a recurring program.
-                  {selectedFreq === "WEEKLY" &&
-                    " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
-                  {selectedFreq === "MONTHLY" &&
-                    " Program end date must fall on the same day of the week as the selected start date and be at least one month apart."}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {(selectedFreq === "WEEKLY" || selectedFreq === "MONTHLY") && (
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    End Date*
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Enter the last day of a recurring program.
+                    {selectedFreq === "WEEKLY" &&
+                      " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
+                    {selectedFreq === "MONTHLY" &&
+                      " Program end date must fall on the same day of the week as the selected start date and be at least one month apart."}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           {/** Time */}
           <div className="flex gap-2">
