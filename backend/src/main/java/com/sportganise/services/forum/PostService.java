@@ -223,8 +223,10 @@ public class PostService {
         throw new ResourceNotFoundException("Unsupported ProgramType: " + programtype);
     }
 
+    String metadata = String.format("{\"programID\":%d}", programId);
+
     Post savedPost =
-        new Post(accountId, title, description, programId.toString(), postType, occurrenceDate);
+        new Post(accountId, title, description, metadata, postType, occurrenceDate);
     postRepository.save(savedPost);
   }
 
