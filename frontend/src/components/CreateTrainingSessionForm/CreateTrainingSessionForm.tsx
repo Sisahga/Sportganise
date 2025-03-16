@@ -76,13 +76,13 @@ export default function CreateTrainingSessionForm() {
   } = usePlayers();
 
   const members: Member[] = players.map((player) => ({
-    id: player.accountId.toString(),
+    id: player.accountId,
     name: `${player.firstName} ${player.lastName}`,
     email: player.email,
-    role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"
+    role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"    
   }));
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   // AccountId from cookies
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
