@@ -91,9 +91,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -106,9 +106,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -121,9 +121,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -136,9 +136,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -542,11 +542,6 @@ public class GlobalExceptionHandler {
         .message(e.getMessage())
         .build();
   }
-
-
-
-
-
 
   /**
    * Handle invalid frequency exception.
