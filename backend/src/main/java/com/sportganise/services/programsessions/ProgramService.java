@@ -656,7 +656,8 @@ public class ProgramService {
   }
 
   /**
-   * Method to modify a recurring program with drastic changes, namely those with different frequencies and dates.
+   * Method to modify a recurring program with drastic changes, namely those with different
+   * frequencies and dates.
    *
    * @param programId Id of the program.
    * @param newStartDate Start date of the first occurrence.
