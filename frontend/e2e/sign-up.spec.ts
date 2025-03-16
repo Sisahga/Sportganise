@@ -1,5 +1,11 @@
 import { test, expect } from "@playwright/test";
 
+test("ensure backend responds", async () => {
+  const res = await fetch("http://localhost/api/health/ping");
+  console.log(res);
+  expect(res.status).toBe(200);
+});
+
 test("should start at login page", async ({ page }) => {
   await page.goto("/");
 
