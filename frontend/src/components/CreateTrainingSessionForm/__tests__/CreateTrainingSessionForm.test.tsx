@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render } from "@testing-library/react";
+//import { screen } from "@testing-library/react";
 import { HomeContent } from "@/components/HomeContent";
 import { MemoryRouter as Router } from "react-router";
 import { vi } from "vitest";
