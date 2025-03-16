@@ -319,8 +319,10 @@ public class WaitlistService {
                 });
 
     // Subscribed players for training events
-    final String type =
-        program.getProgramType() == ProgramType.TRAINING ? "Subscribed" : account.getType().name();
+    final boolean isTraining = program.getProgramType().equals(ProgramType.TRAINING);
+    final String type = isTraining ? "Subscribed" : account.getType().name();
+    final boolean isConfirmed = isTraining;
+    final ZonedDateTime confirmedDate = isTraining ? ZonedDateTime.now() : null;
 
     ProgramParticipant programParticipant =
         this.participantRepository
@@ -334,17 +336,16 @@ public class WaitlistService {
                       ProgramParticipant.builder()
                           .programParticipantId(new ProgramParticipantId(programId, accountId))
                           .type(type)
-                          .isConfirmed(true)
-                          .confirmedDate(ZonedDateTime.now())
+                          .isConfirmed(isConfirmed)
+                          .confirmedDate(confirmedDate)
                           .build());
                 });
 
     // Participant should not be confirmed yet
-    // Change to make it so we confirm them for now, revisit.
-    // if (programParticipant.isConfirmed()) {
-    //   log.warn("Participant already confirmed to program");
-    //   throw new ProgramInvitationiException("Participant already confirmed to program");
-    // }
+    if (programParticipant.isConfirmed() && isTraining) {
+      log.warn("Participant already confirmed to program");
+      throw new ProgramInvitationiException("Participant already confirmed to program");
+    }
 
     // Send invitation (not for training session)
     if (!program.getProgramType().equals(ProgramType.TRAINING))
