@@ -28,7 +28,7 @@ export const formSchema = z
     location: z.string(),
   })
   .superRefine((data, ctx) => {
-    if (data.frequency !== "DAILY" && !data.endDate) {
+    if (data.frequency !== "ONCE" && !data.endDate) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: "End date is required for recurring programs.",
@@ -61,7 +61,7 @@ export const formSchema = z
       !(
         data.startDate.getDate() === data.endDate.getDate() &&
         data.startDate.getMonth() === data.endDate.getMonth() &&
-        data.frequency !== "DAILY"
+        data.frequency !== "ONCE"
       ),
     {
       message:

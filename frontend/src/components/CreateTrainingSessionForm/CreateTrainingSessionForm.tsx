@@ -66,6 +66,7 @@ import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
+import { ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
@@ -137,6 +138,10 @@ export default function CreateTrainingSessionForm() {
     {
       label: "Monthly",
       value: MONTHLY,
+    },
+    {
+      label: "One time",
+      value: ONCE,
     },
   ] as const;
   const locations = [
@@ -505,7 +510,7 @@ export default function CreateTrainingSessionForm() {
             />
 
             {/** End Date */}
-            {(selectedFreq === "WEEKLY" || selectedFreq === "MONTHLY") && (
+            {selectedFreq !== ONCE && (
               <FormField
                 control={form.control}
                 name="endDate"

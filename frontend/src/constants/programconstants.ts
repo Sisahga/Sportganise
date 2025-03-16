@@ -19,3 +19,4 @@ export const PRIVATE = "private";
 export const DAILY = "DAILY";
 export const WEEKLY = "WEEKLY";
 export const MONTHLY = "MONTHLY";
+export const ONCE = "ONCE";
