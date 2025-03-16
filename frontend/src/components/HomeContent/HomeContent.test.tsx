@@ -36,13 +36,13 @@ test("renders the welcome message", async () => {
     unobserve: vi.fn(),
   }));
   vi.stubGlobal("IntersectionObserver", MockIntersectionObserver);
-  
+
   render(
     <Router>
       <HomeContent />
-    </Router>
+    </Router>,
   );
-  
+
   // Use a more specific text match to find the welcome message
   const welcomeMessage = screen.getByText(/Hello TestUser/i);
   expect(welcomeMessage.parentNode).not.toBeNull();
