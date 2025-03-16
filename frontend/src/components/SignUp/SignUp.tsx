@@ -370,7 +370,11 @@ export default function SignUp() {
               <Button
                 type="submit"
                 className="w-full text-white bg-primaryColour mt-4"
-                disabled={signUpLoading || sendCodeLoading}
+                disabled={signUpLoading || 
+                  sendCodeLoading || 
+                  !isChecklistValid || 
+                  !formData.password ||
+                  !formData.email}
               >
                 {signUpLoading || sendCodeLoading
                   ? "Creating Account..."
