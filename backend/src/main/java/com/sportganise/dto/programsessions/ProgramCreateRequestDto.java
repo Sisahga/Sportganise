@@ -23,4 +23,5 @@ public class ProgramCreateRequestDto {
   private String startTime;
   private String endTime;
   private String location;
+  private String frequency;
 }

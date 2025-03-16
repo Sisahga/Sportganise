@@ -1,8 +1,7 @@
 package com.sportganise.services.programsessions;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDto;
@@ -14,13 +13,13 @@ import com.sportganise.entities.programsessions.*;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
+import com.sportganise.repositories.programsessions.ProgramRecurrenceRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+
+import java.io.IOException;
+import java.time.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -41,6 +40,8 @@ public class ProgramServiceTest {
   @Mock private AccountService accountService;
 
   @Mock private AccountRepository accountRepository;
+
+  @Mock private ProgramRecurrenceRepository programRecurrenceRepository;
 
   @Mock private BlobService blobService;
 
@@ -244,6 +245,15 @@ public class ProgramServiceTest {
             .visibility("private")
             .build();
 
+    ProgramRecurrence recurrence2 =
+        ProgramRecurrence.builder()
+            .recurrenceId(1)
+            .programId(2)
+            .occurrenceDate(
+                ZonedDateTime.of(
+                    LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
+            .build();
+
     return List.of(program1, program2);
   }
 
@@ -251,6 +261,16 @@ public class ProgramServiceTest {
   void testGetPrograms() {
     List<Program> mockPrograms = createMockPrograms();
     when(programRepository.findPrograms()).thenReturn(mockPrograms);
+    ProgramRecurrence recurrence2 =
+            ProgramRecurrence.builder()
+                    .recurrenceId(1)
+                    .programId(2)
+                    .occurrenceDate(
+                            ZonedDateTime.of(
+                                    LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()))
+                    .build();
+
+    when(programRecurrenceRepository.findProgramRecurrenceByProgramId(2)).thenReturn(List.of(recurrence2));
 
     mockPrograms.forEach(
         program ->
@@ -260,19 +280,19 @@ public class ProgramServiceTest {
     List<ProgramDto> result = programService.getPrograms();
 
     assertNotNull(result);
-    assertEquals(2, result.size());
+    assertEquals(2, result.size(), "Expected 2 programs");
 
     ProgramDto firstProgram = result.getFirst();
-    assertEquals(1, firstProgram.getProgramId());
-    assertEquals(ProgramType.TRAINING, firstProgram.getProgramType());
-    assertEquals("First Program", firstProgram.getTitle());
-    assertTrue(firstProgram.getProgramAttachments().isEmpty());
+    assertEquals(1, firstProgram.getProgramId(), "Expected program ID to be 1");
+    assertEquals(ProgramType.TRAINING, firstProgram.getProgramType(), "Expected program type training");
+    assertEquals("First Program", firstProgram.getTitle(), "Expected program title");
+    assertTrue(firstProgram.getProgramAttachments().isEmpty(), "Expected no attachments");
 
     ProgramDto secondProgram = result.get(1);
-    assertEquals(2, secondProgram.getProgramId());
-    assertEquals(ProgramType.FUNDRAISER, secondProgram.getProgramType());
-    assertEquals("Second Program", secondProgram.getTitle());
-    assertTrue(secondProgram.getProgramAttachments().isEmpty());
+    assertEquals(2, secondProgram.getProgramId(), "Expected program ID to be 2");
+    assertEquals(ProgramType.FUNDRAISER, secondProgram.getProgramType(), "Expected program type fundraiser");
+    assertEquals("Second Program", secondProgram.getTitle(), "Expected program title");
+    assertTrue(secondProgram.getProgramAttachments().isEmpty(), "Expected no attachments");
 
     verify(programRepository).findPrograms();
   }
@@ -303,11 +323,121 @@ public class ProgramServiceTest {
                     "Updated Location",
                     Collections.emptyList(), // Empty list for attachments to add
                     Collections.emptyList(), // Empty list for attachments to remove
-                    2)); // Mock account ID
+                    2,null)); // Mock account ID
 
     assertEquals("Program not found with ID: 1", exception.getMessage());
     verify(programRepository).findById(1);
     Mockito.verifyNoInteractions(blobService);
     Mockito.verifyNoInteractions(programAttachmentRepository);
   }
+
+  @Test
+  public void testCreateProgramRecurrences() {
+    ZonedDateTime startDate = ZonedDateTime.of(
+            LocalDate.of(2025, 6, 16), LocalTime.of(0, 0), ZoneId.systemDefault());
+    ZonedDateTime endDate = startDate.plusWeeks(3);
+    String frequency = "weekly";
+    Integer programId = 1;
+
+    programService.createProgramRecurrences(startDate, endDate, frequency, programId);
+
+
+    verify(programRecurrenceRepository, times(4)).save(Mockito.any(ProgramRecurrence.class));
+  }
+
+  @Test
+  public void testDeleteExpiredRecurrences() {
+
+    ZonedDateTime runningDateTime = ZonedDateTime.of(
+            LocalDate.of(2025, 6, 16), LocalTime.of(0, 0), ZoneId.systemDefault());
+    Integer programId = 1;
+    ZonedDateTime expiryDate = runningDateTime.plusDays(7);
+
+
+    ProgramRecurrence recurrence1 = new ProgramRecurrence(programId, runningDateTime, false);
+    ProgramRecurrence recurrence2 = new ProgramRecurrence(programId, runningDateTime.plusDays(10), false);
+    List<ProgramRecurrence> recurrences = List.of(recurrence1, recurrence2);
+
+    programService.deleteExpiredRecurrences(expiryDate, programId);
+
+    verify(programRecurrenceRepository).deleteExpiredRecurrences(expiryDate, programId);
+  }
+
+  @Test
+  void testModifyProgramRecurrences_shouldDeleteExpiredRecurrences() throws IOException {
+    ZonedDateTime mockOccurenceDate = ZonedDateTime.of(
+            LocalDate.of(2025, 5, 15), LocalTime.of(10, 0),  ZoneId.of("UTC"));
+    ZonedDateTime mockExpiryDate =ZonedDateTime.of(
+            LocalDate.of(2025, 5, 17), LocalTime.of(9, 0), ZoneId.of("UTC"));
+    Program mockProgram =
+            Program.builder()
+                    .programId(1)
+                    .programType(ProgramType.TRAINING)
+                    .title("First Program")
+                    .description("First Description")
+                    .capacity(10)
+                    .occurrenceDate(
+                            mockOccurenceDate)
+                    .durationMins(60)
+                    .isRecurring(true)
+                    .expiryDate(mockExpiryDate)
+                    .frequency("Daily")
+                    .location("Location 1")
+                    .visibility("public")
+                    .build();
+
+    ProgramDto mockProgramDto = new ProgramDto(mockProgram, Collections.emptyList());
+
+
+    ZonedDateTime newEndDate = ZonedDateTime.of(
+            LocalDate.of(2025, 5, 16), LocalTime.of(9, 0),  ZoneId.of("UTC"));
+
+
+
+    when(programRepository.findById(1)).thenReturn(Optional.of(mockProgram));
+
+
+    programService.modifyProgram(mockProgramDto, "First Program", ProgramType.TRAINING, "2025-05-15T10:00:00Z[UTC]", "2025-05-16T09:00:00Z[UTC]", true, "public", "First Description", 10, "10:00", "11:00", "Location 1", Collections.emptyList(), Collections.emptyList(), 1,"daily");
+
+    verify(programRecurrenceRepository).deleteExpiredRecurrences(any(ZonedDateTime.class), any(Integer.class));
+  }
+
+    @Test
+    void testModifyProgramRecurrences_shouldCreateNewRecurrences() throws IOException {
+        Program mockProgram =
+                Program.builder()
+                        .programId(1)
+                        .programType(ProgramType.TRAINING)
+                        .title("First Program")
+                        .description("First Description")
+                        .capacity(10)
+                        .occurrenceDate(
+                                ZonedDateTime.of(
+                                        LocalDate.of(2025, 5, 15), LocalTime.of(10, 0),  ZoneId.of("UTC")))
+                        .durationMins(60)
+                        .isRecurring(true)
+                        .expiryDate(
+                                ZonedDateTime.of(
+                                        LocalDate.of(2025, 5, 16), LocalTime.of(11, 0),  ZoneId.of("UTC")))
+                        .frequency("Daily")
+                        .location("Location 1")
+                        .visibility("public")
+                        .build();
+
+        ProgramDto mockProgramDto = new ProgramDto(mockProgram, Collections.emptyList());
+
+
+        ZonedDateTime lastrecurrence = ZonedDateTime.of(
+                LocalDate.of(2025, 5, 16), LocalTime.of(10, 0),  ZoneId.of("UTC"));
+
+        when(programRepository.findById(1)).thenReturn(Optional.of(mockProgram));
+        when(programRecurrenceRepository.findLastRecurrenceByProgramId(1)).thenReturn(Optional.of(new ProgramRecurrence(1, lastrecurrence, false)));
+
+        programService.modifyProgram(mockProgramDto, "First Program", ProgramType.TRAINING, "2025-05-15T10:00:00Z[UTC]", "2025-05-18T02:00:00Z[UTC]", true, "public", "First Description", 10, "10:00", "11:00", "Location 1", Collections.emptyList(), Collections.emptyList(), 1,"daily");
+
+      System.out.println("Last Occurrence: " + lastrecurrence);
+
+        verify(programRecurrenceRepository, times(2)).save(any());
+    }
+
 }

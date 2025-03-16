@@ -138,7 +138,7 @@ public class ProgramController {
               programCreateRequestDto.getEndTime(),
               programCreateRequestDto.getLocation(),
               attachments,
-              accountId);
+              accountId, programCreateRequestDto.getFrequency());
 
       log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
 
@@ -214,7 +214,8 @@ public class ProgramController {
               programModifyRequestDto.getLocation(),
               attachments,
               programModifyRequestDto.getAttachmentsToRemove(),
-              accountId);
+              accountId,
+                  programModifyRequestDto.getFrequency());
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");

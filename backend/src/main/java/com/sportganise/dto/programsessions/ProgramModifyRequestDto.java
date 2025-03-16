@@ -26,4 +26,5 @@ public class ProgramModifyRequestDto {
   private String endTime;
   private String location;
   @Nullable private List<String> attachmentsToRemove;
+  private String frequency;
 }

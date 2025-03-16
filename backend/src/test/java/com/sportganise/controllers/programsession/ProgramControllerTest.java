@@ -72,7 +72,7 @@ public class ProgramControllerTest {
     mockProgramDto.setFrequency("None");
     mockProgramDto.setLocation("999 Random Ave");
     mockProgramDto.setVisibility("public");
-    mockProgramDto.setProgramAttachments(List.of(mockProgramAttachmentDto)); // Add the attachment
+    mockProgramDto.setProgramAttachments(List.of(mockProgramAttachmentDto));
 
     mockProgramParticipantDto.setProgramId(111);
     mockProgramParticipantDto.setAccountId(1);
@@ -94,7 +94,8 @@ public class ProgramControllerTest {
             + "\"capacity\": 10,"
             + "\"startTime\": \"10:30\","
             + "\"endTime\": \"12:30\","
-            + "\"location\": \"Centre-de-loisirs-St-Denis\""
+            + "\"location\": \"Centre-de-loisirs-St-Denis\","
+                + "\"frequency\": null"
             + "}";
   }
 
@@ -199,6 +200,7 @@ public class ProgramControllerTest {
     mockProgramModifyRequestDto.setStartTime("09:00");
     mockProgramModifyRequestDto.setEndTime("11:00");
     mockProgramModifyRequestDto.setLocation("Updated Location");
+    mockProgramModifyRequestDto.setFrequency("None");
 
     MockMultipartFile programData =
         new MockMultipartFile(
@@ -230,7 +232,7 @@ public class ProgramControllerTest {
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyList(),
-                Mockito.anyInt()))
+                Mockito.anyInt(),Mockito.anyString()))
         .thenReturn(mockProgramDto);
 
     mockMvc
@@ -247,6 +249,7 @@ public class ProgramControllerTest {
         .andExpect(
             jsonPath("$.data.programAttachments[0].attachmentUrl")
                 .value("https://example.com/program-guide.pdf"));
+
   }
 
   @Test
@@ -350,7 +353,8 @@ public class ProgramControllerTest {
             Mockito.eq(mockProgramModifyRequestDto.getLocation()),
             Mockito.argThat(list -> list.size() == 2), // Assert 2 attachments were passed
             Mockito.eq(mockProgramModifyRequestDto.getAttachmentsToRemove()),
-            Mockito.eq(2));
+            Mockito.eq(2),
+                Mockito.eq(mockProgramModifyRequestDto.getFrequency()));
   }
 
   @Test
