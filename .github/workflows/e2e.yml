@@ -4,17 +4,16 @@ on:
     branches:
       - main
   pull_request:
-    # # TODO: uncomment run only on PRs to main
-    # branches:
-    #   - main
+    branches:
+      - main
 
 env:
   ENV: DEV
   # Frontend
-  VITE_API_BASE_URL: http://localhost:8080
+  API_BASE_URL: http://localhost:8080
   # Postgres
   POSTGRES_DB: sportganise
-  POSTGRES_USER: sportganise
+  POSTGRES_USER: sportganise-e2e
   POSTGRES_PASSWORD: sportganise-e2e
   POSTGRES_URL: jdbc:postgresql://database:5432/sportganise
   # Auth0
@@ -45,9 +44,6 @@ jobs:
     # Checkout the code
     - uses: actions/checkout@v4
 
-    - name: Debug
-      run: echo $POSTGRES_PASSWORD
-
     # Create config files required by backend
     - name: Create backend config files
       run: echo '${{ secrets.FIREBASE_CONFIGURATION_FILE }}' > ../backend/src/main/resources/firebase-configuration-file.json
@@ -70,34 +66,11 @@ jobs:
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
 
+    # Ensure backend started
+    - name: Check backend ready
+      run: curl --fail --silent --show-error http://localhost:8080/api/health/ping
+
     # Run Playwright tests
     - name: Run Playwright tests
       run: pnpm e2e
 
-    - name: Debug artifact upload
-      run: |
-        pwd
-        echo "LS FRONTEND"
-        ls
-        echo "LS ROOT"
-        ls ..
-        echo "LS /"
-        ls /
-        echo "FIND playwright-report"
-        find -name playwright-report
-        echo "FIND test-results"
-        find -name test-results
-
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
-
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: test-results
-        path: test-results/
-        retention-days: 30
