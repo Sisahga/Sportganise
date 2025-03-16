@@ -138,7 +138,7 @@ public class ProgramServiceTest {
             .expiryDate(
                 ZonedDateTime.of(
                     LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
-            .frequency("None")
+            .frequency("once")
             .location("111 Random Ave")
             .visibility("public")
             .build();
@@ -171,7 +171,7 @@ public class ProgramServiceTest {
     assertEquals(
         ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()),
         programDto.getExpiryDate());
-    assertEquals("None", programDto.getFrequency());
+    assertEquals("once", programDto.getFrequency());
     assertEquals("111 Random Ave", programDto.getLocation());
     assertEquals("public", programDto.getVisibility());
     assertEquals("attachment1.url", programDto.getProgramAttachments().get(0).getAttachmentUrl());
@@ -219,7 +219,7 @@ public class ProgramServiceTest {
             .expiryDate(
                 ZonedDateTime.of(
                     LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()))
-            .frequency("None")
+            .frequency("Once")
             .location("Location 1")
             .visibility("public")
             .build();
