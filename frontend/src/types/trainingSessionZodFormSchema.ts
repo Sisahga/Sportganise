@@ -81,6 +81,18 @@ export const formSchema = z
         "Program start and end dates must be at least a week apart and fall on the same day of the week.",
       path: ["frequency"],
     }
+  )
+  .refine(
+    (data) =>
+      !data.endDate ||
+      (data.frequency === "MONTHLY" &&
+        data.endDate.getDate() === data.startDate.getDate() &&
+        data.endDate.getMonth() !== data.startDate.getMonth()),
+    {
+      message:
+        "Program start and end dates must be at least a month apart and be on the same date.",
+      path: ["frequency"],
+    }
   );
 /*  .refine(
     (data) =>

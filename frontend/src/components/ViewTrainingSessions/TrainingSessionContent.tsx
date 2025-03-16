@@ -187,8 +187,9 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails?.frequency ??
-                (programDetails?.frequency || "one time")}{" "}
+              {programDetails?.frequency
+                ? programDetails?.frequency?.toLowerCase() || "one time"
+                : "N/A"}{" "}
               on{" "}
               {programDetails?.occurrenceDate
                 ? new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
