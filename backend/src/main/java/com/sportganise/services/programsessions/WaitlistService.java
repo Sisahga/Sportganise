@@ -319,6 +319,30 @@ public class WaitlistService {
 
     return isNewParticipant.get();
   }
+
+  public boolean rsvpToEvent(Integer accountId, Integer programId){
+
+    ProgramParticipant participant = getParticipant(programId, accountId);
+
+    if (participant.isConfirmed()) {
+      log.warn("Participant already confirmed to program");
+      throw new ProgramInvitationiException("Participant already confirmed to program");
+    }
+
+    Program program = this.getProgram(programId);
+    if (!program.getProgramType().equals(ProgramType.TRAINING)){
+      participant.setConfirmed(true);
+      participant.setConfirmedDate(ZonedDateTime.now());
+      participantRepository.save(participant);
+
+      return participant.isConfirmed();
+    }
+
+    log.warn("RSVP not allowed for this program type");
+    return false;
+
+  }
+
   public Program getProgram(Integer programId) {
     Program program =
         programRepository
