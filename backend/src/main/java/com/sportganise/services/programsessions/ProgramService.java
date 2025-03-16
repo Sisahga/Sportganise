@@ -5,7 +5,12 @@ import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
-import com.sportganise.entities.programsessions.*;
+import com.sportganise.entities.programsessions.Program;
+import com.sportganise.entities.programsessions.ProgramAttachment;
+import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
+import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramRecurrence;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.ProgramNotFoundException;
@@ -484,6 +489,24 @@ public class ProgramService {
     return new ProgramDto(existingProgram, programAttachmentDtos);
   }
 
+  /**
+   * Method to create a list of ProgramRecurrence objects for a recurring program.
+   *
+   * @param title Title of the program.
+   * @param author The name of the person who created the program.
+   * @param programType Type of the program.
+   * @param startDate Start date of the first occurrence.
+   * @param endDate End date of the last occurrence.
+   * @param isRecurring Boolean for whether this program is recurring.
+   * @param visibility Visibility of the program.
+   * @param description Description of the program.
+   * @param capacity Capacity of the program.
+   * @param startTime Start time of each occurrence of the program.
+   * @param endTime End time of each occurrence of the program.
+   * @param location Location of the program/session.
+   * @param frequency Frequency of the program.
+   * @return A list of ProgramRecurrence objects.
+   */
   private Program createProgramObject(
       String title,
       String author,
@@ -547,29 +570,39 @@ public class ProgramService {
     return program;
   }
 
+  /**
+   * Method to create a list of ProgramRecurrence objects for a recurring program.
+   *
+   * @param startDate Start date of the first occurrence.
+   * @param expiryDate End date of the last occurrence.
+   * @param frequency Frequency of the program.
+   * @param programId Id of the program.
+   */
   public void createProgramRecurrences(
       ZonedDateTime startDate, ZonedDateTime expiryDate, String frequency, Integer programId) {
     ZonedDateTime currentOccurrence = startDate;
     while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
-      System.out.println("extdate " + expiryDate);
-      System.out.println("currdate " + currentOccurrence);
-
-      System.out.println("boolresp is b4" + currentOccurrence.isBefore(expiryDate));
-      System.out.println("boolresp is =" + currentOccurrence.isEqual(expiryDate));
-
-      System.out.println("Current Occurrence: " + currentOccurrence);
       ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
       programRecurrenceRepository.save(recurrence);
-      currentOccurrence = getNextDateTime(currentOccurrence, frequency);
-      System.out.println("Next Occurrence: " + currentOccurrence);
+      if (frequency.equalsIgnoreCase("daily")) {
+        currentOccurrence = currentOccurrence.plusDays(1);
+      } else if (frequency.equalsIgnoreCase("weekly")) {
+        currentOccurrence = currentOccurrence.plusDays(7);
+      } else if (frequency.equalsIgnoreCase("monthly")) {
+        currentOccurrence = currentOccurrence.plusMonths(1);
+      } else {
+        throw new InvalidFrequencyException("Invalid frequency: " + frequency);
+      }
     }
-    System.out.println("out of loop");
   }
 
-  public List<ProgramRecurrence> getProgramRecurrences(Integer programId) {
-    return programRecurrenceRepository.findProgramRecurrenceByProgramId(programId);
-  }
-
+  /**
+   * Method to get the next date time based on the last date time and the frequency.
+   *
+   * @param lastOccurrence The last occurrence of the program.
+   * @param frequency The frequency of the program.
+   * @return The next occurrence of the program.
+   */
   @NotNull
   private ZonedDateTime getNextDateTime(ZonedDateTime lastOccurrence, String frequency) {
     ZonedDateTime nextDateTime;
@@ -587,16 +620,35 @@ public class ProgramService {
     return nextDateTime;
   }
 
+  /**
+   * Method to get the last occurrence of a program.
+   *
+   * @param programId Id of the program.
+   * @return The last occurrence of the program.
+   */
   public ProgramRecurrence getLastProgramRecurrence(Integer programId) {
     return programRecurrenceRepository
         .findLastRecurrenceByProgramId(programId)
         .orElseThrow(() -> new ProgramNotFoundException("Recurrence Not Found"));
   }
 
+  /**
+   * Method to delete a program and all its recurrences.
+   *
+   * @param programId Id of the program to be deleted.
+   */
   public void deleteExpiredRecurrences(ZonedDateTime expiryDate, Integer programId) {
     programRecurrenceRepository.deleteExpiredRecurrences(expiryDate, programId);
   }
 
+  /**
+   * Method to modify a recurring program with drastic changes, namely those with different frequencies and dates.
+   *
+   * @param programId Id of the program.
+   * @param newStartDate Start date of the first occurrence.
+   * @param newEndDate End date of the last occurrence.
+   * @param newFrequency Frequency of the program.
+   */
   public void modifyRecurrenceWithDrasticChanges(
       Integer programId,
       ZonedDateTime newStartDate,
@@ -631,14 +683,39 @@ public class ProgramService {
     }
   }
 
+  /**
+   * Method to create a list of ProgramRecurrence objects for a recurring program.
+   *
+   * @param programId Id of the program.
+   * @return A list of ProgramRecurrence objects.
+   */
+  public List<ProgramRecurrence> getProgramRecurrences(Integer programId) {
+    return programRecurrenceRepository.findProgramRecurrenceByProgramId(programId);
+  }
+
+  /**
+   * Method to delete a program and all its recurrences.
+   *
+   * @param programId Id of the program to be deleted.
+   */
   public void deleteAllRecurrences(Integer programId) {
     programRecurrenceRepository.deleteProgramRecurrenceByProgramId(programId);
   }
 
+  /**
+   * Method to delete a recurrence.
+   *
+   * @param recurrenceId Id of the recurrence to be deleted.
+   */
   public void deleteProgramRecurrence(Integer recurrenceId) {
     programRecurrenceRepository.deleteProgramRecurrenceByRecurrenceId(recurrenceId);
   }
 
+  /**
+   * Method to delete a program and all its recurrences.
+   *
+   * @param programId Id of the program to be deleted.
+   */
   public void deleteMiddleRecurrences(
       Integer programId, ZonedDateTime firstDate, ZonedDateTime secondDate) {
     ZonedDateTime effectiveStartDate = firstDate.plusDays(1);
