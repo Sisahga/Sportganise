@@ -5,21 +5,33 @@ import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import ParticipantPopUp from "./ParticipantPopUp";
 import log from "loglevel";
+import { Badge } from "../ui/badge";
+import { Attendees } from "@/types/trainingSessionDetails";
 
 interface RegisteredPlayerProps {
-  accountId: number;
+  accountAttendee: Attendees;
 }
 
 const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
-  accountId,
+  accountAttendee,
 }: RegisteredPlayerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  console.log(accountAttendee.confirmed);
+  const [isConfirmed, setIsConfirmed] = useState(accountAttendee.confirmed);
+
+  console.log("The account is ", accountAttendee);
+  console.log(
+    "Confirmation, accountID ",
+    isConfirmed,
+    accountAttendee?.accountId,
+  );
 
   const {
     data: accountDetails,
     loading,
     error,
-  } = usePersonalInformation(accountId);
+  } = usePersonalInformation(accountAttendee?.accountId);
   log.debug("Rendering RegisteredPlayer");
 
   return (
@@ -59,14 +71,16 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
               </h4>
             )}
             <AttendeeBadgeType accountType={accountDetails?.type} />
+            {!isConfirmed && <Badge variant="destructive">{"absent"}</Badge>}
           </div>
         </div>
         <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
       </div>
       <ParticipantPopUp
-        accountId={accountId}
+        accountId={accountAttendee?.accountId}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onAbsentMarked={() => setIsConfirmed(false)}
       />
     </div>
   );

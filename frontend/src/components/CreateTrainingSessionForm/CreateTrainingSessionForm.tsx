@@ -44,7 +44,6 @@ import {
   FileUploaderContent,
   FileUploaderItem,
 } from "@/components/ui/file-upload";
-
 import {
   Check,
   ChevronsUpDown,
@@ -53,6 +52,16 @@ import {
   Loader2,
 } from "lucide-react";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+// Import constants for select fields
+import { TRAINING } from "@/constants/programconstants";
+import { SPECIALTRAINING } from "@/constants/programconstants";
+import { TOURNAMENT } from "@/constants/programconstants";
+import { FUNDRAISER } from "@/constants/programconstants";
+import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
+import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
+import { PUBLIC } from "@/constants/programconstants";
+import { MEMBERS_ONLY } from "@/constants/programconstants";
+import { PRIVATE } from "@/constants/programconstants";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -94,29 +103,29 @@ export default function CreateTrainingSessionForm() {
   const types = [
     {
       label: "Training Session",
-      value: "Training",
+      value: TRAINING,
     },
     {
       label: "Fundraiser",
-      value: "Fundraiser",
+      value: FUNDRAISER,
     },
     {
       label: "Tournament",
-      value: "Tournament",
+      value: TOURNAMENT,
     },
     {
       label: "Special Training",
-      value: "Special Training",
+      value: SPECIALTRAINING,
     },
   ] as const;
   const locations = [
     {
       label: "Centre de loisirs St-Denis",
-      value: "Centre-de-loisirs-St-Denis",
+      value: CENTRE_DE_LOISIRS_ST_DENIS,
     },
     {
       label: "Collège de Maisonnneuve",
-      value: "Collège-de-Maisonnneuve",
+      value: COLLEGE_DE_MAISONNEUVE,
     },
   ] as const;
 
@@ -231,544 +240,546 @@ export default function CreateTrainingSessionForm() {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
+            className="space-y-8 max-w-3xl mx-auto pb-20 "
           >
-            {/* form fields */}
-          </form>
-        </Form>
-      )}
-      {/** Create Training Session Form */}
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
-        >
-          {/*Form Title*/}
-          <div className="text-center">
-            <h2 className="font-semibold text-3xl text-secondaryColour text-center">
-              Create New Program
-            </h2>
-            <h2 className="text-fadedPrimaryColour text-center">
-              Complete the form and submit
-            </h2>
-          </div>
+            {/*Form Title*/}
+            <div className="text-center">
+              <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+                Create New Program
+              </h2>
+              <h2 className="text-fadedPrimaryColour text-center">
+                Complete the form and submit
+              </h2>
+            </div>
 
-          {/** Title */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold text-base">Title</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Name the program"
-                    type="text"
-                    className="bg-white"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>Only 30 characters accepted.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** Type */}
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  Type of Program
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "justify-between",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value
-                          ? types.find((type) => type.value === field.value)
-                              ?.label
-                          : "Select type"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search type..." />
-                      <CommandList>
-                        <CommandEmpty>No type found.</CommandEmpty>
-                        <CommandGroup>
-                          {types.map((type) => (
-                            <CommandItem
-                              value={type.label}
-                              key={type.value}
-                              onSelect={() => {
-                                form.setValue("type", type.value);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  type.value === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0",
-                                )}
-                              />
-                              {type.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** Start Date */}
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  Start Date
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Enter the first date of the program. Applies for recurring and
-                  non recurring programs. If recurring, this day will be the
-                  assumed repeat day in the future.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** End Date */}
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  End Date
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Enter the last day of a recurring program. If same-day
-                  program, pick the day entered for start date.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** Time */}
-          <div className="flex gap-2">
-            {/**Start Time */}
+            {/** Title */}
             <FormField
               control={form.control}
-              name="startTime"
+              name="title"
               render={({ field }) => (
-                <FormItem className="w-full">
+                <FormItem>
                   <FormLabel className="font-semibold text-base">
-                    Start Time
+                    Title
                   </FormLabel>
                   <FormControl>
-                    <Input type="time" className="w-full" {...field} />
+                    <Input
+                      placeholder="Name the program"
+                      type="text"
+                      className="bg-white"
+                      {...field}
+                    />
                   </FormControl>
                   <FormDescription>
-                    Select the time the program starts.
+                    Only 30 characters accepted.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/**End Time */}
+            {/** Type */}
             <FormField
               control={form.control}
-              name="endTime"
+              name="type"
               render={({ field }) => (
-                <FormItem className="w-full">
+                <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    End Time
+                    Type of Program
                   </FormLabel>
-                  <FormControl>
-                    <Input type="time" {...field} />
-                  </FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "justify-between",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value
+                            ? types.find((type) => type.value === field.value)
+                                ?.label
+                            : "Select type"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search type..." />
+                        <CommandList>
+                          <CommandEmpty>No type found.</CommandEmpty>
+                          <CommandGroup>
+                            {types.map((type) => (
+                              <CommandItem
+                                value={type.label}
+                                key={type.value}
+                                onSelect={() => {
+                                  form.setValue("type", type.value);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    type.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                                {type.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/** Start Date */}
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    Start Date
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormDescription>
-                    Select the time the program ends.
+                    Enter the first date of the program. Applies for recurring
+                    and non recurring programs. If recurring, this day will be
+                    the assumed repeat day in the future.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
             />
-          </div>
 
-          {/** Location */}
-          <FormField
-            control={form.control}
-            name="location"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  Location
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          "justify-between",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value
-                          ? locations.find(
-                              (location) => location.value === field.value,
-                            )?.label
-                          : "Select location"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search location..." />
-                      <CommandList>
-                        <CommandEmpty>No location found.</CommandEmpty>
-                        <CommandGroup>
-                          {locations.map((location) => (
-                            <CommandItem
-                              value={location.label}
-                              key={location.value}
-                              onSelect={() => {
-                                form.setValue("location", location.value);
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  location.value === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0",
-                                )}
-                              />
-                              {location.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Select the location from the list of locations under your
-                  organization.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/** Recurring */}
-          <FormField
-            control={form.control}
-            name="recurring"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel className="font-semibold">
-                    Recurring program
+            {/** End Date */}
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    End Date
                   </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <FormDescription>
-                    The program recurs on the day and at the times entered.
+                    Enter the last day of a recurring program. If same-day
+                    program, pick the day entered for start date.
                   </FormDescription>
                   <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
+                </FormItem>
+              )}
+            />
 
-          {/** Visibility */}
-          <FormField
-            control={form.control}
-            name="visibility"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  Visibility
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
+            {/** Time */}
+            <div className="flex gap-2">
+              {/**Start Time */}
+              <FormField
+                control={form.control}
+                name="startTime"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel className="font-semibold text-base">
+                      Start Time
+                    </FormLabel>
                     <FormControl>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        className={cn(
-                          !field.value ? "text-muted-foreground" : "",
-                          "justify-between",
-                        )}
-                      >
-                        {field.value ? field.value : "Select visibility"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
+                      <Input type="time" className="w-full" {...field} />
                     </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[200px] p-0">
-                    <Command>
-                      <CommandInput placeholder="Search visibility..." />
-                      <CommandList>
-                        <CommandEmpty>No visibility found.</CommandEmpty>
-                        <CommandGroup>
-                          {[
-                            { label: "Public", value: "public" },
-                            { label: "Members only", value: "members" },
-                            { label: "Private", value: "private" },
-                          ].map((v) => (
-                            <CommandItem
-                              key={v.value}
-                              value={v.label}
-                              onSelect={() => {
-                                form.setValue("visibility", v.value);
-                                // Open the invite modal when selecting "private"
-                                if (v.value === "private") {
-                                  setShowInviteModal(true);
-                                }
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  v.value === field.value
-                                    ? "opacity-100"
-                                    : "opacity-0",
-                                )}
-                              />
-                              {v.label}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Select who can view the program in their dashboard.
-                </FormDescription>
-                <FormMessage />
-                {field.value === "private" && (
-                  <div className="mt-2 border p-2 rounded">
-                    <div className="mb-2 font-medium">Selected Attendees:</div>
-                    {selectedMembers.length > 0 ? (
-                      <ul className="list-disc pl-5">
-                        {selectedMembers.map((memberId) => {
-                          const member = members.find((m) => m.id === memberId);
-                          return (
-                            <li key={memberId}>
-                              {member ? member.name : "Unknown member"}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        No attendees selected.
-                      </p>
-                    )}
-                    <Button
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => setShowInviteModal(true)}
-                    >
-                      Add Attendees
-                    </Button>
-                  </div>
+                    <FormDescription>
+                      Select the time the program starts.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
                 )}
-              </FormItem>
-            )}
-          />
+              />
 
-          {/** Description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold text-base">
-                  Description
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Add description of the program here ..."
-                    className="resize-none"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>Only 100 characters accepted.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              {/**End Time */}
+              <FormField
+                control={form.control}
+                name="endTime"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel className="font-semibold text-base">
+                      End Time
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Select the time the program ends.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-          {/** Add Attachment */}
-          <FormField
-            control={form.control}
-            name="attachment"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold text-base">
-                  Add Attachment
-                </FormLabel>
-                <FormControl>
-                  <FileUploader
-                    value={field.value || []}
-                    onValueChange={(newFiles) => {
-                      //setFiles(newFiles); // Update local state
-                      field.onChange(newFiles); // Sync with React Hook Form
-                    }}
-                    dropzoneOptions={dropZoneConfig}
-                    className="relative bg-background rounded-lg p-2"
-                  >
-                    <FileInput
-                      id="fileInput"
-                      className="outline-dashed outline-1 outline-slate-500"
-                    >
-                      <div className="flex items-center justify-center flex-col p-8 w-full ">
-                        <CloudUpload className="text-gray-500 w-10 h-10" />
-                        <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                          <span className="font-semibold">Click to upload</span>
-                          &nbsp; or drag and drop
-                        </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          PNG, JPG, PDF and more
-                        </p>
+            {/** Location */}
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    Location
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "justify-between",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value
+                            ? locations.find(
+                                (location) => location.value === field.value,
+                              )?.label
+                            : "Select location"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search location..." />
+                        <CommandList>
+                          <CommandEmpty>No location found.</CommandEmpty>
+                          <CommandGroup>
+                            {locations.map((location) => (
+                              <CommandItem
+                                value={location.label}
+                                key={location.value}
+                                onSelect={() => {
+                                  form.setValue("location", location.value);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    location.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                                {location.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Select the location from the list of locations under your
+                    organization.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/** Recurring */}
+            <FormField
+              control={form.control}
+              name="recurring"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel className="font-semibold">
+                      Recurring program
+                    </FormLabel>
+                    <FormDescription>
+                      The program recurs on the day and at the times entered.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/** Visibility */}
+            <FormField
+              control={form.control}
+              name="visibility"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    Visibility
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            !field.value ? "text-muted-foreground" : "",
+                            "justify-between",
+                          )}
+                        >
+                          {field.value ? field.value : "Select visibility"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search visibility..." />
+                        <CommandList>
+                          <CommandEmpty>No visibility found.</CommandEmpty>
+                          <CommandGroup>
+                            {[
+                              { label: "Public", value: PUBLIC },
+                              { label: "Members only", value: MEMBERS_ONLY },
+                              { label: "Private", value: PRIVATE },
+                            ].map((v) => (
+                              <CommandItem
+                                key={v.value}
+                                value={v.label}
+                                onSelect={() => {
+                                  form.setValue("visibility", v.value);
+                                  // Open the invite modal when selecting "private"
+                                  if (v.value === "private") {
+                                    setShowInviteModal(true);
+                                  }
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    v.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                                {v.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Select who can view the program in their dashboard.
+                  </FormDescription>
+                  <FormMessage />
+                  {field.value === "private" && (
+                    <div className="mt-2 border p-2 rounded">
+                      <div className="mb-2 font-medium">
+                        Selected Attendees:
                       </div>
-                    </FileInput>
-                    <FileUploaderContent>
-                      {field.value &&
-                        field.value.length > 0 &&
-                        field.value.map((file: File, i: number) => (
-                          <FileUploaderItem key={i} index={i}>
-                            <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{file.name}</span>
-                          </FileUploaderItem>
-                        ))}
-                    </FileUploaderContent>
-                  </FileUploader>
-                </FormControl>
-                <FormDescription>
-                  Select a file to upload. Limit of 5 files.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                      {selectedMembers.length > 0 ? (
+                        <ul className="list-disc pl-5">
+                          {selectedMembers.map((memberId) => {
+                            const member = members.find(
+                              (m) => m.id === memberId,
+                            );
+                            return (
+                              <li key={memberId}>
+                                {member ? member.name : "Unknown member"}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No attendees selected.
+                        </p>
+                      )}
+                      <Button
+                        size="sm"
+                        className="mt-2"
+                        onClick={() => setShowInviteModal(true)}
+                      >
+                        Add Attendees
+                      </Button>
+                    </div>
+                  )}
+                </FormItem>
+              )}
+            />
 
-          {/** Attendance Capacity */}
-          <FormField
-            control={form.control}
-            name="capacity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="font-semibold text-base">
-                  Attendance Capacity
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Write the max number of attendees"
-                    type="number"
-                    {...field}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
-                      )
-                    }
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/** Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-base">
+                    Description
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Add description of the program here ..."
+                      className="resize-none"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Only 100 characters accepted.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/** Notify All Players */}
-          {/* <div> MAY BE NEEDED BY US305+
+            {/** Add Attachment */}
+            <FormField
+              control={form.control}
+              name="attachment"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-base">
+                    Add Attachment
+                  </FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      value={field.value || []}
+                      onValueChange={(newFiles) => {
+                        //setFiles(newFiles); // Update local state
+                        field.onChange(newFiles); // Sync with React Hook Form
+                      }}
+                      dropzoneOptions={dropZoneConfig}
+                      className="relative bg-background rounded-lg p-2"
+                    >
+                      <FileInput
+                        id="fileInput"
+                        className="outline-dashed outline-1 outline-slate-500"
+                      >
+                        <div className="flex items-center justify-center flex-col p-8 w-full ">
+                          <CloudUpload className="text-gray-500 w-10 h-10" />
+                          <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>
+                            &nbsp; or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            PNG, JPG, PDF and more
+                          </p>
+                        </div>
+                      </FileInput>
+                      <FileUploaderContent>
+                        {field.value &&
+                          field.value.length > 0 &&
+                          field.value.map((file: File, i: number) => (
+                            <FileUploaderItem key={i} index={i}>
+                              <Paperclip className="h-4 w-4 stroke-current" />
+                              <span>{file.name}</span>
+                            </FileUploaderItem>
+                          ))}
+                      </FileUploaderContent>
+                    </FileUploader>
+                  </FormControl>
+                  <FormDescription>
+                    Select a file to upload. Limit of 5 files.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/** Attendance Capacity */}
+            <FormField
+              control={form.control}
+              name="capacity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-base">
+                    Attendance Capacity
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Write the max number of attendees"
+                      type="number"
+                      {...field}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value ? Number(e.target.value) : undefined,
+                        )
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/** Notify All Players */}
+            {/* <div> MAY BE NEEDED BY US305+
             <FormField
               control={form.control}
               name="notify"
@@ -799,24 +810,25 @@ export default function CreateTrainingSessionForm() {
             </div>
           </div> */}
 
-          {/** Submit Button */}
-          {loading ? (
-            <Button disabled className="w-full">
-              <Loader2 className="animate-spin" />
-              Creating Program
-            </Button>
-          ) : (
-            <Button type="submit" className="w-full font-semibold">
-              Create new Program
-            </Button>
-          )}
-          <div className="justify-self-center">
-            <button className=" bg-transparent" onClick={() => navigate(-1)}>
-              <p className="text-center underline text-neutral-400">Cancel</p>
-            </button>
-          </div>
-        </form>
-      </Form>
+            {/** Submit Button */}
+            {loading ? (
+              <Button disabled className="w-full">
+                <Loader2 className="animate-spin" />
+                Creating Program
+              </Button>
+            ) : (
+              <Button type="submit" className="w-full font-semibold">
+                Create new Program
+              </Button>
+            )}
+            <div className="justify-self-center pb-5">
+              <button className=" bg-transparent" onClick={() => navigate(-1)}>
+                <p className="text-center underline text-neutral-400">Cancel</p>
+              </button>
+            </div>
+          </form>
+        </Form>
+      )}
       {/* Invite Modal */}
       <InviteModal
         open={showInviteModal}

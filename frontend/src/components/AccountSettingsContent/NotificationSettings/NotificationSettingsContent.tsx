@@ -1,5 +1,3 @@
-"use client";
-
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,67 +8,151 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BackButton from "@/components/ui/back-button";
 import { BellRing } from "lucide-react";
-import { NotificationOption } from "@/types/notificationSettingOption";
+import {
+  NotificationMethod,
+  NotificationMethodEnum,
+  NotificationPreference,
+  NotificationTypeEnum,
+  UpdateNotificationMethodRequestDto,
+  UpdateNotificationPermissionRequestDto,
+} from "@/types/notifications.ts";
+import useGetNotificationSettings from "@/hooks/useGetNotificationSettings.ts";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import useUpdateNotificationMethod from "@/hooks/useUpdateNotificationMethod.ts";
+import { toast } from "@/hooks/use-toast.ts";
+import useUpdateNotificationPermission from "@/hooks/useUpdateNotificationPermission.ts";
 
-// using mock data need to connect, next step
 export default function NotificationSettings() {
-  const [notificationChannels, setNotificationChannels] = useState({
-    email: true,
-    phone: false,
-  });
+  const cookies = getCookies();
+  const userId = getAccountIdCookie(cookies);
 
-  const [notifications, setNotifications] = useState({
-    trainingSessions: true,
-    events: true,
-    messages: false,
-    mentions: true,
-    updates: true,
-  });
-
-  const notificationOptions: NotificationOption[] = [
+  // Display names for enum values.
+  const NotificationMethodDisplayNames: Record<NotificationMethodEnum, string> =
     {
-      id: "trainingSessions",
-      title: "Training Sessions",
-      description: "Get notified about upcoming training sessions and changes",
-    },
-    {
-      id: "events",
-      title: "Events",
-      description: "Receive updates about tournaments and special events",
-    },
-    {
-      id: "messages",
-      title: "New Messages",
-      description: "Someone sends you a direct message",
-    },
-    {
-      id: "mentions",
-      title: "Mentions",
-      description: "Someone mentions you in a comment or discussion",
-    },
-    {
-      id: "updates",
-      title: "Club Updates",
-      description: "Important announcements and club news",
-    },
-  ];
-
-  const handleChannelToggle = (channel: "email" | "phone") => {
-    setNotificationChannels((prev) => ({
-      ...prev,
-      [channel]: !prev[channel],
-    }));
+      [NotificationMethodEnum.PUSH]: "Phone/Browser",
+      [NotificationMethodEnum.EMAIL]: "Email",
+    };
+  const NotificationTypeDisplayNames: Record<NotificationTypeEnum, string> = {
+    [NotificationTypeEnum.TRAINING_SESSIONS]: "Training Sessions",
+    [NotificationTypeEnum.EVENTS]: "Events",
+    [NotificationTypeEnum.MESSAGING]: "Direct Messages",
   };
 
-  const handleToggleNotification = (id: string, checked: boolean) => {
-    setNotifications((prev) => ({
-      ...prev,
-      [id]: checked,
-    }));
+  // States.
+  const [notificationMethods, setNotificationMethods] = useState<
+    NotificationMethod[] | []
+  >([]);
+  const [notificationTypes, setNotificationTypes] = useState<
+    NotificationPreference[] | []
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Hooks.
+  const { getNotificationSettings } = useGetNotificationSettings();
+  const { updateNotificationMethod } = useUpdateNotificationMethod();
+  const { updateNotificationPermission } = useUpdateNotificationPermission();
+
+  const handleChannelToggle = async (method: NotificationMethodEnum) => {
+    setNotificationMethods((prev) =>
+      prev.map((item) =>
+        item.notificationMethod === method
+          ? { ...item, enabled: !item.enabled }
+          : item,
+      ),
+    );
+    const request: UpdateNotificationMethodRequestDto = {
+      accountId: userId,
+      method: method,
+      enabled: !notificationMethods.find(
+        (item) => item.notificationMethod === method,
+      )?.enabled,
+    };
+    const response = await updateNotificationMethod(request);
+    if (response.statusCode === 200) {
+      toast({
+        title: "Success",
+        description: "Notification method updated successfully",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: response.message,
+        variant: "destructive",
+      });
+      setNotificationMethods((prev) =>
+        prev.map((item) =>
+          item.notificationMethod === method
+            ? { ...item, enabled: !item.enabled }
+            : item,
+        ),
+      );
+    }
   };
+
+  const handleToggleNotification = async (
+    notifName: NotificationTypeEnum,
+    checked: boolean,
+  ) => {
+    setNotificationTypes((prev) =>
+      prev.map((item) =>
+        item.notifName === notifName ? { ...item, enabled: checked } : item,
+      ),
+    );
+    const request: UpdateNotificationPermissionRequestDto = {
+      accountId: userId,
+      type: notifName,
+      enabled: checked,
+    };
+    const response = await updateNotificationPermission(request);
+    if (response.statusCode === 200) {
+      toast({
+        title: "Success",
+        description: "Notification permission updated successfully",
+        variant: "success",
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: response.message,
+        variant: "destructive",
+      });
+      setNotificationTypes((prev) =>
+        prev.map((item) =>
+          item.notifName === notifName ? { ...item, enabled: !checked } : item,
+        ),
+      );
+    }
+  };
+
+  useEffect(() => {
+    getNotificationSettings(userId).then((response) => {
+      if (response.statusCode === 200 && response.data) {
+        setNotificationMethods(response.data.notificationMethods);
+        setNotificationTypes(response.data.notificationComponents);
+      } else {
+        return (
+          <div>
+            Error retrieving notifications settings. Please try again later.
+          </div>
+        );
+      }
+    });
+  }, [userId]);
+
+  useEffect(() => {
+    console.log(notificationMethods, notificationTypes);
+    if (notificationMethods.length > 0 && notificationTypes.length > 0) {
+      setLoading(false);
+    }
+  }, [notificationTypes, notificationMethods]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="">
@@ -83,7 +165,7 @@ export default function NotificationSettings() {
             Notification Settings{" "}
           </CardTitle>
 
-          <CardDescription className="flex justify-center text-medium font-light items-center justify-center text-primaryColour">
+          <CardDescription className="flex justify-center text-medium font-light items-center text-primaryColour">
             Choose how you want to receive notifications
           </CardDescription>
         </CardHeader>
@@ -94,69 +176,64 @@ export default function NotificationSettings() {
               Receive notifications via:
             </Label>
             <div className="flex flex-col sm:flex-row gap-8">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="email"
-                  checked={notificationChannels.email}
-                  onCheckedChange={() => handleChannelToggle("email")}
-                />
-                <Label
-                  htmlFor="email"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primaryColour"
-                >
-                  Email
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="phone"
-                  checked={notificationChannels.phone}
-                  onCheckedChange={() => handleChannelToggle("phone")}
-                />
-                <Label
-                  htmlFor="phone"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primaryColour"
-                >
-                  Phone
-                </Label>
-              </div>
+              {notificationMethods.map((method, index) => (
+                <div key={index} className="flex items-center space-x-2">
+                  <Checkbox
+                    id={method.notificationMethod}
+                    checked={method.enabled}
+                    onCheckedChange={() =>
+                      handleChannelToggle(method.notificationMethod)
+                    }
+                  />
+                  <Label
+                    htmlFor={method.notificationMethod}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-primaryColour"
+                  >
+                    {
+                      NotificationMethodDisplayNames[
+                        method.notificationMethod as NotificationMethodEnum
+                      ]
+                    }
+                  </Label>
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Show message if no channel selected */}
-          {!notificationChannels.email && !notificationChannels.phone && (
-            <div className="text-sm text-muted-foreground italic text-primaryColour">
-              Select at least one notification method to configure your
-              notifications
-            </div>
-          )}
+          {!notificationMethods[0].enabled &&
+            !notificationMethods[1].enabled && (
+              <div className="text-sm text-muted-foreground italic text-primaryColour">
+                Select at least one notification method to configure your
+                notifications
+              </div>
+            )}
 
           {/* Notification Options */}
-          {(notificationChannels.email || notificationChannels.phone) && (
+          {(notificationMethods[0].enabled ||
+            notificationMethods[1].enabled) && (
             <div className="space-y-4">
               <Label className="flex text-base font-bold text-primaryColour">
                 Notification preferences
               </Label>
               <div className="space-y-2">
-                {notificationOptions.map((option) => (
+                {notificationTypes.map((option, index) => (
                   <div
-                    key={option.id}
+                    key={index}
                     className="flex items-center justify-between"
                   >
                     <div>
                       <Label className="text-sm font-medium">
-                        {option.title}
+                        {NotificationTypeDisplayNames[option.notifName]}
                       </Label>
                       <p className="text-sm text-muted-foreground">
                         {option.description}
                       </p>
                     </div>
                     <Switch
-                      checked={
-                        notifications[option.id as keyof typeof notifications]
-                      }
+                      checked={option.enabled}
                       onCheckedChange={(checked) =>
-                        handleToggleNotification(option.id, checked)
+                        handleToggleNotification(option.notifName, checked)
                       }
                     />
                   </div>

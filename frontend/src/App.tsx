@@ -27,8 +27,10 @@ import PrivateRoute from "./components/PrivateRoute/PrivateRoute.tsx";
 import { PublicRoute } from "./components/PublicRoute/index.tsx";
 import NotificationSettingsPage from "./pages/NotificationSettingsPage.tsx";
 import ChangeForgottenPasswordPage from "./pages/ResetPassword.tsx";
+import useFcmNotifications from "@/hooks/useFcmNotifications.ts";
 
 function App() {
+  useFcmNotifications();
   return (
     <Router>
       <Routes>

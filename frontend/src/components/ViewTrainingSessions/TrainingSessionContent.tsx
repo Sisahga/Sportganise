@@ -28,16 +28,19 @@ import { getFileName } from "@/utils/getFileName";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
+import { CookiesDto } from "@/types/auth";
+import waitlistParticipantsApi from "@/services/api/waitlistParticipantsApi";
 
 const TrainingSessionContent = () => {
-  const [accountType, setAccountType] = useState<string | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
+  const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
+  const [accountAttendee, setAccountAttendee] = useState<Attendees>();
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
 
   log.debug("Rendering TrainingSessionContent");
   useEffect(() => {
     const user = getCookies();
-    setAccountType(user?.type);
+    setUser(user);
     log.info("Training Session Card account type : ", user);
   }, [navigate]);
 
@@ -57,6 +60,7 @@ const TrainingSessionContent = () => {
     visibility: "",
     author: "",
   });
+
   useEffect(() => {
     // Update state safely using useEffect
     if (location.state && location.state.programDetails) {
@@ -72,6 +76,29 @@ const TrainingSessionContent = () => {
     }
     log.info("Attendees in training session content: ", attendees);
   }, [location.state]);
+
+  useEffect(() => {
+    //TODO: define a useHook instead of all this code, who knows
+    const fetchParticipant = async () => {
+      const programId = location.state?.programDetails?.programId;
+      console.log("ProgramID:", programId, user?.accountId);
+      if (programId && user?.accountId) {
+        try {
+          const accountAttendee: Attendees =
+            await waitlistParticipantsApi.getProgramParticipant(
+              programId,
+              user?.accountId,
+            );
+          setAccountAttendee(accountAttendee);
+          console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
+          console.log(accountAttendee);
+        } catch (error) {
+          log.error("Failed to fetch program participant:", error);
+        }
+      }
+    };
+    fetchParticipant();
+  }, [location.state.programDetails.programId, user?.accountId]);
 
   return (
     <div className="mb-32 mt-5">
@@ -211,24 +238,31 @@ const TrainingSessionContent = () => {
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
         {!(
-          (accountType?.toLowerCase() === "general" ||
-            accountType?.toLowerCase() === "player") &&
+          (user?.type?.toLowerCase() === "general" ||
+            user?.type?.toLowerCase() === "player") &&
           programDetails.programType.toLowerCase() === "training"
         ) && (
           <>
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">Attendees</h2>
               <p className="text-sm font-medium text-gray-500 ml-3">
-                {attendees.length}/{programDetails.capacity}
+                {Array.isArray(attendees)
+                  ? attendees.filter((attendee) => attendee.confirmed).length
+                  : 0}
+                /{programDetails.capacity}
               </p>
             </div>
             <div className="mx-2">
               {attendees.length > 0 ? (
-                attendees.map((attendee, index) => (
-                  <div key={index}>
-                    <RegisteredPlayer accountId={attendee.accountId} />
-                  </div>
-                ))
+                attendees.map((attendee, index) => {
+                  console.log("Attendee Information:", attendee); // Added console log
+                  return attendee.participantType?.toLowerCase() ===
+                    "subscribed" || attendee.confirmed ? (
+                    <div key={index}>
+                      <RegisteredPlayer accountAttendee={attendee} />
+                    </div>
+                  ) : null;
+                })
               ) : (
                 <p className="text-cyan-300 text-sm font-normal m-5 text-center">
                   There are no attendees
@@ -240,7 +274,8 @@ const TrainingSessionContent = () => {
 
         {/**Conditionally render different menu options based on account type */}
         <DropDownMenuButton
-          accountType={accountType}
+          user={user}
+          accountAttendee={accountAttendee}
           programDetails={programDetails}
           attendees={attendees}
         />

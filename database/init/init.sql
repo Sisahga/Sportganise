@@ -229,7 +229,35 @@ CREATE TABLE training_plan(
 	plan_id SERIAL PRIMARY KEY,
 	account_id INTEGER NOT NULL REFERENCES account (account_id) ON DELETE CASCADE,
 	doc_url VARCHAR(255) NOT NULL,
+	shared BOOLEAN,
 	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- PRIMARY KEY is a composite key: case where user has browser and app listening for notifications at the same time.
+CREATE TABLE fcm_token(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL,
+    PRIMARY KEY (token)
+);
+
+-- Notification preferences for each user.
+CREATE TABLE notification_preference(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    push_notifications BOOLEAN DEFAULT TRUE,
+    email_notifications BOOLEAN DEFAULT FALSE,
+    events BOOLEAN DEFAULT TRUE,
+    messaging BOOLEAN DEFAULT TRUE,
+    training_sessions BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (account_id)
+);
+
+CREATE TABLE notification(
+    notification_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    title VARCHAR(30) NOT NULL,
+    body VARCHAR(100) NOT NULL,
+    read BOOLEAN DEFAULT FALSE,
+    sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 SET TIME ZONE 'America/New_York';

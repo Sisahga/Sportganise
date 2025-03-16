@@ -62,23 +62,35 @@ const EditProfileContent: React.FC = () => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: data?.firstName || "",
-      lastName: data?.lastName || "",
-      email: data?.email || "",
-      phone: data?.phone || "",
-      address: data?.address?.line || "",
-      city: data?.address?.city || "",
-      province: data?.address?.province || "",
-      postalCode: data?.address?.postalCode || "",
-      country: data?.address?.country || "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      province: "",
+      postalCode: "",
+      country: "",
     },
   });
 
   useEffect(() => {
     if (data) {
+      form.reset({
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        address: data.address?.line || "",
+        city: data.address?.city || "",
+        province: data.address?.province || "",
+        postalCode: data.address?.postalCode || "",
+        country: data.address?.country || "",
+      });
+
       setImage(data.pictureUrl || "https://via.placeholder.com/150");
     }
-  }, [data]);
+  }, [data, form]);
 
   useEffect(() => {
     if (success) {

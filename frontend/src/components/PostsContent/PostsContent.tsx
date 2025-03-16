@@ -1,138 +1,197 @@
-//TODO: Connect and fetch from sessionId
-
 import React, { useState, useEffect } from "react";
-import { ThumbsUp, MessageCircle } from "lucide-react";
+import {
+  ThumbsUp,
+  MessageCircle,
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { formatDistanceToNow } from "date-fns";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+} from "@/components/ui/card";
+
 import BackButton from "../ui/back-button";
-
-// Define the types for Post and Comment
-interface Comment {
-  id: number;
-  username: string;
-  role: string;
-  content: string;
-  date: Date;
-}
-
-interface Post {
-  id: number;
-  title: string;
-  description: string;
-  date: string;
-  likes: number;
-  comments: Comment[];
-}
+import { useLocation } from "react-router";
+import { getCookies } from "@/services/cookiesService";
+import { Feedback } from "@/types/postdetail";
+import { usePostLike } from "@/hooks/usePostLike";
+import { useFeedback } from "@/hooks/useFeedback";
+import { usePost } from "@/hooks/usePost";
+import log from "loglevel";
+import { Badge } from "../ui/badge";
 
 const PostsContent: React.FC = () => {
-  const [newComment, setNewComment] = useState<string>("");
-
-  const [post, setPost] = useState<Post | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [liked, setLiked] = useState<boolean>(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 5;
+  const location = useLocation();
+  const postId = location.state?.postId;
+  const user = getCookies();
 
-  // MOCK DATA
-  const dummyPost: Post = {
-    id: 1,
-    title: "Training Session Forum Example",
-    date: "2024-12-05T12:30:00",
-    description:
-      "This is a sample description for the session. It contains details about the event or post.",
-    likes: 23,
-    comments: [
-      {
-        id: 1,
-        username: "User1",
-        role: "Player",
-        content: "This is a sample comment.",
-        date: new Date("2024-12-29T12:30:00"),
+  const { post, loading: postLoading, error } = usePost(postId);
+  const { likePost, unlikePost } = usePostLike();
+  const { addFeedback, deleteFeedback } = useFeedback();
+
+  const [newComment, setNewComment] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [comments, setComments] = useState<Feedback[]>(
+    post?.feedbackList || [],
+  );
+  const [liked, setLiked] = useState<boolean>(post ? post.liked : false);
+  const [likeCount, setLikeCount] = useState<number>(post?.likeCount || 0);
+
+  const canDelete = (creationDate: string, commentAuthorId: number) => {
+    const creationTime = new Date(creationDate).getTime();
+    const currentTime = Date.now();
+    const timeDiff = currentTime - creationTime;
+    const timeLimit = 30 * 60 * 1000;
+    return timeDiff <= timeLimit && commentAuthorId === user.accountId;
+  };
+
+  const handleLike = (postId: number) => {
+    if (!post) {
+      log.error("Post is null or undefined");
+      return;
+    }
+
+    if (liked) {
+      setLiked(false);
+      setLikeCount(likeCount - 1);
+      log.debug(`Post ${postId} disliked by user ${user.accountId}`);
+      unlikePost(postId, user.accountId);
+    } else {
+      setLiked(true);
+      setLikeCount(likeCount + 1);
+      log.debug(`Post ${postId} liked by user ${user.accountId}`);
+      likePost(postId, user.accountId);
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!post || !newComment.trim() || user === null || user.type === null)
+      return;
+
+    const tempId = Date.now();
+    const newCommentObj: Feedback = {
+      feedbackId: tempId,
+      author: {
+        accountId: user.accountId ?? 0,
+        name: `${user.firstName} ${user.lastName}`,
+        type: user.type,
+        pictureUrl: user.pictureUrl || "",
       },
-      {
-        id: 2,
-        username: "User2",
-        role: "Player",
-        content: "Another comment here, really like this post!",
-        date: new Date("2024-12-29T13:00:00"),
-      },
-    ],
+      description: newComment,
+      creationDate: new Date().toISOString(),
+    };
+
+    setComments((prevComments) => [newCommentObj, ...prevComments]);
+    setNewComment("");
+    setCurrentPage(1);
+
+    try {
+      const feedbackId = await addFeedback(
+        postId,
+        user.accountId ?? 0,
+        newComment,
+      );
+      log.info(`Comment added with Feedback ID: ${feedbackId}`);
+      if (feedbackId) {
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.feedbackId === tempId
+              ? { ...comment, feedbackId }
+              : comment,
+          ),
+        );
+      }
+    } catch (err) {
+      log.error("Failed to add comment:", err);
+    }
+  };
+
+  const handleDeleteComment = (feedbackId: number) => {
+    if (!post) return;
+
+    setComments((prevComments) =>
+      prevComments.filter((feedback) => feedback.feedbackId !== feedbackId),
+    );
+
+    deleteFeedback(postId, feedbackId);
+    log.info("Deleting comment for Feedback ID:", feedbackId);
   };
 
   useEffect(() => {
-    const fetchPost = async () => {
-      setLoading(true);
-      setTimeout(() => {
-        setPost(dummyPost);
-        setLoading(false);
-      });
-    };
-
-    fetchPost();
-  }, []);
-
-  const handleAddComment = async () => {
-    if (newComment.trim() && post) {
-      const newCommentObj: Comment = {
-        id: post.comments.length + 1,
-        username: "CurrentUser",
-        role: "Player",
-        content: newComment,
-        date: new Date(),
-      };
-
-      const updatedPost = {
-        ...post,
-        comments: [...post.comments, newCommentObj],
-      };
-      setPost(updatedPost);
-      setNewComment("");
+    if (post && post.feedbackList) {
+      setComments(post.feedbackList);
+      setLiked(post.liked);
+      setLikeCount(post.likeCount || 0);
     }
-  };
-
-  const toggleLike = async () => {
-    if (post) {
-      const updatedLikes = liked ? post.likes - 1 : post.likes + 1;
-      const updatedPost = {
-        ...post,
-        likes: updatedLikes,
-      };
-
-      setPost(updatedPost);
-      setLiked(!liked);
-    }
-  };
-
-  const indexOfLastComment = currentPage * commentsPerPage;
-  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-  const currentComments = post?.comments.slice(
-    indexOfFirstComment,
-    indexOfLastComment,
-  );
+  }, [post]);
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
-  if (loading || !post) {
-    return <div>Loading...</div>;
+  const getBadgeVariant = (authorType: string) => {
+    switch (authorType.toLowerCase()) {
+      case "general":
+        return { variant: "default" } as const;
+      case "player":
+        return { variant: "default" } as const;
+      case "admin":
+        return { variant: "outline" } as const;
+      case "coach":
+        return { variant: "secondary" } as const;
+      default:
+        return { variant: "destructive" } as const;
+    }
+  };
+
+  if (postLoading) {
+    return (
+      <div className="py-4 min-h-screen pb-20">
+        <BackButton />
+        <div className="container mx-auto py-6">
+          <p>Loading post...</p>
+        </div>
+      </div>
+    );
   }
+
+  if (error || !post) {
+    return (
+      <div className="py-4 min-h-screen pb-20">
+        <BackButton />
+        <div className="container mx-auto py-6">
+          <p>Error loading post. Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
+
+  //Pagination logic
+  const startIndex = (currentPage - 1) * commentsPerPage;
+  const currentComments = comments.slice(
+    startIndex,
+    startIndex + commentsPerPage,
+  );
+  const totalPages = Math.ceil(comments.length / commentsPerPage);
 
   return (
     <div className="py-4 min-h-screen pb-20">
       <BackButton />
 
+      {/*POSTS*/}
       <div className="container mx-auto py-6">
         <Card className="w-full mx-auto">
           <CardHeader>
@@ -141,7 +200,9 @@ const PostsContent: React.FC = () => {
                 {post.title}
               </h1>
               <p className="text-sm text-primaryColour">
-                {formatDistanceToNow(new Date(post.date), { addSuffix: true })}
+                {formatDistanceToNow(new Date(post.creationDate), {
+                  addSuffix: true,
+                })}
               </p>
             </div>
           </CardHeader>
@@ -154,11 +215,11 @@ const PostsContent: React.FC = () => {
               <div className="flex space-x-4">
                 <Button
                   variant="outline"
-                  className={`flex items-center space-x-1 bg-transparent ${liked ? "text-secondaryColour" : "text-primaryColour"}`}
-                  onClick={toggleLike}
+                  className={`flex items-center space-x-1 ${liked ? "text-secondaryColour" : "text-primaryColour"}`}
+                  onClick={() => handleLike(post.postId)}
                 >
                   <ThumbsUp className="w-4 h-4" />
-                  <span>{post.likes}</span>
+                  <span>{likeCount}</span>
                 </Button>
 
                 <Button
@@ -166,28 +227,26 @@ const PostsContent: React.FC = () => {
                   className="flex items-center space-x-1"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>{post.comments.length}</span>
+                  <span>{comments.length}</span>
                 </Button>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Add Comment Section */}
+        {/*INPUT FOR NEW COMMENT */}
         <div className="mt-6">
           <div className="w-full mb-2">
             <Textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               rows={1}
-              className="w-full border p-3 rounded-full resize-none min-h-[40px] focus:ring-2 focus:ring-blue-400 transition-all duration-300"
+              className="w-full border p-3 rounded-md resize-none min-h-[40px] focus:ring-2 focus:ring-blue-400 transition-all duration-300"
               placeholder="Leave a feedback..."
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
             />
           </div>
 
-          {(newComment.trim() || isFocused) && (
+          {newComment.trim() && (
             <div className="flex justify-end gap-2">
               <Button
                 variant="default"
@@ -203,60 +262,86 @@ const PostsContent: React.FC = () => {
           )}
         </div>
 
-        {/* Comments Section with Pagination */}
-        <div className="mt-6 space-y-4 font">
-          {currentComments?.map((comment: Comment) => (
-            <div key={comment.id} className="p-4 bg-white rounded-lg shadow-sm">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-light">
-                  {comment.username}{" "}
-                  <span className="text-secondaryColour font-bold">
-                    {comment.role}
-                  </span>
+        {/* COMMENTS SECTION */}
+        <div className="mt-8 space-y-4 font">
+          <h2 className="text-lg font-semibold">Community Feedbacks</h2>
+          {currentComments.map((comment: Feedback) => (
+            <Card
+              key={comment.feedbackId}
+              className="p-4 bg-white rounded-lg shadow-sm"
+            >
+              <CardHeader className="p-0">
+                <div className="flex items-center justify-between ">
+                  <div className="text-sm font-light flex">
+                    <span>{comment.author.name}</span>
+                    <Badge
+                      {...getBadgeVariant(comment.author.type)}
+                      className="ml-1 h-5"
+                    >
+                      {comment.author.type.toLowerCase()}
+                    </Badge>
+                  </div>
+
+                  <div className="text-xs text-gray-500 ">
+                    {formatDistanceToNow(new Date(comment.creationDate), {
+                      addSuffix: true,
+                    })}
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className=" p-0">
+                <div className=" mt-2">
+                  <CardDescription className="text-sm font-light">
+                    {comment.description}
+                  </CardDescription>
                 </div>
 
-                <div className="text-xs text-gray-500">
-                  {formatDistanceToNow(new Date(comment.date), {
-                    addSuffix: true,
-                  })}
-                </div>
-              </div>
-
-              <div className="mt-2">
-                <p className="text-sm font-light">{comment.content}</p>
-              </div>
-            </div>
+                {/* Conditionally render the delete button */}
+                {canDelete(comment.creationDate, comment.author.accountId) && (
+                  <div className=" flex justify-end mt-auto">
+                    <Button
+                      variant="destructive"
+                      className="h-8"
+                      onClick={() => handleDeleteComment(comment.feedbackId)}
+                    >
+                      <Trash2 className="w-2 h-2" />
+                      <span className="text-xs">Delete</span>
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        {/* Pagination Controls */}
-        <Pagination className="mt-6 flex justify-center space-x-2">
-          <PaginationPrevious
-            onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-          >
-            Previous
-          </PaginationPrevious>
+        {/* PAGINATION */}
+        <Pagination className="mt-2 pb-20">
           <PaginationContent>
-            {Array.from(
-              { length: Math.ceil(post.comments.length / commentsPerPage) },
-              (_, index) => (
-                <PaginationItem
-                  key={index + 1}
-                  onClick={() => handlePageChange(index + 1)}
-                >
-                  <PaginationLink>{index + 1}</PaginationLink>
-                </PaginationItem>
-              ),
-            )}
+            <Button
+              variant="outline"
+              className="text-primaryColour"
+              disabled={currentPage <= 1}
+              onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+            >
+              <ChevronLeft></ChevronLeft>
+            </Button>
+
+            <PaginationItem className="m-3">
+              <span className="text-sm">Page {currentPage}</span>
+            </PaginationItem>
+
+            <Button
+              variant="outline"
+              className="text-primaryColour"
+              disabled={comments.length <= 5 || currentPage === totalPages}
+              onClick={() =>
+                handlePageChange(Math.min(currentPage + 1, totalPages))
+              }
+            >
+              <ChevronRight></ChevronRight>
+            </Button>
           </PaginationContent>
-          <PaginationNext
-            onClick={() =>
-              currentPage < Math.ceil(post.comments.length / commentsPerPage) &&
-              handlePageChange(currentPage + 1)
-            }
-          >
-            Next
-          </PaginationNext>
         </Pagination>
       </div>
     </div>
