@@ -6,6 +6,7 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.exceptions.ProgramNotFoundException;
@@ -88,16 +89,7 @@ public class WaitlistService {
    */
   public ProgramParticipantDto fetchParticipant(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
-    ProgramParticipant programParticipant =
-        participantRepository
-            .findById(new ProgramParticipantId(programId, accountId))
-            .orElseThrow(
-                () ->
-                    new ParticipantNotFoundException(
-                        "Participant not found on waitlist for program: "
-                            + programId
-                            + ", account: "
-                            + accountId));
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
 
     return new ProgramParticipantDto(programParticipant);
   }
@@ -181,7 +173,7 @@ public class WaitlistService {
 
     ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
 
-    if (confirmParticipant == true) {
+    if (confirmParticipant) {
       // Confirm participant
       ZonedDateTime ldt = ZonedDateTime.now();
       optedParticipant.setConfirmedDate(ldt);
@@ -230,16 +222,7 @@ public class WaitlistService {
   public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
 
-    ProgramParticipant programParticipant =
-        participantRepository
-            .findById(new ProgramParticipantId(programId, accountId))
-            .orElseThrow(
-                () ->
-                    new ParticipantNotFoundException(
-                        "Participant not found on waitlist for program: "
-                            + programId
-                            + ", account: "
-                            + accountId));
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
 
     if (programParticipant.isConfirmed() == false) {
       return null;
@@ -294,14 +277,7 @@ public class WaitlistService {
   public boolean inviteToPrivateEvent(Integer accountId, Integer programId) {
     AtomicBoolean isNewParticipant = new AtomicBoolean(false);
 
-    Program program =
-        programRepository
-            .findById(programId)
-            .orElseThrow(
-                () -> {
-                  log.warn("Program not found with id " + programId);
-                  return new ProgramNotFoundException("Program not found");
-                });
+    Program program = this.getProgram(programId);
 
     // Direct user invitation is only supported for private events
     if (!program.getVisibility().equals("private")) {
@@ -342,5 +318,33 @@ public class WaitlistService {
     this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
 
     return isNewParticipant.get();
+  }
+  public Program getProgram(Integer programId) {
+    Program program =
+        programRepository
+            .findById(programId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Program not found with id " + programId);
+                  return new ProgramNotFoundException("Program not found");
+                });
+    
+                return program;
+  }
+
+  public ProgramParticipant getParticipant(Integer programId, Integer accountId) {
+    ProgramParticipant programParticipant =
+        participantRepository
+            .findById(new ProgramParticipantId(programId, accountId))
+            .orElseThrow(
+                () ->
+                    new ParticipantNotFoundException(
+                        "Participant not found for program: "
+                            + programId
+                            + ", account: "
+                            + accountId));
+
+    return programParticipant;
+
   }
 }
