@@ -6,12 +6,18 @@ export const useInviteToPrivateEvent = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const invite = async (accountId: number, programId: number | null | undefined) => {
+  const invite = async (
+    accountId: number,
+    programId: number | null | undefined,
+  ) => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await programParticipantApi.inviteToPrivateEvent(accountId, programId);
+      const response = await programParticipantApi.inviteToPrivateEvent(
+        accountId,
+        programId,
+      );
       log.info("Successfully invited to private event:", response);
       return response;
     } catch (err) {
