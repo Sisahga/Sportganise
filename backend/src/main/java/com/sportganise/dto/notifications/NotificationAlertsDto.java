@@ -1,6 +1,5 @@
 package com.sportganise.dto.notifications;
 
-import com.sportganise.entities.notifications.Notification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,5 +14,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class NotificationAlertsDto {
-  List<Notification> notifications;
+  List<NotificationDto> notifications;
 }
