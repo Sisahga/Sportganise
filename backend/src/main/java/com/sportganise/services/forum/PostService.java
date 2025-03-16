@@ -30,32 +30,28 @@ import org.springframework.stereotype.Service;
 @Service
 public class PostService {
 
-  @Autowired
-  private PostRepository postRepository;
-  @Autowired
-  private LikesRepository likesRepository;
-  @Autowired
-  private PostAttachmentRepository attachmentRepository;
-  @Autowired
-  private FeedbackService feedbackService;
-  @Autowired
-  private AccountRepository accountRepository;
+  @Autowired private PostRepository postRepository;
+  @Autowired private LikesRepository likesRepository;
+  @Autowired private PostAttachmentRepository attachmentRepository;
+  @Autowired private FeedbackService feedbackService;
+  @Autowired private AccountRepository accountRepository;
 
-  private static final ZonedDateTime ABSURD_DATE = ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
+  private static final ZonedDateTime ABSURD_DATE =
+      ZonedDateTime.of(1, 1, 1, 0, 0, 0, 0, ZoneId.of("UTC"));
 
   /**
    * Fetches posts based on search criteria.
    *
-   * @param searchTerm     Search term to filter posts by.
+   * @param searchTerm Search term to filter posts by.
    * @param occurrenceDate Date of occurrence of the post.
-   * @param type           Type of the post.
-   * @param selectedLabel  Label selected to filter posts by.
-   * @param limit          Number of posts to fetch.
-   * @param page           Page number of posts to fetch.
-   * @param sortBy         Field to sort posts by.
-   * @param sortDirection  Direction to sort posts in.
-   * @param orgId          ID of the organization.
-   * @param accountId      ID of the account.
+   * @param type Type of the post.
+   * @param selectedLabel Label selected to filter posts by.
+   * @param limit Number of posts to fetch.
+   * @param page Page number of posts to fetch.
+   * @param sortBy Field to sort posts by.
+   * @param sortDirection Direction to sort posts in.
+   * @param orgId ID of the organization.
+   * @param accountId ID of the account.
    * @return List of fetched posts.
    */
   public List<PostDto> searchAndFilterPosts(
@@ -74,9 +70,10 @@ public class PostService {
 
     List<Integer> labels = accountRepository.getLabelIdsByAccountIdAndOrgId(accountId, orgId);
 
-    Sort sort = sortBy.equals("likeCount")
-        ? Sort.unsorted()
-        : Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+    Sort sort =
+        sortBy.equals("likeCount")
+            ? Sort.unsorted()
+            : Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
 
     Pageable pageable = PageRequest.of(page, limit, sort);
 
@@ -91,43 +88,47 @@ public class PostService {
     log.debug("Fetching posts with sortBy: {}", sortBy);
     log.debug("Fetching posts with sortDirection: {}", sortDirection);
 
-    Page<Post> posts = postRepository.searchAndFilterPosts(
-        searchTerm,
-        labels,
-        selectedLabel,
-        occurrenceDate != null ? occurrenceDate : ABSURD_DATE,
-        this.getThreeMonthsAgo(),
-        this.getYesterday(),
-        ABSURD_DATE,
-        type,
-        pageable);
+    Page<Post> posts =
+        postRepository.searchAndFilterPosts(
+            searchTerm,
+            labels,
+            selectedLabel,
+            occurrenceDate != null ? occurrenceDate : ABSURD_DATE,
+            this.getThreeMonthsAgo(),
+            this.getYesterday(),
+            ABSURD_DATE,
+            type,
+            pageable);
 
-    List<PostDto> dtos = posts.stream()
-        .map(
-            post -> {
-              long likeCount = countLikesByPostId(post.getPostId());
-              long feedbackCount = countFeedbackByPostId(post.getPostId());
-              boolean liked = likedPost(post.getPostId(), accountId);
-              PostDto dto = new PostDto(
-                  post.getPostId(),
-                  post.getTitle(),
-                  post.getDescription(),
-                  post.getType(),
-                  post.getOccurrenceDate(),
-                  post.getCreationDate(),
-                  likeCount,
-                  liked,
-                  feedbackCount);
+    List<PostDto> dtos =
+        posts.stream()
+            .map(
+                post -> {
+                  long likeCount = countLikesByPostId(post.getPostId());
+                  long feedbackCount = countFeedbackByPostId(post.getPostId());
+                  boolean liked = likedPost(post.getPostId(), accountId);
+                  PostDto dto =
+                      new PostDto(
+                          post.getPostId(),
+                          post.getTitle(),
+                          post.getDescription(),
+                          post.getType(),
+                          post.getOccurrenceDate(),
+                          post.getCreationDate(),
+                          likeCount,
+                          liked,
+                          feedbackCount);
 
-              return dto;
-            })
-        .collect(Collectors.toList());
+                  return dto;
+                })
+            .collect(Collectors.toList());
 
     if (sortBy.equals("likeCount")) {
       dtos.sort(
-          (a, b) -> sortDirection.equalsIgnoreCase("asc")
-              ? Long.compare(a.getLikeCount(), b.getLikeCount())
-              : Long.compare(b.getLikeCount(), a.getLikeCount()));
+          (a, b) ->
+              sortDirection.equalsIgnoreCase("asc")
+                  ? Long.compare(a.getLikeCount(), b.getLikeCount())
+                  : Long.compare(b.getLikeCount(), a.getLikeCount()));
     }
 
     log.info("Fetched posts with search criteria");
@@ -171,7 +172,7 @@ public class PostService {
   /**
    * Likes a post.
    *
-   * @param postId    Post id.
+   * @param postId Post id.
    * @param accountId Account id.
    */
   public void likePost(Integer postId, Integer accountId) {
@@ -190,13 +191,12 @@ public class PostService {
   /**
    * Method to create new post when a new program is created.
    *
-   * @param accountId      Id of account.
-   * @param title          Title of the post which is the same as the program's.
-   * @param description    Description of the post which is the same as the
-   *                       program's.
+   * @param accountId Id of account.
+   * @param title Title of the post which is the same as the program's.
+   * @param description Description of the post which is the same as the program's.
    * @param occurrenceDate Occurrence Date of the program.
-   * @param programtype    Type of program. Enum.
-   * @param programId      Id of the program.
+   * @param programtype Type of program. Enum.
+   * @param programId Id of the program.
    */
   public void createNewPost(
       Integer accountId,
@@ -212,13 +212,7 @@ public class PostService {
     String metadata = String.format("{\"programID\":%d}", programId);
 
     postRepository.insertPost(
-            accountId,
-            title,
-            description,
-            metadata,
-            postType.name(),
-            occurrenceDate
-        );
+        accountId, title, description, metadata, postType.name(), occurrenceDate);
   }
 
   private boolean likedPost(Integer postId, Integer accountId) {
