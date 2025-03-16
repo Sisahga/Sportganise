@@ -321,8 +321,9 @@ public class WaitlistService {
     //   throw new ProgramInvitationiException("Participant already confirmed to program");
     // }
 
-    // Send invitation email
-    this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
+    // Send invitation (not for training session)
+    if (!program.getProgramType().equals(ProgramType.TRAINING))
+      this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
 
     return isNewParticipant.get();
   }
