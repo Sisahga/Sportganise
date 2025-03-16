@@ -16,8 +16,8 @@ public class NotificationCleanupTask {
   }
 
   /**
-   * Cleans up read notifications every day at midnight.
-   * Read notifications that are 1 week or older are deleted.
+   * Cleans up read notifications every day at midnight. Read notifications that are 1 week or older
+   * are deleted.
    */
   @Scheduled(cron = "0 0 0 * * ?")
   public void cleanup() {
