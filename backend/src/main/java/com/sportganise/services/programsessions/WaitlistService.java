@@ -6,6 +6,7 @@ import com.sportganise.entities.account.Account;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.exceptions.ProgramNotFoundException;
@@ -317,26 +318,34 @@ public class WaitlistService {
                   return new AccountNotFoundException("Account not found with id " + accountId);
                 });
 
+    // Subscribed players for training events
+    final String type = program.getProgramType() == ProgramType.TRAINING
+          ? "Subscribed"
+          : account.getType().name();
+
     ProgramParticipant programParticipant =
         this.participantRepository
             .findById(new ProgramParticipantId(programId, accountId))
             .orElseGet(
                 () -> {
-                  // Register new program participant
+                  // Register new program participant 
+                  // Confirming them
                   isNewParticipant.set(true);
                   return this.participantRepository.save(
                       ProgramParticipant.builder()
                           .programParticipantId(new ProgramParticipantId(programId, accountId))
-                          .type(account.getType().name())
-                          .isConfirmed(false)
+                          .type(type)
+                          .isConfirmed(true)
+                          .confirmedDate(ZonedDateTime.now())
                           .build());
                 });
 
     // Participant should not be confirmed yet
-    if (programParticipant.isConfirmed()) {
-      log.warn("Participant already confirmed to program");
-      throw new ProgramInvitationiException("Participant already confirmed to program");
-    }
+    // Change to make it so we confirm them for now, revisit.
+    // if (programParticipant.isConfirmed()) {
+    //   log.warn("Participant already confirmed to program");
+    //   throw new ProgramInvitationiException("Participant already confirmed to program");
+    // }
 
     // Send invitation email
     this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
