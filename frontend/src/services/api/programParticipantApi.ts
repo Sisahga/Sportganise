@@ -61,7 +61,7 @@ const programParticipantApi = {
   },
 
   inviteToPrivateEvent: async (
-    accountId: number, 
+    accountId: number,
     programId: number | null | undefined,
   ) => {
     const url = `${baseMappingUrl}/invite-private?programId=${programId}&accountId=${accountId}`;
@@ -85,7 +85,7 @@ const programParticipantApi = {
     const data: Attendees = await response.json();
     console.log("Heres the data:", data);
     return data;
-  }
+  },
 };
 
 export default programParticipantApi;

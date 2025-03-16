@@ -80,7 +80,7 @@ export default function CreateTrainingSessionForm() {
     id: player.accountId,
     name: `${player.firstName} ${player.lastName}`,
     email: player.email,
-    role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"    
+    role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"
   }));
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
@@ -142,7 +142,11 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
-  const { invite, loading: inviteLoading, error: inviteError } = useInviteToPrivateEvent();
+  const {
+    invite,
+    loading: inviteLoading,
+    error: inviteError,
+  } = useInviteToPrivateEvent();
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -204,7 +208,7 @@ export default function CreateTrainingSessionForm() {
         );
       }
 
-      const programId = create.data.programId
+      const programId = create.data.programId;
 
       if (values.visibility === "private" && selectedMembers.length > 0) {
         await Promise.all(
@@ -215,10 +219,10 @@ export default function CreateTrainingSessionForm() {
               console.error(`Failed to invite member ${accountId}:`, error);
               throw error; // Re-throw to trigger the catch block
             }
-          })
+          }),
         );
       }
-  
+
       console.log("loading", loading);
       log.info("createTrainingSession submit success ✔");
 
