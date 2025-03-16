@@ -157,7 +157,7 @@ const TrainingSessionContent = () => {
                 {programDetails?.occurrenceDate
                   ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
                       "en-CA",
-                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
                     )
                   : "N/A"}
               </p>
@@ -166,7 +166,7 @@ const TrainingSessionContent = () => {
                 {programDetails.occurrenceDate && programDetails.durationMins
                   ? calculateEndTime(
                       new Date(programDetails.occurrenceDate),
-                      programDetails.durationMins
+                      programDetails.durationMins,
                     )
                   : "N/A"}
               </p>
@@ -193,7 +193,7 @@ const TrainingSessionContent = () => {
               on{" "}
               {programDetails?.occurrenceDate
                 ? new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                    new Date(programDetails.occurrenceDate)
+                    new Date(programDetails.occurrenceDate),
                   )
                 : "N/A"}
             </p>
