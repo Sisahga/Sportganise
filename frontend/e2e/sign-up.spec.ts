@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("ensure backend responds", async () => {
   try {
-    const res = await fetch("http://localhost/api/health/ping");
+    const res = await fetch("http://localhost:8080/api/health/ping");
     console.log(res);
     expect(res.status).toBe(200);
   } catch (error) {
