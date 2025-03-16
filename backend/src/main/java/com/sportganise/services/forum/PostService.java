@@ -191,12 +191,12 @@ public class PostService {
   /**
    * Method to create new post when a new program is created.
    *
-   * @param accountId
-   * @param title
-   * @param description
-   * @param occurrenceDate
-   * @param programtype
-   * @param programId
+   * @param accountId Id of account.
+   * @param title Title of the post which is the same as the program's.
+   * @param description Description of the post which is the same as the program's.
+   * @param occurrenceDate Occurrence Date of the program.
+   * @param programtype Type of program. Enum.
+   * @param programId Id of the program.
    */
   public void createNewPost(
       Integer accountId,
@@ -270,6 +270,12 @@ public class PostService {
     return ZonedDateTime.now().minusDays(1);
   }
 
+  /**
+   * Helper method to convert a programType enum to a PostType enum value.
+   * 
+   * @param programtype Type of program. Enum.
+   * @return Corresponding PostType.
+   */
   private PostType programTypeToPostType(ProgramType programtype){
     switch (programtype) {
       case TRAINING:
