@@ -131,8 +131,7 @@ describe("EditProfileContent Component", () => {
       </MemoryRouter>,
     );
 
-    const buttons = screen.getAllByRole("button");
-    const backButton = buttons[0];
+    const backButton = screen.getByRole("button", { name: /back/i });
     fireEvent.click(backButton);
 
     expect(mockNavigate).toHaveBeenCalledWith(-1);
@@ -264,7 +263,7 @@ describe("EditProfileContent Component", () => {
     expect(screen.getByLabelText("Country")).toHaveValue(formValues.country);
   });
 
-  it("shows toast on succes profile update", async () => {
+  it("shows toast on successful profile update", async () => {
     render(
       <MemoryRouter>
         <EditProfileContent />

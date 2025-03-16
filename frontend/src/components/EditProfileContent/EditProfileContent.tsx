@@ -97,7 +97,7 @@ const EditProfileContent: React.FC = () => {
       toast({
         title: "Profile Updated",
         description: message || "Your profile has been updated successfully.",
-        variant: "default",
+        variant: "success",
       });
     }
     if (!success && message) {
@@ -203,7 +203,10 @@ const EditProfileContent: React.FC = () => {
       },
     };
 
-    await updateAccount(accountId || 0, payload);
+    updateAccount(accountId || 0, payload);
+    setTimeout(() => {
+      navigate("/pages/PersonalInformationPage");
+    }, 500);
   };
 
   const cancelSavePersonalInfo = () => {
