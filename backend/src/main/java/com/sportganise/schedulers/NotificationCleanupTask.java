@@ -6,6 +6,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+/** Scheduled task to clean up read notifications. */
 @Component
 @Slf4j
 public class NotificationCleanupTask {

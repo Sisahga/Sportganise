@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/** Entity for Notification. Represents a notification that is sent to an account. */
 @Getter
 @Setter
 @AllArgsConstructor
