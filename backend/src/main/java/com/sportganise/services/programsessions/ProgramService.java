@@ -199,7 +199,7 @@ public class ProgramService {
       String location = program.getLocation();
       String visibility = program.getVisibility();
 
-      if (program.isRecurring()) {
+      if (!(program.getFrequency() == null || program.getFrequency().equalsIgnoreCase("once"))) {
         List<ProgramRecurrence> recurrences = getProgramRecurrences(program.getProgramId());
         for (ProgramRecurrence recurrence : recurrences) {
           programDtos.add(
@@ -405,16 +405,23 @@ public class ProgramService {
 
     log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: ", existingProgram.getProgramId());
 
+    boolean existingProgramIsRecurring =
+        (existingProgram.getFrequency() == null
+                || existingProgram.getFrequency().equalsIgnoreCase("once"))
+            ? false
+            : true;
+    boolean newProgramIsRecurring =
+        (frequency == null || frequency.equalsIgnoreCase("once")) ? false : true;
     log.debug("Modifying recurrences for recurring programs");
     ZonedDateTime parsedStartDateTime =
         ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
 
-    if (existingProgram.isRecurring()) {
+    if (existingProgramIsRecurring) {
       if (endDate == null) {
         throw new ProgramModificationException("End date is required for recurring programs.");
       }
       ZonedDateTime parsedEndDateTime = ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime));
-      if (!isRecurring) {
+      if (!newProgramIsRecurring) {
         deleteAllRecurrences(existingProgram.getProgramId());
       } else if (!existingProgram.getFrequency().equalsIgnoreCase(frequency)
           || !(existingProgram.getOccurrenceDate().isEqual(parsedStartDateTime))) {
@@ -433,6 +440,8 @@ public class ProgramService {
               newStartDate, newExpiryDate, usedFrequency, existingProgram.getProgramId());
         } else if (existingProgram.getExpiryDate().isAfter(parsedEndDateTime)) {
           deleteExpiredRecurrences(parsedEndDateTime, existingProgram.getProgramId());
+        } else {
+          throw new ProgramModificationException(("An error occurred while handling recurrences"));
         }
       }
     }
@@ -533,7 +542,7 @@ public class ProgramService {
     ZonedDateTime expiryDate = null;
     Program program;
 
-    if (isRecurring != null && isRecurring) {
+    if (frequency != null && !(frequency.equalsIgnoreCase("once"))) {
       ZonedDateTime currentOccurrence = occurrenceDate;
       expiryDate = ZonedDateTime.parse(endDate);
       program =
