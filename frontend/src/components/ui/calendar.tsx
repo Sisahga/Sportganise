@@ -1,10 +1,12 @@
 import * as React from "react";
+import { useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { DayPicker, DayContentProps } from "react-day-picker";
-import { isSaturday, isSunday, format } from "date-fns";
-
+import { isSaturday, isSunday, format, isSameDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/Button";
+import usePrograms from "@/hooks/usePrograms";
+import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
@@ -25,14 +27,38 @@ function WeekendDot() {
   );
 }
 
+function EventHighlight() {
+  return (
+    <span
+      style={{
+        position: "absolute",
+        bottom: "2px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "80%",
+        height: "4px",
+        backgroundColor: "blue",
+        borderRadius: "2px",
+      }}
+    />
+  );
+}
+
 // An orange dot is added on each saturday and sunday
-function CustomDayContent({ date }: DayContentProps) {
+function CustomDayContent({
+  date,
+  eventDates,
+}: DayContentProps & { eventDates: Date[] }) {
   const weekend = isSaturday(date) || isSunday(date);
+  const isEventDay = eventDates.some((eventDate: Date) =>
+    isSameDay(eventDate, date)
+  );
 
   return (
     <span className="relative flex items-center justify-center w-full h-full">
       {weekend && <WeekendDot />}
-      {format(date, "d")} {/* This correctly formats the day number */}
+      {isEventDay && <EventHighlight />}
+      {format(date, "d")}
     </span>
   );
 }
@@ -43,6 +69,19 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const cookies = getCookies();
+  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { eventDates, fetchProgramDates } = usePrograms(accountId); // Fetch function from hook
+
+  // Fetch event dates when the Calendar component mounts
+  useEffect(() => {
+    async function loadEventDates() {
+      if (!accountId) return;
+      await fetchProgramDates(accountId);
+    }
+    loadEventDates();
+  }, [accountId, fetchProgramDates]); // Re-run if fetchProgramDates changes
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -93,7 +132,9 @@ function Calendar({
       }}
       components={{
         // CustomDayContent will add the dots
-        DayContent: CustomDayContent,
+        DayContent: (props) => (
+          <CustomDayContent {...props} eventDates={eventDates} />
+        ), // Pass eventDates
         IconLeft: ({ className, ...props }) => (
           <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
         ),

@@ -3,45 +3,97 @@ import { Program } from "@/types/trainingSessionDetails";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
 import log from "loglevel";
 
-function usePrograms(accountId: number | null | undefined) {
+function usePrograms(accountId: number | null) {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null); //either exists or does not
+  const [error, setError] = useState<string | null>(null);
+  const [eventDates, setEventDates] = useState<Date[]>([]);
 
-  const fetchPrograms = async () => {
+  const fetchPrograms = async (accountId: number | null) => {
+    if (!accountId) {
+      console.warn("Skipping fetchPrograms because accountId is null.");
+      setPrograms([]); // Prevent UI from breaking
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
     try {
+      log.info("Fetching programs for accountId:", accountId);
       const response = await trainingSessionApi.getPrograms(accountId);
-      setPrograms(response.data ?? []); // else returns empty array of Programs (Program[])
 
-      if (response.statusCode !== 200) {
+      if (!response || response.statusCode !== 200) {
         throw new Error("Failed to fetch all programs.");
       }
+
+      // Convert `occurrenceDate` to Date objects
+      const formattedPrograms = (response.data ?? []).map(
+        (program: Program) => ({
+          ...program,
+          programDetails: {
+            ...program.programDetails,
+            occurrenceDate:
+              typeof program.programDetails.occurrenceDate === "string"
+                ? new Date(program.programDetails.occurrenceDate)
+                : program.programDetails.occurrenceDate,
+          },
+        })
+      );
+
+      setPrograms(formattedPrograms ?? []);
 
       log.info("usePrograms response:", response);
       log.info("usePrograms statusCode:", response.statusCode);
       log.info("usePrograms message:", response.message);
-      console.log(
-        "usePrograms : const programs = useState<Program[]> => ",
-        programs,
-      );
     } catch (err) {
       console.error("Error fetching all programs:", err);
       log.error("Error fetching all programs:", err);
       setError("Failed to fetch all programs.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProgramDates = async (accountId: number | null) => {
+    if (!accountId) {
+      console.warn("Skipping fetchProgramDates because accountId is null.");
+      return;
+    }
+
+    try {
+      log.info("Fetching program dates for accountId:", accountId);
+      const eventDates = await trainingSessionApi.getProgramDates(accountId);
+      setEventDates(eventDates ?? []);
+    } catch (err) {
+      console.error("Error fetching program dates:", err);
+      log.error("Error fetching program dates:", err);
+      setEventDates([]);
     }
   };
 
   useEffect(() => {
-    fetchPrograms().then(() => {
-      setLoading(false);
-    });
-  }, []);
+    async function loadAllEvents() {
+      if (accountId) {
+        await fetchPrograms(accountId);
+        await fetchProgramDates(accountId);
+      } else {
+        log.warn("Skipping event fetching because accountId is null.");
+      }
+    }
+    loadAllEvents();
+  }, [accountId]);
 
   return {
-    programs, //returns Program[] or empty array []
+    programs,
     setPrograms,
     loading,
+    setLoading,
     error,
+    setError,
+    fetchProgramDates,
+    eventDates,
+    setEventDates,
+    fetchPrograms,
   };
 }
 
