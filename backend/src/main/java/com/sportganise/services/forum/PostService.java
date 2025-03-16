@@ -7,6 +7,7 @@ import com.sportganise.entities.forum.Likes;
 import com.sportganise.entities.forum.LikesCompositeKey;
 import com.sportganise.entities.forum.Post;
 import com.sportganise.entities.forum.PostType;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.forum.LikesRepository;
@@ -185,6 +186,46 @@ public class PostService {
 
   public void unlikePost(Integer postId, Integer accountId) {
     likesRepository.deleteByPostIdAndAccountId(postId, accountId);
+  }
+
+  /**
+   * Method to create new post when a new program is created.
+   *
+   * @param accountId
+   * @param title
+   * @param description
+   * @param occurrenceDate
+   * @param programtype
+   * @param programId
+   */
+  public void createNewPost(
+      Integer accountId,
+      String title,
+      String description,
+      ZonedDateTime occurrenceDate,
+      ProgramType programtype,
+      Integer programId) {
+    PostType postType;
+    switch (programtype) {
+      case TRAINING:
+        postType = PostType.TRAINING;
+        break;
+      case SPECIALTRAINING:
+        postType = PostType.SPECIAL;
+        break;
+      case FUNDRAISER:
+        postType = PostType.FUNDRAISER;
+        break;
+      case TOURNAMENT:
+        postType = PostType.TOURNAMENT;
+        break;
+      default:
+        throw new ResourceNotFoundException("Unsupported ProgramType: " + programtype);
+    }
+
+    Post savedPost =
+        new Post(accountId, title, description, programId.toString(), postType, occurrenceDate);
+    postRepository.save(savedPost);
   }
 
   private boolean likedPost(Integer postId, Integer accountId) {
