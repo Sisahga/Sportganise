@@ -95,7 +95,7 @@ public class ProgramControllerTest {
             + "\"startTime\": \"10:30\","
             + "\"endTime\": \"12:30\","
             + "\"location\": \"Centre-de-loisirs-St-Denis\","
-                + "\"frequency\": null"
+            + "\"frequency\": null"
             + "}";
   }
 
@@ -232,7 +232,8 @@ public class ProgramControllerTest {
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyList(),
-                Mockito.anyInt(),Mockito.anyString()))
+                Mockito.anyInt(),
+                Mockito.anyString()))
         .thenReturn(mockProgramDto);
 
     mockMvc
@@ -249,7 +250,6 @@ public class ProgramControllerTest {
         .andExpect(
             jsonPath("$.data.programAttachments[0].attachmentUrl")
                 .value("https://example.com/program-guide.pdf"));
-
   }
 
   @Test
@@ -354,7 +354,7 @@ public class ProgramControllerTest {
             Mockito.argThat(list -> list.size() == 2), // Assert 2 attachments were passed
             Mockito.eq(mockProgramModifyRequestDto.getAttachmentsToRemove()),
             Mockito.eq(2),
-                Mockito.eq(mockProgramModifyRequestDto.getFrequency()));
+            Mockito.eq(mockProgramModifyRequestDto.getFrequency()));
   }
 
   @Test
