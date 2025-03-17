@@ -87,7 +87,7 @@ const TrainingSessionContent = () => {
           const accountAttendee: Attendees =
             await waitlistParticipantsApi.getProgramParticipant(
               programId,
-              user?.accountId
+              user?.accountId,
             );
           setAccountAttendee(accountAttendee);
           console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
