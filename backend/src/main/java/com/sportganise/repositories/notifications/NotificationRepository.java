@@ -31,4 +31,14 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
         WHERE n.read = true AND n.sentAt < :retentionTime
         """)
   int deleteReadNotificationsOlderThanOneWeek(ZonedDateTime retentionTime);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+        UPDATE Notification n
+        SET n.read = true
+        WHERE n.accountId = :userId
+        """)
+  int markAllNotificationsRead(Integer userId);
 }

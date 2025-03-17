@@ -143,4 +143,21 @@ public class NotificationsController {
             .build();
     return ResponseEntity.ok(response);
   }
+
+  /**
+   * Mark all alerts as read for a user.
+   *
+   * @param userId Id of the user to mark alerts as read for.
+   * @return a response entity with a success message.
+   */
+  @PutMapping("/mark-alerts-read/{userId}")
+  public ResponseEntity<ResponseDto<Null>> markAlertsRead(@PathVariable Integer userId) {
+    notificationsService.markAlertsRead(userId);
+    ResponseDto<Null> responseDto =
+        ResponseDto.<Null>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Alerts marked as read.")
+            .build();
+    return ResponseEntity.ok(responseDto);
+  }
 }
