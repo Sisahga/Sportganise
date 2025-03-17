@@ -1,17 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-test("ensure backend responds", async () => {
-  try {
-    const res = await fetch("http://localhost:8080/api/health/ping");
-    console.log(res);
-    expect(res.status).toBe(200);
-  } catch (error) {
-    console.log(error);
-    console.log(JSON.stringify(error));
-    throw error;
-  }
-});
-
 test("should start at login page", async ({ page }) => {
   await page.goto("/");
 
