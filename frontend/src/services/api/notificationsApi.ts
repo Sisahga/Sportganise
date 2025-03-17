@@ -5,12 +5,24 @@ import {
   NotificationSettings,
   UpdateNotificationMethodRequestDto,
   UpdateNotificationPermissionRequestDto,
+  NotificationAlerts,
 } from "@/types/notifications.ts";
 import ResponseDto from "@/types/response.ts";
 
 const BASE_API_URL = import.meta.env.VITE_API_BASE_URL + "/api/notifications";
 
 const notificationsApi = {
+  getNotificationAlerts: async (userId: number) => {
+    const response = await fetch(`${BASE_API_URL}/get-notif-alerts/${userId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getBearerToken(),
+      },
+    });
+    const data: ResponseDto<NotificationAlerts> = await response.json();
+    console.log("Response: ", data);
+    return data;
+  },
   getNotificationSettings: async (userId: number) => {
     const response = await fetch(
       `${BASE_API_URL}/get-notif-settings/${userId}`,
