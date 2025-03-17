@@ -60,6 +60,10 @@ jobs:
         run_install: true
     - uses: actions/setup-node@v4
 
+    # Ensure backend ready
+    - name: Check backend running
+      run: curl --fail --silent --show-error http://localhost:8080/api/health/ping
+
     # Setup Playwright
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
