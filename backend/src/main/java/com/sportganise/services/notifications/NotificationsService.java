@@ -13,6 +13,7 @@ import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
 import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
+import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
 import com.sportganise.repositories.AccountRepository;
@@ -256,5 +257,20 @@ public class NotificationsService {
         notificationRepository.deleteReadNotificationsOlderThanOneWeek(retentionTime);
     log.info("Cleaned up {} notifications.", deletedCount);
     return deletedCount;
+  }
+
+  /**
+   * Mark all alerts as read for a user.
+   *
+   * @param userId Id of the user to mark alerts as read for.
+   */
+  public void markAlertsRead(Integer userId) {
+    try {
+      int affectedRows = notificationRepository.markAllNotificationsRead(userId);
+      log.debug("Marked {} notifications read for user {}.", affectedRows, userId);
+    } catch (DataAccessException e) {
+      log.error("DB error when marking alerts as read.");
+      throw new MarkNotificationReadException("DB error occured when marking alerts as read.");
+    }
   }
 }
