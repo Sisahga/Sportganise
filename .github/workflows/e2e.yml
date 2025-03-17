@@ -66,10 +66,6 @@ jobs:
     - name: Install Playwright Browsers
       run: pnpm exec playwright install --with-deps
 
-    # Ensure backend started
-    - name: Check backend ready
-      run: curl --fail --silent --show-error http://localhost:8080/api/health/ping
-
     # Run Playwright tests
     - name: Run Playwright tests
       run: pnpm e2e
