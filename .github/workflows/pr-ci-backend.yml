@@ -9,6 +9,46 @@ on:
       - main
 
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: maven
+
+      - name: Run formatter
+        run: mvn spotless:check --batch-mode
+
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: maven
+
+      - name: Run linter
+        run: mvn checkstyle:check --batch-mode -Dcheckstyle.violationSeverity=warning -Dcheckstyle.failOnViolation=true
+
   build-test:
     runs-on: ubuntu-latest
     defaults:
@@ -54,4 +94,20 @@ jobs:
           cache: maven
 
       - name: Build and test
-        run: mvn --batch-mode package 2>&1 | grep -v -P '\[INFO\] Download(?:ing|ed) from [a-z-]+:'
+        run: mvn --batch-mode package 2>&1 | grep -vF '[INFO] Download'
+
+  build-image:
+    runs-on: ubuntu-latest
+    needs: [format, lint]
+
+    defaults:
+      run:
+        working-directory: ./backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build .
