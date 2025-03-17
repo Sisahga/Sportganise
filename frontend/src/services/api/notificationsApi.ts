@@ -23,6 +23,17 @@ const notificationsApi = {
     console.log("Response: ", data);
     return data;
   },
+  markNotificationsRead: async (userId: number) => {
+    const response = await fetch(`${BASE_API_URL}/mark-alerts-read/${userId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: getBearerToken(),
+      },
+    });
+    const data: ResponseDto<null> = await response.json();
+    return data;
+  },
   getNotificationSettings: async (userId: number) => {
     const response = await fetch(
       `${BASE_API_URL}/get-notif-settings/${userId}`,
