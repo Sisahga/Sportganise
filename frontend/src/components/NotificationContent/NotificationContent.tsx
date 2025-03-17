@@ -3,6 +3,7 @@ import log from "loglevel";
 import { Notification } from "@/types/notifications";
 import useGetNotificationAlerts from "@/hooks/useGetNotificationAlerts.ts";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import useMarkNotificationsRead from "@/hooks/useMarkNotificationsRead.ts";
 
 log.setLevel("info");
 
@@ -14,6 +15,7 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
 
   const { getNotifications } = useGetNotificationAlerts();
+  const { markNotificationsRead } = useMarkNotificationsRead();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   log.info(
@@ -116,7 +118,6 @@ export default function NotificationsPage() {
     getNotifications(userId).then((response) => {
       if (response.statusCode === 200 && response.data) {
         setNotifications(response.data.notifications);
-        // TODO - Mark all as read once they load.
       } else if (response.statusCode === 200 && !response.data) {
         setNotifications([]);
       } else {
@@ -127,6 +128,13 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     setLoading(false);
+    markNotificationsRead(userId).then((response) => {
+      if (response.statusCode === 200) {
+        log.info("All notifications marked as read");
+      } else {
+        log.error("Failed to mark all notifications as read");
+      }
+    });
   }, [notifications]);
 
   if (loading) {
