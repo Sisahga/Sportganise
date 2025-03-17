@@ -54,4 +54,4 @@ jobs:
           cache: maven
 
       - name: Build and test
-        run: mvn --batch-mode test 2>&1 | grep -v -P '\[INFO\] Download(?:ing|ed) from [a-z-]+:'
+        run: mvn --batch-mode package 2>&1 | grep -v -P '\[INFO\] Download(?:ing|ed) from [a-z-]+:'
