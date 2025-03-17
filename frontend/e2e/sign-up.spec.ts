@@ -7,7 +7,7 @@ test("ensure backend responds", async () => {
     expect(res.status).toBe(200);
   } catch (error) {
     console.log(error);
-    console.log(JSON.stringify(error))
+    console.log(JSON.stringify(error));
     throw error;
   }
 });
