@@ -13,7 +13,7 @@ env:
   VITE_API_BASE_URL: http://localhost:8080
   # Postgres
   POSTGRES_DB: sportganise
-  POSTGRES_USER: sportganise-e2e
+  POSTGRES_USER: sportganise
   POSTGRES_PASSWORD: sportganise-e2e
   POSTGRES_URL: jdbc:postgresql://database:5432/sportganise
   # Auth0
@@ -69,4 +69,3 @@ jobs:
     # Run Playwright tests
     - name: Run Playwright tests
       run: pnpm e2e
-
