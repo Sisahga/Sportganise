@@ -15,7 +15,7 @@ export const formSchema = z
         //array of files
         z.custom<File>((file) => file instanceof File && file.size > 0, {
           message: "Each file must be a valid file and not empty.",
-        }),
+        })
       )
       .optional(),
     capacity: z.number().min(0),
@@ -53,7 +53,7 @@ export const formSchema = z
       message:
         "Program start and end dates are the same and therefore cannot recur.",
       path: ["recurring"],
-    },
+    }
   )
   .refine(
     (data) =>
@@ -67,7 +67,7 @@ export const formSchema = z
       message:
         "Program start and end dates are the same and therefore can only occur once.",
       path: ["frequency"],
-    },
+    }
   )
   .refine(
     (data) =>
@@ -80,19 +80,20 @@ export const formSchema = z
       message:
         "Program start and end dates must be at least a week apart and fall on the same day of the week.",
       path: ["frequency"],
-    },
+    }
   )
   .refine(
     (data) =>
-      !data.endDate ||
-      (data.frequency === "MONTHLY" &&
-        data.endDate.getDate() === data.startDate.getDate() &&
-        data.endDate.getMonth() !== data.startDate.getMonth()),
+      data.frequency !== "MONTHLY" ||
+      (!data.endDate
+        ? true
+        : data.endDate.getDate() === data.startDate.getDate() &&
+          data.endDate.getMonth() !== data.startDate.getMonth()),
     {
       message:
         "Program start and end dates must be at least a month apart and be on the same date.",
       path: ["frequency"],
-    },
+    }
   );
 /*  .refine(
     (data) =>
