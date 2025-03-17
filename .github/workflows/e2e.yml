@@ -53,14 +53,14 @@ jobs:
       with:
         compose-file: ./docker-compose.e2e.yml
 
-    # Install pnpm
+    # Setup node
     - uses: pnpm/action-setup@v4
       with:
         version: 9.14.2
-        run_install: true
-
-    # Setup node
     - uses: actions/setup-node@v4
+      with:
+        cache: 'pnpm'
+    - run: pnpm install
 
     # Setup Playwright
     - name: Install Playwright Browsers
