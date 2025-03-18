@@ -34,6 +34,8 @@ import { NotificationRequest } from "@/types/notifications.ts";
 import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
 
+log.setLevel("debug");
+
 const formSchema = z.object({
   message: z.string().optional(),
   attachments: z.array(z.custom<File>()).optional(),
@@ -102,10 +104,14 @@ const ChatScreen: React.FC = () => {
     },
   });
 
+  // Connects to web socket and subscribes to channel conversation.
   const connectWebSocket = async (): Promise<void> => {
     webSocketServiceRef.current = new WebSocketService(onMessageReceived);
     const connSuccess = await webSocketServiceRef.current.connect();
     setConnected(connSuccess);
+    if (connSuccess) {
+      webSocketServiceRef.current.subscribeToConversation(channelId);
+    }
   };
 
   const onMessageReceived = (message: MessageComponent): void => {
@@ -226,8 +232,10 @@ const ChatScreen: React.FC = () => {
     if (
       data.message?.trim() === "" &&
       (!data.attachments || data.attachments.length === 0)
-    )
+    ) {
+      log.debug("No message or attachments to send.");
       return;
+    }
 
     const messagePayload: SendMessageComponent = {
       senderId: currentUserId,
@@ -243,6 +251,7 @@ const ChatScreen: React.FC = () => {
       messagePayload,
       webSocketServiceRef.current,
     );
+    log.info("Response:", response);
     if (!response) {
       setMessageStatus("");
     }
@@ -252,15 +261,17 @@ const ChatScreen: React.FC = () => {
 
     // Send attachments if any.
     if (data.attachments && data.attachments.length > 0 && response) {
+      log.debug("Message response: ", response);
       setActivateSkeleton(true);
       setSkeletonId(response.messageId);
       setSkeletonCount(data.attachments.length);
 
-      log.info("Uploading {} attachments", data.attachments.length);
+      log.debug("Uploading {} attachments", data.attachments.length);
       const formData = new FormData();
       data.attachments.forEach((file) => {
         formData.append("attachments", file);
       });
+      formData.append("channelId", channelId.toString());
       formData.append("messageId", response.messageId.toString());
       formData.append("senderId", currentUserId.toString());
       formData.append("senderFirstName", cookies.firstName);
@@ -282,6 +293,7 @@ const ChatScreen: React.FC = () => {
       setSkeletonId(0);
       setSkeletonCount(0);
     } else if (response) {
+      log.debug("Message sent successfully, no attachments.");
       // Message sent successfully, no attachments to upload.
       const notifTitle =
         channelType === "GROUP"
@@ -300,7 +312,7 @@ const ChatScreen: React.FC = () => {
               .filter((member) => member.accountId !== currentUserId)
               .map((member) => member.accountId);
 
-      log.info("notifiees: ", notifiees);
+      log.debug("notifiees: ", notifiees);
 
       const notifRequest: NotificationRequest = {
         title: notifTitle,
@@ -336,7 +348,7 @@ const ChatScreen: React.FC = () => {
         }
       });
     }
-  }, []); // TODO: Add proper dependencies.
+  }, [channelId]);
 
   useEffect(() => {
     log.debug("Messages fetched:", messages);
