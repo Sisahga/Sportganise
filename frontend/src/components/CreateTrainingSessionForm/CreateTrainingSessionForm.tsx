@@ -144,8 +144,6 @@ export default function CreateTrainingSessionForm() {
 
   const {
     invite,
-    loading: inviteLoading,
-    error: inviteError,
   } = useInviteToPrivateEvent();
 
   /** Handle form submission and networking logic */
