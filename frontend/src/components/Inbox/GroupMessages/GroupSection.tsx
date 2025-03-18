@@ -4,7 +4,7 @@ import { Dot } from "lucide-react";
 import log from "loglevel";
 
 function GroupSection({ groupChannels }: GroupSectionProps) {
-  log.info(
+  log.debug(
     `Rendering GroupSection with ${groupChannels.length} group channels`,
   );
   return (
