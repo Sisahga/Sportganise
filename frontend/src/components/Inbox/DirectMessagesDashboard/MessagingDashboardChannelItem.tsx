@@ -52,7 +52,7 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
       >
         {/* Channel Avatar */}
         <img
-          src={channel.channelImageBlob}
+          src={channel.channelImageBlob || DefaultAvatar}
           alt={channel.channelName}
           onError={(e) => {
             e.currentTarget.src = DefaultAvatar;
@@ -123,7 +123,7 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
       onClick={handleClick}
     >
       <img
-        src={channel.channelImageBlob}
+        src={channel.channelImageBlob || DefaultGroupAvatar}
         alt={channel.channelName}
         onError={(e) => {
           e.currentTarget.src = DefaultGroupAvatar;
