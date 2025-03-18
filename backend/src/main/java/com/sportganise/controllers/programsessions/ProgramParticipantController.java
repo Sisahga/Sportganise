@@ -235,7 +235,7 @@ public class ProgramParticipantController {
     }
   }
 
-    /**
+  /**
    * RSVPS a user to a program.
    *
    * @param accountId The user to invite
