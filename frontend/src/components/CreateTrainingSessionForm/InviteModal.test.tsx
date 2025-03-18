@@ -6,18 +6,18 @@ import { vi } from "vitest";
 describe("InviteModal Component", () => {
   const mockMembers: Member[] = [
     {
-      id: "1",
+      id: 1,
       name: "Walter White",
       email: "walter@example.com",
       role: "Coach",
     },
     {
-      id: "2",
+      id: 2,
       name: "Jesse Pinkman",
       email: "jesse@example.com",
       role: "Player",
     },
-    { id: "3", name: "Saul Goodman", email: "saul@example.com", role: "Admin" },
+    { id: 3, name: "Saul Goodman", email: "saul@example.com", role: "Admin" },
   ];
 
   const mockOnClose = vi.fn();
@@ -65,7 +65,7 @@ describe("InviteModal Component", () => {
         open={true}
         onClose={mockOnClose}
         members={mockMembers}
-        selectedMembers={["2"]}
+        selectedMembers={[2]}
         setSelectedMembers={mockSetSelectedMembers}
       />,
     );
