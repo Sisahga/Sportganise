@@ -142,9 +142,7 @@ export default function CreateTrainingSessionForm() {
     },
   };
 
-  const {
-    invite,
-  } = useInviteToPrivateEvent();
+  const { invite } = useInviteToPrivateEvent();
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
