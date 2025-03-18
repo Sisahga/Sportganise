@@ -320,7 +320,14 @@ public class WaitlistService {
     return isNewParticipant.get();
   }
 
-  public boolean rsvpToEvent(Integer accountId, Integer programId){
+  /**
+   * RSVPs a user to an event.
+   *
+   * @param accountId The user to RSVP
+   * @param programId The program to RSVP the user to
+   * @return True if the user is newly registered as a participant, false otherwise.
+   */
+  public boolean rsvpToEvent(Integer accountId, Integer programId) {
 
     ProgramParticipant participant = getParticipant(programId, accountId);
 
@@ -330,7 +337,7 @@ public class WaitlistService {
     }
 
     Program program = this.getProgram(programId);
-    if (!program.getProgramType().equals(ProgramType.TRAINING)){
+    if (!program.getProgramType().equals(ProgramType.TRAINING)) {
       participant.setConfirmed(true);
       participant.setConfirmedDate(ZonedDateTime.now());
       participantRepository.save(participant);
@@ -340,9 +347,14 @@ public class WaitlistService {
 
     log.warn("RSVP not allowed for this program type");
     return false;
-
   }
 
+  /**
+   * Fetches a program.
+   *
+   * @param programId The program to fetch
+   * @return Program entity if program found.
+   */
   public Program getProgram(Integer programId) {
     Program program =
         programRepository
@@ -352,10 +364,16 @@ public class WaitlistService {
                   log.warn("Program not found with id " + programId);
                   return new ProgramNotFoundException("Program not found");
                 });
-    
-                return program;
+
+    return program;
   }
 
+  /**
+   * Fetches a ProgramParticipant.
+   *
+   * @param accountId The ProgramParticipant to fetch
+   * @return ProgramParticipant entity if program found.
+   */
   public ProgramParticipant getParticipant(Integer programId, Integer accountId) {
     ProgramParticipant programParticipant =
         participantRepository
@@ -369,6 +387,5 @@ public class WaitlistService {
                             + accountId));
 
     return programParticipant;
-
   }
 }
