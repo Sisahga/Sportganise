@@ -188,10 +188,6 @@ public class DirectMessageService {
       // endpoint.
       directMessageDto.setAttachments(Collections.emptyList());
 
-      log.info("Message sent.");
-
-      // TODO: Implement Nofication Service.
-
       return directMessageDto;
     } catch (DataAccessException e) {
       log.error("Database error occured while sending message.");
