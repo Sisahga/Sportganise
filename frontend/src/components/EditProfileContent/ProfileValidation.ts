@@ -4,33 +4,43 @@ import { z } from "zod";
 export const profileSchema = z.object({
   firstName: z
     .string()
-    .regex(/^[a-zA-Z]+$/, "Only letters are allowed")
-    .optional()
-    .or(z.literal("")),
+    .min(1, "First name cannot be empty")
+    .regex(/^[a-zA-Z]+$/, "Only letters are allowed"),
+
   lastName: z
     .string()
-    .regex(/^[a-zA-Z]+$/, "Only letters are allowed")
-    .optional()
-    .or(z.literal("")),
-  email: z.string().email("Invalid email address").optional().or(z.literal("")),
+    .min(1, "Last name cannot be empty")
+    .regex(/^[a-zA-Z]+$/, "Only letters are allowed"),
+
+  email: z
+    .string()
+    .min(1, "Email cannot be empty")
+    .email("Invalid email address"),
+
   phone: z
     .string()
+    .min(1, "Phone number cannot be empty")
     .min(10, "Phone number must be 10 digits")
     .regex(
       /^\d{3}-\d{3}-\d{4}$/,
-      "Phone number must be in the format 222-222-2222",
-    )
-    .optional()
-    .or(z.literal("")),
-  address: z.string().optional().or(z.literal("")),
-  city: z.string().optional().or(z.literal("")),
-  province: z.string().optional().or(z.literal("")),
+      "Phone number must be in the format 111-111-1111",
+    ),
+
+  address: z.string().min(1, "Address cannot be empty"),
+
+  city: z.string().min(1, "City cannot be empty"),
+
+  province: z.string().min(1, "Province cannot be empty"),
+
   postalCode: z
     .string()
-    .regex(/^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/, "Invalid postal code: X1X 1X1.")
-    .optional()
-    .or(z.literal("")),
-  country: z.string().optional().or(z.literal("")),
+    .min(1, "Postal code cannot be empty")
+    .regex(
+      /^[A-Za-z]\d[A-Za-z] \d[A-Za-z]\d$/,
+      "Invalid postal code: X1X 1X1.",
+    ),
+
+  country: z.string().min(1, "Country cannot be empty"),
 });
 
 export type ProfileFormValues = z.infer<typeof profileSchema>;
