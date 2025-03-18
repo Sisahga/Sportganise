@@ -7,6 +7,7 @@ function useSendMessage() {
     webSocketServiceRef: WebSocketService | null,
   ): Promise<MessageComponent | undefined> => {
     if (!webSocketServiceRef) {
+      console.error("WebSocketService not initialized");
       return undefined;
     }
     return webSocketServiceRef.sendMessage(messagePayload);

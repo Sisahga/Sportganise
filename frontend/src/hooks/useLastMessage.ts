@@ -19,10 +19,6 @@ const useLastMessage = (channelId: number) => {
 
     fetchLastMessage().then((r) => r);
   }, [channelId]);
-
-  useEffect(() => {
-    console.log("Last message: ", lastMessage);
-  }, [lastMessage]);
   return {
     lastMessage,
   };

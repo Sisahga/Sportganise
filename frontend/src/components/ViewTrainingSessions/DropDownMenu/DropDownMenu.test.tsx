@@ -2,11 +2,15 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import "@testing-library/jest-dom";
-import { CookiesDto } from "@/types/auth";
 
 // Mock useNavigate from react-router
 vi.mock("react-router", () => ({
   useNavigate: () => vi.fn(),
+}));
+
+// Mock hooks
+vi.mock("@/hooks/useAbsent", () => ({
+  default: () => ({ markAbsent: vi.fn(), error: null }),
 }));
 
 // Mock DropdownMenu components
@@ -98,45 +102,54 @@ vi.mock("@/components/ui/alert-dialog", () => ({
 // Import the component to test
 import DropDownMenuButton from "./DropDownMenuButton";
 import { ProgramDetails, Attendees } from "@/types/trainingSessionDetails";
+import { CookiesDto } from "@/types/auth";
 
-// Provide minimal valid test data for programDetails and attendees.
-const programDetails: ProgramDetails = {} as ProgramDetails;
+// Provide minimal valid test data
+const programDetails: ProgramDetails = {
+  programId: "123",
+} as unknown as ProgramDetails;
+
 const attendees: Attendees[] = [];
 
 // Create dummy user objects that fully satisfy CookiesDto.
-const coachUser: CookiesDto = {
-  accountId: 123,
-  firstName: "Coach",
-  lastName: "User",
-  email: "coach@example.com",
-  pictureUrl: "http://example.com/coach.png",
-  type: "coach",
-  phone: "1234567890",
-  organisationIds: [1, 2],
-  jwtToken: "dummyJwtToken",
-};
+// const coachUser: CookiesDto = {
+//   accountId: 123,
+//   firstName: "Coach",
+//   lastName: "User",
+//   email: "coach@example.com",
+//   pictureUrl: "http://example.com/coach.png",
+//   type: "coach",
+//   phone: "1234567890",
+//   organisationIds: [1, 2],
+//   jwtToken: "dummyJwtToken",
+// };
 
-const playerUser: CookiesDto = {
-  accountId: 456,
-  firstName: "Player",
-  lastName: "User",
-  email: "player@example.com",
-  pictureUrl: "http://example.com/player.png",
-  type: "player",
-  phone: "0987654321",
-  organisationIds: [1],
-  jwtToken: "dummyJwtToken",
-};
+// const playerUser: CookiesDto = {
+//   accountId: 456,
+//   firstName: "Player",
+//   lastName: "User",
+//   email: "player@example.com",
+//   pictureUrl: "http://example.com/player.png",
+//   type: "player",
+//   phone: "0987654321",
+//   organisationIds: [1],
+//   jwtToken: "dummyJwtToken",
+// };
 
 // Optionally provide an accountAttendee if needed (for now, undefined)
-const accountAttendee: Attendees | undefined = undefined;
+// const accountAttendee: Attendees | undefined = undefined;
 
 describe("DropDownMenuButton component", () => {
   it("renders coach/admin options when user type is 'coach'", () => {
+    const user: CookiesDto = {
+      accountId: "12345",
+      type: "coach",
+    } as unknown as CookiesDto;
+
     render(
       <DropDownMenuButton
-        user={coachUser}
-        accountAttendee={accountAttendee}
+        user={user}
+        accountAttendee={undefined}
         programDetails={programDetails}
         attendees={attendees}
       />,
@@ -156,9 +169,19 @@ describe("DropDownMenuButton component", () => {
   });
 
   it("renders non-coach options when user type is 'player'", () => {
+    const user: CookiesDto = {
+      accountId: "12345",
+      type: "player",
+    } as unknown as CookiesDto;
+
+    const accountAttendee: Attendees = {
+      participantType: "player",
+      confirmed: true,
+    } as Attendees;
+
     render(
       <DropDownMenuButton
-        user={playerUser}
+        user={user}
         accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
@@ -178,10 +201,15 @@ describe("DropDownMenuButton component", () => {
   });
 
   it("handles postpone event flow for coach/admin", async () => {
+    const user: CookiesDto = {
+      accountId: "12345",
+      type: "coach",
+    } as unknown as CookiesDto;
+
     render(
       <DropDownMenuButton
-        user={coachUser}
-        accountAttendee={accountAttendee}
+        user={user}
+        accountAttendee={undefined}
         programDetails={programDetails}
         attendees={attendees}
       />,
@@ -211,9 +239,19 @@ describe("DropDownMenuButton component", () => {
   });
 
   it("handles RSVP flow for non-coach", async () => {
+    const user: CookiesDto = {
+      accountId: "12345",
+      type: "player",
+    } as unknown as CookiesDto;
+
+    const accountAttendee: Attendees = {
+      participantType: "player",
+      confirmed: true,
+    } as Attendees;
+
     render(
       <DropDownMenuButton
-        user={playerUser}
+        user={user}
         accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
