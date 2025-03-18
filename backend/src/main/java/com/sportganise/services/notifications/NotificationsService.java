@@ -1,6 +1,8 @@
 package com.sportganise.services.notifications;
 
+import com.sportganise.dto.notifications.NotificationAlertsDto;
 import com.sportganise.dto.notifications.NotificationComponentDto;
+import com.sportganise.dto.notifications.NotificationDto;
 import com.sportganise.dto.notifications.NotificationFcmRequestDto;
 import com.sportganise.dto.notifications.NotificationMethodDto;
 import com.sportganise.dto.notifications.NotificationMethodEnum;
@@ -11,12 +13,15 @@ import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
 import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
+import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.notifications.FcmTokenRepository;
 import com.sportganise.repositories.notifications.NotificationPreferenceRepository;
+import com.sportganise.repositories.notifications.NotificationRepository;
 import com.sportganise.services.EmailService;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -31,6 +36,7 @@ public class NotificationsService {
   private final NotificationPreferenceRepository notificationPreferenceRepository;
   private final AccountRepository accountRepository;
   private final EmailService emailService;
+  private final NotificationRepository notificationRepository;
 
   /**
    * Constructor for Notifications Service.
@@ -46,12 +52,14 @@ public class NotificationsService {
       FcmTokenRepository fcmTokenRepository,
       NotificationPreferenceRepository notificationPreferenceRepository,
       AccountRepository accountRepository,
-      EmailService emailService) {
+      EmailService emailService,
+      NotificationRepository notificationRepository) {
     this.fcmService = fcmService;
     this.fcmTokenRepository = fcmTokenRepository;
     this.notificationPreferenceRepository = notificationPreferenceRepository;
     this.accountRepository = accountRepository;
     this.emailService = emailService;
+    this.notificationRepository = notificationRepository;
   }
 
   /**
@@ -223,6 +231,46 @@ public class NotificationsService {
       log.error("DB error when getting notification settings.");
       throw new GetNotificationPermissionException(
           "DB error occured when getting notification settings.");
+    }
+  }
+
+  /**
+   * Get notification alerts for a user.
+   *
+   * @param userId Id of the user to get notification alerts for.
+   * @return NotificationAlertsDto containing the notifications.
+   */
+  public NotificationAlertsDto getNotificationAlerts(Integer userId) {
+    List<NotificationDto> notifications = notificationRepository.findByAccountId(userId);
+    return NotificationAlertsDto.builder().notifications(notifications).build();
+  }
+
+  /**
+   * Clean up read notifications. Read notifications that are 1 week or older. Works with
+   * NotificationCleanupTask.
+   *
+   * @return int Number of deleted notifications.
+   */
+  public int cleanupOldReadNotifications() {
+    ZonedDateTime retentionTime = ZonedDateTime.now().minusWeeks(1);
+    int deletedCount =
+        notificationRepository.deleteReadNotificationsOlderThanOneWeek(retentionTime);
+    log.info("Cleaned up {} notifications.", deletedCount);
+    return deletedCount;
+  }
+
+  /**
+   * Mark all alerts as read for a user.
+   *
+   * @param userId Id of the user to mark alerts as read for.
+   */
+  public void markAlertsRead(Integer userId) {
+    try {
+      int affectedRows = notificationRepository.markAllNotificationsRead(userId);
+      log.debug("Marked {} notifications read for user {}.", affectedRows, userId);
+    } catch (DataAccessException e) {
+      log.error("DB error when marking alerts as read.");
+      throw new MarkNotificationReadException("DB error occured when marking alerts as read.");
     }
   }
 }

@@ -182,3 +182,13 @@ INSERT INTO notification_preference(account_id) VALUES
 (5),
 (6),
 (7);
+
+INSERT INTO notification(account_id, title, body) VALUES
+(1, 'Welcome to OniBad', 'Welcome to OniBad!'),
+(2, 'Welcome to Onibad', 'Welcome to OniBad!'),
+(2, 'Training Session', 'Training upcoming March 25th @ 9:00 A.M.'),
+(3, 'Welcome to OniBad', 'Welcome to OniBad!'),
+(4, 'Welcome to OniBad', 'Welcome to OniBad!'),
+(5, 'Welcome to OniBad', 'Welcome to OniBad!'),
+(6, 'Welcome to OniBad', 'Welcome to OniBad!'),
+(7, 'Welcome to OniBad', 'Welcome to OniBad!');
