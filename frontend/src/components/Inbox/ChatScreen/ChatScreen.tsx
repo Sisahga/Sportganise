@@ -166,7 +166,11 @@ const ChatScreen: React.FC = () => {
   const adjustTextAreaHeight = (element: HTMLTextAreaElement) => {
     if (!element) return;
     element.style.height = "auto";
-    element.style.height = `${element.scrollHeight}px`;
+    const style = getComputedStyle(element);
+    const yBorderHeight =
+      parseInt(style.borderTopWidth) + parseInt(style.borderBottomWidth);
+    const height = element.scrollHeight + yBorderHeight;
+    element.style.height = `${height}px`;
   };
 
   const resetTextAreaHeight = (element: HTMLTextAreaElement) => {
@@ -573,7 +577,7 @@ const ChatScreen: React.FC = () => {
               {...field}
               id="chatScreenInputArea"
               placeholder="Send a message..."
-              className={`${channelIsBlocked ? "force-hide" : ""} flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none`}
+              className={`${channelIsBlocked ? "force-hide" : ""} flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none h-auto`}
               style={{ scrollbarWidth: "none" }}
               rows={1}
               onChange={(e) => {
