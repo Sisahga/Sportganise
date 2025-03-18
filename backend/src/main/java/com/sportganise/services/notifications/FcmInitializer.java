@@ -49,9 +49,9 @@ public class FcmInitializer {
         }
 
         FirebaseOptions options =
-                FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
-                        .build();
+            FirebaseOptions.builder()
+                .setCredentials(GoogleCredentials.fromStream(resource.getInputStream()))
+                .build();
         if (FirebaseApp.getApps().isEmpty()) {
           FirebaseApp.initializeApp(options);
           log.info("Firebase application has been initialized in production.");
