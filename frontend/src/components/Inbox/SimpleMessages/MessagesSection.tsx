@@ -7,7 +7,6 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
   function formatDatetime(date: string | Date): string {
     const currentDate = new Date();
     const inputDate = new Date(date);
-    log.info(`Formatting datetime: ${date}`);
 
     // Check if it's the same day
     const isSameDay = currentDate.toDateString() === inputDate.toDateString();
@@ -34,7 +33,9 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
     return inputDate.toLocaleDateString();
   }
 
-  log.info(`Rendering MessagesSection with ${messageChannels.length} channels`);
+  log.debug(
+    `Rendering MessagesSection with ${messageChannels.length} channels`,
+  );
   return (
     <div className="px-4 relative max-w-screen-lg left-1/2 -translate-x-1/2">
       <div className="py-3 bg-white mt-4 rounded-lg shadow-lg border border-navbar mb-8">

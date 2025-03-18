@@ -45,10 +45,10 @@ function DirectMessagesDashboard() {
   }, []);
 
   useEffect(() => {
-    log.info("Simple Channels: ", simpleChannels);
+    log.debug("Simple Channels: ", simpleChannels);
   }, [simpleChannels]);
   useEffect(() => {
-    log.info("Group Channels: ", groupChannels);
+    log.debug("Group Channels: ", groupChannels);
   }, [groupChannels]);
 
   if (loading) {
