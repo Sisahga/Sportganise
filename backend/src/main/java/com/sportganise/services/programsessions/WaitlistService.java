@@ -89,16 +89,7 @@ public class WaitlistService {
    */
   public ProgramParticipantDto fetchParticipant(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
-    ProgramParticipant programParticipant =
-        participantRepository
-            .findById(new ProgramParticipantId(programId, accountId))
-            .orElseThrow(
-                () ->
-                    new ParticipantNotFoundException(
-                        "Participant not found on waitlist for program: "
-                            + programId
-                            + ", account: "
-                            + accountId));
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
 
     return new ProgramParticipantDto(programParticipant);
   }
@@ -182,7 +173,7 @@ public class WaitlistService {
 
     ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
 
-    if (confirmParticipant == true) {
+    if (confirmParticipant) {
       // Confirm participant
       ZonedDateTime ldt = ZonedDateTime.now();
       optedParticipant.setConfirmedDate(ldt);
@@ -231,16 +222,7 @@ public class WaitlistService {
   public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
 
-    ProgramParticipant programParticipant =
-        participantRepository
-            .findById(new ProgramParticipantId(programId, accountId))
-            .orElseThrow(
-                () ->
-                    new ParticipantNotFoundException(
-                        "Participant not found on waitlist for program: "
-                            + programId
-                            + ", account: "
-                            + accountId));
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
 
     if (programParticipant.isConfirmed() == false) {
       return null;
@@ -295,14 +277,7 @@ public class WaitlistService {
   public boolean inviteToPrivateEvent(Integer accountId, Integer programId) {
     AtomicBoolean isNewParticipant = new AtomicBoolean(false);
 
-    Program program =
-        programRepository
-            .findById(programId)
-            .orElseThrow(
-                () -> {
-                  log.warn("Program not found with id " + programId);
-                  return new ProgramNotFoundException("Program not found");
-                });
+    Program program = this.getProgram(programId);
 
     // Direct user invitation is only supported for private events
     if (!program.getVisibility().equals("private")) {
@@ -353,5 +328,74 @@ public class WaitlistService {
     }
 
     return isNewParticipant.get();
+  }
+
+  /**
+   * RSVPs a user to an event.
+   *
+   * @param accountId The user to RSVP
+   * @param programId The program to RSVP the user to
+   * @return True if the user is newly registered as a participant, false otherwise.
+   */
+  public boolean rsvpToEvent(Integer accountId, Integer programId) {
+
+    ProgramParticipant participant = getParticipant(programId, accountId);
+
+    if (participant.isConfirmed()) {
+      log.warn("Participant already confirmed to program");
+      throw new ProgramInvitationiException("Participant already confirmed to program");
+    }
+
+    Program program = this.getProgram(programId);
+    if (!program.getProgramType().equals(ProgramType.TRAINING)) {
+      participant.setConfirmed(true);
+      participant.setConfirmedDate(ZonedDateTime.now());
+      participantRepository.save(participant);
+
+      return participant.isConfirmed();
+    }
+
+    log.warn("RSVP not allowed for this program type");
+    return false;
+  }
+
+  /**
+   * Fetches a program.
+   *
+   * @param programId The program to fetch
+   * @return Program entity if program found.
+   */
+  public Program getProgram(Integer programId) {
+    Program program =
+        programRepository
+            .findById(programId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Program not found with id " + programId);
+                  return new ProgramNotFoundException("Program not found");
+                });
+
+    return program;
+  }
+
+  /**
+   * Fetches a ProgramParticipant.
+   *
+   * @param accountId The ProgramParticipant to fetch
+   * @return ProgramParticipant entity if program found.
+   */
+  public ProgramParticipant getParticipant(Integer programId, Integer accountId) {
+    ProgramParticipant programParticipant =
+        participantRepository
+            .findById(new ProgramParticipantId(programId, accountId))
+            .orElseThrow(
+                () ->
+                    new ParticipantNotFoundException(
+                        "Participant not found for program: "
+                            + programId
+                            + ", account: "
+                            + accountId));
+
+    return programParticipant;
   }
 }

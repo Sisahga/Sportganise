@@ -234,4 +234,34 @@ public class ProgramParticipantController {
       return ResponseDto.ok(null, "User successfully re-invited to event.");
     }
   }
+
+  /**
+   * RSVPS a user to a program.
+   *
+   * @param accountId The user to invite
+   * @param programId The program to invite the user to
+   * @return A success boolean in the form of isConfirmed.
+   */
+  @PostMapping("/rsvp")
+  public ResponseEntity<?> rsvpParticipant(
+      @RequestParam Integer programId, @RequestParam Integer accountId) {
+
+    log.info("Processing RSVP for programId: {}, accountId: {}", programId, accountId);
+
+    try {
+      boolean rsvpSuccess = waitlistService.rsvpToEvent(accountId, programId);
+      if (rsvpSuccess) {
+        log.info("RSVP successful for programId: {}, accountId: {}", programId, accountId);
+        return ResponseEntity.ok(rsvpSuccess);
+      }
+      log.warn("RSVP failed - program not eligible for direct confirmation");
+      return ResponseEntity.badRequest()
+          .body("RSVP failed - program not eligible for direct confirmation");
+
+    } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant not found for RSVP: programId: {}, accountId: {}", programId, accountId);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+  }
 }
