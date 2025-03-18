@@ -323,8 +323,9 @@ public class WaitlistService {
     }
 
     // Send invitation (not for training session)
-    if (!program.getProgramType().equals(ProgramType.TRAINING))
+    if (!program.getProgramType().equals(ProgramType.TRAINING)) {
       this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
+    }
 
     return isNewParticipant.get();
   }
