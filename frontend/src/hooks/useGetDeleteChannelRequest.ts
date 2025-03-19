@@ -21,11 +21,10 @@ function useGetDeleteChannelRequest(channelId: number, currentUserId: number) {
           | ResponseDto<null>
           | ResponseDto<DeleteChannelRequestResponseDto> =
           await directMessagingApi.getIsDeleteChannelRequestActive(channelId);
-        log.info("RESPONSE CODE: ", response.statusCode);
         if (response.statusCode === 200) {
           setDeleteRequestActive(true);
           setDeleteRequest(response.data);
-          log.info("Delete Request Response:", response);
+          log.debug("Delete request active:", response);
           setCurrentMemberStatus(
             response.data?.channelMembers.find(
               (member) => member.accountId === currentUserId,
@@ -34,6 +33,7 @@ function useGetDeleteChannelRequest(channelId: number, currentUserId: number) {
         } else if (response.statusCode === 204) {
           setDeleteRequestActive(false);
           setDeleteRequest(null);
+          log.debug("No delete request active:", response);
         } else {
           log.error("Error fetching delete request:", response);
         }

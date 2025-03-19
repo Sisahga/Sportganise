@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Attendees } from "@/types/trainingSessionDetails";
 import log from "loglevel";
-import waitlistParticipantsApi from "@/services/api/waitlistParticipantsApi";
+import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 
 const useAbsent = () => {
   const [loading, setLoading] = useState<boolean>(false);

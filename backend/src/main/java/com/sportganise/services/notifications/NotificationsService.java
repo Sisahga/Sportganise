@@ -1,6 +1,8 @@
 package com.sportganise.services.notifications;
 
+import com.sportganise.dto.notifications.NotificationAlertsDto;
 import com.sportganise.dto.notifications.NotificationComponentDto;
+import com.sportganise.dto.notifications.NotificationDto;
 import com.sportganise.dto.notifications.NotificationFcmRequestDto;
 import com.sportganise.dto.notifications.NotificationMethodDto;
 import com.sportganise.dto.notifications.NotificationMethodEnum;
@@ -11,6 +13,7 @@ import com.sportganise.dto.notifications.UpdateNotificationMethodDto;
 import com.sportganise.dto.notifications.UpdateNotificationPermissionDto;
 import com.sportganise.entities.notifications.NotificationPreference;
 import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
+import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
 import com.sportganise.repositories.AccountRepository;
@@ -232,6 +235,17 @@ public class NotificationsService {
   }
 
   /**
+   * Get notification alerts for a user.
+   *
+   * @param userId Id of the user to get notification alerts for.
+   * @return NotificationAlertsDto containing the notifications.
+   */
+  public NotificationAlertsDto getNotificationAlerts(Integer userId) {
+    List<NotificationDto> notifications = notificationRepository.findByAccountId(userId);
+    return NotificationAlertsDto.builder().notifications(notifications).build();
+  }
+
+  /**
    * Clean up read notifications. Read notifications that are 1 week or older. Works with
    * NotificationCleanupTask.
    *
@@ -243,5 +257,20 @@ public class NotificationsService {
         notificationRepository.deleteReadNotificationsOlderThanOneWeek(retentionTime);
     log.info("Cleaned up {} notifications.", deletedCount);
     return deletedCount;
+  }
+
+  /**
+   * Mark all alerts as read for a user.
+   *
+   * @param userId Id of the user to mark alerts as read for.
+   */
+  public void markAlertsRead(Integer userId) {
+    try {
+      int affectedRows = notificationRepository.markAllNotificationsRead(userId);
+      log.debug("Marked {} notifications read for user {}.", affectedRows, userId);
+    } catch (DataAccessException e) {
+      log.error("DB error when marking alerts as read.");
+      throw new MarkNotificationReadException("DB error occured when marking alerts as read.");
+    }
   }
 }

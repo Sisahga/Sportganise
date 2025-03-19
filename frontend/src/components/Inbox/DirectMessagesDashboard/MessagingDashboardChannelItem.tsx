@@ -4,6 +4,8 @@ import { ChannelItemProps } from "@/types/dmchannels.ts";
 import useLastMessage from "@/hooks/useLastMessage.ts";
 import log from "loglevel";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import DefaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
+import DefaultAvatar from "@/assets/defaultAvatar.png";
 
 const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   channel,
@@ -50,8 +52,11 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
       >
         {/* Channel Avatar */}
         <img
-          src={channel.channelImageBlob}
+          src={channel.channelImageBlob || DefaultAvatar}
           alt={channel.channelName}
+          onError={(e) => {
+            e.currentTarget.src = DefaultAvatar;
+          }}
           className="w-12 h-12 rounded-full object-cover"
         />
 
@@ -118,8 +123,11 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
       onClick={handleClick}
     >
       <img
-        src={channel.channelImageBlob}
+        src={channel.channelImageBlob || DefaultGroupAvatar}
         alt={channel.channelName}
+        onError={(e) => {
+          e.currentTarget.src = DefaultGroupAvatar;
+        }}
         className="w-12 h-12 rounded-full object-cover"
       />
       <span
