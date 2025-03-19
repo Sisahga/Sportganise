@@ -103,7 +103,7 @@ export default function HomeContent() {
         </div>
         <p className="text-primaryColour/90">{description}</p>
         {linkText != "" && (
-          <div className="flex items-end sm:items-center md:justify-end sm:gap-2">
+          <div className="flex items-end justify-between sm:items-center md:justify-end sm:gap-2">
             <Link
               to={{ pathname: link }}
               className="flex items-center xl:text-lg text-wrap sm:text-nowrap text-primaryColour/90
@@ -112,7 +112,7 @@ export default function HomeContent() {
               <p>{linkText}</p>
             </Link>
             <ChevronRight
-              className="absolute right-4 sm:relative sm:right-auto w-5 h-5 sm:w-auto sm:h-auto
+              className="absolute right-4 sm:relative sm:right-auto w-4 h-4 sm:w-auto sm:h-auto
                                       group-hover:translate-x-1 transition-all ease-in-out duration-200"
             />
           </div>
