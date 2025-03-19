@@ -2,6 +2,8 @@ package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,12 +27,15 @@ public class Program {
   @Column(name = "program_id")
   private Integer programId;
 
-  @Column(name = "type")
-  private String programType;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", nullable = false)
+  private ProgramType programType;
 
   private String title;
 
   private String description;
+
+  private String author;
 
   private Integer capacity;
 
@@ -58,6 +63,7 @@ public class Program {
    * @param programType type of the program.
    * @param title title of the program.
    * @param description description of the program.
+   * @param author the name of the person who created the program.
    * @param capacity capacity of the program.
    * @param occurrenceDate start date and time of the first program occurrence.
    * @param durationMins duration of the program in minutes.
@@ -68,9 +74,10 @@ public class Program {
    * @param visibility visibility type of the program to the members.
    */
   public Program(
-      String programType,
+      ProgramType programType,
       String title,
       String description,
+      String author,
       Integer capacity,
       ZonedDateTime occurrenceDate,
       Integer durationMins,
@@ -82,6 +89,7 @@ public class Program {
     this.programType = programType;
     this.title = title;
     this.description = description;
+    this.author = author;
     this.capacity = capacity;
     this.occurrenceDate = occurrenceDate;
     this.durationMins = durationMins;

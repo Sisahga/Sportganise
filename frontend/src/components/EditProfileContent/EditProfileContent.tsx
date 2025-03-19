@@ -62,30 +62,42 @@ const EditProfileContent: React.FC = () => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      firstName: data?.firstName || "",
-      lastName: data?.lastName || "",
-      email: data?.email || "",
-      phone: data?.phone || "",
-      address: data?.address?.line || "",
-      city: data?.address?.city || "",
-      province: data?.address?.province || "",
-      postalCode: data?.address?.postalCode || "",
-      country: data?.address?.country || "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      province: "",
+      postalCode: "",
+      country: "",
     },
   });
 
   useEffect(() => {
     if (data) {
+      form.reset({
+        firstName: data.firstName || "",
+        lastName: data.lastName || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        address: data.address?.line || "",
+        city: data.address?.city || "",
+        province: data.address?.province || "",
+        postalCode: data.address?.postalCode || "",
+        country: data.address?.country || "",
+      });
+
       setImage(data.pictureUrl || "https://via.placeholder.com/150");
     }
-  }, [data]);
+  }, [data, form]);
 
   useEffect(() => {
     if (success) {
       toast({
         title: "Profile Updated",
         description: message || "Your profile has been updated successfully.",
-        variant: "default",
+        variant: "success",
       });
     }
     if (!success && message) {
@@ -191,7 +203,10 @@ const EditProfileContent: React.FC = () => {
       },
     };
 
-    await updateAccount(accountId || 0, payload);
+    updateAccount(accountId || 0, payload);
+    setTimeout(() => {
+      navigate("/pages/PersonalInformationPage");
+    }, 500);
   };
 
   const cancelSavePersonalInfo = () => {
@@ -214,7 +229,7 @@ const EditProfileContent: React.FC = () => {
             htmlFor="file-input"
             className="absolute bottom-3 right-3 translate-x-1/2 translate-y-1/2 cursor-pointer rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl transition"
           >
-            <CirclePlus className="rounded-full text-secondaryColour w-10 h-10 hover:scale-110 hover:text-black transition-transform " />
+            <CirclePlus className="rounded-full w-10 h-10 hover:scale-110 hover:text-black transition-transform " />
           </Label>
 
           <Input
@@ -244,7 +259,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="firstName"
-                      placeholder={data?.firstName || "First Name"}
+                      placeholder={"First Name"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -260,11 +275,7 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="lastName">Last Name</Label>
                   <FormControl>
-                    <Input
-                      {...field}
-                      id="lastName"
-                      placeholder={data?.lastName || "Last Name"}
-                    />
+                    <Input {...field} id="lastName" placeholder={"Last Name"} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -282,7 +293,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="email"
-                      placeholder={data?.email || "Email"}
+                      placeholder={"example@domain.com"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -298,11 +309,7 @@ const EditProfileContent: React.FC = () => {
                 <FormItem>
                   <Label htmlFor="phone">Phone</Label>
                   <FormControl>
-                    <Input
-                      {...field}
-                      id="phone"
-                      placeholder={data?.phone || "Phone"}
-                    />
+                    <Input {...field} id="phone" placeholder={"111-111-1111"} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -320,7 +327,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="address"
-                      placeholder={data?.address?.line || "Address"}
+                      placeholder={"Street Address"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -339,7 +346,7 @@ const EditProfileContent: React.FC = () => {
                     <Input
                       {...field}
                       id="postalCode"
-                      placeholder={data?.address?.postalCode || "Postal Code"}
+                      placeholder={"Postal Code"}
                     />
                   </FormControl>
                   <FormMessage />
@@ -356,11 +363,7 @@ const EditProfileContent: React.FC = () => {
                   <FormItem className="flex-1">
                     <Label htmlFor="city">City</Label>
                     <FormControl>
-                      <Input
-                        {...field}
-                        id="city"
-                        placeholder={data?.address?.city || "City"}
-                      />
+                      <Input {...field} id="city" placeholder={"City"} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -376,7 +379,7 @@ const EditProfileContent: React.FC = () => {
                       <Input
                         {...field}
                         id="province"
-                        placeholder={data?.address?.province || "Province"}
+                        placeholder={"Province"}
                       />
                     </FormControl>
                     <FormMessage />
@@ -391,11 +394,7 @@ const EditProfileContent: React.FC = () => {
                   <FormItem className="flex-1">
                     <Label htmlFor="country">Country</Label>
                     <FormControl>
-                      <Input
-                        {...field}
-                        id="country"
-                        placeholder={data?.address?.country || "Country"}
-                      />
+                      <Input {...field} id="country" placeholder={"Country"} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -405,11 +404,7 @@ const EditProfileContent: React.FC = () => {
 
             {/* Save Personal Info Button */}
             <div className="flex justify-center pt-1 pb-12">
-              <Button
-                className="w-30 h-10 bg-secondaryColour text-black rounded-full"
-                variant="outline"
-                type="submit"
-              >
+              <Button className="w-30 h-10" type="submit">
                 <Save />
                 Save
               </Button>

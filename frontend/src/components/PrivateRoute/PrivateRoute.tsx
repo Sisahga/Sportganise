@@ -1,6 +1,8 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import { getCookies } from "@/services/cookiesService";
+import { clearCookies, getCookies } from "@/services/cookiesService";
 import { getBearerToken } from "@/services/apiHelper.ts";
+import { Capacitor } from "@capacitor/core";
+import { useRequestNotificationPermission } from "@/hooks/useFcmRequestPermission.ts";
 /* eslint-disable react/prop-types */
 
 interface PrivateRouteProps {
@@ -15,6 +17,18 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   const location = useLocation();
   const user = getCookies();
   const token = getBearerToken();
+  const notified = localStorage.getItem("pushNotifications");
+
+  const { requestPermission } = useRequestNotificationPermission();
+
+  // If user already granted permission, it won't do anything.
+  const initializeFcm = async (userId: number) => {
+    if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
+      await requestPermission(userId);
+    } else {
+      console.warn("Mobile app suspected.");
+    }
+  };
 
   if (
     token === null ||
@@ -23,9 +37,14 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     user.accountId === null ||
     user.accountId === undefined
   ) {
+    clearCookies();
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );
+  } else {
+    if (notified === undefined || notified === null) {
+      initializeFcm(user.accountId).then((r) => r);
+    }
   }
 
   if (requiredRole && user.type !== requiredRole && user.type !== "ADMIN") {

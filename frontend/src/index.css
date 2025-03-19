@@ -50,6 +50,9 @@
   border: 2px solid var(--faded-primary-colour);
 }
 
+.bg-primary-colour {
+  background-color: var(--primary-colour) !important;
+}
 .bg-placeholder-colour {
   background-color: var(--text-placheolder-colour) !important;
 }
@@ -62,6 +65,9 @@
 .bg-primary-red {
   background-color: var(--primary-red) !important;
 }
+.bg-secondaryColour-msg-gradient {
+  background: var(--secondary-colour);
+}
 
 .force-hide {
   display: none !important;
@@ -70,6 +76,7 @@
   margin-left: 0 !important;
   margin-right: 0 !important;
 }
+
 a {
   font-weight: 500;
   color: #646cff;
@@ -94,6 +101,45 @@ button {
   background-color: var(--text-placheolder-colour);
   cursor: pointer;
   transition: border-color 0.25s;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-color: var(--primary-navbar-colour);
+  }
+  100% {
+    background-color: var(--faded-primary-colour);
+  }
+}
+
+.animate-skeleton {
+  opacity: 0.7;
+  animation: skeleton-loading 1s infinite linear alternate;
+}
+
+/* WebKit Browsers */
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important; /* For horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-radius: 10px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent !important;
 }
 
 @media (prefers-color-scheme: light) {
@@ -168,6 +214,15 @@ button {
 @layer base {
   * {
     @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;

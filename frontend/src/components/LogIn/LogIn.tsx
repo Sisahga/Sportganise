@@ -3,43 +3,23 @@ import { FormField } from "@/components/ui/formfield";
 import logo from "../../assets/Logo.png";
 import { Link, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast"; // Toast hook
-import { useLogin } from "@/hooks/useLogin"; // Custom hook
+import { useToast } from "@/hooks/use-toast";
+import { useLogin } from "@/hooks/useLogin";
+import { useSendCode } from "@/hooks/useSendCode";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LogIn() {
   const navigate = useNavigate();
   const { toast } = useToast(); // Toast function
-  const { isLoading, error, data, loginUser } = useLogin(); // Hook state and function
+  const { isLoading, error, data, loginUser } = useLogin();
+  const { sendVerificationCode } = useSendCode();
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  // Helper function to validate password constraints
-  const validatePassword = (password: string): boolean => {
-    const hasMinLength = password.length >= 8; // Check if password has at least 8 characters
-    const hasUpperCase = /[A-Z]/.test(password); // Check if password has an uppercase letter
-    const hasLowerCase = /[a-z]/.test(password); // Check if password has a lowercase letter
-    const hasSpecialChar = /[!@#$%^&*]/.test(password); // Check if password has a special character
-
-    // Count how many conditions are met
-    const conditionsMet = [
-      hasMinLength,
-      hasUpperCase,
-      hasLowerCase,
-      hasSpecialChar,
-    ].filter(Boolean).length;
-
-    console.log("Password Validation Conditions:", {
-      hasMinLength,
-      hasUpperCase,
-      hasLowerCase,
-      hasSpecialChar,
-    }); // Debug: Log results
-
-    return conditionsMet >= 3; // Return true if at least 3 conditions are met
-  };
+  const [showPassword, setShowPassword] = useState(true);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -50,49 +30,53 @@ export default function LogIn() {
   // Handle login submission
   const handleLogIn = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Validate password constraints
-    if (!validatePassword(formData.password)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid Password",
-        description:
-          "Password must be at least 8 characters long and include 1 uppercase letter, 1 lowercase letter, and 1 special character (!@#$%^&*).",
-      });
-      return;
-    }
-
-    console.log("Calling loginUser with:", formData); // Debug
+    console.log("Login Request Sent");
     loginUser(formData).catch((err) => {
-      console.error("Login error:", err); // Debug: Log error
+      console.error("Login error:", err);
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid Credentials",
+        description: err.message,
       });
     });
   };
 
-  // Handle login success or error by listening to changes in data
+  // Handle login success or error
   useEffect(() => {
     if (data?.statusCode === 200) {
-      console.log("Login successful, redirecting..."); // Debug
+      localStorage.removeItem("pushNotifications");
+      console.log("Login successful, redirecting...");
       navigate("/");
     }
 
     if (error) {
-      console.log("Error:", error); // Debug
-      // Show toast for invalid credentials or errors
+      console.log("Error:", error);
+      if (error == "Account not verified") {
+        navigate("/verificationcode", {
+          state: { email: formData.email },
+        });
+
+        // Send verification code when account is not verified
+        sendVerificationCode(formData.email.trim()).then((codeResponse) => {
+          if (codeResponse?.statusCode === 201) {
+            toast({
+              variant: "success",
+              title: "Verification Code Sent",
+              description: "A verification code has been sent to your email.",
+            });
+          }
+        });
+      }
       toast({
         variant: "destructive",
         title: "Login Failed",
-        description: "Invalid Credentials",
+        description: error,
       });
     }
   }, [data, error, navigate, toast]);
 
   return (
-    <div className="relative flex flex-col items-center justify-center min-h-screen bg-white pt-10">
+    <div className="relative flex flex-col items-center justify-center min-h-screen bg-white bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
       <img
         src={logo}
         alt="Logo"
@@ -112,15 +96,24 @@ export default function LogIn() {
               value={formData.email}
               onChange={handleInputChange}
             />
-            <FormField
-              id="Password"
-              label="Password"
-              placeholder="Password"
-              name="password"
-              inputProps={{ type: "password" }}
-              value={formData.password}
-              onChange={handleInputChange}
-            />
+            <div className="relative">
+              <FormField
+                id="Password"
+                label="Password"
+                placeholder="Password"
+                name="password"
+                inputProps={{ type: showPassword ? "password" : "text" }}
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+              <button
+                type="button"
+                className="absolute right-3 top-1/2 transform -translate-y-1/10 text-sm text-secondaryColour"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
             <button
               type="submit"
               className="w-full text-white bg-primaryColour py-2 md:py-3 rounded-lg flex items-center justify-center text-sm md:text-base"
@@ -137,14 +130,19 @@ export default function LogIn() {
           >
             Don&#39;t have an account?
             <Link
-              className="ml-2 text-secondaryColour font-bold underline p-0 bg-white border-none hover:bg-transparent"
+              className="ml-2 text-secondaryColour font-bold underline p-0 bg-white border-none hover:bg-transparent hover:text-primaryColour"
               to="/signup"
             >
               Sign Up
             </Link>
           </p>
-          <p className="mt-2 mb-6 text-primaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent">
-            <Link to="/forgotpassword">Forgot password?</Link>
+          <p>
+            <Link
+              className="mt-2 mb-6 text-primaryColour hover:text-secondaryColour text-xs font-semibold underline p-0 bg-white border-none hover:bg-transparent"
+              to="/forgotpassword"
+            >
+              Forgot password?
+            </Link>
           </p>
         </CardFooter>
       </Card>

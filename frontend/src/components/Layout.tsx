@@ -9,7 +9,22 @@ const hideHeaderPaths = [
   "/signup",
   "/forgotpassword",
   "/verificationcode",
+  "/pages/ResetPasswordPage",
 ]; // Header hidden on all these pages
+
+const medTopMarginPaths = [
+  "/pages/DirectMessagesDashboard",
+  "/pages/DirectMessageChannelPage",
+  "/pages/CreateDmChannelPage",
+];
+
+const noTopMarginPaths = [
+  "/login",
+  "/signup",
+  "/forgotpassword",
+  "/verificationcode",
+  "/pages/ResetPasswordPage",
+];
 
 // Paths where the footer should be hidden
 const hideFooterPaths = [
@@ -18,12 +33,18 @@ const hideFooterPaths = [
   "/signup",
   "/forgotpassword",
   "/verificationcode",
+  "/pages/ResetPasswordPage",
 ]; // Footer hidden on /chat, login and signup pages
 
 // Define paths where you don't want horizontal margins (like full-width pages)
 const fullWidthPaths = [
   "/pages/DirectMessagesDashboard",
   "/pages/DirectMessageChannelPage",
+  "/pages/CreateDmChannelPage",
+  "/login",
+  "/signup",
+  "/forgotpassword",
+  "/verificationcode",
 ]; // Full-width layout on these paths
 
 // Function to check if the current path matches any hide paths
@@ -36,9 +57,11 @@ const Layout = () => {
   const hideHeader = shouldHide(hideHeaderPaths, location.pathname);
   const hideFooter = shouldHide(hideFooterPaths, location.pathname);
   const isFullWidth = shouldHide(fullWidthPaths, location.pathname);
+  const medTopMargin = shouldHide(medTopMarginPaths, location.pathname);
+  const noTopMargin = shouldHide(noTopMarginPaths, location.pathname);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-secondaryColour/30 to-white to-[40%]">
       <Toaster />
       {/* Conditionally render HeaderNav */}
       {!hideHeader && <HeaderNav />}
@@ -46,7 +69,13 @@ const Layout = () => {
       {/* Main content area */}
       <main
         className={`flex-1 ${
-          !hideHeader ? "mt-40" : ""
+          noTopMargin
+            ? "mt-0"
+            : medTopMargin
+              ? "mt-28"
+              : !hideHeader
+                ? "mt-40"
+                : "mt-28"
         } ${isFullWidth ? "mx-0" : "mx-6"}`}
       >
         <Outlet /> {/* This will render the routed page content */}

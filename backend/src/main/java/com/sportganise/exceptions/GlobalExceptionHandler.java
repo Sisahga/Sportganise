@@ -13,7 +13,14 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelAp
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
+import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
+import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadException;
+import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
+import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
+import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingPathVariableException;
@@ -55,6 +62,85 @@ public class GlobalExceptionHandler {
         .message(e.getMessage())
         .build();
   }
+
+  /**
+   * Handle general bad request exceptions.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleIllegalArgumentException(IllegalArgumentException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  // <editor-fold desc="Region: Auth Exceptions">
+
+  /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(InvalidCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(ExpiredCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle account not verified exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(AccountNotVerifiedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle invalid credentials exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(InvalidCredentialsException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  // </editor-fold>
 
   // <editor-fold desc="Region: Channel Exceptions">
   /**
@@ -277,6 +363,133 @@ public class GlobalExceptionHandler {
     return ResponseDto.builder()
         .statusCode(HttpStatus.BAD_REQUEST.value())
         .message("Program modification failed: " + e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle exceptions when inviting users to private events.
+   *
+   * @param e exception
+   * @return Response DTO with status 400.
+   */
+  @ExceptionHandler(ProgramInvitationiException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleProgramInvitationException(ProgramInvitationiException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message("Program invitation failed: " + e.getMessage())
+        .build();
+  }
+
+  // </editor-fold>
+
+  // <editor-fold desc="Region: Notifications Exceptions">
+
+  /**
+   * Handle store FCM token exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(StoreFcmTokenException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleStoreFcmTokenException(StoreFcmTokenException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle notification not sent exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(NotificationNotSentException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleNotificationNotSentException(NotificationNotSentException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle get FCM token exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(GetFcmTokenException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleGetFcmTokenException(GetFcmTokenException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle save notification preference exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(SaveNotificationPrefereceException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleSaveNotificationPrefereceException(
+      SaveNotificationPrefereceException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle update notification permission exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(UpdateNotificationPermissionException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleUpdateNotificationPermissionException(
+      UpdateNotificationPermissionException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle get notification permission exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(GetNotificationPermissionException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleGetNotificationPermissionException(
+      GetNotificationPermissionException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle mark notification read exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(MarkNotificationReadException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleMarkNotificationReadException(MarkNotificationReadException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
         .build();
   }
 

@@ -82,7 +82,10 @@ const trainingSessionApi = {
     }
 
     log.info("trainingSessionApi.getPrograms:", response);
-    log.info("trainingSessionApi.getPrograms:", data);
+    log.info(
+      "trainingSessionApi.getPrograms: SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOW ME THIS SHSIT ARIGBHASJDFHKSDFHSAJKFHKASDHFKASHDFKHAKSFHDN",
+      data,
+    );
 
     return data;
   },

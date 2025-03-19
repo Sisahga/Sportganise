@@ -4,11 +4,11 @@ import { Dot } from "lucide-react";
 import log from "loglevel";
 
 function GroupSection({ groupChannels }: GroupSectionProps) {
-  log.info(
+  log.debug(
     `Rendering GroupSection with ${groupChannels.length} group channels`,
   );
   return (
-    <div className="px-4">
+    <div className="px-4 relative max-w-screen-lg left-1/2 -translate-x-1/2">
       <div className="px-4 py-3 bg-white mt-4 rounded-lg shadow-lg border border-navbar">
         <div className="flex flex-col">
           <div>

@@ -1,5 +1,6 @@
 package com.sportganise.controllers.programsessions;
 
+import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +33,31 @@ public class ProgramParticipantController {
   @Autowired
   public ProgramParticipantController(WaitlistService waitlistService) {
     this.waitlistService = waitlistService;
+  }
+
+  /**
+   * Adds a participant to a program's waitlist and assigns them a rank.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return The rank assigned to the participant.
+   */
+  @GetMapping("/get-participant")
+  public ResponseEntity<?> fetchProgramParticipant(
+      @RequestParam Integer programId, @RequestParam Integer accountId) {
+    log.info("Fetchin participant: programId: {}, accountId: {}", programId, accountId);
+    try {
+      ProgramParticipantDto participant = waitlistService.fetchParticipant(programId, accountId);
+      log.info("Fetched participant. programId: {}, accountId: {}", programId, accountId);
+      return ResponseEntity.ok(participant);
+    } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant not found for opt-in. programId: {}, accountId: {}. Error: {}",
+          programId,
+          accountId,
+          e.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
   }
 
   /**
@@ -181,6 +208,60 @@ public class ProgramParticipantController {
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body("Error fetching waitlist programs");
+    }
+  }
+
+  /**
+   * Invites a user to a private program.
+   *
+   * @param accountId The user to invite
+   * @param programId The program to invite the user to
+   * @return An empty ResponseDTO.
+   */
+  @PostMapping("/invite-private")
+  public ResponseEntity<ResponseDto<Void>> inviteToPrivateEvent(
+      @RequestParam Integer accountId, @RequestParam Integer programId) {
+    log.info(
+        "Inviting participant to private program: programId: {}, accountId: {}",
+        programId,
+        accountId);
+
+    boolean isNewParticipant = this.waitlistService.inviteToPrivateEvent(accountId, programId);
+
+    if (isNewParticipant) {
+      return ResponseDto.created(null, "User successfully invited to event.");
+    } else {
+      return ResponseDto.ok(null, "User successfully re-invited to event.");
+    }
+  }
+
+  /**
+   * RSVPS a user to a program.
+   *
+   * @param accountId The user to invite
+   * @param programId The program to invite the user to
+   * @return A success boolean in the form of isConfirmed.
+   */
+  @PostMapping("/rsvp")
+  public ResponseEntity<?> rsvpParticipant(
+      @RequestParam Integer programId, @RequestParam Integer accountId) {
+
+    log.info("Processing RSVP for programId: {}, accountId: {}", programId, accountId);
+
+    try {
+      boolean rsvpSuccess = waitlistService.rsvpToEvent(accountId, programId);
+      if (rsvpSuccess) {
+        log.info("RSVP successful for programId: {}, accountId: {}", programId, accountId);
+        return ResponseEntity.ok(rsvpSuccess);
+      }
+      log.warn("RSVP failed - program not eligible for direct confirmation");
+      return ResponseEntity.badRequest()
+          .body("RSVP failed - program not eligible for direct confirmation");
+
+    } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant not found for RSVP: programId: {}, accountId: {}", programId, accountId);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
   }
 }

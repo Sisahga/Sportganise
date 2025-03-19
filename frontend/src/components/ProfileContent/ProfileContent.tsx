@@ -50,7 +50,7 @@ const ProfileContent: React.FC = () => {
 
           {/* Profile image */}
           <img
-            className="h-48 w-48 rounded-full border-2 border-gray dark:border-gray-800 mx-auto my-2"
+            className="h-48 w-48 rounded-full border-2 border-gray dark:border-gray-800 mx-auto my-2 object-cover"
             src={data?.pictureUrl || "https://via.placeholder.com/150"}
             alt="Profile"
           />
@@ -83,7 +83,7 @@ const ProfileContent: React.FC = () => {
           <Button
             className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
             variant="outline"
-            onClick={() => navigate("/pages/Settings")}
+            onClick={() => navigate("/pages/NotificationSettingsPage")}
           >
             <span className="flex items-center">
               <Settings className="mr-2" />

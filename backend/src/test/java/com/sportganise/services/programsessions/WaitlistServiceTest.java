@@ -3,26 +3,42 @@ package com.sportganise.services.programsessions;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
+import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
+import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
+import com.sportganise.entities.programsessions.ProgramType;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.ParticipantNotFoundException;
+import com.sportganise.exceptions.ProgramNotFoundException;
+import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
+import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
+import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.services.EmailService;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
 public class WaitlistServiceTest {
 
   @Mock private ProgramParticipantRepository participantRepository;
+  @Mock private ProgramRepository programRepository;
+  @Mock private AccountRepository accountRepository;
+  @Mock private EmailService emailService;
 
   @InjectMocks private WaitlistService programParticipantService;
 
@@ -351,5 +367,121 @@ public class WaitlistServiceTest {
               programParticipantService.markAbsent(programId, accountId);
             });
     assertEquals("Database error", exception.getMessage());
+  }
+
+  @Nested
+  class InviteToPrivateEvent {
+    private Integer programId;
+    private Program program;
+    private Integer accountId;
+    private Account account;
+    private ProgramParticipantId participantId;
+    private ProgramParticipant participant;
+
+    @BeforeEach
+    public void setup() {
+      programId = 1;
+      program = Program.builder().programId(programId).visibility("private").build();
+      accountId = 1;
+      account = Account.builder().accountId(accountId).type(AccountType.PLAYER).build();
+      participantId = new ProgramParticipantId(programId, accountId);
+      participant =
+          ProgramParticipant.builder()
+              .programParticipantId(participantId)
+              .isConfirmed(false)
+              .build();
+    }
+
+    @Test
+    public void programNotFound() {
+      when(programRepository.findById(anyInt())).thenReturn(Optional.empty());
+      when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+
+      assertThrows(
+          ProgramNotFoundException.class,
+          () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
+      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
+    }
+
+    @Test
+    public void programNotPrivate() {
+      program.setVisibility("public");
+      when(programRepository.findById(programId)).thenReturn(Optional.of(program));
+      when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+
+      assertThrows(
+          ProgramInvitationiException.class,
+          () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
+      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
+    }
+
+    @Test
+    public void accountNotFound() {
+      when(programRepository.findById(programId)).thenReturn(Optional.of(program));
+      when(accountRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+      assertThrows(
+          AccountNotFoundException.class,
+          () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
+      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
+    }
+
+    @Test
+    public void participantAlreadyConfirmed() {
+      program.setProgramType(ProgramType.TRAINING);
+      participant.setConfirmed(true);
+
+      when(programRepository.findById(programId)).thenReturn(Optional.of(program));
+      when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+      when(participantRepository.findById(participantId)).thenReturn(Optional.of(participant));
+
+      assertThrows(
+          ProgramInvitationiException.class,
+          () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
+      verify(emailService, never()).sendPrivateProgramInvitation(any(), any());
+    }
+
+    @Test
+    public void successfullyReinviteParticipant() {
+      program.setProgramType(ProgramType.FUNDRAISER);
+      when(programRepository.findById(programId)).thenReturn(Optional.of(program));
+      when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+      when(participantRepository.findById(participantId)).thenReturn(Optional.of(participant));
+
+      boolean isNewParticipant =
+          programParticipantService.inviteToPrivateEvent(accountId, programId);
+
+      assertFalse(isNewParticipant);
+      verify(participantRepository, times(0)).save(any(ProgramParticipant.class));
+      verify(emailService).sendPrivateProgramInvitation(account.getEmail(), program);
+    }
+
+    @Test
+    public void successfullyInviteNewParticipant() {
+      program.setProgramType(ProgramType.FUNDRAISER);
+      when(programRepository.findById(programId)).thenReturn(Optional.of(program));
+      when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
+      when(participantRepository.findById(participantId)).thenReturn(Optional.empty());
+      when(participantRepository.save(
+              argThat(
+                  p ->
+                      p.getProgramParticipantId().equals(participantId)
+                          && "PLAYER".equals(p.getType())
+                          && !p.isConfirmed())))
+          .thenReturn(participant);
+
+      boolean isNewParticipant =
+          programParticipantService.inviteToPrivateEvent(accountId, programId);
+
+      assertTrue(isNewParticipant);
+      verify(participantRepository)
+          .save(
+              argThat(
+                  p ->
+                      p.getProgramParticipantId().equals(participantId)
+                          && "PLAYER".equals(p.getType())
+                          && !p.isConfirmed()));
+      verify(emailService).sendPrivateProgramInvitation(account.getEmail(), program);
+    }
   }
 }

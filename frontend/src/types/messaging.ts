@@ -1,5 +1,10 @@
-import { FileAttachment } from "@/components/Inbox/ChatScreen/ChatScreen";
 import WebSocketService from "@/services/WebSocketService.ts";
+
+export enum AttachmentType {
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
+  FILE = "FILE",
+}
 
 export interface MessageComponent {
   messageId: number;
@@ -7,7 +12,7 @@ export interface MessageComponent {
   senderFirstName: string;
   channelId: number;
   messageContent: string;
-  attachments: FileAttachment[];
+  attachments: Attachment[];
   sentAt: string;
   type: string;
   avatarUrl: string | undefined;
@@ -17,16 +22,24 @@ export interface SendMessageComponent {
   senderId: number;
   channelId: number;
   messageContent: string;
-  attachments: FileAttachment[];
   sentAt: string;
   type: string;
   senderFirstName: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
 }
 
 export interface ChatMessageProps {
   messages: MessageComponent[];
   currentUserId: number;
+  activateSkeleton: boolean;
+  skeletonId: number;
+  skeletonCount: number;
+  status: string;
+}
+
+export interface Attachment {
+  attachmentUrl: string;
+  fileType: AttachmentType;
 }
 
 export interface LastMessageComponent {
@@ -42,4 +55,8 @@ export interface UserBlockedComponentProps {
   webSocketRef: WebSocketService | null;
   channelId: number;
   channelType: string;
+}
+
+export interface ChatImageDialogProps {
+  attachment: Attachment;
 }

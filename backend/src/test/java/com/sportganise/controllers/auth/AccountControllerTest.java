@@ -376,13 +376,13 @@ class AccountControllerTest {
 
   @Test
   public void getLabelsByAccountIdAndOrgId_Success() throws Exception {
-    long accountId = 1;
-    long orgId = 1;
+    int accountId = 1;
+    int orgId = 1;
     LabelDto label1 = new LabelDto(1, "label1");
     LabelDto label2 = new LabelDto(2, "label2");
     List<LabelDto> labels = List.of(label1, label2);
 
-    when(accountService.getLabelsByAccountIdAndOrgId(anyLong(), anyLong())).thenReturn(labels);
+    when(accountService.getLabelsByAccountIdAndOrgId(anyInt(), anyInt())).thenReturn(labels);
 
     mockMvc
         .perform(

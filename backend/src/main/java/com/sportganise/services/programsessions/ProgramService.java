@@ -9,14 +9,16 @@ import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
-import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
+import io.micrometer.common.lang.Nullable;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
 import java.time.LocalTime;
@@ -36,7 +38,6 @@ public class ProgramService {
 
   private final ProgramRepository programRepository;
   private final AccountService accountService;
-  private final AccountRepository accountRepository;
   private final ProgramAttachmentRepository programAttachmentRepository;
   private final BlobService blobService;
 
@@ -45,17 +46,14 @@ public class ProgramService {
    *
    * @param programRepository program repository object.
    * @param accountService account service object.
-   * @param accountRepository account repository object.
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
       ProgramRepository programRepository,
       AccountService accountService,
-      AccountRepository accountRepository,
       ProgramAttachmentRepository programAttachmentRepository,
       BlobService blobService) {
     this.programRepository = programRepository;
-    this.accountRepository = accountRepository;
     this.accountService = accountService;
     this.programAttachmentRepository = programAttachmentRepository;
     this.blobService = blobService;
@@ -96,6 +94,7 @@ public class ProgramService {
                   account.getAccountId(),
                   programId,
                   participant.getRank(),
+                  participant.getType(),
                   participant.isConfirmed(),
                   participant.getConfirmedDate());
             })
@@ -122,6 +121,7 @@ public class ProgramService {
         program.getProgramType(),
         program.getTitle(),
         program.getDescription(),
+        program.getAuthor(),
         program.getCapacity(),
         program.getOccurrenceDate(),
         program.getDurationMins(),
@@ -182,6 +182,7 @@ public class ProgramService {
               program.getProgramType(),
               program.getTitle(),
               program.getDescription(),
+              program.getAuthor(),
               program.getCapacity(),
               program.getOccurrenceDate(),
               program.getDurationMins(),
@@ -244,7 +245,7 @@ public class ProgramService {
   @Transactional
   public ProgramDto createProgramDto(
       String title,
-      String programType,
+      ProgramType programType,
       String startDate,
       String endDate,
       Boolean isRecurring,
@@ -257,9 +258,17 @@ public class ProgramService {
       List<MultipartFile> attachments,
       Integer accountId) {
 
+    Account user = accountService.getAccountById(accountId);
+    if (user == null) {
+      throw new ResourceNotFoundException("User with ID: " + accountId + " not found.");
+    }
+
+    String author = user.getFirstName() + " " + user.getLastName();
+
     Program savedProgram =
         createProgramObject(
             title,
+            author,
             programType,
             startDate,
             endDate,
@@ -323,7 +332,7 @@ public class ProgramService {
   public ProgramDto modifyProgram(
       ProgramDto programDtoToModify,
       String title,
-      String programType,
+      ProgramType programType,
       String startDate,
       String endDate,
       Boolean isRecurring,
@@ -334,7 +343,7 @@ public class ProgramService {
       String endTime,
       String location,
       List<MultipartFile> attachmentsToAdd,
-      List<String> attachmentsToRemove,
+      @Nullable List<String> attachmentsToRemove,
       Integer accountId)
       throws IOException {
 
@@ -351,6 +360,7 @@ public class ProgramService {
     Program updatedProgram =
         createProgramObject(
             title,
+            existingProgram.getAuthor(),
             programType,
             startDate,
             endDate,
@@ -366,42 +376,46 @@ public class ProgramService {
 
     log.debug("PROGRAM ID OF MODIFIED PROGRAM: ", existingProgram.getProgramId());
 
-    if (!attachmentsToRemove.isEmpty()) {
-      // Delete from repo.
-      int rowsAffected =
-          programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
-              programDtoToModify.getProgramId(), attachmentsToRemove);
-      if (rowsAffected != attachmentsToRemove.size()) {
-        throw new RuntimeException("Could not delete all attachments.");
-      }
-      // Delete from S3 bucket.
-      for (String attachment : attachmentsToRemove) {
-        this.blobService.deleteFile(attachment);
+    if (attachmentsToRemove != null) {
+      if (!attachmentsToRemove.isEmpty()) {
+        // Delete from repo.
+        int rowsAffected =
+            programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+                programDtoToModify.getProgramId(), attachmentsToRemove);
+        if (rowsAffected != attachmentsToRemove.size()) {
+          throw new RuntimeException("Could not delete all attachments.");
+        }
+        // Delete from S3 bucket.
+        for (String attachment : attachmentsToRemove) {
+          this.blobService.deleteFile(attachment);
+        }
       }
     }
 
     List<ProgramAttachment> programAttachments = new ArrayList<>();
     List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
     String s3AttachmentUrl;
-    if (!attachmentsToAdd.isEmpty()) {
-      for (MultipartFile attachment : attachmentsToAdd) {
-        s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
-        ProgramAttachmentCompositeKey programAttachmentCompositeKey =
-            new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
-        programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
-        programAttachmentDtos.add(
-            new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+    if (attachmentsToAdd != null) {
+      if (!attachmentsToAdd.isEmpty()) {
+        for (MultipartFile attachment : attachmentsToAdd) {
+          s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
+          ProgramAttachmentCompositeKey programAttachmentCompositeKey =
+              new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
+          programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
+          programAttachmentDtos.add(
+              new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+          programAttachmentRepository.saveAll(programAttachments);
+        }
+        log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
       }
-      programAttachmentRepository.saveAll(programAttachments);
-
-      log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
     }
     return new ProgramDto(updatedProgram, programAttachmentDtos);
   }
 
   private Program createProgramObject(
       String title,
-      String programType,
+      String author,
+      ProgramType programType,
       String startDate,
       String endDate,
       Boolean isRecurring,
@@ -439,6 +453,7 @@ public class ProgramService {
         programType,
         title,
         description,
+        author,
         capacity,
         occurrenceDate,
         durationMins,

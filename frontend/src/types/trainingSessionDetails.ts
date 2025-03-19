@@ -2,9 +2,10 @@
 export interface Attendees {
   accountId: number;
   programId: number;
-  confirmedDate: Date;
+  confirmedDate: Date | null;
   confirmed: boolean;
   rank: string | null;
+  participantType: string | null;
 }
 
 export interface ProgramDetails {
@@ -21,6 +22,7 @@ export interface ProgramDetails {
   location: string;
   visibility: string;
   recurring: boolean;
+  author: string;
 }
 
 export interface ProgramAttachments {

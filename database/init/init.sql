@@ -22,7 +22,8 @@ CREATE TABLE account (
 	phone VARCHAR(20) NOT NULL,
 	first_name VARCHAR(50) NOT NULL,
 	last_name VARCHAR(50) NOT NULL,
-	picture VARCHAR(255)
+	picture VARCHAR(255),
+    verified BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE blob (
@@ -80,10 +81,15 @@ CREATE TABLE account_settings (
 	PRIMARY KEY(account_id)
 );
 
+CREATE TYPE program_type as ENUM('TRAINING', 'SPECIALTRAINING', 'FUNDRAISER', 'TOURNAMENT');
+
+CREATE CAST (varchar AS program_type) WITH INOUT AS IMPLICIT; 	
+
 CREATE TABLE program (
 	program_id SERIAL PRIMARY KEY,
-	type VARCHAR(20),
+	type program_type,
 	title VARCHAR(30) NOT NULL,
+	author VARCHAR(20) NOT NULL,
 	description VARCHAR(100),
 	capacity INTEGER,
 	occurence_date TIMESTAMPTZ,
@@ -156,7 +162,9 @@ CREATE TABLE message (
 CREATE TABLE message_blob (
     message_id INTEGER NOT NULL REFERENCES message(message_id) ON DELETE SET NULL,
     blob_url VARCHAR(255) NOT NULL,
-    PRIMARY KEY (message_id)
+    file_type VARCHAR(10) NOT NULL,
+    PRIMARY KEY (message_id, blob_url),
+    CONSTRAINT valid_blob CHECK (file_type IN ('IMAGE', 'VIDEO', 'FILE'))
 );
 
 ALTER TABLE channel
@@ -164,16 +172,19 @@ ADD last_message_id INTEGER REFERENCES message(message_id);
 
 CREATE TABLE delete_channel_request (
     delete_request_id SERIAL PRIMARY KEY,
-    channel_id INTEGER NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
-    requester_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
-    request_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+    channel_id INTEGER UNIQUE NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
+    requester_id INTEGER NOT NULL,
+    request_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (channel_id, requester_id) REFERENCES channel_member(channel_id, account_id) ON DELETE CASCADE
 );
 
 CREATE TABLE delete_channel_request_approver (
     delete_request_id INTEGER NOT NULL REFERENCES delete_channel_request(delete_request_id) ON DELETE CASCADE,
-    approver_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    channel_id INTEGER NOT NULL,
+    approver_id INTEGER NOT NULL,
     status VARCHAR(8) NOT NULL,
     PRIMARY KEY (delete_request_id, approver_id),
+    FOREIGN KEY (channel_id, approver_id) REFERENCES channel_member(channel_id, account_id) ON DELETE CASCADE,
     CONSTRAINT valid_status CHECK (status IN ('APPROVED', 'DENIED', 'PENDING'))
 );
 
@@ -182,7 +193,6 @@ CREATE TABLE post(
     account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
     title VARCHAR(100) NOT NULL,
     description TEXT NOT NULL,
-    attachment VARCHAR(255),
     metadata JSON ,
     type VARCHAR(20) CHECK (type IN ('TRAINING', 'FUNDRAISER', 'TOURNAMENT','SPECIAL')),
     occurrence_date TIMESTAMPTZ,
@@ -208,11 +218,46 @@ CREATE TABLE post_attachment(
 );
 
 CREATE TABLE feedback(
+    feedback_id SERIAL PRIMARY KEY,
 	post_id INTEGER NOT NULL REFERENCES post(post_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	content TEXT NOT NULL,
-	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	PRIMARY KEY (post_id,account_id)
+	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE training_plan(
+	plan_id SERIAL PRIMARY KEY,
+	account_id INTEGER NOT NULL REFERENCES account (account_id) ON DELETE CASCADE,
+	doc_url VARCHAR(255) NOT NULL,
+	shared BOOLEAN,
+	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- PRIMARY KEY is a composite key: case where user has browser and app listening for notifications at the same time.
+CREATE TABLE fcm_token(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL,
+    PRIMARY KEY (token)
+);
+
+-- Notification preferences for each user.
+CREATE TABLE notification_preference(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    push_notifications BOOLEAN DEFAULT TRUE,
+    email_notifications BOOLEAN DEFAULT FALSE,
+    events BOOLEAN DEFAULT TRUE,
+    messaging BOOLEAN DEFAULT TRUE,
+    training_sessions BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (account_id)
+);
+
+CREATE TABLE notification(
+    notification_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    title VARCHAR(30) NOT NULL,
+    body VARCHAR(100) NOT NULL,
+    read BOOLEAN DEFAULT FALSE,
+    sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 SET TIME ZONE 'America/New_York';

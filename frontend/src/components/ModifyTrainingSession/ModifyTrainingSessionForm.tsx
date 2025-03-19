@@ -50,48 +50,69 @@ import useModifyTrainingSession from "@/hooks/useModifyProgram";
 import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
+import { getFileName } from "@/utils/getFileName";
+// Import constants for select fields
+import { TRAINING } from "@/constants/programconstants";
+import { SPECIALTRAINING } from "@/constants/programconstants";
+import { TOURNAMENT } from "@/constants/programconstants";
+import { FUNDRAISER } from "@/constants/programconstants";
+import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
+import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
+import { MAIN_STREET } from "@/constants/programconstants";
+import { TEST_WATER_ROAD } from "@/constants/programconstants";
+import { PUBLIC } from "@/constants/programconstants";
+import { MEMBERS_ONLY } from "@/constants/programconstants";
+import { PRIVATE } from "@/constants/programconstants";
 
 /**All select element options */
 const types = [
   {
     label: "Training Session",
-    value: "Training",
+    value: TRAINING,
   },
   {
     label: "Fundraiser",
-    value: "Fundraiser",
+    value: FUNDRAISER,
+  },
+  {
+    label: "Tournament",
+    value: TOURNAMENT,
+  },
+  {
+    label: "Special Training",
+    value: SPECIALTRAINING,
   },
 ] as const;
 const visibilities = [
   {
     label: "Public",
-    value: "public",
+    value: PUBLIC,
   },
   {
     label: "Members only",
-    value: "members",
+    value: MEMBERS_ONLY,
   },
   {
     label: "Private",
-    value: "private",
+    value: PRIVATE,
   },
 ] as const;
 const locations = [
   {
     label: "Centre de loisirs St-Denis",
-    value: "Centre-de-loisirs-St-Denis",
+    value: CENTRE_DE_LOISIRS_ST_DENIS,
   },
   {
     label: "Collège de Maisonnneuve",
-    value: "Collège-de-Maisonnneuve",
+    value: COLLEGE_DE_MAISONNEUVE,
   },
   {
     label: "123 test water rd.",
-    value: "123 test water rd.",
+    value: TEST_WATER_ROAD,
   },
   {
     label: "123 Main st",
-    value: "123 Main St",
+    value: MAIN_STREET,
   },
 ] as const;
 
@@ -120,6 +141,7 @@ export default function ModifyTrainingSessionForm() {
     programAttachments: [],
     frequency: "",
     visibility: "",
+    author: "",
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
 
@@ -143,10 +165,6 @@ export default function ModifyTrainingSessionForm() {
       "application/pdf": [".pdf"],
     },
   };
-
-  function fileName(file: File): string {
-    return file.name.split("_").pop() ?? "fileName"; //pop aws bucket
-  }
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -222,27 +240,24 @@ export default function ModifyTrainingSessionForm() {
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           if (!attachmentsToRemove.includes(file.name)) {
-            formData.append("attachments", file);
+            formData.append("attachments", file); //attachment to add
             log.debug("File in form field appended to formData : ", file);
           }
         });
+        values.attachment.forEach((file) => {
+          log.debug("All files in form field, not the ones to append :", file);
+        });
+      }
+
+      if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
             (urlName) => urlName !== file.name,
           );
         });
-        values.attachment.forEach((file) => {
-          log.debug("File in form field :", file);
-        });
-        log.info("attachmentsToRemove : ", attachmentsToRemove);
-      } else {
-        formData.append(
-          "attachments",
-          new Blob([], {
-            type: "application/json",
-          }),
-        );
       }
+      console.warn("attachmentsToRemove : ", attachmentsToRemove);
+
       const programData = {
         title: values.title,
         type: values.type,
@@ -320,7 +335,7 @@ export default function ModifyTrainingSessionForm() {
               <span className="text-secondaryColour">
                 {programDetails.title}
               </span>{" "}
-              Event
+              Program
             </h2>
             <h2>Edit fields and update the form</h2>
           </div>
@@ -333,7 +348,12 @@ export default function ModifyTrainingSessionForm() {
               <FormItem>
                 <FormLabel className="font-semibold text-base">Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Name the event" type="text" {...field} />
+                  <Input
+                    placeholder="Name the program"
+                    type="text"
+                    className="bg-white"
+                    {...field}
+                  />
                 </FormControl>
                 <FormDescription>Only 30 characters accepted.</FormDescription>
                 <FormMessage />
@@ -348,7 +368,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Type of Event
+                  Type of Program
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -443,8 +463,8 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the first date of the event. Applies for recurring and
-                  non recurring events. If recurring, this day will be the
+                  Enter the first date of the program. Applies for recurring and
+                  non recurring programs. If recurring, this day will be the
                   assumed repeat day in the future.
                 </FormDescription>
                 <FormMessage />
@@ -490,7 +510,7 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Enter the last day of a recurring event.
+                  Enter the last day of a recurring program.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -512,7 +532,7 @@ export default function ModifyTrainingSessionForm() {
                     <Input type="time" className="w-full" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Select the time the event starts.
+                    Select the time the program starts.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -532,7 +552,7 @@ export default function ModifyTrainingSessionForm() {
                     <Input type="time" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Select the time the event ends.
+                    Select the time the program ends.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -622,10 +642,10 @@ export default function ModifyTrainingSessionForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-semibold">
-                    Recurring event
+                    Recurring program
                   </FormLabel>
                   <FormDescription>
-                    The event recurs on the day and at the times entered.
+                    The program recurs on the day and at the times entered.
                   </FormDescription>
                   <FormMessage />
                 </div>
@@ -693,7 +713,7 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Select who can view the event in their dashboard.
+                  Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -711,7 +731,7 @@ export default function ModifyTrainingSessionForm() {
                 </FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Add description of the event here ..."
+                    placeholder="Add description of the program here ..."
                     className="resize-none"
                     {...field}
                   />
@@ -762,14 +782,15 @@ export default function ModifyTrainingSessionForm() {
                         field.value.map((file: File, i: number) => (
                           <FileUploaderItem key={i} index={i}>
                             <Paperclip className="h-4 w-4 stroke-current" />
-                            <span>{fileName(file)}</span>
+                            <span>{getFileName(file.name)}</span>
                           </FileUploaderItem>
                         ))}
                     </FileUploaderContent>
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Limit of 5 files.
+                  Select a file to upload. Max file size is 4 MB. Limit of 5
+                  files.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -839,11 +860,11 @@ export default function ModifyTrainingSessionForm() {
           {loading ? (
             <Button disabled className="w-full">
               <Loader2 className="animate-spin" />
-              Updating Event
+              Updating Program
             </Button>
           ) : (
             <Button type="submit" className="w-full font-semibold">
-              Update Event
+              Update Program
             </Button>
           )}
           <div className="justify-self-center">

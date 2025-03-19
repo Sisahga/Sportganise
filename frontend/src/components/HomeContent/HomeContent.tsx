@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import {
   MessageCircle,
   Calendar,
@@ -13,6 +12,9 @@ import log from "loglevel";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
 import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
+import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+import { useState, useEffect } from "react";
+import usePersonalInformation from "@/hooks/usePersonalInfromation";
 
 log.info("HomeContent component is being rendered.");
 
@@ -26,7 +28,32 @@ interface FeatureCardProps {
 }
 
 export default function HomeContent() {
+  const [accountType, setAccountType] = useState<string | null | undefined>();
+  useEffect(() => {
+    const user = getCookies();
+    setAccountType(user?.type);
+  }, [accountType]);
+
   const navigate = useNavigate();
+  const [firstName, setFirstName] = useState<string | null>(null);
+  const cookies = getCookies();
+  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { data, loading, error } = usePersonalInformation(accountId || 0);
+
+  useEffect(() => {
+    if (data) {
+      setFirstName(data.firstName);
+    }
+  }, [data]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red">{error}</div>;
+  }
+
   const FeatureCard: React.FC<FeatureCardProps> = ({
     icon,
     title,
@@ -46,17 +73,17 @@ export default function HomeContent() {
         onClick={() => {
           navigate(link);
         }}
-        className={`group p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg active:scale-95 ${linkText !== "" ? "cursor-pointer" : ""}`}
+        className={`group p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg active:scale-95 ${linkText !== "" ? "cursor-pointer" : ""} h-32`}
       >
         <div className="flex items-center gap-4 mb-4">
           <div className="p-2 rounded-lg bg-textPlaceholderColour/70 group-hover:bg-secondaryColour/10 transition-colors duration-300">
             {icon}
           </div>
-          <h3 className="font-semibold text-nowrap">{title}</h3>
+          <h3 className="font-semibold text-nowrap xl:text-xl md:text-xl lg:text-sm sm:text-lg text-md">
+            {title}
+          </h3>
         </div>
-        <p className="text-primaryColour/90 md:min-h-[3lh] lg:min-h-[5lh] xl:min-h-[4lh]">
-          {description}
-        </p>
+        <p className="text-primaryColour/90">{description}</p>
         {linkText != "" && (
           <Link
             to={{ pathname: link }}
@@ -74,9 +101,8 @@ export default function HomeContent() {
       icon: (
         <Calendar className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
       ),
-      title: "Training Sessions",
-      description:
-        "Efficiently manage and schedule your training sessions. Stay organized and focused on what matters most - your game.",
+      title: "Calendar",
+      description: "",
       linkText: "View My Schedule",
       link: "/pages/CalendarPage",
     },
@@ -85,8 +111,7 @@ export default function HomeContent() {
         <MessagesSquare className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
       ),
       title: "Community Forum",
-      description:
-        "Share experiences, give feedback, and learn from fellow players in our vibrant community forum.",
+      description: "",
       linkText: "View Community Feedback",
       link: "/pages/ForumPage",
     },
@@ -95,62 +120,54 @@ export default function HomeContent() {
         <MessageCircle className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
       ),
       title: "Direct Messaging",
-      description:
-        "Connect directly with coaches and players. Build relationships and coordinate effortlessly.",
+      description: "",
       linkText: "View My Messages",
       link: "/pages/DirectMessagesDashboard",
     },
-    {
-      icon: (
-        <Share2 className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
-      ),
-      title: "Coach Collaboration",
-      description:
-        "Share and access training plans with fellow coaches. Elevate coaching standards together.",
-    },
-    {
-      icon: (
-        <ClipboardList className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
-      ),
-      title: "Player Insights",
-      description:
-        "Gain valuable insights into player development and performance trends.",
-    },
+    ...(accountType?.toLowerCase() === "coach" ||
+    accountType?.toLowerCase() === "admin"
+      ? [
+          {
+            icon: (
+              <Share2 className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
+            ),
+            title: "Create Trainings & Events",
+            description: "",
+            linkText: "Create a Program",
+            link: "/pages/CreateTrainingSessionPage",
+          },
+          {
+            icon: (
+              <ClipboardList className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
+            ),
+            title: "Training Plans",
+            description: "",
+            linkText: "Share Training Plans",
+            link: "/pages/TrainingPlanPage",
+          },
+        ]
+      : []),
     {
       icon: (
         <Users className="w-6 h-6 text-primaryColour/90 group-hover:text-secondaryColour" />
       ),
-      title: "Active Community",
-      description:
-        "Join a thriving community of badminton enthusiasts. Learn, grow, and succeed together.",
+      title: "Alerts",
+      description: "",
+      linkText: "View My Notifications",
+      link: "/pages/NotificationsPage",
     },
   ];
 
   return (
     <div className="bg-primaryColour w-screen mt-32 z-40">
-      <div className="flex-1 max-w-[100vw] bg-white shadow-md bg-gradient-to-b from-secondaryColour/20 to-white to-[20%] rounded-t-2xl pb-16">
+      <div className="flex-1 max-w-[100vw] bg-white shadow-md rounded-t-2xl pb-16 bg-gradient-to-b from-secondaryColour/20 to-white to-[20%]">
         <div className="min-h-screen">
           <div className="p-4 space-y-6">
-            <Card className="border-0 lg:mx-20 rounded-md overflow-hidden mb-12 bg-transparent shadow-none">
-              <div className="py-4">
-                <CardHeader>
-                  <CardTitle className="font-font font-bold text-3xl text-primaryColour">
-                    Welcome to ONIBAD!
-                  </CardTitle>
-                </CardHeader>
-              </div>
-              <CardContent className="mb-4">
-                <p className="text-primaryColour text-lg font-font leading-relaxed">
-                  A non-profit badminton club for you, where passion meets play!
-                </p>
-              </CardContent>
-            </Card>
-
-            <div className="lg:mx-24">
-              <h2 className="text-lg text-primaryColour text-sec font-semibold mb-4">
-                Elevate Your Game with ONIBAD
+            <div className="lg:mx-24 mb-20 mt-6">
+              <h2 className="text-2xl text-primaryColour text-sec font-semibold mb-4">
+                Hello {firstName}!
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16 min-h-[3lh]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
                 {features.map((feature, index) => (
                   <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}
@@ -163,7 +180,7 @@ export default function HomeContent() {
               <Link
                 to="/pages/CalendarPage"
                 className="inline-flex items-center justify-center font-medium text-primaryColour hover:text-primaryColour hover:bg-textPlaceholderColour/40
-                text-sm font-font px-6 py-2 border rounded-md h-auto mb-4 group transition-all duration-300 hover:shadow-md"
+                text-sm px-6 py-2 border rounded-md h-auto mb-4 group transition-all duration-300 hover:shadow-md"
               >
                 See all Programs
               </Link>

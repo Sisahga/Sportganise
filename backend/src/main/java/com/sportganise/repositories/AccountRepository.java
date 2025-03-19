@@ -81,7 +81,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
             AND l.orgId = :orgId
           """)
   List<Integer> getLabelIdsByAccountIdAndOrgId(
-      @Param("accountId") Long accountId, @Param("orgId") Long orgId);
+      @Param("accountId") Integer accountId, @Param("orgId") Integer orgId);
 
   /**
    * Gets a label by its ID.
@@ -91,4 +91,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
    */
   @Query("SELECT l FROM Label l WHERE l.labelId = :labelId")
   Label getLabelById(@Param("labelId") Integer labelId);
+
+  @Query("SELECT email FROM Account WHERE  accountId = :id")
+  String getEmailByAccountId(int id);
 }

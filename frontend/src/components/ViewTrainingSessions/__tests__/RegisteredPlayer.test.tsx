@@ -1,15 +1,37 @@
 import { render, screen } from "@testing-library/react";
 import { test, expect, vi } from "vitest";
+import { MemoryRouter } from "react-router";
 import RegisteredPlayer from "../RegisteredPlayer";
+import "@testing-library/jest-dom";
+import type { Attendees } from "@/types/trainingSessionDetails";
 
-test("displays loading", () => {
-  const mock = vi.fn();
-  mock.mockReturnValue({
+// Mock the usePersonalInformation hook
+vi.mock("@/hooks/usePersonalInformation", () => ({
+  usePersonalInformation: vi.fn().mockReturnValue({
     data: null,
     loading: true,
     error: null,
-  });
-  render(<RegisteredPlayer accountId={1} />);
+  }),
+}));
+
+test("displays loading", () => {
+  // Create mock attendee data
+  const mockAttendee: Attendees = {
+    accountId: 4,
+    programId: 1,
+    confirmedDate: null,
+    participantType: "Subscribed",
+    confirmed: false,
+    rank: null,
+  };
+
+  render(
+    <MemoryRouter>
+      <RegisteredPlayer accountAttendee={mockAttendee} />
+    </MemoryRouter>,
+  );
+
+  // Check if "Loading..." text is present
   const loading = screen.getByText("Loading...");
-  expect(document.body.contains(loading)).toBe(true);
+  expect(loading).toBeInTheDocument();
 });

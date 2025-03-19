@@ -24,6 +24,14 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
   List<String> findDistinctTypes();
 
   /**
+   * Fetches post by post id.
+   *
+   * @param postId Post id.
+   * @return Post.
+   */
+  Post findByPostId(Integer postId);
+
+  /**
    * Fetches posts based on search criteria.
    *
    * @param searchTerm Search term to filter posts by.
@@ -54,8 +62,8 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                      WHERE pl.postLabelCompositeKey.postId = p.postId
                      AND pl.postLabelCompositeKey.labelId NOT IN :labels
           ))
-          AND (CAST(:occurrenceDate AS TIMESTAMP)) = CAST(:absurdDate AS TIMESTAMP)
-              OR DATE(p.occurrenceDate) = DATE(CAST(:occurrenceDate AS TIMESTAMP))
+          AND( (CAST(:occurrenceDate AS TIMESTAMP)) = CAST(:absurdDate AS TIMESTAMP)
+              OR DATE(p.occurrenceDate) = DATE(CAST(:occurrenceDate AS TIMESTAMP)))
           AND p.occurrenceDate BETWEEN CAST( :threeMonthsAgo AS TIMESTAMP)
               AND CAST(  :yesterday AS TIMESTAMP)
           AND (:type  IS NULL OR p.type = :type)

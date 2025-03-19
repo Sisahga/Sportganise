@@ -13,10 +13,13 @@ A sport Management Application <br>
 ![GitHub Workflow](https://img.shields.io/badge/GitHub_Workflow-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 ![Electron](https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white)
 
+## Link to Website
+https://onibad.sportganise.com
+
 ## Release Demos
 Release 1: https://drive.google.com/file/d/1UsRUmvnBbStKwHjvWQnSvQ8CL8Uo43cr/view?usp=drive_link
 
-Release 2 (Jan 26): -
+Release 2 (Jan 26): https://drive.google.com/file/d/1ZR2Kzu-3m0_4q3iK0jbFxGDulEswFCIK/view?usp=drive_link (if this one doesn't work try this one: https://drive.google.com/file/d/17PjGi0htj1HTh7uOTOJakSlLiGE2qZJv/view?usp=drive_link)
 
 Release 3 (Apr 5): -
 

@@ -7,6 +7,11 @@ import {
   RenameChannelDto,
   UpdateChannelPictureResponse,
 } from "@/types/dmchannels.ts";
+import {
+  DeleteChannelRequestDto,
+  DeleteChannelRequestResponseDto,
+  SetDeleteApproverStatusDto,
+} from "@/types/deleteRequest.ts";
 import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
@@ -149,6 +154,112 @@ const directMessagingApi = {
     });
     const data: ResponseDto<UpdateChannelPictureResponse> =
       await response.json();
+    return data;
+  },
+  requestChannelDelete: async (
+    deleteChannelRequestDto: DeleteChannelRequestDto,
+  ) => {
+    const response = await fetch(
+      `${baseMappingUrl}/channel/delete-channel-request`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBearerToken(),
+        },
+        body: JSON.stringify(deleteChannelRequestDto),
+      },
+    );
+    if (response.status === 204) {
+      const data: ResponseDto<null> = {
+        statusCode: 204,
+        message: "Channel immediately and successfully deleted.",
+        data: null,
+      };
+      return data;
+    } else {
+      const data: ResponseDto<DeleteChannelRequestResponseDto> =
+        await response.json();
+      return data;
+    }
+  },
+  getIsDeleteChannelRequestActive: async (channelId: number) => {
+    const response = await fetch(
+      `${baseMappingUrl}/channel/delete-request-active/${channelId}`,
+      {
+        headers: {
+          Authorization: getBearerToken(),
+        },
+      },
+    );
+    if (response.status === 204) {
+      const data: ResponseDto<null> = {
+        statusCode: 204,
+        message: "No delete request found",
+        data: null,
+      };
+      return data;
+    } else if (response.status === 200) {
+      const data: ResponseDto<DeleteChannelRequestResponseDto> =
+        await response.json();
+      return data;
+    } else {
+      const data: ResponseDto<null> = {
+        statusCode: response.status,
+        message: "Error fetching delete request.",
+        data: null,
+      };
+      return data;
+    }
+  },
+  setApproverDeleteStatus: async (
+    setDeleteApproverStatusDto: SetDeleteApproverStatusDto,
+  ) => {
+    const response = await fetch(
+      `${baseMappingUrl}/channel/set-delete-approver-status`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBearerToken(),
+        },
+        body: JSON.stringify(setDeleteApproverStatusDto),
+      },
+    );
+    log.info("Set Approver Delete Status Response:", response);
+    if (response.status === 204) {
+      const data: ResponseDto<null> = {
+        statusCode: 204,
+        message: "No delete request found",
+        data: null,
+      };
+      log.info("Channel denied deletion.");
+      return data;
+    } else if (response.status === 200) {
+      const data: ResponseDto<DeleteChannelRequestResponseDto> =
+        await response.json();
+      return data;
+    } else {
+      const data: ResponseDto<null> = {
+        statusCode: response.status,
+        message: "Error fetching delete request.",
+        data: null,
+      };
+      return data;
+    }
+  },
+  uploadAttachments: async (formData: FormData) => {
+    const response = await fetch(
+      `${baseMappingUrl}/directmessage/upload-attachments`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: getBearerToken(),
+        },
+        body: formData,
+      },
+    );
+    const data: ResponseDto<MessageComponent> = await response.json();
     return data;
   },
 };

@@ -1,8 +1,10 @@
 package com.sportganise.entities.directmessaging;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,10 +21,9 @@ import lombok.Setter;
 @Entity
 @Table(name = "message_blob")
 public class DirectMessageBlob {
-  @Id
-  @Column(name = "message_id")
-  private Integer messageId;
+  @EmbeddedId DirectMessageBlobCompositeKey compositeKey;
 
-  @Column(name = "blob_url")
-  private String blobUrl;
+  @Column(name = "file_type")
+  @Enumerated(EnumType.STRING)
+  private DirectMessageBlobType fileType;
 }

@@ -16,10 +16,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DirectMessageChannelMemberRepository
     extends JpaRepository<DirectMessageChannelMember, DirectMessageChannelMemberCompositeKey> {
-  @Transactional
-  @Modifying
-  @Query("DELETE FROM DirectMessageChannelMember d WHERE d.compositeKey.channelId = :channelId")
-  void deleteDirectMessageChannelMemberByChannelId(@Param("channelId") int channelId);
 
   @Query(
       """
@@ -44,10 +40,13 @@ public interface DirectMessageChannelMemberRepository
   @Modifying
   @Query(
       """
-        UPDATE DirectMessageChannelMember cm
-        SET cm.read = true
-        WHERE cm.compositeKey.channelId = :channelId AND cm.compositeKey.accountId = :accountId
-        """)
+            UPDATE DirectMessageChannelMember cm
+            SET cm.read = CASE
+                WHEN cm.compositeKey.accountId = :accountId THEN true
+                ELSE false
+            END
+            WHERE cm.compositeKey.channelId = :channelId
+            """)
   int updateChannelMemberReadStatus(
       @Param("accountId") int accountId, @Param("channelId") int channelId);
 
@@ -109,4 +108,14 @@ public interface DirectMessageChannelMemberRepository
         AND cm.compositeKey.accountId != :accountId
         """)
   List<Integer> getOtherGroupAdminMemberIds(int channelId, int accountId);
+
+  @Query(
+      """
+          SELECT COUNT(*)
+          FROM DirectMessageChannelMember cm
+          WHERE cm.compositeKey.channelId = :channelId
+            AND cm.compositeKey.accountId != :accountId
+            AND cm.role = 'ADMIN'
+        """)
+  int getAdminChannelMembersCount(int channelId, int accountId);
 }

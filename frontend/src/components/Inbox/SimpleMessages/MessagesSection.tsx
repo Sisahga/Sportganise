@@ -7,7 +7,6 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
   function formatDatetime(date: string | Date): string {
     const currentDate = new Date();
     const inputDate = new Date(date);
-    log.info(`Formatting datetime: ${date}`);
 
     // Check if it's the same day
     const isSameDay = currentDate.toDateString() === inputDate.toDateString();
@@ -34,10 +33,12 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
     return inputDate.toLocaleDateString();
   }
 
-  log.info(`Rendering MessagesSection with ${messageChannels.length} channels`);
+  log.debug(
+    `Rendering MessagesSection with ${messageChannels.length} channels`,
+  );
   return (
-    <div className="px-4">
-      <div className="py-3 bg-white mt-4 rounded-lg shadow-lg border border-navbar">
+    <div className="px-4 relative max-w-screen-lg left-1/2 -translate-x-1/2">
+      <div className="py-3 bg-white mt-4 rounded-lg shadow-lg border border-navbar mb-8">
         <div className="flex flex-col">
           <div>
             <h2 className="px-4 text-lg primary-colour font-bold">Messages</h2>
@@ -66,15 +67,6 @@ function MessagesSection({ messageChannels }: MessagesSectionProps) {
                     </>
                   }
                 />
-                {/* Optional Delete Button (if onDeleteChannel is provided) */}
-                {/*{onDeleteChannel && (*/}
-                {/*  <button*/}
-                {/*    onClick={() => onDeleteChannel(channel.channelId)}*/}
-                {/*    className="text-sm text-red-500 px-2"*/}
-                {/*  >*/}
-                {/*    Delete*/}
-                {/*  </button>*/}
-                {/*)}*/}
               </div>
             ))}
           </div>
