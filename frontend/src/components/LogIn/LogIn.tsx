@@ -108,7 +108,8 @@ export default function LogIn() {
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 transform -translate-y-1/10 text-sm text-secondaryColour"
+                className="absolute right-4 text-sm text-secondaryColour"
+                style={{ top: "34px" }}
                 onClick={() => setShowPassword((prev) => !prev)}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
