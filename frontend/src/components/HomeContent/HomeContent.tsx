@@ -190,7 +190,7 @@ export default function HomeContent() {
       >
         <div className="min-h-screen">
           <div className="py-4 px-8 lg:px-4 flex flex-col gap-8">
-            <div className="lg:mx-24 mt-6 flex flex-col gap-8">
+            <div className="lg:mx-24 mt-6 flex flex-col gap-6 sm:gap-8">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl text-primaryColour text-sec font-semibold animate-flowIn sm:mt-8">
                   {getGreeting()}, {firstName}
