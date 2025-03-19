@@ -22,7 +22,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2 } from "lucide-react";
 import log from "loglevel";
 
-export default function TrainingSessionsList() {
+export default function TrainingSessionsList({
+  selectedMonth,
+}: {
+  selectedMonth: Date;
+}) {
   log.debug("Rendering TrainingSessionList");
 
   // AccountId from cookies
@@ -36,7 +40,7 @@ export default function TrainingSessionsList() {
   }, [accountId]);
 
   // Fetch programs on component mount
-  const { programs, /*setPrograms,*/ error, loading } = usePrograms(accountId); // Program[]
+  const { programs, error, loading, fetchPrograms } = usePrograms(accountId);
   useEffect(() => {
     console.log("TrainingSessionList : Programs fetched:", programs);
     log.info("TrainingSessionList : Programs fetched:", programs);
@@ -47,14 +51,26 @@ export default function TrainingSessionsList() {
   const todayDayIndex = today.getDay(); // index of today's day of the week
   const startOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`,
+    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`
   );
   startOfWeek.setDate(today.getDate() - todayDayIndex); // start of the week date = today's date - day of week
   const endOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`,
+    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`
   );
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
+
+  const startOfMonth = new Date(
+    selectedMonth.getFullYear(),
+    selectedMonth.getMonth(),
+    1
+  ); // First day of the current month
+
+  const endOfMonth = new Date(
+    selectedMonth.getFullYear(),
+    selectedMonth.getMonth() + 1,
+    0
+  ); // Last day of the month
 
   // Start Date Range
   const [dateRange, setDateRange] = useState([
@@ -64,6 +80,24 @@ export default function TrainingSessionsList() {
       key: "selection",
     },
   ]);
+
+  useEffect(() => {
+    if (!accountId) return;
+
+    setDateRange([
+      {
+        startDate: startOfMonth,
+        endDate: endOfMonth,
+        key: "selection",
+      },
+    ]);
+  }, [accountId, selectedMonth]);
+
+  useEffect(() => {
+    if (!accountId || !dateRange[0].startDate || !dateRange[0].endDate) return;
+
+    fetchPrograms(accountId, dateRange[0].startDate, dateRange[0].endDate);
+  }, [accountId, dateRange]);
 
   // Handle Selected Program Type
   const [selectedProgramType, setSelectedProgramType] = useState<string[]>([]);
@@ -79,11 +113,27 @@ export default function TrainingSessionsList() {
     const dateFilter =
       programDate >= dateRange[0].startDate &&
       programDate <= dateRange[0].endDate;
-    const typeFilter =
+      const typeFilter =
       selectedProgramType.length === 0 ||
       selectedProgramType.includes(program.programDetails.programType);
     return dateFilter && typeFilter;
+    );
   });
+
+  function handleDateChange(item: any) {
+    const newStartDate = new Date(item.selection.startDate);
+    const newEndDate = new Date(item.selection.endDate);
+
+    setDateRange([
+      {
+        startDate: newStartDate,
+        endDate: newEndDate,
+        key: "selection",
+      },
+    ]);
+
+    fetchPrograms(accountId, newStartDate, newEndDate);
+  }
 
   // Handle Cancel
   function handleCancel() {
@@ -126,9 +176,9 @@ export default function TrainingSessionsList() {
               <div className="flex overflow-auto my-5">
                 <DateRangePicker
                   editableDateInputs={true}
-                  onChange={(item: any) => setDateRange([item.selection])}
+                  onChange={handleDateChange} //  Ensures state is updated
                   moveRangeOnFirstSelection={false}
-                  ranges={dateRange}
+                  ranges={dateRange} //  Uses updated `dateRange`
                 />
               </div>
               <div className="flex flex-col gap-1 my-4">
@@ -175,7 +225,7 @@ export default function TrainingSessionsList() {
             .sort(
               (a, b) =>
                 new Date(a.programDetails.occurrenceDate).getTime() -
-                new Date(b.programDetails.occurrenceDate).getTime(),
+                new Date(b.programDetails.occurrenceDate).getTime()
             )
             .map((program, index) => (
               <div key={index} className="my-5">

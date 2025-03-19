@@ -8,7 +8,10 @@ import { buttonVariants } from "@/components/ui/Button";
 import usePrograms from "@/hooks/usePrograms";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
+  selectedMonth?: Date;
+  onMonthChange?: (month: Date) => void;
+};
 
 // Creating a small reusable dots for weekends
 function WeekendDot() {
@@ -67,11 +70,14 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  selectedMonth,
+  onMonthChange,
   ...props
 }: CalendarProps) {
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
   const { eventDates, fetchProgramDates } = usePrograms(accountId); // Fetch function from hook
+  const currentMonth = selectedMonth instanceof Date ? selectedMonth : new Date();
 
   // Fetch event dates when the Calendar component mounts
   useEffect(() => {
@@ -80,12 +86,14 @@ function Calendar({
       await fetchProgramDates(accountId);
     }
     loadEventDates();
-  }, [accountId, fetchProgramDates]); // Re-run if fetchProgramDates changes
+  }, [accountId, fetchProgramDates]); // Re-run if accountId changes
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
+      month={currentMonth}
+      onMonthChange={onMonthChange}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",

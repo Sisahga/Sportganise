@@ -13,6 +13,7 @@ import log from "loglevel";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
 import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 log.info("HomeContent component is being rendered.");
 
@@ -27,6 +28,7 @@ interface FeatureCardProps {
 
 export default function HomeContent() {
   const navigate = useNavigate();
+  const [selectedMonth] = useState<Date>(new Date());
   const FeatureCard: React.FC<FeatureCardProps> = ({
     icon,
     title,
@@ -157,7 +159,7 @@ export default function HomeContent() {
               </div>
             </div>
             <div className="space-y-4">
-              <TrainingSessionsList />
+              <TrainingSessionsList selectedMonth={selectedMonth} />
             </div>
             <div className="flex items-center justify-center">
               <Link

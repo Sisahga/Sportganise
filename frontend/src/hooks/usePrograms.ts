@@ -9,7 +9,11 @@ function usePrograms(accountId: number | null) {
   const [error, setError] = useState<string | null>(null);
   const [eventDates, setEventDates] = useState<Date[]>([]);
 
-  const fetchPrograms = async (accountId: number | null) => {
+  const fetchPrograms = async (
+    accountId: number | null,
+    startDate?: Date,
+    endDate?: Date
+  ) => {
     if (!accountId) {
       console.warn("Skipping fetchPrograms because accountId is null.");
       setPrograms([]); // Prevent UI from breaking
@@ -27,18 +31,24 @@ function usePrograms(accountId: number | null) {
       }
 
       // Convert `occurrenceDate` to Date objects
-      const formattedPrograms = (response.data ?? []).map(
-        (program: Program) => ({
-          ...program,
-          programDetails: {
-            ...program.programDetails,
-            occurrenceDate:
-              typeof program.programDetails.occurrenceDate === "string"
-                ? new Date(program.programDetails.occurrenceDate)
-                : program.programDetails.occurrenceDate,
-          },
-        })
-      );
+      let formattedPrograms = (response.data ?? []).map((program: Program) => ({
+        ...program,
+        programDetails: {
+          ...program.programDetails,
+          occurrenceDate:
+            typeof program.programDetails.occurrenceDate === "string"
+              ? new Date(program.programDetails.occurrenceDate)
+              : program.programDetails.occurrenceDate,
+        },
+      }));
+
+      //If date range is provided, filter programs
+      if (startDate && endDate) {
+        formattedPrograms = formattedPrograms.filter((program: Program) => {
+          const programDate = new Date(program.programDetails.occurrenceDate);
+          return programDate >= startDate && programDate <= endDate;
+        });
+      }
 
       setPrograms(formattedPrograms ?? []);
 
