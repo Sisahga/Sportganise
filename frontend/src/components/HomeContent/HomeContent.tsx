@@ -103,7 +103,7 @@ export default function HomeContent() {
         </div>
         <p className="text-primaryColour/90">{description}</p>
         {linkText != "" && (
-          <div className="flex items-end sm:items-center sm:gap-2">
+          <div className="flex items-end sm:items-center md:justify-end sm:gap-2">
             <Link
               to={{ pathname: link }}
               className="flex items-center xl:text-lg text-wrap sm:text-nowrap text-primaryColour/90
