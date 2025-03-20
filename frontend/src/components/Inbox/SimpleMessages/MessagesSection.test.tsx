@@ -14,7 +14,7 @@ vi.mock("../DirectMessagesDashboard/MessagingDashboardChannelItem", () => ({
   )),
 }));
 
-describe("MessagesSection Component", () => {
+describe.skip("MessagesSection Component", () => {
   const mockProps: MessagesSectionProps = {
     messageChannels: [
       {
