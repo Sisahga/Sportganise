@@ -8,6 +8,7 @@ import useCreateChannel from "@/hooks/useCreateChannel.ts";
 import { CreateChannelDto } from "@/types/dmchannels.ts";
 import log from "loglevel";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import { motion } from "framer-motion";
 
 export default function CreateDirectMessagingChannel() {
   const cookies = getCookies();
@@ -100,19 +101,26 @@ export default function CreateDirectMessagingChannel() {
       </header>
       {/* user can search for any players to send his first message */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 md:px-8 relative">
-        <div className="max-w-md mx-auto space-y-6">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center leading-tight px-4 animate-textPulse">
-            Chat with other players and coaches!
-          </h1>
-          <AddMembers
-            selectedUsers={selectedUsers}
-            setSelectedUsers={setSelectedUsers}
-            submitButtonLabel={"Create Channel"}
-            createFunction={handleCreateChannel}
-            currentUserId={userId}
-            excludedMembers={null}
-          />
-        </div>
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.15 }}
+          viewport={{ once: true }}
+        >
+          <div className="max-w-md mx-auto space-y-6">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-center leading-tight px-4 animate-textPulse">
+              Chat with other players and coaches!
+            </h1>
+            <AddMembers
+              selectedUsers={selectedUsers}
+              setSelectedUsers={setSelectedUsers}
+              submitButtonLabel={"Create Channel"}
+              createFunction={handleCreateChannel}
+              currentUserId={userId}
+              excludedMembers={null}
+            />
+          </div>
+        </motion.div>
       </div>
     </div>
   );

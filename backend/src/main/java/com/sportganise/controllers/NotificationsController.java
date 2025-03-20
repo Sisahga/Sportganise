@@ -1,6 +1,7 @@
 package com.sportganise.controllers;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.notifications.NotificationAlertsDto;
 import com.sportganise.dto.notifications.NotificationRequestDto;
 import com.sportganise.dto.notifications.NotificationSettingsDto;
 import com.sportganise.dto.notifications.StoreFcmTokenDto;
@@ -122,5 +123,41 @@ public class NotificationsController {
             .data(notifSettings)
             .build();
     return ResponseEntity.ok(response);
+  }
+
+  /**
+   * Get the notification alerts of a user.
+   *
+   * @param userId Id of the user to get notification alerts for.
+   * @return a response entity with the notification alerts and status 200 OK.
+   */
+  @GetMapping("/get-notif-alerts/{userId}")
+  public ResponseEntity<ResponseDto<NotificationAlertsDto>> getNotificationAlerts(
+      @PathVariable Integer userId) {
+    NotificationAlertsDto notificationAlerts = notificationsService.getNotificationAlerts(userId);
+    ResponseDto<NotificationAlertsDto> response =
+        ResponseDto.<NotificationAlertsDto>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Successfully retrieved notification alerts.")
+            .data(notificationAlerts)
+            .build();
+    return ResponseEntity.ok(response);
+  }
+
+  /**
+   * Mark all alerts as read for a user.
+   *
+   * @param userId Id of the user to mark alerts as read for.
+   * @return a response entity with a success message.
+   */
+  @PutMapping("/mark-alerts-read/{userId}")
+  public ResponseEntity<ResponseDto<Null>> markAlertsRead(@PathVariable Integer userId) {
+    notificationsService.markAlertsRead(userId);
+    ResponseDto<Null> responseDto =
+        ResponseDto.<Null>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Alerts marked as read.")
+            .build();
+    return ResponseEntity.ok(responseDto);
   }
 }

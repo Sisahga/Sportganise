@@ -47,6 +47,7 @@ export interface LastMessageComponent {
   channelId: number;
   messageContent: string;
   type: string;
+  hasAttachments: boolean;
 }
 
 export interface UserBlockedComponentProps {

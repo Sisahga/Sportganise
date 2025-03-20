@@ -18,6 +18,7 @@ import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
+import com.sportganise.services.forum.PostService;
 import io.micrometer.common.lang.Nullable;
 import jakarta.transaction.Transactional;
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class ProgramService {
 
   private final ProgramRepository programRepository;
   private final AccountService accountService;
+  private final PostService postService;
   private final ProgramAttachmentRepository programAttachmentRepository;
   private final BlobService blobService;
 
@@ -51,10 +53,12 @@ public class ProgramService {
   public ProgramService(
       ProgramRepository programRepository,
       AccountService accountService,
+      PostService postService,
       ProgramAttachmentRepository programAttachmentRepository,
       BlobService blobService) {
     this.programRepository = programRepository;
     this.accountService = accountService;
+    this.postService = postService;
     this.programAttachmentRepository = programAttachmentRepository;
     this.blobService = blobService;
   }
@@ -224,7 +228,8 @@ public class ProgramService {
   }
 
   /**
-   * Method to create new ProgramDto.
+   * Method to create new ProgramDto. It creates a new post too which will be linked to this program
+   * by programId.
    *
    * @param title Title of the program.
    * @param programType Type of the program.
@@ -283,6 +288,14 @@ public class ProgramService {
 
     log.debug("NEW PROGRAM ID: ", savedProgram.getProgramId());
 
+    postService.createNewPost(
+        accountId,
+        title,
+        description,
+        savedProgram.getOccurrenceDate(),
+        programType,
+        savedProgram.getProgramId());
+
     List<ProgramAttachmentDto> programAttachmentsDto = new ArrayList<>();
 
     if (attachments != null && !attachments.isEmpty()) {
@@ -303,6 +316,7 @@ public class ProgramService {
         throw new ProgramCreationException("Failed to create program: " + e.getMessage());
       }
     }
+
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
 
