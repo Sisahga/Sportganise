@@ -63,7 +63,7 @@ export default function FooterNav() {
   return (
     <div className="z-50">
       <nav
-        className="fixed shadow-md rounded-xl bottom-2 left-0 right-0 mx-4 bg-white p-3
+        className="fixed shadow-md rounded-xl bottom-2 mx-auto bg-white p-3
             grid grid-cols-5 text-xs sm:text-base md:w-2/3 lg:w-1/2 2xl:w-2/5 md:left-1/2 md:transform md:-translate-x-1/2"
       >
         {routes.map((route) => {
