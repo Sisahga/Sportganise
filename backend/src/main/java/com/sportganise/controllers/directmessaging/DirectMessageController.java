@@ -4,6 +4,7 @@ import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.directmessaging.DirectMessageDto;
 import com.sportganise.dto.directmessaging.SendDirectMessageRequestDto;
 import com.sportganise.services.directmessaging.DirectMessageService;
+import java.time.ZonedDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,14 +37,22 @@ public class DirectMessageController {
   }
 
   /**
-   * Get all messages in a channel.
+   * Gets messages dynamically in a message channel in chunks of 30. Starts with 30 most recent
+   * messages.
    *
    * @param channelId The ID of the channel.
    * @return List of messages in the channel with status 200.
    */
   @GetMapping("/get-messages/{channelId}")
-  public ResponseEntity<List<DirectMessageDto>> getChannelMessages(@PathVariable int channelId) {
-    return new ResponseEntity<>(directMessageService.getChannelMessages(channelId), HttpStatus.OK);
+  public ResponseEntity<List<DirectMessageDto>> getChannelMessages(
+      @PathVariable int channelId, @RequestParam(required = false) String lastSentAt) {
+    ZonedDateTime lastSentAtDateTime = null;
+    if (lastSentAt != null && !lastSentAt.isEmpty()) {
+      lastSentAtDateTime = ZonedDateTime.parse(lastSentAt);
+    }
+
+    return new ResponseEntity<>(
+        directMessageService.getChannelMessages(channelId, lastSentAtDateTime), HttpStatus.OK);
   }
 
   /**
