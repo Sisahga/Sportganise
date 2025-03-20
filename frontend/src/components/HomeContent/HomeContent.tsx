@@ -209,7 +209,6 @@ export default function HomeContent() {
 
             <div style={{ marginTop: "0 !important" }}>
               <TrainingSessionsList selectedMonth={selectedMonth} />
-
             </div>
             <div className="flex items-center justify-center">
               <Link
