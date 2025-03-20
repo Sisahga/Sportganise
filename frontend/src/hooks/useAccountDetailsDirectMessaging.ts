@@ -7,6 +7,7 @@ function useAccountDetailsDirectMessaging(
   userId: number,
 ) {
   const [users, setUsers] = useState<AccountDetailsDirectMessaging[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -16,8 +17,10 @@ function useAccountDetailsDirectMessaging(
           userId,
         );
         setUsers(response);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching users:", error);
+        setLoading(false);
       }
     };
     fetchUsers().then((r) => r);
@@ -28,6 +31,7 @@ function useAccountDetailsDirectMessaging(
 
   return {
     users,
+    loading,
   };
 }
 

@@ -10,11 +10,15 @@ export enum NotificationTypeEnum {
 }
 
 export interface Notification {
-  id: string;
-  message: string;
-  timestamp: string;
-  isRead: boolean;
-  sender: string;
+  notificationId: number;
+  title: string;
+  body: string;
+  read: boolean;
+  sentAt: string;
+}
+
+export interface NotificationAlerts {
+  notifications: Notification[];
 }
 
 export interface NotificationRequest {

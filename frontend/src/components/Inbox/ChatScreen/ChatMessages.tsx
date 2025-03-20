@@ -38,6 +38,20 @@ const ChatMessages = ({
     return format(zonedDate, "MM/dd/yyyy 'at' h:mm a");
   };
 
+  const renderTextWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/g;
+    const phoneRegex =
+      /(\+?[0-9]{1,3}[-. ]?\(?[0-9]{3}\)?[-. ]?[0-9]{3}[-. ]?[0-9]{4}|[0-9]{3}[-. ]?[0-9]{3}[-. ]?[0-9]{4})/g;
+
+    const textWithLinks = text
+      .replace(urlRegex, (url) => `<a href="${url}" target="_blank">${url}</a>`)
+      .replace(emailRegex, (email) => `<a href="mailto:${email}">${email}</a>`)
+      .replace(phoneRegex, (phone) => `<a href="tel:${phone}">${phone}</a>`);
+
+    return <p dangerouslySetInnerHTML={{ __html: textWithLinks }} />;
+  };
+
   return (
     <div className="flex flex-col justify-end overflow-y-scroll scroll-smooth px-4 pt-4 pb-2 w-full min-h-full">
       {messages.map((message, index) => {
@@ -136,7 +150,9 @@ const ChatMessages = ({
                               : "bg-gray-200 text-gray-800"
                           }`}
                         >
-                          <p className="text-sm">{message.messageContent}</p>
+                          <div className="text-sm">
+                            {renderTextWithLinks(message.messageContent)}
+                          </div>
                         </div>
                       )}
 

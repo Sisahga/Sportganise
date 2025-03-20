@@ -60,11 +60,13 @@ public class DirectMessageService {
    * @return List of messages in the channel in dto format.
    * @throws DirectMessageFetchException If an error occurs while fetching messages.
    */
-  public List<DirectMessageDto> getChannelMessages(int channelId) {
+  public List<DirectMessageDto> getChannelMessages(int channelId, ZonedDateTime lastSentAt) {
     try {
       log.info("Getting messages for channel {}", channelId);
+      int messageLimit = 30;
+
       List<DirectMessage> messagesNoAttachments =
-          directMessageRepository.getMessagesByChannelId(channelId);
+          directMessageRepository.getMessagesByChannelId(channelId, lastSentAt, messageLimit);
       Map<Integer, MemberDetailsDto> memberDetails = getChannelMembersDetails(channelId);
       for (Map.Entry<Integer, MemberDetailsDto> entry : memberDetails.entrySet()) {
         Integer key = entry.getKey();
@@ -78,12 +80,11 @@ public class DirectMessageService {
                 + value.getFirstName());
         System.out.println(memberDetails.get(key).getFirstName());
       }
-      log.info("Received member details for channel.");
+      log.debug("Received member details for channel.");
       List<DirectMessageDto> messages = new ArrayList<>();
       List<DmAttachmentDto> attachments;
       DirectMessageDto messageDto;
       for (DirectMessage message : messagesNoAttachments) {
-        log.info("Sender ID: {}", message.getSenderId());
         // Case where member that sent the message isn't in the channel anymore.
         if (!memberDetails.containsKey(message.getSenderId())) {
           log.info("Sender no longer in message channel.");
@@ -118,6 +119,7 @@ public class DirectMessageService {
                 .build();
         messages.add(messageDto);
       }
+      log.debug("Successfully fetched messages for channel {}", channelId);
       return messages;
     } catch (DataAccessException e) {
       log.error("Database error occured while fetching messages for channel {}", channelId);
@@ -187,10 +189,6 @@ public class DirectMessageService {
       // Set to empty list by default. Will be updated if there are attachments in a different
       // endpoint.
       directMessageDto.setAttachments(Collections.emptyList());
-
-      log.info("Message sent.");
-
-      // TODO: Implement Nofication Service.
 
       return directMessageDto;
     } catch (DataAccessException e) {

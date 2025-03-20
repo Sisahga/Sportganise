@@ -15,6 +15,7 @@ import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchExce
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
 import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
 import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
+import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadException;
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
@@ -471,6 +472,21 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleGetNotificationPermissionException(
       GetNotificationPermissionException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle mark notification read exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(MarkNotificationReadException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleMarkNotificationReadException(MarkNotificationReadException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
         .message(e.getMessage())

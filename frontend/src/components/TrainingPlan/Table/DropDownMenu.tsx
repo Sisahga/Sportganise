@@ -23,7 +23,6 @@ import { ConfirmationDialog } from "./ConfirmationDialog";
 import { CircleDotDashed, Ellipsis, Share, Trash2 } from "lucide-react";
 // Logs
 import log from "loglevel";
-import { getBearerToken } from "@/services/apiHelper.ts";
 
 // Component Props
 interface DropDownMenuProps {
@@ -71,6 +70,10 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
         description: "The training plan was shared with all coaches.",
         variant: "success",
       });
+      // Reload page to see "unshared" changed to "shared" in dropdown menu
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (err) {
       toast({
         title: "Training plan could not be shared ✖",
@@ -81,21 +84,13 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
   } // Deleting training plan is in separate component
 
   // Unshare Training Plan
-  const API_BASE_URL =
-    import.meta.env.VITE_API_BASE_URL + "/api/training-plans";
   async function handleUnshare(userId: number, planId: number) {
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/${userId}/${planId}/unshare-plan`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: getBearerToken(),
-          },
-        },
-      );
-      if (!response.ok) {
-        throw new Error("The training plan could not be unshared.");
+      // Call API
+      const data = await shareTrainingPlan(userId, planId);
+      // Check For Null Response
+      if (!data) {
+        throw new Error("The training plan was not shared.");
       }
       // Success
       toast({

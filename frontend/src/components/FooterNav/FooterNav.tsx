@@ -61,8 +61,11 @@ export default function FooterNav() {
   log.info("FooterNav rendered");
   log.info("Current location:", location.pathname);
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-50">
-      <nav className="fixed bottom-0 w-full bg-white shadow-md p-3 flex justify-around">
+    <div className="z-50 w-full flex items-center justify-center">
+      <nav
+        className="fixed shadow-md rounded-xl bottom-2 mx-auto bg-white p-3
+            grid grid-cols-5 text-xs sm:text-base w-4/5 sm:w-auto md:w-2/3 lg:w-1/2 2xl:w-2/5"
+      >
         {routes.map((route) => {
           const isActive = route.activeRoutes.includes(location.pathname);
           log.info(`Rendering route: ${route.label}, Active: ${isActive}`);
@@ -72,7 +75,7 @@ export default function FooterNav() {
               key={route.href}
               to={route.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 rounded-lg transition-colors px-2 py-2 w-20 sm:w-28 md:w-36 lg:w-52 h-16",
+                "flex flex-col items-center justify-center gap-1 rounded-lg transition-colors px-2 py-2 h-16",
                 isActive
                   ? "text-secondaryColour hover:text-secondaryColour bg-textPlaceholderColour"
                   : "text-primaryColour hover:text-secondaryColour",

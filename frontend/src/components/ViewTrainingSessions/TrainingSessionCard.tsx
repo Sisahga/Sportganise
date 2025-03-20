@@ -43,12 +43,14 @@ const TrainingSessionCard: React.FC<Program> = ({
               <img src="/src/assets/Logo.png" alt="organisation" />
             </AvatarFallback>
           </Avatar>
-          <span>{programDetails.author}</span>{" "}
+          <span>{programDetails?.author ?? "N/A"}</span>{" "}
           <span className="ml-auto text-xs">
-            {new Date(programDetails.occurrenceDate).toDateString()}
+            {programDetails?.occurrenceDate
+              ? new Date(programDetails.occurrenceDate).toDateString()
+              : "N/A"}
           </span>
         </div>
-        <span className="font-semibold">{programDetails.title}</span>
+        <span className="font-semibold">{programDetails?.title ?? "N/A"}</span>
         <div>
           <span className="flex items-center">
             <Clock
@@ -58,17 +60,21 @@ const TrainingSessionCard: React.FC<Program> = ({
             />
             <span className="flex items-center">
               <p className="text-gray-500 whitespace-break-spaces text-xs">
-                {new Date(programDetails.occurrenceDate).toLocaleTimeString(
-                  "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
-                )}
+                {programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
+                      "en-CA",
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                    )
+                  : "N/A"}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-gray-500 whitespace-break-spaces text-xs">
-                {calculateEndTime(
-                  new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
-                )}
+                {programDetails?.occurrenceDate && programDetails?.durationMins
+                  ? calculateEndTime(
+                      new Date(programDetails.occurrenceDate),
+                      programDetails.durationMins,
+                    )
+                  : "N/A"}
               </p>
             </span>
           </span>
@@ -80,7 +86,7 @@ const TrainingSessionCard: React.FC<Program> = ({
             />
             <span className="flex items-center">
               <p className="text-gray-500 whitespace-break-spaces text-xs">
-                {programDetails.durationMins} min
+                {programDetails?.durationMins ?? "N/A"} min
               </p>
             </span>
           </span>
@@ -91,15 +97,17 @@ const TrainingSessionCard: React.FC<Program> = ({
               className="mr-1"
             />
             <p className="text-gray-500 whitespace-break-spaces text-xs">
-              {programDetails.location}
+              {programDetails?.location ?? "N/A"}
             </p>
           </span>
         </div>
         <span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
-          {programDetails.description}
+          {programDetails?.description}
         </span>
         <div className="flex">
-          <EventBadgeType programType={programDetails.programType} />
+          {programDetails?.programType && (
+            <EventBadgeType programType={programDetails.programType} />
+          )}
 
           {/*Click to view details */}
           <button
