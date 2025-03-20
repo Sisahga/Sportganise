@@ -9,7 +9,6 @@ import {
   ChevronsRight,
 } from "lucide-react";
 import log from "loglevel";
-import { TrainingSessionsList } from "../ViewTrainingSessions";
 import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
@@ -203,19 +202,6 @@ export default function HomeContent() {
                   <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}
               </div>
-            </div>
-            <div style={{ marginTop: "0 !important" }}>
-              <TrainingSessionsList />
-            </div>
-            <div className="flex items-center justify-center">
-              <Link
-                to="/pages/CalendarPage"
-                className="inline-flex items-center justify-center font-medium text-primaryColour
-                hover:text-primaryColour hover:bg-textPlaceholderColour/40 text-sm px-6 py-2 border rounded-md
-                h-auto mb-4 group transition-all duration-300 hover:shadow-md"
-              >
-                See all Programs
-              </Link>
             </div>
           </div>
         </div>
