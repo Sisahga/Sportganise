@@ -6,7 +6,7 @@ import {
   ClipboardList,
   MessagesSquare,
   Share2,
-  ChevronRight,
+  ChevronsRight,
 } from "lucide-react";
 import log from "loglevel";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
@@ -15,6 +15,7 @@ import { motion } from "framer-motion";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { useState, useEffect } from "react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
+import HomeContentSkeleton from "@/components/HomeContent/HomeContentSkeleton.tsx";
 
 log.info("HomeContent component is being rendered.");
 
@@ -47,7 +48,7 @@ export default function HomeContent() {
   }, [data]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <HomeContentSkeleton />;
   }
 
   if (error) {
@@ -84,7 +85,7 @@ export default function HomeContent() {
         onClick={() => {
           navigate(link);
         }}
-        className={`group p-4 sm:p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all 
+        className={`group p-4 lg:p-6 rounded-lg border border-navbar hover:border-secondaryColour transition-all 
                         duration-300 transform hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between 
                         active:scale-95 ${linkText !== "" ? "cursor-pointer" : ""} sm:h-32 h-36`}
       >
@@ -97,22 +98,23 @@ export default function HomeContent() {
               {icon}
             </div>
           </div>
-          <h3 className="font-semibold text-wrap md:text-nowrap xl:text-xl md:text-xl lg:text-sm sm:text-lg text-sm">
+          <h3 className="font-semibold text-wrap xl:text-nowrap text-sm sm:text-lg md:text-sm lg:text-base xl:text-xl">
             {title}
           </h3>
         </div>
         <p className="text-primaryColour/90">{description}</p>
         {linkText != "" && (
-          <div className="flex items-end justify-between sm:items-center md:justify-end sm:gap-2">
+          <div className="flex items-end justify-between lg:items-center lg:justify-end sm:gap-2">
             <Link
               to={{ pathname: link }}
-              className="flex items-center xl:text-lg text-wrap sm:text-nowrap text-primaryColour/90
-                        group-hover:text-secondaryColour align-end text-xs sm:text-base w-4/5 sm:w-auto"
+              className="flex items-center text-wrap lg:text-nowrap text-primaryColour/90
+              group-hover:text-secondaryColour align-end text-xs sm:text-sm xl:text-xl w-4/5 lg:w-auto"
             >
               <p>{linkText}</p>
             </Link>
-            <ChevronRight
-              className="absolute right-4 sm:relative sm:right-auto w-4 h-4 sm:w-auto sm:h-auto
+            <ChevronsRight
+              strokeWidth={2}
+              className="absolute right-4 lg:relative lg:right-auto w-4 h-4 sm:w-5 sm:h-5 xl:w-auto xl:h-auto
                                       group-hover:translate-x-1 transition-all ease-in-out duration-200"
             />
           </div>
@@ -196,7 +198,7 @@ export default function HomeContent() {
                   {getGreeting()}, {firstName}
                 </h2>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
                 {features.map((feature, index) => (
                   <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}
