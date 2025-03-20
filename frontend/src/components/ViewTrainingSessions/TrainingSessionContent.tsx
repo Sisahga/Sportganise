@@ -91,7 +91,7 @@ const TrainingSessionContent = () => {
           const accountAttendee: Attendees =
             await waitlistParticipantsApi.getProgramParticipant(
               programId,
-              user?.accountId,
+              user?.accountId
             );
           setAccountAttendee(accountAttendee);
           console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
@@ -164,7 +164,7 @@ const TrainingSessionContent = () => {
                 {programDetails?.occurrenceDate
                   ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
                       "en-CA",
-                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                     )
                   : "N/A"}
               </p>
@@ -173,7 +173,7 @@ const TrainingSessionContent = () => {
                 {programDetails.occurrenceDate && programDetails.durationMins
                   ? calculateEndTime(
                       new Date(programDetails.occurrenceDate),
-                      programDetails.durationMins,
+                      programDetails.durationMins
                     )
                   : "N/A"}
               </p>
