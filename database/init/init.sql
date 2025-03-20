@@ -97,8 +97,15 @@ CREATE TABLE program (
 	expiry_date TIMESTAMPTZ,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10)
+    visibility VARCHAR(10),
+    cancelled BOOLEAN DEFAULT FALSE
 );
+
+CREATE TABLE program_recurrence (
+                                    recurrence_id SERIAL PRIMARY KEY,
+                                    program_id INT REFERENCES program(program_id) ON DELETE CASCADE,
+                                    occurrence_date TIMESTAMPTZ NOT NULL,
+                                    cancelled BOOLEAN DEFAULT FALSE);
 
 CREATE TABLE program_attachments (
 	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
