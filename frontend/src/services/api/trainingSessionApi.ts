@@ -75,7 +75,7 @@ const trainingSessionApi = {
       return { data: [] }; //  Return an empty array instead of calling API
     }
 
-    let url = `${baseMappingUrl}/${accountId}/details`; // Only call API if accountId is present
+    const url = `${baseMappingUrl}/${accountId}/details`; // Only call API if accountId is present
 
     try {
       const response = await fetch(url, {
@@ -102,7 +102,7 @@ const trainingSessionApi = {
       return [];
     }
 
-    let url = `${baseMappingUrl}/${accountId}/details`; // Calls API only if accountId exists
+    const url = `${baseMappingUrl}/${accountId}/details`; // Calls API only if accountId exists
 
     try {
       const response = await fetch(url, {
