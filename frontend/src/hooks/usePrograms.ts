@@ -35,6 +35,7 @@ function usePrograms(accountId: number | null) {
         ...program,
         programDetails: {
           ...program.programDetails,
+
           occurrenceDate:
             typeof program.programDetails.occurrenceDate === "string"
               ? new Date(program.programDetails.occurrenceDate)

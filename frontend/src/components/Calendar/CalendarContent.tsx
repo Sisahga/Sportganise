@@ -12,7 +12,10 @@ export default function CalendarContent() {
       </h2>
 
       <div className="w-[270px] justify-self-center my-5">
-        <Calendar selectedMonth={selectedMonth} onMonthChange={setSelectedMonth} />
+        <Calendar
+          selectedMonth={selectedMonth}
+          onMonthChange={setSelectedMonth}
+        />
       </div>
 
       <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />

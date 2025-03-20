@@ -77,7 +77,8 @@ function Calendar({
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
   const { eventDates, fetchProgramDates } = usePrograms(accountId); // Fetch function from hook
-  const currentMonth = selectedMonth instanceof Date ? selectedMonth : new Date();
+  const currentMonth =
+    selectedMonth instanceof Date ? selectedMonth : new Date();
 
   // Fetch event dates when the Calendar component mounts
   useEffect(() => {

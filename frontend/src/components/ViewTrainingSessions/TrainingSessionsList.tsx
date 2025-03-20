@@ -117,7 +117,6 @@ export default function TrainingSessionsList({
       selectedProgramType.length === 0 ||
       selectedProgramType.includes(program.programDetails.programType);
     return dateFilter && typeFilter;
-    );
   });
 
   function handleDateChange(item: any) {
