@@ -11,7 +11,7 @@ const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
   createTrainingSession: async (
     accountId: number | null | undefined,
-    jsonPayload: FormData
+    jsonPayload: FormData,
   ) => {
     const response = await fetch(
       `${baseMappingUrl}/${accountId}/create-program`,
@@ -21,7 +21,7 @@ const trainingSessionApi = {
           Authorization: getBearerToken(),
         },
         body: jsonPayload,
-      }
+      },
     );
     console.log("In trainingSessionApi.createTrainingSession");
     log.info("------ In trainingSessionApi.createTrainingSession");
@@ -42,7 +42,7 @@ const trainingSessionApi = {
   modifyTrainingSession: async (
     accountId: number | null | undefined,
     programId: number,
-    formValues: FormData
+    formValues: FormData,
   ) => {
     const response = await fetch(
       `${baseMappingUrl}/${accountId}/${programId}/modify-program`,
@@ -52,16 +52,16 @@ const trainingSessionApi = {
           Authorization: getBearerToken(),
         },
         body: formValues,
-      }
+      },
     );
     log.info(
       "Reponse from trainingSessionApi.modifyTrainignSession : ",
-      response
+      response,
     );
 
     if (!response.ok) {
       throw new Error(
-        "trainingSessionApi.modifyTrainignSession : Reponse is not ok!"
+        "trainingSessionApi.modifyTrainignSession : Reponse is not ok!",
       );
     }
     const data: ResponseDto<ProgramDetails> = await response.json();
@@ -85,7 +85,7 @@ const trainingSessionApi = {
       if (!response.ok) {
         console.error("Error fetching programs:", response.status);
         throw new Error(
-          `trainingSessionApi.getPrograms : Response not ok! (${response.status})`
+          `trainingSessionApi.getPrograms : Response not ok! (${response.status})`,
         );
       }
 
@@ -114,7 +114,7 @@ const trainingSessionApi = {
       if (!response.ok) {
         console.error("Error fetching program dates:", response.status);
         throw new Error(
-          `trainingSessionApi.getProgramDates : Response not ok! (${response.status})`
+          `trainingSessionApi.getProgramDates : Response not ok! (${response.status})`,
         );
       }
 
@@ -127,7 +127,7 @@ const trainingSessionApi = {
       log.info("trainingSessionApi.getPrograms:", response);
       log.info(
         "trainingSessionApi.getPrograms: SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOW ME THIS SHSIT ARIGBHASJDFHKSDFHSAJKFHKASDHFKASHDFKHAKSFHDN",
-        data
+        data,
       );
 
       return data.data

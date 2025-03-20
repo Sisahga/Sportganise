@@ -54,7 +54,7 @@ function CustomDayContent({
 }: DayContentProps & { eventDates: Date[] }) {
   const weekend = isSaturday(date) || isSunday(date);
   const isEventDay = eventDates.some((eventDate: Date) =>
-    isSameDay(eventDate, date)
+    isSameDay(eventDate, date),
   );
 
   return (
@@ -103,7 +103,7 @@ function Calendar({
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
-          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
+          "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
@@ -120,11 +120,11 @@ function Calendar({
             : // Single date classes:
               "[&:has([aria-selected])]:rounded-md",
           // Applies a highlight behind the selected day (including outside days if selected)
-          "[&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md"
+          "[&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md",
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-8 w-8 p-0 font-normal aria-selected:opacity-100"
+          "h-8 w-8 p-0 font-normal aria-selected:opacity-100",
         ),
         day_range_start: "day-range-start",
         day_range_end: "day-range-end",

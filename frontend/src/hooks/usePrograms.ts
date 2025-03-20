@@ -12,7 +12,7 @@ function usePrograms(accountId: number | null) {
   const fetchPrograms = async (
     accountId: number | null,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ) => {
     if (!accountId) {
       console.warn("Skipping fetchPrograms because accountId is null.");
