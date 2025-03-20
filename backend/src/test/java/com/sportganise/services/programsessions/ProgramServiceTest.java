@@ -167,7 +167,6 @@ public class ProgramServiceTest {
         ZonedDateTime.of(LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()),
         programDto.getOccurrenceDate());
     assertEquals(120, programDto.getDurationMins());
-    assertFalse(programDto.isRecurring());
     assertEquals(
         ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()),
         programDto.getExpiryDate());
@@ -294,7 +293,6 @@ public class ProgramServiceTest {
                     ProgramType.TOURNAMENT,
                     "2024-01-30T10:00:00Z",
                     "2024-01-30T10:00:00Z",
-                    false,
                     "private",
                     "Updated Description",
                     30,

@@ -94,7 +94,6 @@ CREATE TABLE program (
 	capacity INTEGER,
 	occurence_date TIMESTAMPTZ,
 	duration INTEGER,
-	is_recurring BOOLEAN DEFAULT FALSE,
 	expiry_date TIMESTAMPTZ,
 	frequency VARCHAR(10),
 	location VARCHAR(50),

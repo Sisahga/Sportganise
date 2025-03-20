@@ -81,7 +81,6 @@ public class Program {
       Integer capacity,
       ZonedDateTime occurrenceDate,
       Integer durationMins,
-      Boolean isRecurring,
       ZonedDateTime expiryDate,
       String frequency,
       String location,
@@ -93,7 +92,6 @@ public class Program {
     this.capacity = capacity;
     this.occurrenceDate = occurrenceDate;
     this.durationMins = durationMins;
-    this.isRecurring = isRecurring;
     this.expiryDate = expiryDate;
     this.frequency = frequency;
     this.location = location;

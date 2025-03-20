@@ -16,7 +16,6 @@ public class ProgramCreateRequestDto {
   private ProgramType type;
   private String startDate;
   private String endDate;
-  private Boolean recurring;
   private String visibility;
   private String description;
   private Integer capacity;
