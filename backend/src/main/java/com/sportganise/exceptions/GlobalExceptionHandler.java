@@ -44,9 +44,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.FORBIDDEN)
   public ResponseDto<?> handleForbiddenException(ForbiddenException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.FORBIDDEN.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.FORBIDDEN.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -59,9 +59,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseDto<?> handleResourceNotFoundException(ResourceNotFoundException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.NOT_FOUND.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -74,9 +74,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleIllegalArgumentException(IllegalArgumentException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // <editor-fold desc="Region: Auth Exceptions">
@@ -91,9 +91,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -106,9 +106,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -121,9 +121,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -136,9 +136,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.UNAUTHORIZED.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -155,9 +155,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleChannelCreationException(ChannelCreationException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -170,9 +170,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelDeletionException(ChannelDeletionException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -185,9 +185,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelFetchException(ChannelFetchException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -204,9 +204,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public ResponseDto<?> handleDeleteChannelApproverException(DeleteChannelApproverException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.NOT_FOUND.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -219,9 +219,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleDeleteChannelRequestException(DeleteChannelRequestException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -237,9 +237,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberSaveException(ChannelMemberSaveException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -252,9 +252,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberFetchException(ChannelMemberFetchException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -267,9 +267,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberDeletionException(ChannelMemberDeleteException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -282,9 +282,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMarkReadException(ChannelMemberMarkReadException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -297,9 +297,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleChannelMemberSetRoleException(ChannelMemberSetRoleException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -315,9 +315,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleDirectMessageSendException(DirectMessageSendException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -330,9 +330,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleDirectMessageFetchException(DirectMessageFetchException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -348,9 +348,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleProgramCreationException(ProgramCreationException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -363,9 +363,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleProgramModificationException(ProgramModificationException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message("Program modification failed: " + e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message("Program modification failed: " + e.getMessage())
+        .build();
   }
 
   /**
@@ -378,9 +378,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleProgramInvitationException(ProgramInvitationiException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message("Program invitation failed: " + e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message("Program invitation failed: " + e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -397,9 +397,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleStoreFcmTokenException(StoreFcmTokenException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -412,9 +412,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleNotificationNotSentException(NotificationNotSentException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -427,9 +427,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleGetFcmTokenException(GetFcmTokenException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -441,11 +441,11 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(SaveNotificationPrefereceException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleSaveNotificationPrefereceException(
-          SaveNotificationPrefereceException e) {
+      SaveNotificationPrefereceException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -457,11 +457,11 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(UpdateNotificationPermissionException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleUpdateNotificationPermissionException(
-          UpdateNotificationPermissionException e) {
+      UpdateNotificationPermissionException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -473,11 +473,11 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(GetNotificationPermissionException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleGetNotificationPermissionException(
-          GetNotificationPermissionException e) {
+      GetNotificationPermissionException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -490,9 +490,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleMarkNotificationReadException(MarkNotificationReadException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   // </editor-fold>
@@ -507,9 +507,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleFileProcessingException(FileProcessingException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -521,11 +521,11 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(MissingServletRequestParameterException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleMissingServletRequestParameterException(
-          MissingServletRequestParameterException e) {
+      MissingServletRequestParameterException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -538,9 +538,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   public ResponseDto<?> handleMissingPathVariableException(MissingPathVariableException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.BAD_REQUEST.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -553,9 +553,9 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
   public ResponseDto<?> handleInvalidFrequencyException(InvalidFrequencyException e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.EXPECTATION_FAILED.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.EXPECTATION_FAILED.value())
+        .message(e.getMessage())
+        .build();
   }
 
   /**
@@ -568,8 +568,8 @@ public class GlobalExceptionHandler {
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
   public ResponseDto<?> handleGenericException(Exception e) {
     return ResponseDto.builder()
-            .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-            .message(e.getMessage())
-            .build();
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
   }
 }
