@@ -12,6 +12,7 @@ import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import useAccountDetailsDirectMessaging from "@/hooks/useAccountDetailsDirectMessaging.ts";
 import { AddMembersDialogProps } from "@/types/dmchannels.ts";
 import log from "loglevel";
+import { UserSkeleton } from "@/components/UserSkeleton";
 
 export default function AddMembers({
   selectedUsers,
@@ -24,14 +25,13 @@ export default function AddMembers({
   const organizationId = 1; // TODO: Get from cookies once org cookies is properly setup.
   // States.
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
 
   log.info(
     `AddMembers component initialized for organization ID: ${organizationId}`,
   );
 
   // Hook.
-  const { users } = useAccountDetailsDirectMessaging(
+  const { users, loading } = useAccountDetailsDirectMessaging(
     organizationId,
     currentUserId,
   );
@@ -42,8 +42,17 @@ export default function AddMembers({
   // Updates user search to be more specific by letter as they type player's name
   const filteredUsers = users.filter((user: AccountDetailsDirectMessaging) => {
     if (searchQuery.length === 0) {
-      return false;
+      console.log("No search query");
+      if (user.accountId === currentUserId) {
+        return false;
+      } else if (excludedMembers) {
+        if (excludedMembers.some((m) => m.accountId === user.accountId)) {
+          return false;
+        }
+      }
+      return true;
     }
+
     if (user.accountId === currentUserId) {
       return false;
     } else if (excludedMembers) {
@@ -79,17 +88,18 @@ export default function AddMembers({
         <Input
           type="text"
           placeholder="Search for a player"
-          className="pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
+          className="pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-md text-sm sm:text-base"
           value={searchQuery}
           onChange={(event) => {
             setSearchQuery(event.target.value);
-            setIsSearching(event.target.value.length > 0);
           }}
         />
       </div>
       {/* once user searches for a player, results will start to show */}
-      {(isSearching || selectedUsers.length > 0) && (
-        <ScrollArea className="flex-1 w-full max-h-[30vh] rounded-md border overflow-y-auto">
+      <ScrollArea className="flex-1 w-full max-h-[30vh] rounded-md border overflow-y-auto">
+        {loading ? (
+          <UserSkeleton />
+        ) : (
           <div className="p-4 space-y-4">
             {/* Render selected players at the top */}
             {selectedUsers.map((user) => (
@@ -164,8 +174,8 @@ export default function AddMembers({
               </p>
             )}
           </div>
-        </ScrollArea>
-      )}
+        )}
+      </ScrollArea>
       {selectedUsers.length > 0 && (
         <div className="mt-4">
           <Button className="w-full text-sm" onClick={createFunction}>
