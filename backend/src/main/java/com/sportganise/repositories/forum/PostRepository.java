@@ -99,9 +99,10 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
       @Param("type") PostType type,
       Pageable pageable);
 
-      @Modifying
-      @Query(
-          value = """
+  @Modifying
+  @Query(
+      value =
+          """
               INSERT INTO post (
                   account_id,
                   title,
@@ -118,8 +119,6 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                   :#{#post.occurrenceDate}
               )
               """,
-          nativeQuery = true
-      )
-      int insertPost(@Param("post") Post post);
-      
+      nativeQuery = true)
+  int insertPost(@Param("post") Post post);
 }
