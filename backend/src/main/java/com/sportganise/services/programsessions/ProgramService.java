@@ -129,7 +129,6 @@ public class ProgramService {
         program.getCapacity(),
         program.getOccurrenceDate(),
         program.getDurationMins(),
-        program.isRecurring(),
         program.getExpiryDate(),
         program.getFrequency(),
         program.getLocation(),
@@ -190,7 +189,6 @@ public class ProgramService {
               program.getCapacity(),
               program.getOccurrenceDate(),
               program.getDurationMins(),
-              program.isRecurring(),
               program.getExpiryDate(),
               program.getFrequency(),
               program.getLocation(),
@@ -235,7 +233,6 @@ public class ProgramService {
    * @param programType Type of the program.
    * @param startDate The first or only date of occurrence of the program.
    * @param endDate The end date of the first or only program occurrence.
-   * @param isRecurring Boolean for whether this program is recurring.
    * @param visibility Visibility of the program i.e. is it only visible to registered members or
    *     all members.
    * @param description Description of the program.
@@ -253,7 +250,6 @@ public class ProgramService {
       ProgramType programType,
       String startDate,
       String endDate,
-      Boolean isRecurring,
       String visibility,
       String description,
       Integer capacity,
@@ -277,7 +273,6 @@ public class ProgramService {
             programType,
             startDate,
             endDate,
-            isRecurring,
             visibility,
             description,
             capacity,
@@ -329,7 +324,6 @@ public class ProgramService {
    * @param programType Type of the program.
    * @param startDate Start date of the first or only occurrence.
    * @param endDate End date of the last or only occurrence.
-   * @param isRecurring Whether or not the program is a recurring one.
    * @param visibility Visibility of the program. If it can be seen by registered members only or
    *     all members.
    * @param description Description of the program.
@@ -349,7 +343,6 @@ public class ProgramService {
       ProgramType programType,
       String startDate,
       String endDate,
-      Boolean isRecurring,
       String visibility,
       String description,
       Integer capacity,
@@ -378,7 +371,6 @@ public class ProgramService {
             programType,
             startDate,
             endDate,
-            isRecurring,
             visibility,
             description,
             capacity,
@@ -432,7 +424,6 @@ public class ProgramService {
       ProgramType programType,
       String startDate,
       String endDate,
-      Boolean isRecurring,
       String visibility,
       String description,
       Integer capacity,
@@ -451,7 +442,7 @@ public class ProgramService {
     ZonedDateTime expiryDate = null;
     String frequency = null;
 
-    if (isRecurring != null && isRecurring) {
+    if (frequency != null ) {
       ZonedDateTime currentOccurrence = occurrenceDate;
       frequency = "weekly";
       expiryDate = ZonedDateTime.parse(endDate);
@@ -471,7 +462,6 @@ public class ProgramService {
         capacity,
         occurrenceDate,
         durationMins,
-        isRecurring,
         expiryDate,
         frequency,
         location,

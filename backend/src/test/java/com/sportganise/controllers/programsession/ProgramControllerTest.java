@@ -66,7 +66,6 @@ public class ProgramControllerTest {
     mockProgramDto.setOccurrenceDate(
         ZonedDateTime.of(LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()));
     mockProgramDto.setDurationMins(120);
-    mockProgramDto.setRecurring(false);
     mockProgramDto.setExpiryDate(
         ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()));
     mockProgramDto.setFrequency("None");
@@ -192,7 +191,6 @@ public class ProgramControllerTest {
     mockProgramModifyRequestDto.setType(ProgramType.TRAINING);
     mockProgramModifyRequestDto.setStartDate("2024-02-01");
     mockProgramModifyRequestDto.setEndDate("2024-02-10");
-    mockProgramModifyRequestDto.setRecurring(false);
     mockProgramModifyRequestDto.setVisibility("private");
     mockProgramModifyRequestDto.setDescription("Updated Description");
     mockProgramModifyRequestDto.setCapacity(20);
@@ -222,7 +220,6 @@ public class ProgramControllerTest {
                 Mockito.any(ProgramType.class),
                 Mockito.anyString(),
                 Mockito.anyString(),
-                Mockito.anyBoolean(),
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyInt(),
@@ -291,7 +288,6 @@ public class ProgramControllerTest {
     mockProgramModifyRequestDto.setType(ProgramType.SPECIALTRAINING);
     mockProgramModifyRequestDto.setStartDate("2024-01-30T10:00:00Z");
     mockProgramModifyRequestDto.setEndDate("2024-02-01T10:00:00Z");
-    mockProgramModifyRequestDto.setRecurring(false);
     mockProgramModifyRequestDto.setVisibility("public");
     mockProgramModifyRequestDto.setDescription("description");
     mockProgramModifyRequestDto.setCapacity(10);
@@ -341,7 +337,6 @@ public class ProgramControllerTest {
             Mockito.eq(mockProgramModifyRequestDto.getType()),
             Mockito.eq(mockProgramModifyRequestDto.getStartDate()),
             Mockito.eq(mockProgramModifyRequestDto.getEndDate()),
-            Mockito.eq(mockProgramModifyRequestDto.getRecurring()),
             Mockito.eq(mockProgramModifyRequestDto.getVisibility()),
             Mockito.eq(mockProgramModifyRequestDto.getDescription()),
             Mockito.eq(mockProgramModifyRequestDto.getCapacity()),
