@@ -53,7 +53,7 @@ public class ProgramController {
    */
   @GetMapping("/{accountId}/details")
   public ResponseEntity<ResponseDto<List<ProgramDetailsParticipantsDto>>> getProgramDetails(
-      @PathVariable Integer accountId) {
+          @PathVariable Integer accountId) {
 
     ResponseDto<List<ProgramDetailsParticipantsDto>> responseDto = new ResponseDto<>();
 
@@ -100,53 +100,54 @@ public class ProgramController {
    * @return HTTP Response for newly created program.
    */
   @PostMapping(
-      value = "/{accountId}/create-program",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+          value = "/{accountId}/create-program",
+          consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
-      @PathVariable Integer accountId,
-      @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
-      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
+          @PathVariable Integer accountId,
+          @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
+          @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     // log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
     Account user =
-        getAccount(accountId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+            getAccount(accountId)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     log.debug("USER ID: ", user.getAccountId());
 
     if (!hasPermissions(user)) {
       throw new ForbiddenException(
-          "User with id: " + accountId + " does not have permission to create a program.");
+              "User with id: " + accountId + " does not have permission to create a program.");
     }
 
     log.debug("HAS PERMISSION: ", hasPermissions(user));
 
     try {
       ProgramDto newProgramDto =
-          programService.createProgramDto(
-              programCreateRequestDto.getTitle(),
-              programCreateRequestDto.getType(),
-              programCreateRequestDto.getStartDate(),
-              programCreateRequestDto.getEndDate(),
-              programCreateRequestDto.getVisibility(),
-              programCreateRequestDto.getDescription(),
-              programCreateRequestDto.getCapacity(),
-              programCreateRequestDto.getStartTime(),
-              programCreateRequestDto.getEndTime(),
-              programCreateRequestDto.getLocation(),
-              attachments,
-              accountId);
+              programService.createProgramDto(
+                      programCreateRequestDto.getTitle(),
+                      programCreateRequestDto.getType(),
+                      programCreateRequestDto.getStartDate(),
+                      programCreateRequestDto.getEndDate(),
+                      programCreateRequestDto.getVisibility(),
+                      programCreateRequestDto.getDescription(),
+                      programCreateRequestDto.getCapacity(),
+                      programCreateRequestDto.getStartTime(),
+                      programCreateRequestDto.getEndTime(),
+                      programCreateRequestDto.getLocation(),
+                      attachments,
+                      accountId,
+                      programCreateRequestDto.getFrequency());
 
       log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
 
       ResponseDto<ProgramDto> responseDto =
-          ResponseDto.<ProgramDto>builder()
-              .statusCode(HttpStatus.CREATED.value())
-              .message("Created a new program successfully.")
-              .data(newProgramDto)
-              .build();
+              ResponseDto.<ProgramDto>builder()
+                      .statusCode(HttpStatus.CREATED.value())
+                      .message("Created a new program successfully.")
+                      .data(newProgramDto)
+                      .build();
       return ResponseEntity.status(HttpStatus.CREATED.value()).body(responseDto);
     } catch (Exception e) {
       throw new ProgramCreationException("Failed to create program: " + e.getMessage());
@@ -163,24 +164,24 @@ public class ProgramController {
    * @return HTTP Response for modified/updated data
    */
   @PostMapping(
-      value = "/{accountId}/{programId}/modify-program",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+          value = "/{accountId}/{programId}/modify-program",
+          consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
-      @PathVariable Integer accountId,
-      @PathVariable Integer programId,
-      @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
-      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
+          @PathVariable Integer accountId,
+          @PathVariable Integer programId,
+          @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
+          @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
 
     Account user =
-        getAccount(accountId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+            getAccount(accountId)
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     log.debug("USER ID: ", user.getAccountId());
 
     if (!hasPermissions(user)) {
       throw new ForbiddenException(
-          "User with id: " + accountId + " does not have permission to create a program.");
+              "User with id: " + accountId + " does not have permission to create a program.");
     }
 
     log.debug("HAS PERMISSION: ", hasPermissions(user));
@@ -198,21 +199,22 @@ public class ProgramController {
 
     try {
       ProgramDto updatedProgramDto =
-          programService.modifyProgram(
-              programDtoToModify,
-              programModifyRequestDto.getTitle(),
-              programModifyRequestDto.getType(),
-              programModifyRequestDto.getStartDate(),
-              programModifyRequestDto.getEndDate(),
-              programModifyRequestDto.getVisibility(),
-              programModifyRequestDto.getDescription(),
-              programModifyRequestDto.getCapacity(),
-              programModifyRequestDto.getStartTime(),
-              programModifyRequestDto.getEndTime(),
-              programModifyRequestDto.getLocation(),
-              attachments,
-              programModifyRequestDto.getAttachmentsToRemove(),
-              accountId);
+              programService.modifyProgram(
+                      programDtoToModify,
+                      programModifyRequestDto.getTitle(),
+                      programModifyRequestDto.getType(),
+                      programModifyRequestDto.getStartDate(),
+                      programModifyRequestDto.getEndDate(),
+                      programModifyRequestDto.getVisibility(),
+                      programModifyRequestDto.getDescription(),
+                      programModifyRequestDto.getCapacity(),
+                      programModifyRequestDto.getStartTime(),
+                      programModifyRequestDto.getEndTime(),
+                      programModifyRequestDto.getLocation(),
+                      attachments,
+                      programModifyRequestDto.getAttachmentsToRemove(),
+                      accountId,
+                      programModifyRequestDto.getFrequency());
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");

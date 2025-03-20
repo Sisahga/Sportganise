@@ -9,18 +9,24 @@ import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramRecurrence;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.ProgramNotFoundException;
 import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
+import com.sportganise.exceptions.programexceptions.ProgramModificationException;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
+import com.sportganise.repositories.programsessions.ProgramRecurrenceRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.forum.PostService;
 import io.micrometer.common.lang.Nullable;
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.ZonedDateTime;
@@ -41,6 +47,7 @@ public class ProgramService {
   private final AccountService accountService;
   private final PostService postService;
   private final ProgramAttachmentRepository programAttachmentRepository;
+  private final ProgramRecurrenceRepository programRecurrenceRepository;
   private final BlobService blobService;
 
   /**
@@ -51,15 +58,17 @@ public class ProgramService {
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
-      ProgramRepository programRepository,
-      AccountService accountService,
-      PostService postService,
-      ProgramAttachmentRepository programAttachmentRepository,
-      BlobService blobService) {
+          ProgramRepository programRepository,
+          AccountService accountService,
+          PostService postService,
+          ProgramAttachmentRepository programAttachmentRepository,
+          ProgramRecurrenceRepository programRecurrenceRepository,
+          BlobService blobService) {
     this.programRepository = programRepository;
     this.accountService = accountService;
     this.postService = postService;
     this.programAttachmentRepository = programAttachmentRepository;
+    this.programRecurrenceRepository = programRecurrenceRepository;
     this.blobService = blobService;
   }
 
@@ -75,34 +84,34 @@ public class ProgramService {
    */
   public List<ProgramParticipantDto> getParticipants(Integer programId) {
     List<ProgramParticipant> participants =
-        programRepository.findParticipantsByProgramId(programId);
+            programRepository.findParticipantsByProgramId(programId);
 
     log.debug("PARTICIPANTS COUNT: ", participants.size());
 
     return participants.stream()
-        .map(
-            participant -> {
-              Optional<Account> accountOptional =
-                  accountService.getAccount(participant.getAccountId());
+            .map(
+                    participant -> {
+                      Optional<Account> accountOptional =
+                              accountService.getAccount(participant.getAccountId());
 
-              if (accountOptional.isEmpty()) {
-                throw new IllegalArgumentException(
-                    "Account not found for id: " + participant.getAccountId());
-              }
+                      if (accountOptional.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "Account not found for id: " + participant.getAccountId());
+                      }
 
-              Account account = accountOptional.get();
+                      Account account = accountOptional.get();
 
-              log.debug("ACCOUNT ID: ", account.getFirstName(), " ", account.getLastName());
+                      log.debug("ACCOUNT ID: ", account.getFirstName(), " ", account.getLastName());
 
-              return new ProgramParticipantDto(
-                  account.getAccountId(),
-                  programId,
-                  participant.getRank(),
-                  participant.getType(),
-                  participant.isConfirmed(),
-                  participant.getConfirmedDate());
-            })
-        .toList();
+                      return new ProgramParticipantDto(
+                              account.getAccountId(),
+                              programId,
+                              participant.getRank(),
+                              participant.getType(),
+                              participant.isConfirmed(),
+                              participant.getConfirmedDate());
+                    })
+            .toList();
   }
 
   /**
@@ -121,19 +130,20 @@ public class ProgramService {
     log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
 
     return new ProgramDto(
-        program.getProgramId(),
-        program.getProgramType(),
-        program.getTitle(),
-        program.getDescription(),
-        program.getAuthor(),
-        program.getCapacity(),
-        program.getOccurrenceDate(),
-        program.getDurationMins(),
-        program.getExpiryDate(),
-        program.getFrequency(),
-        program.getLocation(),
-        program.getVisibility(),
-        programAttachments);
+            program.getProgramId(),
+            null,
+            program.getProgramType(),
+            program.getTitle(),
+            program.getDescription(),
+            program.getAuthor(),
+            program.getCapacity(),
+            program.getOccurrenceDate(),
+            program.getDurationMins(),
+            program.getExpiryDate(),
+            program.getFrequency(),
+            program.getLocation(),
+            program.getVisibility(),
+            programAttachments);
   }
 
   /**
@@ -147,7 +157,7 @@ public class ProgramService {
     log.debug("PROGRAM ID: {}", programId);
 
     List<ProgramAttachment> programAttachments =
-        programAttachmentRepository.findAttachmentsByProgramId(programId);
+            programAttachmentRepository.findAttachmentsByProgramId(programId);
 
     log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: ", programAttachments.size());
 
@@ -155,9 +165,9 @@ public class ProgramService {
 
     for (ProgramAttachment attachment : programAttachments) {
       programAttachmentDtos.add(
-          new ProgramAttachmentDto(
-              attachment.getCompositeProgramAttachmentKey().getProgramId(),
-              attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
+              new ProgramAttachmentDto(
+                      attachment.getCompositeProgramAttachmentKey().getProgramId(),
+                      attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
     }
 
     log.debug("PROGRAM ATTACHMENTS DTOS COUNT: ", programAttachmentDtos.size());
@@ -179,21 +189,57 @@ public class ProgramService {
 
     for (Program program : programs) {
       List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
-      programDtos.add(
-          new ProgramDto(
-              program.getProgramId(),
-              program.getProgramType(),
-              program.getTitle(),
-              program.getDescription(),
-              program.getAuthor(),
-              program.getCapacity(),
-              program.getOccurrenceDate(),
-              program.getDurationMins(),
-              program.getExpiryDate(),
-              program.getFrequency(),
-              program.getLocation(),
-              program.getVisibility(),
-              programAttachments));
+      Integer programId = program.getProgramId();
+      ProgramType programType = program.getProgramType();
+      String title = program.getTitle();
+      String description = program.getDescription();
+      String author = program.getAuthor();
+      Integer capacity = program.getCapacity();
+      ZonedDateTime occurrenceDate = program.getOccurrenceDate();
+      Integer durationMins = program.getDurationMins();
+      ZonedDateTime expiryDate = program.getExpiryDate();
+      String frequency = program.getFrequency();
+      String location = program.getLocation();
+      String visibility = program.getVisibility();
+
+      if (!(program.getFrequency() == null || program.getFrequency().equalsIgnoreCase("once"))) {
+        List<ProgramRecurrence> recurrences = getProgramRecurrences(program.getProgramId());
+        for (ProgramRecurrence recurrence : recurrences) {
+          programDtos.add(
+                  new ProgramDto(
+                          programId,
+                          recurrence.getRecurrenceId(),
+                          programType,
+                          title,
+                          description,
+                          author,
+                          capacity,
+                          recurrence.getOccurrenceDate(),
+                          durationMins,
+                          expiryDate,
+                          frequency,
+                          location,
+                          visibility,
+                          programAttachments));
+        }
+      } else {
+        programDtos.add(
+                new ProgramDto(
+                        programId,
+                        null,
+                        programType,
+                        title,
+                        description,
+                        author,
+                        capacity,
+                        occurrenceDate,
+                        durationMins,
+                        expiryDate,
+                        frequency,
+                        location,
+                        visibility,
+                        programAttachments));
+      }
     }
 
     log.debug("PROGRAM DTOS COUNT: ", programDtos.size());
@@ -210,19 +256,19 @@ public class ProgramService {
    * @return a list of ProgramDetailsParticipantsDto.
    */
   public List<ProgramDetailsParticipantsDto> getProgramDetailsParticipantsDto(
-      List<ProgramDto> programDtos, Boolean hasPermissions) {
+          List<ProgramDto> programDtos, Boolean hasPermissions) {
 
     return programDtos.stream()
-        .map(
-            programDto -> {
-              List<ProgramParticipantDto> participants =
-                  hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
+            .map(
+                    programDto -> {
+                      List<ProgramParticipantDto> participants =
+                              hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
 
-              log.debug("PROGRAM PARTICIPANTS COUNT: ", participants.size());
+                      log.debug("PROGRAM PARTICIPANTS COUNT: ", participants.size());
 
-              return new ProgramDetailsParticipantsDto(programDto, participants);
-            })
-        .collect(Collectors.toList());
+                      return new ProgramDetailsParticipantsDto(programDto, participants);
+                    })
+            .collect(Collectors.toList());
   }
 
   /**
@@ -246,18 +292,19 @@ public class ProgramService {
    */
   @Transactional
   public ProgramDto createProgramDto(
-      String title,
-      ProgramType programType,
-      String startDate,
-      String endDate,
-      String visibility,
-      String description,
-      Integer capacity,
-      String startTime,
-      String endTime,
-      String location,
-      List<MultipartFile> attachments,
-      Integer accountId) {
+          String title,
+          ProgramType programType,
+          String startDate,
+          String endDate,
+          String visibility,
+          String description,
+          Integer capacity,
+          String startTime,
+          String endTime,
+          String location,
+          List<MultipartFile> attachments,
+          Integer accountId,
+          String frequency) {
 
     Account user = accountService.getAccountById(accountId);
     if (user == null) {
@@ -267,29 +314,30 @@ public class ProgramService {
     String author = user.getFirstName() + " " + user.getLastName();
 
     Program savedProgram =
-        createProgramObject(
-            title,
-            author,
-            programType,
-            startDate,
-            endDate,
-            visibility,
-            description,
-            capacity,
-            startTime,
-            endTime,
-            location);
+            createProgramObject(
+                    title,
+                    author,
+                    programType,
+                    startDate,
+                    endDate,
+                    visibility,
+                    description,
+                    capacity,
+                    startTime,
+                    endTime,
+                    location,
+                    frequency);
     programRepository.save(savedProgram);
 
     log.debug("NEW PROGRAM ID: ", savedProgram.getProgramId());
 
     postService.createNewPost(
-        accountId,
-        title,
-        description,
-        savedProgram.getOccurrenceDate(),
-        programType,
-        savedProgram.getProgramId());
+            accountId,
+            title,
+            description,
+            savedProgram.getOccurrenceDate(),
+            programType,
+            savedProgram.getProgramId());
 
     List<ProgramAttachmentDto> programAttachmentsDto = new ArrayList<>();
 
@@ -299,13 +347,13 @@ public class ProgramService {
           String s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
           log.debug("Attachment Saved to S3 bucket: {}", s3AttachmentUrl);
           programAttachmentsDto.add(
-              new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
+                  new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
           ProgramAttachmentCompositeKey savedProgramCompositeKey =
-              new ProgramAttachmentCompositeKey(savedProgram.getProgramId(), s3AttachmentUrl);
+                  new ProgramAttachmentCompositeKey(savedProgram.getProgramId(), s3AttachmentUrl);
           ProgramAttachment programAttachment = new ProgramAttachment(savedProgramCompositeKey);
           programAttachmentRepository.saveProgramAttachment(
-              programAttachment.getCompositeProgramAttachmentKey().getProgramId(),
-              programAttachment.getCompositeProgramAttachmentKey().getAttachmentUrl());
+                  programAttachment.getCompositeProgramAttachmentKey().getProgramId(),
+                  programAttachment.getCompositeProgramAttachmentKey().getAttachmentUrl());
         }
       } catch (FileProcessingException | IOException e) {
         throw new ProgramCreationException("Failed to create program: " + e.getMessage());
@@ -338,47 +386,86 @@ public class ProgramService {
    */
   @Transactional
   public ProgramDto modifyProgram(
-      ProgramDto programDtoToModify,
-      String title,
-      ProgramType programType,
-      String startDate,
-      String endDate,
-      String visibility,
-      String description,
-      Integer capacity,
-      String startTime,
-      String endTime,
-      String location,
-      List<MultipartFile> attachmentsToAdd,
-      @Nullable List<String> attachmentsToRemove,
-      Integer accountId)
-      throws IOException {
+          ProgramDto programDtoToModify,
+          String title,
+          ProgramType programType,
+          String startDate,
+          String endDate,
+          String visibility,
+          String description,
+          Integer capacity,
+          String startTime,
+          String endTime,
+          String location,
+          List<MultipartFile> attachmentsToAdd,
+          @Nullable List<String> attachmentsToRemove,
+          Integer accountId,
+          String frequency)
+          throws IOException {
 
     Program existingProgram =
-        programRepository
-            .findById(programDtoToModify.getProgramId())
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(
-                        "Program not found with ID: " + programDtoToModify.getProgramId()));
+            programRepository
+                    .findById(programDtoToModify.getProgramId())
+                    .orElseThrow(
+                            () ->
+                                    new EntityNotFoundException(
+                                            "Program not found with ID: " + programDtoToModify.getProgramId()));
 
     log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: ", existingProgram.getProgramId());
 
-    Program updatedProgram =
-        createProgramObject(
-            title,
-            existingProgram.getAuthor(),
-            programType,
-            startDate,
-            endDate,
-            visibility,
-            description,
-            capacity,
-            startTime,
-            endTime,
-            location);
-    updatedProgram.setProgramId(existingProgram.getProgramId());
-    programRepository.save(updatedProgram);
+    boolean existingProgramIsRecurring =
+            (existingProgram.getFrequency() == null
+                    || existingProgram.getFrequency().equalsIgnoreCase("once"))
+                    ? false
+                    : true;
+    boolean newProgramIsRecurring =
+            (frequency == null || frequency.equalsIgnoreCase("once")) ? false : true;
+    log.debug("Modifying recurrences for recurring programs");
+    ZonedDateTime parsedStartDateTime =
+            ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
+
+    if (existingProgramIsRecurring) {
+      if (endDate == null) {
+        throw new ProgramModificationException("End date is required for recurring programs.");
+      }
+      ZonedDateTime parsedEndDateTime = ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime));
+      if (!newProgramIsRecurring) {
+        deleteAllRecurrences(existingProgram.getProgramId());
+      } else if (!existingProgram.getFrequency().equalsIgnoreCase(frequency)
+              || !(existingProgram.getOccurrenceDate().isEqual(parsedStartDateTime))) {
+        modifyRecurrenceWithDrasticChanges(
+                existingProgram.getProgramId(), parsedStartDateTime, parsedEndDateTime, frequency);
+      } else if (existingProgram.getFrequency().equalsIgnoreCase(frequency)) {
+
+        if (existingProgram.getExpiryDate().isBefore(parsedEndDateTime)) {
+
+          ZonedDateTime lastOccurrence =
+                  getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
+          ZonedDateTime newExpiryDate = parsedEndDateTime;
+          String usedFrequency = existingProgram.getFrequency();
+          ZonedDateTime newStartDate = getNextDateTime(lastOccurrence, usedFrequency);
+          createProgramRecurrences(
+                  newStartDate, newExpiryDate, usedFrequency, existingProgram.getProgramId());
+        } else if (existingProgram.getExpiryDate().isAfter(parsedEndDateTime)) {
+          deleteExpiredRecurrences(parsedEndDateTime, existingProgram.getProgramId());
+        } else {
+          throw new ProgramModificationException(("An error occurred while handling recurrences"));
+        }
+      }
+    }
+
+    existingProgram.setTitle(title);
+    existingProgram.setProgramType(programType);
+    existingProgram.setOccurrenceDate(parsedStartDateTime);
+    existingProgram.setExpiryDate(
+            endDate != null ? ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime)) : null);
+    existingProgram.setVisibility(visibility);
+    existingProgram.setDescription(description);
+    existingProgram.setCapacity(capacity);
+    existingProgram.setLocation(location);
+    existingProgram.setFrequency(frequency);
+
+    programRepository.save(existingProgram);
 
     log.debug("PROGRAM ID OF MODIFIED PROGRAM: ", existingProgram.getProgramId());
 
@@ -386,8 +473,8 @@ public class ProgramService {
       if (!attachmentsToRemove.isEmpty()) {
         // Delete from repo.
         int rowsAffected =
-            programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
-                programDtoToModify.getProgramId(), attachmentsToRemove);
+                programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+                        programDtoToModify.getProgramId(), attachmentsToRemove);
         if (rowsAffected != attachmentsToRemove.size()) {
           throw new RuntimeException("Could not delete all attachments.");
         }
@@ -406,65 +493,249 @@ public class ProgramService {
         for (MultipartFile attachment : attachmentsToAdd) {
           s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
           ProgramAttachmentCompositeKey programAttachmentCompositeKey =
-              new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
+                  new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
           programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
           programAttachmentDtos.add(
-              new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
+                  new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
           programAttachmentRepository.saveAll(programAttachments);
         }
         log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
       }
     }
-    return new ProgramDto(updatedProgram, programAttachmentDtos);
+    return new ProgramDto(existingProgram, programAttachmentDtos);
   }
 
+  /**
+   * Method to create a list of ProgramRecurrence objects for a recurring program.
+   *
+   * @param title Title of the program.
+   * @param author The name of the person who created the program.
+   * @param programType Type of the program.
+   * @param startDate Start date of the first occurrence.
+   * @param endDate End date of the last occurrence.
+   * @param visibility Visibility of the program.
+   * @param description Description of the program.
+   * @param capacity Capacity of the program.
+   * @param startTime Start time of each occurrence of the program.
+   * @param endTime End time of each occurrence of the program.
+   * @param location Location of the program/session.
+   * @param frequency Frequency of the program.
+   * @return A list of ProgramRecurrence objects.
+   */
   private Program createProgramObject(
-      String title,
-      String author,
-      ProgramType programType,
-      String startDate,
-      String endDate,
-      String visibility,
-      String description,
-      Integer capacity,
-      String startTime,
-      String endTime,
-      String location) {
+          String title,
+          String author,
+          ProgramType programType,
+          String startDate,
+          String endDate,
+          String visibility,
+          String description,
+          Integer capacity,
+          String startTime,
+          String endTime,
+          String location,
+          String frequency) {
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     log.debug("occurrenceDate: ", occurrenceDate);
 
     int durationMins =
-        (int)
-            java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
-                .toMinutes();
+            (int)
+                    java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
+                            .toMinutes();
     log.debug("durationMins: ", durationMins);
 
     ZonedDateTime expiryDate = null;
-    String frequency = null;
+    Program program;
 
-    if (frequency != null ) {
+    if (frequency != null && !(frequency.equalsIgnoreCase("once"))) {
       ZonedDateTime currentOccurrence = occurrenceDate;
-      frequency = "weekly";
       expiryDate = ZonedDateTime.parse(endDate);
+      program =
+              new Program(
+                      programType,
+                      title,
+                      description,
+                      author,
+                      capacity,
+                      occurrenceDate,
+                      durationMins,
+                      expiryDate,
+                      frequency,
+                      location,
+                      visibility);
+      createProgramRecurrences(currentOccurrence, expiryDate, frequency, program.getProgramId());
+    } else {
+      program =
+              new Program(
+                      programType,
+                      title,
+                      description,
+                      author,
+                      capacity,
+                      occurrenceDate,
+                      durationMins,
+                      expiryDate,
+                      frequency,
+                      location,
+                      visibility);
+    }
+    return program;
+  }
 
-      while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
-
+  /**
+   * Method to create a list of ProgramRecurrence objects for a recurring program.
+   *
+   * @param startDate Start date of the first occurrence.
+   * @param expiryDate End date of the last occurrence.
+   * @param frequency Frequency of the program.
+   * @param programId Id of the program.
+   */
+  public void createProgramRecurrences(
+          ZonedDateTime startDate, ZonedDateTime expiryDate, String frequency, Integer programId) {
+    ZonedDateTime currentOccurrence = startDate;
+    while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
+      ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
+      programRecurrenceRepository.save(recurrence);
+      if (frequency.equalsIgnoreCase("daily")) {
+        currentOccurrence = currentOccurrence.plusDays(1);
+      } else if (frequency.equalsIgnoreCase("weekly")) {
         currentOccurrence = currentOccurrence.plusDays(7);
-        log.debug("nextOccurrence: ", currentOccurrence);
+      } else if (frequency.equalsIgnoreCase("monthly")) {
+        currentOccurrence = currentOccurrence.plusMonths(1);
+      } else {
+        throw new InvalidFrequencyException("Invalid frequency: " + frequency);
       }
     }
+  }
 
-    return new Program(
-        programType,
-        title,
-        description,
-        author,
-        capacity,
-        occurrenceDate,
-        durationMins,
-        expiryDate,
-        frequency,
-        location,
-        visibility);
+  /**
+   * Method to get the next date time based on the last date time and the frequency.
+   *
+   * @param lastOccurrence The last occurrence of the program.
+   * @param frequency The frequency of the program.
+   * @return The next occurrence of the program.
+   */
+  @NotNull
+  private ZonedDateTime getNextDateTime(ZonedDateTime lastOccurrence, String frequency) {
+    ZonedDateTime nextDateTime;
+    System.out.println("Last Occurrence in method getnext: " + lastOccurrence);
+    if (frequency.equalsIgnoreCase("daily")) {
+      nextDateTime = lastOccurrence.plusDays(1);
+    } else if (frequency.equalsIgnoreCase("weekly")) {
+      nextDateTime = lastOccurrence.plusDays(7);
+    } else if (frequency.equalsIgnoreCase("monthly")) {
+      nextDateTime = lastOccurrence.plusMonths(1);
+    } else {
+      throw new InvalidFrequencyException("Invalid frequency: " + frequency);
+    }
+    System.out.println("Next Occurrence in method getnext: " + nextDateTime);
+    return nextDateTime;
+  }
+
+  /**
+   * Method to get the last occurrence of a program.
+   *
+   * @param programId Id of the program.
+   * @return The last occurrence of the program.
+   */
+  public ProgramRecurrence getLastProgramRecurrence(Integer programId) {
+    return programRecurrenceRepository
+            .findLastRecurrenceByProgramId(programId)
+            .orElseThrow(() -> new ProgramNotFoundException("Recurrence Not Found"));
+  }
+
+  /**
+   * Method to delete a program and all its recurrences.
+   *
+   * @param programId Id of the program to be deleted.
+   */
+  public void deleteExpiredRecurrences(ZonedDateTime expiryDate, Integer programId) {
+    programRecurrenceRepository.deleteExpiredRecurrences(expiryDate, programId);
+  }
+
+  /**
+   * Method to modify a recurring program with drastic changes, namely those with different
+   * frequencies and dates.
+   *
+   * @param programId Id of the program.
+   * @param newStartDate Start date of the first occurrence.
+   * @param newEndDate End date of the last occurrence.
+   * @param newFrequency Frequency of the program.
+   */
+  public void modifyRecurrenceWithDrasticChanges(
+          Integer programId,
+          ZonedDateTime newStartDate,
+          ZonedDateTime newEndDate,
+          String newFrequency) {
+    ZonedDateTime currentOccurrence = newStartDate;
+    ZonedDateTime nextOccurrence;
+
+    List<ProgramRecurrence> existingRecurrences =
+            programRecurrenceRepository.findByProgramIdAndOccurrenceDateBetween(
+                    programId, newStartDate, newEndDate);
+
+    while (currentOccurrence.isBefore(newEndDate) || currentOccurrence.isEqual(newEndDate)) {
+      nextOccurrence = getNextDateTime(currentOccurrence, newFrequency);
+
+      ZonedDateTime currentOccurrenceForComparison = currentOccurrence;
+
+      boolean exists =
+              existingRecurrences.stream()
+                      .anyMatch(
+                              recurrence ->
+                                      recurrence.getOccurrenceDate().equals(currentOccurrenceForComparison));
+
+      if (!exists) {
+        ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
+        programRecurrenceRepository.save(recurrence);
+      }
+
+      deleteMiddleRecurrences(programId, currentOccurrence, nextOccurrence);
+
+      currentOccurrence = nextOccurrence;
+    }
+  }
+
+  /**
+   * Method to create a list of ProgramRecurrence objects for a recurring program.
+   *
+   * @param programId Id of the program.
+   * @return A list of ProgramRecurrence objects.
+   */
+  public List<ProgramRecurrence> getProgramRecurrences(Integer programId) {
+    return programRecurrenceRepository.findProgramRecurrenceByProgramId(programId);
+  }
+
+  /**
+   * Method to delete a program and all its recurrences.
+   *
+   * @param programId Id of the program to be deleted.
+   */
+  public void deleteAllRecurrences(Integer programId) {
+    programRecurrenceRepository.deleteProgramRecurrenceByProgramId(programId);
+  }
+
+  /**
+   * Method to delete a recurrence.
+   *
+   * @param recurrenceId Id of the recurrence to be deleted.
+   */
+  public void deleteProgramRecurrence(Integer recurrenceId) {
+    programRecurrenceRepository.deleteProgramRecurrenceByRecurrenceId(recurrenceId);
+  }
+
+  /**
+   * Method to delete a program and all its recurrences.
+   *
+   * @param programId Id of the program to be deleted.
+   */
+  public void deleteMiddleRecurrences(
+          Integer programId, ZonedDateTime firstDate, ZonedDateTime secondDate) {
+    ZonedDateTime effectiveStartDate = firstDate.plusDays(1);
+    ZonedDateTime effectiveEndDate = secondDate.minusDays(1);
+    if (effectiveStartDate.isBefore(effectiveEndDate)) {
+      programRecurrenceRepository.deleteMiddleRecurrences(
+              programId, effectiveStartDate, effectiveEndDate);
+    }
   }
 }
