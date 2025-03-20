@@ -235,8 +235,7 @@ public class DirectMessageChannelService {
         log.info("Channel read: {}", dmChannel.getRead());
       }
       for (ListDirectMessageChannelDto dmChannel : dmChannels) {
-        // Set image blob of channel to be the image blob of the other member of the channel if it
-        // is
+        // Set image blob of channel to be image blob of other member of the channel if it is
         if (dmChannel.getChannelType().equals("SIMPLE")) {
           int otherMemberId =
               directMessageChannelMemberRepository.getOtherMemberIdInSimpleChannel(

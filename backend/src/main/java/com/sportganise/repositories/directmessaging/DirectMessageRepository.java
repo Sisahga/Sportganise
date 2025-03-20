@@ -38,12 +38,15 @@ public interface DirectMessageRepository extends JpaRepository<DirectMessage, In
             m.senderId,
             m.channelId,
             m.content,
-            m.type)
+            m.type,
+            CASE WHEN COUNT(dmb) > 0 THEN TRUE ELSE FALSE END)
         FROM DirectMessage m
+        LEFT JOIN DirectMessageBlob dmb ON m.messageId = dmb.compositeKey.messageId
         WHERE m.messageId = (
             SELECT c.lastMessageId
             FROM DirectMessageChannel c
             WHERE c.channelId = :channelId)
+        GROUP BY m.senderId, m.channelId, m.content, m.type
         """)
   LastMessageDto getLastMessageByChannelId(int channelId);
 

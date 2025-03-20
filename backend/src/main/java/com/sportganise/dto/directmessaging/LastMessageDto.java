@@ -18,4 +18,5 @@ public class LastMessageDto {
   private Integer channelId;
   private String messageContent;
   private DirectMessageType type;
+  private Boolean hasAttachments;
 }
