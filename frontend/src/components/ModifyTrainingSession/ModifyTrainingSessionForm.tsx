@@ -497,8 +497,7 @@ export default function ModifyTrainingSessionForm() {
                 </Popover>
                 <FormDescription>
                   Enter the first date of the program. Applies for recurring and
-                  non recurring programs. If recurring, this day will be the
-                  assumed repeat day of the week in the future.
+                  non recurring programs.
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -565,8 +564,16 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>
-                  Select the frequency at which you would like the program to
-                  recur.
+                  {!selectedFreq &&
+                    "Select the frequency at which you would like the program to recur."}
+                  {selectedFreq === ONCE &&
+                    " The program is a one day event and will not recur. No end date required."}
+                  {selectedFreq === DAILY &&
+                    " The program will occur on each day between the start and end dates."}
+                  {selectedFreq === WEEKLY &&
+                    " The program will recur on the day of the week of the start and end dates."}
+                  {selectedFreq === MONTHLY &&
+                    " The program will recur on the date given for the start date of the program until the end date."}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -614,7 +621,7 @@ export default function ModifyTrainingSessionForm() {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>
-                    Enter the last day of a recurring program.
+                    Enter the last day of the recurring program.
                     {selectedFreq === "WEEKLY" &&
                       " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
                     {selectedFreq === "MONTHLY" &&
