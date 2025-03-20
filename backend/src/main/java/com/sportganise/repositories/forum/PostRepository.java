@@ -99,32 +99,27 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
       @Param("type") PostType type,
       Pageable pageable);
 
-  @Modifying
-  @Query(
-      value =
-          """
-            INSERT INTO post (
-                account_id,
-                title,
-                description,
-                metadata,
-                type,
-                occurrence_date
-            ) VALUES (
-                :accountId,
-                :title,
-                :description,
-                CAST(:metadata AS JSON),
-                :type,
-                :occurrenceDate
-            )
-            """,
-      nativeQuery = true)
-  void insertPost(
-      @Param("accountId") Integer accountId,
-      @Param("title") String title,
-      @Param("description") String description,
-      @Param("metadata") String metadata,
-      @Param("type") String type,
-      @Param("occurrenceDate") ZonedDateTime occurrenceDate);
+      @Modifying
+      @Query(
+          value = """
+              INSERT INTO post (
+                  account_id,
+                  title,
+                  description,
+                  metadata,
+                  type,
+                  occurrence_date
+              ) VALUES (
+                  :#{#post.accountId},
+                  :#{#post.title},
+                  :#{#post.description},
+                  CAST(:#{#post.metadata} AS JSON),
+                  :#{#post.type},
+                  :#{#post.occurrenceDate}
+              )
+              """,
+          nativeQuery = true
+      )
+      int insertPost(@Param("post") Post post);
+      
 }
