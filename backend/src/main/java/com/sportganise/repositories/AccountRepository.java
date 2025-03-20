@@ -61,6 +61,7 @@ public interface AccountRepository extends JpaRepository<Account, Integer> {
                  AND b1.compositeBlocklistId IS NULL
                  AND b2.compositeBlocklistId IS NULL
                  AND a.accountId <> :currentUserId
+             ORDER BY a.firstName
         """)
   List<AccountDetailsDirectMessaging> getAllNonBlockedAccountsByOrganization(
       int organizationId, int currentUserId);
