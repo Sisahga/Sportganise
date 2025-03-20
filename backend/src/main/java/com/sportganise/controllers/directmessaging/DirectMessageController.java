@@ -38,7 +38,9 @@ public class DirectMessageController {
 
   /**
    * Gets messages dynamically in a message channel in chunks of 30. Starts with 30 most recent
-   * messages.
+   * messages. API Endpoint (null lastSentAt): GET
+   * /api/messaging/directmessage/get-messages/{channelId} API Endpoint (with lastSentAt): GET
+   * /api/messaging/directmessage/get-messages/{channelId}?lastSentAt={lastSentAt}
    *
    * @param channelId The ID of the channel.
    * @return List of messages in the channel with status 200.
