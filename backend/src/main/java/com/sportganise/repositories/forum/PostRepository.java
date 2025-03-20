@@ -115,7 +115,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                   :#{#post.title},
                   :#{#post.description},
                   CAST(:#{#post.metadata} AS JSON),
-                  :#{#post.type},
+                  :#{#post.type.name()},
                   :#{#post.occurrenceDate}
               )
               """,
