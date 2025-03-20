@@ -241,7 +241,7 @@ export default function CreateTrainingSessionForm() {
               console.error(`Failed to invite member ${accountId}:`, error);
               throw error; // Re-throw to trigger the catch block
             }
-          })
+          }),
         );
       }
 
