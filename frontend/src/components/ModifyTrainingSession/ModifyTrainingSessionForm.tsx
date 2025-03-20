@@ -216,7 +216,7 @@ export default function ModifyTrainingSessionForm() {
     } else {
       form.setValue("frequency", ONCE); // TODO
     }
-    form.setValue("recurring", programDetails.recurring);
+    //form.setValue("recurring", programDetails.recurring);
     form.setValue("visibility", programDetails.visibility);
     form.setValue("description", programDetails.description);
     if (programDetails.programAttachments) {
