@@ -170,6 +170,8 @@ CREATE TABLE message_blob (
 ALTER TABLE channel
 ADD last_message_id INTEGER REFERENCES message(message_id);
 
+CREATE INDEX idx_dm_message_channel_time ON message(channel_id, sent_at);
+
 CREATE TABLE delete_channel_request (
     delete_request_id SERIAL PRIMARY KEY,
     channel_id INTEGER UNIQUE NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
