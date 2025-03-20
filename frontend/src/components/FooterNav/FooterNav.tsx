@@ -61,10 +61,10 @@ export default function FooterNav() {
   log.info("FooterNav rendered");
   log.info("Current location:", location.pathname);
   return (
-    <div className="z-50">
+    <div className="z-50 w-full flex items-center justify-center">
       <nav
         className="fixed shadow-md rounded-xl bottom-2 mx-auto bg-white p-3
-            grid grid-cols-5 text-xs sm:text-base md:w-2/3 lg:w-1/2 2xl:w-2/5 md:left-1/2 md:transform md:-translate-x-1/2"
+            grid grid-cols-5 text-xs sm:text-base w-4/5 sm:w-auto md:w-2/3 lg:w-1/2 2xl:w-2/5"
       >
         {routes.map((route) => {
           const isActive = route.activeRoutes.includes(location.pathname);
