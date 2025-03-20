@@ -68,10 +68,7 @@ function DirectMessagesDashboard() {
   }
 
   return (
-    <div
-      className="flex flex-col lg:mx-24 gap-6 pt-12 relative overflow-y-scroll"
-      style={{ maxHeight: "calc(100vh - 192px)" }}
-    >
+    <div className="flex mx-auto flex-col sm:w-3/4 lg:w-3/5 gap-6 relative overflow-y-scroll pt-10 min-h-screen">
       <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
         <div className="space-y-1">
           <h2 className="font-semibold text-3xl text-secondaryColour text-center">
