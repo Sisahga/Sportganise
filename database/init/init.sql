@@ -98,10 +98,6 @@ CREATE TABLE program (
 	frequency VARCHAR(10),
 	location VARCHAR(50),
 	visibility VARCHAR(10)
-	CONSTRAINT check_recurrence
-		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
-		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
-    )
 );
 
 CREATE TABLE program_attachments (
