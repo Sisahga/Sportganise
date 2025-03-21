@@ -72,12 +72,12 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
             )}
             <AttendeeBadgeType accountType={accountDetails?.type} />
             {!isConfirmed && <Badge variant="destructive">{"absent"}</Badge>}
+            {!isConfirmed && accountAttendee.rank === null && <Badge variant="destructive">{"absent"}</Badge>}
           </div>
         </div>
         <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
       </div>
       <ParticipantPopUp
-        accountId={accountAttendee?.accountId}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAbsentMarked={() => setIsConfirmed(false)}
