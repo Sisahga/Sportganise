@@ -5,6 +5,7 @@ import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
@@ -13,6 +14,7 @@ import com.sportganise.entities.programsessions.ProgramRecurrence;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
+import com.sportganise.exceptions.ForbiddenException;
 import com.sportganise.exceptions.ProgramNotFoundException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
@@ -53,8 +55,8 @@ public class ProgramService {
   /**
    * Constructor for ProgramService.
    *
-   * @param programRepository program repository object.
-   * @param accountService account service object.
+   * @param programRepository           program repository object.
+   * @param accountService              account service object.
    * @param programAttachmentRepository program attachment repository object.
    */
   public ProgramService(
@@ -83,16 +85,14 @@ public class ProgramService {
    * @return List of participants of a program
    */
   public List<ProgramParticipantDto> getParticipants(Integer programId) {
-    List<ProgramParticipant> participants =
-        programRepository.findParticipantsByProgramId(programId);
+    List<ProgramParticipant> participants = programRepository.findParticipantsByProgramId(programId);
 
     log.debug("PARTICIPANTS COUNT: ", participants.size());
 
     return participants.stream()
         .map(
             participant -> {
-              Optional<Account> accountOptional =
-                  accountService.getAccount(participant.getAccountId());
+              Optional<Account> accountOptional = accountService.getAccount(participant.getAccountId());
 
               if (accountOptional.isEmpty()) {
                 throw new IllegalArgumentException(
@@ -156,8 +156,7 @@ public class ProgramService {
 
     log.debug("PROGRAM ID: {}", programId);
 
-    List<ProgramAttachment> programAttachments =
-        programAttachmentRepository.findAttachmentsByProgramId(programId);
+    List<ProgramAttachment> programAttachments = programAttachmentRepository.findAttachmentsByProgramId(programId);
 
     log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: ", programAttachments.size());
 
@@ -251,10 +250,12 @@ public class ProgramService {
   }
 
   /**
-   * Method to create a list of ProgramDetailsParticipantsDto with all the programs and their
-   * participants depending if the user accessing this view has permissions or not.
+   * Method to create a list of ProgramDetailsParticipantsDto with all the
+   * programs and their
+   * participants depending if the user accessing this view has permissions or
+   * not.
    *
-   * @param programDtos Dtos of programs.
+   * @param programDtos    Dtos of programs.
    * @param hasPermissions Boolean for whether the user has permissions or not.
    * @return a list of ProgramDetailsParticipantsDto.
    */
@@ -264,8 +265,8 @@ public class ProgramService {
     return programDtos.stream()
         .map(
             programDto -> {
-              List<ProgramParticipantDto> participants =
-                  hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
+              List<ProgramParticipantDto> participants = hasPermissions ? getParticipants(programDto.getProgramId())
+                  : new ArrayList<>();
 
               log.debug("PROGRAM PARTICIPANTS COUNT: ", participants.size());
 
@@ -275,22 +276,24 @@ public class ProgramService {
   }
 
   /**
-   * Method to create new ProgramDto. It creates a new post too which will be linked to this program
+   * Method to create new ProgramDto. It creates a new post too which will be
+   * linked to this program
    * by programId.
    *
-   * @param title Title of the program.
+   * @param title       Title of the program.
    * @param programType Type of the program.
-   * @param startDate The first or only date of occurrence of the program.
-   * @param endDate The end date of the first or only program occurrence.
-   * @param visibility Visibility of the program i.e. is it only visible to registered members or
-   *     all members.
+   * @param startDate   The first or only date of occurrence of the program.
+   * @param endDate     The end date of the first or only program occurrence.
+   * @param visibility  Visibility of the program i.e. is it only visible to
+   *                    registered members or
+   *                    all members.
    * @param description Description of the program.
-   * @param capacity Participants capacity.
-   * @param startTime Start time of each occurrence of the program.
-   * @param endTime End time of each occurrence of the program.
-   * @param location Location of the program/session.
+   * @param capacity    Participants capacity.
+   * @param startTime   Start time of each occurrence of the program.
+   * @param endTime     End time of each occurrence of the program.
+   * @param location    Location of the program/session.
    * @param attachments String paths of files attached to this program/session.
-   * @param accountId The account id of the user making the request.
+   * @param accountId   The account id of the user making the request.
    * @return A newly created programDto.
    */
   @Transactional
@@ -316,20 +319,19 @@ public class ProgramService {
 
     String author = user.getFirstName() + " " + user.getLastName();
 
-    Program savedProgram =
-        createProgramObject(
-            title,
-            author,
-            programType,
-            startDate,
-            endDate,
-            visibility,
-            description,
-            capacity,
-            startTime,
-            endTime,
-            location,
-            frequency);
+    Program savedProgram = createProgramObject(
+        title,
+        author,
+        programType,
+        startDate,
+        endDate,
+        visibility,
+        description,
+        capacity,
+        startTime,
+        endTime,
+        location,
+        frequency);
 
     log.debug("NEW PROGRAM ID: ", savedProgram.getProgramId());
 
@@ -350,8 +352,8 @@ public class ProgramService {
           log.debug("Attachment Saved to S3 bucket: {}", s3AttachmentUrl);
           programAttachmentsDto.add(
               new ProgramAttachmentDto(savedProgram.getProgramId(), s3AttachmentUrl));
-          ProgramAttachmentCompositeKey savedProgramCompositeKey =
-              new ProgramAttachmentCompositeKey(savedProgram.getProgramId(), s3AttachmentUrl);
+          ProgramAttachmentCompositeKey savedProgramCompositeKey = new ProgramAttachmentCompositeKey(
+              savedProgram.getProgramId(), s3AttachmentUrl);
           ProgramAttachment programAttachment = new ProgramAttachment(savedProgramCompositeKey);
           programAttachmentRepository.saveProgramAttachment(
               programAttachment.getCompositeProgramAttachmentKey().getProgramId(),
@@ -366,24 +368,27 @@ public class ProgramService {
   }
 
   /**
-   * Method to modify an existing program. Any attachment not already in the database will be added.
-   * Any attachment in the database but not included in the payload will be removed.
+   * Method to modify an existing program. Any attachment not already in the
+   * database will be added.
+   * Any attachment in the database but not included in the payload will be
+   * removed.
    *
-   * @param programDtoToModify programDto of the program to be modified.
-   * @param title Title of the program.
-   * @param programType Type of the program.
-   * @param startDate Start date of the first or only occurrence.
-   * @param endDate End date of the last or only occurrence.
-   * @param visibility Visibility of the program. If it can be seen by registered members only or
-   *     all members.
-   * @param description Description of the program.
-   * @param capacity Capacity of the program.
-   * @param startTime Start time of each occurrence of the program.
-   * @param endTime End time of each occurrence of the program.
-   * @param location Location of the program/session.
-   * @param attachmentsToAdd Attachments to add to the program.
+   * @param programDtoToModify  programDto of the program to be modified.
+   * @param title               Title of the program.
+   * @param programType         Type of the program.
+   * @param startDate           Start date of the first or only occurrence.
+   * @param endDate             End date of the last or only occurrence.
+   * @param visibility          Visibility of the program. If it can be seen by
+   *                            registered members only or
+   *                            all members.
+   * @param description         Description of the program.
+   * @param capacity            Capacity of the program.
+   * @param startTime           Start time of each occurrence of the program.
+   * @param endTime             End time of each occurrence of the program.
+   * @param location            Location of the program/session.
+   * @param attachmentsToAdd    Attachments to add to the program.
    * @param attachmentsToRemove Attachments to remove from the program.
-   * @param accountId Id of the user making the request.
+   * @param accountId           Id of the user making the request.
    * @return An updated programDto.
    */
   @Transactional
@@ -405,26 +410,21 @@ public class ProgramService {
       String frequency)
       throws IOException {
 
-    Program existingProgram =
-        programRepository
-            .findById(programDtoToModify.getProgramId())
-            .orElseThrow(
-                () ->
-                    new EntityNotFoundException(
-                        "Program not found with ID: " + programDtoToModify.getProgramId()));
+    Program existingProgram = programRepository
+        .findById(programDtoToModify.getProgramId())
+        .orElseThrow(
+            () -> new EntityNotFoundException(
+                "Program not found with ID: " + programDtoToModify.getProgramId()));
 
     log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: ", existingProgram.getProgramId());
 
-    boolean existingProgramIsRecurring =
-        (existingProgram.getFrequency() == null
-                || existingProgram.getFrequency().equalsIgnoreCase("once"))
+    boolean existingProgramIsRecurring = (existingProgram.getFrequency() == null
+        || existingProgram.getFrequency().equalsIgnoreCase("once"))
             ? false
             : true;
-    boolean newProgramIsRecurring =
-        (frequency == null || frequency.equalsIgnoreCase("once")) ? false : true;
+    boolean newProgramIsRecurring = (frequency == null || frequency.equalsIgnoreCase("once")) ? false : true;
     log.debug("Modifying recurrences for recurring programs");
-    ZonedDateTime parsedStartDateTime =
-        ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
+    ZonedDateTime parsedStartDateTime = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
 
     if (existingProgramIsRecurring) {
       if (endDate == null) {
@@ -441,8 +441,7 @@ public class ProgramService {
 
         if (existingProgram.getExpiryDate().isBefore(parsedEndDateTime)) {
 
-          ZonedDateTime lastOccurrence =
-              getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
+          ZonedDateTime lastOccurrence = getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
           ZonedDateTime newExpiryDate = parsedEndDateTime;
           String usedFrequency = existingProgram.getFrequency();
           ZonedDateTime newStartDate = getNextDateTime(lastOccurrence, usedFrequency);
@@ -474,9 +473,8 @@ public class ProgramService {
     if (attachmentsToRemove != null) {
       if (!attachmentsToRemove.isEmpty()) {
         // Delete from repo.
-        int rowsAffected =
-            programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
-                programDtoToModify.getProgramId(), attachmentsToRemove);
+        int rowsAffected = programAttachmentRepository.deleteProgramAttachmentByProgramIdAndAttachmentUrl(
+            programDtoToModify.getProgramId(), attachmentsToRemove);
         if (rowsAffected != attachmentsToRemove.size()) {
           throw new RuntimeException("Could not delete all attachments.");
         }
@@ -494,8 +492,8 @@ public class ProgramService {
       if (!attachmentsToAdd.isEmpty()) {
         for (MultipartFile attachment : attachmentsToAdd) {
           s3AttachmentUrl = this.blobService.uploadFile(attachment, accountId);
-          ProgramAttachmentCompositeKey programAttachmentCompositeKey =
-              new ProgramAttachmentCompositeKey(programDtoToModify.getProgramId(), s3AttachmentUrl);
+          ProgramAttachmentCompositeKey programAttachmentCompositeKey = new ProgramAttachmentCompositeKey(
+              programDtoToModify.getProgramId(), s3AttachmentUrl);
           programAttachments.add(new ProgramAttachment(programAttachmentCompositeKey));
           programAttachmentDtos.add(
               new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
@@ -510,18 +508,18 @@ public class ProgramService {
   /**
    * Method to create a list of ProgramRecurrence objects for a recurring program.
    *
-   * @param title Title of the program.
-   * @param author The name of the person who created the program.
+   * @param title       Title of the program.
+   * @param author      The name of the person who created the program.
    * @param programType Type of the program.
-   * @param startDate Start date of the first occurrence.
-   * @param endDate End date of the last occurrence.
-   * @param visibility Visibility of the program.
+   * @param startDate   Start date of the first occurrence.
+   * @param endDate     End date of the last occurrence.
+   * @param visibility  Visibility of the program.
    * @param description Description of the program.
-   * @param capacity Capacity of the program.
-   * @param startTime Start time of each occurrence of the program.
-   * @param endTime End time of each occurrence of the program.
-   * @param location Location of the program/session.
-   * @param frequency Frequency of the program.
+   * @param capacity    Capacity of the program.
+   * @param startTime   Start time of each occurrence of the program.
+   * @param endTime     End time of each occurrence of the program.
+   * @param location    Location of the program/session.
+   * @param frequency   Frequency of the program.
    * @return A list of ProgramRecurrence objects.
    */
   private Program createProgramObject(
@@ -540,10 +538,8 @@ public class ProgramService {
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
     log.debug("occurrenceDate: ", occurrenceDate);
 
-    int durationMins =
-        (int)
-            java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
-                .toMinutes();
+    int durationMins = (int) java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
+        .toMinutes();
     log.debug("durationMins: ", durationMins);
 
     ZonedDateTime expiryDate = null;
@@ -552,35 +548,33 @@ public class ProgramService {
     if (frequency != null && !(frequency.equalsIgnoreCase("once"))) {
       ZonedDateTime currentOccurrence = occurrenceDate;
       expiryDate = ZonedDateTime.parse(endDate);
-      program =
-          new Program(
-              programType,
-              title,
-              description,
-              author,
-              capacity,
-              occurrenceDate,
-              durationMins,
-              expiryDate,
-              frequency,
-              location,
-              visibility);
+      program = new Program(
+          programType,
+          title,
+          description,
+          author,
+          capacity,
+          occurrenceDate,
+          durationMins,
+          expiryDate,
+          frequency,
+          location,
+          visibility);
       programRepository.save(program);
       createProgramRecurrences(occurrenceDate, expiryDate, frequency, program.getProgramId());
     } else {
-      program =
-          new Program(
-              programType,
-              title,
-              description,
-              author,
-              capacity,
-              occurrenceDate,
-              durationMins,
-              expiryDate,
-              frequency,
-              location,
-              visibility);
+      program = new Program(
+          programType,
+          title,
+          description,
+          author,
+          capacity,
+          occurrenceDate,
+          durationMins,
+          expiryDate,
+          frequency,
+          location,
+          visibility);
       programRepository.save(program);
     }
     return program;
@@ -589,10 +583,10 @@ public class ProgramService {
   /**
    * Method to create a list of ProgramRecurrence objects for a recurring program.
    *
-   * @param startDate Start date of the first occurrence.
+   * @param startDate  Start date of the first occurrence.
    * @param expiryDate End date of the last occurrence.
-   * @param frequency Frequency of the program.
-   * @param programId Id of the program.
+   * @param frequency  Frequency of the program.
+   * @param programId  Id of the program.
    */
   public void createProgramRecurrences(
       ZonedDateTime startDate, ZonedDateTime expiryDate, String frequency, Integer programId) {
@@ -613,10 +607,11 @@ public class ProgramService {
   }
 
   /**
-   * Method to get the next date time based on the last date time and the frequency.
+   * Method to get the next date time based on the last date time and the
+   * frequency.
    *
    * @param lastOccurrence The last occurrence of the program.
-   * @param frequency The frequency of the program.
+   * @param frequency      The frequency of the program.
    * @return The next occurrence of the program.
    */
   @NotNull
@@ -658,12 +653,13 @@ public class ProgramService {
   }
 
   /**
-   * Method to modify a recurring program with drastic changes, namely those with different
+   * Method to modify a recurring program with drastic changes, namely those with
+   * different
    * frequencies and dates.
    *
-   * @param programId Id of the program.
+   * @param programId    Id of the program.
    * @param newStartDate Start date of the first occurrence.
-   * @param newEndDate End date of the last occurrence.
+   * @param newEndDate   End date of the last occurrence.
    * @param newFrequency Frequency of the program.
    */
   public void modifyRecurrenceWithDrasticChanges(
@@ -674,20 +670,17 @@ public class ProgramService {
     ZonedDateTime currentOccurrence = newStartDate;
     ZonedDateTime nextOccurrence;
 
-    List<ProgramRecurrence> existingRecurrences =
-        programRecurrenceRepository.findByProgramIdAndOccurrenceDateBetween(
-            programId, newStartDate, newEndDate);
+    List<ProgramRecurrence> existingRecurrences = programRecurrenceRepository.findByProgramIdAndOccurrenceDateBetween(
+        programId, newStartDate, newEndDate);
 
     while (currentOccurrence.isBefore(newEndDate) || currentOccurrence.isEqual(newEndDate)) {
       nextOccurrence = getNextDateTime(currentOccurrence, newFrequency);
 
       ZonedDateTime currentOccurrenceForComparison = currentOccurrence;
 
-      boolean exists =
-          existingRecurrences.stream()
-              .anyMatch(
-                  recurrence ->
-                      recurrence.getOccurrenceDate().equals(currentOccurrenceForComparison));
+      boolean exists = existingRecurrences.stream()
+          .anyMatch(
+              recurrence -> recurrence.getOccurrenceDate().equals(currentOccurrenceForComparison));
 
       if (!exists) {
         ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
@@ -708,6 +701,21 @@ public class ProgramService {
    */
   public List<ProgramRecurrence> getProgramRecurrences(Integer programId) {
     return programRecurrenceRepository.findProgramRecurrenceByProgramId(programId);
+  }
+
+  /**
+   * Method to delete a program.
+   *
+   * @param accountId Id of the user making the request.
+   * @param programId Id of the program to be deleted.
+   */
+  public void deleteProgram(Integer accountId, Integer programId) {
+    if (!isOwner(accountId, programId)) {
+      log.debug("USER DOES NOT HAVE PERMISSION TO DELETE PROGRAM- ID: {}", programId);
+      log.debug("USER ID: {}", accountId);
+      throw new ForbiddenException("This user does not have permission to delete the program.");
+    }
+    programRepository.deleteProgramByProgramId(programId);
   }
 
   /**
