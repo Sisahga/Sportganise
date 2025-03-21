@@ -269,9 +269,45 @@ const TrainingSessionContent = () => {
                 </p>
               )}
             </div>
+            <div className="mb-8"></div>
           </>
         )}
 
+        {!(
+          (user?.type?.toLowerCase() === "general" ||
+            user?.type?.toLowerCase() === "player") &&
+          programDetails.programType.toLowerCase() === "training"
+        ) && 
+        attendees.some(attendee => attendee.rank !== null) && (
+          <>
+            <div className="flex items-center">
+              <h2 className="text-lg font-semibold">Waitlist Queue</h2>
+            </div>
+            <div className="mx-2">
+              {(() => {
+                // Filter and type cast to ensure rank exists
+                const waitlisted = attendees
+                  .filter((attendee): attendee is { rank: number } & typeof attendee => 
+                    attendee.rank !== null
+                  )
+                  .sort((a, b) => a.rank - b.rank);
+                
+                return waitlisted.length > 0 ? (
+                  waitlisted.map((attendee, index) => (
+                    <div key={index}>
+                      <RegisteredPlayer accountAttendee={attendee} onRefresh={handleRefresh} />
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                    There are no waitlisted attendees.
+                  </p>
+                );
+              })()}
+            </div>
+          </>
+        )}
+        
         {/**Conditionally render different menu options based on account type */}
         <DropDownMenuButton
           user={user}
