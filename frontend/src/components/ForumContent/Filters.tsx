@@ -222,9 +222,9 @@ const Filters: React.FC<FilterProps> = ({
 
             <Separator></Separator>
 
-            {/* Type of Event */}
+            {/* Type of Program */}
             <RadioGroup value={type} onValueChange={(value) => setType(value)}>
-              <h3 className="text-sm font-semibold">Type of event</h3>
+              <h3 className="text-sm font-semibold">Type of Program</h3>
               <div className="flex flex-col space-y-2">
                 <div className="flex justify-between items-center w-full">
                   <label htmlFor="all" className="text-xs">
@@ -265,7 +265,7 @@ const Filters: React.FC<FilterProps> = ({
 
                 <div className="flex justify-between items-center w-full">
                   <label htmlFor="special" className="text-xs">
-                    Special
+                    Special Training
                   </label>
                   <RadioGroupItem
                     value="SPECIAL"
