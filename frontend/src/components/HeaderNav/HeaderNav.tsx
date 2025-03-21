@@ -11,16 +11,36 @@ import { useState, useEffect } from "react";
 import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import { clearCookies } from "@/services/cookiesService";
+import { CookiesDto } from "@/types/auth";
+import useWaitlistPrograms from "@/hooks/useWaitlistPrograms";
+
 
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
   const [accountType, setAccountType] = useState<string | null | undefined>();
+  const [user, setUser] = useState<CookiesDto>();
+
   useEffect(() => {
-    const user = getCookies();
-    setAccountType(user?.type);
+    const userCookie = getCookies();
+    setUser(userCookie);
+    setAccountType(userCookie?.type);
   }, [accountType]);
   const navigate = useNavigate();
+
+  const {data: waitlistData, waitlistPrograms} = useWaitlistPrograms();
+  useEffect(() => {
+    if (user?.accountId) {
+      waitlistPrograms(user.accountId);
+    }
+  }, [user, waitlistPrograms]);
+
+  useEffect(() => {
+    if (waitlistData) {
+      console.log("Waitlist Programs Data:", waitlistData);
+    }
+  }, [waitlistData]);
+
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const closeDrawer = () => {
@@ -102,6 +122,14 @@ export default function HeaderNav() {
                     User Permissions
                   </Link>
                 </>
+              )}
+              {waitlistData && waitlistData.length > 0 && (
+                <Link
+                to="/pages/WaitlistTrainingSessionPage"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+              >
+                Waitlist
+              </Link>
               )}
               <Link
                 to="/pages/NotificationSettingsPage"
