@@ -38,6 +38,7 @@ import {
 import useAbsent from "@/hooks/useAbsent";
 import { CookiesDto } from "@/types/auth";
 import OptInButton from "./OptInButton";
+import OptOutButton from "./OptOutButton";
 
 interface DropDownMenuButtonProps {
   user: CookiesDto | null | undefined;
@@ -206,6 +207,18 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                   }
                 />
               )}
+
+              {/* Opt-out button */}
+  {accountAttendee?.rank !== null && (
+    <OptOutButton
+      accountAttendee={accountAttendee}
+      programId={programDetails.programId}
+      accountId={user?.accountId}
+      onClose={() => {
+        setDropdownOpen(false);
+      }}
+    />
+  )}
             </DropdownMenuGroup>
           )}
         </DropdownMenuContent>
