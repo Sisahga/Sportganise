@@ -25,14 +25,14 @@ interface ParticipantPopUpProps {
   accountAttendee: Attendees;
   isOpen: boolean;
   onClose: () => void;
-  onAbsentMarked?: () => void;
+  onRefresh: () => void;
 }
 
 const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
   accountAttendee,
   isOpen,
   onClose,
-  onAbsentMarked,
+  onRefresh,
 }) => {
   log.debug(
     "ParticipantPopUp component initialized with accountId:",
@@ -105,7 +105,7 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
       console.log("Loading... ", absentLoading);
       console.log("Marked Absent Participant: ", absentData);
       console.log("error maybe", absentError);
-      if (onAbsentMarked) onAbsentMarked();
+      if (onRefresh) onRefresh();
       onClose();
     } catch {
       console.log("programID", location.state.programDetails.programId);
