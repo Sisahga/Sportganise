@@ -23,6 +23,7 @@ import com.sportganise.exceptions.programexceptions.ProgramModificationException
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramRecurrenceRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
+import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.services.BlobService;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.forum.PostService;
@@ -50,6 +51,7 @@ public class ProgramService {
   private final PostService postService;
   private final ProgramAttachmentRepository programAttachmentRepository;
   private final ProgramRecurrenceRepository programRecurrenceRepository;
+  private final ProgramParticipantRepository programParticipantRepository;
   private final BlobService blobService;
 
   /**
@@ -65,12 +67,14 @@ public class ProgramService {
       PostService postService,
       ProgramAttachmentRepository programAttachmentRepository,
       ProgramRecurrenceRepository programRecurrenceRepository,
+      ProgramParticipantRepository programParticipantRepository,
       BlobService blobService) {
     this.programRepository = programRepository;
     this.accountService = accountService;
     this.postService = postService;
     this.programAttachmentRepository = programAttachmentRepository;
     this.programRecurrenceRepository = programRecurrenceRepository;
+    this.programParticipantRepository = programParticipantRepository;
     this.blobService = blobService;
   }
 

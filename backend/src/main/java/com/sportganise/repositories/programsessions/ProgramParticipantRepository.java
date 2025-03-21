@@ -75,5 +75,5 @@ public interface ProgramParticipantRepository
         WHERE pp.programId = :programId 
         AND pp.type = 'Coach'
         """)
-  List<Integer> findCoachIdByProgramId(@Param("programId") Integer programId);
+  int findCoachIdByProgramId(@Param("programId") Integer programId);
 }
