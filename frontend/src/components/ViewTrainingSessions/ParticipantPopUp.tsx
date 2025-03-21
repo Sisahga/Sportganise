@@ -18,24 +18,27 @@ import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 import useCreateChannel from "@/hooks/useCreateChannel";
 import useAbsent from "@/hooks/useAbsent";
 import { useEffect } from "react";
+import { Attendees } from "@/types/trainingSessionDetails";
+import useConfirmParticipant from "@/hooks/useConfirmParticipant";
 
 interface ParticipantPopUpProps {
-  accountId: number;
+  accountAttendee: Attendees;
   isOpen: boolean;
   onClose: () => void;
   onAbsentMarked?: () => void;
 }
 
 const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
-  accountId,
+  accountAttendee,
   isOpen,
   onClose,
   onAbsentMarked,
 }) => {
   log.debug(
     "ParticipantPopUp component initialized with accountId:",
-    accountId,
+    accountAttendee.accountId,
   );
+  const accountId = accountAttendee.accountId;
   const {
     data: accountDetails,
     loading,
@@ -90,6 +93,8 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
     data: absentData,
   } = useAbsent();
 
+  const {confirmParticipant, confirming, error: confirmError, successData: confirmData} = useConfirmParticipant();
+
   useEffect(() => {
     console.log("Updated absentData:", absentData);
   }, [absentData]);
@@ -107,6 +112,23 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
       console.log(
         "Error marking the user as absent in DropDownMenuButton",
         absentError,
+      );
+    }
+  };
+
+  const handleConfirmClick = async () => {
+    try {
+      await confirmParticipant(location.state.programDetails.programId, accountId);
+      console.log("Loading... ", confirming);
+      console.log("Confirming Participant: ", confirmData);
+      console.log("error", confirmError);
+      if (onRefresh) onRefresh();
+      onClose();
+    } catch {
+      console.log("programID", location.state.programDetails.programId);
+      console.log(
+        "Error confirming the user in ParticipantPopUp",
+        confirmError,
       );
     }
   };
@@ -145,10 +167,16 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
         </div>
         <DialogFooter>
           <Button onClick={handleSendMessage}> Send Message </Button>
+        {accountAttendee.confirmed ? (
           <Button onClick={handleAbsentClick} className="bg-red">
             {" "}
             Mark Absent{" "}
           </Button>
+        ): accountAttendee.rank !== null ?
+        (<Button onClick={handleConfirmClick} className="bg-teal-500">
+          {" "}
+          Confirm for the Training Session{" "}
+        </Button>): null}
         </DialogFooter>
       </DialogContent>
     </Dialog>
