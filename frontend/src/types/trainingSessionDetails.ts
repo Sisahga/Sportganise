@@ -11,6 +11,7 @@ export interface Attendees {
 export interface ProgramDetails {
   programAttachments: ProgramAttachments[];
   programId: number;
+  recurrenceId: number;
   programType: string;
   title: string;
   description: string;
@@ -23,6 +24,7 @@ export interface ProgramDetails {
   visibility: string;
   recurring: boolean;
   author: string;
+  cancelled: boolean;
 }
 
 export interface ProgramAttachments {
