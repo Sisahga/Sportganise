@@ -731,6 +731,16 @@ public class ProgramService {
   }
 
   /**
+   * Method to get the coach id of a program.
+   *
+   * @param programId Id of the program.
+   * @return Id of the coach of the program.
+   */
+  private Integer getCoachId(Integer programId) {
+    return programParticipantRepository.findCoachIdByProgramId(programId);
+  }
+
+  /**
    * Method to delete a program and all its recurrences.
    *
    * @param programId Id of the program to be deleted.
