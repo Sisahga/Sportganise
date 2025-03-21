@@ -1,4 +1,5 @@
 import { getBearerToken } from "@/services/apiHelper";
+import { Attendees } from "@/types/trainingSessionDetails";
 
 const baseMappingUrl =
   import.meta.env.VITE_API_BASE_URL + "/api/program-participant";
@@ -56,9 +57,9 @@ const waitlistApi = {
   confirmParticipant: async (
     programId: number,
     accountId: number,
-  ): Promise<boolean> => {
+  ): Promise<Attendees | null> => {
     try {
-      const response = await fetch(`${baseMappingUrl}/confirm-participant`, {
+      const response = await fetch(`${baseMappingUrl}/confirm-participant?programId=${programId}&accountId=${accountId}`, {
         method: "PATCH",
         headers: {
           Authorization: getBearerToken(),
@@ -72,10 +73,10 @@ const waitlistApi = {
       }
 
       const data = await response.json();
-      return data.isConfirmed === true;
+      return data 
     } catch (error) {
       console.error("Error confirming participant:", error);
-      return false;
+      return null;
     }
   },
   /** Reject (remove) a participant from the waitlist */
