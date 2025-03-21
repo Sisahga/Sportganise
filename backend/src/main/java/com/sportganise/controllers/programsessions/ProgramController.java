@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * REST Controller for managing 'Program' Entities. Handles HTTP request and routes them to
+ * REST Controller for managing 'Program' Entities. Handles HTTP request and
+ * routes them to
  * appropriate services.
  */
 @RestController
@@ -94,14 +96,12 @@ public class ProgramController {
   /**
    * Post mapping for creating new program.
    *
-   * @param accountId Id of user who is making the request.
+   * @param accountId               Id of user who is making the request.
    * @param programCreateRequestDto Dto for the request body.
-   * @param attachments List of attachments.
+   * @param attachments             List of attachments.
    * @return HTTP Response for newly created program.
    */
-  @PostMapping(
-      value = "/{accountId}/create-program",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(value = "/{accountId}/create-program", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
@@ -109,10 +109,9 @@ public class ProgramController {
 
     // log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
-    Account user =
-        getAccount(accountId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+    Account user = getAccount(accountId)
+        .orElseThrow(
+            () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     log.debug("USER ID: ", user.getAccountId());
 
@@ -124,30 +123,28 @@ public class ProgramController {
     log.debug("HAS PERMISSION: ", hasPermissions(user));
 
     try {
-      ProgramDto newProgramDto =
-          programService.createProgramDto(
-              programCreateRequestDto.getTitle(),
-              programCreateRequestDto.getType(),
-              programCreateRequestDto.getStartDate(),
-              programCreateRequestDto.getEndDate(),
-              programCreateRequestDto.getVisibility(),
-              programCreateRequestDto.getDescription(),
-              programCreateRequestDto.getCapacity(),
-              programCreateRequestDto.getStartTime(),
-              programCreateRequestDto.getEndTime(),
-              programCreateRequestDto.getLocation(),
-              attachments,
-              accountId,
-              programCreateRequestDto.getFrequency());
+      ProgramDto newProgramDto = programService.createProgramDto(
+          programCreateRequestDto.getTitle(),
+          programCreateRequestDto.getType(),
+          programCreateRequestDto.getStartDate(),
+          programCreateRequestDto.getEndDate(),
+          programCreateRequestDto.getVisibility(),
+          programCreateRequestDto.getDescription(),
+          programCreateRequestDto.getCapacity(),
+          programCreateRequestDto.getStartTime(),
+          programCreateRequestDto.getEndTime(),
+          programCreateRequestDto.getLocation(),
+          attachments,
+          accountId,
+          programCreateRequestDto.getFrequency());
 
       log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
 
-      ResponseDto<ProgramDto> responseDto =
-          ResponseDto.<ProgramDto>builder()
-              .statusCode(HttpStatus.CREATED.value())
-              .message("Created a new program successfully.")
-              .data(newProgramDto)
-              .build();
+      ResponseDto<ProgramDto> responseDto = ResponseDto.<ProgramDto>builder()
+          .statusCode(HttpStatus.CREATED.value())
+          .message("Created a new program successfully.")
+          .data(newProgramDto)
+          .build();
       return ResponseEntity.status(HttpStatus.CREATED.value()).body(responseDto);
     } catch (Exception e) {
       throw new ProgramCreationException("Failed to create program: " + e.getMessage());
@@ -157,25 +154,22 @@ public class ProgramController {
   /**
    * POST mapping for modifying/updating an existing program.
    *
-   * @param accountId Id of user who is making the request.
-   * @param programId Id of the program that we wish to modify.
+   * @param accountId               Id of user who is making the request.
+   * @param programId               Id of the program that we wish to modify.
    * @param programModifyRequestDto Dto for the request body.
-   * @param attachments List of attachments.
+   * @param attachments             List of attachments.
    * @return HTTP Response for modified/updated data
    */
-  @PostMapping(
-      value = "/{accountId}/{programId}/modify-program",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(value = "/{accountId}/{programId}/modify-program", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   ResponseEntity<ResponseDto<ProgramDto>> modifyProgram(
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
       @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
       @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
 
-    Account user =
-        getAccount(accountId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+    Account user = getAccount(accountId)
+        .orElseThrow(
+            () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
 
     log.debug("USER ID: ", user.getAccountId());
 
@@ -198,23 +192,22 @@ public class ProgramController {
     log.debug("PROGRAM ID OF PROGRAM TO MODIFY: ", programDtoToModify.getProgramId());
 
     try {
-      ProgramDto updatedProgramDto =
-          programService.modifyProgram(
-              programDtoToModify,
-              programModifyRequestDto.getTitle(),
-              programModifyRequestDto.getType(),
-              programModifyRequestDto.getStartDate(),
-              programModifyRequestDto.getEndDate(),
-              programModifyRequestDto.getVisibility(),
-              programModifyRequestDto.getDescription(),
-              programModifyRequestDto.getCapacity(),
-              programModifyRequestDto.getStartTime(),
-              programModifyRequestDto.getEndTime(),
-              programModifyRequestDto.getLocation(),
-              attachments,
-              programModifyRequestDto.getAttachmentsToRemove(),
-              accountId,
-              programModifyRequestDto.getFrequency());
+      ProgramDto updatedProgramDto = programService.modifyProgram(
+          programDtoToModify,
+          programModifyRequestDto.getTitle(),
+          programModifyRequestDto.getType(),
+          programModifyRequestDto.getStartDate(),
+          programModifyRequestDto.getEndDate(),
+          programModifyRequestDto.getVisibility(),
+          programModifyRequestDto.getDescription(),
+          programModifyRequestDto.getCapacity(),
+          programModifyRequestDto.getStartTime(),
+          programModifyRequestDto.getEndTime(),
+          programModifyRequestDto.getLocation(),
+          attachments,
+          programModifyRequestDto.getAttachmentsToRemove(),
+          accountId,
+          programModifyRequestDto.getFrequency());
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");
@@ -223,6 +216,23 @@ public class ProgramController {
     } catch (Exception e) {
       throw new ProgramModificationException("Program modification failed: " + e.getMessage());
     }
+  }
+
+  /**
+   * DELETE mapping for deleting a program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programId Id of the program that we wish to delete.
+   * @return HTTP Response for deleted program.
+   */
+  @DeleteMapping("/{accountId}/delete-program/{programId}")
+  public ResponseEntity<ResponseDto<String>> deleteProgram(
+      @PathVariable Integer accountId, @PathVariable Integer programId) {
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    programService.deleteProgram(accountId, programId);
+    responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
+    responseDto.setMessage("Program deleted successfully.");
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /** Helper method to fetch and validate user account based on accountId. */
