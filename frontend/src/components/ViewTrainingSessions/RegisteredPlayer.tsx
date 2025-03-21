@@ -19,16 +19,6 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
 }: RegisteredPlayerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(accountAttendee.confirmed);
-  const [isConfirmed, setIsConfirmed] = useState(accountAttendee.confirmed);
-
-  console.log("The account is ", accountAttendee);
-  console.log(
-    "Confirmation, accountID ",
-    isConfirmed,
-    accountAttendee?.accountId,
-  );
-
   const {
     data: accountDetails,
     loading,
@@ -73,7 +63,7 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
               </h4>
             )}
             <AttendeeBadgeType accountType={accountDetails?.type} />
-            {!isConfirmed && accountAttendee.rank === null && <Badge variant="destructive">{"absent"}</Badge>}
+            {!accountAttendee.confirmed && accountAttendee.rank === null && <Badge variant="destructive">{"absent"}</Badge>}
           </div>
         </div>
         <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
