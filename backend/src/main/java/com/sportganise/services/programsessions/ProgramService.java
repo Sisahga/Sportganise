@@ -741,6 +741,21 @@ public class ProgramService {
   }
 
   /**
+   * Method to get a program by its id.
+   *
+   * @param programId Id of the program.
+   * @return Program object.
+   */
+  private Program getProgramById(Integer programId) {
+    Program program = programRepository.findProgramById(programId);
+    if (program == null) {
+      log.debug("PROGRAM DOES NOT EXIST- ID: {}", programId);
+      throw new EntityNotFoundException("Program not found");
+    }
+    return program;
+  }
+
+  /**
    * Method to delete a program and all its recurrences.
    *
    * @param programId Id of the program to be deleted.
