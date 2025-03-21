@@ -86,6 +86,33 @@ const programParticipantApi = {
     console.log("Heres the data:", data);
     return data;
   },
+
+  optIn: async (
+    programId: number, 
+    accountId: number | undefined,
+  ) => {
+    const url = `${baseMappingUrl}/opt-participant?programId=${programId}&accountId=${accountId}`;
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
+    console.log("In waitlistParticipantsApi.optIn");
+    log.info("------ In waitlistParticipantsApi.optIn");
+    console.log("response in waitlistParticipantsApi.optIn:", response);
+    log.info("response in waitlistParticipantsApi.optIn:", response);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      log.error(`Error: ${response.status}`, errorText);
+      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    }
+
+    const data: number = await response.json();
+    console.log("Heres the data:", data);
+    return data;
+  },
 };
 
 export default programParticipantApi;
