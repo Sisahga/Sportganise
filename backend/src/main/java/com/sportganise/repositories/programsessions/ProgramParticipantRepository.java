@@ -69,10 +69,10 @@ public interface ProgramParticipantRepository
   int countConfirmedParticipants(@Param("programId") Integer programId);
 
   @Query(
-        """
-        SELECT pp.accountId 
-        FROM ProgramParticipants pp 
-        WHERE pp.programId = :programId 
+      """
+        SELECT pp.accountId
+        FROM ProgramParticipants pp
+        WHERE pp.programId = :programId
         AND pp.type = 'Coach'
         """)
   int findCoachIdByProgramId(@Param("programId") Integer programId);
