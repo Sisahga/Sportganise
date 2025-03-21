@@ -33,6 +33,7 @@ import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 import { ONCE, WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
+import trainingSessionApi from "@/services/api/trainingSessionApi";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -66,21 +67,33 @@ const TrainingSessionContent = () => {
     reccurenceDate: new Date(),
   });
 
-  useEffect(() => {
-    // Update state safely using useEffect
-    if (location.state && location.state.programDetails) {
-      setProgramDetails(location.state.programDetails);
-    }
-    log.info("Program details in training session content: ", programDetails);
-  }, [location.state]);
-
   const [attendees, setAttendees] = useState<Attendees[]>([]);
-  useEffect(() => {
-    if (location.state && location.state.attendees) {
-      setAttendees(location.state.attendees);
+
+  const fetchProgramData = async () => {
+    const programId = location.state?.programDetails?.programId;
+    if (programId && user?.accountId) {
+      try {
+        const response = await trainingSessionApi.getPrograms(user?.accountId);
+        const program = response.data?.find(
+          (p) => p.programDetails.programId === programId
+        );
+        if (program) {
+          setProgramDetails(program.programDetails);
+          setAttendees(program.attendees);
+        } else {
+          console.log("No program found");
+        }
+      } catch (error) {
+        log.error("Failed to fetch program data:", error);
+      }
     }
-    log.info("Attendees in training session content: ", attendees);
-  }, [location.state]);
+  };
+
+  useEffect(() => {
+    // Fetch fresh data when the component mounts
+    fetchProgramData();
+  }, [user, location.state?.programDetails?.programId]);
+  
 
   useEffect(() => {
     //TODO: define a useHook instead of all this code, who knows
@@ -104,6 +117,21 @@ const TrainingSessionContent = () => {
     };
     fetchParticipant();
   }, [location.state.programDetails.programId, user?.accountId]);
+
+  const handleRefresh = async () => {
+    const programs = await trainingSessionApi.getPrograms(user?.accountId);
+    if (programs.data){
+      const program = programs.data.find((p) => p.programDetails.programId === programDetails.programId)
+      if (program) {
+        console.log("Refreshed programs: ", programs)
+        setAttendees(program.attendees)
+        setProgramDetails(program.programDetails)
+        console.log("Refreshed attendees: ", program.attendees)
+        console.log("Refreshed programDetails: ", program.programDetails)
+      }
+      else console.log("No program found")
+    }
+  }
 
   return (
     <div className="mb-32 mt-5">
@@ -296,7 +324,7 @@ const TrainingSessionContent = () => {
                   return attendee.participantType?.toLowerCase() ===
                     "subscribed" || attendee.confirmed ? (
                     <div key={index}>
-                      <RegisteredPlayer accountAttendee={attendee} />
+                      <RegisteredPlayer accountAttendee={attendee} onRefresh={handleRefresh} />
                     </div>
                   ) : null;
                 })
@@ -351,6 +379,7 @@ const TrainingSessionContent = () => {
           accountAttendee={accountAttendee}
           programDetails={programDetails}
           attendees={attendees}
+          onRefresh={handleRefresh}
         />
       </div>
     </div>
