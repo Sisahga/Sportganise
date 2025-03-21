@@ -183,16 +183,18 @@ public class ProgramService {
   public List<ProgramDto> getPrograms() {
     List<Program> programs = programRepository.findPrograms();
 
-    log.debug("PROGRAMS COUNT: ", programs.size());
+    log.debug("PROGRAMS COUNT: {} ", programs.size());
 
     List<ProgramDto> programDtos = new ArrayList<>();
 
     for (Program program : programs) {
+      log.debug("fetching program: {} ", program.getProgramId());
       List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
       Integer programId = program.getProgramId();
       ProgramType programType = program.getProgramType();
       String title = program.getTitle();
-      String description = program.getDescription();
+      String description =
+              program.getDescription();
       String author = program.getAuthor();
       Integer capacity = program.getCapacity();
       ZonedDateTime occurrenceDate = program.getOccurrenceDate();
@@ -204,7 +206,9 @@ public class ProgramService {
 
       if (!(program.getFrequency() == null || program.getFrequency().equalsIgnoreCase("once"))) {
         List<ProgramRecurrence> recurrences = getProgramRecurrences(program.getProgramId());
+        log.debug("PROGRAM RECURRENCES COUNT: {}", recurrences.size());
         for (ProgramRecurrence recurrence : recurrences) {
+          log.debug("FETCHING RECURRENCE: {} ", recurrence.getRecurrenceId());
           programDtos.add(
                   new ProgramDto(
                           programId,
@@ -242,7 +246,7 @@ public class ProgramService {
       }
     }
 
-    log.debug("PROGRAM DTOS COUNT: ", programDtos.size());
+    log.debug("PROGRAM DTOS COUNT: {}", programDtos.size());
 
     return programDtos;
   }
@@ -327,7 +331,6 @@ public class ProgramService {
                     endTime,
                     location,
                     frequency);
-    programRepository.save(savedProgram);
 
     log.debug("NEW PROGRAM ID: ", savedProgram.getProgramId());
 
@@ -563,7 +566,8 @@ public class ProgramService {
                       frequency,
                       location,
                       visibility);
-      createProgramRecurrences(currentOccurrence, expiryDate, frequency, program.getProgramId());
+      programRepository.save(program);
+      createProgramRecurrences(occurrenceDate, expiryDate, frequency, program.getProgramId());
     } else {
       program =
               new Program(
@@ -578,6 +582,7 @@ public class ProgramService {
                       frequency,
                       location,
                       visibility);
+      programRepository.save(program);
     }
     return program;
   }
