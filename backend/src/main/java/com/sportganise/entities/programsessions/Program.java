@@ -45,9 +45,6 @@ public class Program {
   @Column(name = "duration")
   private Integer durationMins;
 
-  @Column(name = "is_recurring")
-  private boolean isRecurring;
-
   @Column(name = "expiry_date")
   private ZonedDateTime expiryDate;
 
@@ -67,7 +64,6 @@ public class Program {
    * @param capacity capacity of the program.
    * @param occurrenceDate start date and time of the first program occurrence.
    * @param durationMins duration of the program in minutes.
-   * @param isRecurring boolean for whether or not this program is a recurring one.
    * @param expiryDate date and time of the last occurrence of the program.
    * @param frequency frequency of the program if it is recurring.
    * @param location location of the program.

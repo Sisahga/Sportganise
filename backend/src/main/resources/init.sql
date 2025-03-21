@@ -1,5 +1,3 @@
-
-
 CREATE TABLE organization(
                              org_id SERIAL PRIMARY KEY,
                              name VARCHAR(50) NOT NULL,
