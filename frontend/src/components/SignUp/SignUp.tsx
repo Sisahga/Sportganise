@@ -149,6 +149,36 @@ export default function SignUp() {
       return;
     }
 
+    const validEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(?<tld>[a-zA-Z]{2,})$/;
+
+    const validTLDs = new Set([
+      "com", "org", "net", "edu", "gov", "mil", "io", "co", "ai", "ca", "uk", "us",
+      "au", "de", "fr", "jp", "cn", "in", "ru", "br", "it", "es", "nl", "se", "no",
+      "fi", "dk", "pl", "ch", "be", "ar", "mx", "za", "nz", "sg", "hk", "id", "my"
+    ]); // Add more valid TLDs as needed
+    
+    const match = formData.email.match(validEmailRegex);
+    
+    if (!match || !match.groups || !validTLDs.has(match.groups.tld.toLowerCase())) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Email Format",
+        description: "Please use a valid email format with a real domain.",
+      });
+      return;
+    }
+
+    // Additional check to reject emails with consecutive dots (..)
+if (formData.email.includes("..")) {
+  toast({
+    variant: "destructive",
+    title: "Invalid Email Format",
+    description: "Email cannot contain consecutive dots.",
+  });
+  return;
+}
+    
+
     try {
       const response = await signUpUser(formData); // Perform sign-up
 
