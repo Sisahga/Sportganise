@@ -133,6 +133,11 @@ const TrainingSessionContent = () => {
     }
   }
 
+  useEffect(() => {
+    console.log("Updated attendees:", attendees);
+    console.log("Update programDetails: ", programDetails)
+  }, [attendees]);
+
   return (
     <div className="mb-32 mt-5">
       {/**Return to previous page */}
