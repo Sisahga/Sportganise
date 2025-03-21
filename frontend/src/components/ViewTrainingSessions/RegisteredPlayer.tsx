@@ -10,10 +10,12 @@ import { Attendees } from "@/types/trainingSessionDetails";
 
 interface RegisteredPlayerProps {
   accountAttendee: Attendees;
+  onRefresh: () => void;
 }
 
 const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
   accountAttendee,
+  onRefresh,
 }: RegisteredPlayerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -71,16 +73,16 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
               </h4>
             )}
             <AttendeeBadgeType accountType={accountDetails?.type} />
-            {!isConfirmed && <Badge variant="destructive">{"absent"}</Badge>}
             {!isConfirmed && accountAttendee.rank === null && <Badge variant="destructive">{"absent"}</Badge>}
           </div>
         </div>
         <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
       </div>
       <ParticipantPopUp
+        accountAttendee={accountAttendee}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onAbsentMarked={() => setIsConfirmed(false)}
+        onRefresh={onRefresh}
       />
     </div>
   );

@@ -44,6 +44,7 @@ interface DropDownMenuButtonProps {
   accountAttendee: Attendees | undefined;
   programDetails: ProgramDetails;
   attendees: Attendees[];
+  onRefresh: () => void;
 }
 
 export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
@@ -51,6 +52,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   accountAttendee,
   programDetails,
   attendees,
+  onRefresh,
 }: DropDownMenuButtonProps) => {
   const navigate = useNavigate();
   const handleNavigation = (path: string, data: Program) => {
@@ -83,6 +85,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const handleDeleteConfirmation = () => {
     setDeleteDialogOpen(false);
     setDeleteConfirmationVisible(true);
+    if (onRefresh) onRefresh();
 
     setTimeout(() => {
       setDeleteConfirmationVisible(false);
@@ -97,6 +100,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const handlePostponeConfirmation = () => {
     setPostponeDialogOpen(false);
     setPostponeConfirmationVisible(true); // Show postpone confirmation message
+    if (onRefresh) onRefresh();
 
     setTimeout(() => {
       setPostponeConfirmationVisible(false);
@@ -111,6 +115,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const handleRSVPConfirmation = () => {
     setRSVPDialogOpen(false);
     setRSVPConfirmationVisible(true); // Show RSVP confirmation message
+    if (onRefresh) onRefresh();
 
     setTimeout(() => {
       setRSVPConfirmationVisible(false);
@@ -127,6 +132,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       await markAbsent(programDetails.programId, user?.accountId);
       setAbsentDialogOpen(false);
       setNotificationVisible(true);
+      if (onRefresh) onRefresh();
+      console.log("Updated account?: ", accountAttendee)
       setTimeout(() => {
         setNotificationVisible(false);
       }, 3000);
@@ -135,6 +142,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     }
   };
 
+  
   return (
     <div>
       <DropdownMenu open={isDropdownOpen} onOpenChange={setDropdownOpen}>
