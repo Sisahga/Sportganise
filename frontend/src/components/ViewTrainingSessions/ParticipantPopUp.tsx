@@ -20,6 +20,7 @@ import useAbsent from "@/hooks/useAbsent";
 import { useEffect } from "react";
 import { Attendees } from "@/types/trainingSessionDetails";
 import useConfirmParticipant from "@/hooks/useConfirmParticipant";
+import useRejectParticipant from "@/hooks/useRejectParticipant";
 
 interface ParticipantPopUpProps {
   accountAttendee: Attendees;
@@ -49,6 +50,7 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
   const currentUserId = getAccountIdCookie(cookies);
   const { createChannel } = useCreateChannel();
   const location = useLocation();
+  const programId = location.state.programDetails.programId;
 
   const handleSendMessage = async () => {
     const memberIds = [currentUserId, accountId];
@@ -93,7 +95,12 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
     data: absentData,
   } = useAbsent();
 
-  const {confirmParticipant, confirming, error: confirmError, successData: confirmData} = useConfirmParticipant();
+  const {
+    confirmParticipant,
+    confirming,
+    error: confirmError,
+    successData: confirmData,
+  } = useConfirmParticipant();
 
   useEffect(() => {
     console.log("Updated absentData:", absentData);
@@ -101,14 +108,14 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
 
   const handleAbsentClick = async () => {
     try {
-      await markAbsent(location.state.programDetails.programId, accountId);
+      await markAbsent(programId, accountId);
       console.log("Loading... ", absentLoading);
       console.log("Marked Absent Participant: ", absentData);
       console.log("error maybe", absentError);
       if (onRefresh) onRefresh();
       onClose();
     } catch {
-      console.log("programID", location.state.programDetails.programId);
+      console.log("programID", programId);
       console.log(
         "Error marking the user as absent in DropDownMenuButton",
         absentError,
@@ -118,18 +125,32 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
 
   const handleConfirmClick = async () => {
     try {
-      await confirmParticipant(location.state.programDetails.programId, accountId);
+      await confirmParticipant(programId, accountId);
       console.log("Loading... ", confirming);
       console.log("Confirming Participant: ", confirmData);
       console.log("error", confirmError);
       if (onRefresh) onRefresh();
       onClose();
     } catch {
-      console.log("programID", location.state.programDetails.programId);
+      console.log("programID", programId);
       console.log(
         "Error confirming the user in ParticipantPopUp",
         confirmError,
       );
+    }
+  };
+
+  const {rejectParticipant} = useRejectParticipant();
+  // New function to handle the opt out action.
+  const handleOptOutClick = async () => {
+    try {
+      await rejectParticipant(programId, accountId)
+      console.log("Participant opted out");
+      // Add additional opt out logic here if needed.
+      if (onRefresh) onRefresh();
+      onClose();
+    } catch (error) {
+      console.error("Error opting out:", error);
     }
   };
 
@@ -166,17 +187,31 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleSendMessage}> Send Message </Button>
-        {accountAttendee.confirmed ? (
-          <Button onClick={handleAbsentClick} className="bg-red">
-            {" "}
-            Mark Absent{" "}
-          </Button>
-        ): accountAttendee.rank !== null ?
-        (<Button onClick={handleConfirmClick} className="bg-teal-500">
-          {" "}
-          Confirm for the Training Session{" "}
-        </Button>): null}
+          <div className="flex flex-col w-full space-y-2">
+            {/* First row - Send Message button on right, Mark Absent on left if applicable */}
+            <div className="flex justify-between items-center w-full">
+              <div>
+                {accountAttendee.confirmed && (
+                  <Button onClick={handleAbsentClick} className="bg-red">
+                    Mark Absent
+                  </Button>
+                )}
+              </div>
+              <Button onClick={handleSendMessage}>Send Message</Button>
+            </div>
+            
+            {/* Second row - Confirm and Opt Out buttons if applicable */}
+            {!accountAttendee.confirmed && accountAttendee.rank !== null && (
+              <div className="flex space-x-2">
+                <Button onClick={handleConfirmClick} className="bg-teal-500">
+                  Confirm for the Training Session
+                </Button>
+                <Button onClick={handleOptOutClick} className="bg-gray-500">
+                  Opt Out
+                </Button>
+              </div>
+            )}
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
