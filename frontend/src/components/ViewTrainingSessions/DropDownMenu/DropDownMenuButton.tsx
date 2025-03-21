@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import useAbsent from "@/hooks/useAbsent";
 import { CookiesDto } from "@/types/auth";
+import OptInButton from "./OptInButton";
 
 interface DropDownMenuButtonProps {
   user: CookiesDto | null | undefined;
@@ -68,17 +69,11 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const [isAbsentDialogOpen, setAbsentDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPostponeDialogOpen, setPostponeDialogOpen] = useState(false);
+  const [isOptedIn, setIsOptedIn] = useState(false);
   const [isPostponeConfirmationVisible, setPostponeConfirmationVisible] =
     useState(false);
   const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] =
     useState(false);
-
-  // Handle waitlisted joining
-  /*
-  const handleButtonClickWaitlisted = () => {
-    setModalVisible(true); // Show the modal on button click
-  };
-  */
 
   const handleDeleteClick = () => {
     setDropdownOpen(false); //Close the dropdown
@@ -184,13 +179,24 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <span className="text-green-500">RSVP</span>
               </DropdownMenuItem>
               {/* Here instead I want to check if a player is of role waitlisted */}
-              {(accountAttendee?.participantType?.toLowerCase() !=
-                "waitlisted" ||
-                accountAttendee.confirmed === true) && (
+              {(accountAttendee?.confirmed === true) && (
                 <DropdownMenuItem onSelect={handleAbsentClick}>
                   <LogOut color="red" />
                   <span className="text-red"> Mark absent </span>
                 </DropdownMenuItem>
+              )}
+               {accountAttendee?.participantType?.toLowerCase() === "waitlisted" &&
+              accountAttendee?.rank === null && !isOptedIn && (
+                <OptInButton
+                  accountAttendee={accountAttendee}
+                  programId={programDetails.programId}
+                  accountId={user?.accountId}
+                  onClose={() => {
+                    setDropdownOpen(false);
+                    setIsOptedIn(true);
+                  }
+                  }
+                />
               )}
             </DropdownMenuGroup>
           )}
