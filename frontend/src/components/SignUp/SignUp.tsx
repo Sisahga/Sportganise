@@ -155,7 +155,7 @@ export default function SignUp() {
       "com", "org", "net", "edu", "gov", "mil", "io", "co", "ai", "ca", "uk", "us",
       "au", "de", "fr", "jp", "cn", "in", "ru", "br", "it", "es", "nl", "se", "no",
       "fi", "dk", "pl", "ch", "be", "ar", "mx", "za", "nz", "sg", "hk", "id", "my"
-    ]); // Add more valid TLDs as needed
+    ]);
     
     const match = formData.email.match(validEmailRegex);
     
@@ -288,10 +288,11 @@ if (formData.email.includes("..")) {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/10 text-sm text-secondaryColour"
+                  className="absolute right-4 text-sm text-secondaryColour"
+                  style={{ top: "34px" }}
                   onClick={() => setShowPassword((prev) => !prev)}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                   {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
                 </button>
               </div>
               {/* Progress Bar */}
