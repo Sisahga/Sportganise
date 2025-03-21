@@ -1,43 +1,49 @@
-import { useState, useEffect } from "react";
-import { Program } from "@/types/trainingSessionDetails";
-import waitlistApi from "@/services/api/waitlistApi";
+import { useState, useCallback } from "react";
 import log from "loglevel";
+import { ProgramDetails } from "@/types/trainingSessionDetails";
+import programParticipantApi from "@/services/api/programParticipantApi";
 
-function useWaitlistPrograms() {
-  const [waitlistPrograms, setWaitlistPrograms] = useState<Program[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const useWaitlistPrograms = () => {
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<ProgramDetails[] | null>(null);
 
-  useEffect(() => {
-    console.log(
-      "useWaitlistPrograms: Retrieved waitlist programs:",
-      waitlistPrograms,
-    );
-  }, [waitlistPrograms]);
-
-  const fetchWaitlistPrograms = async () => {
-    try {
-      const response = await waitlistApi.getWaitlistPrograms();
-      console.log("Raw response from getWaitlistPrograms:", response);
-      setWaitlistPrograms(response ?? []);
-      log.info("useWaitlistPrograms response:", response);
-    } catch (err) {
-      console.error("Error fetching waitlist programs:", err);
-      setError(`Failed to fetch waitlist programs: ${err}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchWaitlistPrograms();
-  }, []);
+  const waitlistPrograms = useCallback(
+    async (accountId: number) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const dataWaitlist = await programParticipantApi.waitlistPrograms(
+          accountId,
+        );
+        setData(dataWaitlist);
+        log.info("Waitlist programs fetched succesfully.");
+        console.log("Participant information: ", dataWaitlist);
+      } catch (err) {
+        let errorMessage =
+          "An error occurred while fetching waitlist programs.";
+        if (err instanceof Error) {
+          errorMessage = err.message;
+          console.log(errorMessage);
+        } else if (typeof err === "string") {
+          errorMessage = err;
+          console.log(errorMessage);
+        }
+        setError(errorMessage);
+        log.error("Error fetching waitlist programs:", err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   return {
-    waitlistPrograms,
     loading,
     error,
+    data,
+    waitlistPrograms,
   };
-}
+};
 
 export default useWaitlistPrograms;
