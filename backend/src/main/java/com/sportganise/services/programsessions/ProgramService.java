@@ -719,6 +719,18 @@ public class ProgramService {
   }
 
   /**
+   * Method to check if the user is the program's coach or an ADMIN.
+   *
+   * @param accountId Id of the user.
+   * @return Boolean for whether the user is an admin or the program owner.
+   */
+  private boolean isOwner(Integer accountId, Integer programId) {
+    getProgramById(programId);
+    return (accountId.equals(getCoachId(programId))
+        || accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN));
+  }
+
+  /**
    * Method to delete a program and all its recurrences.
    *
    * @param programId Id of the program to be deleted.
