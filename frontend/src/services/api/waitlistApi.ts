@@ -83,9 +83,9 @@ const waitlistApi = {
   rejectParticipant: async (
     programId: number,
     accountId: number,
-  ): Promise<boolean> => {
+  ): Promise<Attendees | null> => {
     try {
-      const response = await fetch(`${baseMappingUrl}/out-participant`, {
+      const response = await fetch(`${baseMappingUrl}/out-participant?programId=${programId}&accountId=${accountId}`, {
         method: "PATCH",
         headers: {
           Authorization: getBearerToken(),
@@ -99,10 +99,10 @@ const waitlistApi = {
       }
 
       const data = await response.json();
-      return data.isConfirmed === false;
+      return data;
     } catch (error) {
       console.error("Error rejecting participant:", error);
-      return false;
+      return null;
     }
   },
 };
