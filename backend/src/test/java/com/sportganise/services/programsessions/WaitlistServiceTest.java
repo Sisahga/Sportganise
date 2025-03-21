@@ -349,7 +349,8 @@ public class WaitlistServiceTest {
             () -> {
               programParticipantService.markAbsent(programId, accountId);
             });
-assertEquals("Participant not found for program: 1, account: 2", exception.getMessage());  }
+    assertEquals("Participant not found for program: 1, account: 2", exception.getMessage());
+  }
 
   @Test
   public void testMarkAbsent_DatabaseSaveFailure() {
