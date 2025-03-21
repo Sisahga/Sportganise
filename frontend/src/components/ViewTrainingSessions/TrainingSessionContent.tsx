@@ -46,6 +46,7 @@ const TrainingSessionContent = () => {
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
+    recurrenceId: 0,
     title: "",
     programType: "",
     description: "",
@@ -59,6 +60,7 @@ const TrainingSessionContent = () => {
     frequency: "",
     visibility: "",
     author: "",
+    cancelled: false,
   });
 
   useEffect(() => {

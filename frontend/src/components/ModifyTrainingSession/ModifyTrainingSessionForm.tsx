@@ -154,6 +154,7 @@ export default function ModifyTrainingSessionForm() {
   const [, /* attendees */ setAttendees] = useState<Attendees[]>([]); // For US305+
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
+    recurrenceId: 0,
     title: "",
     programType: "",
     description: "",
@@ -167,6 +168,7 @@ export default function ModifyTrainingSessionForm() {
     frequency: "",
     visibility: "",
     author: "",
+    cancelled: false,
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
 
@@ -202,12 +204,8 @@ export default function ModifyTrainingSessionForm() {
     form.setValue("capacity", programDetails.capacity);
     form.setValue("type", programDetails.programType.toUpperCase());
     form.setValue("startDate", new Date(programDetails.occurrenceDate));
-    // TODO: HANDLE FREQUENCY CHANGES, NEW OCCURENCE DATES AND EXPIRY DATES
     if (
-      !(
-        programDetails.frequency === null ||
-        programDetails.frequency.toLowerCase() === "once" // TODO
-      )
+      !(programDetails.frequency === null || programDetails.frequency === ONCE)
     ) {
       form.setValue("endDate", new Date(programDetails.expiryDate));
     }
@@ -284,7 +282,12 @@ export default function ModifyTrainingSessionForm() {
         title: values.title,
         type: values.type,
         startDate: values.startDate.toISOString(),
-        endDate: values.endDate?.toISOString() ?? null,
+        // If you're changing an event from recurring to non recurring, endDate will already be initialized.
+        // therefore, must ensure endDate: null is sent in API body.
+        endDate:
+          values.frequency === ONCE
+            ? null
+            : (values.endDate?.toISOString() ?? null),
         frequency: values.frequency,
         //recurring: values.recurring.toString(),
         visibility: values.visibility,
@@ -295,6 +298,7 @@ export default function ModifyTrainingSessionForm() {
         location: values.location,
         attachmentsToRemove: attachmentsToRemove ?? [],
       };
+      console.warn("programData:", programData);
       formData.append(
         "programData",
         new Blob([JSON.stringify(programData)], {
