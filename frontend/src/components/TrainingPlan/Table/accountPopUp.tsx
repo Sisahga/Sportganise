@@ -10,12 +10,10 @@ import { Button } from "@/components/ui/Button";
 import { User2Icon } from "lucide-react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import log from "loglevel";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { CreateChannelDto } from "@/types/dmchannels";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 import useCreateChannel from "@/hooks/useCreateChannel";
-import useAbsent from "@/hooks/useAbsent";
-import { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AttendeeBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/AttendeeBadgeType";
 
@@ -23,14 +21,12 @@ interface AccountPopUpProps {
   accountId: number;
   isOpen: boolean;
   onClose: () => void;
-  onAbsentMarked?: () => void;
 }
 
 const AccountPopUp: React.FC<AccountPopUpProps> = ({
   accountId,
   isOpen,
   onClose,
-  onAbsentMarked,
 }) => {
   log.debug(
     "ParticipantPopUp component initialized with accountId:",
@@ -45,7 +41,6 @@ const AccountPopUp: React.FC<AccountPopUpProps> = ({
   const cookies = getCookies();
   const currentUserId = getAccountIdCookie(cookies);
   const { createChannel } = useCreateChannel();
-  const location = useLocation();
 
   const handleSendMessage = async () => {
     const memberIds = [currentUserId, accountId];
@@ -83,33 +78,6 @@ const AccountPopUp: React.FC<AccountPopUpProps> = ({
   };
   log.debug("Rendering ParticipantPopUp");
 
-  const {
-    markAbsent,
-    loading: absentLoading,
-    error: absentError,
-    data: absentData,
-  } = useAbsent();
-
-  useEffect(() => {
-    console.log("Updated absentData:", absentData);
-  }, [absentData]);
-
-  const handleAbsentClick = async () => {
-    try {
-      await markAbsent(location.state.programDetails.programId, accountId);
-      console.log("Loading... ", absentLoading);
-      console.log("Marked Absent Participant: ", absentData);
-      console.log("error maybe", absentError);
-      if (onAbsentMarked) onAbsentMarked();
-      onClose();
-    } catch {
-      console.log("programID", location.state.programDetails.programId);
-      console.log(
-        "Error marking the user as absent in DropDownMenuButton",
-        absentError,
-      );
-    }
-  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -145,10 +113,6 @@ const AccountPopUp: React.FC<AccountPopUpProps> = ({
         </div>
         <DialogFooter>
           <Button onClick={handleSendMessage}> Send Message </Button>
-          <Button onClick={handleAbsentClick} className="bg-red">
-            {" "}
-            Mark Absent{" "}
-          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
