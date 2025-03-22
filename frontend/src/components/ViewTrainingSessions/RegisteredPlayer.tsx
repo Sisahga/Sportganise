@@ -40,6 +40,13 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
         className="cursor-pointer"
       >
         <div className="flex my-2">
+          {accountAttendee.rank && (
+            <div className="mr-2 self-center flex items-center justify-center">
+              <Badge className="bg-secondaryColour text-white text-xs font-semibold">
+                {accountAttendee.rank}
+              </Badge>
+            </div>
+          )}
           <div className="mr-4 self-center">
             <Avatar>
               <AvatarImage src={accountDetails?.pictureUrl} />
