@@ -55,7 +55,6 @@ const TrainingSessionContent = () => {
     capacity: 0,
     occurrenceDate: new Date(),
     durationMins: 0,
-    recurring: false,
     expiryDate: new Date(),
     location: "",
     programAttachments: [],
@@ -63,6 +62,7 @@ const TrainingSessionContent = () => {
     visibility: "",
     author: "",
     cancelled: false,
+    reccurenceDate: new Date(),
   });
 
   useEffect(() => {
