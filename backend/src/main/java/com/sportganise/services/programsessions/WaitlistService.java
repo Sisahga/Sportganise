@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -39,265 +38,283 @@ public class WaitlistService {
   private final AccountRepository accountRepository;
   private final EmailService emailService;
   private final ProgramAttachmentRepository programAttachmentRepository;
-  
-    /**
-     * Constructor for WaitlistService.
-     *
-     * @param participantRepository Repository for managing program participants.
-     */
-    public WaitlistService(
-        ProgramParticipantRepository participantRepository,
-        ProgramRepository programRepository,
-        AccountRepository accountRepository,
-        EmailService emailService,
-        ProgramAttachmentRepository programAttachmentRepository) {
-      this.participantRepository = participantRepository;
-      this.programRepository = programRepository;
-      this.accountRepository = accountRepository;
-      this.emailService = emailService;
-      this.programAttachmentRepository = programAttachmentRepository;
+
+  /**
+   * Constructor for WaitlistService.
+   *
+   * @param participantRepository Repository for managing program participants.
+   */
+  public WaitlistService(
+      ProgramParticipantRepository participantRepository,
+      ProgramRepository programRepository,
+      AccountRepository accountRepository,
+      EmailService emailService,
+      ProgramAttachmentRepository programAttachmentRepository) {
+    this.participantRepository = participantRepository;
+    this.programRepository = programRepository;
+    this.accountRepository = accountRepository;
+    this.emailService = emailService;
+    this.programAttachmentRepository = programAttachmentRepository;
+  }
+
+  /**
+   * Fetchs a waitlisted participant.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A programParticipantDto.
+   * @throws ParticipantNotFoundException whenever participant can't be found
+   */
+  public ProgramParticipant getWaitlistedParticipant(Integer programId, Integer accountId) {
+    log.debug("opt-in participant (programId={}, accountId={})", programId, accountId);
+    log.debug("{}", programId);
+    ProgramParticipant participant =
+        participantRepository.findWaitlistParticipant(programId, accountId);
+    if (participant == null) {
+      log.error(
+          "Participant not found on waitlist for program={}, account={}", programId, accountId);
+      throw new ParticipantNotFoundException(
+          "Participant not found on waitlist for program: "
+              + programId
+              + ", account: "
+              + accountId);
     }
-  
-    /**
-     * Fetchs a waitlisted participant.
-     *
-     * @param programId The ID of the program.
-     * @param accountId The ID of the participant's account.
-     * @return A programParticipantDto.
-     * @throws ParticipantNotFoundException whenever participant can't be found
-     */
-    public ProgramParticipant getWaitlistedParticipant(Integer programId, Integer accountId) {
-      log.debug("opt-in participant (programId={}, accountId={})", programId, accountId);
-      log.debug("{}", programId);
-      ProgramParticipant participant =
-          participantRepository.findWaitlistParticipant(programId, accountId);
-      if (participant == null) {
-        log.error(
-            "Participant not found on waitlist for program={}, account={}", programId, accountId);
-        throw new ParticipantNotFoundException(
-            "Participant not found on waitlist for program: "
-                + programId
-                + ", account: "
-                + accountId);
-      }
-  
-      return participant;
+
+    return participant;
+  }
+
+  /**
+   * Fetches a confirmed program participant by their program ID and account ID.
+   *
+   * @param programId The ID of the program to search for (must not be null)
+   * @param accountId The ID of the account to search for (must not be null)
+   * @return If a confirmed participant is found, {@code null} if participant exists but is not
+   *     confirmed
+   * @throws ParticipantNotFoundException if no participant is found with the specified program ID
+   *     and account ID combination
+   * @throws IllegalArgumentException if either programId or accountId is null
+   */
+  public ProgramParticipantDto fetchParticipant(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
+
+    return new ProgramParticipantDto(programParticipant);
+  }
+
+  /**
+   * Adds a participant to the waitlist for a program and assigns them a rank.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return The rank assigned to the participant.
+   * @throws ParticipantNotFoundException whenever participant can't be found
+   */
+  public Integer optProgramParticipantDto(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+
+    Integer maxRank = participantRepository.findMaxRank(programId);
+    int newRank = (maxRank == null) ? 1 : maxRank + 1;
+
+    ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
+
+    if (optedParticipant.isConfirmed() == true || optedParticipant.getRank() != null) {
+      log.warn("Participant already confirmed");
+      return null;
     }
-  
-    /**
-     * Fetches a confirmed program participant by their program ID and account ID.
-     *
-     * @param programId The ID of the program to search for (must not be null)
-     * @param accountId The ID of the account to search for (must not be null)
-     * @return If a confirmed participant is found, {@code null} if participant exists but is not
-     *     confirmed
-     * @throws ParticipantNotFoundException if no participant is found with the specified program ID
-     *     and account ID combination
-     * @throws IllegalArgumentException if either programId or accountId is null
-     */
-    public ProgramParticipantDto fetchParticipant(Integer programId, Integer accountId)
-        throws ParticipantNotFoundException {
-      ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
-  
-      return new ProgramParticipantDto(programParticipant);
+
+    optedParticipant.setRank(newRank);
+
+    ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
+
+    // TODO: Notify everyone
+
+    return savedParticipant.getRank();
+  }
+
+  /**
+   * Confirms a participant's spot in a program, updating ranks of other participants.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the confirmed participant, or null if not found.
+   * @throws ParticipantNotFoundException whenever participant can't be found
+   */
+  public ProgramParticipantDto confirmParticipant(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+    log.info("Confirming participant's spot (programId={}, accountId={})", programId, accountId);
+    return removeParticipant(programId, accountId, true);
+  }
+
+  /**
+   * Removes a participant from the waitlist and updates ranks of other participants.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the opted-out participant, or null if not found.
+   * @throws ParticipantNotFoundException whenever participant can't be found
+   */
+  public ProgramParticipantDto optOutParticipant(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+    log.info(
+        "Opting out participant from waitlist (programId={}, accountId={})", programId, accountId);
+    return removeParticipant(programId, accountId, false);
+  }
+
+  /**
+   * Function used by optOut and confirmParticipant to refactor and clean code.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @param confirmParticipant boolean if true confirms the participant and sends them into the
+   *     program, if false removes them from the waitlist
+   * @return A DTO representing the opted-out participant, or null if not found.
+   * @throws ParticipantNotFoundException whenever participant can't be found
+   */
+  public ProgramParticipantDto removeParticipant(
+      Integer programId, Integer accountId, boolean confirmParticipant)
+      throws ParticipantNotFoundException {
+    log.debug(
+        "Participant removal/confirmation from waitlist (programId={}, accountId={}, confirm={})",
+        programId,
+        accountId);
+
+    ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
+
+    if (confirmParticipant) {
+      // Confirm participant
+      ZonedDateTime ldt = ZonedDateTime.now();
+      optedParticipant.setConfirmedDate(ldt);
+      optedParticipant.setConfirmed(true);
     }
-  
-    /**
-     * Adds a participant to the waitlist for a program and assigns them a rank.
-     *
-     * @param programId The ID of the program.
-     * @param accountId The ID of the participant's account.
-     * @return The rank assigned to the participant.
-     * @throws ParticipantNotFoundException whenever participant can't be found
-     */
-    public Integer optProgramParticipantDto(Integer programId, Integer accountId)
-        throws ParticipantNotFoundException {
-  
-      Integer maxRank = participantRepository.findMaxRank(programId);
-      int newRank = (maxRank == null) ? 1 : maxRank + 1;
-  
-      ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
-  
-      if (optedParticipant.isConfirmed() == true || optedParticipant.getRank() != null) {
-        log.warn("Participant already confirmed");
-        return null;
-      }
-  
-      optedParticipant.setRank(newRank);
-  
-      ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
-  
-      // TODO: Notify everyone
-  
-      return savedParticipant.getRank();
+
+    // Update the ranks of everyone
+    participantRepository.updateRanks(programId, optedParticipant.getRank());
+    optedParticipant.setRank(null);
+
+    ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
+    log.debug(
+        "Participant processed successfully (programId={}, accountId={})",
+        savedParticipant.getProgramId(),
+        savedParticipant.getAccountId());
+
+    return new ProgramParticipantDto(savedParticipant);
+  }
+
+  /**
+   * Retrieves a list of all participants currently opted into a program.
+   *
+   * @param programId The ID of the program.
+   * @return A list of DTOs representing the opted-in participants.
+   */
+  public List<ProgramParticipantDto> allOptedParticipants(Integer programId) {
+    List<ProgramParticipant> queue = participantRepository.findOptedParticipants(programId);
+
+    List<ProgramParticipantDto> queueDto =
+        queue.stream().map(pp -> new ProgramParticipantDto(pp)).collect(Collectors.toList());
+    log.debug("Found {} opted participants:{}", queueDto.size(), queueDto);
+    ;
+
+    return queueDto;
+  }
+
+  /**
+   * Marks a confirmed participant as absent and removes their confirmation.
+   *
+   * @param programId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the marked absent participant, or null if participant is not
+   *     confirmed.
+   * @throws ParticipantNotFoundException whenever participant can't be found.
+   */
+  public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
+      throws ParticipantNotFoundException {
+
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
+    log.info("Program Participant:", programParticipant);
+
+    if (programParticipant.isConfirmed() == false) {
+      return null;
     }
-  
-    /**
-     * Confirms a participant's spot in a program, updating ranks of other participants.
-     *
-     * @param programId The ID of the program.
-     * @param accountId The ID of the participant's account.
-     * @return A DTO representing the confirmed participant, or null if not found.
-     * @throws ParticipantNotFoundException whenever participant can't be found
-     */
-    public ProgramParticipantDto confirmParticipant(Integer programId, Integer accountId)
-        throws ParticipantNotFoundException {
-      log.info("Confirming participant's spot (programId={}, accountId={})", programId, accountId);
-      return removeParticipant(programId, accountId, true);
+
+    programParticipant.setConfirmed(false);
+    programParticipant.setConfirmedDate(null);
+
+    ProgramParticipant savedParticipant = participantRepository.save(programParticipant);
+    return new ProgramParticipantDto(savedParticipant);
+  }
+
+  /**
+   * Gets all programs that are open for waitlisted participants to join.
+   *
+   * @return A list of ProgramDto's containing the waitlisted .
+   * @throws ResourceNotFoundException whenever programs can't be found.
+   */
+  public List<ProgramDto> getWaitlistPrograms(Integer accountId) throws ResourceNotFoundException {
+
+    Account account =
+        this.accountRepository
+            .findById(accountId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Account not found with id " + accountId);
+                  return new AccountNotFoundException("Account not found with id " + accountId);
+                });
+
+    // TODO: Come back to this for the coach
+    if (account.getType() == AccountType.ADMIN) {
+      List<Program> programs = programRepository.findProgramByType(ProgramType.TRAINING.toString());
+
+      return programs.stream()
+          .filter(
+              program -> {
+                Integer confirmedCount =
+                    participantRepository.countConfirmedParticipants(program.getProgramId());
+                return confirmedCount < program.getCapacity();
+              })
+          .map(
+              program -> {
+                List<ProgramAttachmentDto> programAttachments =
+                    getProgramAttachments(program.getProgramId());
+                return new ProgramDto(program, programAttachments);
+              })
+          .collect(Collectors.toList());
+    } else {
+      List<ProgramParticipant> userParticipants = participantRepository.findByAccountId(accountId);
+      return userParticipants.stream()
+          .map(
+              pp ->
+                  programRepository
+                      .findById(pp.getProgramParticipantId().getProgramId())
+                      .orElse(null))
+          .distinct() // Remove duplicate programs if user is in multiple roles
+          .filter(
+              program -> {
+                long confirmedCount =
+                    participantRepository.countConfirmedParticipants(program.getProgramId());
+                return confirmedCount < program.getCapacity();
+              })
+          .map(
+              program -> {
+                List<ProgramAttachmentDto> programAttachments =
+                    getProgramAttachments(program.getProgramId());
+                return new ProgramDto(program, programAttachments);
+              })
+          .collect(Collectors.toList());
     }
-  
-    /**
-     * Removes a participant from the waitlist and updates ranks of other participants.
-     *
-     * @param programId The ID of the program.
-     * @param accountId The ID of the participant's account.
-     * @return A DTO representing the opted-out participant, or null if not found.
-     * @throws ParticipantNotFoundException whenever participant can't be found
-     */
-    public ProgramParticipantDto optOutParticipant(Integer programId, Integer accountId)
-        throws ParticipantNotFoundException {
-      log.info(
-          "Opting out participant from waitlist (programId={}, accountId={})", programId, accountId);
-      return removeParticipant(programId, accountId, false);
-    }
-  
-    /**
-     * Function used by optOut and confirmParticipant to refactor and clean code.
-     *
-     * @param programId The ID of the program.
-     * @param accountId The ID of the participant's account.
-     * @param confirmParticipant boolean if true confirms the participant and sends them into the
-     *     program, if false removes them from the waitlist
-     * @return A DTO representing the opted-out participant, or null if not found.
-     * @throws ParticipantNotFoundException whenever participant can't be found
-     */
-    public ProgramParticipantDto removeParticipant(
-        Integer programId, Integer accountId, boolean confirmParticipant)
-        throws ParticipantNotFoundException {
-      log.debug(
-          "Participant removal/confirmation from waitlist (programId={}, accountId={}, confirm={})",
-          programId,
-          accountId);
-  
-      ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
-  
-      if (confirmParticipant) {
-        // Confirm participant
-        ZonedDateTime ldt = ZonedDateTime.now();
-        optedParticipant.setConfirmedDate(ldt);
-        optedParticipant.setConfirmed(true);
-      }
-  
-      // Update the ranks of everyone
-      participantRepository.updateRanks(programId, optedParticipant.getRank());
-      optedParticipant.setRank(null);
-  
-      ProgramParticipant savedParticipant = participantRepository.save(optedParticipant);
-      log.debug(
-          "Participant processed successfully (programId={}, accountId={})",
-          savedParticipant.getProgramId(),
-          savedParticipant.getAccountId());
-  
-      return new ProgramParticipantDto(savedParticipant);
-    }
-  
-    /**
-     * Retrieves a list of all participants currently opted into a program.
-     *
-     * @param programId The ID of the program.
-     * @return A list of DTOs representing the opted-in participants.
-     */
-    public List<ProgramParticipantDto> allOptedParticipants(Integer programId) {
-      List<ProgramParticipant> queue = participantRepository.findOptedParticipants(programId);
-  
-      List<ProgramParticipantDto> queueDto =
-          queue.stream().map(pp -> new ProgramParticipantDto(pp)).collect(Collectors.toList());
-      log.debug("Found {} opted participants:{}", queueDto.size(), queueDto);
-      ;
-  
-      return queueDto;
-    }
-  
-    /**
-     * Marks a confirmed participant as absent and removes their confirmation.
-     *
-     * @param programId The ID of the program.
-     * @param accountId The ID of the participant's account.
-     * @return A DTO representing the marked absent participant, or null if participant is not
-     *     confirmed.
-     * @throws ParticipantNotFoundException whenever participant can't be found.
-     */
-    public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
-        throws ParticipantNotFoundException {
-  
-      ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
-      log.info("Program Participant:", programParticipant);
-  
-      if (programParticipant.isConfirmed() == false) {
-        return null;
-      }
-  
-      programParticipant.setConfirmed(false);
-      programParticipant.setConfirmedDate(null);
-  
-      ProgramParticipant savedParticipant = participantRepository.save(programParticipant);
-      return new ProgramParticipantDto(savedParticipant);
-    }
-  
-    /**
-     * Gets all programs that are open for waitlisted participants to join.
-     *
-     * @return A list of ProgramDto's containing the waitlisted .
-     * @throws ResourceNotFoundException whenever programs can't be found.
-     */
-    public List<ProgramDto> getWaitlistPrograms(Integer accountId) throws ResourceNotFoundException {
-  
-      Account account =
-          this.accountRepository
-              .findById(accountId)
-              .orElseThrow(
-                  () -> {
-                    log.warn("Account not found with id " + accountId);
-                    return new AccountNotFoundException("Account not found with id " + accountId);
-                  });
-  
-      // TODO: Come back to this for the coach
-      if (account.getType() == AccountType.ADMIN) {
-        List<Program> programs = programRepository.findProgramByType(ProgramType.TRAINING.toString());
-  
-        return programs.stream()
-        .filter(program -> {
-            Integer confirmedCount = participantRepository.countConfirmedParticipants(program.getProgramId());
-            return confirmedCount < program.getCapacity();
-        })
-        .map(program ->{
-          List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
-          return new ProgramDto(program, programAttachments);
-     })
-        .collect(Collectors.toList());
-      } else {
-        List<ProgramParticipant> userParticipants = participantRepository.findByAccountId(accountId);
-        return userParticipants.stream()
-        .map(pp -> programRepository.findById(pp.getProgramParticipantId().getProgramId()).orElse(null))
-        .distinct() // Remove duplicate programs if user is in multiple roles
-        .filter(program -> {
-            long confirmedCount = participantRepository.countConfirmedParticipants(program.getProgramId());
-            return confirmedCount < program.getCapacity();
-        })
-        .map(program -> {
-          List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
-          return new ProgramDto(program, programAttachments);
-        })
-        .collect(Collectors.toList());
-        }
-    }
-    
+  }
+
+  /**
+   * Method to get all the attachments uploaded to a specific program.
+   *
+   * @param programId Id of the program we want to fetch.
+   * @return a list of ProgramAttachmentDto related to the program.
+   */
   public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
-  
-      log.debug("PROGRAM ID: {}", programId);
-  
-      List<ProgramAttachment> programAttachments =
-          programAttachmentRepository.findAttachmentsByProgramId(programId);
+
+    log.debug("PROGRAM ID: {}", programId);
+
+    List<ProgramAttachment> programAttachments =
+        programAttachmentRepository.findAttachmentsByProgramId(programId);
 
     log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: ", programAttachments.size());
 
