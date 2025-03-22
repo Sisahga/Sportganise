@@ -45,8 +45,8 @@ const TrainingSessionCard: React.FC<Program> = ({
           </Avatar>
           <span>{programDetails?.author ?? "N/A"}</span>{" "}
           <span className="ml-auto text-xs">
-            {programDetails?.occurrenceDate
-              ? new Date(programDetails.occurrenceDate).toDateString()
+            {programDetails?.reccurenceDate
+              ? new Date(programDetails.reccurenceDate).toDateString()
               : "N/A"}
           </span>
         </div>
