@@ -19,14 +19,14 @@ import { useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AttendeeBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/AttendeeBadgeType";
 
-interface accountPopUpProps {
+interface AccountPopUpProps {
   accountId: number;
   isOpen: boolean;
   onClose: () => void;
   onAbsentMarked?: () => void;
 }
 
-const accountPopUp: React.FC<accountPopUpProps> = ({
+const AccountPopUp: React.FC<AccountPopUpProps> = ({
   accountId,
   isOpen,
   onClose,
@@ -155,4 +155,4 @@ const accountPopUp: React.FC<accountPopUpProps> = ({
   );
 };
 
-export default accountPopUp;
+export default AccountPopUp;
