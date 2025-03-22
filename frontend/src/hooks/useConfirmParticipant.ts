@@ -17,21 +17,19 @@ const useConfirmParticipant = () => {
         programId,
         accountId,
       );
-      
+
       setSuccessData(success);
       log.info("Participant confirmed successfully.");
       console.log("Participant information: ", success);
-      
     } catch (err: unknown) {
-      let errorMessage =
-                "An error occurred while marking participant absent.";
-              if (err instanceof Error) {
-                errorMessage = err.message;
-              } else if (typeof err === "string") {
-                errorMessage = err;
-              }
-              setError(errorMessage);
-              log.error("Error marking participant absent:", err);
+      let errorMessage = "An error occurred while marking participant absent.";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === "string") {
+        errorMessage = err;
+      }
+      setError(errorMessage);
+      log.error("Error marking participant absent:", err);
     } finally {
       setConfirming(false);
     }
