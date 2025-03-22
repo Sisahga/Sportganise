@@ -235,7 +235,7 @@ const ForumContent: React.FC = () => {
             <CardFooter className="flex space-x-2">
               <Button
                 variant="outline"
-                className={`flex items-center rounded-full ${post.liked ? "text-secondaryColour" : "text-primaryColour"}`}
+                className={`flex items-center rounded-lg ${post.liked ? "text-secondaryColour" : "text-primaryColour"}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleLike(post.postId);
@@ -247,7 +247,7 @@ const ForumContent: React.FC = () => {
 
               <Button
                 variant="outline"
-                className=" flex items-center rounded-full"
+                className=" flex items-center rounded-lg"
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(`/pages/PostDetailPage`, {
