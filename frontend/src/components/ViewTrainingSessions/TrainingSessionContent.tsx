@@ -63,15 +63,8 @@ const TrainingSessionContent = () => {
     frequency: "",
     visibility: "",
     author: "",
+    cancelled: false,
   });
-
-  useEffect(() => {
-    // Update state safely using useEffect
-    if (location.state && location.state.programDetails) {
-      setProgramDetails(location.state.programDetails);
-    }
-    log.info("Program details in training session content: ", programDetails);
-  }, [location.state]);
 
   const [attendees, setAttendees] = useState<Attendees[]>([]);
 
