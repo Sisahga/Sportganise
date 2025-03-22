@@ -70,7 +70,7 @@ const TrainingSessionContent = () => {
       try {
         const response = await trainingSessionApi.getPrograms(user?.accountId);
         const program = response.data?.find(
-          (p) => p.programDetails.programId === programId
+          (p) => p.programDetails.programId === programId,
         );
         if (program) {
           setProgramDetails(program.programDetails);
@@ -88,7 +88,6 @@ const TrainingSessionContent = () => {
     // Fetch fresh data when the component mounts
     fetchProgramData();
   }, [user, location.state?.programDetails?.programId]);
-  
 
   useEffect(() => {
     //TODO: define a useHook instead of all this code, who knows
@@ -115,22 +114,23 @@ const TrainingSessionContent = () => {
 
   const handleRefresh = async () => {
     const programs = await trainingSessionApi.getPrograms(user?.accountId);
-    if (programs.data){
-      const program = programs.data.find((p) => p.programDetails.programId === programDetails.programId)
+    if (programs.data) {
+      const program = programs.data.find(
+        (p) => p.programDetails.programId === programDetails.programId,
+      );
       if (program) {
-        console.log("Refreshed programs: ", programs)
-        setAttendees(program.attendees)
-        setProgramDetails(program.programDetails)
-        console.log("Refreshed attendees: ", program.attendees)
-        console.log("Refreshed programDetails: ", program.programDetails)
-      }
-      else console.log("No program found")
+        console.log("Refreshed programs: ", programs);
+        setAttendees(program.attendees);
+        setProgramDetails(program.programDetails);
+        console.log("Refreshed attendees: ", program.attendees);
+        console.log("Refreshed programDetails: ", program.programDetails);
+      } else console.log("No program found");
     }
-  }
+  };
 
   useEffect(() => {
     console.log("Updated attendees:", attendees);
-    console.log("Update programDetails: ", programDetails)
+    console.log("Update programDetails: ", programDetails);
   }, [attendees]);
 
   return (
@@ -292,7 +292,10 @@ const TrainingSessionContent = () => {
                   return attendee.participantType?.toLowerCase() ===
                     "subscribed" || attendee.confirmed ? (
                     <div key={index}>
-                      <RegisteredPlayer accountAttendee={attendee} onRefresh={handleRefresh} />
+                      <RegisteredPlayer
+                        accountAttendee={attendee}
+                        onRefresh={handleRefresh}
+                      />
                     </div>
                   ) : null;
                 })
@@ -310,37 +313,43 @@ const TrainingSessionContent = () => {
           (user?.type?.toLowerCase() === "general" ||
             user?.type?.toLowerCase() === "player") &&
           programDetails.programType.toLowerCase() === "training"
-        ) && 
-        attendees.some(attendee => attendee.rank !== null) && (
-          <>
-            <div className="flex items-center">
-              <h2 className="text-lg font-semibold">Waitlist Queue</h2>
-            </div>
-            <div className="mx-2">
-              {(() => {
-                // Filter and type cast to ensure rank exists
-                const waitlisted = attendees
-                  .filter((attendee): attendee is { rank: number } & typeof attendee => 
-                    attendee.rank !== null
-                  )
-                  .sort((a, b) => a.rank - b.rank);
-                
-                return waitlisted.length > 0 ? (
-                  waitlisted.map((attendee, index) => (
-                    <div key={index}>
-                      <RegisteredPlayer accountAttendee={attendee} onRefresh={handleRefresh} />
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-cyan-300 text-sm font-normal m-5 text-center">
-                    There are no waitlisted attendees.
-                  </p>
-                );
-              })()}
-            </div>
-          </>
-        )}
-        
+        ) &&
+          attendees.some((attendee) => attendee.rank !== null) && (
+            <>
+              <div className="flex items-center">
+                <h2 className="text-lg font-semibold">Waitlist Queue</h2>
+              </div>
+              <div className="mx-2">
+                {(() => {
+                  // Filter and type cast to ensure rank exists
+                  const waitlisted = attendees
+                    .filter(
+                      (
+                        attendee,
+                      ): attendee is { rank: number } & typeof attendee =>
+                        attendee.rank !== null,
+                    )
+                    .sort((a, b) => a.rank - b.rank);
+
+                  return waitlisted.length > 0 ? (
+                    waitlisted.map((attendee, index) => (
+                      <div key={index}>
+                        <RegisteredPlayer
+                          accountAttendee={attendee}
+                          onRefresh={handleRefresh}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                      There are no waitlisted attendees.
+                    </p>
+                  );
+                })()}
+              </div>
+            </>
+          )}
+
         {/**Conditionally render different menu options based on account type */}
         <DropDownMenuButton
           user={user}

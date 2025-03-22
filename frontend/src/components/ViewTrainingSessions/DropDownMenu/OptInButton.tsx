@@ -16,6 +16,7 @@ import log from "loglevel";
 import useOptInParticipant from "@/hooks/useOptInParticipant";
 import { createPortal } from "react-dom";
 
+/* eslint-disable react/prop-types */
 interface OptInButton {
   accountAttendee: Attendees | undefined;
   programId: number;
@@ -31,10 +32,13 @@ export const OptInButton: React.FC<OptInButton> = ({
 }) => {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const [isConfirmationVisible, setConfirmationVisible] = useState(false);
-  const {loading, error, data: rank, optIn } = useOptInParticipant();
+  const { loading, error, data: rank, optIn } = useOptInParticipant();
   // Only show the opt-in button if the attendee is of type "waitlist" and has a rank
-  const isWaitlisted = accountAttendee?.participantType?.toLowerCase() === "waitlisted" && accountAttendee?.rank === null && accountAttendee?.confirmed === false;
-  
+  const isWaitlisted =
+    accountAttendee?.participantType?.toLowerCase() === "waitlisted" &&
+    accountAttendee?.rank === null &&
+    accountAttendee?.confirmed === false;
+
   if (!isWaitlisted) {
     return null;
   }
@@ -44,22 +48,27 @@ export const OptInButton: React.FC<OptInButton> = ({
   };
 
   const handleOptInConfirmation = async () => {
-    try{
+    try {
       await optIn(programId, accountId);
       setDialogOpen(false);
-      setConfirmationVisible(true);  
+      setConfirmationVisible(true);
       setTimeout(() => {
-        setConfirmationVisible(false);  
+        setConfirmationVisible(false);
         onClose();
       }, 3000);
-    }catch(err) {
+    } catch (err) {
       log.error("Error during opt-out:", err);
     }
   };
 
   return (
     <>
-      <DropdownMenuItem onMouseDown={(e) => { e.preventDefault(); handleOptInClick(); }}>
+      <DropdownMenuItem
+        onMouseDown={(e) => {
+          e.preventDefault();
+          handleOptInClick();
+        }}
+      >
         <LogIn color="blue" />
         <span className="text-blue-500">Opt Into Waitlist</span>
       </DropdownMenuItem>
@@ -68,9 +77,7 @@ export const OptInButton: React.FC<OptInButton> = ({
       <AlertDialog open={isDialogOpen}>
         <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Join the waitlist?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Join the waitlist?</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to opt into the waitlist?
             </AlertDialogDescription>
@@ -80,7 +87,10 @@ export const OptInButton: React.FC<OptInButton> = ({
             <AlertDialogCancel onClick={() => setDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleOptInConfirmation} disabled={loading}>
+            <AlertDialogAction
+              onClick={handleOptInConfirmation}
+              disabled={loading}
+            >
               {loading ? "Preprocessing..." : "Confirm"}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -88,17 +98,18 @@ export const OptInButton: React.FC<OptInButton> = ({
       </AlertDialog>
 
       {/* Confirmation Message */}
-      {isConfirmationVisible && createPortal(
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-        <div className="bg-teal-500 text-white p-4 rounded-lg shadow-lg max-w-md w-full m-4">
-          <p className="text-center text-lg font-medium">
-            You have successfully opted into the waitlist.
-            {rank && <span> Your position is #{rank}.</span>}
-          </p>
-        </div>
-      </div>,
-      document.body
-      )}
+      {isConfirmationVisible &&
+        createPortal(
+          <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+            <div className="bg-teal-500 text-white p-4 rounded-lg shadow-lg max-w-md w-full m-4">
+              <p className="text-center text-lg font-medium">
+                You have successfully opted into the waitlist.
+                {rank && <span> Your position is #{rank}.</span>}
+              </p>
+            </div>
+          </div>,
+          document.body,
+        )}
     </>
   );
 };

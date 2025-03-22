@@ -13,12 +13,19 @@ export default function WaitlistTrainingSessionPage() {
 
   const handleSelectTraining = (program: Program) => {
     const fullProgram = programs.find(
-      (p) => p.programDetails.programId === program.programDetails.programId
+      (p) => p.programDetails.programId === program.programDetails.programId,
     );
     if (fullProgram) {
-      navigate("/pages/ViewTrainingSessionPage", { state: { programDetails: fullProgram.programDetails, attendees: fullProgram.attendees } });
+      navigate("/pages/ViewTrainingSessionPage", {
+        state: {
+          programDetails: fullProgram.programDetails,
+          attendees: fullProgram.attendees,
+        },
+      });
     } else {
-      navigate("/pages/ViewTrainingSessionPage", { state: { programDetails: program.programDetails, attendees: [] } });
+      navigate("/pages/ViewTrainingSessionPage", {
+        state: { programDetails: program.programDetails, attendees: [] },
+      });
     }
   };
 

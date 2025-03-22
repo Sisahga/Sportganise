@@ -59,21 +59,24 @@ const waitlistApi = {
     accountId: number,
   ): Promise<Attendees | null> => {
     try {
-      const response = await fetch(`${baseMappingUrl}/confirm-participant?programId=${programId}&accountId=${accountId}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: getBearerToken(),
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${baseMappingUrl}/confirm-participant?programId=${programId}&accountId=${accountId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: getBearerToken(),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ programId, accountId }),
         },
-        body: JSON.stringify({ programId, accountId }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to confirm participant: ${response.status}`);
       }
 
       const data = await response.json();
-      return data 
+      return data;
     } catch (error) {
       console.error("Error confirming participant:", error);
       return null;
@@ -85,14 +88,17 @@ const waitlistApi = {
     accountId: number,
   ): Promise<Attendees | null> => {
     try {
-      const response = await fetch(`${baseMappingUrl}/out-participant?programId=${programId}&accountId=${accountId}`, {
-        method: "PATCH",
-        headers: {
-          Authorization: getBearerToken(),
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${baseMappingUrl}/out-participant?programId=${programId}&accountId=${accountId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: getBearerToken(),
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ programId, accountId }),
         },
-        body: JSON.stringify({ programId, accountId }),
-      });
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to reject participant: ${response.status}`);

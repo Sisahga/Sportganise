@@ -82,10 +82,7 @@ const trainingSessionApi = {
     }
 
     log.info("trainingSessionApi.getPrograms:", response);
-    log.info(
-      "trainingSessionApi.getPrograms: ",
-      data,
-    );
+    log.info("trainingSessionApi.getPrograms: ", data);
     console.log("trainingSessionApi.getPrograms", response);
 
     return data;
