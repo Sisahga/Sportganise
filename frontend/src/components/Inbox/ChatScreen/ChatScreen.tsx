@@ -1,6 +1,13 @@
 import React, { type DragEvent, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { ChevronLeft, FolderOpen, Paperclip, Send, X } from "lucide-react";
+import {
+  ChevronLeft,
+  FolderOpen,
+  LoaderCircle,
+  Paperclip,
+  Send,
+  X,
+} from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
 import defaultAvatar from "../../../assets/defaultAvatar.png";
 import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
@@ -76,12 +83,18 @@ const ChatScreen: React.FC = () => {
   const [skeletonId, setSkeletonId] = useState<number>(0);
   const [skeletonCount, setSkeletonCount] = useState<number>(0);
   const [messageStatus, setMessageStatus] = useState<string>("Delivered");
+  const [disableFetching, setDisableFetching] = useState<boolean>(false);
 
   // Hooks.
-  const { messages, setMessages, loading, error } = useChatMessages(
-    channelId,
-    read,
-  ); // Fetch messages.
+  const {
+    messages,
+    setMessages,
+    loading,
+    error,
+    hasMoreMessages,
+    fetchMoreMessages,
+    loadingMore,
+  } = useChatMessages(channelId, read); // Fetch messages.
   const { sendDirectMessage } = useSendMessage();
   const { uploadAttachments } = useUploadAttachments();
   const {
@@ -95,6 +108,7 @@ const ChatScreen: React.FC = () => {
   const { sendNotification } = useSendNotification();
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -342,6 +356,7 @@ const ChatScreen: React.FC = () => {
     }
   };
 
+  // Connect to WebSocket
   useEffect(() => {
     if (!connected) {
       connectWebSocket().then(() => {
@@ -354,21 +369,67 @@ const ChatScreen: React.FC = () => {
     }
   }, [channelId]);
 
-  useEffect(() => {
-    log.debug("Messages fetched:", messages);
-    scrollChatScreenToBottom();
-  }, [messages]);
-
+  // Scroll to bottom once messages load.
   useEffect(() => {
     scrollChatScreenToBottom();
-  }, [attachments]);
+  }, [loading]);
 
+  // Check if there is a delete request active.
   useEffect(() => {
     if (deleteRequestActive && deleteRequest) {
-      log.info("Delete request active:", deleteRequest);
-      log.info("Current member status:", currentMemberStatus);
+      log.debug("Delete request active:", deleteRequest);
+      log.debug("Current member status:", currentMemberStatus);
     }
   }, [deleteRequestActive]);
+
+  // Intersection Observer for loading more messages.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !disableFetching &&
+          hasMoreMessages &&
+          !loadingMore
+        ) {
+          setDisableFetching(true);
+
+          const chatSection = chatScrollRef.current;
+
+          if (chatSection) {
+            const prevScrollHeight = chatSection.scrollHeight;
+            const prevScrollTop = chatSection.scrollTop;
+
+            try {
+              await fetchMoreMessages();
+              // Flicker-free animation.
+              requestAnimationFrame(() => {
+                chatSection.scrollTop =
+                  prevScrollTop + (chatSection.scrollHeight - prevScrollHeight);
+                setDisableFetching(false);
+              });
+            } catch (err) {
+              log.error("Error fetching more messages:", err);
+            }
+          }
+        }
+      },
+      {
+        threshold: 0.5,
+      },
+    );
+
+    const currentLoader = loadMoreRef.current;
+    if (currentLoader) {
+      observer.observe(currentLoader);
+    }
+
+    return () => {
+      if (currentLoader) {
+        observer.unobserve(currentLoader);
+      }
+    };
+  }, [fetchMoreMessages, hasMoreMessages, loadingMore, disableFetching]);
 
   if (loading) {
     return (
@@ -465,6 +526,11 @@ const ChatScreen: React.FC = () => {
 
       {/* Chat Messages */}
       <div ref={chatScrollRef} className="overflow-y-auto flex-1 mt-4 relative">
+        {hasMoreMessages && (
+          <div ref={loadMoreRef} className="w-full flex justify-center py-1">
+            {loadingMore && <LoaderCircle className="animate-spin h-6 w-6" />}
+          </div>
+        )}
         <ChatMessages
           messages={messages}
           currentUserId={currentUserId}
