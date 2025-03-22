@@ -23,6 +23,7 @@ public class ProgramDto {
   private String author;
   private Integer capacity;
   private ZonedDateTime occurrenceDate;
+  private ZonedDateTime reccurenceDate;
   private Integer durationMins;
   private ZonedDateTime expiryDate;
   private String frequency;
