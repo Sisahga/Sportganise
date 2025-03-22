@@ -40,6 +40,7 @@ import useSendNotification from "@/hooks/useSendNotification.ts";
 import { NotificationRequest } from "@/types/notifications.ts";
 import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
+import ChatScreenSkeleton from "@/components/Inbox/ChatScreen/ChatScreenSkeleton.tsx";
 
 log.setLevel("debug");
 
@@ -432,11 +433,7 @@ const ChatScreen: React.FC = () => {
   }, [fetchMoreMessages, hasMoreMessages, loadingMore, disableFetching]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
-      </div>
-    );
+    return <ChatScreenSkeleton />;
   }
 
   if (error) {
