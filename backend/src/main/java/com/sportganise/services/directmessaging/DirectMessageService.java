@@ -67,7 +67,6 @@ public class DirectMessageService {
 
       List<DirectMessage> messagesNoAttachments =
           directMessageRepository.getMessagesByChannelId(channelId, lastSentAt, messageLimit);
-      Collections.reverse(messagesNoAttachments);
       Map<Integer, MemberDetailsDto> memberDetails = getChannelMembersDetails(channelId);
       for (Map.Entry<Integer, MemberDetailsDto> entry : memberDetails.entrySet()) {
         Integer key = entry.getKey();
