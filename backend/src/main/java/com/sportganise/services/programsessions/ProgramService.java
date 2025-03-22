@@ -729,6 +729,7 @@ public class ProgramService {
       throw new ForbiddenException("This user does not have permission to delete the program.");
     }
     programRepository.deleteById(programId);
+    log.debug("DELETED PROGRAM WITH ID: {}", programId);
   }
 
   /**
