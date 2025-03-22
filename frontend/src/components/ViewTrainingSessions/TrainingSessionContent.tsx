@@ -30,6 +30,8 @@ import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
+import { WEEKLY } from "@/constants/programconstants";
+import { MONTHLY } from "@/constants/programconstants";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -46,6 +48,7 @@ const TrainingSessionContent = () => {
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
+    recurrenceId: 0,
     title: "",
     programType: "",
     description: "",
@@ -59,6 +62,7 @@ const TrainingSessionContent = () => {
     frequency: "",
     visibility: "",
     author: "",
+    cancelled: false,
   });
 
   useEffect(() => {
@@ -190,12 +194,16 @@ const TrainingSessionContent = () => {
               {programDetails?.frequency
                 ? programDetails?.frequency?.toLowerCase() || "one time"
                 : "N/A"}{" "}
-              on{" "}
-              {programDetails?.occurrenceDate
-                ? new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                    new Date(programDetails.occurrenceDate),
-                  )
-                : "N/A"}
+              {programDetails?.occurrenceDate &&
+                (programDetails?.frequency == WEEKLY ||
+                  programDetails?.frequency == MONTHLY) && (
+                  <>
+                    on{" "}
+                    {new Intl.DateTimeFormat("en-CA", {
+                      weekday: "long",
+                    }).format(new Date(programDetails.occurrenceDate))}
+                  </>
+                )}
             </p>
           </div>
           <div className="flex items-center gap-2">

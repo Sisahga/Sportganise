@@ -18,7 +18,6 @@ public class ProgramModifyRequestDto {
   private ProgramType type;
   private String startDate;
   private String endDate;
-  private Boolean recurring;
   private String visibility;
   private String description;
   private Integer capacity;
@@ -26,4 +25,5 @@ public class ProgramModifyRequestDto {
   private String endTime;
   private String location;
   @Nullable private List<String> attachmentsToRemove;
+  private String frequency;
 }
