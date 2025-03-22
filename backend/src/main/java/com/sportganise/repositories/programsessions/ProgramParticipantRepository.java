@@ -68,6 +68,16 @@ public interface ProgramParticipantRepository
       """)
   int countConfirmedParticipants(@Param("programId") Integer programId);
 
+  /**
+   * Finds all ProgramParticipant entities for a given account ID.
+   *
+   * @param accountId the account ID to search by.
+   * @return a list of ProgramParticipant entities associated with the given account.
+   */
+  @Query(
+      "SELECT pp FROM ProgramParticipant pp WHERE pp.programParticipantId.accountId = :accountId")
+  List<ProgramParticipant> findByAccountId(@Param("accountId") Integer accountId);
+
   @Query(
       """
       SELECT pp.programParticipantId.accountId
@@ -76,12 +86,4 @@ public interface ProgramParticipantRepository
       AND pp.type = 'Coach'
       """)
   Integer findCoachIdByProgramId(@Param("programId") Integer programId);
-      /**
-     * Finds all ProgramParticipant entities for a given account ID.
-     *
-     * @param accountId the account ID to search by.
-     * @return a list of ProgramParticipant entities associated with the given account.
-     */
-    @Query("SELECT pp FROM ProgramParticipant pp WHERE pp.programParticipantId.accountId = :accountId")
-    List<ProgramParticipant> findByAccountId(@Param("accountId") Integer accountId);
 }
