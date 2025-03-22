@@ -472,31 +472,30 @@ public class ProgramService {
           modifyAllRecurrencesStartTime(existingProgram.getProgramId(), LocalTime.parse(startTime));
         }
         if (existingProgram.getExpiryDate().isAfter(parsedEndDateTime)) {
-          log.debug(
-              "Deleting overflowing recurrences for program with a receding end date");
+          log.debug("Deleting overflowing recurrences for program with a receding end date");
           deleteOverflowingRecurrences(parsedEndDateTime, existingProgram.getProgramId());
         }
 
-        if (existingProgram.getFrequency().equalsIgnoreCase(frequency)&&existingProgram.getExpiryDate().isBefore(parsedEndDateTime)) {
-            log.debug(
-                "Modifying recurrences for program with same frequency and different end date");
+        if (existingProgram.getFrequency().equalsIgnoreCase(frequency)
+            && existingProgram.getExpiryDate().isBefore(parsedEndDateTime)) {
+          log.debug("Modifying recurrences for program with same frequency and different end date");
 
-            ZonedDateTime lastOccurrence =
-                getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
-            String usedFrequency = existingProgram.getFrequency();
-            ZonedDateTime newStartDate = getNextDateTime(lastOccurrence, usedFrequency);
-            createProgramRecurrences(
-                newStartDate, parsedEndDateTime, usedFrequency, existingProgram.getProgramId());
+          ZonedDateTime lastOccurrence =
+              getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
+          String usedFrequency = existingProgram.getFrequency();
+          ZonedDateTime newStartDate = getNextDateTime(lastOccurrence, usedFrequency);
+          createProgramRecurrences(
+              newStartDate, parsedEndDateTime, usedFrequency, existingProgram.getProgramId());
 
-        }else {
+        } else {
           log.debug(
-                  "Modifying recurrences for program with different frequency or receded start date");
+              "Modifying recurrences for program with different frequency or receded start date");
           modifyRecurrence(
-                  existingProgram.getProgramId(),
-                  parsedStartDateTime,
-                  parsedEndDateTime,
-                  existingProgram.getFrequency(),
-                  frequency);
+              existingProgram.getProgramId(),
+              parsedStartDateTime,
+              parsedEndDateTime,
+              existingProgram.getFrequency(),
+              frequency);
         }
       }
     } else if (newProgramIsRecurring) {
@@ -728,9 +727,9 @@ public class ProgramService {
         programRecurrenceRepository.findByProgramIdAndOccurrenceDateBetween(
             programId, newStartDate, newEndDate);
     Set<ZonedDateTime> existingOccurrenceDates =
-            existingRecurrences.stream()
-                    .map(ProgramRecurrence::getOccurrenceDate)
-                    .collect(Collectors.toSet());
+        existingRecurrences.stream()
+            .map(ProgramRecurrence::getOccurrenceDate)
+            .collect(Collectors.toSet());
     log.debug("EXISTING RECURRENCES COUNT: {}", existingRecurrences.size());
 
     while (currentOccurrence.isBefore(newEndDate) || currentOccurrence.isEqual(newEndDate)) {
@@ -748,7 +747,6 @@ public class ProgramService {
 
       deleteMiddleRecurrences(programId, currentOccurrence, nextOccurrence);
       currentOccurrence = nextOccurrence;
-
     }
   }
 
@@ -842,13 +840,15 @@ public class ProgramService {
       Integer programId, ZonedDateTime firstDate, ZonedDateTime secondDate) {
     ZonedDateTime effectiveStartDate = firstDate.plusMinutes(1);
     ZonedDateTime effectiveEndDate = secondDate.minusMinutes(1);
-    log.debug("recurrences before middle remove: {} ", programRecurrenceRepository.findProgramRecurrenceByProgramId(programId));
+    log.debug(
+        "recurrences before middle remove: {} ",
+        programRecurrenceRepository.findProgramRecurrenceByProgramId(programId));
     if (!effectiveStartDate.isAfter(effectiveEndDate)) {
       programRecurrenceRepository.deleteMiddleRecurrences(programId, firstDate, secondDate);
     }
-    log.debug("recurrences after middle remove: {} ", programRecurrenceRepository.findProgramRecurrenceByProgramId(programId));
-
-
+    log.debug(
+        "recurrences after middle remove: {} ",
+        programRecurrenceRepository.findProgramRecurrenceByProgramId(programId));
   }
 
   public void deletePrecedingRecurrences(Integer programId, ZonedDateTime firstDate) {
