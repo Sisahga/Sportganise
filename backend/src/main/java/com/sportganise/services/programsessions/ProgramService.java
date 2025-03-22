@@ -431,11 +431,6 @@ public class ProgramService {
 
     log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: {}", existingProgram.getProgramId());
 
-    boolean existingProgramIsRecurring =
-        existingProgram.getFrequency() != null
-            && !existingProgram.getFrequency().equalsIgnoreCase("once");
-    boolean newProgramIsRecurring = frequency != null && !frequency.equalsIgnoreCase("once");
-
     LocalTime existingProgramStartTime = existingProgram.getOccurrenceDate().toLocalTime();
 
     log.debug("Modifying recurrences for recurring programs");
@@ -444,6 +439,9 @@ public class ProgramService {
 
     ZonedDateTime parsedEndDateTime;
 
+
+    boolean newProgramIsRecurring = frequency != null && !frequency.equalsIgnoreCase("once");
+
     if (endDate == null && newProgramIsRecurring) {
       throw new ProgramModificationException("End date is required for recurring programs.");
     } else if (newProgramIsRecurring) {
@@ -451,6 +449,10 @@ public class ProgramService {
     } else {
       parsedEndDateTime = null;
     }
+
+    boolean existingProgramIsRecurring =
+            existingProgram.getFrequency() != null
+                    && !existingProgram.getFrequency().equalsIgnoreCase("once");
 
     log.debug("DEBUG:Parsed start date time: {}", parsedStartDateTime);
     log.debug("DEBUG:Parsed end date time: {}", parsedEndDateTime);
