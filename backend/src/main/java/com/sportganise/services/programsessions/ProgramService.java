@@ -36,6 +36,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -92,7 +93,7 @@ public class ProgramService {
     List<ProgramParticipant> participants =
         programRepository.findParticipantsByProgramId(programId);
 
-    log.debug("PARTICIPANTS COUNT: ", participants.size());
+    log.debug("PARTICIPANTS COUNT: {} ", participants.size());
 
     return participants.stream()
         .map(
@@ -107,7 +108,7 @@ public class ProgramService {
 
               Account account = accountOptional.get();
 
-              log.debug("ACCOUNT ID: ", account.getFirstName(), " ", account.getLastName());
+              log.debug("ACCOUNT ID: {} {}", account.getFirstName(), account.getLastName());
 
               return new ProgramParticipantDto(
                   account.getAccountId(),
@@ -129,11 +130,11 @@ public class ProgramService {
   public ProgramDto getProgramDetails(Integer programId) {
     Program program = programRepository.findProgramById(programId);
 
-    log.debug("PROGRAM ID: ", program.getProgramId());
+    log.debug("PROGRAM ID: {} ", program.getProgramId());
 
     List<ProgramAttachmentDto> programAttachments = getProgramAttachments(programId);
 
-    log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
+    log.debug("PROGRAM ATTACHMENTS COUNT: {} ", programAttachments.size());
 
     return new ProgramDto(
         program.getProgramId(),
@@ -166,7 +167,7 @@ public class ProgramService {
     List<ProgramAttachment> programAttachments =
         programAttachmentRepository.findAttachmentsByProgramId(programId);
 
-    log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: ", programAttachments.size());
+    log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: {}", programAttachments.size());
 
     List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
 
@@ -177,7 +178,7 @@ public class ProgramService {
               attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
     }
 
-    log.debug("PROGRAM ATTACHMENTS DTOS COUNT: ", programAttachmentDtos.size());
+    log.debug("PROGRAM ATTACHMENTS DTOS COUNT: {} ", programAttachmentDtos.size());
 
     return programAttachmentDtos;
   }
@@ -282,7 +283,7 @@ public class ProgramService {
               List<ProgramParticipantDto> participants =
                   hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
 
-              log.debug("PROGRAM PARTICIPANTS COUNT: ", participants.size());
+              log.debug("PROGRAM PARTICIPANTS COUNT: {}", participants.size());
 
               return new ProgramDetailsParticipantsDto(programDto, participants);
             })
@@ -346,7 +347,7 @@ public class ProgramService {
             location,
             frequency);
 
-    log.debug("NEW PROGRAM ID: ", savedProgram.getProgramId());
+    log.debug("NEW PROGRAM ID:{} ", savedProgram.getProgramId());
 
     postService.createNewPost(
         accountId,
@@ -428,47 +429,80 @@ public class ProgramService {
                     new EntityNotFoundException(
                         "Program not found with ID: " + programDtoToModify.getProgramId()));
 
-    log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: ", existingProgram.getProgramId());
+    log.debug("PROGRAM ID OF EXISTING PROGRAM TO BE MODIFIED: {}", existingProgram.getProgramId());
 
     boolean existingProgramIsRecurring =
-        (existingProgram.getFrequency() == null
-                || existingProgram.getFrequency().equalsIgnoreCase("once"))
-            ? false
-            : true;
-    boolean newProgramIsRecurring =
-        (frequency == null || frequency.equalsIgnoreCase("once")) ? false : true;
+        existingProgram.getFrequency() != null
+            && !existingProgram.getFrequency().equalsIgnoreCase("once");
+    boolean newProgramIsRecurring = frequency != null && !frequency.equalsIgnoreCase("once");
+
+    LocalTime existingProgramStartTime = existingProgram.getOccurrenceDate().toLocalTime();
+
     log.debug("Modifying recurrences for recurring programs");
     ZonedDateTime parsedStartDateTime =
         ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
 
+    ZonedDateTime parsedEndDateTime;
+
+    if (endDate == null && newProgramIsRecurring) {
+      throw new ProgramModificationException("End date is required for recurring programs.");
+    } else if (newProgramIsRecurring) {
+      parsedEndDateTime = ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime));
+    } else {
+      parsedEndDateTime = null;
+    }
+
+    log.debug("DEBUG:Parsed start date time: {}", parsedStartDateTime);
+    log.debug("DEBUG:Parsed end date time: {}", parsedEndDateTime);
+
     if (existingProgramIsRecurring) {
-      if (endDate == null) {
-        throw new ProgramModificationException("End date is required for recurring programs.");
-      }
-      ZonedDateTime parsedEndDateTime = ZonedDateTime.parse(endDate).with(LocalTime.parse(endTime));
+      log.debug("Existing program is recurring");
       if (!newProgramIsRecurring) {
+        log.debug("Deleting all recurrences for program: {}", existingProgram.getProgramId());
         deleteAllRecurrences(existingProgram.getProgramId());
-      } else if (!existingProgram.getFrequency().equalsIgnoreCase(frequency)
-          || !(existingProgram.getOccurrenceDate().isEqual(parsedStartDateTime))) {
-        modifyRecurrenceWithDrasticChanges(
-            existingProgram.getProgramId(), parsedStartDateTime, parsedEndDateTime, frequency);
-      } else if (existingProgram.getFrequency().equalsIgnoreCase(frequency)) {
+      } else {
 
-        if (existingProgram.getExpiryDate().isBefore(parsedEndDateTime)) {
+        if (parsedStartDateTime.isAfter(existingProgram.getOccurrenceDate())) {
+          log.debug(
+              "Modifying recurrences for program with same frequency and different start time");
+          deletePrecedingRecurrences(existingProgram.getProgramId(), parsedStartDateTime);
+        }
+        if (!(LocalTime.parse(startTime)).equals(existingProgramStartTime)) {
+          log.debug("Modifying recurrences all start time");
+          modifyAllRecurrencesStartTime(existingProgram.getProgramId(), LocalTime.parse(startTime));
+        }
+        if (existingProgram.getExpiryDate().isAfter(parsedEndDateTime)) {
+          log.debug(
+              "Deleting overflowing recurrences for program with a receding end date");
+          deleteOverflowingRecurrences(parsedEndDateTime, existingProgram.getProgramId());
+        }
 
-          ZonedDateTime lastOccurrence =
-              getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
-          ZonedDateTime newExpiryDate = parsedEndDateTime;
-          String usedFrequency = existingProgram.getFrequency();
-          ZonedDateTime newStartDate = getNextDateTime(lastOccurrence, usedFrequency);
-          createProgramRecurrences(
-              newStartDate, newExpiryDate, usedFrequency, existingProgram.getProgramId());
-        } else if (existingProgram.getExpiryDate().isAfter(parsedEndDateTime)) {
-          deleteExpiredRecurrences(parsedEndDateTime, existingProgram.getProgramId());
-        } else {
-          throw new ProgramModificationException(("An error occurred while handling recurrences"));
+        if (existingProgram.getFrequency().equalsIgnoreCase(frequency)&&existingProgram.getExpiryDate().isBefore(parsedEndDateTime)) {
+            log.debug(
+                "Modifying recurrences for program with same frequency and different end date");
+
+            ZonedDateTime lastOccurrence =
+                getLastProgramRecurrence(existingProgram.getProgramId()).getOccurrenceDate();
+            String usedFrequency = existingProgram.getFrequency();
+            ZonedDateTime newStartDate = getNextDateTime(lastOccurrence, usedFrequency);
+            createProgramRecurrences(
+                newStartDate, parsedEndDateTime, usedFrequency, existingProgram.getProgramId());
+
+        }else {
+          log.debug(
+                  "Modifying recurrences for program with different frequency or receded start date");
+          modifyRecurrence(
+                  existingProgram.getProgramId(),
+                  parsedStartDateTime,
+                  parsedEndDateTime,
+                  existingProgram.getFrequency(),
+                  frequency);
         }
       }
+    } else if (newProgramIsRecurring) {
+      log.debug("Creating recurrences for new recurring program");
+      createProgramRecurrences(
+          parsedStartDateTime, parsedEndDateTime, frequency, existingProgram.getProgramId());
     }
 
     existingProgram.setTitle(title);
@@ -484,7 +518,7 @@ public class ProgramService {
 
     programRepository.save(existingProgram);
 
-    log.debug("PROGRAM ID OF MODIFIED PROGRAM: ", existingProgram.getProgramId());
+    log.debug("PROGRAM ID OF MODIFIED PROGRAM: {} ", existingProgram.getProgramId());
 
     if (attachmentsToRemove != null) {
       if (!attachmentsToRemove.isEmpty()) {
@@ -516,7 +550,7 @@ public class ProgramService {
               new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
           programAttachmentRepository.saveAll(programAttachments);
         }
-        log.debug("PROGRAM ATTACHMENTS COUNT: ", programAttachments.size());
+        log.debug("PROGRAM ATTACHMENTS COUNT: {} ", programAttachments.size());
       }
     }
     return new ProgramDto(existingProgram, programAttachmentDtos);
@@ -553,13 +587,13 @@ public class ProgramService {
       String location,
       String frequency) {
     ZonedDateTime occurrenceDate = ZonedDateTime.parse(startDate).with(LocalTime.parse(startTime));
-    log.debug("occurrenceDate: ", occurrenceDate);
+    log.debug("occurrenceDate: {}", occurrenceDate);
 
     int durationMins =
         (int)
             java.time.Duration.between(LocalTime.parse(startTime), LocalTime.parse(endTime))
                 .toMinutes();
-    log.debug("durationMins: ", durationMins);
+    log.debug("durationMins: {} ", durationMins);
 
     ZonedDateTime expiryDate = null;
     Program program;
@@ -668,8 +702,8 @@ public class ProgramService {
    *
    * @param programId Id of the program to be deleted.
    */
-  public void deleteExpiredRecurrences(ZonedDateTime expiryDate, Integer programId) {
-    programRecurrenceRepository.deleteExpiredRecurrences(expiryDate, programId);
+  public void deleteOverflowingRecurrences(ZonedDateTime expiryDate, Integer programId) {
+    programRecurrenceRepository.deleteOverflowingRecurrences(expiryDate, programId);
   }
 
   /**
@@ -681,10 +715,11 @@ public class ProgramService {
    * @param newEndDate End date of the last occurrence.
    * @param newFrequency Frequency of the program.
    */
-  public void modifyRecurrenceWithDrasticChanges(
+  public void modifyRecurrence(
       Integer programId,
       ZonedDateTime newStartDate,
       ZonedDateTime newEndDate,
+      String previousFrequency,
       String newFrequency) {
     ZonedDateTime currentOccurrence = newStartDate;
     ZonedDateTime nextOccurrence;
@@ -692,31 +727,33 @@ public class ProgramService {
     List<ProgramRecurrence> existingRecurrences =
         programRecurrenceRepository.findByProgramIdAndOccurrenceDateBetween(
             programId, newStartDate, newEndDate);
+    Set<ZonedDateTime> existingOccurrenceDates =
+            existingRecurrences.stream()
+                    .map(ProgramRecurrence::getOccurrenceDate)
+                    .collect(Collectors.toSet());
+    log.debug("EXISTING RECURRENCES COUNT: {}", existingRecurrences.size());
 
     while (currentOccurrence.isBefore(newEndDate) || currentOccurrence.isEqual(newEndDate)) {
       nextOccurrence = getNextDateTime(currentOccurrence, newFrequency);
 
-      ZonedDateTime currentOccurrenceForComparison = currentOccurrence;
-
-      boolean exists =
-          existingRecurrences.stream()
-              .anyMatch(
-                  recurrence ->
-                      recurrence.getOccurrenceDate().equals(currentOccurrenceForComparison));
+      boolean exists = existingOccurrenceDates.contains(currentOccurrence);
 
       if (!exists) {
+        log.debug("CREATING NEW RECURRENCE: {} ", currentOccurrence);
         ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
         programRecurrenceRepository.save(recurrence);
+      } else {
+        log.debug("FOUND EXISTING RECURRENCE: {} ", currentOccurrence);
       }
 
       deleteMiddleRecurrences(programId, currentOccurrence, nextOccurrence);
-
       currentOccurrence = nextOccurrence;
+
     }
   }
 
   /**
-   * Method to create a list of ProgramRecurrence objects for a recurring program.
+   * Method to create a list of ProgramRecurrence objects for a recurring program. g
    *
    * @param programId Id of the program.
    * @return A list of ProgramRecurrence objects.
@@ -803,11 +840,22 @@ public class ProgramService {
    */
   public void deleteMiddleRecurrences(
       Integer programId, ZonedDateTime firstDate, ZonedDateTime secondDate) {
-    ZonedDateTime effectiveStartDate = firstDate.plusDays(1);
-    ZonedDateTime effectiveEndDate = secondDate.minusDays(1);
-    if (effectiveStartDate.isBefore(effectiveEndDate)) {
-      programRecurrenceRepository.deleteMiddleRecurrences(
-          programId, effectiveStartDate, effectiveEndDate);
+    ZonedDateTime effectiveStartDate = firstDate.plusMinutes(1);
+    ZonedDateTime effectiveEndDate = secondDate.minusMinutes(1);
+    log.debug("recurrences before middle remove: {} ", programRecurrenceRepository.findProgramRecurrenceByProgramId(programId));
+    if (!effectiveStartDate.isAfter(effectiveEndDate)) {
+      programRecurrenceRepository.deleteMiddleRecurrences(programId, firstDate, secondDate);
     }
+    log.debug("recurrences after middle remove: {} ", programRecurrenceRepository.findProgramRecurrenceByProgramId(programId));
+
+
+  }
+
+  public void deletePrecedingRecurrences(Integer programId, ZonedDateTime firstDate) {
+    programRecurrenceRepository.deletePrecedingRecurrences(programId, firstDate);
+  }
+
+  public void modifyAllRecurrencesStartTime(Integer programId, LocalTime newStartTime) {
+    programRecurrenceRepository.updateRecurrenceStartTime(programId, newStartTime);
   }
 }
