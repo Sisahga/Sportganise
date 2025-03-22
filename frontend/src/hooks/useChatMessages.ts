@@ -52,7 +52,7 @@ function useChatMessages(channelId: number, read: boolean) {
     try {
       setLoadingMore(true);
       console.log("Fetching more messages...");
-      let response = await directMessagingApi.getDirectMessages(
+      const response = await directMessagingApi.getDirectMessages(
         channelId,
         lastSentAt,
       );
