@@ -161,7 +161,6 @@ export default function ModifyTrainingSessionForm() {
     capacity: 0,
     occurrenceDate: new Date(),
     durationMins: 0,
-    recurring: false, // TODO: GET RID OF RECURRING AND REPLACE FOR NEW CHANGES MADE FOR FREQUENCY
     expiryDate: new Date(),
     location: "",
     programAttachments: [],
@@ -169,6 +168,7 @@ export default function ModifyTrainingSessionForm() {
     visibility: "",
     author: "",
     cancelled: false,
+    reccurenceDate: new Date(),
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
 
