@@ -93,6 +93,7 @@ INSERT INTO program_participants (program_id, account_id, type, is_confirmed, co
 (1, 3, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
 (1, 4, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
 (1, 5, 'Waitlisted', FALSE, null),
+(1, 6, 'Waitlisted', FALSE, null),
 (1,2, 'Coach', FALSE, null);
 
 
