@@ -140,11 +140,11 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
     }
   };
 
-  const {rejectParticipant} = useRejectParticipant();
+  const { rejectParticipant } = useRejectParticipant();
   // New function to handle the opt out action.
   const handleOptOutClick = async () => {
     try {
-      await rejectParticipant(programId, accountId)
+      await rejectParticipant(programId, accountId);
       console.log("Participant opted out");
       // Add additional opt out logic here if needed.
       if (onRefresh) onRefresh();
@@ -199,7 +199,7 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
               </div>
               <Button onClick={handleSendMessage}>Send Message</Button>
             </div>
-            
+
             {/* Second row - Confirm and Opt Out buttons if applicable */}
             {!accountAttendee.confirmed && accountAttendee.rank !== null && (
               <div className="flex space-x-2">
