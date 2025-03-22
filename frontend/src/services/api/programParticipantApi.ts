@@ -87,10 +87,7 @@ const programParticipantApi = {
     return data;
   },
 
-  optIn: async (
-    programId: number, 
-    accountId: number | undefined,
-  ) => {
+  optIn: async (programId: number, accountId: number | undefined) => {
     const url = `${baseMappingUrl}/opt-participant?programId=${programId}&accountId=${accountId}`;
     const response = await fetch(url, {
       method: "PATCH",
@@ -114,9 +111,7 @@ const programParticipantApi = {
     return data;
   },
 
-  waitlistPrograms: async (
-    accountId: number,
-  ) => {
+  waitlistPrograms: async (accountId: number) => {
     const url = `${baseMappingUrl}/waitlist-programs?accountId=${accountId}`;
     const response = await fetch(url, {
       method: "GET",
@@ -135,10 +130,10 @@ const programParticipantApi = {
       throw new Error(`HTTP error ${response.status}: ${errorText}`);
     }
 
-    const data: ProgramDetails[]= await response.json();
+    const data: ProgramDetails[] = await response.json();
     console.log("Heres the data:", data);
     return data;
-  }
+  },
 };
 
 export default programParticipantApi;

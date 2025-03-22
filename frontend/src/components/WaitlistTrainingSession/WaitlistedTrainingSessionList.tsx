@@ -13,7 +13,12 @@ interface WaitlistedTrainingSessionListProps {
 export default function WaitlistedTrainingSessionList({
   onSelectTraining,
 }: WaitlistedTrainingSessionListProps) {
-  const { data: waitlistData, error, loading, waitlistPrograms } = useWaitlistPrograms();
+  const {
+    data: waitlistData,
+    error,
+    loading,
+    waitlistPrograms,
+  } = useWaitlistPrograms();
   const [user, setUser] = useState<CookiesDto>();
 
   // Run only once on component mount
@@ -31,15 +36,16 @@ export default function WaitlistedTrainingSessionList({
 
   useEffect(() => {
     if (waitlistData) {
-      console.log("Waitlist Programs Data inside waitlistTrainingPage:", waitlistData);
+      console.log(
+        "Waitlist Programs Data inside waitlistTrainingPage:",
+        waitlistData,
+      );
     }
   }, [waitlistData]);
 
   if (error) {
     return (
-      <p className="text-red text-center">
-        Error loading waitlist programs
-      </p>
+      <p className="text-red text-center">Error loading waitlist programs</p>
     );
   }
 

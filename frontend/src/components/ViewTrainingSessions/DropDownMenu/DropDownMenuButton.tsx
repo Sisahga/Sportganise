@@ -134,7 +134,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       setAbsentDialogOpen(false);
       setNotificationVisible(true);
       if (onRefresh) onRefresh();
-      console.log("Updated account?: ", accountAttendee)
+      console.log("Updated account?: ", accountAttendee);
       setTimeout(() => {
         setNotificationVisible(false);
       }, 3000);
@@ -143,7 +143,6 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     }
   };
 
-  
   return (
     <div>
       <DropdownMenu open={isDropdownOpen} onOpenChange={setDropdownOpen}>
@@ -188,37 +187,38 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <span className="text-green-500">RSVP</span>
               </DropdownMenuItem>
               {/* Here instead I want to check if a player is of role waitlisted */}
-              {(accountAttendee?.confirmed === true) && (
+              {accountAttendee?.confirmed === true && (
                 <DropdownMenuItem onSelect={handleAbsentClick}>
                   <LogOut color="red" />
                   <span className="text-red"> Mark absent </span>
                 </DropdownMenuItem>
               )}
-               {accountAttendee?.participantType?.toLowerCase() === "waitlisted" &&
-              accountAttendee?.rank === null && !isOptedIn && (
-                <OptInButton
+              {accountAttendee?.participantType?.toLowerCase() ===
+                "waitlisted" &&
+                accountAttendee?.rank === null &&
+                !isOptedIn && (
+                  <OptInButton
+                    accountAttendee={accountAttendee}
+                    programId={programDetails.programId}
+                    accountId={user?.accountId}
+                    onClose={() => {
+                      setDropdownOpen(false);
+                      setIsOptedIn(true);
+                    }}
+                  />
+                )}
+
+              {/* Opt-out button */}
+              {accountAttendee?.rank !== null && (
+                <OptOutButton
                   accountAttendee={accountAttendee}
                   programId={programDetails.programId}
                   accountId={user?.accountId}
                   onClose={() => {
                     setDropdownOpen(false);
-                    setIsOptedIn(true);
-                  }
-                  }
+                  }}
                 />
               )}
-
-              {/* Opt-out button */}
-  {accountAttendee?.rank !== null && (
-    <OptOutButton
-      accountAttendee={accountAttendee}
-      programId={programDetails.programId}
-      accountId={user?.accountId}
-      onClose={() => {
-        setDropdownOpen(false);
-      }}
-    />
-  )}
             </DropdownMenuGroup>
           )}
         </DropdownMenuContent>

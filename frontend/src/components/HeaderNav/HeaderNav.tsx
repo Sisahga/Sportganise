@@ -14,7 +14,6 @@ import { clearCookies } from "@/services/cookiesService";
 import { CookiesDto } from "@/types/auth";
 import useWaitlistPrograms from "@/hooks/useWaitlistPrograms";
 
-
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
@@ -28,7 +27,7 @@ export default function HeaderNav() {
   }, [accountType]);
   const navigate = useNavigate();
 
-  const {data: waitlistData, waitlistPrograms} = useWaitlistPrograms();
+  const { data: waitlistData, waitlistPrograms } = useWaitlistPrograms();
   useEffect(() => {
     if (user?.accountId) {
       waitlistPrograms(user.accountId);
@@ -40,7 +39,6 @@ export default function HeaderNav() {
       console.log("Waitlist Programs Data:", waitlistData);
     }
   }, [waitlistData]);
-
 
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const closeDrawer = () => {
@@ -125,11 +123,11 @@ export default function HeaderNav() {
               )}
               {waitlistData && waitlistData.length > 0 && (
                 <Link
-                to="/pages/WaitlistTrainingSessionPage"
-                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
-              >
-                Waitlist
-              </Link>
+                  to="/pages/WaitlistTrainingSessionPage"
+                  className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                >
+                  Waitlist
+                </Link>
               )}
               <Link
                 to="/pages/NotificationSettingsPage"
