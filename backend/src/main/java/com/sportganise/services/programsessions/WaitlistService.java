@@ -278,22 +278,18 @@ public class WaitlistService {
       } else {
         List<ProgramParticipant> userParticipants = participantRepository.findByAccountId(accountId);
         return userParticipants.stream()
-            .filter(pp -> {
-                Program program = programRepository.findById(pp.getProgramParticipantId().getProgramId())
-                    .orElse(null);
-                return program != null 
-                    && program.getProgramType().equals(ProgramType.TRAINING) 
-                    && !pp.isConfirmed()
-                    && pp.getType().equals("Waitlisted");
-            })
-            .map(pp -> {
-                Program program = programRepository.findById(pp.getProgramParticipantId().getProgramId())
-                    .orElse(null);
-                    // TODO: Revisit the programAttachment
-                return new ProgramDto(program, null);
-            })
-            .collect(Collectors.toList());
-    }
+        .map(pp -> programRepository.findById(pp.getProgramParticipantId().getProgramId()).orElse(null))
+        .distinct() // Remove duplicate programs if user is in multiple roles
+        .filter(program -> {
+            long confirmedCount = participantRepository.countConfirmedParticipants(program.getProgramId());
+            return confirmedCount < program.getCapacity();
+        })
+        .map(program -> {
+          List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
+          return new ProgramDto(program, programAttachments);
+        })
+        .collect(Collectors.toList());
+        }
     }
     
   public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
