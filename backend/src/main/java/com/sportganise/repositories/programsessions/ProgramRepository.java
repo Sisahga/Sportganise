@@ -2,8 +2,6 @@ package com.sportganise.repositories.programsessions;
 
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
-import jakarta.transaction.Transactional;
-
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -36,25 +34,8 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
       """)
   List<ProgramParticipant> findParticipantsByProgramId(@Param("programId") Integer programId);
 
-  @Transactional
-  @Modifying
   @Query(
-      """
-          UPDATE Program p
-          SET p.cancelled = true
-          WHERE p.programId = :programId
-          """)
-  void cancelProgram(Integer programId);
-
-  @Transactional
-  @Modifying
-  @Query(
-      """
-            UPDATE Program p
-            SET p.cancelled = false
-            WHERE p.programId = :programId
-            """)
-  void uncancelProgram(Integer programId);
-  @Query(value = "SELECT * FROM program WHERE type = CAST(:programType AS program_type)", nativeQuery = true)
-    List<Program> findProgramByType(@Param("programType") String programType);
+      value = "SELECT * FROM program WHERE type = CAST(:programType AS program_type)",
+      nativeQuery = true)
+  List<Program> findProgramByType(@Param("programType") String programType);
 }
