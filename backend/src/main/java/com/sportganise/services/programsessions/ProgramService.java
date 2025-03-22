@@ -439,7 +439,6 @@ public class ProgramService {
 
     ZonedDateTime parsedEndDateTime;
 
-
     boolean newProgramIsRecurring = frequency != null && !frequency.equalsIgnoreCase("once");
 
     if (endDate == null && newProgramIsRecurring) {
@@ -451,8 +450,8 @@ public class ProgramService {
     }
 
     boolean existingProgramIsRecurring =
-            existingProgram.getFrequency() != null
-                    && !existingProgram.getFrequency().equalsIgnoreCase("once");
+        existingProgram.getFrequency() != null
+            && !existingProgram.getFrequency().equalsIgnoreCase("once");
 
     log.debug("DEBUG:Parsed start date time: {}", parsedStartDateTime);
     log.debug("DEBUG:Parsed end date time: {}", parsedEndDateTime);
