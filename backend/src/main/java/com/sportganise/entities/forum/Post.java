@@ -56,4 +56,21 @@ public class Post {
     this.title = title;
     this.description = description;
   }
+
+  /** Constructor for Post for when new program is created. */
+  public Post(
+      Integer accountId,
+      String title,
+      String description,
+      String metadata,
+      PostType type,
+      ZonedDateTime occurrenceDate) {
+    this.accountId = accountId;
+    this.title = title;
+    this.description = description;
+    this.metadata = metadata;
+    this.type = type;
+    this.occurrenceDate = occurrenceDate;
+    this.creationDate = ZonedDateTime.now(); // Optional: set creation date when creating new posts
+  }
 }

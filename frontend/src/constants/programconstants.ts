@@ -10,7 +10,13 @@ export const COLLEGE_DE_MAISONNEUVE = "Collège-de-Maisonnneuve";
 export const TEST_WATER_ROAD = "123 test water rd.";
 export const MAIN_STREET = "123 Main St";
 
-// Program Visbilities Constant
+// Program Visbilities Constants
 export const PUBLIC = "public";
 export const MEMBERS_ONLY = "members";
 export const PRIVATE = "private";
+
+// Program Frequencies Constants
+export const DAILY = "DAILY";
+export const WEEKLY = "WEEKLY";
+export const MONTHLY = "MONTHLY";
+export const ONCE = "ONCE";

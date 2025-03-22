@@ -7,6 +7,7 @@ import com.sportganise.entities.forum.Likes;
 import com.sportganise.entities.forum.LikesCompositeKey;
 import com.sportganise.entities.forum.Post;
 import com.sportganise.entities.forum.PostType;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.forum.LikesRepository;
@@ -187,6 +188,35 @@ public class PostService {
     likesRepository.deleteByPostIdAndAccountId(postId, accountId);
   }
 
+  /**
+   * Method to create new post when a new program is created.
+   *
+   * @param accountId Id of account.
+   * @param title Title of the post which is the same as the program's.
+   * @param description Description of the post which is the same as the program's.
+   * @param occurrenceDate Occurrence Date of the program.
+   * @param programtype Type of program. Enum.
+   * @param programId Id of the program.
+   */
+  public void createNewPost(
+      Integer accountId,
+      String title,
+      String description,
+      ZonedDateTime occurrenceDate,
+      ProgramType programtype,
+      Integer programId) {
+    PostType postType = programTypeToPostType(programtype);
+
+    log.debug("POST TYPE: {}", postType);
+
+    String metadata = String.format("{\"programID\":%d}", programId);
+
+    Post newPost = new Post(accountId, title, description, metadata, postType, occurrenceDate);
+
+    int rowsInserted = postRepository.insertPost(newPost);
+    log.debug("POST CREATED WITH ROWS INSERTED: {}", rowsInserted);
+  }
+
   private boolean likedPost(Integer postId, Integer accountId) {
     return likesRepository.findByPostIdAndAccountId(postId, accountId) != null;
   }
@@ -241,5 +271,26 @@ public class PostService {
   private ZonedDateTime getYesterday() {
     log.debug("Fetching date yesterday");
     return ZonedDateTime.now().minusDays(1);
+  }
+
+  /**
+   * Helper method to convert a programType enum to a PostType enum value.
+   *
+   * @param programtype Type of program. Enum.
+   * @return Corresponding PostType.
+   */
+  private PostType programTypeToPostType(ProgramType programtype) {
+    switch (programtype) {
+      case TRAINING:
+        return PostType.TRAINING;
+      case SPECIALTRAINING:
+        return PostType.SPECIAL;
+      case FUNDRAISER:
+        return PostType.FUNDRAISER;
+      case TOURNAMENT:
+        return PostType.TOURNAMENT;
+      default:
+        throw new ResourceNotFoundException("Unsupported ProgramType: " + programtype);
+    }
   }
 }

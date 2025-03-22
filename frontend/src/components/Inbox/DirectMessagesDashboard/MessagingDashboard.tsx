@@ -8,6 +8,10 @@ import log from "loglevel";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import {
+  GroupSkeleton,
+  MessageSkeleton,
+} from "@/components/Inbox/DirectMessagesDashboard/MessagingDashboardSkeletons.tsx";
 
 function DirectMessagesDashboard() {
   const cookies = getCookies();
@@ -34,6 +38,7 @@ function DirectMessagesDashboard() {
           setUnreadChannelCount((prev) => prev + 1);
         }
       });
+      setLoading(false);
     } catch (err) {
       log.error("Error fetching chat messages:", err);
       setError("Failed to load messages.");
@@ -41,7 +46,7 @@ function DirectMessagesDashboard() {
   };
 
   useEffect(() => {
-    fetchChannels().then(() => setLoading(false));
+    fetchChannels().then((r) => r);
   }, []);
 
   useEffect(() => {
@@ -53,8 +58,17 @@ function DirectMessagesDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
+      <div className="flex mx-auto flex-col sm:w-3/4 lg:w-3/5 gap-6 relative overflow-y-scroll pt-10 min-h-screen">
+        <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
+          <div className="space-y-1">
+            <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+              Messages
+            </h2>
+            <p className="text-fadedPrimaryColour text-center mx-auto h-5 pt-2 rounded-md w-32 animate-skeleton"></p>
+          </div>
+        </div>
+        <GroupSkeleton />
+        <MessageSkeleton />
       </div>
     );
   }
@@ -68,10 +82,7 @@ function DirectMessagesDashboard() {
   }
 
   return (
-    <div
-      className="flex flex-col lg:mx-24 gap-6 pt-12 relative overflow-y-scroll"
-      style={{ maxHeight: "calc(100vh - 192px)" }}
-    >
+    <div className="flex mx-auto flex-col sm:w-3/4 lg:w-3/5 gap-6 relative overflow-y-scroll pt-10 min-h-screen">
       <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
         <div className="space-y-1">
           <h2 className="font-semibold text-3xl text-secondaryColour text-center">

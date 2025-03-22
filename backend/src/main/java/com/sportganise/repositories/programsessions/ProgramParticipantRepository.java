@@ -77,4 +77,12 @@ public interface ProgramParticipantRepository
   @Query(
       "SELECT pp FROM ProgramParticipant pp WHERE pp.programParticipantId.accountId = :accountId")
   List<ProgramParticipant> findByAccountId(@Param("accountId") Integer accountId);
+  @Query(
+      """
+      SELECT pp.programParticipantId.accountId
+      FROM ProgramParticipant pp
+      WHERE pp.programParticipantId.programId = :programId
+      AND pp.type = 'Coach'
+      """)
+  Integer findCoachIdByProgramId(@Param("programId") Integer programId);
 }

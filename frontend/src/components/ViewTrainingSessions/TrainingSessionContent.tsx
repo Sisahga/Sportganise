@@ -31,6 +31,8 @@ import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
+import { WEEKLY } from "@/constants/programconstants";
+import { MONTHLY } from "@/constants/programconstants";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -47,6 +49,7 @@ const TrainingSessionContent = () => {
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
+    recurrenceId: 0,
     title: "",
     programType: "",
     description: "",
@@ -61,6 +64,14 @@ const TrainingSessionContent = () => {
     visibility: "",
     author: "",
   });
+
+  useEffect(() => {
+    // Update state safely using useEffect
+    if (location.state && location.state.programDetails) {
+      setProgramDetails(location.state.programDetails);
+    }
+    log.info("Program details in training session content: ", programDetails);
+  }, [location.state]);
 
   const [attendees, setAttendees] = useState<Attendees[]>([]);
 
@@ -147,9 +158,11 @@ const TrainingSessionContent = () => {
         </Avatar>
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-secondaryColour">
-            {programDetails.title}
+            {programDetails?.title ?? "N/A"}
           </h2>
-          <EventBadgeType programType={programDetails.programType} />
+          {programDetails?.programType && (
+            <EventBadgeType programType={programDetails.programType} />
+          )}
         </div>
       </div>
 
@@ -163,9 +176,11 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {new Date(programDetails.occurrenceDate).toDateString()}
+              {programDetails?.occurrenceDate
+                ? new Date(programDetails.occurrenceDate).toDateString()
+                : "N/A"}
             </p>
-            {programDetails.expiryDate ? (
+            {programDetails?.expiryDate ? (
               <div className="flex items-center gap-2">
                 <hr className="w-1 h-px border-0 bg-gray-500 " />
                 <p className="text-sm text-gray-500">
@@ -183,17 +198,21 @@ const TrainingSessionContent = () => {
             />
             <span className="flex items-center">
               <p className="text-sm text-gray-500">
-                {new Date(programDetails.occurrenceDate).toLocaleTimeString(
-                  "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
-                )}
+                {programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
+                      "en-CA",
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                    )
+                  : "N/A"}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-sm text-gray-500">
-                {calculateEndTime(
-                  new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
-                )}
+                {programDetails.occurrenceDate && programDetails.durationMins
+                  ? calculateEndTime(
+                      new Date(programDetails.occurrenceDate),
+                      programDetails.durationMins,
+                    )
+                  : "N/A"}
               </p>
             </span>
           </div>
@@ -203,7 +222,7 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails.durationMins} min
+              {programDetails?.durationMins ?? "N/A"} min
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -212,10 +231,19 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails.frequency || "one time"} on{" "}
-              {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                new Date(programDetails.occurrenceDate),
-              )}
+              {programDetails?.frequency
+                ? programDetails?.frequency?.toLowerCase() || "one time"
+                : "N/A"}{" "}
+              {programDetails?.occurrenceDate &&
+                (programDetails?.frequency == WEEKLY ||
+                  programDetails?.frequency == MONTHLY) && (
+                  <>
+                    on{" "}
+                    {new Intl.DateTimeFormat("en-CA", {
+                      weekday: "long",
+                    }).format(new Date(programDetails.occurrenceDate))}
+                  </>
+                )}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -223,53 +251,64 @@ const TrainingSessionContent = () => {
               size={15}
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
-            <p className="text-sm text-gray-500">{programDetails.author}</p>
+            <p className="text-sm text-gray-500">
+              {programDetails?.author ?? "N/A"}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <MapPin
               size={15}
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
-            <p className="text-sm text-gray-500">{programDetails.location}</p>
+            <p className="text-sm text-gray-500">
+              {programDetails?.location ?? "N/A"}
+            </p>
           </div>
         </div>
 
         {/**Information */}
         <div className="my-10">
           <h2 className="text-lg font-semibold my-2">Information</h2>
-          <div className="mx-2">
-            <p className="text-sm my-2 text-gray-500">
-              {programDetails.description}
-            </p>
-            <div className="grid gap-2">
-              {programDetails.programAttachments.map((attachment, index) => (
-                <div
-                  key={index}
-                  className="flex items-center border-[1px] rounded-md p-2"
-                >
-                  <FileText
-                    size={15}
-                    color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-                    className="w-8 pr-2"
-                  />
-                  <div className="overflow-x-scroll">
-                    <a
-                      className="text-sm text-gray-500 hover:text-cyan-300"
-                      href={attachment.attachmentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                    >
-                      {getFileName(attachment.attachmentUrl)}
-                    </a>
+          {programDetails?.description || programDetails?.programAttachments ? (
+            <div className="mx-2">
+              <p className="text-sm my-2 text-gray-500">
+                {programDetails?.description}
+              </p>
+              <div className="grid gap-2">
+                {programDetails.programAttachments.map((attachment, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center border-[1px] rounded-md p-2"
+                  >
+                    <FileText
+                      size={15}
+                      color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                      className="w-8 pr-2"
+                    />
+                    <div className="overflow-x-scroll">
+                      <a
+                        className="text-sm text-gray-500 hover:text-cyan-300"
+                        href={attachment.attachmentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                      >
+                        {getFileName(attachment.attachmentUrl)}
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <p className="text-gray-500 text-sm font-normal m-5 text-center">
+              No information given
+            </p>
+          )}
         </div>
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
+        {/**Can render attendees list to Players or General when program type us not training session*/}
         {!(
           (user?.type?.toLowerCase() === "general" ||
             user?.type?.toLowerCase() === "player") &&

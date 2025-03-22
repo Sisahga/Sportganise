@@ -16,14 +16,15 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProgramDto {
   private Integer programId;
+  private Integer recurrenceId = null;
   private ProgramType programType;
   private String title;
   private String description;
   private String author;
   private Integer capacity;
   private ZonedDateTime occurrenceDate;
+  private ZonedDateTime reccurenceDate;
   private Integer durationMins;
-  private boolean isRecurring;
   private ZonedDateTime expiryDate;
   private String frequency;
   private String location;
@@ -45,7 +46,6 @@ public class ProgramDto {
     this.capacity = program.getCapacity();
     this.occurrenceDate = program.getOccurrenceDate();
     this.durationMins = program.getDurationMins();
-    this.isRecurring = program.isRecurring();
     this.expiryDate = program.getExpiryDate();
     this.frequency = program.getFrequency();
     this.location = program.getLocation();
