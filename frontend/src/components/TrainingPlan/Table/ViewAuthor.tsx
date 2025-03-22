@@ -10,7 +10,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User2Icon } from "lucide-react";
 // Log
 import log from "loglevel";
-import AccountPopUp from "./accountPopUp";
+import AccountPopUp from "./AccountPopUp";
 
 // Display Author Personal Details in Table Row
 interface ViewAuthorProps {
