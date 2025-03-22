@@ -78,7 +78,6 @@ const AccountPopUp: React.FC<AccountPopUpProps> = ({
   };
   log.debug("Rendering ParticipantPopUp");
 
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto p-6 rounded-lg">
