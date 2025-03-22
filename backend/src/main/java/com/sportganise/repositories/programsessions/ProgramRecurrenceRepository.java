@@ -2,6 +2,7 @@ package com.sportganise.repositories.programsessions;
 
 import com.sportganise.entities.programsessions.ProgramRecurrence;
 import jakarta.transaction.Transactional;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,9 +30,9 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
       """
                  DELETE FROM ProgramRecurrence pr
                  WHERE pr.programId = :programId
-                 AND pr.occurrenceDate <= :expiryDate
+                 AND pr.occurrenceDate > :expiryDate
                  """)
-  void deleteExpiredRecurrences(
+  void deleteOverflowingRecurrences(
       @Param("expiryDate") ZonedDateTime expiryDate, @Param("programId") Integer programId);
 
   /**
@@ -82,7 +83,7 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
       """
              DELETE FROM ProgramRecurrence pr
              WHERE pr.programId = :programId
-             AND pr.occurrenceDate BETWEEN :firstDate AND :secondDate
+             AND pr.occurrenceDate >:firstDate AND pr.occurrenceDate< :secondDate
                     """)
   void deleteMiddleRecurrences(
       @Param("programId") Integer programId,
@@ -99,4 +100,25 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
    */
   List<ProgramRecurrence> findByProgramIdAndOccurrenceDateBetween(
       Integer programId, ZonedDateTime newStartDate, ZonedDateTime newEndDate);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+                 DELETE FROM ProgramRecurrence pr
+                 WHERE pr.programId = :programId
+                 AND pr.occurrenceDate < :firstDate
+                 """)
+  void deletePrecedingRecurrences(Integer programId, ZonedDateTime firstDate);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+       UPDATE ProgramRecurrence pr
+       SET pr.occurrenceDate =
+           FUNCTION('TIMESTAMP', FUNCTION('DATE', pr.occurrenceDate), :newStartTime)
+       WHERE pr.programId = :programId
+       """)
+  void updateRecurrenceStartTime(Integer programId, LocalTime newStartTime);
 }
