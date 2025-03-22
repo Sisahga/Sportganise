@@ -136,8 +136,8 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails?.occurrenceDate
-                ? new Date(programDetails.occurrenceDate).toDateString()
+              {programDetails?.reccurenceDate
+                ? new Date(programDetails.reccurenceDate).toDateString()
                 : "N/A"}
             </p>
             {programDetails?.expiryDate ? (
