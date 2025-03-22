@@ -144,6 +144,7 @@ public class ProgramService {
         program.getAuthor(),
         program.getCapacity(),
         program.getOccurrenceDate(),
+        null,
         program.getDurationMins(),
         program.getExpiryDate(),
         program.getFrequency(),
@@ -214,6 +215,7 @@ public class ProgramService {
         log.debug("PROGRAM RECURRENCES COUNT: {}", recurrences.size());
         for (ProgramRecurrence recurrence : recurrences) {
           log.debug("FETCHING RECURRENCE: {} ", recurrence.getRecurrenceId());
+          System.out.println("Program id: " + programId);
           programDtos.add(
               new ProgramDto(
                   programId,
@@ -223,6 +225,7 @@ public class ProgramService {
                   description,
                   author,
                   capacity,
+                  occurrenceDate,
                   recurrence.getOccurrenceDate(),
                   durationMins,
                   expiryDate,
@@ -242,16 +245,22 @@ public class ProgramService {
                 author,
                 capacity,
                 occurrenceDate,
+                null,
                 durationMins,
                 expiryDate,
                 frequency,
                 location,
                 visibility,
                 programAttachments));
+        System.out.println("Program id: " + programId);
       }
     }
 
     log.debug("PROGRAM DTOS COUNT: {}", programDtos.size());
+
+    for (ProgramDto programDto : programDtos) {
+      System.out.println("Program id: " + programDto.getProgramId());
+    }
 
     return programDtos;
   }
