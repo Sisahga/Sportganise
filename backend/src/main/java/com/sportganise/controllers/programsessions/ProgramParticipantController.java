@@ -1,4 +1,4 @@
-    package com.sportganise.controllers.programsessions;
+package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.ResponseDto;
 import com.sportganise.dto.programsessions.ProgramDto;
