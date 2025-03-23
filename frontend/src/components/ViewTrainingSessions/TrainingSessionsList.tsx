@@ -182,6 +182,33 @@ export default function TrainingSessionsList({
             </p>
           </div>
 
+          <Sheet>
+            <SheetTrigger asChild>
+              <button className="ml-auto bg-transparent">
+                <Filter color="rgb(130 219 216 / var(--tw-text-opacity, 1))" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom">
+              <SheetHeader>
+                <SheetTitle>Filter Programs</SheetTitle>
+                <SheetDescription>Select to filter programs.</SheetDescription>
+              </SheetHeader>
+              <p className="font-semibold my-3">Filter by date</p>
+              <div className="flex overflow-auto my-5">
+                <DateRangePicker
+                  editableDateInputs={true}
+                  onChange={handleDateChange} //  Ensures state is updated
+                  moveRangeOnFirstSelection={false}
+                  ranges={dateRange} //  Uses updated `dateRange`
+                />
+              </div>
+              <div className="flex flex-col gap-1 my-4">
+                <p className="font-semibold mb-3">Filter by type</p>
+                {programTypes.map((type, index) => (
+                  <label
+                    key={index}
+                    className="font-medium flex gap-2 items-center"
+
           {/**Filters */}
           <Drawer direction="bottom">
             <DrawerTrigger asChild>
