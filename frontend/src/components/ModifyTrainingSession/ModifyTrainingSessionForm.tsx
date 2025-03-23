@@ -70,6 +70,8 @@ import { ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
+import { NotificationRequest } from "@/types/notifications";
+import useSendNotification from "@/hooks/useSendNotification";
 
 /**All select element options */
 const types = [
@@ -151,7 +153,7 @@ export default function ModifyTrainingSessionForm() {
   );
   const [loading, setLoading] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
-  const [, /* attendees */ setAttendees] = useState<Attendees[]>([]); // For US305+
+  const [attendees, setAttendees] = useState<Attendees[]>([]); // For US305+
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
     recurrenceId: 0,
@@ -171,6 +173,7 @@ export default function ModifyTrainingSessionForm() {
     reccurenceDate: new Date(),
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
+  const { sendNotification } = useSendNotification();
 
   useEffect(() => {
     const user = getCookies();
@@ -328,6 +331,17 @@ export default function ModifyTrainingSessionForm() {
         title: "Form updated successfully ✔",
         description: "Program was updated in your calendar.",
       });
+
+      // If successful, notify attendees of changes
+      const attendeeIds: Array<number> = attendees.map((a) => a.accountId);
+      console.warn("attendeeIds", attendeeIds);
+      const modifyNotif: NotificationRequest = {
+        title: `Changes made to ${programDetails.title ?? "your"} program.`,
+        body: "Open the app to view new changes.",
+        topic: null,
+        recipients: attendeeIds,
+      };
+      await sendNotification(modifyNotif);
 
       // If successful, navigate back to calendar page
       navigate("/pages/CalendarPage");
