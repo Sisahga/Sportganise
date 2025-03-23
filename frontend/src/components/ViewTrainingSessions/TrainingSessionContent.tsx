@@ -17,8 +17,9 @@ import {
   FileText,
   Hourglass,
   Repeat,
+  User2Icon,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
@@ -30,7 +31,7 @@ import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
-import { WEEKLY } from "@/constants/programconstants";
+import { ONCE, WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
 
 const TrainingSessionContent = () => {
@@ -55,7 +56,6 @@ const TrainingSessionContent = () => {
     capacity: 0,
     occurrenceDate: new Date(),
     durationMins: 0,
-    recurring: false,
     expiryDate: new Date(),
     location: "",
     programAttachments: [],
@@ -63,6 +63,7 @@ const TrainingSessionContent = () => {
     visibility: "",
     author: "",
     cancelled: false,
+    reccurenceDate: new Date(),
   });
 
   useEffect(() => {
@@ -113,8 +114,9 @@ const TrainingSessionContent = () => {
       <div className="flex items-center gap-3 my-5">
         <Avatar className="w-16 h-16">
           <AvatarFallback className="bg-primaryColour">
-            <img src="/src/assets/Logo.png" alt="organisation" />
+            <User2Icon color="#a1a1aa" />
           </AvatarFallback>
+          <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
         </Avatar>
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-secondaryColour">
@@ -136,9 +138,12 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails?.occurrenceDate
-                ? new Date(programDetails.occurrenceDate).toDateString()
-                : "N/A"}
+              {programDetails?.reccurenceDate &&
+              programDetails?.frequency !== ONCE
+                ? new Date(programDetails.reccurenceDate).toDateString()
+                : programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toDateString()
+                  : "N/A"}
             </p>
             {programDetails?.expiryDate ? (
               <div className="flex items-center gap-2">

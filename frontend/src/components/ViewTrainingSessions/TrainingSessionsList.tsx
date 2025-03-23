@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect } from "react";
-import { DateRangePicker } from "react-date-range";
+import { DateRange } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import TrainingSessionCard from "./TrainingSessionCard";
@@ -9,17 +9,19 @@ import usePrograms from "@/hooks/usePrograms";
 import { Program } from "@/types/trainingSessionDetails";
 import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-  SheetFooter,
-} from "@/components/ui/sheet";
+  Drawer,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from "@/components/ui/drawer";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Filter, Loader2 } from "lucide-react";
+import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
 
 export default function TrainingSessionsList({
@@ -123,7 +125,11 @@ export default function TrainingSessionsList({
 
   // Filter Programs by Date Range
   const filteredPrograms: Program[] = programs.filter((program) => {
-    const programDate = new Date(program.programDetails.occurrenceDate);
+    const programDate = new Date(
+      program.programDetails.reccurenceDate
+        ? program.programDetails.reccurenceDate
+        : program.programDetails.occurrenceDate,
+    );
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
     const dateFilter =
       programDate >= dateRange[0].startDate &&
@@ -175,6 +181,7 @@ export default function TrainingSessionsList({
               {dateRange[0].endDate.toLocaleDateString()}
             </p>
           </div>
+
           <Sheet>
             <SheetTrigger asChild>
               <button className="ml-auto bg-transparent">
@@ -201,28 +208,86 @@ export default function TrainingSessionsList({
                   <label
                     key={index}
                     className="font-medium flex gap-2 items-center"
+
+          {/**Filters */}
+          <Drawer direction="bottom">
+            <DrawerTrigger asChild>
+              <Button variant="outline" className="w-6 ml-auto">
+                <Filter className="text-secondaryColour w-3 h-3" />
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader className="flex flex-col items-center text-center relative">
+                {/* Close button*/}
+                <DrawerClose asChild>
+                  <Button
+                    variant="ghost"
+                    className="text-fadedPrimaryColour rounded-full absolute top-5 left-4 w-2"
                   >
-                    <Checkbox
-                      checked={selectedProgramType.includes(type)}
-                      onCheckedChange={(checked) => {
-                        setSelectedProgramType((prev) =>
-                          checked
-                            ? [...prev, type]
-                            : prev.filter((t) => t !== type),
-                        );
-                      }}
-                    />
-                    {type}
-                  </label>
-                ))}
-              </div>
-              <SheetFooter>
-                <Button variant="outline" onClick={handleCancel}>
-                  Cancel
-                </Button>
-              </SheetFooter>
-            </SheetContent>
-          </Sheet>
+                    <X></X>
+                  </Button>
+                </DrawerClose>
+                <DrawerTitle>Filter Options</DrawerTitle>
+                <DrawerDescription>
+                  Customize your program filters
+                </DrawerDescription>
+              </DrawerHeader>
+
+              <Separator className="border border-secondaryColour" />
+
+              <ScrollArea className="h-[80vh]">
+                <div className="px-6 mb-2 mt-8 flex flex-col">
+                  {/**Filter by date range */}
+                  <div className="space-y-4">
+                    <h3 className="text-base font-semibold text-center">
+                      Filter by date
+                    </h3>
+                    <div className="overflow-auto my-3 flex justify-center items-center">
+                      <DateRange
+                        editableDateInputs={true}
+                        onChange={(item: any) => setDateRange([item.selection])}
+                        moveRangeOnFirstSelection={false}
+                        ranges={dateRange}
+                      />
+                    </div>
+                  </div>
+                  <Separator />
+                  {/**Filter by program type */}
+                  <div className="flex flex-col gap-1 mt-6">
+                    <h3 className="text-base font-semibold mb-2 text-center">
+                      Filter by type
+                    </h3>
+                    {programTypes.map((type, index) => (
+                      <label
+                        key={index}
+                        className="text-sm flex gap-2 items-center"
+                      >
+                        <Checkbox
+                          checked={selectedProgramType.includes(type)}
+                          onCheckedChange={(checked) => {
+                            setSelectedProgramType((prev) =>
+                              checked
+                                ? [...prev, type]
+                                : prev.filter((t) => t !== type),
+                            );
+                          }}
+                        />
+                        {type}
+                      </label>
+                    ))}
+                  </div>
+                  {/**Cancel filters button */}
+                  <Button
+                    className="px-12 mt-8 mb-8"
+                    variant="outline"
+                    onClick={handleCancel}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </ScrollArea>
+            </DrawerContent>
+          </Drawer>
         </span>
         {error ? (
           <p className="text-red text-center my-5">Error loading programs</p>
@@ -238,8 +303,16 @@ export default function TrainingSessionsList({
           filteredPrograms
             .sort(
               (a, b) =>
-                new Date(a.programDetails.occurrenceDate).getTime() -
-                new Date(b.programDetails.occurrenceDate).getTime(),
+                new Date(
+                  a.programDetails.reccurenceDate
+                    ? a.programDetails.reccurenceDate
+                    : a.programDetails.occurrenceDate,
+                ).getTime() -
+                new Date(
+                  b.programDetails.reccurenceDate
+                    ? b.programDetails.reccurenceDate
+                    : b.programDetails.occurrenceDate,
+                ).getTime(),
             )
             .map((program, index) => (
               <div key={index} className="my-5">

@@ -185,7 +185,6 @@ export default function CreateTrainingSessionForm() {
         startDate: values.startDate.toISOString(),
         endDate: values.endDate?.toISOString() ?? null,
         frequency: values.frequency,
-        //recurring: values.recurring.toString(),
         visibility: values.visibility,
         description: values.description,
         capacity: values.capacity.toString(),

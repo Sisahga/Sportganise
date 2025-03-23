@@ -4,8 +4,8 @@ import log from "loglevel";
 // Component imports
 import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Hourglass } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Hourglass, User2Icon } from "lucide-react";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
 
 // Data structure for data received from API call
@@ -17,6 +17,7 @@ import {
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
+import { ONCE } from "@/constants/programconstants";
 
 interface TrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -40,14 +41,17 @@ const TrainingSessionCard: React.FC<Program> = ({
         <div className="flex w-full items-center gap-2">
           <Avatar>
             <AvatarFallback className="bg-primaryColour">
-              <img src="/src/assets/Logo.png" alt="organisation" />
+              <User2Icon color="#a1a1aa" />
             </AvatarFallback>
+            <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
           </Avatar>
           <span>{programDetails?.author ?? "N/A"}</span>{" "}
           <span className="ml-auto text-xs">
-            {programDetails?.occurrenceDate
-              ? new Date(programDetails.occurrenceDate).toDateString()
-              : "N/A"}
+            {programDetails?.reccurenceDate &&
+            programDetails?.frequency !== ONCE
+              ? new Date(programDetails.reccurenceDate).toDateString()
+              : (new Date(programDetails.occurrenceDate).toDateString() ??
+                "N/A")}
           </span>
         </div>
         <span className="font-semibold">{programDetails?.title ?? "N/A"}</span>

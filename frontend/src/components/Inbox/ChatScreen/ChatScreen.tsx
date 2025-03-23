@@ -9,8 +9,8 @@ import {
   X,
 } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
-import defaultAvatar from "../../../assets/defaultAvatar.png";
-import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
+import defaultAvatar from "@/assets/defaultAvatar.png";
+import defaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
 import type { MessageComponent, SendMessageComponent } from "@/types/messaging";
@@ -76,7 +76,8 @@ const ChatScreen: React.FC = () => {
   const [currentChannelName, setCurrentChannelName] =
     useState<string>(channelName);
   const [currentChannelImageUrl, setCurrentChannelImageUrl] = useState<string>(
-    channelImageBlob || defaultAvatar,
+    channelImageBlob ||
+      (channelType === "GROUP" ? defaultGroupAvatar : defaultAvatar),
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -145,9 +146,8 @@ const ChatScreen: React.FC = () => {
         dupMessage.remove();
       }
     }
-    if (message.senderId !== currentUserId) {
-      setMessageStatus("");
-    }
+
+    setTimeout(scrollChatScreenToBottom, 0);
   };
 
   const handleDragEnter = (e: DragEvent<HTMLDivElement>): void => {
@@ -266,6 +266,7 @@ const ChatScreen: React.FC = () => {
       avatarUrl: cookies.pictureUrl,
     };
     setMessageStatus("Sending...");
+
     const response = await sendDirectMessage(
       messagePayload,
       webSocketServiceRef.current,
@@ -299,6 +300,16 @@ const ChatScreen: React.FC = () => {
         await uploadAttachments(formData);
       if (uploadResponse.statusCode === 200) {
         log.info("Attachments uploaded successfully.");
+        let notifBody;
+        if (response.messageContent === "") {
+          notifBody = "Sent an attachment";
+        } else {
+          notifBody =
+            data.message !== undefined && data.message.length > MAX_BODY_LENGTH
+              ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
+              : data.message || "";
+        }
+        await sendNotif(notifBody);
       } else {
         log.error("Error uploading attachments:", uploadResponse.message);
         toast({
@@ -314,33 +325,11 @@ const ChatScreen: React.FC = () => {
     } else if (response) {
       log.debug("Message sent successfully, no attachments.");
       // Message sent successfully, no attachments to upload.
-      const notifTitle =
-        channelType === "GROUP"
-          ? `${currentChannelName} - ${cookies.firstName} sent a message`
-          : `${cookies.firstName}`;
       const notifBody =
         data.message !== undefined && data.message.length > MAX_BODY_LENGTH
           ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
           : data.message || "";
-
-      // Get the notifiees for the notification.
-      const notifiees =
-        channelType === "SIMPLE"
-          ? members.map((member) => member.accountId)
-          : members
-              .filter((member) => member.accountId !== currentUserId)
-              .map((member) => member.accountId);
-
-      log.debug("notifiees: ", notifiees);
-
-      const notifRequest: NotificationRequest = {
-        title: notifTitle,
-        body: notifBody,
-        topic: null, // No topic to assign here.
-        recipients: notifiees,
-      };
-
-      await sendNotification(notifRequest);
+      await sendNotif(notifBody);
     }
 
     setMessageStatus("Delivered");
@@ -351,9 +340,38 @@ const ChatScreen: React.FC = () => {
     );
   };
 
+  const sendNotif = async (notifBody: string) => {
+    // Get the notifiees for the notification.
+    const notifiees =
+      channelType === "SIMPLE"
+        ? members.map((member) => member.accountId)
+        : members
+            .filter((member) => member.accountId !== currentUserId)
+            .map((member) => member.accountId);
+
+    log.debug("notifiees: ", notifiees);
+
+    const notifTitle =
+      channelType === "GROUP"
+        ? `${currentChannelName} - ${cookies.firstName} sent a message`
+        : `${cookies.firstName}`;
+
+    const notifRequest: NotificationRequest = {
+      title: notifTitle,
+      body: notifBody,
+      topic: null, // No topic to assign here.
+      recipients: notifiees,
+    };
+    await sendNotification(notifRequest);
+  };
+
   const scrollChatScreenToBottom = () => {
+    log.debug("Attempting to scroll to bottom...");
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+      log.debug("Scrolled to bottom");
+    } else {
+      log.debug("Chat screen ref is null.");
     }
   };
 
@@ -372,7 +390,9 @@ const ChatScreen: React.FC = () => {
 
   // Scroll to bottom once messages load.
   useEffect(() => {
-    scrollChatScreenToBottom();
+    requestAnimationFrame(() => {
+      scrollChatScreenToBottom();
+    });
   }, [loading]);
 
   // Check if there is a delete request active.
@@ -474,12 +494,12 @@ const ChatScreen: React.FC = () => {
           </Button>
           <div className="flex items-center flex-grow gap-3">
             <img
-              src={currentChannelImageUrl || "/placeholder.svg"}
+              src={currentChannelImageUrl}
               alt={defaultGroupAvatar}
               style={{ width: "36px", height: "36px" }}
               className="rounded-full object-cover"
             />
-            <h1 className="text-lg font-bold text-gray-800 te">
+            <h1 className="text-lg font-bold text-gray-800">
               {currentChannelName}
             </h1>
           </div>

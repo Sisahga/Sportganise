@@ -121,4 +121,52 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
        WHERE pr.programId = :programId
        """)
   void updateRecurrenceStartTime(Integer programId, LocalTime newStartTime);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+              UPDATE ProgramRecurrence pr
+              SET pr.cancelled = true
+              WHERE pr.programId = :programId
+              """)
+  void cancelProgramRecurrences(Integer programId);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+          UPDATE ProgramRecurrence pr
+          SET pr.cancelled = false
+          WHERE pr.programId = :programId
+          """)
+  void uncancelProgramRecurrences(Integer programId);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+            UPDATE ProgramRecurrence pr
+            SET pr.cancelled = true
+            WHERE pr.recurrenceId = :recurrenceId
+            """)
+  void cancelRecurrence(Integer recurrenceId);
+
+  @Transactional
+  @Modifying
+  @Query(
+      """
+              UPDATE ProgramRecurrence pr
+              SET pr.cancelled = false
+              WHERE pr.recurrenceId = :recurrenceId
+              """)
+  void uncancelRecurrence(Integer recurrenceId);
+
+  @Query(
+      """
+            SELECT pr
+            FROM ProgramRecurrence pr
+            WHERE pr.recurrenceId = :recurrenceId
+            """)
+  ProgramRecurrence findProgramRecurrenceById(@Param("recurrenceId") Integer recurrenceId);
 }

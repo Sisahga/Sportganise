@@ -22,9 +22,9 @@ export interface ProgramDetails {
   frequency: string;
   location: string;
   visibility: string;
-  recurring: boolean;
   author: string;
   cancelled: boolean;
+  reccurenceDate: Date;
 }
 
 export interface ProgramAttachments {

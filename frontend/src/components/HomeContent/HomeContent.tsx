@@ -9,7 +9,6 @@ import {
   ChevronsRight,
 } from "lucide-react";
 import log from "loglevel";
-import { TrainingSessionsList } from "../ViewTrainingSessions";
 import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
@@ -195,14 +194,14 @@ export default function HomeContent() {
                       from-secondaryColour/20 to-white to-[20%]"
       >
         <div className="min-h-screen">
-          <div className="py-4 px-8 lg:px-4 flex flex-col gap-8">
+          <div className="py-4 px-5 sm:px-8 lg:px-4 flex flex-col gap-8">
             <div className="lg:mx-24 mt-6 flex flex-col gap-6 sm:gap-8">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl text-primaryColour text-sec font-semibold animate-flowIn sm:mt-8">
                   {getGreeting()}, {firstName}
                 </h2>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-6">
                 {features.map((feature, index) => (
                   <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}

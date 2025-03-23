@@ -13,6 +13,7 @@ import com.sportganise.entities.programsessions.*;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
+import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRecurrenceRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.BlobService;
@@ -41,6 +42,8 @@ public class ProgramServiceTest {
   @Mock private AccountRepository accountRepository;
 
   @Mock private ProgramRecurrenceRepository programRecurrenceRepository;
+
+  @Mock private ProgramParticipantRepository programParticipantRepository;
 
   @Mock private BlobService blobService;
 
@@ -457,5 +460,64 @@ public class ProgramServiceTest {
     System.out.println("Last Occurrence: " + lastrecurrence);
 
     verify(programRecurrenceRepository, times(2)).save(any());
+  }
+
+  @Test
+  void cancel_shouldCallProgramRepository_cancelMethods() {
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+
+    programService.cancel(1, 1, false, false, true);
+    verify(programRecurrenceRepository, times(1)).cancelProgramRecurrences(any());
+    verify(programRepository, times(1)).cancelProgram(any());
+  }
+
+  @Test
+  void cancel_shouldCallProgramRepository_uncancelMethods() {
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+
+    programService.cancel(1, 1, false, false, false);
+    verify(programRecurrenceRepository, times(1)).uncancelProgramRecurrences(any());
+    verify(programRepository, times(1)).uncancelProgram(any());
+  }
+
+  @Test
+  void cancel_shouldCallProgramRecurrenceRepository_cancelMethods() {
+    ProgramRecurrence mockRecurrence = ProgramRecurrence.builder().programId(1).build();
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+    when(programRecurrenceRepository.findProgramRecurrenceById(1)).thenReturn(mockRecurrence);
+    programService.cancel(1, 1, true, false, true);
+    verify(programRecurrenceRepository, times(1)).cancelRecurrence(any());
+  }
+
+  @Test
+  void cancel_shouldCallProgramRecurrenceRepository_uncancelMethods() {
+    ProgramRecurrence mockRecurrence = ProgramRecurrence.builder().programId(1).build();
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+    when(programRecurrenceRepository.findProgramRecurrenceById(1)).thenReturn(mockRecurrence);
+    programService.cancel(1, 1, true, false, false);
+    verify(programRecurrenceRepository, times(1)).uncancelRecurrence(any());
+  }
+
+  @Test
+  void cancel_shouldThrowInsufficientPermissionException_When_AccountTypeIsPlayer() {
+    Program mockProgram = Program.builder().programId(1).build();
+    when(accountService.getAccountById(1))
+        .thenReturn(Account.builder().accountId(1).type(AccountType.PLAYER).build());
+
+    assertThrows(
+        com.sportganise.exceptions.InsufficientPermissionsException.class,
+        () -> programService.cancel(1, 1, false, false, true));
+  }
+
+  @Test
+  void cancel_shouldThrowInsufficientPermissionException_When_AccountTypeIsCoach() {
+    Program mockProgram = Program.builder().programId(1).build();
+    when(accountService.getAccountById(1))
+        .thenReturn(Account.builder().accountId(1).type(AccountType.COACH).build());
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(2));
+
+    assertThrows(
+        com.sportganise.exceptions.InsufficientPermissionsException.class,
+        () -> programService.cancel(1, 1, false, false, true));
   }
 }
