@@ -1,9 +1,13 @@
 import { Calendar } from "../ui/calendar";
 import { TrainingSessionsList } from "../ViewTrainingSessions";
 import { useState } from "react";
+import usePrograms from "@/hooks/usePrograms";
 
 export default function CalendarContent() {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  // Shared instance of usePrograms() hook that will be passed down as a prop to other components
+  const programsProp = usePrograms();
 
   return (
     <div className="mb-32 mt-5">
@@ -15,12 +19,16 @@ export default function CalendarContent() {
         <Calendar
           selectedMonth={selectedMonth}
           onMonthChange={setSelectedMonth}
+          programsProp={programsProp}
         />
       </div>
 
       <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
 
-      <TrainingSessionsList selectedMonth={selectedMonth} />
+      <TrainingSessionsList
+        selectedMonth={selectedMonth}
+        programsProp={programsProp}
+      />
     </div>
   );
 }

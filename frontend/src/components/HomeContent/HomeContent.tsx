@@ -16,6 +16,7 @@ import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { useState, useEffect } from "react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import HomeContentSkeleton from "@/components/HomeContent/HomeContentSkeleton.tsx";
+import usePrograms from "@/hooks/usePrograms";
 
 log.info("HomeContent component is being rendered.");
 
@@ -38,6 +39,7 @@ export default function HomeContent() {
   const navigate = useNavigate();
 
   const [selectedMonth] = useState<Date>(new Date());
+  const programsProp = usePrograms();
   const [firstName, setFirstName] = useState<string | null>(null);
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
@@ -208,7 +210,10 @@ export default function HomeContent() {
             </div>
 
             <div style={{ marginTop: "0 !important" }}>
-              <TrainingSessionsList selectedMonth={selectedMonth} />
+              <TrainingSessionsList
+                selectedMonth={selectedMonth}
+                programsProp={programsProp}
+              />
             </div>
             <div className="flex items-center justify-center">
               <Link

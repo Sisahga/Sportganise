@@ -24,8 +24,10 @@ import log from "loglevel";
 
 export default function TrainingSessionsList({
   selectedMonth,
+  programsProp,
 }: {
   selectedMonth: Date;
+  programsProp: ReturnType<typeof usePrograms>;
 }) {
   log.debug("Rendering TrainingSessionList");
 
@@ -40,7 +42,7 @@ export default function TrainingSessionsList({
   }, [accountId]);
 
   // Fetch programs on component mount
-  const { programs, error, loading, fetchPrograms } = usePrograms(accountId);
+  const { programs, error, loading, fetchPrograms } = programsProp;
   useEffect(() => {
     console.log("TrainingSessionList : Programs fetched:", programs);
     log.info("TrainingSessionList : Programs fetched:", programs);
@@ -84,20 +86,33 @@ export default function TrainingSessionsList({
   useEffect(() => {
     if (!accountId) return;
 
-    setDateRange([
-      {
-        startDate: startOfMonth,
-        endDate: endOfMonth,
-        key: "selection",
-      },
-    ]);
+    const prevStart = dateRange[0].startDate;
+    const prevEnd = dateRange[0].endDate;
+
+    if (
+      prevStart.getTime() !== startOfMonth.getTime() ||
+      prevEnd.getTime() !== endOfMonth.getTime()
+    ) {
+      setDateRange([
+        {
+          startDate: startOfMonth,
+          endDate: endOfMonth,
+          key: "selection",
+        },
+      ]);
+    }
   }, [accountId, selectedMonth]);
 
   useEffect(() => {
     if (!accountId || !dateRange[0].startDate || !dateRange[0].endDate) return;
 
-    fetchPrograms(accountId, dateRange[0].startDate, dateRange[0].endDate);
-  }, [accountId, dateRange]);
+    const { startDate, endDate } = dateRange[0];
+    fetchPrograms(accountId, startDate, endDate);
+  }, [
+    accountId,
+    dateRange[0].startDate.getTime(),
+    dateRange[0].endDate.getTime(),
+  ]);
 
   // Handle Selected Program Type
   const [selectedProgramType, setSelectedProgramType] = useState<string[]>([]);

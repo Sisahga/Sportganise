@@ -11,6 +11,7 @@ import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   selectedMonth?: Date;
   onMonthChange?: (month: Date) => void;
+  programsProp?: ReturnType<typeof usePrograms>;
 };
 
 // Creating a small reusable dots for weekends
@@ -72,22 +73,36 @@ function Calendar({
   showOutsideDays = true,
   selectedMonth,
   onMonthChange,
+  programsProp,
   ...props
 }: CalendarProps) {
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
-  const { eventDates, fetchProgramDates } = usePrograms(accountId); // Fetch function from hook
+  const eventDates = programsProp?.eventDates ?? [];
+  const fetchProgramDates = programsProp?.fetchProgramDates;
+
   const currentMonth =
     selectedMonth instanceof Date ? selectedMonth : new Date();
 
   // Fetch event dates when the Calendar component mounts
   useEffect(() => {
-    async function loadEventDates() {
-      if (!accountId) return;
-      await fetchProgramDates(accountId);
-    }
-    loadEventDates();
-  }, [accountId, fetchProgramDates]); // Re-run if accountId changes
+    if (!accountId || !fetchProgramDates) return;
+
+    let cancelled = false;
+
+    const load = async () => {
+      if (!cancelled) {
+        console.log(" CALENDAR FETCH triggered for accountId:", accountId);
+        await fetchProgramDates(accountId);
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accountId, fetchProgramDates]);
 
   return (
     <DayPicker
