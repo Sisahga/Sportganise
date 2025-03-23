@@ -80,10 +80,10 @@ public interface ProgramParticipantRepository
 
   @Query(
       """
-      SELECT pp.programParticipantId.accountId
-      FROM ProgramParticipant pp
-      WHERE pp.programParticipantId.programId = :programId
-      AND pp.type = 'Coach'
-      """)
-  Integer findCoachIdByProgramId(@Param("programId") Integer programId);
+              SELECT p.programParticipantId.accountId
+              FROM ProgramParticipant p
+              WHERE p.programParticipantId.programId = :programId
+              AND LOWER(p.type) = LOWER('COACH')
+              """)
+  List<Integer> findProgramCoachIds(Integer programId);
 }

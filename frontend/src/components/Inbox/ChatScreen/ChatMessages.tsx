@@ -53,7 +53,7 @@ const ChatMessages = ({
   };
 
   return (
-    <div className="flex flex-col justify-end overflow-y-scroll scroll-smooth px-4 pt-4 pb-2 w-full min-h-full">
+    <div className="flex flex-col justify-end scroll-smooth px-4 pt-4 pb-2 w-full min-h-full">
       {messages.map((message, index) => {
         const showTimestamp =
           index === 0 || // Always show the timestamp for the first message
@@ -73,7 +73,7 @@ const ChatMessages = ({
         }
         return (
           <div
-            id={message.messageId.toString()}
+            id={`message-${message.messageId.toString()}`}
             key={message.messageId}
             className="mb-4"
           >
@@ -106,15 +106,16 @@ const ChatMessages = ({
                     style={{ maxWidth: "80%" }}
                   >
                     {message.senderId !== currentUserId && (
-                      <div className="px-3">
-                        <p className="text-xs font-extralight rounded">
+                      <div className="px-3 py-1">
+                        <p className="text-xs font-light rounded">
                           {message.senderFirstName}
                         </p>
                       </div>
                     )}
                     <div
                       id={`msg-status-${message.messageId}`}
-                      className="flex flex-col gap-2 items-end max-w-full relative"
+                      className={`flex flex-col gap-2 max-w-full relative
+                                  ${currentUserId === message.senderId ? "items-end" : "items-start"}`}
                     >
                       {activateSkeleton && skeletonId === message.messageId && (
                         <div className="overflow-x-auto w-full">
@@ -138,6 +139,8 @@ const ChatMessages = ({
                       {message.attachments.length > 0 && (
                         <ChatMessageAttachments
                           attachments={message.attachments}
+                          senderId={message.senderId}
+                          currentUserId={currentUserId}
                         />
                       )}
 

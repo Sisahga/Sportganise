@@ -31,8 +31,7 @@ import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
-import { WEEKLY } from "@/constants/programconstants";
-import { MONTHLY } from "@/constants/programconstants";
+import { ONCE, WEEKLY, MONTHLY} from "@/constants/programconstants";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -56,7 +55,6 @@ const TrainingSessionContent = () => {
     capacity: 0,
     occurrenceDate: new Date(),
     durationMins: 0,
-    recurring: false,
     expiryDate: new Date(),
     location: "",
     programAttachments: [],
@@ -64,6 +62,7 @@ const TrainingSessionContent = () => {
     visibility: "",
     author: "",
     cancelled: false,
+    reccurenceDate: new Date(),
   });
 
   const [attendees, setAttendees] = useState<Attendees[]>([]);
@@ -169,9 +168,12 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails?.occurrenceDate
-                ? new Date(programDetails.occurrenceDate).toDateString()
-                : "N/A"}
+              {programDetails?.reccurenceDate &&
+              programDetails?.frequency !== ONCE
+                ? new Date(programDetails.reccurenceDate).toDateString()
+                : programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toDateString()
+                  : "N/A"}
             </p>
             {programDetails?.expiryDate ? (
               <div className="flex items-center gap-2">

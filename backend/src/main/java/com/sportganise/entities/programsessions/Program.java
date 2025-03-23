@@ -54,6 +54,9 @@ public class Program {
 
   private String visibility;
 
+  @Column(name = "cancelled")
+  private boolean cancelled = false;
+
   /**
    * Constructor excluding programId since it's generated automatically.
    *
