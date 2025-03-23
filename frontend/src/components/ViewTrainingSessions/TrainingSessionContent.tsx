@@ -30,7 +30,7 @@ import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
-import { WEEKLY } from "@/constants/programconstants";
+import { ONCE, WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
 
 const TrainingSessionContent = () => {
@@ -55,7 +55,6 @@ const TrainingSessionContent = () => {
     capacity: 0,
     occurrenceDate: new Date(),
     durationMins: 0,
-    recurring: false,
     expiryDate: new Date(),
     location: "",
     programAttachments: [],
@@ -63,6 +62,7 @@ const TrainingSessionContent = () => {
     visibility: "",
     author: "",
     cancelled: false,
+    reccurenceDate: new Date(),
   });
 
   useEffect(() => {
@@ -136,9 +136,12 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails?.occurrenceDate
-                ? new Date(programDetails.occurrenceDate).toDateString()
-                : "N/A"}
+              {programDetails?.reccurenceDate &&
+              programDetails?.frequency !== ONCE
+                ? new Date(programDetails.reccurenceDate).toDateString()
+                : programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toDateString()
+                  : "N/A"}
             </p>
             {programDetails?.expiryDate ? (
               <div className="flex items-center gap-2">

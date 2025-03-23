@@ -74,7 +74,11 @@ export default function TrainingSessionsList() {
 
   // Filter Programs by Date Range
   const filteredPrograms: Program[] = programs.filter((program) => {
-    const programDate = new Date(program.programDetails.occurrenceDate);
+    const programDate = new Date(
+      program.programDetails.reccurenceDate
+        ? program.programDetails.reccurenceDate
+        : program.programDetails.occurrenceDate,
+    );
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
     const dateFilter =
       programDate >= dateRange[0].startDate &&
@@ -174,8 +178,16 @@ export default function TrainingSessionsList() {
           filteredPrograms
             .sort(
               (a, b) =>
-                new Date(a.programDetails.occurrenceDate).getTime() -
-                new Date(b.programDetails.occurrenceDate).getTime(),
+                new Date(
+                  a.programDetails.reccurenceDate
+                    ? a.programDetails.reccurenceDate
+                    : a.programDetails.occurrenceDate,
+                ).getTime() -
+                new Date(
+                  b.programDetails.reccurenceDate
+                    ? b.programDetails.reccurenceDate
+                    : b.programDetails.occurrenceDate,
+                ).getTime(),
             )
             .map((program, index) => (
               <div key={index} className="my-5">
