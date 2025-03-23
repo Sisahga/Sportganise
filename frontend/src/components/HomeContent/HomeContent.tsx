@@ -16,6 +16,7 @@ import { useState, useEffect } from "react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import HomeContentSkeleton from "@/components/HomeContent/HomeContentSkeleton.tsx";
 import usePrograms from "@/hooks/usePrograms";
+import { TrainingSessionsList } from "../ViewTrainingSessions";
 
 log.info("HomeContent component is being rendered.");
 
