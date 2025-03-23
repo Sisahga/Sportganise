@@ -53,7 +53,7 @@ const ChatMessages = ({
   };
 
   return (
-    <div className="flex flex-col justify-end overflow-y-scroll scroll-smooth px-4 pt-4 pb-2 w-full min-h-full">
+    <div className="flex flex-col justify-end scroll-smooth px-4 pt-4 pb-2 w-full min-h-full">
       {messages.map((message, index) => {
         const showTimestamp =
           index === 0 || // Always show the timestamp for the first message
@@ -73,7 +73,7 @@ const ChatMessages = ({
         }
         return (
           <div
-            id={message.messageId.toString()}
+            id={`message-${message.messageId.toString()}`}
             key={message.messageId}
             className="mb-4"
           >
