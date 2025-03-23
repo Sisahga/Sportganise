@@ -17,6 +17,7 @@ import {
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
+import { ONCE } from "@/constants/programconstants";
 
 interface TrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -45,9 +46,11 @@ const TrainingSessionCard: React.FC<Program> = ({
           </Avatar>
           <span>{programDetails?.author ?? "N/A"}</span>{" "}
           <span className="ml-auto text-xs">
-            {programDetails?.reccurenceDate
+            {programDetails?.reccurenceDate &&
+            programDetails?.frequency !== ONCE
               ? new Date(programDetails.reccurenceDate).toDateString()
-              : "N/A"}
+              : (new Date(programDetails.occurrenceDate).toDateString() ??
+                "N/A")}
           </span>
         </div>
         <span className="font-semibold">{programDetails?.title ?? "N/A"}</span>
