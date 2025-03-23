@@ -17,8 +17,9 @@ import {
   FileText,
   Hourglass,
   Repeat,
+  User2Icon,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
@@ -91,7 +92,7 @@ const TrainingSessionContent = () => {
           const accountAttendee: Attendees =
             await waitlistParticipantsApi.getProgramParticipant(
               programId,
-              user?.accountId
+              user?.accountId,
             );
           setAccountAttendee(accountAttendee);
           console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
@@ -113,8 +114,9 @@ const TrainingSessionContent = () => {
       <div className="flex items-center gap-3 my-5">
         <Avatar className="w-16 h-16">
           <AvatarFallback className="bg-primaryColour">
-            <img src="/src/assets/Logo.png" alt="organisation" />
+            <User2Icon color="#a1a1aa" />
           </AvatarFallback>
+          <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
         </Avatar>
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-secondaryColour">
@@ -164,7 +166,7 @@ const TrainingSessionContent = () => {
                 {programDetails?.occurrenceDate
                   ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
                       "en-CA",
-                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
                     )
                   : "N/A"}
               </p>
@@ -173,7 +175,7 @@ const TrainingSessionContent = () => {
                 {programDetails.occurrenceDate && programDetails.durationMins
                   ? calculateEndTime(
                       new Date(programDetails.occurrenceDate),
-                      programDetails.durationMins
+                      programDetails.durationMins,
                     )
                   : "N/A"}
               </p>
