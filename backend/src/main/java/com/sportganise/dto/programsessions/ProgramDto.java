@@ -29,6 +29,7 @@ public class ProgramDto {
   private String frequency;
   private String location;
   private String visibility;
+  private boolean isCancelled = false;
   private List<ProgramAttachmentDto> programAttachments;
 
   /**

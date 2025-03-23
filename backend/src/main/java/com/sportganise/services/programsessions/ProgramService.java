@@ -14,12 +14,12 @@ import com.sportganise.entities.programsessions.ProgramRecurrence;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
-import com.sportganise.exceptions.ForbiddenException;
-import com.sportganise.exceptions.ProgramNotFoundException;
+import com.sportganise.exceptions.InsufficientPermissionsException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
+import com.sportganise.exceptions.programexceptions.ProgramNotFoundException;
 import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRecurrenceRepository;
@@ -151,6 +151,7 @@ public class ProgramService {
         program.getFrequency(),
         program.getLocation(),
         program.getVisibility(),
+        program.isCancelled(),
         programAttachments);
   }
 
@@ -210,6 +211,7 @@ public class ProgramService {
       String frequency = program.getFrequency();
       String location = program.getLocation();
       String visibility = program.getVisibility();
+      boolean cancelled = program.isCancelled();
 
       if (!(program.getFrequency() == null || program.getFrequency().equalsIgnoreCase("once"))) {
         List<ProgramRecurrence> recurrences = getProgramRecurrences(program.getProgramId());
@@ -233,6 +235,7 @@ public class ProgramService {
                   frequency,
                   location,
                   visibility,
+                  recurrence.isCancelled(),
                   programAttachments));
         }
       } else {
@@ -252,6 +255,7 @@ public class ProgramService {
                 frequency,
                 location,
                 visibility,
+                cancelled,
                 programAttachments));
         System.out.println("Program id: " + programId);
       }
@@ -752,6 +756,49 @@ public class ProgramService {
   }
 
   /**
+   * Method to cancel a program or a recurrence.
+   *
+   * @param programOrRecurrenceId Id of the program or recurrence.
+   * @param accountId Id of the user making the request.
+   * @param isRecurrence Boolean for whether the program is a recurrence or not.
+   * @param affectAllRecurrences Boolean for whether all recurrences should be affected.
+   * @param cancel Boolean for whether the program should be cancelled or not.
+   */
+  public void cancel(
+      Integer programOrRecurrenceId,
+      Integer accountId,
+      boolean isRecurrence,
+      boolean affectAllRecurrences,
+      boolean cancel) {
+    Integer programId;
+    if (isRecurrence) {
+      programId =
+          programRecurrenceRepository
+              .findProgramRecurrenceById(programOrRecurrenceId)
+              .getProgramId();
+    } else {
+      programId = programOrRecurrenceId;
+    }
+    checkProgramOwner(accountId, programId);
+
+    if (cancel) {
+      if (!isRecurrence || affectAllRecurrences) {
+        programRepository.cancelProgram(programId);
+        programRecurrenceRepository.cancelProgramRecurrences(programId);
+      } else {
+        programRecurrenceRepository.cancelRecurrence(programOrRecurrenceId);
+      }
+    } else {
+      if (!isRecurrence || affectAllRecurrences) {
+        programRepository.uncancelProgram(programId);
+        programRecurrenceRepository.uncancelProgramRecurrences(programId);
+      } else {
+        programRecurrenceRepository.uncancelRecurrence(programOrRecurrenceId);
+      }
+    }
+  }
+
+  /**
    * Method to create a list of ProgramRecurrence objects for a recurring program. g
    *
    * @param programId Id of the program.
@@ -768,11 +815,7 @@ public class ProgramService {
    * @param programId Id of the program to be deleted.
    */
   public void deleteProgram(Integer accountId, Integer programId) {
-    if (!isOwner(accountId, programId)) {
-      log.debug("USER DOES NOT HAVE PERMISSION TO DELETE PROGRAM- ID: {}", programId);
-      log.debug("USER ID: {}", accountId);
-      throw new ForbiddenException("This user does not have permission to delete the program.");
-    }
+    checkProgramOwner(accountId, programId);
     programRepository.deleteById(programId);
     log.debug("DELETED PROGRAM WITH ID: {}", programId);
   }
@@ -781,12 +824,14 @@ public class ProgramService {
    * Method to check if the user is the program's coach or an ADMIN.
    *
    * @param accountId Id of the user.
-   * @return Boolean for whether the user is an admin or the program owner.
+   * @param programId Id of the program.
    */
-  private boolean isOwner(Integer accountId, Integer programId) {
-    getProgramById(programId);
-    return (accountId.equals(getCoachId(programId))
-        || accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN));
+  private void checkProgramOwner(Integer accountId, Integer programId) {
+    List<Integer> programOwnerIds = programParticipantRepository.findProgramCoachIds(programId);
+    if (!(programOwnerIds.contains(accountId)
+        || accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN))) {
+      throw new InsufficientPermissionsException("User is not the program's owner or an admin");
+    }
   }
 
   /**
@@ -795,8 +840,8 @@ public class ProgramService {
    * @param programId Id of the program.
    * @return Id of the coach of the program.
    */
-  private Integer getCoachId(Integer programId) {
-    return programParticipantRepository.findCoachIdByProgramId(programId);
+  private List<Integer> getCoachIds(Integer programId) {
+    return programParticipantRepository.findProgramCoachIds(programId);
   }
 
   /**
@@ -856,6 +901,12 @@ public class ProgramService {
     programRecurrenceRepository.deletePrecedingRecurrences(programId, firstDate);
   }
 
+  /**
+   * Method to modify the start time of all recurrences of a program.
+   *
+   * @param programId Id of the program.
+   * @param newStartTime New start time of the program.
+   */
   public void modifyAllRecurrencesStartTime(Integer programId, LocalTime newStartTime) {
     programRecurrenceRepository.updateRecurrenceStartTime(programId, newStartTime);
   }
