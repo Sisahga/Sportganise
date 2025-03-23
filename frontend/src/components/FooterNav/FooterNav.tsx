@@ -64,7 +64,7 @@ export default function FooterNav() {
     <div className="z-50 w-full flex items-center justify-center">
       <nav
         className="fixed shadow-md rounded-t-2xl bottom-0 mx-auto bg-white p-3
-            grid grid-cols-5 text-xs sm:text-base w-full sm:w-4/5 lg:w-2/3 2xl:w-2/5"
+            grid grid-cols-5 text-xs sm:text-base w-full md:w-4/5 lg:w-2/3 2xl:w-2/5"
       >
         {routes.map((route) => {
           const isActive = route.activeRoutes.includes(location.pathname);
