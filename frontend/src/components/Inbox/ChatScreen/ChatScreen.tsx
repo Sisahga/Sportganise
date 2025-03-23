@@ -299,6 +299,16 @@ const ChatScreen: React.FC = () => {
         await uploadAttachments(formData);
       if (uploadResponse.statusCode === 200) {
         log.info("Attachments uploaded successfully.");
+        let notifBody;
+        if (response.messageContent === "") {
+          notifBody = "Sent an attachment";
+        } else {
+          notifBody =
+            data.message !== undefined && data.message.length > MAX_BODY_LENGTH
+              ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
+              : data.message || "";
+        }
+        await sendNotif(notifBody);
       } else {
         log.error("Error uploading attachments:", uploadResponse.message);
         toast({
@@ -314,33 +324,11 @@ const ChatScreen: React.FC = () => {
     } else if (response) {
       log.debug("Message sent successfully, no attachments.");
       // Message sent successfully, no attachments to upload.
-      const notifTitle =
-        channelType === "GROUP"
-          ? `${currentChannelName} - ${cookies.firstName} sent a message`
-          : `${cookies.firstName}`;
       const notifBody =
         data.message !== undefined && data.message.length > MAX_BODY_LENGTH
           ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
           : data.message || "";
-
-      // Get the notifiees for the notification.
-      const notifiees =
-        channelType === "SIMPLE"
-          ? members.map((member) => member.accountId)
-          : members
-              .filter((member) => member.accountId !== currentUserId)
-              .map((member) => member.accountId);
-
-      log.debug("notifiees: ", notifiees);
-
-      const notifRequest: NotificationRequest = {
-        title: notifTitle,
-        body: notifBody,
-        topic: null, // No topic to assign here.
-        recipients: notifiees,
-      };
-
-      await sendNotification(notifRequest);
+      await sendNotif(notifBody);
     }
 
     setMessageStatus("Delivered");
@@ -349,6 +337,31 @@ const ChatScreen: React.FC = () => {
     resetTextAreaHeight(
       document.getElementById("chatScreenInputArea") as HTMLTextAreaElement,
     );
+  };
+
+  const sendNotif = async (notifBody: string) => {
+    // Get the notifiees for the notification.
+    const notifiees =
+      channelType === "SIMPLE"
+        ? members.map((member) => member.accountId)
+        : members
+            .filter((member) => member.accountId !== currentUserId)
+            .map((member) => member.accountId);
+
+    log.debug("notifiees: ", notifiees);
+
+    const notifTitle =
+      channelType === "GROUP"
+        ? `${currentChannelName} - ${cookies.firstName} sent a message`
+        : `${cookies.firstName}`;
+
+    const notifRequest: NotificationRequest = {
+      title: notifTitle,
+      body: notifBody,
+      topic: null, // No topic to assign here.
+      recipients: notifiees,
+    };
+    await sendNotification(notifRequest);
   };
 
   const scrollChatScreenToBottom = () => {
