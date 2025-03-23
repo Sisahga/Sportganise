@@ -114,7 +114,8 @@ const ChatMessages = ({
                     )}
                     <div
                       id={`msg-status-${message.messageId}`}
-                      className="flex flex-col gap-2 items-end max-w-full relative"
+                      className={`flex flex-col gap-2 max-w-full relative
+                                  ${currentUserId === message.senderId ? "items-end" : "items-start"}`}
                     >
                       {activateSkeleton && skeletonId === message.messageId && (
                         <div className="overflow-x-auto w-full">
@@ -138,6 +139,8 @@ const ChatMessages = ({
                       {message.attachments.length > 0 && (
                         <ChatMessageAttachments
                           attachments={message.attachments}
+                          senderId={message.senderId}
+                          currentUserId={currentUserId}
                         />
                       )}
 
