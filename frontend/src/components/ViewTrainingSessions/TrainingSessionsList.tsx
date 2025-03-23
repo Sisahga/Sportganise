@@ -23,6 +23,14 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
+import {
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 
 export default function TrainingSessionsList({
   selectedMonth,
@@ -55,25 +63,25 @@ export default function TrainingSessionsList({
   const todayDayIndex = today.getDay(); // index of today's day of the week
   const startOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`,
+    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`
   );
   startOfWeek.setDate(today.getDate() - todayDayIndex); // start of the week date = today's date - day of week
   const endOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`,
+    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`
   );
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
   const startOfMonth = new Date(
     selectedMonth.getFullYear(),
     selectedMonth.getMonth(),
-    1,
+    1
   ); // First day of the current month
 
   const endOfMonth = new Date(
     selectedMonth.getFullYear(),
     selectedMonth.getMonth() + 1,
-    0,
+    0
   ); // Last day of the month
 
   // Start Date Range
@@ -120,7 +128,7 @@ export default function TrainingSessionsList({
   const [selectedProgramType, setSelectedProgramType] = useState<string[]>([]);
   // List of programDetails.programTypes For Check
   const programTypes = Array.from(
-    new Set(programs.map((program) => program.programDetails.programType)),
+    new Set(programs.map((program) => program.programDetails.programType))
   );
 
   // Filter Programs by Date Range
@@ -128,7 +136,7 @@ export default function TrainingSessionsList({
     const programDate = new Date(
       program.programDetails.reccurenceDate
         ? program.programDetails.reccurenceDate
-        : program.programDetails.occurrenceDate,
+        : program.programDetails.occurrenceDate
     );
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
     const dateFilter =
@@ -195,7 +203,7 @@ export default function TrainingSessionsList({
               </SheetHeader>
               <p className="font-semibold my-3">Filter by date</p>
               <div className="flex overflow-auto my-5">
-                <DateRangePicker
+                <DateRange
                   editableDateInputs={true}
                   onChange={handleDateChange} //  Ensures state is updated
                   moveRangeOnFirstSelection={false}
@@ -208,87 +216,105 @@ export default function TrainingSessionsList({
                   <label
                     key={index}
                     className="font-medium flex gap-2 items-center"
-
-          {/**Filters */}
-          <Drawer direction="bottom">
-            <DrawerTrigger asChild>
-              <Button variant="outline" className="w-6 ml-auto">
-                <Filter className="text-secondaryColour w-3 h-3" />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent>
-              <DrawerHeader className="flex flex-col items-center text-center relative">
-                {/* Close button*/}
-                <DrawerClose asChild>
-                  <Button
-                    variant="ghost"
-                    className="text-fadedPrimaryColour rounded-full absolute top-5 left-4 w-2"
                   >
-                    <X></X>
-                  </Button>
-                </DrawerClose>
-                <DrawerTitle>Filter Options</DrawerTitle>
-                <DrawerDescription>
-                  Customize your program filters
-                </DrawerDescription>
-              </DrawerHeader>
-
-              <Separator className="border border-secondaryColour" />
-
-              <ScrollArea className="h-[80vh]">
-                <div className="px-6 mb-2 mt-8 flex flex-col">
-                  {/**Filter by date range */}
-                  <div className="space-y-4">
-                    <h3 className="text-base font-semibold text-center">
-                      Filter by date
-                    </h3>
-                    <div className="overflow-auto my-3 flex justify-center items-center">
-                      <DateRange
-                        editableDateInputs={true}
-                        onChange={handleDateChange} //  Ensures state is updated
-                        moveRangeOnFirstSelection={false}
-                        ranges={dateRange} //  Uses updated `dateRange`
-                      />
-                    </div>
-                  </div>
-                  <Separator />
-                  {/**Filter by program type */}
-                  <div className="flex flex-col gap-1 mt-6">
-                    <h3 className="text-base font-semibold mb-2 text-center">
-                      Filter by type
-                    </h3>
-                    {programTypes.map((type, index) => (
-                      <label
-                        key={index}
-                        className="text-sm flex gap-2 items-center"
-                      >
-                        <Checkbox
-                          checked={selectedProgramType.includes(type)}
-                          onCheckedChange={(checked) => {
-                            setSelectedProgramType((prev) =>
-                              checked
-                                ? [...prev, type]
-                                : prev.filter((t) => t !== type),
-                            );
-                          }}
-                        />
-                        {type}
-                      </label>
-                    ))}
-                  </div>
-                  {/**Cancel filters button */}
-                  <Button
-                    className="px-12 mt-8 mb-8"
-                    variant="outline"
-                    onClick={handleCancel}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </ScrollArea>
-            </DrawerContent>
-          </Drawer>
+                    <Checkbox
+                      checked={selectedProgramType.includes(type)}
+                      onCheckedChange={(checked) => {
+                        setSelectedProgramType((prev) =>
+                          checked
+                            ? [...prev, type]
+                            : prev.filter((t) => t !== type)
+                        );
+                      }}
+                    />
+                    {type}
+                  </label>
+                ))}
+              </div>
+            </SheetContent>
+          </Sheet>
         </span>
+
+        {/**Filters */}
+        <Drawer direction="bottom">
+          <DrawerTrigger asChild>
+            {/* <Button variant="outline" className="w-6 ml-auto">
+              <Filter className="text-secondaryColour w-3 h-3" />
+            </Button> */}
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader className="flex flex-col items-center text-center relative">
+              {/* Close button*/}
+              <DrawerClose asChild>
+                <Button
+                  variant="ghost"
+                  className="text-fadedPrimaryColour rounded-full absolute top-5 left-4 w-2"
+                >
+                  <X></X>
+                </Button>
+              </DrawerClose>
+              <DrawerTitle>Filter Options</DrawerTitle>
+              <DrawerDescription>
+                Customize your program filters
+              </DrawerDescription>
+            </DrawerHeader>
+
+            <Separator className="border border-secondaryColour" />
+
+            <ScrollArea className="h-[80vh]">
+              <div className="px-6 mb-2 mt-8 flex flex-col">
+                {/**Filter by date range */}
+                <div className="space-y-4">
+                  <h3 className="text-base font-semibold text-center">
+                    Filter by date
+                  </h3>
+                  <div className="overflow-auto my-3 flex justify-center items-center">
+                    <DateRange
+                      editableDateInputs={true}
+                      onChange={handleDateChange} //  Ensures state is updated
+                      moveRangeOnFirstSelection={false}
+                      ranges={dateRange} //  Uses updated `dateRange`
+                    />
+                  </div>
+                </div>
+                <Separator />
+                {/**Filter by program type */}
+                <div className="flex flex-col gap-1 mt-6">
+                  <h3 className="text-base font-semibold mb-2 text-center">
+                    Filter by type
+                  </h3>
+                  {programTypes.map((type, index) => (
+                    <label
+                      key={index}
+                      className="text-sm flex gap-2 items-center"
+                    >
+                      <Checkbox
+                        checked={selectedProgramType.includes(type)}
+                        onCheckedChange={(checked) => {
+                          setSelectedProgramType((prev) =>
+                            checked
+                              ? [...prev, type]
+                              : prev.filter((t) => t !== type)
+                          );
+                        }}
+                      />
+                      {type}
+                    </label>
+                  ))}
+                </div>
+                {/**Cancel filters button */}
+                <Button
+                  className="px-12 mt-8 mb-8"
+                  variant="outline"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </ScrollArea>
+          </DrawerContent>
+        </Drawer>
+        {/* </span> */}
         {error ? (
           <p className="text-red text-center my-5">Error loading programs</p>
         ) : loading ? (
@@ -306,13 +332,13 @@ export default function TrainingSessionsList({
                 new Date(
                   a.programDetails.reccurenceDate
                     ? a.programDetails.reccurenceDate
-                    : a.programDetails.occurrenceDate,
+                    : a.programDetails.occurrenceDate
                 ).getTime() -
                 new Date(
                   b.programDetails.reccurenceDate
                     ? b.programDetails.reccurenceDate
-                    : b.programDetails.occurrenceDate,
-                ).getTime(),
+                    : b.programDetails.occurrenceDate
+                ).getTime()
             )
             .map((program, index) => (
               <div key={index} className="my-5">
