@@ -149,7 +149,7 @@ export default function ModifyTrainingSessionForm() {
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
   let [attachmentsToRemove /* setAttachmentsToRemove */] = useState<string[]>(
-    [],
+    []
   );
   const [loading, setLoading] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
@@ -218,7 +218,7 @@ export default function ModifyTrainingSessionForm() {
     if (programDetails.frequency) {
       form.setValue("frequency", programDetails.frequency.toUpperCase());
     } else {
-      form.setValue("frequency", ONCE); // TODO
+      form.setValue("frequency", ONCE);
     }
     //form.setValue("recurring", programDetails.recurring);
     form.setValue("visibility", programDetails.visibility.toLowerCase());
@@ -234,7 +234,7 @@ export default function ModifyTrainingSessionForm() {
     }
     form.setValue(
       "startTime",
-      new Date(programDetails.occurrenceDate).toISOString().slice(11, 16),
+      new Date(programDetails.occurrenceDate).toISOString().slice(11, 16)
     );
     const endTime = new Date(programDetails.occurrenceDate);
     endTime.setMinutes(endTime.getMinutes() + programDetails.durationMins); //REFACTOR
@@ -278,7 +278,7 @@ export default function ModifyTrainingSessionForm() {
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           attachmentsToRemove = attachmentsToRemove.filter(
-            (urlName) => urlName !== file.name,
+            (urlName) => urlName !== file.name
           );
         });
       }
@@ -295,7 +295,6 @@ export default function ModifyTrainingSessionForm() {
             ? null
             : (values.endDate?.toISOString() ?? null),
         frequency: values.frequency,
-        //recurring: values.recurring.toString(),
         visibility: values.visibility,
         description: values.description,
         capacity: values.capacity.toString(),
@@ -309,7 +308,7 @@ export default function ModifyTrainingSessionForm() {
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
-        }),
+        })
       );
 
       // API call submit form
@@ -317,13 +316,13 @@ export default function ModifyTrainingSessionForm() {
       const modify = await modifyTrainingSession(
         accountId,
         programDetails.programId,
-        formData,
+        formData
       );
       log.info("modify : ", modify);
       setLoading(false);
       if (modify === null) {
         throw new Error(
-          "Error from usemodifyTrainingSession.modifyTrainingSession!",
+          "Error from usemodifyTrainingSession.modifyTrainingSession!"
         );
       }
       log.info("modifyTrainingSession submit success ✔");
@@ -432,7 +431,7 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
@@ -462,7 +461,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   type.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {type.label}
@@ -495,7 +494,7 @@ export default function ModifyTrainingSessionForm() {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value ? (
@@ -542,12 +541,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? frequencies.find(
-                              (frequency) => frequency.value === field.value,
+                              (frequency) => frequency.value === field.value
                             )?.label
                           : "Select frequency"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -573,7 +572,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   frequency.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {frequency.label}
@@ -620,7 +619,7 @@ export default function ModifyTrainingSessionForm() {
                           variant={"outline"}
                           className={cn(
                             "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
@@ -714,12 +713,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? locations.find(
-                              (location) => location.value === field.value,
+                              (location) => location.value === field.value
                             )?.label
                           : "Select location"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -745,7 +744,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   location.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {location.label}
@@ -807,12 +806,12 @@ export default function ModifyTrainingSessionForm() {
                         role="combobox"
                         className={cn(
                           "justify-between",
-                          !field.value && "text-muted-foreground",
+                          !field.value && "text-muted-foreground"
                         )}
                       >
                         {field.value
                           ? visibilities.find(
-                              (visibility) => visibility.value === field.value,
+                              (visibility) => visibility.value === field.value
                             )?.label
                           : "Select visibility"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -838,7 +837,7 @@ export default function ModifyTrainingSessionForm() {
                                   "mr-2 h-4 w-4",
                                   visibility.value === field.value
                                     ? "opacity-100"
-                                    : "opacity-0",
+                                    : "opacity-0"
                                 )}
                               />
                               {visibility.label}
@@ -950,7 +949,7 @@ export default function ModifyTrainingSessionForm() {
                     {...field}
                     onChange={(e) =>
                       field.onChange(
-                        e.target.value ? Number(e.target.value) : undefined,
+                        e.target.value ? Number(e.target.value) : undefined
                       )
                     }
                   />
