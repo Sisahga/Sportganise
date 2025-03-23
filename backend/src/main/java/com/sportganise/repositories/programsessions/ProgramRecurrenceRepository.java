@@ -162,9 +162,8 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
               """)
   void uncancelRecurrence(Integer recurrenceId);
 
-
   @Query(
-          """
+      """
             SELECT pr
             FROM ProgramRecurrence pr
             WHERE pr.recurrenceId = :recurrenceId
