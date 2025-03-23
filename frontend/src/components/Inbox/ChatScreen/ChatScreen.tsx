@@ -41,6 +41,8 @@ import { NotificationRequest } from "@/types/notifications.ts";
 import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
 import ChatScreenSkeleton from "@/components/Inbox/ChatScreen/ChatScreenSkeleton.tsx";
+import DefaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
+import DefaultAvatar from "@/assets/defaultAvatar.png";
 
 log.setLevel("debug");
 
@@ -487,7 +489,11 @@ const ChatScreen: React.FC = () => {
           </Button>
           <div className="flex items-center flex-grow gap-3">
             <img
-              src={currentChannelImageUrl || "/placeholder.svg"}
+              src={
+                currentChannelImageUrl || channelType === "GROUP"
+                  ? DefaultGroupAvatar
+                  : DefaultAvatar
+              }
               alt={defaultGroupAvatar}
               style={{ width: "36px", height: "36px" }}
               className="rounded-full object-cover"
