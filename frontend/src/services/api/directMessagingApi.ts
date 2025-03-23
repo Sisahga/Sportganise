@@ -74,15 +74,19 @@ const directMessagingApi = {
     const data: ResponseDto<ChannelMember[]> = await response.json();
     return data;
   },
-  getDirectMessages: async (channelId: number | null) => {
-    const response = await fetch(
-      `${baseMappingUrl}/directmessage/get-messages/${channelId}`,
-      {
-        headers: {
-          Authorization: getBearerToken(),
-        },
+  getDirectMessages: async (channelId: number | null, lastSentAt?: string) => {
+    let url = `${baseMappingUrl}/directmessage/get-messages/${channelId}`;
+
+    // Timestamp for pagination
+    if (lastSentAt) {
+      url += `?lastSentAt=${encodeURIComponent(lastSentAt)}`;
+    }
+
+    const response = await fetch(url, {
+      headers: {
+        Authorization: getBearerToken(),
       },
-    );
+    });
     const data: MessageComponent[] = await response.json();
     return data;
   },
