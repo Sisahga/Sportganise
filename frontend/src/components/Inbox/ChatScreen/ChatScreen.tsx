@@ -147,9 +147,8 @@ const ChatScreen: React.FC = () => {
         dupMessage.remove();
       }
     }
-    if (message.senderId !== currentUserId) {
-      setMessageStatus("");
-    }
+
+    setTimeout(scrollChatScreenToBottom, 0);
   };
 
   const handleDragEnter = (e: DragEvent<HTMLDivElement>): void => {
@@ -268,6 +267,7 @@ const ChatScreen: React.FC = () => {
       avatarUrl: cookies.pictureUrl,
     };
     setMessageStatus("Sending...");
+
     const response = await sendDirectMessage(
       messagePayload,
       webSocketServiceRef.current,
@@ -367,8 +367,12 @@ const ChatScreen: React.FC = () => {
   };
 
   const scrollChatScreenToBottom = () => {
+    log.debug("Attempting to scroll to bottom...");
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+      log.debug("Scrolled to bottom");
+    } else {
+      log.debug("Chat screen ref is null.");
     }
   };
 
@@ -387,7 +391,9 @@ const ChatScreen: React.FC = () => {
 
   // Scroll to bottom once messages load.
   useEffect(() => {
-    scrollChatScreenToBottom();
+    requestAnimationFrame(() => {
+      scrollChatScreenToBottom();
+    });
   }, [loading]);
 
   // Check if there is a delete request active.

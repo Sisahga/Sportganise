@@ -88,7 +88,9 @@ const ChatMessageAttachments = ({
                                   min-w-20 min-h-20 max-w-28 max-h-36 rounded object-cover cursor-pointer
                                   ${isLoaded ? "" : "animate-skeleton"}
                                 `}
-                      onLoad={() => setIsLoaded(true)}
+                      onLoad={() => {
+                        setIsLoaded(true);
+                      }}
                       loading={"lazy"}
                     />
                   </button>
