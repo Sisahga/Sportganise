@@ -1,4 +1,4 @@
-export function formatDate(date: Date) {
+export function formatDate(date: Date): Date {
   const [year, month, day] = date
     .toString()
     .split("T")[0]

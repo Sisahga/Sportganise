@@ -206,11 +206,13 @@ export default function ModifyTrainingSessionForm() {
     form.setValue("title", programDetails.title);
     form.setValue("capacity", programDetails.capacity);
     form.setValue("type", programDetails.programType.toUpperCase());
-    form.setValue("startDate", new Date(programDetails.occurrenceDate));
+    const tempDate = new Date(programDetails.occurrenceDate); // handle UTC to EDT, must add back 4 hrs
+    tempDate.setHours(tempDate.getHours() + 4); // done so the proper start dates are displayed
+    form.setValue("startDate", tempDate);
     if (
       !(
         programDetails.frequency === null ||
-        programDetails.frequency.toUpperCase() === ONCE // TODO
+        programDetails.frequency.toUpperCase() === ONCE
       )
     ) {
       form.setValue("endDate", new Date(programDetails.expiryDate));
@@ -220,7 +222,6 @@ export default function ModifyTrainingSessionForm() {
     } else {
       form.setValue("frequency", ONCE);
     }
-    //form.setValue("recurring", programDetails.recurring);
     form.setValue("visibility", programDetails.visibility.toLowerCase());
     form.setValue("description", programDetails.description);
     if (programDetails.programAttachments) {
@@ -246,6 +247,7 @@ export default function ModifyTrainingSessionForm() {
       const fileName = attachment.attachmentUrl;
       attachmentsToRemove.push(fileName);
     });
+    log.debug("Modify --> Set values in form:", form.getValues());
   }, [programDetails, attachmentsToRemove, form]);
 
   /** Handle form submission and networking logic */
