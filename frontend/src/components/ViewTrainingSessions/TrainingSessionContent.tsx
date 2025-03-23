@@ -33,6 +33,7 @@ import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
 import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
+import trainingSessionApi from "@/services/api/trainingSessionApi";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.

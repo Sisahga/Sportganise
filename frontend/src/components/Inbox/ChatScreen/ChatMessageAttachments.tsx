@@ -11,8 +11,12 @@ import {
 
 const ChatMessageAttachments = ({
   attachments,
+  senderId,
+  currentUserId,
 }: {
   attachments: Attachment[];
+  senderId: number;
+  currentUserId: number;
 }) => {
   const extractFileName = (url: string) => {
     const segments = url.split("/");
@@ -62,7 +66,10 @@ const ChatMessageAttachments = ({
       {/* Images */}
       {attachments.some((att) => att.fileType === AttachmentType.IMAGE) && (
         <div className="overflow-x-auto w-full">
-          <div className="flex gap-2 justify-end items-end min-w-min">
+          <div
+            className={`flex gap-2 items-end min-w-min
+                           ${senderId === currentUserId ? "justify-end" : "justify-start"}`}
+          >
             {attachments
               .filter((att) => att.fileType === AttachmentType.IMAGE)
               .map((attachment) => (
@@ -81,7 +88,9 @@ const ChatMessageAttachments = ({
                                   min-w-20 min-h-20 max-w-28 max-h-36 rounded object-cover cursor-pointer
                                   ${isLoaded ? "" : "animate-skeleton"}
                                 `}
-                      onLoad={() => setIsLoaded(true)}
+                      onLoad={() => {
+                        setIsLoaded(true);
+                      }}
                       loading={"lazy"}
                     />
                   </button>
@@ -119,7 +128,9 @@ const ChatMessageAttachments = ({
 
       {/* Files */}
       {attachments.some((att) => att.fileType === AttachmentType.FILE) && (
-        <div className="flex flex-col gap-2 items-end">
+        <div
+          className={`flex flex-col gap-2 ${senderId === currentUserId ? "items-end" : "items-start"}`}
+        >
           {attachments
             .filter((att) => att.fileType === AttachmentType.FILE)
             .map((attachment) => (

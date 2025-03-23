@@ -355,9 +355,9 @@ public class ProgramServiceTest {
         new ProgramRecurrence(programId, runningDateTime.plusDays(10), false);
     List<ProgramRecurrence> recurrences = List.of(recurrence1, recurrence2);
 
-    programService.deleteExpiredRecurrences(expiryDate, programId);
+    programService.deleteOverflowingRecurrences(expiryDate, programId);
 
-    verify(programRecurrenceRepository).deleteExpiredRecurrences(expiryDate, programId);
+    verify(programRecurrenceRepository).deleteOverflowingRecurrences(expiryDate, programId);
   }
 
   @Test
@@ -406,7 +406,7 @@ public class ProgramServiceTest {
         "daily");
 
     verify(programRecurrenceRepository)
-        .deleteExpiredRecurrences(any(ZonedDateTime.class), any(Integer.class));
+        .deleteOverflowingRecurrences(any(ZonedDateTime.class), any(Integer.class));
   }
 
   @Test
