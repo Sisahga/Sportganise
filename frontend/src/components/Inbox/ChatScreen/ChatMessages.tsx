@@ -106,8 +106,8 @@ const ChatMessages = ({
                     style={{ maxWidth: "80%" }}
                   >
                     {message.senderId !== currentUserId && (
-                      <div className="px-3">
-                        <p className="text-xs font-extralight rounded">
+                      <div className="px-3 py-1">
+                        <p className="text-xs font-light rounded">
                           {message.senderFirstName}
                         </p>
                       </div>
