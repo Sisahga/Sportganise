@@ -51,9 +51,6 @@ INSERT INTO sport (name) VALUES
 INSERT INTO program (type, title, description, author, capacity, occurence_date, duration, expiry_date, frequency, location, visibility, cancelled) VALUES
     ('TRAINING', 'Advanced Group', 'Intensive training camp for badminton pros', 'John Doe', 1, '2024-07-01 10:00:00', 120,  '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public',false),
     ('FUNDRAISER', 'Basketball Clinic', 'Skill enhancement clinic', 'Jane Doe', 20, '2024-06-15 10:00:00', 90,  NULL, NULL, '123 Main St', 'Public',false);
-INSERT INTO program (type, title, description, author, capacity, occurence_date, duration, is_recurring, expiry_date, frequency, location, visibility) VALUES
-    ('TRAINING', 'Advanced Group', 'Intensive training camp for badminton pros', 'John Doe', 2, '2024-07-01 10:00:00', 120, TRUE, '2024-08-01 12:00:00', 'Weekly', '123 test water rd.', 'Public'),
-    ('FUNDRAISER', 'Basketball Clinic', 'Skill enhancement clinic', 'Jane Doe', 20, '2024-06-15 10:00:00', 90, FALSE, NULL, NULL, '123 Main St', 'Public');
 
 INSERT INTO program_recurrence(program_id,occurrence_date,cancelled) VALUES
                                                                          (1, '2024-07-08 10:00:00', true),
