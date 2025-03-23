@@ -335,8 +335,8 @@ export default function ModifyTrainingSessionForm() {
       const attendeeIds: Array<number> = attendees.map((a) => a.accountId);
       console.warn("attendeeIds", attendeeIds);
       const modifyNotif: NotificationRequest = {
-        title: `Changes made to ${programDetails.title ?? "your"} program.`,
-        body: "View changes in the app.",
+        title: `Changes made to ${programDetails.title ?? "your"} program`,
+        body: "Open the app to view changes",
         topic: null,
         recipients: attendeeIds,
       };
