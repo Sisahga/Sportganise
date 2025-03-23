@@ -9,8 +9,8 @@ import {
   X,
 } from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
-import defaultAvatar from "../../../assets/defaultAvatar.png";
-import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
+import defaultAvatar from "@/assets/defaultAvatar.png";
+import defaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
 import type { MessageComponent, SendMessageComponent } from "@/types/messaging";
@@ -41,8 +41,6 @@ import { NotificationRequest } from "@/types/notifications.ts";
 import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
 import ChatScreenSkeleton from "@/components/Inbox/ChatScreen/ChatScreenSkeleton.tsx";
-import DefaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
-import DefaultAvatar from "@/assets/defaultAvatar.png";
 
 log.setLevel("debug");
 
@@ -78,7 +76,8 @@ const ChatScreen: React.FC = () => {
   const [currentChannelName, setCurrentChannelName] =
     useState<string>(channelName);
   const [currentChannelImageUrl, setCurrentChannelImageUrl] = useState<string>(
-    channelImageBlob || defaultAvatar,
+    channelImageBlob ||
+      (channelType === "GROUP" ? defaultGroupAvatar : defaultAvatar),
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -495,16 +494,12 @@ const ChatScreen: React.FC = () => {
           </Button>
           <div className="flex items-center flex-grow gap-3">
             <img
-              src={
-                currentChannelImageUrl || channelType === "GROUP"
-                  ? DefaultGroupAvatar
-                  : DefaultAvatar
-              }
+              src={currentChannelImageUrl}
               alt={defaultGroupAvatar}
               style={{ width: "36px", height: "36px" }}
               className="rounded-full object-cover"
             />
-            <h1 className="text-lg font-bold text-gray-800 te">
+            <h1 className="text-lg font-bold text-gray-800">
               {currentChannelName}
             </h1>
           </div>
