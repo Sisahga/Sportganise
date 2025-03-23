@@ -216,6 +216,8 @@ export default function ModifyTrainingSessionForm() {
       )
     ) {
       form.setValue("endDate", new Date(programDetails.expiryDate));
+    } else {
+      form.setValue("endDate", undefined); // force endDate=null for frequency=once
     }
     if (programDetails.frequency) {
       form.setValue("frequency", programDetails.frequency.toUpperCase());
