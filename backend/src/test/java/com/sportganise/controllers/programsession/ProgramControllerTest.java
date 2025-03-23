@@ -1,6 +1,7 @@
 package com.sportganise.controllers.programsession;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -443,5 +444,44 @@ public class ProgramControllerTest {
                 .file(attachment)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void testCancelProgram_Success() throws Exception {
+
+    mockMvc
+        .perform(
+            put("/api/programs/2/111/cancel-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cancel\": true}"))
+        .andExpect(status().isOk());
+
+    Mockito.verify(programService).cancel(111, 2, false, false, true);
+  }
+
+  @Test
+  public void testCancelRecurrence_Success() throws Exception {
+
+    mockMvc
+        .perform(
+            put("/api/programs/2/111/cancel-recurrence")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cancel\": true}"))
+        .andExpect(status().isOk());
+
+    Mockito.verify(programService).cancel(111, 2, true, false, true);
+  }
+
+  @Test
+  public void testCancelAllRecurrences_Success() throws Exception {
+
+    mockMvc
+        .perform(
+            put("/api/programs/2/111/cancel-all-recurrences")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cancel\": true}"))
+        .andExpect(status().isOk());
+
+    Mockito.verify(programService).cancel(111, 2, true, true, true);
   }
 }

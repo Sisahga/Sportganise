@@ -564,9 +564,9 @@ public class GlobalExceptionHandler {
    * @param e exception
    * @return response dto with status 403.
    */
-  @ExceptionHandler(InsufficientPermissionException.class)
+  @ExceptionHandler(InsufficientPermissionsException.class)
   @ResponseStatus(HttpStatus.FORBIDDEN)
-  public ResponseDto<?> handleInsufficientPermissionException(InsufficientPermissionException e) {
+  public ResponseDto<?> handleInsufficientPermissionException(InsufficientPermissionsException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.FORBIDDEN.value())
         .message(e.getMessage())

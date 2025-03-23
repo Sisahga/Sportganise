@@ -14,7 +14,7 @@ import com.sportganise.entities.programsessions.ProgramRecurrence;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
-import com.sportganise.exceptions.InsufficientPermissionException;
+import com.sportganise.exceptions.InsufficientPermissionsException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -830,7 +830,7 @@ public class ProgramService {
     List<Integer> programOwnerIds = programParticipantRepository.findProgramCoachIds(programId);
     if (!(programOwnerIds.contains(accountId)
         || accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN))) {
-      throw new InsufficientPermissionException("User is not the program's owner or an admin");
+      throw new InsufficientPermissionsException("User is not the program's owner or an admin");
     }
   }
 
