@@ -127,69 +127,75 @@ function App() {
               element={<NotificationSettingsPage />}
             ></Route>
           </Route>
-        <Route
-          path="/pages/CreateDmChannelPage"
-          element={<CreateDmChannelPage />}
-        ></Route>
-        <Route path="/" element={<Layout />}>
-          {" "}
-          {/*Place the routes to all your pages nested beneath this Route tag */}
           <Route
-            path="/pages/ChangePasswordPage"
-            element={<ChangePasswordPage />}
+            path="/pages/CreateDmChannelPage"
+            element={<CreateDmChannelPage />}
           ></Route>
-          <Route
-            path="/pages/CreateTrainingSessionPage"
-            element={<CreateTrainingSessionPage />}
-          ></Route>
-          <Route
-            path="/pages/DirectMessageChannelPage"
-            element={<DirectMessageChatPage />}
-          />
-          <Route
-            path="/pages/EditProfilePage"
-            element={<EditProfilePage />}
-          ></Route>
-          <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
-          <Route
-            path="/pages/DirectMessagesDashboard"
-            element={<MessagingDashboard />}
-          />
-          <Route
-            path="/pages/PersonalInformationPage"
-            element={<PersonalInformationPage />}
-          ></Route>
-          <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
-          <Route path="/login" element={<LogInPage />}></Route>
-          <Route path="/signup" element={<SignUpPage />}></Route>
-          <Route path="/verificationcode" element={<VerificationCodePage />} />
-          <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-          <Route
-            path="/pages/ViewTrainingSessionPage"
-            element={<ViewTrainingSessionPage />}
-          ></Route>
-          <Route path="/pages/CalendarPage" element={<CalendarPage />}></Route>
-          <Route
-            path="/pages/ModifyTrainingSessionPage"
-            element={<ModifyTrainingSessionPage />}
-          ></Route>
-          <Route
-            path="/pages/BlockedUserListPage"
-            element={<BlockedUsersListPage />}
-          ></Route>
-          <Route
-            path="/pages/TrainingPlanPage"
-            element={<TrainingPlanPage />}
-          ></Route>
-          <Route
-            path="/pages/NotificationsPage"
-            element={<NotificationsPage />}
-          ></Route>
-          <Route
-            path="/pages/WaitlistTrainingSessionPage"
-            element={<WaitlistTrainingSessionPage />}
-          ></Route>
-        </Route>
+          <Route path="/" element={<Layout />}>
+            {" "}
+            {/*Place the routes to all your pages nested beneath this Route tag */}
+            <Route
+              path="/pages/ChangePasswordPage"
+              element={<ChangePasswordPage />}
+            ></Route>
+            <Route
+              path="/pages/CreateTrainingSessionPage"
+              element={<CreateTrainingSessionPage />}
+            ></Route>
+            <Route
+              path="/pages/DirectMessageChannelPage"
+              element={<DirectMessageChatPage />}
+            />
+            <Route
+              path="/pages/EditProfilePage"
+              element={<EditProfilePage />}
+            ></Route>
+            <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
+            <Route
+              path="/pages/DirectMessagesDashboard"
+              element={<MessagingDashboard />}
+            />
+            <Route
+              path="/pages/PersonalInformationPage"
+              element={<PersonalInformationPage />}
+            ></Route>
+            <Route path="/pages/ProfilePage" element={<ProfilePage />}></Route>
+            <Route path="/login" element={<LogInPage />}></Route>
+            <Route path="/signup" element={<SignUpPage />}></Route>
+            <Route
+              path="/verificationcode"
+              element={<VerificationCodePage />}
+            />
+            <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
+            <Route
+              path="/pages/ViewTrainingSessionPage"
+              element={<ViewTrainingSessionPage />}
+            ></Route>
+            <Route
+              path="/pages/CalendarPage"
+              element={<CalendarPage />}
+            ></Route>
+            <Route
+              path="/pages/ModifyTrainingSessionPage"
+              element={<ModifyTrainingSessionPage />}
+            ></Route>
+            <Route
+              path="/pages/BlockedUserListPage"
+              element={<BlockedUsersListPage />}
+            ></Route>
+            <Route
+              path="/pages/TrainingPlanPage"
+              element={<TrainingPlanPage />}
+            ></Route>
+            <Route
+              path="/pages/NotificationsPage"
+              element={<NotificationsPage />}
+            ></Route>
+            <Route
+              path="/pages/WaitlistTrainingSessionPage"
+              element={<WaitlistTrainingSessionPage />}
+            ></Route>
+          </Route>
         </Route>
       </Routes>
     </Router>
