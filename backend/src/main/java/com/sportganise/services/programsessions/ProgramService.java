@@ -151,6 +151,7 @@ public class ProgramService {
         program.getFrequency(),
         program.getLocation(),
         program.getVisibility(),
+        program.isCancelled(),
         programAttachments);
   }
 
@@ -210,6 +211,7 @@ public class ProgramService {
       String frequency = program.getFrequency();
       String location = program.getLocation();
       String visibility = program.getVisibility();
+      boolean cancelled = program.isCancelled();
 
       if (!(program.getFrequency() == null || program.getFrequency().equalsIgnoreCase("once"))) {
         List<ProgramRecurrence> recurrences = getProgramRecurrences(program.getProgramId());
@@ -233,6 +235,7 @@ public class ProgramService {
                   frequency,
                   location,
                   visibility,
+                  recurrence.isCancelled(),
                   programAttachments));
         }
       } else {
@@ -252,6 +255,7 @@ public class ProgramService {
                 frequency,
                 location,
                 visibility,
+                cancelled,
                 programAttachments));
         System.out.println("Program id: " + programId);
       }
