@@ -59,6 +59,7 @@ export default function TrainingSessionsList() {
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
   // Start Date Range
+  //console.warn("startOfWeek", startOfWeek);
   const [dateRange, setDateRange] = useState([
     {
       startDate: startOfWeek, // this week
@@ -76,15 +77,42 @@ export default function TrainingSessionsList() {
 
   // Filter Programs by Date Range
   const filteredPrograms: Program[] = programs.filter((program) => {
-    const programDate = new Date(
+    // Normalize date before filtering
+    console.log(
+      "hellloooooo",
+      (program.programDetails.reccurenceDate
+        ? program.programDetails.reccurenceDate
+        : program.programDetails.occurrenceDate
+      ).toString(),
+    );
+    const [year, month, day] = (
       program.programDetails.reccurenceDate
         ? program.programDetails.reccurenceDate
-        : program.programDetails.occurrenceDate,
-    );
+        : program.programDetails.occurrenceDate
+    )
+      .toString()
+      .split("T")[0]
+      .split("-")
+      .map(Number);
+    const programDate = new Date(year, month - 1, day);
+    console.error("new programDate", programDate);
+
+    /* const programDate = new Date(
+      program.programDetails.reccurenceDate
+        ? program.programDetails.reccurenceDate
+        : program.programDetails.occurrenceDate
+    ); */
+
+    console.log("HEEEEEEERE!", new Date("2025-03-23T02:11:00Z")); //sundays are being created as saturdays
+
+    console.warn("programDate", programDate.getDate());
+
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
+    console.warn("programDate w/ setHours", programDate);
     const dateFilter =
       programDate >= dateRange[0].startDate &&
       programDate <= dateRange[0].endDate;
+    //console.warn("dateFilter", dateFilter);
     const typeFilter =
       selectedProgramType.length === 0 ||
       selectedProgramType.includes(program.programDetails.programType);
