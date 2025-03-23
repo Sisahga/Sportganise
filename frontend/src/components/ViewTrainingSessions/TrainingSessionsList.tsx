@@ -58,8 +58,12 @@ export default function TrainingSessionsList() {
   );
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
+  startOfWeek.setHours(0, 0, 0, 0);
+  endOfWeek.setHours(0, 0, 0, 0);
+
   // Start Date Range
-  //console.warn("startOfWeek", startOfWeek);
+  console.warn("startOfWeek", startOfWeek);
+  console.warn("endOfWeek", endOfWeek);
   const [dateRange, setDateRange] = useState([
     {
       startDate: startOfWeek, // this week
@@ -78,7 +82,7 @@ export default function TrainingSessionsList() {
   // Filter Programs by Date Range
   const filteredPrograms: Program[] = programs.filter((program) => {
     // Normalize date before filtering
-    console.log(
+    log.debug(
       "hellloooooo",
       (program.programDetails.reccurenceDate
         ? program.programDetails.reccurenceDate
@@ -95,7 +99,7 @@ export default function TrainingSessionsList() {
       .split("-")
       .map(Number);
     const programDate = new Date(year, month - 1, day);
-    console.error("new programDate", programDate);
+    //console.error("new programDate", programDate);
 
     /* const programDate = new Date(
       program.programDetails.reccurenceDate
@@ -103,12 +107,12 @@ export default function TrainingSessionsList() {
         : program.programDetails.occurrenceDate
     ); */
 
-    console.log("HEEEEEEERE!", new Date("2025-03-23T02:11:00Z")); //sundays are being created as saturdays
+    //log.debug("HEEEEEEERE!", new Date("2025-03-23T02:11:00Z")); //sundays are being created as saturdays
 
-    console.warn("programDate", programDate.getDate());
+    //log.warn("programDate", programDate.getDate());
 
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
-    console.warn("programDate w/ setHours", programDate);
+    //log.warn("programDate w/ setHours", programDate);
     const dateFilter =
       programDate >= dateRange[0].startDate &&
       programDate <= dateRange[0].endDate;
