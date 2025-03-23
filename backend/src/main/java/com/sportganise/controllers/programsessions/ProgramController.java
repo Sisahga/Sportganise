@@ -254,7 +254,7 @@ public class ProgramController {
    * @param cancel boolean value to cancel or uncancel the program.
    * @return HTTP Response for modified/updated data
    */
-  @PutMapping("/{accountId}/{programId}/cancelProgram")
+  @PutMapping("/{accountId}/{programId}/cancel-program")
   ResponseEntity<ResponseDto<String>> cancelProgram(
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
@@ -274,7 +274,7 @@ public class ProgramController {
    * @param cancel boolean value to cancel or uncancel the recurrence.
    * @return HTTP Response for modified/updated data
    */
-  @PutMapping("/{accountId}/{recurrenceId}/cancelRecurrence")
+  @PutMapping("/{accountId}/{recurrenceId}/cancel-recurrence")
   ResponseEntity<ResponseDto<String>> cancelRecurrence(
       @PathVariable Integer accountId,
       @PathVariable Integer recurrenceId,
@@ -295,7 +295,7 @@ public class ProgramController {
    * @param cancel boolean value to cancel or uncancel the recurrences.
    * @return HTTP Response for modified/updated data
    */
-  @PutMapping("/{accountId}/{recurrenceId}/cancelAllRecurrences")
+  @PutMapping("/{accountId}/{recurrenceId}/cancel-all-recurrences")
   ResponseEntity<ResponseDto<String>> cancelAllRecurrences(
       @PathVariable Integer accountId,
       @PathVariable Integer recurrenceId,
