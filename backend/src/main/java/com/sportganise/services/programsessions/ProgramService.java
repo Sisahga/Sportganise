@@ -12,11 +12,7 @@ import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramRecurrence;
 import com.sportganise.entities.programsessions.ProgramType;
-import com.sportganise.exceptions.EntityNotFoundException;
-import com.sportganise.exceptions.FileProcessingException;
-import com.sportganise.exceptions.ForbiddenException;
-import com.sportganise.exceptions.ProgramNotFoundException;
-import com.sportganise.exceptions.ResourceNotFoundException;
+import com.sportganise.exceptions.*;
 import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
@@ -755,6 +751,40 @@ public class ProgramService {
     }
   }
 
+  public void cancel(
+          Integer programOrRecurrenceId,
+          Integer accountId,
+          boolean isRecurrence,
+          boolean affectAllRecurrences,
+          boolean cancel) {
+    Integer programId;
+    if (isRecurrence) {
+      programId =
+              programRecurrenceRepository
+                      .findProgramRecurrenceById(programOrRecurrenceId)
+                      .getProgramId();
+    } else {
+      programId = programOrRecurrenceId;
+    }
+    checkProgramOwner(accountId, programId);
+
+    if (cancel) {
+      if (!isRecurrence || affectAllRecurrences) {
+        programRepository.cancelProgram(programId);
+        programRecurrenceRepository.cancelProgramRecurrences(programId);
+      } else {
+        programRecurrenceRepository.cancelRecurrence(programOrRecurrenceId);
+      }
+    } else {
+      if (!isRecurrence || affectAllRecurrences) {
+        programRepository.uncancelProgram(programId);
+        programRecurrenceRepository.uncancelProgramRecurrences(programId);
+      } else {
+        programRecurrenceRepository.uncancelRecurrence(programOrRecurrenceId);
+      }
+    }
+  }
+
   /**
    * Method to create a list of ProgramRecurrence objects for a recurring program. g
    *
@@ -772,11 +802,7 @@ public class ProgramService {
    * @param programId Id of the program to be deleted.
    */
   public void deleteProgram(Integer accountId, Integer programId) {
-    if (!isOwner(accountId, programId)) {
-      log.debug("USER DOES NOT HAVE PERMISSION TO DELETE PROGRAM- ID: {}", programId);
-      log.debug("USER ID: {}", accountId);
-      throw new ForbiddenException("This user does not have permission to delete the program.");
-    }
+    checkProgramOwner(accountId, programId);
     programRepository.deleteById(programId);
     log.debug("DELETED PROGRAM WITH ID: {}", programId);
   }
@@ -785,12 +811,13 @@ public class ProgramService {
    * Method to check if the user is the program's coach or an ADMIN.
    *
    * @param accountId Id of the user.
-   * @return Boolean for whether the user is an admin or the program owner.
+   * @param programId Id of the program.
    */
-  private boolean isOwner(Integer accountId, Integer programId) {
-    getProgramById(programId);
-    return (accountId.equals(getCoachId(programId))
-        || accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN));
+  private void checkProgramOwner(Integer accountId, Integer programId) {
+    List<Integer> programOwnerIds = programParticipantRepository.findProgramCoachIds(programId);
+    if(!(programOwnerIds.contains(accountId)|| accountService.getAccountById(accountId).getType().equals(AccountType.ADMIN))){
+      throw new InsufficientPermissionException("User is not the program's owner or an admin");
+    }
   }
 
   /**
@@ -799,8 +826,8 @@ public class ProgramService {
    * @param programId Id of the program.
    * @return Id of the coach of the program.
    */
-  private Integer getCoachId(Integer programId) {
-    return programParticipantRepository.findCoachIdByProgramId(programId);
+  private List<Integer> getCoachIds(Integer programId) {
+    return programParticipantRepository.findProgramCoachIds(programId);
   }
 
   /**
