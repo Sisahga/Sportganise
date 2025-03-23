@@ -69,7 +69,7 @@ public interface ProgramParticipantRepository
   int countConfirmedParticipants(@Param("programId") Integer programId);
 
   @Query(
-          """
+      """
               SELECT p.programParticipantId.accountId
               FROM ProgramParticipant p
               WHERE p.programParticipantId.programId = :programId

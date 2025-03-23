@@ -56,5 +56,4 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
             WHERE p.programId = :programId
             """)
   void uncancelProgram(Integer programId);
-
 }
