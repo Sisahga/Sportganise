@@ -33,6 +33,7 @@ import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 import { ONCE, WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
+import trainingSessionApi from "@/services/api/trainingSessionApi";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -66,21 +67,32 @@ const TrainingSessionContent = () => {
     reccurenceDate: new Date(),
   });
 
-  useEffect(() => {
-    // Update state safely using useEffect
-    if (location.state && location.state.programDetails) {
-      setProgramDetails(location.state.programDetails);
-    }
-    log.info("Program details in training session content: ", programDetails);
-  }, [location.state]);
-
   const [attendees, setAttendees] = useState<Attendees[]>([]);
-  useEffect(() => {
-    if (location.state && location.state.attendees) {
-      setAttendees(location.state.attendees);
+
+  const fetchProgramData = async () => {
+    const programId = location.state?.programDetails?.programId;
+    if (programId && user?.accountId) {
+      try {
+        const response = await trainingSessionApi.getPrograms(user?.accountId);
+        const program = response.data?.find(
+          (p) => p.programDetails.programId === programId,
+        );
+        if (program) {
+          setProgramDetails(program.programDetails);
+          setAttendees(program.attendees);
+        } else {
+          console.log("No program found");
+        }
+      } catch (error) {
+        log.error("Failed to fetch program data:", error);
+      }
     }
-    log.info("Attendees in training session content: ", attendees);
-  }, [location.state]);
+  };
+
+  useEffect(() => {
+    // Fetch fresh data when the component mounts
+    fetchProgramData();
+  }, [user, location.state?.programDetails?.programId]);
 
   useEffect(() => {
     //TODO: define a useHook instead of all this code, who knows
@@ -104,6 +116,27 @@ const TrainingSessionContent = () => {
     };
     fetchParticipant();
   }, [location.state.programDetails.programId, user?.accountId]);
+
+  const handleRefresh = async () => {
+    const programs = await trainingSessionApi.getPrograms(user?.accountId);
+    if (programs.data) {
+      const program = programs.data.find(
+        (p) => p.programDetails.programId === programDetails.programId,
+      );
+      if (program) {
+        console.log("Refreshed programs: ", programs);
+        setAttendees(program.attendees);
+        setProgramDetails(program.programDetails);
+        console.log("Refreshed attendees: ", program.attendees);
+        console.log("Refreshed programDetails: ", program.programDetails);
+      } else console.log("No program found");
+    }
+  };
+
+  useEffect(() => {
+    console.log("Updated attendees:", attendees);
+    console.log("Update programDetails: ", programDetails);
+  }, [attendees]);
 
   return (
     <div className="mb-32 mt-5">
@@ -296,7 +329,10 @@ const TrainingSessionContent = () => {
                   return attendee.participantType?.toLowerCase() ===
                     "subscribed" || attendee.confirmed ? (
                     <div key={index}>
-                      <RegisteredPlayer accountAttendee={attendee} />
+                      <RegisteredPlayer
+                        accountAttendee={attendee}
+                        onRefresh={handleRefresh}
+                      />
                     </div>
                   ) : null;
                 })
@@ -306,8 +342,50 @@ const TrainingSessionContent = () => {
                 </p>
               )}
             </div>
+            <div className="mb-8"></div>
           </>
         )}
+
+        {!(
+          (user?.type?.toLowerCase() === "general" ||
+            user?.type?.toLowerCase() === "player") &&
+          programDetails.programType.toLowerCase() === "training"
+        ) &&
+          attendees.some((attendee) => attendee.rank !== null) && (
+            <>
+              <div className="flex items-center">
+                <h2 className="text-lg font-semibold">Waitlist Queue</h2>
+              </div>
+              <div className="mx-2">
+                {(() => {
+                  // Filter and type cast to ensure rank exists
+                  const waitlisted = attendees
+                    .filter(
+                      (
+                        attendee,
+                      ): attendee is { rank: number } & typeof attendee =>
+                        attendee.rank !== null,
+                    )
+                    .sort((a, b) => a.rank - b.rank);
+
+                  return waitlisted.length > 0 ? (
+                    waitlisted.map((attendee, index) => (
+                      <div key={index}>
+                        <RegisteredPlayer
+                          accountAttendee={attendee}
+                          onRefresh={handleRefresh}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                      There are no waitlisted attendees.
+                    </p>
+                  );
+                })()}
+              </div>
+            </>
+          )}
 
         {/**Conditionally render different menu options based on account type */}
         <DropDownMenuButton
@@ -315,6 +393,7 @@ const TrainingSessionContent = () => {
           accountAttendee={accountAttendee}
           programDetails={programDetails}
           attendees={attendees}
+          onRefresh={handleRefresh}
         />
       </div>
     </div>

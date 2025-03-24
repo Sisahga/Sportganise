@@ -152,6 +152,7 @@ describe("DropDownMenuButton component", () => {
         accountAttendee={undefined}
         programDetails={programDetails}
         attendees={attendees}
+        onRefresh={vi.fn()}
       />,
     );
 
@@ -185,6 +186,7 @@ describe("DropDownMenuButton component", () => {
         accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
+        onRefresh={vi.fn()}
       />,
     );
 
@@ -212,6 +214,7 @@ describe("DropDownMenuButton component", () => {
         accountAttendee={undefined}
         programDetails={programDetails}
         attendees={attendees}
+        onRefresh={vi.fn()}
       />,
     );
 
@@ -255,6 +258,7 @@ describe("DropDownMenuButton component", () => {
         accountAttendee={accountAttendee}
         programDetails={programDetails}
         attendees={attendees}
+        onRefresh={vi.fn()}
       />,
     );
 
