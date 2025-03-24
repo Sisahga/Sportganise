@@ -4,8 +4,8 @@ import log from "loglevel";
 // Component imports
 import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Hourglass } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Hourglass, User2Icon } from "lucide-react";
 import EventBadgeType from "./BadgeTypes/EventBadgeType";
 
 // Data structure for data received from API call
@@ -17,6 +17,7 @@ import {
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
+import { ONCE } from "@/constants/programconstants";
 
 interface TrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -40,15 +41,20 @@ const TrainingSessionCard: React.FC<Program> = ({
         <div className="flex w-full items-center gap-2">
           <Avatar>
             <AvatarFallback className="bg-primaryColour">
-              <img src="/src/assets/Logo.png" alt="organisation" />
+              <User2Icon color="#a1a1aa" />
             </AvatarFallback>
+            <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
           </Avatar>
-          <span>{programDetails.author}</span>{" "}
+          <span>{programDetails?.author ?? "N/A"}</span>{" "}
           <span className="ml-auto text-xs">
-            {new Date(programDetails.occurrenceDate).toDateString()}
+            {programDetails?.reccurenceDate &&
+            programDetails?.frequency !== ONCE
+              ? new Date(programDetails.reccurenceDate).toDateString()
+              : (new Date(programDetails.occurrenceDate).toDateString() ??
+                "N/A")}
           </span>
         </div>
-        <span className="font-semibold">{programDetails.title}</span>
+        <span className="font-semibold">{programDetails?.title ?? "N/A"}</span>
         <div>
           <span className="flex items-center">
             <Clock
@@ -58,17 +64,21 @@ const TrainingSessionCard: React.FC<Program> = ({
             />
             <span className="flex items-center">
               <p className="text-gray-500 whitespace-break-spaces text-xs">
-                {new Date(programDetails.occurrenceDate).toLocaleTimeString(
-                  "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
-                )}
+                {programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
+                      "en-CA",
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                    )
+                  : "N/A"}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-gray-500 whitespace-break-spaces text-xs">
-                {calculateEndTime(
-                  new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
-                )}
+                {programDetails?.occurrenceDate && programDetails?.durationMins
+                  ? calculateEndTime(
+                      new Date(programDetails.occurrenceDate),
+                      programDetails.durationMins,
+                    )
+                  : "N/A"}
               </p>
             </span>
           </span>
@@ -80,7 +90,7 @@ const TrainingSessionCard: React.FC<Program> = ({
             />
             <span className="flex items-center">
               <p className="text-gray-500 whitespace-break-spaces text-xs">
-                {programDetails.durationMins} min
+                {programDetails?.durationMins ?? "N/A"} min
               </p>
             </span>
           </span>
@@ -91,15 +101,17 @@ const TrainingSessionCard: React.FC<Program> = ({
               className="mr-1"
             />
             <p className="text-gray-500 whitespace-break-spaces text-xs">
-              {programDetails.location}
+              {programDetails?.location ?? "N/A"}
             </p>
           </span>
         </div>
         <span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
-          {programDetails.description}
+          {programDetails?.description}
         </span>
         <div className="flex">
-          <EventBadgeType programType={programDetails.programType} />
+          {programDetails?.programType && (
+            <EventBadgeType programType={programDetails.programType} />
+          )}
 
           {/*Click to view details */}
           <button

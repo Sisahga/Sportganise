@@ -17,8 +17,8 @@ import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.ParticipantNotFoundException;
-import com.sportganise.exceptions.ProgramNotFoundException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
+import com.sportganise.exceptions.programexceptions.ProgramNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
@@ -349,8 +349,7 @@ public class WaitlistServiceTest {
             () -> {
               programParticipantService.markAbsent(programId, accountId);
             });
-    assertEquals(
-        "Participant not found on waitlist for program: 1, account: 2", exception.getMessage());
+    assertEquals("Participant not found for program: 1, account: 2", exception.getMessage());
   }
 
   @Test

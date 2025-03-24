@@ -26,8 +26,15 @@ test("displays loading", () => {
   };
 
   render(
-    <MemoryRouter>
-      <RegisteredPlayer accountAttendee={mockAttendee} />
+    <MemoryRouter
+      initialEntries={[
+        {
+          pathname: "/pages/ViewTrainingSessionPage",
+          state: { programDetails: { programId: 1 } },
+        },
+      ]}
+    >
+      <RegisteredPlayer accountAttendee={mockAttendee} onRefresh={() => {}} />
     </MemoryRouter>,
   );
 

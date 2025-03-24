@@ -19,6 +19,7 @@ import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadExc
 import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
 import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
 import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
+import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
@@ -143,6 +144,7 @@ public class GlobalExceptionHandler {
   // </editor-fold>
 
   // <editor-fold desc="Region: Channel Exceptions">
+
   /**
    * Handle bad request exception for channel creation.
    *
@@ -537,6 +539,36 @@ public class GlobalExceptionHandler {
   public ResponseDto<?> handleMissingPathVariableException(MissingPathVariableException e) {
     return ResponseDto.builder()
         .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle invalid frequency exception.
+   *
+   * @param e exception
+   * @return response dto with status 417.
+   */
+  @ExceptionHandler(InvalidFrequencyException.class)
+  @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+  public ResponseDto<?> handleInvalidFrequencyException(InvalidFrequencyException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.EXPECTATION_FAILED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle insufficient permission exception.
+   *
+   * @param e exception
+   * @return response dto with status 403.
+   */
+  @ExceptionHandler(InsufficientPermissionsException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  public ResponseDto<?> handleInsufficientPermissionException(InsufficientPermissionsException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.FORBIDDEN.value())
         .message(e.getMessage())
         .build();
   }

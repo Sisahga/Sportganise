@@ -103,6 +103,24 @@ button {
   transition: border-color 0.25s;
 }
 
+@keyframes flowIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  60% {
+    transform: translateX(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-flowIn {
+  animation: flowIn 0.75s ease-out forwards;
+}
+
 @keyframes skeleton-loading {
   0% {
     background-color: var(--primary-navbar-colour);

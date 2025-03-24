@@ -45,9 +45,6 @@ public class Program {
   @Column(name = "duration")
   private Integer durationMins;
 
-  @Column(name = "is_recurring")
-  private boolean isRecurring;
-
   @Column(name = "expiry_date")
   private ZonedDateTime expiryDate;
 
@@ -56,6 +53,9 @@ public class Program {
   private String location;
 
   private String visibility;
+
+  @Column(name = "cancelled")
+  private boolean cancelled = false;
 
   /**
    * Constructor excluding programId since it's generated automatically.
@@ -67,7 +67,6 @@ public class Program {
    * @param capacity capacity of the program.
    * @param occurrenceDate start date and time of the first program occurrence.
    * @param durationMins duration of the program in minutes.
-   * @param isRecurring boolean for whether or not this program is a recurring one.
    * @param expiryDate date and time of the last occurrence of the program.
    * @param frequency frequency of the program if it is recurring.
    * @param location location of the program.
@@ -81,7 +80,6 @@ public class Program {
       Integer capacity,
       ZonedDateTime occurrenceDate,
       Integer durationMins,
-      Boolean isRecurring,
       ZonedDateTime expiryDate,
       String frequency,
       String location,
@@ -93,7 +91,6 @@ public class Program {
     this.capacity = capacity;
     this.occurrenceDate = occurrenceDate;
     this.durationMins = durationMins;
-    this.isRecurring = isRecurring;
     this.expiryDate = expiryDate;
     this.frequency = frequency;
     this.location = location;

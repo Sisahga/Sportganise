@@ -32,6 +32,16 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
     });
   };
 
+  const isSpecialMessage = (message: string | null) => {
+    if (!message) return false;
+    return (
+      message.startsWith("INIT*") ||
+      message.startsWith("BLOCK*") ||
+      message.startsWith("UNBLOCK*") ||
+      message.startsWith("DELETE*")
+    );
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
@@ -64,14 +74,13 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
         <div className="ml-4 flex justify-between flex-1 min-w-0">
           <div className="flex flex-col overflow-hidden">
             <p className="text-md font-semibold">{channel.channelName}</p>
-            {!channel.lastMessage?.startsWith("INIT*") &&
-              !channel.lastMessage?.startsWith("BLOCK*") &&
-              !channel.lastMessage?.startsWith("UNBLOCK*") &&
-              !channel.lastMessage?.startsWith("DELETE*") && (
-                <p className="text-sm text-gray-500 mt-1 truncate">
-                  {channel.lastMessage}
-                </p>
-              )}
+            {!isSpecialMessage(channel.lastMessage) && (
+              <p className="text-sm text-gray-500 mt-1 truncate">
+                {channel.lastMessage === "" && lastMessage?.hasAttachments
+                  ? `${channel.channelName} sent an attachment`
+                  : channel.lastMessage}
+              </p>
+            )}
             {lastMessage?.type == "JOIN" && (
               <p className="text-sm text-gray-500 mt-1 truncate">
                 {parseInt(lastMessage.messageContent.split("*")[1]) === userId
@@ -79,34 +88,15 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
                   : lastMessage.messageContent.split("*")[3]}
               </p>
             )}
-            {channel.lastMessage?.split("*")[0].startsWith("BLOCK") && (
-              <p className="text-sm text-gray-500 mt-1 truncate italic">
-                {parseInt(channel.lastMessage.split("*")[1]) === userId
-                  ? channel.lastMessage.split("*")[2]
-                  : channel.lastMessage.split("*")[3]}
-              </p>
-            )}
-            {channel.lastMessage?.split("*")[0].startsWith("UNBLOCK") && (
-              <p className="text-sm text-gray-500 mt-1 truncate italic">
-                {parseInt(channel.lastMessage.split("*")[1]) === userId
-                  ? channel.lastMessage.split("*")[2]
-                  : channel.lastMessage.split("*")[3]}
-              </p>
-            )}
-            {channel.lastMessage?.startsWith("UPDATE*") && (
-              <p className="text-sm text-gray-500 mt-1 truncate italic">
-                {parseInt(channel.lastMessage.split("*")[1]) === userId
-                  ? channel.lastMessage.split("*")[2]
-                  : channel.lastMessage.split("*")[3]}
-              </p>
-            )}
-            {channel.lastMessage?.startsWith("DELETE*") && (
-              <p className="text-sm text-gray-500 mt-1 truncate italic">
-                {parseInt(channel.lastMessage.split("*")[1]) === userId
-                  ? channel.lastMessage.split("*")[2]
-                  : channel.lastMessage.split("*")[3]}
-              </p>
-            )}
+            {channel.lastMessage?.split("*")[0].startsWith("BLOCK") ||
+              channel.lastMessage?.split("*")[0].startsWith("UNBLOCK") ||
+              (channel.lastMessage?.split("*")[0].startsWith("DELETE*") && (
+                <p className="text-sm text-gray-500 mt-1 truncate italic">
+                  {parseInt(channel.lastMessage.split("*")[1]) === userId
+                    ? channel.lastMessage.split("*")[2]
+                    : channel.lastMessage.split("*")[3]}
+                </p>
+              ))}
           </div>
           <div className="flex flex-col min-w-fit">{extraInfo}</div>
         </div>
@@ -118,8 +108,8 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   return (
     <button
       type="button"
-      className={`flex flex-col items-center w-20 cursor-pointer focus:outline-none bg-white relative
-      ${channel.read ? "" : "font-bold"}`}
+      className={`flex flex-col items-center p-1.5 w-20 cursor-pointer focus:outline-none bg-white relative
+      ${channel.read ? "" : "font-bold"} hover:bg-gray-50`}
       onClick={handleClick}
     >
       <img
@@ -131,7 +121,7 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
         className="w-12 h-12 rounded-full object-cover"
       />
       <span
-        className="text-xs text-gray-600 mt-2 text-center inline-block
+        className="text-xs text-gray-600 mt-2 text-center inline-block text-nowrap
       max-w-full overflow-hidden overflow-ellipsis"
       >
         {channel.channelName}

@@ -17,8 +17,9 @@ import {
   FileText,
   Hourglass,
   Repeat,
+  User2Icon,
 } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
@@ -30,6 +31,9 @@ import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
 import waitlistParticipantsApi from "@/services/api/programParticipantApi";
+import { ONCE, WEEKLY } from "@/constants/programconstants";
+import { MONTHLY } from "@/constants/programconstants";
+import trainingSessionApi from "@/services/api/trainingSessionApi";
 
 const TrainingSessionContent = () => {
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
@@ -46,36 +50,49 @@ const TrainingSessionContent = () => {
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
+    recurrenceId: 0,
     title: "",
     programType: "",
     description: "",
     capacity: 0,
     occurrenceDate: new Date(),
     durationMins: 0,
-    recurring: false,
     expiryDate: new Date(),
     location: "",
     programAttachments: [],
     frequency: "",
     visibility: "",
     author: "",
+    cancelled: false,
+    reccurenceDate: new Date(),
   });
 
-  useEffect(() => {
-    // Update state safely using useEffect
-    if (location.state && location.state.programDetails) {
-      setProgramDetails(location.state.programDetails);
-    }
-    log.info("Program details in training session content: ", programDetails);
-  }, [location.state]);
-
   const [attendees, setAttendees] = useState<Attendees[]>([]);
-  useEffect(() => {
-    if (location.state && location.state.attendees) {
-      setAttendees(location.state.attendees);
+
+  const fetchProgramData = async () => {
+    const programId = location.state?.programDetails?.programId;
+    if (programId && user?.accountId) {
+      try {
+        const response = await trainingSessionApi.getPrograms(user?.accountId);
+        const program = response.data?.find(
+          (p) => p.programDetails.programId === programId,
+        );
+        if (program) {
+          setProgramDetails(program.programDetails);
+          setAttendees(program.attendees);
+        } else {
+          console.log("No program found");
+        }
+      } catch (error) {
+        log.error("Failed to fetch program data:", error);
+      }
     }
-    log.info("Attendees in training session content: ", attendees);
-  }, [location.state]);
+  };
+
+  useEffect(() => {
+    // Fetch fresh data when the component mounts
+    fetchProgramData();
+  }, [user, location.state?.programDetails?.programId]);
 
   useEffect(() => {
     //TODO: define a useHook instead of all this code, who knows
@@ -100,6 +117,27 @@ const TrainingSessionContent = () => {
     fetchParticipant();
   }, [location.state.programDetails.programId, user?.accountId]);
 
+  const handleRefresh = async () => {
+    const programs = await trainingSessionApi.getPrograms(user?.accountId);
+    if (programs.data) {
+      const program = programs.data.find(
+        (p) => p.programDetails.programId === programDetails.programId,
+      );
+      if (program) {
+        console.log("Refreshed programs: ", programs);
+        setAttendees(program.attendees);
+        setProgramDetails(program.programDetails);
+        console.log("Refreshed attendees: ", program.attendees);
+        console.log("Refreshed programDetails: ", program.programDetails);
+      } else console.log("No program found");
+    }
+  };
+
+  useEffect(() => {
+    console.log("Updated attendees:", attendees);
+    console.log("Update programDetails: ", programDetails);
+  }, [attendees]);
+
   return (
     <div className="mb-32 mt-5">
       {/**Return to previous page */}
@@ -109,14 +147,17 @@ const TrainingSessionContent = () => {
       <div className="flex items-center gap-3 my-5">
         <Avatar className="w-16 h-16">
           <AvatarFallback className="bg-primaryColour">
-            <img src="/src/assets/Logo.png" alt="organisation" />
+            <User2Icon color="#a1a1aa" />
           </AvatarFallback>
+          <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
         </Avatar>
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-secondaryColour">
-            {programDetails.title}
+            {programDetails?.title ?? "N/A"}
           </h2>
-          <EventBadgeType programType={programDetails.programType} />
+          {programDetails?.programType && (
+            <EventBadgeType programType={programDetails.programType} />
+          )}
         </div>
       </div>
 
@@ -130,9 +171,14 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {new Date(programDetails.occurrenceDate).toDateString()}
+              {programDetails?.reccurenceDate &&
+              programDetails?.frequency !== ONCE
+                ? new Date(programDetails.reccurenceDate).toDateString()
+                : programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toDateString()
+                  : "N/A"}
             </p>
-            {programDetails.expiryDate ? (
+            {programDetails?.expiryDate ? (
               <div className="flex items-center gap-2">
                 <hr className="w-1 h-px border-0 bg-gray-500 " />
                 <p className="text-sm text-gray-500">
@@ -150,17 +196,21 @@ const TrainingSessionContent = () => {
             />
             <span className="flex items-center">
               <p className="text-sm text-gray-500">
-                {new Date(programDetails.occurrenceDate).toLocaleTimeString(
-                  "en-CA",
-                  { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
-                )}
+                {programDetails?.occurrenceDate
+                  ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
+                      "en-CA",
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                    )
+                  : "N/A"}
               </p>
               <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
               <p className="text-sm text-gray-500">
-                {calculateEndTime(
-                  new Date(programDetails.occurrenceDate),
-                  programDetails.durationMins,
-                )}
+                {programDetails.occurrenceDate && programDetails.durationMins
+                  ? calculateEndTime(
+                      new Date(programDetails.occurrenceDate),
+                      programDetails.durationMins,
+                    )
+                  : "N/A"}
               </p>
             </span>
           </div>
@@ -170,7 +220,7 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails.durationMins} min
+              {programDetails?.durationMins ?? "N/A"} min
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -179,10 +229,19 @@ const TrainingSessionContent = () => {
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
             <p className="text-sm text-gray-500">
-              {programDetails.frequency || "one time"} on{" "}
-              {new Intl.DateTimeFormat("en-CA", { weekday: "long" }).format(
-                new Date(programDetails.occurrenceDate),
-              )}
+              {programDetails?.frequency
+                ? programDetails?.frequency?.toLowerCase() || "one time"
+                : "N/A"}{" "}
+              {programDetails?.occurrenceDate &&
+                (programDetails?.frequency == WEEKLY ||
+                  programDetails?.frequency == MONTHLY) && (
+                  <>
+                    on{" "}
+                    {new Intl.DateTimeFormat("en-CA", {
+                      weekday: "long",
+                    }).format(new Date(programDetails.occurrenceDate))}
+                  </>
+                )}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -190,53 +249,64 @@ const TrainingSessionContent = () => {
               size={15}
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
-            <p className="text-sm text-gray-500">{programDetails.author}</p>
+            <p className="text-sm text-gray-500">
+              {programDetails?.author ?? "N/A"}
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <MapPin
               size={15}
               color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
             />
-            <p className="text-sm text-gray-500">{programDetails.location}</p>
+            <p className="text-sm text-gray-500">
+              {programDetails?.location ?? "N/A"}
+            </p>
           </div>
         </div>
 
         {/**Information */}
         <div className="my-10">
           <h2 className="text-lg font-semibold my-2">Information</h2>
-          <div className="mx-2">
-            <p className="text-sm my-2 text-gray-500">
-              {programDetails.description}
-            </p>
-            <div className="grid gap-2">
-              {programDetails.programAttachments.map((attachment, index) => (
-                <div
-                  key={index}
-                  className="flex items-center border-[1px] rounded-md p-2"
-                >
-                  <FileText
-                    size={15}
-                    color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-                    className="w-8 pr-2"
-                  />
-                  <div className="overflow-x-scroll">
-                    <a
-                      className="text-sm text-gray-500 hover:text-cyan-300"
-                      href={attachment.attachmentUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                    >
-                      {getFileName(attachment.attachmentUrl)}
-                    </a>
+          {programDetails?.description || programDetails?.programAttachments ? (
+            <div className="mx-2">
+              <p className="text-sm my-2 text-gray-500">
+                {programDetails?.description}
+              </p>
+              <div className="grid gap-2">
+                {programDetails.programAttachments.map((attachment, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center border-[1px] rounded-md p-2"
+                  >
+                    <FileText
+                      size={15}
+                      color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                      className="w-8 pr-2"
+                    />
+                    <div className="overflow-x-scroll">
+                      <a
+                        className="text-sm text-gray-500 hover:text-cyan-300"
+                        href={attachment.attachmentUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download
+                      >
+                        {getFileName(attachment.attachmentUrl)}
+                      </a>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          ) : (
+            <p className="text-gray-500 text-sm font-normal m-5 text-center">
+              No information given
+            </p>
+          )}
         </div>
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
+        {/**Can render attendees list to Players or General when program type us not training session*/}
         {!(
           (user?.type?.toLowerCase() === "general" ||
             user?.type?.toLowerCase() === "player") &&
@@ -259,7 +329,10 @@ const TrainingSessionContent = () => {
                   return attendee.participantType?.toLowerCase() ===
                     "subscribed" || attendee.confirmed ? (
                     <div key={index}>
-                      <RegisteredPlayer accountAttendee={attendee} />
+                      <RegisteredPlayer
+                        accountAttendee={attendee}
+                        onRefresh={handleRefresh}
+                      />
                     </div>
                   ) : null;
                 })
@@ -269,8 +342,50 @@ const TrainingSessionContent = () => {
                 </p>
               )}
             </div>
+            <div className="mb-8"></div>
           </>
         )}
+
+        {!(
+          (user?.type?.toLowerCase() === "general" ||
+            user?.type?.toLowerCase() === "player") &&
+          programDetails.programType.toLowerCase() === "training"
+        ) &&
+          attendees.some((attendee) => attendee.rank !== null) && (
+            <>
+              <div className="flex items-center">
+                <h2 className="text-lg font-semibold">Waitlist Queue</h2>
+              </div>
+              <div className="mx-2">
+                {(() => {
+                  // Filter and type cast to ensure rank exists
+                  const waitlisted = attendees
+                    .filter(
+                      (
+                        attendee,
+                      ): attendee is { rank: number } & typeof attendee =>
+                        attendee.rank !== null,
+                    )
+                    .sort((a, b) => a.rank - b.rank);
+
+                  return waitlisted.length > 0 ? (
+                    waitlisted.map((attendee, index) => (
+                      <div key={index}>
+                        <RegisteredPlayer
+                          accountAttendee={attendee}
+                          onRefresh={handleRefresh}
+                        />
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                      There are no waitlisted attendees.
+                    </p>
+                  );
+                })()}
+              </div>
+            </>
+          )}
 
         {/**Conditionally render different menu options based on account type */}
         <DropDownMenuButton
@@ -278,6 +393,7 @@ const TrainingSessionContent = () => {
           accountAttendee={accountAttendee}
           programDetails={programDetails}
           attendees={attendees}
+          onRefresh={handleRefresh}
         />
       </div>
     </div>

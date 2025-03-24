@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+//import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CloudUpload, Paperclip } from "lucide-react";
 import {
@@ -63,6 +63,15 @@ import { TEST_WATER_ROAD } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
 import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
+import { DAILY } from "@/constants/programconstants";
+import { WEEKLY } from "@/constants/programconstants";
+import { MONTHLY } from "@/constants/programconstants";
+import { ONCE } from "@/constants/programconstants";
+// Import dropZoneConfig for files
+import { dropZoneConfig } from "@/constants/drop.zone.config";
+import { useWatch } from "react-hook-form";
+import { NotificationRequest } from "@/types/notifications";
+import useSendNotification from "@/hooks/useSendNotification";
 
 /**All select element options */
 const types = [
@@ -81,6 +90,24 @@ const types = [
   {
     label: "Special Training",
     value: SPECIALTRAINING,
+  },
+] as const;
+const frequencies = [
+  {
+    label: "Daily",
+    value: DAILY,
+  },
+  {
+    label: "Weekly",
+    value: WEEKLY,
+  },
+  {
+    label: "Monthly",
+    value: MONTHLY,
+  },
+  {
+    label: "One time",
+    value: ONCE,
   },
 ] as const;
 const visibilities = [
@@ -126,24 +153,27 @@ export default function ModifyTrainingSessionForm() {
   );
   const [loading, setLoading] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
-  const [, /* attendees */ setAttendees] = useState<Attendees[]>([]); // For US305+
+  const [attendees, setAttendees] = useState<Attendees[]>([]); // For US305+
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
+    recurrenceId: 0,
     title: "",
     programType: "",
     description: "",
     capacity: 0,
     occurrenceDate: new Date(),
     durationMins: 0,
-    recurring: false,
     expiryDate: new Date(),
     location: "",
     programAttachments: [],
     frequency: "",
     visibility: "",
     author: "",
+    cancelled: false,
+    reccurenceDate: new Date(),
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
+  const { sendNotification } = useSendNotification();
 
   useEffect(() => {
     const user = getCookies();
@@ -153,18 +183,6 @@ export default function ModifyTrainingSessionForm() {
     setAccountId(user?.accountId);
     log.debug(`Modify Training Session Form accountId : ${accountId}`);
   }, [accountId, navigate]);
-
-  /** Handle files for file upload in form*/
-  const dropZoneConfig = {
-    //File configurations
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg"],
-      "application/pdf": [".pdf"],
-    },
-  };
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -187,15 +205,23 @@ export default function ModifyTrainingSessionForm() {
     // Set form defaults and update field values
     form.setValue("title", programDetails.title);
     form.setValue("capacity", programDetails.capacity);
-    form.setValue("type", programDetails.programType);
+    form.setValue("type", programDetails.programType.toUpperCase());
     form.setValue("startDate", new Date(programDetails.occurrenceDate));
-    if (programDetails.frequency === null) {
-      form.setValue("endDate", new Date(programDetails.occurrenceDate));
-    } else {
+    if (
+      !(
+        programDetails.frequency === null ||
+        programDetails.frequency.toUpperCase() === ONCE // TODO
+      )
+    ) {
       form.setValue("endDate", new Date(programDetails.expiryDate));
     }
-    form.setValue("recurring", programDetails.recurring);
-    form.setValue("visibility", programDetails.visibility);
+    if (programDetails.frequency) {
+      form.setValue("frequency", programDetails.frequency.toUpperCase());
+    } else {
+      form.setValue("frequency", ONCE);
+    }
+    //form.setValue("recurring", programDetails.recurring);
+    form.setValue("visibility", programDetails.visibility.toLowerCase());
     form.setValue("description", programDetails.description);
     if (programDetails.programAttachments) {
       const files = programDetails.programAttachments.map((attachment) => {
@@ -262,8 +288,13 @@ export default function ModifyTrainingSessionForm() {
         title: values.title,
         type: values.type,
         startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
-        recurring: values.recurring.toString(),
+        // If you're changing an event from recurring to non recurring, endDate will already be initialized.
+        // therefore, must ensure endDate: null is sent in API body.
+        endDate:
+          values.frequency === ONCE
+            ? null
+            : (values.endDate?.toISOString() ?? null),
+        frequency: values.frequency,
         visibility: values.visibility,
         description: values.description,
         capacity: values.capacity.toString(),
@@ -272,6 +303,7 @@ export default function ModifyTrainingSessionForm() {
         location: values.location,
         attachmentsToRemove: attachmentsToRemove ?? [],
       };
+      console.warn("programData:", programData);
       formData.append(
         "programData",
         new Blob([JSON.stringify(programData)], {
@@ -297,9 +329,21 @@ export default function ModifyTrainingSessionForm() {
 
       // Toast popup for user to say form submitted successfully
       toast({
+        variant: "success",
         title: "Form updated successfully ✔",
-        description: "Event was updated in your calendar.",
+        description: "Program was updated in your calendar.",
       });
+
+      // If successful, notify attendees of changes
+      const attendeeIds: Array<number> = attendees.map((a) => a.accountId);
+      console.warn("attendeeIds", attendeeIds);
+      const modifyNotif: NotificationRequest = {
+        title: `Changes made to ${programDetails.title ?? "your"} program`,
+        body: "Open the app to view changes",
+        topic: null,
+        recipients: attendeeIds,
+      };
+      await sendNotification(modifyNotif);
 
       // If successful, navigate back to calendar page
       navigate("/pages/CalendarPage");
@@ -309,7 +353,7 @@ export default function ModifyTrainingSessionForm() {
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description:
-          "There was a problem with your request. Event was not updated.",
+          "There was a problem with your request. Program was not updated.",
       });
     } finally {
       form.reset();
@@ -317,8 +361,15 @@ export default function ModifyTrainingSessionForm() {
     }
   };
 
+  // Watch for changes to frequency
+  // ... conditionally display endDate when frequency != "DAILY"
+  const selectedFreq = useWatch({
+    control: form.control,
+    name: "frequency",
+  });
+
   return (
-    <div>
+    <div className="mb-32">
       {/** Navigate to previous page */}
       <BackButton />
 
@@ -326,7 +377,7 @@ export default function ModifyTrainingSessionForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-8 max-w-3xl mx-auto pt-10 mb-32"
+          className="space-y-8 max-w-3xl mx-auto pt-10"
         >
           {/*Form Title*/}
           <div>
@@ -346,7 +397,9 @@ export default function ModifyTrainingSessionForm() {
             name="title"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="font-semibold text-base">Title</FormLabel>
+                <FormLabel className="font-semibold text-base">
+                  Title*
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Name the program"
@@ -368,7 +421,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Type of Program
+                  Type of Program*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -419,7 +472,7 @@ export default function ModifyTrainingSessionForm() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-
+                <FormDescription>Select the program type.</FormDescription>
                 <FormMessage />
               </FormItem>
             )}
@@ -432,7 +485,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Start Date
+                  Start Date*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -464,8 +517,83 @@ export default function ModifyTrainingSessionForm() {
                 </Popover>
                 <FormDescription>
                   Enter the first date of the program. Applies for recurring and
-                  non recurring programs. If recurring, this day will be the
-                  assumed repeat day in the future.
+                  non recurring programs.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/** Frequency */}
+          <FormField
+            control={form.control}
+            name="frequency"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="font-semibold text-base">
+                  Frequency*
+                </FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className={cn(
+                          "justify-between",
+                          !field.value && "text-muted-foreground",
+                        )}
+                      >
+                        {field.value
+                          ? frequencies.find(
+                              (frequency) => frequency.value === field.value,
+                            )?.label
+                          : "Select frequency"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[200px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search type..." />
+                      <CommandList>
+                        <CommandEmpty>No frequency found.</CommandEmpty>
+                        <CommandGroup>
+                          {frequencies.map((frequency) => (
+                            <CommandItem
+                              value={frequency.label}
+                              key={frequency.value}
+                              onSelect={() => {
+                                form.setValue("frequency", frequency.value);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  frequency.value === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                              {frequency.label}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+                <FormDescription>
+                  {!selectedFreq &&
+                    "Select the frequency at which you would like the program to recur."}
+                  {selectedFreq === ONCE &&
+                    " The program is a one day event and will not recur. No end date required."}
+                  {selectedFreq === DAILY &&
+                    " The program will occur on each day between the start and end dates."}
+                  {selectedFreq === WEEKLY &&
+                    " The program will recur on the day of the week of the start and end dates."}
+                  {selectedFreq === MONTHLY &&
+                    " The program will recur on the date given for the start date of the program until the end date."}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -473,49 +601,57 @@ export default function ModifyTrainingSessionForm() {
           />
 
           {/** End Date */}
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="font-semibold text-base">
-                  End Date
-                </FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground",
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Enter the last day of a recurring program.
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {(selectedFreq === DAILY ||
+            selectedFreq === WEEKLY ||
+            selectedFreq === MONTHLY) && (
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    End Date*
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Enter the last day of the recurring program.
+                    {selectedFreq === "WEEKLY" &&
+                      " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
+                    {selectedFreq === "MONTHLY" &&
+                      " Program end date must fall on the same day of the week as the selected start date and be at least one month apart."}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           {/** Time */}
           <div className="flex gap-2">
@@ -526,7 +662,7 @@ export default function ModifyTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
-                    Start Time
+                    Start Time*
                   </FormLabel>
                   <FormControl>
                     <Input type="time" className="w-full" {...field} />
@@ -546,7 +682,7 @@ export default function ModifyTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormLabel className="font-semibold text-base">
-                    End Time
+                    End Time*
                   </FormLabel>
                   <FormControl>
                     <Input type="time" {...field} />
@@ -567,7 +703,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Location
+                  Location*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -629,7 +765,7 @@ export default function ModifyTrainingSessionForm() {
           />
 
           {/** Recurring */}
-          <FormField
+          {/* <FormField
             control={form.control}
             name="recurring"
             render={({ field }) => (
@@ -642,7 +778,7 @@ export default function ModifyTrainingSessionForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-semibold">
-                    Recurring program
+                    Recurring program*
                   </FormLabel>
                   <FormDescription>
                     The program recurs on the day and at the times entered.
@@ -651,7 +787,7 @@ export default function ModifyTrainingSessionForm() {
                 </div>
               </FormItem>
             )}
-          />
+          /> */}
 
           {/** Visibility */}
           <FormField
@@ -660,7 +796,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
-                  Visibility
+                  Visibility*
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -727,7 +863,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-semibold text-base">
-                  Description
+                  Description*
                 </FormLabel>
                 <FormControl>
                   <Textarea
@@ -789,7 +925,7 @@ export default function ModifyTrainingSessionForm() {
                   </FileUploader>
                 </FormControl>
                 <FormDescription>
-                  Select a file to upload. Max file size is 4 MB. Limit of 5
+                  Select a file to upload. Max file size is 10 MB. Limit of 5
                   files.
                 </FormDescription>
                 <FormMessage />
@@ -804,7 +940,7 @@ export default function ModifyTrainingSessionForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-semibold text-base">
-                  Attendance Capacity
+                  Attendance Capacity*
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -824,38 +960,6 @@ export default function ModifyTrainingSessionForm() {
             )}
           />
 
-          {/** Notify All Players */}
-          {/* <div>
-            <FormField
-              control={form.control}
-              name="notify"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel className="font-semibold">
-                      Notify all players
-                    </FormLabel>
-                    <FormDescription>
-                      Notifies all subscribed members.
-                    </FormDescription>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-            <div className="mt-2">
-              <a href="../" className=" underline text-neutral-400">
-                Customize attendance list
-              </a>
-            </div>
-          </div> */}
-
           {/** Submit Button */}
           {loading ? (
             <Button disabled className="w-full">
@@ -867,13 +971,13 @@ export default function ModifyTrainingSessionForm() {
               Update Program
             </Button>
           )}
-          <div className="justify-self-center">
-            <button className=" bg-transparent" onClick={() => navigate(-1)}>
-              <p className="text-center underline text-neutral-400">Cancel</p>
-            </button>
-          </div>
         </form>
       </Form>
+      <div className="justify-self-center mt-8">
+        <button className=" bg-transparent" onClick={() => navigate(-1)}>
+          <p className="text-center underline text-neutral-400">Cancel</p>
+        </button>
+      </div>
     </div>
   );
 }

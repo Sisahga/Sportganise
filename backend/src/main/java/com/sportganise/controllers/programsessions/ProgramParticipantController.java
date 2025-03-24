@@ -182,6 +182,7 @@ public class ProgramParticipantController {
           "Successfully marked participant as absent. programId: {}, accountId: {}",
           programId,
           accountId);
+      log.info("Program participant: ", programParticipant);
       return ResponseEntity.ok(programParticipant);
     } catch (ParticipantNotFoundException e) {
       log.error(
@@ -197,9 +198,9 @@ public class ProgramParticipantController {
    * Fetches all the training sessions missing a player, making waitlist players available to join.
    */
   @GetMapping("/waitlist-programs")
-  public ResponseEntity<?> getWaitlistPrograms() {
+  public ResponseEntity<?> getWaitlistPrograms(@RequestParam Integer accountId) {
     try {
-      List<ProgramDto> ppc = waitlistService.getWaitlistPrograms();
+      List<ProgramDto> ppc = waitlistService.getWaitlistPrograms(accountId);
       log.info("Successfully fetched {} waitlist programs", ppc.size());
       return ResponseEntity.ok(ppc);
     } catch (ResourceNotFoundException e) {

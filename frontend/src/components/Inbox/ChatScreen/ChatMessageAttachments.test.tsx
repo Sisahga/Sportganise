@@ -26,7 +26,13 @@ describe("ChatMessageAttachments", () => {
   };
 
   it("renders image attachments and opens dialog on click", async () => {
-    render(<ChatMessageAttachments attachments={[imageAttachment]} />);
+    render(
+      <ChatMessageAttachments
+        attachments={[imageAttachment]}
+        currentUserId={1}
+        senderId={1}
+      />,
+    );
 
     const imageButton = screen.getByLabelText("View image.png");
     expect(imageButton).toBeDefined();
@@ -47,7 +53,13 @@ describe("ChatMessageAttachments", () => {
   });
 
   it("renders video attachments", () => {
-    render(<ChatMessageAttachments attachments={[videoAttachment]} />);
+    render(
+      <ChatMessageAttachments
+        attachments={[videoAttachment]}
+        currentUserId={1}
+        senderId={1}
+      />,
+    );
     const video = document.querySelector("video");
     expect(video).toBeTruthy();
     expect(video?.getAttribute("controls")).not.toBeNull();
@@ -55,7 +67,13 @@ describe("ChatMessageAttachments", () => {
   });
 
   it("renders file attachments", () => {
-    render(<ChatMessageAttachments attachments={[fileAttachment]} />);
+    render(
+      <ChatMessageAttachments
+        attachments={[fileAttachment]}
+        currentUserId={1}
+        senderId={1}
+      />,
+    );
     const fileLink = screen.getByRole("link", { name: /file_document\.pdf/i });
     expect(fileLink).toBeDefined();
     expect(fileLink.getAttribute("download")).not.toBeNull();
