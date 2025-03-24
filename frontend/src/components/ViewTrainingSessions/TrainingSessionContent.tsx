@@ -26,7 +26,7 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 import { getFileName } from "@/utils/getFileName";
 
 // Data structure for data received from API call
-import { ProgramDetails } from "@/types/trainingSessionDetails";
+import { Program, ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
@@ -75,7 +75,7 @@ const TrainingSessionContent = () => {
       try {
         const response = await trainingSessionApi.getPrograms(user?.accountId);
         const program = response.data?.find(
-          (p) => p.programDetails.programId === programId,
+          (p: Program) => p.programDetails.programId === programId,
         );
         if (program) {
           setProgramDetails(program.programDetails);
@@ -121,7 +121,7 @@ const TrainingSessionContent = () => {
     const programs = await trainingSessionApi.getPrograms(user?.accountId);
     if (programs.data) {
       const program = programs.data.find(
-        (p) => p.programDetails.programId === programDetails.programId,
+        (p: Program) => p.programDetails.programId === programDetails.programId,
       );
       if (program) {
         console.log("Refreshed programs: ", programs);

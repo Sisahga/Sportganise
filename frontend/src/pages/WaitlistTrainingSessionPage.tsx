@@ -4,12 +4,12 @@ import WaitlistedTrainingSession from "@/components/WaitlistTrainingSession/Wait
 import { Program } from "@/types/trainingSessionDetails";
 import { useNavigate } from "react-router";
 import usePrograms from "@/hooks/usePrograms";
-import { getCookies } from "@/services/cookiesService";
+//import { getCookies } from "@/services/cookiesService";
 
 export default function WaitlistTrainingSessionPage() {
-  const user = getCookies();
+  //const user = getCookies();
   const navigate = useNavigate();
-  const { programs } = usePrograms(user?.accountId);
+  const { programs } = usePrograms();
 
   const handleSelectTraining = (program: Program) => {
     const fullProgram = programs.find(
