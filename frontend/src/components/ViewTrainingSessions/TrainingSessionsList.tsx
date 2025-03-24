@@ -24,7 +24,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
 
-export default function TrainingSessionsList() {
+export default function TrainingSessionsList({
+  selectedMonth,
+  programsProp,
+}: {
+  selectedMonth: Date;
+  programsProp: ReturnType<typeof usePrograms>;
+}) {
   log.debug("Rendering TrainingSessionList");
 
   // AccountId from cookies
@@ -38,7 +44,7 @@ export default function TrainingSessionsList() {
   }, [accountId]);
 
   // Fetch programs on component mount
-  const { programs, /*setPrograms,*/ error, loading } = usePrograms(accountId); // Program[]
+  const { programs, error, loading, fetchPrograms } = programsProp;
   useEffect(() => {
     console.log("TrainingSessionList : Programs fetched:", programs);
     log.info("TrainingSessionList : Programs fetched:", programs);
@@ -58,6 +64,18 @@ export default function TrainingSessionsList() {
   );
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
+  const startOfMonth = new Date(
+    selectedMonth.getFullYear(),
+    selectedMonth.getMonth(),
+    1,
+  ); // First day of the current month
+
+  const endOfMonth = new Date(
+    selectedMonth.getFullYear(),
+    selectedMonth.getMonth() + 1,
+    0,
+  ); // Last day of the month
+
   // Start Date Range
   const [dateRange, setDateRange] = useState([
     {
@@ -65,6 +83,37 @@ export default function TrainingSessionsList() {
       endDate: endOfWeek,
       key: "selection",
     },
+  ]);
+
+  useEffect(() => {
+    if (!accountId) return;
+
+    const prevStart = dateRange[0].startDate;
+    const prevEnd = dateRange[0].endDate;
+
+    if (
+      prevStart.getTime() !== startOfMonth.getTime() ||
+      prevEnd.getTime() !== endOfMonth.getTime()
+    ) {
+      setDateRange([
+        {
+          startDate: startOfMonth,
+          endDate: endOfMonth,
+          key: "selection",
+        },
+      ]);
+    }
+  }, [accountId, selectedMonth]);
+
+  useEffect(() => {
+    if (!accountId || !dateRange[0].startDate || !dateRange[0].endDate) return;
+
+    const { startDate, endDate } = dateRange[0];
+    fetchPrograms(accountId, startDate, endDate);
+  }, [
+    accountId,
+    dateRange[0].startDate.getTime(),
+    dateRange[0].endDate.getTime(),
   ]);
 
   // Handle Selected Program Type
@@ -90,6 +139,21 @@ export default function TrainingSessionsList() {
       selectedProgramType.includes(program.programDetails.programType);
     return dateFilter && typeFilter;
   });
+
+  function handleDateChange(item: any) {
+    const newStartDate = new Date(item.selection.startDate);
+    const newEndDate = new Date(item.selection.endDate);
+
+    setDateRange([
+      {
+        startDate: newStartDate,
+        endDate: newEndDate,
+        key: "selection",
+      },
+    ]);
+
+    fetchPrograms(accountId, newStartDate, newEndDate);
+  }
 
   // Handle Cancel
   function handleCancel() {
@@ -154,9 +218,9 @@ export default function TrainingSessionsList() {
                     <div className="overflow-auto my-3 flex justify-center items-center">
                       <DateRange
                         editableDateInputs={true}
-                        onChange={(item: any) => setDateRange([item.selection])}
+                        onChange={handleDateChange} //  Ensures state is updated
                         moveRangeOnFirstSelection={false}
-                        ranges={dateRange}
+                        ranges={dateRange} //  Uses updated `dateRange`
                       />
                     </div>
                   </div>
@@ -198,6 +262,7 @@ export default function TrainingSessionsList() {
             </DrawerContent>
           </Drawer>
         </span>
+
         {error ? (
           <p className="text-red text-center my-5">Error loading programs</p>
         ) : loading ? (
