@@ -117,11 +117,11 @@ export default function HeaderNav() {
               )}
               {waitlistData && waitlistData.length > 0 && (
                 <Link
-                to="/pages/WaitlistTrainingSessionPage"
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
-              >
-                Waitlist
-              </Link>
+                  to="/pages/WaitlistTrainingSessionPage"
+                  className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                >
+                  Waitlist
+                </Link>
               )}
               <Link
                 to="/" //add actual redirect once setting page is set up
