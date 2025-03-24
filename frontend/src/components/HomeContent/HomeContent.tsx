@@ -15,6 +15,8 @@ import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { useState, useEffect } from "react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import HomeContentSkeleton from "@/components/HomeContent/HomeContentSkeleton.tsx";
+import usePrograms from "@/hooks/usePrograms";
+import { TrainingSessionsList } from "../ViewTrainingSessions";
 
 log.info("HomeContent component is being rendered.");
 
@@ -35,6 +37,9 @@ export default function HomeContent() {
   }, [accountType]);
 
   const navigate = useNavigate();
+
+  const [selectedMonth] = useState<Date>(new Date());
+  const programsProp = usePrograms();
   const [firstName, setFirstName] = useState<string | null>(null);
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
@@ -202,6 +207,23 @@ export default function HomeContent() {
                   <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}
               </div>
+            </div>
+
+            <div style={{ marginTop: "0 !important" }}>
+              <TrainingSessionsList
+                selectedMonth={selectedMonth}
+                programsProp={programsProp}
+              />
+            </div>
+            <div className="flex items-center justify-center">
+              <Link
+                to="/pages/CalendarPage"
+                className="inline-flex items-center justify-center font-medium text-primaryColour
+                hover:text-primaryColour hover:bg-textPlaceholderColour/40 text-sm px-6 py-2 border rounded-md
+                h-auto mb-4 group transition-all duration-300 hover:shadow-md"
+              >
+                See all Programs
+              </Link>
             </div>
           </div>
         </div>
