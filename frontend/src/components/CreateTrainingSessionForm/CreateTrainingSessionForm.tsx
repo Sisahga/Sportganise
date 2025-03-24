@@ -226,7 +226,6 @@ export default function CreateTrainingSessionForm() {
               await invite(accountId, programId!);
             } catch (error) {
               console.error(`Failed to invite member ${accountId}:`, error);
-              throw error; // Re-throw to trigger the catch block
             }
           }),
         );
@@ -234,6 +233,9 @@ export default function CreateTrainingSessionForm() {
 
       console.log("loading", loading);
       log.info("createTrainingSession submit success ✔");
+
+      form.reset();
+      setSelectedMembers([]);
 
       // Toast popup for user to say form submitted successfully
       toast({
@@ -257,11 +259,9 @@ export default function CreateTrainingSessionForm() {
           "There was a problem with your request. Program was not created.",
       });
     } finally {
-      form.reset();
       setLoading(false);
     }
   };
-  console.log("members in form:", members);
 
   // Watch for changes to frequency
   // ... conditionally display endDate when frequency != "DAILY"

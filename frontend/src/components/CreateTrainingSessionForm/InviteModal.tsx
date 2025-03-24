@@ -54,7 +54,7 @@ export default function InviteModal({
   };
 
   useEffect(() => {
-    console.log("Current selected members OVAA HEEREE:", selectedMembers);
+    console.log("Current selected members:", selectedMembers);
   }, [selectedMembers]);
 
   return (
