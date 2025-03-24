@@ -115,8 +115,9 @@ export default function HeaderNav() {
                   </Link>
                 </>
               )}
-              {((accountType?.toLowerCase() === "coach" ||
-                accountType?.toLowerCase() === "admin") || (waitlistData && waitlistData.length > 0)) && (
+              {(accountType?.toLowerCase() === "coach" ||
+                accountType?.toLowerCase() === "admin" ||
+                (waitlistData && waitlistData.length > 0)) && (
                 <Link
                   to="/pages/WaitlistTrainingSessionPage"
                   className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
