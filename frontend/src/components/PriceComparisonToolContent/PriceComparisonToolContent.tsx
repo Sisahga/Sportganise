@@ -20,44 +20,15 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Search, DollarSign, ShoppingCart, LinkIcon } from "lucide-react";
-
-const data = [
-  {
-    company: "Amazon",
-    product:
-      "Yonex ZR 100 Light Aluminum Blend Badminton Racquet with Full Cover",
-    price: 30.99,
-    link: "#",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    company: "Racquets4U",
-    product: "Yonex ZR 100 Light Badminton Racquet (White/Grey, Strung)",
-    price: 25.99,
-    link: "#",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    company: "eBay",
-    product: "Yonex ZR 100 Light Aluminum Badminton Racquet with Full Cover",
-    price: 54.99,
-    link: "#",
-    image: "https://via.placeholder.com/50",
-  },
-  {
-    company: "Walmart",
-    product:
-      "Yonex ZR 100 Light Aluminum Badminton Racquet with Full Cover, Set of 2 Blue",
-    price: 42.99,
-    link: "#",
-    image: "https://via.placeholder.com/50",
-  },
-];
+import {
+  searchProducts,
+  ProductSearchResponse,
+} from "@/services/api/productSearchApi";
 
 // Define columns for React Table
 const columns = [
   {
-    accessorKey: "image",
+    accessorKey: "imageUrl",
     header: () => (
       <div className="flex items-center">
         Image
@@ -73,14 +44,14 @@ const columns = [
     ),
   },
   {
-    accessorKey: "company",
+    accessorKey: "seller",
     header: "Company",
     cell: (props: any) => (
       <div className="font-bold text-textColour">{props.getValue()}</div>
     ),
   },
   {
-    accessorKey: "product",
+    accessorKey: "title",
     header: "Product",
     cell: (props: any) => (
       <div className="text-sm text-fadedPrimaryColour">{props.getValue()}</div>
@@ -94,7 +65,7 @@ const columns = [
         <DollarSign size={15} className="mx-2" />
       </div>
     ),
-    cell: (props: any) => <div>${props.getValue().toFixed(2)}</div>,
+    cell: (props: any) => <div>${parseFloat(props.getValue()).toFixed(2)}</div>,
   },
   {
     accessorKey: "link",
@@ -118,7 +89,7 @@ const columns = [
 ];
 
 export default function PriceComparisonToolContent() {
-  const [tableData, setTableData] = useState(data);
+  const [tableData, setTableData] = useState<ProductSearchResponse[]>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [searchInput, setSearchInput] = useState("");
 
@@ -130,25 +101,26 @@ export default function PriceComparisonToolContent() {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  // Sorting function
+  // Sort function
   const sortByPrice = () => {
     const sorted = [...tableData].sort((a, b) => {
-      if (sortOrder === "asc") {
-        return b.price - a.price;
-      }
-      return a.price - b.price;
+      const priceA = parseFloat(a.price);
+      const priceB = parseFloat(b.price);
+      return sortOrder === "asc" ? priceB - priceA : priceA - priceB;
     });
-
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     setTableData(sorted);
   };
 
-  // Search function
-  const handleSearch = () => {
-    const filteredData = data.filter((item) =>
-      item.product.toLowerCase().includes(searchInput.toLowerCase()),
-    );
-    setTableData(filteredData);
+  // Fetch live data on search
+  const handleSearch = async () => {
+    try {
+      const products = await searchProducts(searchInput);
+      setTableData(products);
+    } catch (error) {
+      console.error("Search failed:", error);
+      setTableData([]);
+    }
   };
 
   return (
