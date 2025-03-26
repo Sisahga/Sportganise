@@ -1,25 +1,30 @@
 package com.sportganise.services.programsessions;
 
+import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.Program;
+import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.ParticipantNotFoundException;
-import com.sportganise.exceptions.ProgramNotFoundException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
+import com.sportganise.exceptions.programexceptions.ProgramNotFoundException;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.EmailService;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +37,7 @@ public class WaitlistService {
   private final ProgramRepository programRepository;
   private final AccountRepository accountRepository;
   private final EmailService emailService;
+  private final ProgramAttachmentRepository programAttachmentRepository;
 
   /**
    * Constructor for WaitlistService.
@@ -42,11 +48,13 @@ public class WaitlistService {
       ProgramParticipantRepository participantRepository,
       ProgramRepository programRepository,
       AccountRepository accountRepository,
-      EmailService emailService) {
+      EmailService emailService,
+      ProgramAttachmentRepository programAttachmentRepository) {
     this.participantRepository = participantRepository;
     this.programRepository = programRepository;
     this.accountRepository = accountRepository;
     this.emailService = emailService;
+    this.programAttachmentRepository = programAttachmentRepository;
   }
 
   /**
@@ -75,10 +83,22 @@ public class WaitlistService {
     return participant;
   }
 
+  /**
+   * Fetches a confirmed program participant by their program ID and account ID.
+   *
+   * @param programId The ID of the program to search for (must not be null)
+   * @param accountId The ID of the account to search for (must not be null)
+   * @return If a confirmed participant is found, {@code null} if participant exists but is not
+   *     confirmed
+   * @throws ParticipantNotFoundException if no participant is found with the specified program ID
+   *     and account ID combination
+   * @throws IllegalArgumentException if either programId or accountId is null
+   */
   public ProgramParticipantDto fetchParticipant(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
-    ProgramParticipant participant = getWaitlistedParticipant(programId, accountId);
-    return new ProgramParticipantDto(participant);
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
+
+    return new ProgramParticipantDto(programParticipant);
   }
 
   /**
@@ -160,7 +180,7 @@ public class WaitlistService {
 
     ProgramParticipant optedParticipant = getWaitlistedParticipant(programId, accountId);
 
-    if (confirmParticipant == true) {
+    if (confirmParticipant) {
       // Confirm participant
       ZonedDateTime ldt = ZonedDateTime.now();
       optedParticipant.setConfirmedDate(ldt);
@@ -209,16 +229,8 @@ public class WaitlistService {
   public ProgramParticipantDto markAbsent(Integer programId, Integer accountId)
       throws ParticipantNotFoundException {
 
-    ProgramParticipant programParticipant =
-        participantRepository
-            .findById(new ProgramParticipantId(programId, accountId))
-            .orElseThrow(
-                () ->
-                    new ParticipantNotFoundException(
-                        "Participant not found on waitlist for program: "
-                            + programId
-                            + ", account: "
-                            + accountId));
+    ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
+    log.info("Program Participant:", programParticipant);
 
     if (programParticipant.isConfirmed() == false) {
       return null;
@@ -237,28 +249,87 @@ public class WaitlistService {
    * @return A list of ProgramDto's containing the waitlisted .
    * @throws ResourceNotFoundException whenever programs can't be found.
    */
-  public List<ProgramDto> getWaitlistPrograms() throws ResourceNotFoundException {
-    List<Program> programs = programRepository.findByProgramType("Training");
+  public List<ProgramDto> getWaitlistPrograms(Integer accountId) throws ResourceNotFoundException {
 
-    if (programs == null) {
-      log.error("Program list is null. Can't fetch waitlist programs");
-      throw new ResourceNotFoundException("Programs list is null. Cannot fetch waitlist programs.");
+    Account account =
+        this.accountRepository
+            .findById(accountId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Account not found with id " + accountId);
+                  return new AccountNotFoundException("Account not found with id " + accountId);
+                });
+
+    // TODO: Come back to this for the coach
+    if (account.getType() == AccountType.ADMIN) {
+      List<Program> programs = programRepository.findProgramByType(ProgramType.TRAINING.toString());
+
+      return programs.stream()
+          .filter(
+              program -> {
+                Integer confirmedCount =
+                    participantRepository.countConfirmedParticipants(program.getProgramId());
+                return confirmedCount < program.getCapacity();
+              })
+          .map(
+              program -> {
+                List<ProgramAttachmentDto> programAttachments =
+                    getProgramAttachments(program.getProgramId());
+                return new ProgramDto(program, programAttachments);
+              })
+          .collect(Collectors.toList());
+    } else {
+      List<ProgramParticipant> userParticipants = participantRepository.findByAccountId(accountId);
+      return userParticipants.stream()
+          .map(
+              pp ->
+                  programRepository
+                      .findById(pp.getProgramParticipantId().getProgramId())
+                      .orElse(null))
+          .distinct() // Remove duplicate programs if user is in multiple roles
+          .filter(
+              program -> {
+                long confirmedCount =
+                    participantRepository.countConfirmedParticipants(program.getProgramId());
+                return confirmedCount < program.getCapacity();
+              })
+          .map(
+              program -> {
+                List<ProgramAttachmentDto> programAttachments =
+                    getProgramAttachments(program.getProgramId());
+                return new ProgramDto(program, programAttachments);
+              })
+          .collect(Collectors.toList());
+    }
+  }
+
+  /**
+   * Method to get all the attachments uploaded to a specific program.
+   *
+   * @param programId Id of the program we want to fetch.
+   * @return a list of ProgramAttachmentDto related to the program.
+   */
+  public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
+
+    log.debug("PROGRAM ID: {}", programId);
+
+    List<ProgramAttachment> programAttachments =
+        programAttachmentRepository.findAttachmentsByProgramId(programId);
+
+    log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: ", programAttachments.size());
+
+    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
+
+    for (ProgramAttachment attachment : programAttachments) {
+      programAttachmentDtos.add(
+          new ProgramAttachmentDto(
+              attachment.getCompositeProgramAttachmentKey().getProgramId(),
+              attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
     }
 
-    return programs.stream()
-        .flatMap(
-            program -> {
-              log.debug("{}", program);
-              Integer participantCount =
-                  participantRepository.countConfirmedParticipants(program.getProgramId());
+    log.debug("PROGRAM ATTACHMENTS DTOS COUNT: ", programAttachmentDtos.size());
 
-              if (participantCount >= program.getCapacity()) {
-                return Stream.empty();
-              }
-
-              return Stream.of(new ProgramDto(program, null));
-            })
-        .toList();
+    return programAttachmentDtos;
   }
 
   /**
@@ -273,14 +344,7 @@ public class WaitlistService {
   public boolean inviteToPrivateEvent(Integer accountId, Integer programId) {
     AtomicBoolean isNewParticipant = new AtomicBoolean(false);
 
-    Program program =
-        programRepository
-            .findById(programId)
-            .orElseThrow(
-                () -> {
-                  log.warn("Program not found with id " + programId);
-                  return new ProgramNotFoundException("Program not found");
-                });
+    Program program = this.getProgram(programId);
 
     // Direct user invitation is only supported for private events
     if (!program.getVisibility().equals("private")) {
@@ -296,30 +360,109 @@ public class WaitlistService {
                   return new AccountNotFoundException("Account not found with id " + accountId);
                 });
 
+    // Subscribed players for training events
+    final boolean isTraining = program.getProgramType().equals(ProgramType.TRAINING);
+    final String type = isTraining ? "Subscribed" : account.getType().name();
+    final boolean isConfirmed = isTraining;
+    final ZonedDateTime confirmedDate = isTraining ? ZonedDateTime.now() : null;
+
     ProgramParticipant programParticipant =
         this.participantRepository
             .findById(new ProgramParticipantId(programId, accountId))
             .orElseGet(
                 () -> {
                   // Register new program participant
+                  // Confirming them
                   isNewParticipant.set(true);
                   return this.participantRepository.save(
                       ProgramParticipant.builder()
                           .programParticipantId(new ProgramParticipantId(programId, accountId))
-                          .type(account.getType().name())
-                          .isConfirmed(false)
+                          .type(type)
+                          .isConfirmed(isConfirmed)
+                          .confirmedDate(confirmedDate)
                           .build());
                 });
 
     // Participant should not be confirmed yet
-    if (programParticipant.isConfirmed()) {
+    if (programParticipant.isConfirmed() && isTraining) {
       log.warn("Participant already confirmed to program");
       throw new ProgramInvitationiException("Participant already confirmed to program");
     }
 
-    // Send invitation email
-    this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
+    // Send invitation (not for training session)
+    if (!program.getProgramType().equals(ProgramType.TRAINING)) {
+      this.emailService.sendPrivateProgramInvitation(account.getEmail(), program);
+    }
 
     return isNewParticipant.get();
+  }
+
+  /**
+   * RSVPs a user to an event.
+   *
+   * @param accountId The user to RSVP
+   * @param programId The program to RSVP the user to
+   * @return True if the user is newly registered as a participant, false otherwise.
+   */
+  public boolean rsvpToEvent(Integer accountId, Integer programId) {
+
+    ProgramParticipant participant = getParticipant(programId, accountId);
+
+    if (participant.isConfirmed()) {
+      log.warn("Participant already confirmed to program");
+      throw new ProgramInvitationiException("Participant already confirmed to program");
+    }
+
+    Program program = this.getProgram(programId);
+    if (!program.getProgramType().equals(ProgramType.TRAINING)) {
+      participant.setConfirmed(true);
+      participant.setConfirmedDate(ZonedDateTime.now());
+      participantRepository.save(participant);
+
+      return participant.isConfirmed();
+    }
+
+    log.warn("RSVP not allowed for this program type");
+    return false;
+  }
+
+  /**
+   * Fetches a program.
+   *
+   * @param programId The program to fetch
+   * @return Program entity if program found.
+   */
+  public Program getProgram(Integer programId) {
+    Program program =
+        programRepository
+            .findById(programId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Program not found with id " + programId);
+                  return new ProgramNotFoundException("Program not found");
+                });
+
+    return program;
+  }
+
+  /**
+   * Fetches a ProgramParticipant.
+   *
+   * @param accountId The ProgramParticipant to fetch
+   * @return ProgramParticipant entity if program found.
+   */
+  public ProgramParticipant getParticipant(Integer programId, Integer accountId) {
+    ProgramParticipant programParticipant =
+        participantRepository
+            .findById(new ProgramParticipantId(programId, accountId))
+            .orElseThrow(
+                () ->
+                    new ParticipantNotFoundException(
+                        "Participant not found for program: "
+                            + programId
+                            + ", account: "
+                            + accountId));
+
+    return programParticipant;
   }
 }

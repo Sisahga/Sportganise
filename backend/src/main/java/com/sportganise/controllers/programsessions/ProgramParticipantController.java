@@ -182,6 +182,7 @@ public class ProgramParticipantController {
           "Successfully marked participant as absent. programId: {}, accountId: {}",
           programId,
           accountId);
+      log.info("Program participant: ", programParticipant);
       return ResponseEntity.ok(programParticipant);
     } catch (ParticipantNotFoundException e) {
       log.error(
@@ -197,9 +198,9 @@ public class ProgramParticipantController {
    * Fetches all the training sessions missing a player, making waitlist players available to join.
    */
   @GetMapping("/waitlist-programs")
-  public ResponseEntity<?> getWaitlistPrograms() {
+  public ResponseEntity<?> getWaitlistPrograms(@RequestParam Integer accountId) {
     try {
-      List<ProgramDto> ppc = waitlistService.getWaitlistPrograms();
+      List<ProgramDto> ppc = waitlistService.getWaitlistPrograms(accountId);
       log.info("Successfully fetched {} waitlist programs", ppc.size());
       return ResponseEntity.ok(ppc);
     } catch (ResourceNotFoundException e) {
@@ -232,6 +233,36 @@ public class ProgramParticipantController {
       return ResponseDto.created(null, "User successfully invited to event.");
     } else {
       return ResponseDto.ok(null, "User successfully re-invited to event.");
+    }
+  }
+
+  /**
+   * RSVPS a user to a program.
+   *
+   * @param accountId The user to invite
+   * @param programId The program to invite the user to
+   * @return A success boolean in the form of isConfirmed.
+   */
+  @PostMapping("/rsvp")
+  public ResponseEntity<?> rsvpParticipant(
+      @RequestParam Integer programId, @RequestParam Integer accountId) {
+
+    log.info("Processing RSVP for programId: {}, accountId: {}", programId, accountId);
+
+    try {
+      boolean rsvpSuccess = waitlistService.rsvpToEvent(accountId, programId);
+      if (rsvpSuccess) {
+        log.info("RSVP successful for programId: {}, accountId: {}", programId, accountId);
+        return ResponseEntity.ok(rsvpSuccess);
+      }
+      log.warn("RSVP failed - program not eligible for direct confirmation");
+      return ResponseEntity.badRequest()
+          .body("RSVP failed - program not eligible for direct confirmation");
+
+    } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Participant not found for RSVP: programId: {}, accountId: {}", programId, accountId);
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
   }
 }

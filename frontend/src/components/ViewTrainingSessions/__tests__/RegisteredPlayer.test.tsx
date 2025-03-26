@@ -3,6 +3,7 @@ import { test, expect, vi } from "vitest";
 import { MemoryRouter } from "react-router";
 import RegisteredPlayer from "../RegisteredPlayer";
 import "@testing-library/jest-dom";
+import type { Attendees } from "@/types/trainingSessionDetails";
 
 // Mock the usePersonalInformation hook
 vi.mock("@/hooks/usePersonalInformation", () => ({
@@ -14,9 +15,26 @@ vi.mock("@/hooks/usePersonalInformation", () => ({
 }));
 
 test("displays loading", () => {
+  // Create mock attendee data
+  const mockAttendee: Attendees = {
+    accountId: 4,
+    programId: 1,
+    confirmedDate: null,
+    participantType: "Subscribed",
+    confirmed: false,
+    rank: null,
+  };
+
   render(
-    <MemoryRouter>
-      <RegisteredPlayer accountId={1} />
+    <MemoryRouter
+      initialEntries={[
+        {
+          pathname: "/pages/ViewTrainingSessionPage",
+          state: { programDetails: { programId: 1 } },
+        },
+      ]}
+    >
+      <RegisteredPlayer accountAttendee={mockAttendee} onRefresh={() => {}} />
     </MemoryRouter>,
   );
 

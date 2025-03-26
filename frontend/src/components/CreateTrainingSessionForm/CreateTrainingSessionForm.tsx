@@ -36,7 +36,7 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
+//import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
   FileInput,
@@ -62,6 +62,14 @@ import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
 import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
+import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
+import { DAILY } from "@/constants/programconstants";
+import { WEEKLY } from "@/constants/programconstants";
+import { MONTHLY } from "@/constants/programconstants";
+import { ONCE } from "@/constants/programconstants";
+// Import dropZoneConfig for files
+import { dropZoneConfig } from "@/constants/drop.zone.config";
+import { useWatch } from "react-hook-form";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -76,13 +84,13 @@ export default function CreateTrainingSessionForm() {
   } = usePlayers();
 
   const members: Member[] = players.map((player) => ({
-    id: player.accountId.toString(),
+    id: player.accountId,
     name: `${player.firstName} ${player.lastName}`,
     email: player.email,
     role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"
   }));
   const [showInviteModal, setShowInviteModal] = useState(false);
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   // AccountId from cookies
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
@@ -118,6 +126,24 @@ export default function CreateTrainingSessionForm() {
       value: SPECIALTRAINING,
     },
   ] as const;
+  const frequencies = [
+    {
+      label: "Daily",
+      value: DAILY,
+    },
+    {
+      label: "Weekly",
+      value: WEEKLY,
+    },
+    {
+      label: "Monthly",
+      value: MONTHLY,
+    },
+    {
+      label: "One time",
+      value: ONCE,
+    },
+  ] as const;
   const locations = [
     {
       label: "Centre de loisirs St-Denis",
@@ -129,17 +155,7 @@ export default function CreateTrainingSessionForm() {
     },
   ] as const;
 
-  /** Handle files for file upload in form*/
-  const dropZoneConfig = {
-    //File configurations
-    maxFiles: 5,
-    maxSize: 1024 * 1024 * 4,
-    multiple: true,
-    accept: {
-      "image/*": [".png", ".jpg", ".jpeg"],
-      "application/pdf": [".pdf"],
-    },
-  };
+  const { invite } = useInviteToPrivateEvent();
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -167,8 +183,8 @@ export default function CreateTrainingSessionForm() {
         title: values.title,
         type: values.type,
         startDate: values.startDate.toISOString(),
-        endDate: values.endDate.toISOString(),
-        recurring: values.recurring.toString(),
+        endDate: values.endDate?.toISOString() ?? null,
+        frequency: values.frequency,
         visibility: values.visibility,
         description: values.description,
         capacity: values.capacity.toString(),
@@ -200,13 +216,32 @@ export default function CreateTrainingSessionForm() {
           "Error from useCreateTrainingSession.createTrainingSession!",
         );
       }
+
+      const programId = create.data.programId;
+
+      if (values.visibility === "private" && selectedMembers.length > 0) {
+        await Promise.all(
+          selectedMembers.map(async (accountId) => {
+            try {
+              await invite(accountId, programId!);
+            } catch (error) {
+              console.error(`Failed to invite member ${accountId}:`, error);
+            }
+          }),
+        );
+      }
+
       console.log("loading", loading);
       log.info("createTrainingSession submit success ✔");
 
+      form.reset();
+      setSelectedMembers([]);
+
       // Toast popup for user to say form submitted successfully
       toast({
+        variant: "success",
         title: "Form submitted successfully ✔",
-        description: "Event was added to your calendar.",
+        description: "Program was added to your calendar.",
       });
 
       // Navigate to home page
@@ -221,14 +256,19 @@ export default function CreateTrainingSessionForm() {
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
         description:
-          "There was a problem with your request. Event was not created.",
+          "There was a problem with your request. Program was not created.",
       });
     } finally {
-      form.reset();
       setLoading(false);
     }
   };
-  console.log("members in form:", members);
+
+  // Watch for changes to frequency
+  // ... conditionally display endDate when frequency != "DAILY"
+  const selectedFreq = useWatch({
+    control: form.control,
+    name: "frequency",
+  });
 
   return (
     <>
@@ -259,7 +299,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-base">
-                    Title
+                    Title*
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -284,7 +324,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Type of Program
+                    Type of Program*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -335,6 +375,7 @@ export default function CreateTrainingSessionForm() {
                       </Command>
                     </PopoverContent>
                   </Popover>
+                  <FormDescription>Select the program type.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -347,7 +388,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Start Date
+                    Start Date*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -379,8 +420,83 @@ export default function CreateTrainingSessionForm() {
                   </Popover>
                   <FormDescription>
                     Enter the first date of the program. Applies for recurring
-                    and non recurring programs. If recurring, this day will be
-                    the assumed repeat day in the future.
+                    and non recurring programs.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/** Frequency */}
+            <FormField
+              control={form.control}
+              name="frequency"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    Frequency*
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "justify-between",
+                            !field.value && "text-muted-foreground",
+                          )}
+                        >
+                          {field.value
+                            ? frequencies.find(
+                                (frequency) => frequency.value === field.value,
+                              )?.label
+                            : "Select frequency"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandInput placeholder="Search type..." />
+                        <CommandList>
+                          <CommandEmpty>No frequency found.</CommandEmpty>
+                          <CommandGroup>
+                            {frequencies.map((frequency) => (
+                              <CommandItem
+                                value={frequency.label}
+                                key={frequency.value}
+                                onSelect={() => {
+                                  form.setValue("frequency", frequency.value);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    frequency.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0",
+                                  )}
+                                />
+                                {frequency.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    {!selectedFreq &&
+                      "Select the frequency at which you would like the program to recur."}
+                    {selectedFreq === ONCE &&
+                      " The program is a one day event and will not recur. No end date required."}
+                    {selectedFreq === DAILY &&
+                      " The program will occur on each day between the start and end dates."}
+                    {selectedFreq === WEEKLY &&
+                      " The program will recur on the day of the week of the start and end dates."}
+                    {selectedFreq === MONTHLY &&
+                      " The program will recur on the date given for the start date of the program until the end date."}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -388,50 +504,57 @@ export default function CreateTrainingSessionForm() {
             />
 
             {/** End Date */}
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel className="font-semibold text-base">
-                    End Date
-                  </FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    Enter the last day of a recurring program. If same-day
-                    program, pick the day entered for start date.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {(selectedFreq === DAILY ||
+              selectedFreq === WEEKLY ||
+              selectedFreq === MONTHLY) && (
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="font-semibold text-base">
+                      End Date*
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground",
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      Enter the last day of the recurring program.
+                      {selectedFreq === "WEEKLY" &&
+                        " Program end date must fall on the same day of the week as the selected start date and be at least one week apart."}
+                      {selectedFreq === "MONTHLY" &&
+                        " Program end date must have the same date of the month as the selected start date and be at least one month apart."}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/** Time */}
             <div className="flex gap-2">
@@ -442,7 +565,7 @@ export default function CreateTrainingSessionForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel className="font-semibold text-base">
-                      Start Time
+                      Start Time*
                     </FormLabel>
                     <FormControl>
                       <Input type="time" className="w-full" {...field} />
@@ -462,7 +585,7 @@ export default function CreateTrainingSessionForm() {
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormLabel className="font-semibold text-base">
-                      End Time
+                      End Time*
                     </FormLabel>
                     <FormControl>
                       <Input type="time" {...field} />
@@ -483,7 +606,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Location
+                    Location*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -545,7 +668,7 @@ export default function CreateTrainingSessionForm() {
             />
 
             {/** Recurring */}
-            <FormField
+            {/* <FormField
               control={form.control}
               name="recurring"
               render={({ field }) => (
@@ -567,7 +690,7 @@ export default function CreateTrainingSessionForm() {
                   </div>
                 </FormItem>
               )}
-            />
+            /> */}
 
             {/** Visibility */}
             <FormField
@@ -576,7 +699,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel className="font-semibold text-base">
-                    Visibility
+                    Visibility*
                   </FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
@@ -679,7 +802,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-base">
-                    Description
+                    Description*
                   </FormLabel>
                   <FormControl>
                     <Textarea
@@ -745,7 +868,8 @@ export default function CreateTrainingSessionForm() {
                     </FileUploader>
                   </FormControl>
                   <FormDescription>
-                    Select a file to upload. Limit of 5 files.
+                    Select a file to upload. Max file size is 10 MB. Limit of 5
+                    files.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -759,7 +883,7 @@ export default function CreateTrainingSessionForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="font-semibold text-base">
-                    Attendance Capacity
+                    Attendance Capacity*
                   </FormLabel>
                   <FormControl>
                     <Input

@@ -1,6 +1,7 @@
 package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.programsessions.CancelProgramDto;
 import com.sportganise.dto.programsessions.ProgramCreateRequestDto;
 import com.sportganise.dto.programsessions.ProgramDetailsParticipantsDto;
 import com.sportganise.dto.programsessions.ProgramDto;
@@ -19,9 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -130,7 +134,6 @@ public class ProgramController {
               programCreateRequestDto.getType(),
               programCreateRequestDto.getStartDate(),
               programCreateRequestDto.getEndDate(),
-              programCreateRequestDto.getRecurring(),
               programCreateRequestDto.getVisibility(),
               programCreateRequestDto.getDescription(),
               programCreateRequestDto.getCapacity(),
@@ -138,7 +141,8 @@ public class ProgramController {
               programCreateRequestDto.getEndTime(),
               programCreateRequestDto.getLocation(),
               attachments,
-              accountId);
+              accountId,
+              programCreateRequestDto.getFrequency());
 
       log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
 
@@ -205,7 +209,6 @@ public class ProgramController {
               programModifyRequestDto.getType(),
               programModifyRequestDto.getStartDate(),
               programModifyRequestDto.getEndDate(),
-              programModifyRequestDto.getRecurring(),
               programModifyRequestDto.getVisibility(),
               programModifyRequestDto.getDescription(),
               programModifyRequestDto.getCapacity(),
@@ -214,7 +217,8 @@ public class ProgramController {
               programModifyRequestDto.getLocation(),
               attachments,
               programModifyRequestDto.getAttachmentsToRemove(),
-              accountId);
+              accountId,
+              programModifyRequestDto.getFrequency());
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");
@@ -223,6 +227,85 @@ public class ProgramController {
     } catch (Exception e) {
       throw new ProgramModificationException("Program modification failed: " + e.getMessage());
     }
+  }
+
+  /**
+   * DELETE mapping for deleting a program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programId Id of the program that we wish to delete.
+   * @return HTTP Response for deleted program.
+   */
+  @DeleteMapping("/{accountId}/delete-program/{programId}")
+  public ResponseEntity<ResponseDto<String>> deleteProgram(
+      @PathVariable Integer accountId, @PathVariable Integer programId) {
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    programService.deleteProgram(accountId, programId);
+    responseDto.setStatusCode(HttpStatus.NO_CONTENT.value());
+    responseDto.setMessage("Program deleted successfully.");
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+  }
+
+  /**
+   * Cancel a program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param programId Id of the program that we wish to modify.
+   * @param cancel boolean value to cancel or uncancel the program.
+   * @return HTTP Response for modified/updated data
+   */
+  @PutMapping("/{accountId}/{programId}/cancel-program")
+  ResponseEntity<ResponseDto<String>> cancelProgram(
+      @PathVariable Integer accountId,
+      @PathVariable Integer programId,
+      @RequestBody CancelProgramDto cancel) {
+    programService.cancel(programId, accountId, false, false, cancel.isCancel());
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Program cancellation status modified successfully.");
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+  }
+
+  /**
+   * Cancel a recurrence.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param recurrenceId Id of the recurrence that we wish to modify.
+   * @param cancel boolean value to cancel or uncancel the recurrence.
+   * @return HTTP Response for modified/updated data
+   */
+  @PutMapping("/{accountId}/{recurrenceId}/cancel-recurrence")
+  ResponseEntity<ResponseDto<String>> cancelRecurrence(
+      @PathVariable Integer accountId,
+      @PathVariable Integer recurrenceId,
+      @RequestBody CancelProgramDto cancel) {
+
+    programService.cancel(recurrenceId, accountId, true, false, cancel.isCancel());
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("Recurrence cancellation status modified successfully.");
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
+  }
+
+  /**
+   * Cancel all recurrences of a program.
+   *
+   * @param accountId Id of user who is making the request.
+   * @param recurrenceId Id of the recurrence that we wish to modify.
+   * @param cancel boolean value to cancel or uncancel the recurrences.
+   * @return HTTP Response for modified/updated data
+   */
+  @PutMapping("/{accountId}/{recurrenceId}/cancel-all-recurrences")
+  ResponseEntity<ResponseDto<String>> cancelAllRecurrences(
+      @PathVariable Integer accountId,
+      @PathVariable Integer recurrenceId,
+      @RequestBody CancelProgramDto cancel) {
+
+    programService.cancel(recurrenceId, accountId, true, true, cancel.isCancel());
+    ResponseDto<String> responseDto = new ResponseDto<>();
+    responseDto.setStatusCode(HttpStatus.OK.value());
+    responseDto.setMessage("All recurrences' cancellation status modified successfully.");
+    return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
   }
 
   /** Helper method to fetch and validate user account based on accountId. */

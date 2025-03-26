@@ -1,9 +1,16 @@
 import React, { type DragEvent, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
-import { ChevronLeft, FolderOpen, Paperclip, Send, X } from "lucide-react";
+import {
+  ChevronLeft,
+  FolderOpen,
+  LoaderCircle,
+  Paperclip,
+  Send,
+  X,
+} from "lucide-react";
 import useChatMessages from "../../../hooks/useChatMessages";
-import defaultAvatar from "../../../assets/defaultAvatar.png";
-import defaultGroupAvatar from "../../../assets/defaultGroupAvatar.png";
+import defaultAvatar from "@/assets/defaultAvatar.png";
+import defaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
 import "./ChatScreen.css";
 import WebSocketService from "@/services/WebSocketService";
 import type { MessageComponent, SendMessageComponent } from "@/types/messaging";
@@ -29,6 +36,13 @@ import {
 } from "@/constants/file.constants.ts";
 import useUploadAttachments from "@/hooks/useUploadAttachments.ts";
 import ResponseDto from "@/types/response.ts";
+import useSendNotification from "@/hooks/useSendNotification.ts";
+import { NotificationRequest } from "@/types/notifications.ts";
+import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
+import useChannelMembers from "@/hooks/useChannelMembers.ts";
+import ChatScreenSkeleton from "@/components/Inbox/ChatScreen/ChatScreenSkeleton.tsx";
+
+log.setLevel("debug");
 
 const formSchema = z.object({
   message: z.string().optional(),
@@ -62,7 +76,8 @@ const ChatScreen: React.FC = () => {
   const [currentChannelName, setCurrentChannelName] =
     useState<string>(channelName);
   const [currentChannelImageUrl, setCurrentChannelImageUrl] = useState<string>(
-    channelImageBlob || defaultAvatar,
+    channelImageBlob ||
+      (channelType === "GROUP" ? defaultGroupAvatar : defaultAvatar),
   );
   const [isDragging, setIsDragging] = useState<boolean>(false);
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -70,12 +85,18 @@ const ChatScreen: React.FC = () => {
   const [skeletonId, setSkeletonId] = useState<number>(0);
   const [skeletonCount, setSkeletonCount] = useState<number>(0);
   const [messageStatus, setMessageStatus] = useState<string>("Delivered");
+  const [disableFetching, setDisableFetching] = useState<boolean>(false);
 
   // Hooks.
-  const { messages, setMessages, loading, error } = useChatMessages(
-    channelId,
-    read,
-  ); // Fetch messages.
+  const {
+    messages,
+    setMessages,
+    loading,
+    error,
+    hasMoreMessages,
+    fetchMoreMessages,
+    loadingMore,
+  } = useChatMessages(channelId, read); // Fetch messages.
   const { sendDirectMessage } = useSendMessage();
   const { uploadAttachments } = useUploadAttachments();
   const {
@@ -85,8 +106,11 @@ const ChatScreen: React.FC = () => {
     setDeleteRequest,
     currentMemberStatus,
   } = useGetDeleteChannelRequest(channelId, currentUserId); // Check if a delete request is active.
+  const { members } = useChannelMembers(channelId, currentUserId, channelType);
+  const { sendNotification } = useSendNotification();
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -96,10 +120,14 @@ const ChatScreen: React.FC = () => {
     },
   });
 
+  // Connects to web socket and subscribes to channel conversation.
   const connectWebSocket = async (): Promise<void> => {
     webSocketServiceRef.current = new WebSocketService(onMessageReceived);
     const connSuccess = await webSocketServiceRef.current.connect();
     setConnected(connSuccess);
+    if (connSuccess) {
+      webSocketServiceRef.current.subscribeToConversation(channelId);
+    }
   };
 
   const onMessageReceived = (message: MessageComponent): void => {
@@ -118,9 +146,8 @@ const ChatScreen: React.FC = () => {
         dupMessage.remove();
       }
     }
-    if (message.senderId !== currentUserId) {
-      setMessageStatus("");
-    }
+
+    setTimeout(scrollChatScreenToBottom, 0);
   };
 
   const handleDragEnter = (e: DragEvent<HTMLDivElement>): void => {
@@ -154,7 +181,11 @@ const ChatScreen: React.FC = () => {
   const adjustTextAreaHeight = (element: HTMLTextAreaElement) => {
     if (!element) return;
     element.style.height = "auto";
-    element.style.height = `${element.scrollHeight}px`;
+    const style = getComputedStyle(element);
+    const yBorderHeight =
+      parseInt(style.borderTopWidth) + parseInt(style.borderBottomWidth);
+    const height = element.scrollHeight + yBorderHeight;
+    element.style.height = `${height}px`;
   };
 
   const resetTextAreaHeight = (element: HTMLTextAreaElement) => {
@@ -220,8 +251,10 @@ const ChatScreen: React.FC = () => {
     if (
       data.message?.trim() === "" &&
       (!data.attachments || data.attachments.length === 0)
-    )
+    ) {
+      log.debug("No message or attachments to send.");
       return;
+    }
 
     const messagePayload: SendMessageComponent = {
       senderId: currentUserId,
@@ -233,10 +266,12 @@ const ChatScreen: React.FC = () => {
       avatarUrl: cookies.pictureUrl,
     };
     setMessageStatus("Sending...");
+
     const response = await sendDirectMessage(
       messagePayload,
       webSocketServiceRef.current,
     );
+    log.info("Response:", response);
     if (!response) {
       setMessageStatus("");
     }
@@ -246,15 +281,17 @@ const ChatScreen: React.FC = () => {
 
     // Send attachments if any.
     if (data.attachments && data.attachments.length > 0 && response) {
+      log.debug("Message response: ", response);
       setActivateSkeleton(true);
       setSkeletonId(response.messageId);
       setSkeletonCount(data.attachments.length);
 
-      log.info("Uploading {} attachments", data.attachments.length);
+      log.debug("Uploading {} attachments", data.attachments.length);
       const formData = new FormData();
       data.attachments.forEach((file) => {
         formData.append("attachments", file);
       });
+      formData.append("channelId", channelId.toString());
       formData.append("messageId", response.messageId.toString());
       formData.append("senderId", currentUserId.toString());
       formData.append("senderFirstName", cookies.firstName);
@@ -263,6 +300,16 @@ const ChatScreen: React.FC = () => {
         await uploadAttachments(formData);
       if (uploadResponse.statusCode === 200) {
         log.info("Attachments uploaded successfully.");
+        let notifBody;
+        if (response.messageContent === "") {
+          notifBody = "Sent an attachment";
+        } else {
+          notifBody =
+            data.message !== undefined && data.message.length > MAX_BODY_LENGTH
+              ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
+              : data.message || "";
+        }
+        await sendNotif(notifBody);
       } else {
         log.error("Error uploading attachments:", uploadResponse.message);
         toast({
@@ -275,6 +322,14 @@ const ChatScreen: React.FC = () => {
       setActivateSkeleton(false);
       setSkeletonId(0);
       setSkeletonCount(0);
+    } else if (response) {
+      log.debug("Message sent successfully, no attachments.");
+      // Message sent successfully, no attachments to upload.
+      const notifBody =
+        data.message !== undefined && data.message.length > MAX_BODY_LENGTH
+          ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
+          : data.message || "";
+      await sendNotif(notifBody);
     }
 
     setMessageStatus("Delivered");
@@ -285,12 +340,42 @@ const ChatScreen: React.FC = () => {
     );
   };
 
+  const sendNotif = async (notifBody: string) => {
+    // Get the notifiees for the notification.
+    const notifiees =
+      channelType === "SIMPLE"
+        ? members.map((member) => member.accountId)
+        : members
+            .filter((member) => member.accountId !== currentUserId)
+            .map((member) => member.accountId);
+
+    log.debug("notifiees: ", notifiees);
+
+    const notifTitle =
+      channelType === "GROUP"
+        ? `${currentChannelName} - ${cookies.firstName} sent a message`
+        : `${cookies.firstName}`;
+
+    const notifRequest: NotificationRequest = {
+      title: notifTitle,
+      body: notifBody,
+      topic: null, // No topic to assign here.
+      recipients: notifiees,
+    };
+    await sendNotification(notifRequest);
+  };
+
   const scrollChatScreenToBottom = () => {
+    log.debug("Attempting to scroll to bottom...");
     if (chatScrollRef.current) {
       chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+      log.debug("Scrolled to bottom");
+    } else {
+      log.debug("Chat screen ref is null.");
     }
   };
 
+  // Connect to WebSocket
   useEffect(() => {
     if (!connected) {
       connectWebSocket().then(() => {
@@ -301,30 +386,74 @@ const ChatScreen: React.FC = () => {
         }
       });
     }
-  }, []); // TODO: Add proper dependencies.
+  }, [channelId]);
 
+  // Scroll to bottom once messages load.
   useEffect(() => {
-    log.debug("Messages fetched:", messages);
-    scrollChatScreenToBottom();
-  }, [messages]);
+    requestAnimationFrame(() => {
+      scrollChatScreenToBottom();
+    });
+  }, [loading]);
 
-  useEffect(() => {
-    scrollChatScreenToBottom();
-  }, [attachments]);
-
+  // Check if there is a delete request active.
   useEffect(() => {
     if (deleteRequestActive && deleteRequest) {
-      log.info("Delete request active:", deleteRequest);
-      log.info("Current member status:", currentMemberStatus);
+      log.debug("Delete request active:", deleteRequest);
+      log.debug("Current member status:", currentMemberStatus);
     }
   }, [deleteRequestActive]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
-      </div>
+  // Intersection Observer for loading more messages.
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      async (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !disableFetching &&
+          hasMoreMessages &&
+          !loadingMore
+        ) {
+          setDisableFetching(true);
+
+          const chatSection = chatScrollRef.current;
+
+          if (chatSection) {
+            const prevScrollHeight = chatSection.scrollHeight;
+            const prevScrollTop = chatSection.scrollTop;
+
+            try {
+              await fetchMoreMessages();
+              // Flicker-free animation.
+              requestAnimationFrame(() => {
+                chatSection.scrollTop =
+                  prevScrollTop + (chatSection.scrollHeight - prevScrollHeight);
+                setDisableFetching(false);
+              });
+            } catch (err) {
+              log.error("Error fetching more messages:", err);
+            }
+          }
+        }
+      },
+      {
+        threshold: 0.5,
+      },
     );
+
+    const currentLoader = loadMoreRef.current;
+    if (currentLoader) {
+      observer.observe(currentLoader);
+    }
+
+    return () => {
+      if (currentLoader) {
+        observer.unobserve(currentLoader);
+      }
+    };
+  }, [fetchMoreMessages, hasMoreMessages, loadingMore, disableFetching]);
+
+  if (loading) {
+    return <ChatScreenSkeleton />;
   }
 
   if (error) {
@@ -365,12 +494,12 @@ const ChatScreen: React.FC = () => {
           </Button>
           <div className="flex items-center flex-grow gap-3">
             <img
-              src={currentChannelImageUrl || "/placeholder.svg"}
+              src={currentChannelImageUrl}
               alt={defaultGroupAvatar}
               style={{ width: "36px", height: "36px" }}
               className="rounded-full object-cover"
             />
-            <h1 className="text-lg font-bold text-gray-800 te">
+            <h1 className="text-lg font-bold text-gray-800">
               {currentChannelName}
             </h1>
           </div>
@@ -414,6 +543,11 @@ const ChatScreen: React.FC = () => {
 
       {/* Chat Messages */}
       <div ref={chatScrollRef} className="overflow-y-auto flex-1 mt-4 relative">
+        {hasMoreMessages && (
+          <div ref={loadMoreRef} className="w-full flex justify-center py-1">
+            {loadingMore && <LoaderCircle className="animate-spin h-6 w-6" />}
+          </div>
+        )}
         <ChatMessages
           messages={messages}
           currentUserId={currentUserId}
@@ -526,7 +660,7 @@ const ChatScreen: React.FC = () => {
               {...field}
               id="chatScreenInputArea"
               placeholder="Send a message..."
-              className={`${channelIsBlocked ? "force-hide" : ""} flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none`}
+              className={`${channelIsBlocked ? "force-hide" : ""} flex-1 px-4 py-2 border bg-white rounded-xl text-sm focus:outline-none resize-none h-auto`}
               style={{ scrollbarWidth: "none" }}
               rows={1}
               onChange={(e) => {

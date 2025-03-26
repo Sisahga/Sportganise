@@ -13,6 +13,13 @@ import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelAp
 import com.sportganise.exceptions.deletechannelrequestexceptions.DeleteChannelRequestException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageFetchException;
 import com.sportganise.exceptions.directmessageexceptions.DirectMessageSendException;
+import com.sportganise.exceptions.notificationexceptions.GetFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.GetNotificationPermissionException;
+import com.sportganise.exceptions.notificationexceptions.MarkNotificationReadException;
+import com.sportganise.exceptions.notificationexceptions.SaveNotificationPrefereceException;
+import com.sportganise.exceptions.notificationexceptions.StoreFcmTokenException;
+import com.sportganise.exceptions.notificationexceptions.UpdateNotificationPermissionException;
+import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
@@ -57,7 +64,87 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle general bad request exceptions.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleIllegalArgumentException(IllegalArgumentException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  // <editor-fold desc="Region: Auth Exceptions">
+
+  /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(InvalidCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle expired code exception.
+   *
+   * @param e exception
+   * @return response dto with status 400.
+   */
+  @ExceptionHandler(ExpiredCodeException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle account not verified exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(AccountNotVerifiedException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle invalid credentials exception.
+   *
+   * @param e exception
+   * @return response dto with status 401.
+   */
+  @ExceptionHandler(InvalidCredentialsException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  // </editor-fold>
+
   // <editor-fold desc="Region: Channel Exceptions">
+
   /**
    * Handle bad request exception for channel creation.
    *
@@ -298,6 +385,118 @@ public class GlobalExceptionHandler {
 
   // </editor-fold>
 
+  // <editor-fold desc="Region: Notifications Exceptions">
+
+  /**
+   * Handle store FCM token exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(StoreFcmTokenException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleStoreFcmTokenException(StoreFcmTokenException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle notification not sent exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(NotificationNotSentException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleNotificationNotSentException(NotificationNotSentException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle get FCM token exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(GetFcmTokenException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleGetFcmTokenException(GetFcmTokenException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle save notification preference exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(SaveNotificationPrefereceException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleSaveNotificationPrefereceException(
+      SaveNotificationPrefereceException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle update notification permission exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(UpdateNotificationPermissionException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleUpdateNotificationPermissionException(
+      UpdateNotificationPermissionException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle get notification permission exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(GetNotificationPermissionException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleGetNotificationPermissionException(
+      GetNotificationPermissionException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  /**
+   * Handle mark notification read exception.
+   *
+   * @param e exception
+   * @return response dto with status 500.
+   */
+  @ExceptionHandler(MarkNotificationReadException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseDto<?> handleMarkNotificationReadException(MarkNotificationReadException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        .message(e.getMessage())
+        .build();
+  }
+
+  // </editor-fold>
+
   /**
    * Handle file processing exception.
    *
@@ -345,61 +544,31 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handle expired code exception.
+   * Handle invalid frequency exception.
    *
    * @param e exception
-   * @return response dto with status 400.
+   * @return response dto with status 417.
    */
-  @ExceptionHandler(InvalidCodeException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ResponseDto<?> handleInvalidCodeException(InvalidCodeException e) {
+  @ExceptionHandler(InvalidFrequencyException.class)
+  @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+  public ResponseDto<?> handleInvalidFrequencyException(InvalidFrequencyException e) {
     return ResponseDto.builder()
-        .statusCode(HttpStatus.BAD_REQUEST.value())
+        .statusCode(HttpStatus.EXPECTATION_FAILED.value())
         .message(e.getMessage())
         .build();
   }
 
   /**
-   * Handle expired code exception.
+   * Handle insufficient permission exception.
    *
    * @param e exception
-   * @return response dto with status 400.
+   * @return response dto with status 403.
    */
-  @ExceptionHandler(ExpiredCodeException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public ResponseDto<?> handleExpiredCodeException(ExpiredCodeException e) {
+  @ExceptionHandler(InsufficientPermissionsException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  public ResponseDto<?> handleInsufficientPermissionException(InsufficientPermissionsException e) {
     return ResponseDto.builder()
-        .statusCode(HttpStatus.BAD_REQUEST.value())
-        .message(e.getMessage())
-        .build();
-  }
-
-  /**
-   * Handle account not verified exception.
-   *
-   * @param e exception
-   * @return response dto with status 401.
-   */
-  @ExceptionHandler(AccountNotVerifiedException.class)
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseDto<?> handleAccountNotVerifiedException(AccountNotVerifiedException e) {
-    return ResponseDto.builder()
-        .statusCode(HttpStatus.UNAUTHORIZED.value())
-        .message(e.getMessage())
-        .build();
-  }
-
-  /**
-   * Handle invalid credentials exception.
-   *
-   * @param e exception
-   * @return response dto with status 401.
-   */
-  @ExceptionHandler(InvalidCredentialsException.class)
-  @ResponseStatus(HttpStatus.UNAUTHORIZED)
-  public ResponseDto<?> handleInvalidCredentialsException(InvalidCredentialsException e) {
-    return ResponseDto.builder()
-        .statusCode(HttpStatus.UNAUTHORIZED.value())
+        .statusCode(HttpStatus.FORBIDDEN.value())
         .message(e.getMessage())
         .build();
   }

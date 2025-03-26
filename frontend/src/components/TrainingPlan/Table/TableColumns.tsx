@@ -8,7 +8,7 @@ import { DropDownMenu } from "./DropDownMenu";
 // UI Component
 import { Button } from "@/components/ui/Button";
 // Icons
-import { File, User, Calendar } from "lucide-react";
+import { File, User, Calendar, CircleArrowOutUpRight } from "lucide-react";
 // Helper Util Functions
 import { getDate } from "@/utils/getDate";
 import { getFileName } from "@/utils/getFileName";
@@ -30,18 +30,29 @@ export const columns: ColumnDef<TrainingPlan>[] = [
         </div>
       );
     },
-    cell: ({ row }: any) => (
+    cell: ({ row }: any) => {
       // Downloadable File
-      <a
-        className="lowercase underline text-gray-600 hover:text-cyan-300"
-        href={row.getValue("docUrl")}
-        target="_blank"
-        rel="noopener noreferrer"
-        download
-      >
-        {getFileName(row.getValue("docUrl"))}
-      </a>
-    ),
+      const shared = row.original.shared;
+      return (
+        <div className="flex items-center gap-1">
+          {shared && (
+            <CircleArrowOutUpRight
+              size={12}
+              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+            />
+          )}
+          <a
+            className="lowercase underline text-gray-600 hover:text-cyan-300"
+            href={row.getValue("docUrl")}
+            target="_blank"
+            rel="noopener noreferrer"
+            download
+          >
+            {getFileName(row.getValue("docUrl"))}
+          </a>
+        </div>
+      );
+    },
   },
   {
     accessorKey: "userId",

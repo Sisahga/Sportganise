@@ -3,6 +3,8 @@ package com.sportganise.services.programsessions;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -12,10 +14,11 @@ import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
+import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.ParticipantNotFoundException;
-import com.sportganise.exceptions.ProgramNotFoundException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
+import com.sportganise.exceptions.programexceptions.ProgramNotFoundException;
 import com.sportganise.repositories.AccountRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
@@ -346,8 +349,7 @@ public class WaitlistServiceTest {
             () -> {
               programParticipantService.markAbsent(programId, accountId);
             });
-    assertEquals(
-        "Participant not found on waitlist for program: 1, account: 2", exception.getMessage());
+    assertEquals("Participant not found for program: 1, account: 2", exception.getMessage());
   }
 
   @Test
@@ -425,7 +427,9 @@ public class WaitlistServiceTest {
 
     @Test
     public void participantAlreadyConfirmed() {
+      program.setProgramType(ProgramType.TRAINING);
       participant.setConfirmed(true);
+
       when(programRepository.findById(programId)).thenReturn(Optional.of(program));
       when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
       when(participantRepository.findById(participantId)).thenReturn(Optional.of(participant));
@@ -433,11 +437,12 @@ public class WaitlistServiceTest {
       assertThrows(
           ProgramInvitationiException.class,
           () -> programParticipantService.inviteToPrivateEvent(accountId, programId));
-      verify(emailService, times(0)).sendPrivateProgramInvitation(anyString(), any(Program.class));
+      verify(emailService, never()).sendPrivateProgramInvitation(any(), any());
     }
 
     @Test
     public void successfullyReinviteParticipant() {
+      program.setProgramType(ProgramType.FUNDRAISER);
       when(programRepository.findById(programId)).thenReturn(Optional.of(program));
       when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
       when(participantRepository.findById(participantId)).thenReturn(Optional.of(participant));
@@ -452,11 +457,16 @@ public class WaitlistServiceTest {
 
     @Test
     public void successfullyInviteNewParticipant() {
+      program.setProgramType(ProgramType.FUNDRAISER);
       when(programRepository.findById(programId)).thenReturn(Optional.of(program));
       when(accountRepository.findById(accountId)).thenReturn(Optional.of(account));
       when(participantRepository.findById(participantId)).thenReturn(Optional.empty());
       when(participantRepository.save(
-              argThat((p) -> p.getProgramParticipantId().equals(participantId))))
+              argThat(
+                  p ->
+                      p.getProgramParticipantId().equals(participantId)
+                          && "PLAYER".equals(p.getType())
+                          && !p.isConfirmed())))
           .thenReturn(participant);
 
       boolean isNewParticipant =
@@ -464,7 +474,12 @@ public class WaitlistServiceTest {
 
       assertTrue(isNewParticipant);
       verify(participantRepository)
-          .save(argThat(p -> p.getProgramParticipantId().equals(participantId)));
+          .save(
+              argThat(
+                  p ->
+                      p.getProgramParticipantId().equals(participantId)
+                          && "PLAYER".equals(p.getType())
+                          && !p.isConfirmed()));
       verify(emailService).sendPrivateProgramInvitation(account.getEmail(), program);
     }
   }

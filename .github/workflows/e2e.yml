@@ -1,0 +1,73 @@
+name: E2E Tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  ENV: DEV
+  # Frontend
+  VITE_API_BASE_URL: http://localhost:8080
+  # Postgres
+  POSTGRES_DB: sportganise
+  POSTGRES_USER: sportganise
+  POSTGRES_PASSWORD: sportganise-e2e
+  POSTGRES_URL: jdbc:postgresql://database:5432/sportganise
+  # Auth0
+  AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+  AUTH0_AUDIENCE: ${{ secrets.AUTH0_AUDIENCE }}
+  AUTH0_CLIENT_ID: ${{ secrets.AUTH0_CLIENT_ID }}
+  AUTH0_CLIENT_SECRET: ${{ secrets.AUTH0_CLIENT_SECRET }}
+  JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+  # AWS S3
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_S3_BUCKET_NAME: ${{ secrets.AWS_S3_BUCKET_NAME }}
+  AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
+  # Email server
+  COMPANY_EMAIL: ${{ secrets.COMPANY_EMAIL }}
+  COMPANY_EMAIL_PASSWORD: ${{ secrets.COMPANY_EMAIL_PASSWORD }}
+  # Firebase FCM
+  FIREBASE_FCM_JSON_FILE: firebase-configuration-file.json
+
+jobs:
+  e2e:
+    defaults:
+      run:
+        working-directory: ./frontend
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+    # Checkout the code
+    - uses: actions/checkout@v4
+
+    # Create config files required by backend
+    - name: Create backend config files
+      run: echo '${{ secrets.FIREBASE_CONFIGURATION_FILE }}' > ../backend/src/main/resources/firebase-configuration-file.json
+
+    # Start backend
+    - uses: hoverkraft-tech/compose-action@v2.0.1
+      with:
+        compose-file: ./docker-compose.e2e.yml
+
+    # Setup node
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9.14.2
+        run_install: true
+    - uses: actions/setup-node@v4
+
+    # Ensure backend ready
+    - name: Check backend running
+      run: curl --fail --silent --show-error http://localhost:8080/api/health/ping
+
+    # Setup Playwright
+    - name: Install Playwright Browsers
+      run: pnpm exec playwright install --with-deps
+
+    # Run Playwright tests
+    - name: Run Playwright tests
+      run: pnpm e2e

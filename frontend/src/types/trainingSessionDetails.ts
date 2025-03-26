@@ -2,14 +2,16 @@
 export interface Attendees {
   accountId: number;
   programId: number;
-  confirmedDate: Date;
+  confirmedDate: Date | null;
   confirmed: boolean;
-  rank: string | null;
+  participantType: string | null;
+  rank: number | null;
 }
 
 export interface ProgramDetails {
   programAttachments: ProgramAttachments[];
   programId: number;
+  recurrenceId: number;
   programType: string;
   title: string;
   description: string;
@@ -20,8 +22,9 @@ export interface ProgramDetails {
   frequency: string;
   location: string;
   visibility: string;
-  recurring: boolean;
   author: string;
+  cancelled: boolean;
+  reccurenceDate: Date;
 }
 
 export interface ProgramAttachments {

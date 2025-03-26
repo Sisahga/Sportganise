@@ -10,7 +10,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User2Icon } from "lucide-react";
 // Log
 import log from "loglevel";
-import ParticipantPopUp from "@/components/ViewTrainingSessions/ParticipantPopUp";
+import AccountPopUp from "./accountPopUp";
 
 // Display Author Personal Details in Table Row
 interface ViewAuthorProps {
@@ -53,7 +53,7 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
                 </Avatar>
                 <p>{`${accountDetails?.firstName} ${accountDetails?.lastName}`}</p>
               </div>
-              <ParticipantPopUp
+              <AccountPopUp
                 accountId={userId}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -72,7 +72,7 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
           )}
         </div>
       ) : (
-        <span className="text-yellow-600">DNE</span>
+        <span className="text-yellow-600">N/A</span>
       )}
     </div>
   );

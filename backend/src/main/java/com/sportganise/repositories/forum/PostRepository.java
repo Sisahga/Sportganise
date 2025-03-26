@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -47,27 +48,46 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
    */
   @Query(
       """
-        SELECT p
-        FROM Post p
-        WHERE (CAST(:searchTerm AS STRING) IS NULL OR LOWER(p.title)
-            LIKE LOWER(CONCAT('%', CAST(:searchTerm AS STRING) , '%'))
-               OR LOWER(p.description) LIKE LOWER(CONCAT('%', CAST(:searchTerm AS STRING) , '%')))
-    AND (:selectedLabel IS NULL OR p.postId IN(
-                     SELECT pl.postLabelCompositeKey.postId
-                     FROM PostLabel pl
-                     WHERE pl.postLabelCompositeKey.labelId = :selectedLabel
-          ))     AND (:labels  IS NULL OR NOT EXISTS (
-                     SELECT 1
-                     FROM PostLabel pl
-                     WHERE pl.postLabelCompositeKey.postId = p.postId
-                     AND pl.postLabelCompositeKey.labelId NOT IN :labels
-          ))
-          AND( (CAST(:occurrenceDate AS TIMESTAMP)) = CAST(:absurdDate AS TIMESTAMP)
-              OR DATE(p.occurrenceDate) = DATE(CAST(:occurrenceDate AS TIMESTAMP)))
-          AND p.occurrenceDate BETWEEN CAST( :threeMonthsAgo AS TIMESTAMP)
-              AND CAST(  :yesterday AS TIMESTAMP)
-          AND (:type  IS NULL OR p.type = :type)
-      """)
+                    SELECT p
+                    FROM Post p
+                    WHERE (
+                        CAST(:searchTerm AS STRING) IS NULL
+                        OR LOWER(p.title) LIKE LOWER(
+                    CONCAT('%',
+                           CAST(:searchTerm AS STRING),
+                           '%')
+                )
+            OR LOWER(p.description) LIKE LOWER(
+                    CONCAT('%',
+                           CAST(:searchTerm AS STRING),
+                           '%')
+                )
+                    )
+                    AND (
+                        :selectedLabel IS NULL
+                        OR p.postId IN (
+                            SELECT pl.postLabelCompositeKey.postId
+                            FROM PostLabel pl
+                            WHERE pl.postLabelCompositeKey.labelId = :selectedLabel
+                        )
+                    )
+                    AND (
+                        :labels IS NULL
+                        OR NOT EXISTS (
+                            SELECT 1
+                            FROM PostLabel pl
+                            WHERE pl.postLabelCompositeKey.postId = p.postId
+                            AND pl.postLabelCompositeKey.labelId NOT IN :labels
+                        )
+                    )
+                    AND (
+                        (CAST(:occurrenceDate AS TIMESTAMP)) = CAST(:absurdDate AS TIMESTAMP)
+                        OR DATE(p.occurrenceDate) = DATE(CAST(:occurrenceDate AS TIMESTAMP))
+                    )
+                    AND p.occurrenceDate BETWEEN CAST(:threeMonthsAgo AS TIMESTAMP)
+                    AND CAST(:yesterday AS TIMESTAMP)
+                    AND (:type IS NULL OR p.type = :type)
+                """)
   Page<Post> searchAndFilterPosts(
       @Param("searchTerm") String searchTerm,
       @Param("labels") List<Integer> labels,
@@ -78,4 +98,27 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
       @Param("absurdDate") ZonedDateTime absurdDate,
       @Param("type") PostType type,
       Pageable pageable);
+
+  @Modifying
+  @Query(
+      value =
+          """
+              INSERT INTO post (
+                  account_id,
+                  title,
+                  description,
+                  metadata,
+                  type,
+                  occurrence_date
+              ) VALUES (
+                  :#{#post.accountId},
+                  :#{#post.title},
+                  :#{#post.description},
+                  CAST(:#{#post.metadata} AS JSON),
+                  :#{#post.type.name()},
+                  :#{#post.occurrenceDate}
+              )
+              """,
+      nativeQuery = true)
+  int insertPost(@Param("post") Post post);
 }

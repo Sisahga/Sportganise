@@ -1,6 +1,7 @@
 package com.sportganise.controllers.programsession;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -66,13 +67,12 @@ public class ProgramControllerTest {
     mockProgramDto.setOccurrenceDate(
         ZonedDateTime.of(LocalDate.of(2025, 5, 15), LocalTime.of(10, 0), ZoneId.systemDefault()));
     mockProgramDto.setDurationMins(120);
-    mockProgramDto.setRecurring(false);
     mockProgramDto.setExpiryDate(
         ZonedDateTime.of(LocalDate.of(2025, 5, 16), LocalTime.of(0, 0), ZoneId.systemDefault()));
     mockProgramDto.setFrequency("None");
     mockProgramDto.setLocation("999 Random Ave");
     mockProgramDto.setVisibility("public");
-    mockProgramDto.setProgramAttachments(List.of(mockProgramAttachmentDto)); // Add the attachment
+    mockProgramDto.setProgramAttachments(List.of(mockProgramAttachmentDto));
 
     mockProgramParticipantDto.setProgramId(111);
     mockProgramParticipantDto.setAccountId(1);
@@ -94,7 +94,8 @@ public class ProgramControllerTest {
             + "\"capacity\": 10,"
             + "\"startTime\": \"10:30\","
             + "\"endTime\": \"12:30\","
-            + "\"location\": \"Centre-de-loisirs-St-Denis\""
+            + "\"location\": \"Centre-de-loisirs-St-Denis\","
+            + "\"frequency\": null"
             + "}";
   }
 
@@ -192,13 +193,13 @@ public class ProgramControllerTest {
     mockProgramModifyRequestDto.setType(ProgramType.TRAINING);
     mockProgramModifyRequestDto.setStartDate("2024-02-01");
     mockProgramModifyRequestDto.setEndDate("2024-02-10");
-    mockProgramModifyRequestDto.setRecurring(false);
     mockProgramModifyRequestDto.setVisibility("private");
     mockProgramModifyRequestDto.setDescription("Updated Description");
     mockProgramModifyRequestDto.setCapacity(20);
     mockProgramModifyRequestDto.setStartTime("09:00");
     mockProgramModifyRequestDto.setEndTime("11:00");
     mockProgramModifyRequestDto.setLocation("Updated Location");
+    mockProgramModifyRequestDto.setFrequency("None");
 
     MockMultipartFile programData =
         new MockMultipartFile(
@@ -222,7 +223,6 @@ public class ProgramControllerTest {
                 Mockito.any(ProgramType.class),
                 Mockito.anyString(),
                 Mockito.anyString(),
-                Mockito.anyBoolean(),
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyInt(),
@@ -230,7 +230,8 @@ public class ProgramControllerTest {
                 Mockito.anyString(),
                 Mockito.anyString(),
                 Mockito.anyList(),
-                Mockito.anyInt()))
+                Mockito.anyInt(),
+                Mockito.anyString()))
         .thenReturn(mockProgramDto);
 
     mockMvc
@@ -291,7 +292,6 @@ public class ProgramControllerTest {
     mockProgramModifyRequestDto.setType(ProgramType.SPECIALTRAINING);
     mockProgramModifyRequestDto.setStartDate("2024-01-30T10:00:00Z");
     mockProgramModifyRequestDto.setEndDate("2024-02-01T10:00:00Z");
-    mockProgramModifyRequestDto.setRecurring(false);
     mockProgramModifyRequestDto.setVisibility("public");
     mockProgramModifyRequestDto.setDescription("description");
     mockProgramModifyRequestDto.setCapacity(10);
@@ -341,7 +341,6 @@ public class ProgramControllerTest {
             Mockito.eq(mockProgramModifyRequestDto.getType()),
             Mockito.eq(mockProgramModifyRequestDto.getStartDate()),
             Mockito.eq(mockProgramModifyRequestDto.getEndDate()),
-            Mockito.eq(mockProgramModifyRequestDto.getRecurring()),
             Mockito.eq(mockProgramModifyRequestDto.getVisibility()),
             Mockito.eq(mockProgramModifyRequestDto.getDescription()),
             Mockito.eq(mockProgramModifyRequestDto.getCapacity()),
@@ -350,7 +349,8 @@ public class ProgramControllerTest {
             Mockito.eq(mockProgramModifyRequestDto.getLocation()),
             Mockito.argThat(list -> list.size() == 2), // Assert 2 attachments were passed
             Mockito.eq(mockProgramModifyRequestDto.getAttachmentsToRemove()),
-            Mockito.eq(2));
+            Mockito.eq(2),
+            Mockito.eq(mockProgramModifyRequestDto.getFrequency()));
   }
 
   @Test
@@ -444,5 +444,44 @@ public class ProgramControllerTest {
                 .file(attachment)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
         .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void testCancelProgram_Success() throws Exception {
+
+    mockMvc
+        .perform(
+            put("/api/programs/2/111/cancel-program")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cancel\": true}"))
+        .andExpect(status().isOk());
+
+    Mockito.verify(programService).cancel(111, 2, false, false, true);
+  }
+
+  @Test
+  public void testCancelRecurrence_Success() throws Exception {
+
+    mockMvc
+        .perform(
+            put("/api/programs/2/111/cancel-recurrence")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cancel\": true}"))
+        .andExpect(status().isOk());
+
+    Mockito.verify(programService).cancel(111, 2, true, false, true);
+  }
+
+  @Test
+  public void testCancelAllRecurrences_Success() throws Exception {
+
+    mockMvc
+        .perform(
+            put("/api/programs/2/111/cancel-all-recurrences")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"cancel\": true}"))
+        .andExpect(status().isOk());
+
+    Mockito.verify(programService).cancel(111, 2, true, true, true);
   }
 }

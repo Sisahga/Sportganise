@@ -69,22 +69,75 @@ const trainingSessionApi = {
   },
 
   /**Fetch all programs info */
-  getPrograms: async (accountId: number | null | undefined) => {
-    const response = await fetch(`${baseMappingUrl}/${accountId}/details`, {
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
-    const data: ResponseDto<Program[]> = await response.json();
-
-    if (!response.ok) {
-      throw new Error("trainingSessionApi.getPrograms : Response not ok!");
+  getPrograms: async (accountId?: number | null) => {
+    if (!accountId) {
+      console.warn("Skipping fetchPrograms because accountId is null."); // Prevents API call
+      return { data: [] }; //  Return an empty array instead of calling API
     }
 
-    log.info("trainingSessionApi.getPrograms:", response);
-    log.info("trainingSessionApi.getPrograms:", data);
+    const url = `${baseMappingUrl}/${accountId}/details`; // Only call API if accountId is present
 
-    return data;
+    try {
+      const response = await fetch(url, {
+        headers: { Authorization: getBearerToken() },
+      });
+
+      if (!response.ok) {
+        console.error("Error fetching programs:", response.status);
+        throw new Error(
+          `trainingSessionApi.getPrograms : Response not ok! (${response.status})`,
+        );
+      }
+
+      return response.json();
+    } catch (error) {
+      console.error("Error in getPrograms:", error);
+      return { data: [] }; // Prevent breaking UI if API fails
+    }
+  },
+
+  getProgramDates: async (accountId?: number | null) => {
+    if (!accountId) {
+      console.warn("Skipping fetchProgramDates because accountId is null.");
+      return [];
+    }
+
+    const url = `${baseMappingUrl}/${accountId}/details`; // Calls API only if accountId exists
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Authorization: getBearerToken(),
+        },
+      });
+
+      if (!response.ok) {
+        console.error("Error fetching program dates:", response.status);
+        throw new Error(
+          `trainingSessionApi.getProgramDates : Response not ok! (${response.status})`,
+        );
+      }
+
+      const data: ResponseDto<Program[]> = await response.json();
+      if (!Array.isArray(data.data)) {
+        console.error("Error: API response is not an array.");
+        return [];
+      }
+
+      log.info("trainingSessionApi.getPrograms:", response);
+      log.info(
+        "trainingSessionApi.getPrograms: SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOW ME THIS SHSIT ARIGBHASJDFHKSDFHSAJKFHKASDHFKASHDFKHAKSFHDN",
+        data,
+      );
+
+      return data.data
+        .map((program) => program.programDetails?.occurrenceDate)
+        .filter((date) => typeof date === "string" && !isNaN(Date.parse(date)))
+        .map((date) => new Date(date));
+    } catch (error) {
+      console.error("Error in getProgramDates:", error);
+      return [];
+    }
   },
 };
 

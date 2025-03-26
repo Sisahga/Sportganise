@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useLogin } from "@/hooks/useLogin";
 import { useSendCode } from "@/hooks/useSendCode";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LogIn() {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ export default function LogIn() {
     email: "",
     password: "",
   });
+
+  const [showPassword, setShowPassword] = useState(true);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,6 +44,7 @@ export default function LogIn() {
   // Handle login success or error
   useEffect(() => {
     if (data?.statusCode === 200) {
+      localStorage.removeItem("pushNotifications");
       console.log("Login successful, redirecting...");
       navigate("/");
     }
@@ -92,15 +96,25 @@ export default function LogIn() {
               value={formData.email}
               onChange={handleInputChange}
             />
-            <FormField
-              id="Password"
-              label="Password"
-              placeholder="Password"
-              name="password"
-              inputProps={{ type: "password" }}
-              value={formData.password}
-              onChange={handleInputChange}
-            />
+            <div className="relative">
+              <FormField
+                id="Password"
+                label="Password"
+                placeholder="Password"
+                name="password"
+                inputProps={{ type: showPassword ? "password" : "text" }}
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+              <button
+                type="button"
+                className="absolute right-4 text-sm text-secondaryColour"
+                style={{ top: "34px" }}
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+              </button>
+            </div>
             <button
               type="submit"
               className="w-full text-white bg-primaryColour py-2 md:py-3 rounded-lg flex items-center justify-center text-sm md:text-base"

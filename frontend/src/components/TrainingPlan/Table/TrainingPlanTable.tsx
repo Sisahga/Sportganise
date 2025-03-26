@@ -116,12 +116,12 @@ export default function TrainingPlanTable({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-6 text-center">
-                You do not have any training plans
+                There are no training plans
               </TableCell>
             </TableRow>
           )}
         </TableBody>
-        <TableCaption>A list of all your training plans.</TableCaption>
+        <TableCaption>A list of all training plans.</TableCaption>
       </Table>
 
       {/** Pagination */}

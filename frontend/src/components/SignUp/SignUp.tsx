@@ -8,6 +8,10 @@ import { useSignUp } from "@/hooks/useSignUp";
 import { useSendCode } from "@/hooks/useSendCode";
 import { SignUpRequest } from "@/types/auth";
 import { SecondaryHeader } from "../SecondaryHeader";
+import { Progress } from "@/components/ui/progress";
+import PasswordChecklist from "react-password-checklist";
+import { Separator } from "../ui/separator";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -52,18 +56,40 @@ export default function SignUp() {
     return match ? `(${match[1]}) ${match[2]}-${match[3]}` : cleaned;
   };
 
-  // Password validation logic
+  const [progress, setProgress] = useState(0);
+  const [isChecklistValid, setIsChecklistValid] = useState(false);
+
+  const calculatePasswordStrength = (password: string) => {
+    let strength = 0;
+    if (password.length >= 8) strength += 20;
+    if (/[A-Z]/.test(password)) strength += 20;
+    if (/[a-z]/.test(password)) strength += 20;
+    if (/\d/.test(password)) strength += 20;
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) strength += 20;
+
+    setProgress(strength);
+  };
+
+  useEffect(() => {
+    if (formData.password) calculatePasswordStrength(formData.password);
+  }, [formData.password]);
+
   const validatePassword = (password: string): boolean => {
     const hasMinLength = password.length >= 8;
+
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasSpecialChar = /[!@#$%^&*]/.test(password);
+    const hasNumber = /\d/.test(password);
 
     return (
-      [hasMinLength, hasUpperCase, hasLowerCase, hasSpecialChar].filter(Boolean)
+      hasMinLength &&
+      [hasUpperCase, hasLowerCase, hasSpecialChar, hasNumber].filter(Boolean)
         .length >= 3
     );
   };
+
+  const [showPassword, setShowPassword] = useState(true);
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +145,75 @@ export default function SignUp() {
         variant: "destructive",
         title: "Invalid Account Type",
         description: "Please select a valid account type.",
+      });
+      return;
+    }
+
+    const validEmailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(?<tld>[a-zA-Z]{2,})$/;
+
+    const validTLDs = new Set([
+      "com",
+      "org",
+      "net",
+      "edu",
+      "gov",
+      "mil",
+      "io",
+      "co",
+      "ai",
+      "ca",
+      "uk",
+      "us",
+      "au",
+      "de",
+      "fr",
+      "jp",
+      "cn",
+      "in",
+      "ru",
+      "br",
+      "it",
+      "es",
+      "nl",
+      "se",
+      "no",
+      "fi",
+      "dk",
+      "pl",
+      "ch",
+      "be",
+      "ar",
+      "mx",
+      "za",
+      "nz",
+      "sg",
+      "hk",
+      "id",
+      "my",
+    ]);
+
+    const match = formData.email.match(validEmailRegex);
+
+    if (
+      !match ||
+      !match.groups ||
+      !validTLDs.has(match.groups.tld.toLowerCase())
+    ) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Email Format",
+        description: "Please use a valid email format with a real domain.",
+      });
+      return;
+    }
+
+    // Additional check to reject emails with consecutive dots (..)
+    if (formData.email.includes("..")) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Email Format",
+        description: "Email cannot contain consecutive dots.",
       });
       return;
     }
@@ -220,15 +315,69 @@ export default function SignUp() {
                   pattern: "\\(\\d{3}\\) \\d{3}-\\d{4}",
                 }}
               />
-              <FormField
-                id="Password"
-                label="Password"
-                placeholder="Password"
-                name="password"
-                inputProps={{ type: "password" }}
-                value={formData.password}
-                onChange={handleInputChange}
-              />
+              <div className="relative">
+                <FormField
+                  id="Password"
+                  label="Create a Password"
+                  placeholder="Password"
+                  name="password"
+                  inputProps={{ type: showPassword ? "password" : "text" }}
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
+                <button
+                  type="button"
+                  className="absolute right-4 text-sm text-secondaryColour"
+                  style={{ top: "34px" }}
+                  onClick={() => setShowPassword((prev) => !prev)}
+                >
+                  {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+                </button>
+              </div>
+              {/* Progress Bar */}
+              {formData.password && (
+                <div className="m-4 mb-2">
+                  <Progress value={progress} max={100} />
+                </div>
+              )}
+
+              <div className="m-4 mb-2">
+                {/* Mandatory checks for length and password match*/}
+                <div className="mandatory-rules mb-4">
+                  <PasswordChecklist
+                    className="text-xs"
+                    validColor="#82DBD8"
+                    invalidColor="#383C42"
+                    rules={["minLength"]}
+                    minLength={8}
+                    value={formData.password}
+                    onChange={() => {
+                      setIsChecklistValid(validatePassword(formData.password));
+                    }}
+                  />
+                </div>
+
+                <Separator></Separator>
+
+                {/* 3/4 types of characters checks */}
+                <div className="optional-rules flex flex-col gap-1 mt-2">
+                  <p className="font-normal text-xs">
+                    Check at least 3 from the following:
+                  </p>
+
+                  <PasswordChecklist
+                    className="text-xs"
+                    validColor="#82DBD8"
+                    invalidColor="#383C42"
+                    rules={["capital", "lowercase", "number", "specialChar"]} // Only optional rules
+                    minLength={8}
+                    value={formData.password}
+                    onChange={() => {
+                      setIsChecklistValid(validatePassword(formData.password));
+                    }}
+                  />
+                </div>
+              </div>
               <FormField
                 id="FirstName"
                 label="First Name"
@@ -291,7 +440,13 @@ export default function SignUp() {
               <Button
                 type="submit"
                 className="w-full text-white bg-primaryColour mt-4"
-                disabled={signUpLoading || sendCodeLoading}
+                disabled={
+                  signUpLoading ||
+                  sendCodeLoading ||
+                  !isChecklistValid ||
+                  !formData.password ||
+                  !formData.email
+                }
               >
                 {signUpLoading || sendCodeLoading
                   ? "Creating Account..."

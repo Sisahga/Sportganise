@@ -94,16 +94,18 @@ CREATE TABLE program (
 	capacity INTEGER,
 	occurence_date TIMESTAMPTZ,
 	duration INTEGER,
-	is_recurring BOOLEAN DEFAULT FALSE,
 	expiry_date TIMESTAMPTZ,
 	frequency VARCHAR(10),
 	location VARCHAR(50),
-	visibility VARCHAR(10)
-	CONSTRAINT check_recurrence
-		CHECK( (is_recurring = TRUE AND expiry_date IS NOT NULL AND frequency IS NOT NULL)
-		OR (is_recurring = FALSE AND expiry_date IS NULL AND frequency IS NULL)
-    )
+    visibility VARCHAR(10),
+    cancelled BOOLEAN DEFAULT FALSE
 );
+
+CREATE TABLE program_recurrence (
+                                    recurrence_id SERIAL PRIMARY KEY,
+                                    program_id INT REFERENCES program(program_id) ON DELETE CASCADE,
+                                    occurrence_date TIMESTAMPTZ NOT NULL,
+                                    cancelled BOOLEAN DEFAULT FALSE);
 
 CREATE TABLE program_attachments (
 	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
@@ -170,6 +172,8 @@ CREATE TABLE message_blob (
 ALTER TABLE channel
 ADD last_message_id INTEGER REFERENCES message(message_id);
 
+CREATE INDEX idx_dm_message_channel_time ON message(channel_id, sent_at);
+
 CREATE TABLE delete_channel_request (
     delete_request_id SERIAL PRIMARY KEY,
     channel_id INTEGER UNIQUE NOT NULL REFERENCES channel(channel_id) ON DELETE CASCADE,
@@ -231,6 +235,33 @@ CREATE TABLE training_plan(
 	doc_url VARCHAR(255) NOT NULL,
 	shared BOOLEAN,
 	creation_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+-- PRIMARY KEY is a composite key: case where user has browser and app listening for notifications at the same time.
+CREATE TABLE fcm_token(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL,
+    PRIMARY KEY (token)
+);
+
+-- Notification preferences for each user.
+CREATE TABLE notification_preference(
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    push_notifications BOOLEAN DEFAULT TRUE,
+    email_notifications BOOLEAN DEFAULT FALSE,
+    events BOOLEAN DEFAULT TRUE,
+    messaging BOOLEAN DEFAULT TRUE,
+    training_sessions BOOLEAN DEFAULT TRUE,
+    PRIMARY KEY (account_id)
+);
+
+CREATE TABLE notification(
+    notification_id SERIAL PRIMARY KEY,
+    account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
+    title VARCHAR(30) NOT NULL,
+    body VARCHAR(100) NOT NULL,
+    read BOOLEAN DEFAULT FALSE,
+    sent_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 SET TIME ZONE 'America/New_York';

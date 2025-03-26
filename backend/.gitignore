@@ -38,3 +38,6 @@ build/
 ### MAC OS ###
 .DS_Store
 .github/.DS_Store
+
+### Firebase Config ###
+/src/main/resources/firebase-configuration-file.json

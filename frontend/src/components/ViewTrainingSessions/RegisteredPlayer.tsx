@@ -5,13 +5,17 @@ import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import ParticipantPopUp from "./ParticipantPopUp";
 import log from "loglevel";
+import { Badge } from "../ui/badge";
+import { Attendees } from "@/types/trainingSessionDetails";
 
 interface RegisteredPlayerProps {
-  accountId: number;
+  accountAttendee: Attendees;
+  onRefresh: () => void;
 }
 
 const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
-  accountId,
+  accountAttendee,
+  onRefresh,
 }: RegisteredPlayerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -19,7 +23,7 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
     data: accountDetails,
     loading,
     error,
-  } = usePersonalInformation(accountId);
+  } = usePersonalInformation(accountAttendee?.accountId);
   log.debug("Rendering RegisteredPlayer");
 
   return (
@@ -36,6 +40,13 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
         className="cursor-pointer"
       >
         <div className="flex my-2">
+          {accountAttendee.rank && (
+            <div className="mr-2 self-center flex items-center justify-center">
+              <Badge className="bg-secondaryColour text-white text-xs font-semibold">
+                {accountAttendee.rank}
+              </Badge>
+            </div>
+          )}
           <div className="mr-4 self-center">
             <Avatar>
               <AvatarImage src={accountDetails?.pictureUrl} />
@@ -59,14 +70,18 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
               </h4>
             )}
             <AttendeeBadgeType accountType={accountDetails?.type} />
+            {!accountAttendee.confirmed && accountAttendee.rank === null && (
+              <Badge variant="destructive">{"absent"}</Badge>
+            )}
           </div>
         </div>
         <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
       </div>
       <ParticipantPopUp
-        accountId={accountId}
+        accountAttendee={accountAttendee}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        onRefresh={onRefresh}
       />
     </div>
   );

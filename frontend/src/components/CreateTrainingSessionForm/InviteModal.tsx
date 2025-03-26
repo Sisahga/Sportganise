@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
 export interface Member {
-  id: string;
+  id: number;
   name: string;
   email: string;
   role: string; // e.g., "Coach", "Player", etc.
@@ -22,8 +22,8 @@ interface InviteModalProps {
   open: boolean;
   onClose: () => void;
   members: Member[];
-  selectedMembers: string[];
-  setSelectedMembers: React.Dispatch<React.SetStateAction<string[]>>;
+  selectedMembers: number[];
+  setSelectedMembers: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
 export default function InviteModal({
@@ -47,11 +47,15 @@ export default function InviteModal({
     );
   }, [search, members]);
 
-  const toggleMember = (id: string) => {
+  const toggleMember = (id: number) => {
     setSelectedMembers((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id],
     );
   };
+
+  useEffect(() => {
+    console.log("Current selected members:", selectedMembers);
+  }, [selectedMembers]);
 
   return (
     <Dialog
