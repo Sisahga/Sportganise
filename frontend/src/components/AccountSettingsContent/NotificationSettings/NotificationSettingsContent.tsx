@@ -10,7 +10,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import BackButton from "@/components/ui/back-button";
-import { BellRing } from "lucide-react";
+import { BellRing, AlertTriangle } from "lucide-react";
 import {
   NotificationMethod,
   NotificationMethodEnum,
@@ -54,6 +54,23 @@ export default function NotificationSettings() {
   const { getNotificationSettings } = useGetNotificationSettings();
   const { updateNotificationMethod } = useUpdateNotificationMethod();
   const { updateNotificationPermission } = useUpdateNotificationPermission();
+
+  // Check browser push notification support
+  const checkPushNotificationSupport = () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      toast({
+        variant: "warning",
+        title: "⚠️ Limited Browser Notifications",
+        description: "Your browser may not fully support push notifications. Some app features might be limited.",
+        duration: 10000,
+      });
+    }
+  };
+
+  // Check push notification support on component mount
+  useEffect(() => {
+    checkPushNotificationSupport();
+  }, []);
 
   const handleChannelToggle = async (method: NotificationMethodEnum) => {
     setNotificationMethods((prev) =>
