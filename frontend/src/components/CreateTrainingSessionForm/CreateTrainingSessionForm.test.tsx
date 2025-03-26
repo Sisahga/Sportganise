@@ -1,20 +1,14 @@
-// CreateTrainingSessionForm.test.tsx
-import React from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { useForm } from "react-hook-form";
 
-// ----------------------------------------------------------------
-// Mocks for external hooks and modules using relative paths
-
-// 1. react-router's useNavigate
 const mockNavigate = vi.fn();
 vi.mock("react-router", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-// 2. useCreateTrainingSession
 const mockCreateTrainingSession = vi.fn();
 vi.mock("../../hooks/useCreateTrainingSession", () => ({
   default: () => ({
@@ -23,8 +17,6 @@ vi.mock("../../hooks/useCreateTrainingSession", () => ({
   }),
 }));
 
-// 3. Default useFormHandler mock (for public event)
-//    This one uses react-hook-form's useForm to produce a proper control.
 vi.mock("../../hooks/useFormHandler", () => {
   return {
     default: () => {
@@ -48,7 +40,6 @@ vi.mock("../../hooks/useFormHandler", () => {
   };
 });
 
-// For the private event test, we define a helper
 const privateFormMock = () => {
   const form = useForm({
     defaultValues: {
@@ -68,7 +59,6 @@ const privateFormMock = () => {
   return { form };
 };
 
-// 4. usePlayers – default: players loaded successfully
 vi.mock("../../hooks/usePlayers", () => ({
   default: () => ({
     players: [
@@ -85,25 +75,21 @@ vi.mock("../../hooks/usePlayers", () => ({
   }),
 }));
 
-// 5. useToast
 const mockToast = vi.fn();
 vi.mock("../../hooks/use-toast", () => ({
   useToast: () => ({ toast: mockToast }),
 }));
 
-// 6. useInviteToPrivateEvent
 const mockInvite = vi.fn();
 vi.mock("../../hooks/useInviteToPrivateEvent", () => ({
   useInviteToPrivateEvent: () => ({ invite: mockInvite }),
 }));
 
-// 7. cookies service
 vi.mock("../../services/cookiesService", () => ({
   getCookies: () => ({ type: "ADMIN" }),
   getAccountIdCookie: () => 1,
 }));
 
-// 8. Override react-hook-form’s useWatch so it returns a default for "frequency"
 vi.mock("react-hook-form", async () => {
   const actual = await vi.importActual("react-hook-form");
   return {
@@ -115,15 +101,10 @@ vi.mock("react-hook-form", async () => {
   };
 });
 
-// ----------------------------------------------------------------
-// Import the component under test (static import for tests that don't override modules)
 import CreateTrainingSessionForm from "./CreateTrainingSessionForm";
 
-// ----------------------------------------------------------------
-// Test suite
 describe("CreateTrainingSessionForm", () => {
   beforeEach(() => {
-    // Clear spies
     mockNavigate.mockClear();
     mockCreateTrainingSession.mockClear();
     mockToast.mockClear();
@@ -131,7 +112,6 @@ describe("CreateTrainingSessionForm", () => {
   });
 
   it("renders loading state when players are loading", async () => {
-    // Reset modules so that the new doMock is used.
     vi.resetModules();
     vi.doMock("../../hooks/usePlayers", () => ({
       default: () => ({
@@ -143,7 +123,6 @@ describe("CreateTrainingSessionForm", () => {
     const module = await import("./CreateTrainingSessionForm");
     const Component = module.default;
     render(<Component />);
-    // Match the exact text including the ellipsis
     expect(screen.getByText("Loading players...")).toBeInTheDocument();
   });
 
@@ -164,7 +143,6 @@ describe("CreateTrainingSessionForm", () => {
 
   it("renders form when players are loaded", () => {
     render(<CreateTrainingSessionForm />);
-    // Use getAllByText to account for multiple matches; expect at least one.
     const headings = screen.getAllByText(/Create New Program/i);
     expect(headings.length).toBeGreaterThan(0);
   });
@@ -189,12 +167,10 @@ describe("CreateTrainingSessionForm", () => {
   });
 
   it("shows a validation error when visibility is private and no members are selected", async () => {
-    // Reset modules and override useFormHandler so that default visibility is "private"
     vi.resetModules();
     vi.doMock("../../hooks/useFormHandler", () => ({
       default: () => privateFormMock(),
     }));
-    // Also override usePlayers to ensure consistent state (players loaded)
     vi.doMock("../../hooks/usePlayers", () => ({
       default: () => ({
         players: [
