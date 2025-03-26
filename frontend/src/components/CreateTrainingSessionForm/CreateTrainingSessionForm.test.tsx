@@ -160,7 +160,7 @@ describe("CreateTrainingSessionForm", () => {
         expect.objectContaining({
           variant: "success",
           title: "Form submitted successfully ✔",
-        })
+        }),
       );
       expect(mockNavigate).toHaveBeenCalledWith(-1);
     });
@@ -199,7 +199,7 @@ describe("CreateTrainingSessionForm", () => {
           variant: "destructive",
           title: "Validation Error",
           description: "Please select at least one member for a private event.",
-        })
+        }),
       );
       expect(mockCreateTrainingSession).not.toHaveBeenCalled();
     });
