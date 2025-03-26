@@ -57,11 +57,12 @@ export default function NotificationSettings() {
 
   // Check browser push notification support
   const checkPushNotificationSupport = () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
       toast({
         variant: "warning",
         title: "⚠️ Limited Browser Notifications",
-        description: "Your browser may not fully support push notifications. Some app features might be limited.",
+        description:
+          "Your browser may not fully support push notifications. Some app features might be limited.",
         duration: 10000,
       });
     }
