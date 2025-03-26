@@ -10,7 +10,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
 import BackButton from "@/components/ui/back-button";
-import { BellRing, AlertTriangle } from "lucide-react";
+import { BellRing } from "lucide-react";
 import {
   NotificationMethod,
   NotificationMethodEnum,
