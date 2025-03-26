@@ -176,20 +176,20 @@ export default function ModifyTrainingSessionForm() {
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
   // State for selected participant IDs (existing attendees)
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   // State to control the InviteModal's visibility
   const [showInviteModal, setShowInviteModal] = useState(false);
   const { players } = usePlayers();
   const members: Member[] = players.map((player) => ({
-    id: player.accountId.toString(),
+    id: player.accountId, // <-- now a number
     name: `${player.firstName} ${player.lastName}`,
     email: player.email,
     role: player.type,
   }));
   useEffect(() => {
     if (location.state && location.state.attendees) {
-      const attendeeIds = (location.state.attendees as Attendees[]).map((att) =>
-        att.accountId.toString(),
+      const attendeeIds = (location.state.attendees as Attendees[]).map(
+        (att) => att.accountId, // now a number
       );
       setSelectedMembers(attendeeIds);
     }
