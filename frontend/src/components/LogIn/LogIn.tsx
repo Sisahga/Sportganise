@@ -31,17 +31,56 @@ export default function LogIn() {
   const handleLogIn = (e: React.FormEvent) => {
     e.preventDefault();
     // Email validation regex and TLD set
-    const validEmailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(?<tld>[a-zA-Z]{2,})$/;
+    const validEmailRegex =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(?<tld>[a-zA-Z]{2,})$/;
     const validTLDs = new Set([
-      "com", "org", "net", "edu", "gov", "mil", "io", "co", "ai", "ca", "uk", 
-      "us", "au", "de", "fr", "jp", "cn", "in", "ru", "br", "it", "es", "nl", 
-      "se", "no", "fi", "dk", "pl", "ch", "be", "ar", "mx", "za", "nz", "sg", 
-      "hk", "id", "my"
+      "com",
+      "org",
+      "net",
+      "edu",
+      "gov",
+      "mil",
+      "io",
+      "co",
+      "ai",
+      "ca",
+      "uk",
+      "us",
+      "au",
+      "de",
+      "fr",
+      "jp",
+      "cn",
+      "in",
+      "ru",
+      "br",
+      "it",
+      "es",
+      "nl",
+      "se",
+      "no",
+      "fi",
+      "dk",
+      "pl",
+      "ch",
+      "be",
+      "ar",
+      "mx",
+      "za",
+      "nz",
+      "sg",
+      "hk",
+      "id",
+      "my",
     ]);
 
     // Validate email format
     const match = formData.email.match(validEmailRegex);
-    if (!match || !match.groups || !validTLDs.has(match.groups.tld.toLowerCase())) {
+    if (
+      !match ||
+      !match.groups ||
+      !validTLDs.has(match.groups.tld.toLowerCase())
+    ) {
       toast({
         variant: "destructive",
         title: "Invalid Email Format",
