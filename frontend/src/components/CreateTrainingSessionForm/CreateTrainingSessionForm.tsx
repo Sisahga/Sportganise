@@ -60,7 +60,6 @@ import { FUNDRAISER } from "@/constants/programconstants";
 import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
 import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
-import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
 import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 import { DAILY } from "@/constants/programconstants";
@@ -725,7 +724,6 @@ export default function CreateTrainingSessionForm() {
                           <CommandGroup>
                             {[
                               { label: "Public", value: PUBLIC },
-                              { label: "Members only", value: MEMBERS_ONLY },
                               { label: "Private", value: PRIVATE },
                             ].map((v) => (
                               <CommandItem
