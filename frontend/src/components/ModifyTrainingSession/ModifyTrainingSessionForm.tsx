@@ -61,7 +61,6 @@ import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { MAIN_STREET } from "@/constants/programconstants";
 import { TEST_WATER_ROAD } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
-import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
@@ -114,10 +113,6 @@ const visibilities = [
   {
     label: "Public",
     value: PUBLIC,
-  },
-  {
-    label: "Members only",
-    value: MEMBERS_ONLY,
   },
   {
     label: "Private",
