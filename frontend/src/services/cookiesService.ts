@@ -172,20 +172,24 @@ export const isCookiesDto = (
 };
 
 export const clearCookies = async () => {
-  const cookieNames = [
-    "accountId",
-    "firstName",
-    "lastName",
-    "email",
-    "pictureUrl",
-    "type",
-    "phone",
-    "organisationIds",
-  ];
+  if (isMobilePlatform()) {
+    await Preferences.clear();
+  } else {
+    const cookieNames = [
+      "accountId",
+      "firstName",
+      "lastName",
+      "email",
+      "pictureUrl",
+      "type",
+      "phone",
+      "organisationIds",
+    ];
 
-  cookieNames.forEach((name) => {
-    Cookies.remove(name, { path: "/" });
-  });
+    cookieNames.forEach((name) => {
+      Cookies.remove(name, { path: "/" });
+    });
+  }
 
   await removeAuthToken();
 };
