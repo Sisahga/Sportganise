@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@capacitor-community/http':
+        specifier: ^1.4.1
+        version: 1.4.1
       '@capacitor/android':
         specifier: ^7.0.1
         version: 7.0.1(@capacitor/core@7.0.1)
@@ -20,6 +23,15 @@ importers:
       '@capacitor/ios':
         specifier: ^7.0.1
         version: 7.0.1(@capacitor/core@7.0.1)
+      '@capacitor/keyboard':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.0.1)
+      '@capacitor/preferences':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.0.1)
+      '@capacitor/push-notifications':
+        specifier: ^7.0.0
+        version: 7.0.0(@capacitor/core@7.0.1)
       '@hookform/resolvers':
         specifier: ^3.10.0
         version: 3.10.0(react-hook-form@7.54.2(react@18.3.1))
@@ -470,6 +482,14 @@ packages:
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
+  '@capacitor-community/http@1.4.1':
+    resolution: {integrity: sha512-+pCkBXrwfm97UfjOgjV950H/qZ8SE36Mrcb46BlL1ps3VIsGuIO+AulL8GqTC6LewheRVtGJpRspNtneXQotNA==}
+
+  '@capacitor/android@3.9.0':
+    resolution: {integrity: sha512-YTPyrh1NozEuYXWGtfqN27TLXUrLbZX9fggyd4JQ1yMaUZTmLPm5dCuznONhQ49aPkJnUJB02JfpHy/qGwa2Lw==}
+    peerDependencies:
+      '@capacitor/core': ^3.9.0
+
   '@capacitor/android@7.0.1':
     resolution: {integrity: sha512-jukJJHfkcyEBOkFBJRD3EwXMIIQo7lSv0ExPWgsIliPdGXLAj6ElvK2JaYEzec3vKyLc4RTNFVv0PMEU0vnImg==}
     peerDependencies:
@@ -480,13 +500,41 @@ packages:
     engines: {node: '>=20.0.0'}
     hasBin: true
 
+  '@capacitor/core@3.9.0':
+    resolution: {integrity: sha512-j1lL0+/7stY8YhIq1Lm6xixvUqIn89vtyH5ZpJNNmcZ0kwz6K9eLkcG6fvq1UWMDgSVZg9JrRGSFhb4LLoYOsw==}
+
   '@capacitor/core@7.0.1':
     resolution: {integrity: sha512-1Ob9bvA/p8g8aNwK6VesxEekGXowLVf6APjkW4LRnr05H+7z/bke+Q5pn9zqh/GgTbIxAQ/rwZrAZvvxkdm1UA==}
+
+  '@capacitor/filesystem@1.1.0':
+    resolution: {integrity: sha512-8O3UuvL8HNUEJvZnmn8yUmvgB1evtXfcF0oxIo3YbSlylqywJwS3JTiuhKmsvSxCdpbTy8IaTsutVh3gZgWbKg==}
+    peerDependencies:
+      '@capacitor/core': ^3.0.0
+
+  '@capacitor/ios@3.9.0':
+    resolution: {integrity: sha512-GezPCJIujRHnF4wbrKJx6Q/mgFz0f9rmh/steTTXQZI+nEl6mHk6NWh8235p7YbhonYi5WD0rFNirrjGg1EaGw==}
+    peerDependencies:
+      '@capacitor/core': ^3.9.0
 
   '@capacitor/ios@7.0.1':
     resolution: {integrity: sha512-RN6S1C1k7ue57DFmJM4EizzsYBrahTTiMhcnlHspFLaojgHbFWZbYq1VriuRKysPU1ka/P+klsdtRFsB5K9jyw==}
     peerDependencies:
       '@capacitor/core': ^7.0.0
+
+  '@capacitor/keyboard@7.0.0':
+    resolution: {integrity: sha512-Tqwy8wG+sx4UqiFCX4Q+bFw6uKgG7BiHKAPpeefoIgoEB8H8Jf3xZNZoVPnJIMuPsCdSvuyHXZbJXH9IEEirGA==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
+  '@capacitor/preferences@7.0.0':
+    resolution: {integrity: sha512-crlTtTIWcdlLfQULJ9ZiCPpvpm51WoZ8CIVG3+XSJGyavjD4bscHP15U24ya5SjpYmI44bGY9lvhvcSCfB5+AA==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
+
+  '@capacitor/push-notifications@7.0.0':
+    resolution: {integrity: sha512-B+5Msm6H0gNh+c9vSkd/czxDwC0EXUs9WceQtveJumzcyTsXgk9fZyiTnrAkS1r2yLcooejWes02FSBnQEMPzg==}
+    peerDependencies:
+      '@capacitor/core': '>=7.0.0'
 
   '@esbuild/aix-ppc64@0.21.5':
     resolution: {integrity: sha512-1SDgH6ZSPTlggy1yI6+Dbkiz8xzpHJEVAlF/AM1tHPLsf5STom9rwtjE4hKAF20FfXXNTFqEYXyJNWh1GiZedQ==}
@@ -5204,6 +5252,17 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
+  '@capacitor-community/http@1.4.1':
+    dependencies:
+      '@capacitor/android': 3.9.0(@capacitor/core@3.9.0)
+      '@capacitor/core': 3.9.0
+      '@capacitor/filesystem': 1.1.0(@capacitor/core@3.9.0)
+      '@capacitor/ios': 3.9.0(@capacitor/core@3.9.0)
+
+  '@capacitor/android@3.9.0(@capacitor/core@3.9.0)':
+    dependencies:
+      '@capacitor/core': 3.9.0
+
   '@capacitor/android@7.0.1(@capacitor/core@7.0.1)':
     dependencies:
       '@capacitor/core': 7.0.1
@@ -5230,11 +5289,35 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@capacitor/core@3.9.0':
+    dependencies:
+      tslib: 2.8.1
+
   '@capacitor/core@7.0.1':
     dependencies:
       tslib: 2.8.1
 
+  '@capacitor/filesystem@1.1.0(@capacitor/core@3.9.0)':
+    dependencies:
+      '@capacitor/core': 3.9.0
+
+  '@capacitor/ios@3.9.0(@capacitor/core@3.9.0)':
+    dependencies:
+      '@capacitor/core': 3.9.0
+
   '@capacitor/ios@7.0.1(@capacitor/core@7.0.1)':
+    dependencies:
+      '@capacitor/core': 7.0.1
+
+  '@capacitor/keyboard@7.0.0(@capacitor/core@7.0.1)':
+    dependencies:
+      '@capacitor/core': 7.0.1
+
+  '@capacitor/preferences@7.0.0(@capacitor/core@7.0.1)':
+    dependencies:
+      '@capacitor/core': 7.0.1
+
+  '@capacitor/push-notifications@7.0.0(@capacitor/core@7.0.1)':
     dependencies:
       '@capacitor/core': 7.0.1
 
