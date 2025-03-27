@@ -23,11 +23,14 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
+import { isSameDay } from 'date-fns';
 
 export default function TrainingSessionsList({
   selectedMonth,
   programsProp,
+  selectedDate,
 }: {
+  selectedDate?: Date;
   selectedMonth: Date;
   programsProp: ReturnType<typeof usePrograms>;
 }) {
@@ -131,14 +134,24 @@ export default function TrainingSessionsList({
         : program.programDetails.occurrenceDate,
     );
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
-    const dateFilter =
-      programDate >= dateRange[0].startDate &&
-      programDate <= dateRange[0].endDate;
+    if (!selectedDate) {
+      const dateFilter =
+        programDate >= dateRange[0].startDate &&
+        programDate <= dateRange[0].endDate;
+      const typeFilter =
+        selectedProgramType.length === 0 ||
+        selectedProgramType.includes(program.programDetails.programType);
+      return dateFilter && typeFilter;
+    }
+
+    // If a specific date is selected, filter by that date
+    const dateFilter = isSameDay(programDate, selectedDate);
     const typeFilter =
       selectedProgramType.length === 0 ||
       selectedProgramType.includes(program.programDetails.programType);
     return dateFilter && typeFilter;
   });
+
 
   function handleDateChange(item: any) {
     const newStartDate = new Date(item.selection.startDate);
@@ -172,15 +185,18 @@ export default function TrainingSessionsList({
       {/**List of events */}
       <div>
         <span className="flex mt-8 mx-1">
-          <div>
-            <p className="text-lg text-primaryColour text-sec font-semibold">
-              Upcoming Programs
-            </p>
-            <p className="text-xs text-gray-400 mt-1">
-              {dateRange[0].startDate.toLocaleDateString()} -{" "}
-              {dateRange[0].endDate.toLocaleDateString()}
-            </p>
-          </div>
+        <div>
+          <p className="text-lg text-primaryColour text-sec font-semibold">
+            {selectedDate 
+              ? `Programs on ${selectedDate.toLocaleDateString()}` 
+              : "Upcoming Programs"}
+          </p>
+          <p className="text-xs text-gray-400 mt-1">
+            {selectedDate 
+              ? selectedDate.toLocaleDateString() 
+              : `${dateRange[0].startDate.toLocaleDateString()} - ${dateRange[0].endDate.toLocaleDateString()}`}
+          </p>
+        </div>
 
           {/**Filters */}
           <Drawer direction="bottom">
