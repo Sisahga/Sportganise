@@ -139,6 +139,43 @@ const trainingSessionApi = {
       return [];
     }
   },
+
+  /**Delete Program */
+  deleteProgram: async (
+    accountId: number | null | undefined,
+    programId: number,
+  ) => {
+    if (!accountId || !programId) {
+      log.warn(
+        "Skipping deleteProgram because accountId or programId is null.",
+      );
+      return;
+    }
+
+    const url = `${baseMappingUrl}/${accountId}/delete-program/${programId}`;
+    try {
+      log.info("Delete confirmation initiated");
+      log.info("Making DELETE request to:", url);
+
+      const response = await fetch(url, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: getBearerToken(),
+        },
+      });
+
+      if (!response.ok) {
+        log.error("Failed to delete program. Response:", response);
+        throw new Error("Failed to delete training session");
+      }
+
+      log.info("Program successfully deleted");
+      return response.json();
+    } catch (error) {
+      log.error("Error deleting the program:", error);
+    }
+  },
 };
 
 export default trainingSessionApi;
