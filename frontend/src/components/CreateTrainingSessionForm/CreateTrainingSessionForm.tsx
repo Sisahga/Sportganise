@@ -98,7 +98,6 @@ export default function CreateTrainingSessionForm() {
     }
   }, [form, minAttendees]);
 
-  
   const maxAttendees = form.watch("capacity");
 
   useEffect(() => {
@@ -908,7 +907,9 @@ export default function CreateTrainingSessionForm() {
                       {...field}
                       value={maxAttendees ?? minAttendees}
                       onChange={(e) => {
-                        const newValue = e.target.value ? Number(e.target.value) : minAttendees;
+                        const newValue = e.target.value
+                          ? Number(e.target.value)
+                          : minAttendees;
                         field.onChange(newValue);
                       }}
                     />
