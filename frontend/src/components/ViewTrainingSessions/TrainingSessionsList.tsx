@@ -270,12 +270,20 @@ export default function TrainingSessionsList({
                   </div>
                   {/**Cancel filters button */}
                   <Button
-                    className="px-12 mt-8 mb-8"
+                    className="px-12 mt-8 mb-4"
                     variant="outline"
                     onClick={handleCancel}
                   >
                     Cancel
                   </Button>
+                   {/**Done button */}
+                   <DrawerClose asChild>
+                    <Button
+                      className="px-12 mt-2 mb-8 bg-secondaryColour hover:bg-transparent hover:text-primaryColour hover:border-navbar"
+                    >
+                      Done
+                    </Button>
+                  </DrawerClose>
                 </div>
               </ScrollArea>
             </DrawerContent>
