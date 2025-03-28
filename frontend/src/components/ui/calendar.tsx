@@ -81,8 +81,8 @@ function Calendar({
   const eventDates = programsProp?.eventDates ?? [];
   const fetchProgramDates = programsProp?.fetchProgramDates;
 
-  const currentMonth =
-    selectedMonth instanceof Date ? selectedMonth : new Date();
+  // const currentMonth =
+  //   selectedMonth instanceof Date ? selectedMonth : new Date();
 
   // Fetch event dates when the Calendar component mounts
   useEffect(() => {
