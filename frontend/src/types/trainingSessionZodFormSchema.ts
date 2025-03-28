@@ -4,6 +4,7 @@ export const formSchema = z
   .object({
     title: z.string().max(30, "Only 30 characters accepted."),
     type: z.string(),
+    coaches: z.array(z.number()).min(1, "At least one coach is required"),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().optional(),
     frequency: z.string(),
