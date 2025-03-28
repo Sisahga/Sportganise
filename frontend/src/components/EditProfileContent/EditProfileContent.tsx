@@ -220,16 +220,16 @@ const EditProfileContent: React.FC = () => {
 
       <div className="flex flex-col items-center justify-center mx-auto max-w-2xl">
         <div className="relative">
+        <Label
+    htmlFor="file-input"
+    className="cursor-pointer"
+  >
           <img
             className="h-48 w-48 rounded-full border-2 border-gray-300 mx-auto my-2"
             src={image}
             alt="Profile"
           />
-          <Label
-            htmlFor="file-input"
-            className="absolute bottom-3 right-3 translate-x-1/2 translate-y-1/2 cursor-pointer rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl transition"
-          >
-            <CirclePlus className="rounded-full w-10 h-10 hover:scale-110 hover:text-black transition-transform " />
+            <CirclePlus className="absolute bottom-2 right-2 bg-white p-1 shadow-lg text-primaryColour text-sm hover:scale-110 rounded-full w-10 h-10 hover:scale-110 hover:text-primaryColour transition-transform" />
           </Label>
 
           <Input
