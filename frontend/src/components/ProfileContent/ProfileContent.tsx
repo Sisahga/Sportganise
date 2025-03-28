@@ -7,7 +7,7 @@ import {
   KeyRound,
   UserX,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import {
   getCookies,
@@ -49,21 +49,25 @@ const ProfileContent: React.FC = () => {
           </h2>
 
           {/* Profile image */}
-          <img
+          <Link to="/pages/PersonalInformationPage"> <img
             className="h-48 w-48 rounded-full border-2 border-gray dark:border-gray-800 mx-auto my-2 object-cover"
             src={data?.pictureUrl || "https://via.placeholder.com/150"}
             alt="Profile"
           />
+    
+         
 
           <p className="text-3xl text-primaryColour font-medium">
             {data?.firstName} {data?.lastName}
           </p>
+          </Link>
           <p className="text-lg font-semibold text-primaryColour">
             {data?.type
               ? data?.type.charAt(0).toUpperCase() + data?.type.slice(1)
               : ""}
           </p>
         </div>
+        
 
         <div className="flex flex-col mt-4">
           {/* Personal Information */}
