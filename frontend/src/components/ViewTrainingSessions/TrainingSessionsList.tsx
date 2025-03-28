@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
-import { isSameDay } from 'date-fns';
+import { isSameDay, isWithinInterval  } from 'date-fns';
 
 export default function TrainingSessionsList({
   selectedMonth,
@@ -134,24 +134,27 @@ export default function TrainingSessionsList({
         : program.programDetails.occurrenceDate,
     );
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
-    if (!selectedDate) {
-      const dateFilter =
-        programDate >= dateRange[0].startDate &&
-        programDate <= dateRange[0].endDate;
+    if (selectedDate) {
+      // If a specific date is selected, filter by that date
+      const dateFilter = isSameDay(programDate, selectedDate);
       const typeFilter =
         selectedProgramType.length === 0 ||
         selectedProgramType.includes(program.programDetails.programType);
       return dateFilter && typeFilter;
     }
 
-    // If a specific date is selected, filter by that date
-    const dateFilter = isSameDay(programDate, selectedDate);
-    const typeFilter =
-      selectedProgramType.length === 0 ||
-      selectedProgramType.includes(program.programDetails.programType);
-    return dateFilter && typeFilter;
-  });
-
+    const dateFilter = 
+    isWithinInterval(programDate, {
+      start: dateRange[0].startDate,
+      end: dateRange[0].endDate
+    });
+  
+  const typeFilter =
+    selectedProgramType.length === 0 ||
+    selectedProgramType.includes(program.programDetails.programType);
+  
+  return dateFilter && typeFilter;
+});
 
   function handleDateChange(item: any) {
     const newStartDate = new Date(item.selection.startDate);
