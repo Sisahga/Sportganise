@@ -279,7 +279,8 @@ export default function TrainingSessionsList({
                    {/**Done button */}
                    <DrawerClose asChild>
                     <Button
-                      className="px-12 mt-2 mb-8 bg-secondaryColour hover:bg-transparent hover:text-primaryColour hover:border-navbar"
+                      className="px-12 mt-2 mb-8"
+                      variant="default"
                     >
                       Done
                     </Button>
