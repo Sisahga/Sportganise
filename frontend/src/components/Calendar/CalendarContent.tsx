@@ -18,12 +18,12 @@ export default function CalendarContent() {
 
       <div className="w-[270px] justify-self-center my-5">
         <Calendar
-        mode="single"
-        selected={selectedDate}
-        onSelect={setSelectedDate}
-        selectedMonth={selectedMonth}
-        onMonthChange={setSelectedMonth}
-        programsProp={programsProp}
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          selectedMonth={selectedMonth}
+          onMonthChange={setSelectedMonth}
+          programsProp={programsProp}
         />
       </div>
 
