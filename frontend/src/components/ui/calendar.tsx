@@ -108,8 +108,12 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
-      month={currentMonth}
-      onMonthChange={onMonthChange}
+      // month={currentMonth}
+      // onMonthChange={onMonthChange}
+      month={selectedMonth} // Ensure this is the month that gets updated
+      onMonthChange={(newMonth) => {
+        onMonthChange?.(newMonth); // Call the parent function or handle the state change here
+      }}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
