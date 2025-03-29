@@ -5,6 +5,7 @@ import usePrograms from "@/hooks/usePrograms";
 
 export default function CalendarContent() {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   // Shared instance of usePrograms() hook that will be passed down as a prop to other components
   const programsProp = usePrograms();
@@ -17,6 +18,9 @@ export default function CalendarContent() {
 
       <div className="w-[270px] justify-self-center my-5">
         <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
           selectedMonth={selectedMonth}
           onMonthChange={setSelectedMonth}
           programsProp={programsProp}
@@ -28,6 +32,7 @@ export default function CalendarContent() {
       <TrainingSessionsList
         selectedMonth={selectedMonth}
         programsProp={programsProp}
+        selectedDate={selectedDate}
       />
     </div>
   );
