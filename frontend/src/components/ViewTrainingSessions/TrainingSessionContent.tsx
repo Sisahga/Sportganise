@@ -150,7 +150,7 @@ const TrainingSessionContent = () => {
               <div className="flex items-center gap-2">
                 <hr className="w-1 h-px border-0 bg-gray-500 " />
                 <p className="text-sm text-gray-500">
-                  {new Date(programDetails.expiryDate).toDateString()}
+                  {formatDate(programDetails.expiryDate).toDateString()}
                 </p>
               </div>
             ) : (
