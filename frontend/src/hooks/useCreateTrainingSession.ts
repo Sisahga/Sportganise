@@ -13,7 +13,6 @@ function useCreateTrainingSession() {
     jsonPayload: FormData,
   ) => {
     try {
-      log.info("------- IN useCreateTrainingSession.tsx!");
       const data = await trainingSessionApi.createTrainingSession(
         accountId,
         jsonPayload,
@@ -36,11 +35,9 @@ function useCreateTrainingSession() {
       log.info(
         "error in useCreateTrainingSession.createTrainingSession so return null.",
       );
-      log.info("------- END OF useCreateTrainingSession.createTrainingSession");
       return null;
     }
   };
-  log.info("------- END OF useCreateTrainingSession.createTrainingSession");
   return {
     createTrainingSession,
     error,

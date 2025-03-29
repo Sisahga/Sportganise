@@ -31,7 +31,7 @@ const WaitlistedTrainingSessionCard: React.FC<
               <User2Icon color="#a1a1aa" />
             </AvatarFallback>
           </Avatar>
-          <span>Coach Benjamin Luijan</span>
+          <span>{programDetails?.author ?? "N/A"}</span>
           <span className="ml-auto text-xs">
             {new Date(programDetails.occurrenceDate).toDateString()}
           </span>

@@ -69,6 +69,7 @@ import { ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
+import useDeleteProgram from "@/hooks/useDeleteProgram";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -81,6 +82,7 @@ export default function CreateTrainingSessionForm() {
     loading: playersLoading,
     error: playersError,
   } = usePlayers();
+  const { deleteProgram } = useDeleteProgram();
 
   const members: Member[] = players.map((player) => ({
     id: player.accountId,
@@ -108,20 +110,20 @@ export default function CreateTrainingSessionForm() {
 
   // AccountId from cookies
   const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const userId = cookies ? getAccountIdCookie(cookies) : null;
   useEffect(() => {
-    if (!accountId) {
+    if (!userId) {
       log.debug("No accountId found");
     }
-    log.info(`CreateTrainingSessionForm accountId is ${accountId}`);
-  }, [accountId]);
+    log.info(`CreateTrainingSessionForm accountId is ${userId}`);
+  }, [userId]);
 
   useEffect(() => {
     if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
       navigate("/");
     }
-    log.debug(`CreateTrainingSessionForm accountId : ${accountId}`);
-  }, [accountId, navigate, cookies]);
+    log.debug(`CreateTrainingSessionForm accountId : ${userId}`);
+  }, [userId, navigate, cookies]);
 
   const types = [
     {
@@ -221,8 +223,7 @@ export default function CreateTrainingSessionForm() {
 
       // API submit form
       setLoading(true);
-      const create = await createTrainingSession(accountId, formData);
-      setLoading(false);
+      const create = await createTrainingSession(userId, formData);
       console.log(error);
       console.log("create", create);
       log.info("create", create);
@@ -239,8 +240,13 @@ export default function CreateTrainingSessionForm() {
           selectedMembers.map(async (accountId) => {
             try {
               await invite(accountId, programId!);
+              throw new Error("THIS IS A TEST ERROR");
             } catch (error) {
+              const response = await deleteProgram(userId, programId);
+              console.warn("Delete program response:", response);
+              console.warn(error);
               console.error(`Failed to invite member ${accountId}:`, error);
+              throw error;
             }
           }),
         );

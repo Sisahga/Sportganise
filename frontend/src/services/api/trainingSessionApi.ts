@@ -24,7 +24,6 @@ const trainingSessionApi = {
       },
     );
     console.log("In trainingSessionApi.createTrainingSession");
-    log.info("------ In trainingSessionApi.createTrainingSession");
     console.log("response in trainingSessionApi:", response);
     log.info("response in trainingSessionApi:", response);
 
@@ -35,7 +34,6 @@ const trainingSessionApi = {
       throw new Error(`HTTP error ${response.status}: ${errorText}`);
     }
     log.info(response);
-    log.info("------- END OF 'trainingSessionApi.createTrainingSession'");
     return response.json();
   },
   /**Submit ModifyTrainingSession form */
