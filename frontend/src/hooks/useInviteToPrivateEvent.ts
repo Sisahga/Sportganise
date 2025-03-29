@@ -19,9 +19,11 @@ export const useInviteToPrivateEvent = () => {
         programId,
       );
       log.info("Successfully invited to private event:", response);
+      console.log("Successfully invited to private event:", response);
       return response;
     } catch (err) {
       log.error("Failed to invite to private event:", err);
+      console.log("Failed to invite to private event:", err);
       setError((err as Error).message);
       throw err;
     } finally {

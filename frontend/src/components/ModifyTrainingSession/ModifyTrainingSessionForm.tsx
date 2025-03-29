@@ -61,7 +61,6 @@ import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { MAIN_STREET } from "@/constants/programconstants";
 import { TEST_WATER_ROAD } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
-import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
@@ -72,7 +71,8 @@ import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import { NotificationRequest } from "@/types/notifications";
 import useSendNotification from "@/hooks/useSendNotification";
-
+import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
+import usePlayers from "@/hooks/usePlayers";
 /**All select element options */
 const types = [
   {
@@ -114,10 +114,6 @@ const visibilities = [
   {
     label: "Public",
     value: PUBLIC,
-  },
-  {
-    label: "Members only",
-    value: MEMBERS_ONLY,
   },
   {
     label: "Private",
@@ -188,7 +184,28 @@ export default function ModifyTrainingSessionForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-
+  // State for selected participant IDs (existing attendees)
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  // State to control the InviteModal's visibility
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const { players } = usePlayers();
+  const members: Member[] = players.map((player) => ({
+    id: player.accountId, // <-- now a number
+    name: `${player.firstName} ${player.lastName}`,
+    email: player.email,
+    role: player.type,
+  }));
+  useEffect(() => {
+    if (location.state && location.state.attendees) {
+      const attendeeIds = (location.state.attendees as Attendees[]).map(
+        (att) => att.accountId // now a number
+      );
+      setSelectedMembers(attendeeIds);
+    }
+    if (location.state && location.state.programDetails) {
+      setProgramDetails(location.state.programDetails);
+    }
+  }, [location.state]);
   /** Update state */
   useEffect(() => {
     if (location.state && location.state.programDetails) {
@@ -258,11 +275,21 @@ export default function ModifyTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (values.visibility === "private" && selectedMembers.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description:
+          "Please select at least one participant for a private event.",
+      });
+      return;
+    }
     try {
       const json_payload = {
         ...values,
         programId: programDetails.programId ?? null,
         attachment: values.attachment ?? [],
+        attendees: values.visibility === "private" ? selectedMembers : [],
       };
       console.log(json_payload);
       log.info("Form to modify Training Session : ", json_payload);
@@ -846,6 +873,9 @@ export default function ModifyTrainingSessionForm() {
                               key={visibility.value}
                               onSelect={() => {
                                 form.setValue("visibility", visibility.value);
+                                if (visibility.value === "private") {
+                                  setShowInviteModal(true);
+                                }
                               }}
                             >
                               <Check
@@ -868,8 +898,45 @@ export default function ModifyTrainingSessionForm() {
                   Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
+                {field.value === "private" && (
+                  <div className="mt-2 border p-2 rounded">
+                    <div className="mb-2 font-medium">
+                      Selected Participants:
+                    </div>
+                    {selectedMembers.length > 0 ? (
+                      <ul className="list-disc pl-5">
+                        {selectedMembers.map((memberId) => {
+                          const member = members.find((m) => m.id === memberId);
+                          return (
+                            <li key={memberId}>
+                              {member ? member.name : "Unknown member"}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No participants selected.
+                      </p>
+                    )}
+                    <Button
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setShowInviteModal(true)}
+                    >
+                      Edit Participants
+                    </Button>
+                  </div>
+                )}
               </FormItem>
             )}
+          />
+          <InviteModal
+            open={showInviteModal}
+            onClose={() => setShowInviteModal(false)}
+            members={members}
+            selectedMembers={selectedMembers}
+            setSelectedMembers={setSelectedMembers}
           />
 
           {/** Description */}

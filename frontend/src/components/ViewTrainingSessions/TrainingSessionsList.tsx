@@ -23,8 +23,17 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
+import { isSameDay, isWithinInterval } from "date-fns";
 
-export default function TrainingSessionsList() {
+export default function TrainingSessionsList({
+  selectedMonth,
+  programsProp,
+  selectedDate,
+}: {
+  selectedDate?: Date;
+  selectedMonth: Date;
+  programsProp: ReturnType<typeof usePrograms>;
+}) {
   log.debug("Rendering TrainingSessionList");
 
   // AccountId from cookies
@@ -38,7 +47,7 @@ export default function TrainingSessionsList() {
   }, [accountId]);
 
   // Fetch programs on component mount
-  const { programs, /*setPrograms,*/ error, loading } = usePrograms(accountId); // Program[]
+  const { programs, error, loading, fetchPrograms } = programsProp;
   useEffect(() => {
     console.log("TrainingSessionList : Programs fetched:", programs);
     log.info("TrainingSessionList : Programs fetched:", programs);
@@ -49,17 +58,29 @@ export default function TrainingSessionsList() {
   const todayDayIndex = today.getDay(); // index of today's day of the week
   const startOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`,
+    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`
   );
   startOfWeek.setDate(today.getDate() - todayDayIndex); // start of the week date = today's date - day of week
   const endOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`,
+    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`
   );
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
   startOfWeek.setHours(0, 0, 0, 0);
   endOfWeek.setHours(0, 0, 0, 0);
+
+  const startOfMonth = new Date(
+    selectedMonth.getFullYear(),
+    selectedMonth.getMonth(),
+    1
+  ); // First day of the current month
+
+  const endOfMonth = new Date(
+    selectedMonth.getFullYear(),
+    selectedMonth.getMonth() + 1,
+    0
+  ); // Last day of the month
 
   // Start Date Range
   console.warn("startOfWeek", startOfWeek);
@@ -72,11 +93,42 @@ export default function TrainingSessionsList() {
     },
   ]);
 
+  useEffect(() => {
+    if (!accountId) return;
+
+    const prevStart = dateRange[0].startDate;
+    const prevEnd = dateRange[0].endDate;
+
+    if (
+      prevStart.getTime() !== startOfMonth.getTime() ||
+      prevEnd.getTime() !== endOfMonth.getTime()
+    ) {
+      setDateRange([
+        {
+          startDate: startOfMonth,
+          endDate: endOfMonth,
+          key: "selection",
+        },
+      ]);
+    }
+  }, [accountId, selectedMonth]);
+
+  useEffect(() => {
+    if (!accountId || !dateRange[0].startDate || !dateRange[0].endDate) return;
+
+    const { startDate, endDate } = dateRange[0];
+    fetchPrograms(accountId, startDate, endDate);
+  }, [
+    accountId,
+    dateRange[0].startDate.getTime(),
+    dateRange[0].endDate.getTime(),
+  ]);
+
   // Handle Selected Program Type
   const [selectedProgramType, setSelectedProgramType] = useState<string[]>([]);
   // List of programDetails.programTypes For Check
   const programTypes = Array.from(
-    new Set(programs.map((program) => program.programDetails.programType)),
+    new Set(programs.map((program) => program.programDetails.programType))
   );
 
   // Filter Programs by Date Range
@@ -87,7 +139,7 @@ export default function TrainingSessionsList() {
       (program.programDetails.reccurenceDate
         ? program.programDetails.reccurenceDate
         : program.programDetails.occurrenceDate
-      ).toString(),
+      ).toString()
     );
     const [year, month, day] = (
       program.programDetails.reccurenceDate
@@ -112,16 +164,41 @@ export default function TrainingSessionsList() {
     //log.warn("programDate", programDate.getDate());
 
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
-    //log.warn("programDate w/ setHours", programDate);
-    const dateFilter =
-      programDate >= dateRange[0].startDate &&
-      programDate <= dateRange[0].endDate;
-    //console.warn("dateFilter", dateFilter);
+    if (selectedDate) {
+      // If a specific date is selected, filter by that date
+      const dateFilter = isSameDay(programDate, selectedDate);
+      const typeFilter =
+        selectedProgramType.length === 0 ||
+        selectedProgramType.includes(program.programDetails.programType);
+      return dateFilter && typeFilter;
+    }
+
+    const dateFilter = isWithinInterval(programDate, {
+      start: dateRange[0].startDate,
+      end: dateRange[0].endDate,
+    });
+
     const typeFilter =
       selectedProgramType.length === 0 ||
       selectedProgramType.includes(program.programDetails.programType);
+
     return dateFilter && typeFilter;
   });
+
+  function handleDateChange(item: any) {
+    const newStartDate = new Date(item.selection.startDate);
+    const newEndDate = new Date(item.selection.endDate);
+
+    setDateRange([
+      {
+        startDate: newStartDate,
+        endDate: newEndDate,
+        key: "selection",
+      },
+    ]);
+
+    fetchPrograms(accountId, newStartDate, newEndDate);
+  }
 
   // Handle Cancel
   function handleCancel() {
@@ -142,11 +219,14 @@ export default function TrainingSessionsList() {
         <span className="flex mt-8 mx-1">
           <div>
             <p className="text-lg text-primaryColour text-sec font-semibold">
-              Upcoming Programs
+              {selectedDate
+                ? `Programs on ${selectedDate.toLocaleDateString()}`
+                : "Upcoming Programs"}
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              {dateRange[0].startDate.toLocaleDateString()} -{" "}
-              {dateRange[0].endDate.toLocaleDateString()}
+              {selectedDate
+                ? selectedDate.toLocaleDateString()
+                : `${dateRange[0].startDate.toLocaleDateString()} - ${dateRange[0].endDate.toLocaleDateString()}`}
             </p>
           </div>
 
@@ -186,9 +266,9 @@ export default function TrainingSessionsList() {
                     <div className="overflow-auto my-3 flex justify-center items-center">
                       <DateRange
                         editableDateInputs={true}
-                        onChange={(item: any) => setDateRange([item.selection])}
+                        onChange={handleDateChange} //  Ensures state is updated
                         moveRangeOnFirstSelection={false}
-                        ranges={dateRange}
+                        ranges={dateRange} //  Uses updated `dateRange`
                       />
                     </div>
                   </div>
@@ -209,7 +289,7 @@ export default function TrainingSessionsList() {
                             setSelectedProgramType((prev) =>
                               checked
                                 ? [...prev, type]
-                                : prev.filter((t) => t !== type),
+                                : prev.filter((t) => t !== type)
                             );
                           }}
                         />
@@ -219,17 +299,25 @@ export default function TrainingSessionsList() {
                   </div>
                   {/**Cancel filters button */}
                   <Button
-                    className="px-12 mt-8 mb-8"
+                    className="px-12 mt-8 mb-4"
                     variant="outline"
                     onClick={handleCancel}
                   >
                     Cancel
                   </Button>
+
+                  {/**Done button */}
+                  <DrawerClose asChild>
+                    <Button className="px-12 mt-2 mb-8" variant="default">
+                      Done
+                    </Button>
+                  </DrawerClose>
                 </div>
               </ScrollArea>
             </DrawerContent>
           </Drawer>
         </span>
+
         {error ? (
           <p className="text-red text-center my-5">Error loading programs</p>
         ) : loading ? (
@@ -247,13 +335,13 @@ export default function TrainingSessionsList() {
                 new Date(
                   a.programDetails.reccurenceDate
                     ? a.programDetails.reccurenceDate
-                    : a.programDetails.occurrenceDate,
+                    : a.programDetails.occurrenceDate
                 ).getTime() -
                 new Date(
                   b.programDetails.reccurenceDate
                     ? b.programDetails.reccurenceDate
-                    : b.programDetails.occurrenceDate,
-                ).getTime(),
+                    : b.programDetails.occurrenceDate
+                ).getTime()
             )
             .map((program, index) => (
               <div key={index} className="my-5">

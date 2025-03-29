@@ -1,9 +1,12 @@
 package com.sportganise.services.programsessions;
 
+import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.entities.account.Account;
+import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.Program;
+import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.entities.programsessions.ProgramType;
@@ -13,14 +16,15 @@ import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.ProgramInvitationiException;
 import com.sportganise.exceptions.programexceptions.ProgramNotFoundException;
 import com.sportganise.repositories.AccountRepository;
+import com.sportganise.repositories.programsessions.ProgramAttachmentRepository;
 import com.sportganise.repositories.programsessions.ProgramParticipantRepository;
 import com.sportganise.repositories.programsessions.ProgramRepository;
 import com.sportganise.services.EmailService;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +37,7 @@ public class WaitlistService {
   private final ProgramRepository programRepository;
   private final AccountRepository accountRepository;
   private final EmailService emailService;
+  private final ProgramAttachmentRepository programAttachmentRepository;
 
   /**
    * Constructor for WaitlistService.
@@ -43,11 +48,13 @@ public class WaitlistService {
       ProgramParticipantRepository participantRepository,
       ProgramRepository programRepository,
       AccountRepository accountRepository,
-      EmailService emailService) {
+      EmailService emailService,
+      ProgramAttachmentRepository programAttachmentRepository) {
     this.participantRepository = participantRepository;
     this.programRepository = programRepository;
     this.accountRepository = accountRepository;
     this.emailService = emailService;
+    this.programAttachmentRepository = programAttachmentRepository;
   }
 
   /**
@@ -223,6 +230,7 @@ public class WaitlistService {
       throws ParticipantNotFoundException {
 
     ProgramParticipant programParticipant = this.getParticipant(programId, accountId);
+    log.info("Program Participant:", programParticipant);
 
     if (programParticipant.isConfirmed() == false) {
       return null;
@@ -241,28 +249,87 @@ public class WaitlistService {
    * @return A list of ProgramDto's containing the waitlisted .
    * @throws ResourceNotFoundException whenever programs can't be found.
    */
-  public List<ProgramDto> getWaitlistPrograms() throws ResourceNotFoundException {
-    List<Program> programs = programRepository.findByProgramType("Training");
+  public List<ProgramDto> getWaitlistPrograms(Integer accountId) throws ResourceNotFoundException {
 
-    if (programs == null) {
-      log.error("Program list is null. Can't fetch waitlist programs");
-      throw new ResourceNotFoundException("Programs list is null. Cannot fetch waitlist programs.");
+    Account account =
+        this.accountRepository
+            .findById(accountId)
+            .orElseThrow(
+                () -> {
+                  log.warn("Account not found with id " + accountId);
+                  return new AccountNotFoundException("Account not found with id " + accountId);
+                });
+
+    // TODO: Come back to this for the coach
+    if (account.getType() == AccountType.ADMIN) {
+      List<Program> programs = programRepository.findProgramByType(ProgramType.TRAINING.toString());
+
+      return programs.stream()
+          .filter(
+              program -> {
+                Integer confirmedCount =
+                    participantRepository.countConfirmedParticipants(program.getProgramId());
+                return confirmedCount < program.getCapacity();
+              })
+          .map(
+              program -> {
+                List<ProgramAttachmentDto> programAttachments =
+                    getProgramAttachments(program.getProgramId());
+                return new ProgramDto(program, programAttachments);
+              })
+          .collect(Collectors.toList());
+    } else {
+      List<ProgramParticipant> userParticipants = participantRepository.findByAccountId(accountId);
+      return userParticipants.stream()
+          .map(
+              pp ->
+                  programRepository
+                      .findById(pp.getProgramParticipantId().getProgramId())
+                      .orElse(null))
+          .distinct() // Remove duplicate programs if user is in multiple roles
+          .filter(
+              program -> {
+                long confirmedCount =
+                    participantRepository.countConfirmedParticipants(program.getProgramId());
+                return confirmedCount < program.getCapacity();
+              })
+          .map(
+              program -> {
+                List<ProgramAttachmentDto> programAttachments =
+                    getProgramAttachments(program.getProgramId());
+                return new ProgramDto(program, programAttachments);
+              })
+          .collect(Collectors.toList());
+    }
+  }
+
+  /**
+   * Method to get all the attachments uploaded to a specific program.
+   *
+   * @param programId Id of the program we want to fetch.
+   * @return a list of ProgramAttachmentDto related to the program.
+   */
+  public List<ProgramAttachmentDto> getProgramAttachments(Integer programId) {
+
+    log.debug("PROGRAM ID: {}", programId);
+
+    List<ProgramAttachment> programAttachments =
+        programAttachmentRepository.findAttachmentsByProgramId(programId);
+
+    log.debug("PROGRAM ATTACHMENTS ENTITIES COUNT: ", programAttachments.size());
+
+    List<ProgramAttachmentDto> programAttachmentDtos = new ArrayList<>();
+
+    for (ProgramAttachment attachment : programAttachments) {
+      programAttachmentDtos.add(
+          new ProgramAttachmentDto(
+              attachment.getCompositeProgramAttachmentKey().getProgramId(),
+              attachment.getCompositeProgramAttachmentKey().getAttachmentUrl()));
     }
 
-    return programs.stream()
-        .flatMap(
-            program -> {
-              log.debug("{}", program);
-              Integer participantCount =
-                  participantRepository.countConfirmedParticipants(program.getProgramId());
+    log.debug("PROGRAM ATTACHMENTS DTOS COUNT: ", programAttachmentDtos.size());
 
-              if (participantCount >= program.getCapacity()) {
-                return Stream.empty();
-              }
-
-              return Stream.of(new ProgramDto(program, null));
-            })
-        .toList();
+    return programAttachmentDtos;
   }
 
   /**

@@ -12,7 +12,6 @@ export const MAIN_STREET = "123 Main St";
 
 // Program Visbilities Constants
 export const PUBLIC = "public";
-export const MEMBERS_ONLY = "members";
 export const PRIVATE = "private";
 
 // Program Frequencies Constants

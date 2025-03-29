@@ -60,7 +60,6 @@ import { FUNDRAISER } from "@/constants/programconstants";
 import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
 import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
-import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
 import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 import { DAILY } from "@/constants/programconstants";
@@ -91,6 +90,22 @@ export default function CreateTrainingSessionForm() {
   }));
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const minAttendees = selectedMembers.length;
+
+  useEffect(() => {
+    if (form.getValues("capacity") === undefined) {
+      form.setValue("capacity", minAttendees);
+    }
+  }, [form, minAttendees]);
+
+  const maxAttendees = form.watch("capacity");
+
+  useEffect(() => {
+    if (maxAttendees < minAttendees) {
+      form.setValue("capacity", minAttendees);
+    }
+  }, [minAttendees, maxAttendees, form]);
+
   // AccountId from cookies
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
@@ -226,7 +241,6 @@ export default function CreateTrainingSessionForm() {
               await invite(accountId, programId!);
             } catch (error) {
               console.error(`Failed to invite member ${accountId}:`, error);
-              throw error; // Re-throw to trigger the catch block
             }
           }),
         );
@@ -234,6 +248,9 @@ export default function CreateTrainingSessionForm() {
 
       console.log("loading", loading);
       log.info("createTrainingSession submit success ✔");
+
+      form.reset();
+      setSelectedMembers([]);
 
       // Toast popup for user to say form submitted successfully
       toast({
@@ -257,11 +274,9 @@ export default function CreateTrainingSessionForm() {
           "There was a problem with your request. Program was not created.",
       });
     } finally {
-      form.reset();
       setLoading(false);
     }
   };
-  console.log("members in form:", members);
 
   // Watch for changes to frequency
   // ... conditionally display endDate when frequency != "DAILY"
@@ -725,7 +740,6 @@ export default function CreateTrainingSessionForm() {
                           <CommandGroup>
                             {[
                               { label: "Public", value: PUBLIC },
-                              { label: "Members only", value: MEMBERS_ONLY },
                               { label: "Private", value: PRIVATE },
                             ].map((v) => (
                               <CommandItem
@@ -889,12 +903,15 @@ export default function CreateTrainingSessionForm() {
                     <Input
                       placeholder="Write the max number of attendees"
                       type="number"
+                      min={minAttendees}
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? Number(e.target.value) : undefined,
-                        )
-                      }
+                      value={maxAttendees ?? minAttendees}
+                      onChange={(e) => {
+                        const newValue = e.target.value
+                          ? Number(e.target.value)
+                          : minAttendees;
+                        field.onChange(newValue);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

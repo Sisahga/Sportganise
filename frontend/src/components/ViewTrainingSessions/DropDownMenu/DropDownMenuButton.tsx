@@ -37,12 +37,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import useAbsent from "@/hooks/useAbsent";
 import { CookiesDto } from "@/types/auth";
+import OptInButton from "./OptInButton";
+import OptOutButton from "./OptOutButton";
+import useDeleteProgram from "@/hooks/useDeleteProgram";
 
 interface DropDownMenuButtonProps {
   user: CookiesDto | null | undefined;
   accountAttendee: Attendees | undefined;
   programDetails: ProgramDetails;
   attendees: Attendees[];
+  onRefresh: () => void;
 }
 
 export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
@@ -50,6 +54,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   accountAttendee,
   programDetails,
   attendees,
+  onRefresh,
 }: DropDownMenuButtonProps) => {
   const navigate = useNavigate();
   const handleNavigation = (path: string, data: Program) => {
@@ -60,6 +65,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
   //Confirmation of player absence
   const { markAbsent, error: absentError } = useAbsent();
+  const { deleteProgram } = useDeleteProgram();
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isRSVPDialogOpen, setRSVPDialogOpen] = useState(false);
@@ -68,30 +74,32 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const [isAbsentDialogOpen, setAbsentDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isPostponeDialogOpen, setPostponeDialogOpen] = useState(false);
+  const [isOptedIn, setIsOptedIn] = useState(false);
   const [isPostponeConfirmationVisible, setPostponeConfirmationVisible] =
     useState(false);
   const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] =
     useState(false);
-
-  // Handle waitlisted joining
-  /*
-  const handleButtonClickWaitlisted = () => {
-    setModalVisible(true); // Show the modal on button click
-  };
-  */
 
   const handleDeleteClick = () => {
     setDropdownOpen(false); //Close the dropdown
     setDeleteDialogOpen(true); // Open the alert dialog
   };
 
-  const handleDeleteConfirmation = () => {
+  const handleDeleteConfirmation = async () => {
     setDeleteDialogOpen(false);
     setDeleteConfirmationVisible(true);
 
-    setTimeout(() => {
-      setDeleteConfirmationVisible(false);
-    }, 3000);
+    const response = await deleteProgram(
+      user?.accountId,
+      programDetails.programId,
+    );
+
+    if (response) {
+      if (onRefresh) onRefresh();
+      setTimeout(() => {
+        setDeleteConfirmationVisible(false);
+      }, 3000);
+    }
   };
 
   const handlePostponeClick = () => {
@@ -102,6 +110,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const handlePostponeConfirmation = () => {
     setPostponeDialogOpen(false);
     setPostponeConfirmationVisible(true); // Show postpone confirmation message
+    if (onRefresh) onRefresh();
 
     setTimeout(() => {
       setPostponeConfirmationVisible(false);
@@ -116,6 +125,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   const handleRSVPConfirmation = () => {
     setRSVPDialogOpen(false);
     setRSVPConfirmationVisible(true); // Show RSVP confirmation message
+    if (onRefresh) onRefresh();
 
     setTimeout(() => {
       setRSVPConfirmationVisible(false);
@@ -132,6 +142,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       await markAbsent(programDetails.programId, user?.accountId);
       setAbsentDialogOpen(false);
       setNotificationVisible(true);
+      if (onRefresh) onRefresh();
+      console.log("Updated account?: ", accountAttendee);
       setTimeout(() => {
         setNotificationVisible(false);
       }, 3000);
@@ -184,13 +196,37 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
                 <span className="text-green-500">RSVP</span>
               </DropdownMenuItem>
               {/* Here instead I want to check if a player is of role waitlisted */}
-              {(accountAttendee?.participantType?.toLowerCase() !=
-                "waitlisted" ||
-                accountAttendee.confirmed === true) && (
+              {accountAttendee?.confirmed === true && (
                 <DropdownMenuItem onSelect={handleAbsentClick}>
                   <LogOut color="red" />
                   <span className="text-red"> Mark absent </span>
                 </DropdownMenuItem>
+              )}
+              {accountAttendee?.participantType?.toLowerCase() ===
+                "waitlisted" &&
+                accountAttendee?.rank === null &&
+                !isOptedIn && (
+                  <OptInButton
+                    accountAttendee={accountAttendee}
+                    programId={programDetails.programId}
+                    accountId={user?.accountId}
+                    onClose={() => {
+                      setDropdownOpen(false);
+                      setIsOptedIn(true);
+                    }}
+                  />
+                )}
+
+              {/* Opt-out button */}
+              {accountAttendee?.rank !== null && (
+                <OptOutButton
+                  accountAttendee={accountAttendee}
+                  programId={programDetails.programId}
+                  accountId={user?.accountId}
+                  onClose={() => {
+                    setDropdownOpen(false);
+                  }}
+                />
               )}
             </DropdownMenuGroup>
           )}
@@ -300,7 +336,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         </div>
       )}
 
-      {/* Postpone event confirmation message */}
+      {/* Delete event confirmation message */}
       {isDeleteConfirmationVisible && (
         <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">

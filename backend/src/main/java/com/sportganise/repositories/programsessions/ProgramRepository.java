@@ -35,7 +35,10 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
       """)
   List<ProgramParticipant> findParticipantsByProgramId(@Param("programId") Integer programId);
 
-  List<Program> findByProgramType(String type);
+  @Query(
+      value = "SELECT * FROM program WHERE type = CAST(:programType AS program_type)",
+      nativeQuery = true)
+  List<Program> findProgramByType(@Param("programType") String programType);
 
   @Transactional
   @Modifying
