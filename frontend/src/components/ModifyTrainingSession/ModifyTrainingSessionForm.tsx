@@ -72,8 +72,7 @@ import { useWatch } from "react-hook-form";
 import { NotificationRequest } from "@/types/notifications";
 import useSendNotification from "@/hooks/useSendNotification";
 import AssignCoach from "../CreateTrainingSessionForm/AssignCoaches";
-import usePlayers from "@/hooks/usePlayers";
-import { Member } from "../CreateTrainingSessionForm/InviteModal";
+import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
 import usePlayers from "@/hooks/usePlayers";
 
 /**All select element options */
@@ -143,15 +142,6 @@ const locations = [
 ] as const;
 
 export default function ModifyTrainingSessionForm() {
-  const { players } = usePlayers();
-
-  const members: Member[] = players.map((player) => ({
-    id: player.accountId,
-    name: `${player.firstName} ${player.lastName}`,
-    email: player.email,
-    role: player.type,
-  }));
-
   const [accountId, setAccountId] = useState<number | null | undefined>();
   const { toast } = useToast();
   const location = useLocation(); // Location state data sent from training session details page
