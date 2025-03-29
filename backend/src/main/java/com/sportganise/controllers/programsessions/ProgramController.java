@@ -109,7 +109,8 @@ public class ProgramController {
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
-      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
+      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments,
+      @RequestParam(required=false) Integer[] participantsId) {
 
     // log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
@@ -142,7 +143,8 @@ public class ProgramController {
               programCreateRequestDto.getLocation(),
               attachments,
               accountId,
-              programCreateRequestDto.getFrequency());
+              programCreateRequestDto.getFrequency(),
+              participantsId);
 
       log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
 

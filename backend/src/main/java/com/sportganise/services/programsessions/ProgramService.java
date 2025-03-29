@@ -10,11 +10,13 @@ import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.entities.programsessions.ProgramRecurrence;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.InsufficientPermissionsException;
+import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -327,7 +329,8 @@ public class ProgramService {
       String location,
       List<MultipartFile> attachments,
       Integer accountId,
-      String frequency) {
+      String frequency,
+      Integer[] participantsId) {
 
     Account user = accountService.getAccountById(accountId);
     if (user == null) {
@@ -382,8 +385,39 @@ public class ProgramService {
       }
     }
 
+    if(participantsId!=null){
+      this.createProgramParticipants(savedProgram.getProgramId(), participantsId);
+    }
+    
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
+
+  // Doesnt need to create anything
+  public void createProgramParticipants(Integer programId, Integer[] participants){
+
+    if (participants != null){
+      for (Integer participant: participants){
+        Account user =
+          accountService.getAccount(participant)
+              .orElseThrow(
+                  () -> new ResourceNotFoundException("User with id " + participant + " not found."));
+  
+        ProgramParticipant programParticipant = new ProgramParticipant(
+          new ProgramParticipantId(programId, user.getAccountId()),
+          null,
+          "Subscribed",
+          true,
+          ZonedDateTime.now());
+
+          programParticipantRepository.save(programParticipant);
+          log.info("Created participant : " + programParticipant);
+      }
+
+      log.info("Participants creation is successful");
+  
+    }
+      log.info("There are no participants for this program.");
+    }
 
   /**
    * Method to modify an existing program. Any attachment not already in the database will be added.
