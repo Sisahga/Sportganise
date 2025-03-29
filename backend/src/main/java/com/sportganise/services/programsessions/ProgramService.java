@@ -16,7 +16,6 @@ import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.InsufficientPermissionsException;
-import com.sportganise.exceptions.ParticipantNotFoundException;
 import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.InvalidFrequencyException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
@@ -385,39 +384,47 @@ public class ProgramService {
       }
     }
 
-    if(participantsId!=null){
+    if (participantsId != null) {
       this.createProgramParticipants(savedProgram.getProgramId(), participantsId);
     }
-    
+
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
 
-  // Doesnt need to create anything
-  public void createProgramParticipants(Integer programId, Integer[] participants){
+  /**
+   * Creates and links program participants for a new created program.
+   *
+   * @param programId Takes programId of program
+   * @param participants List of participants for the program
+   */
+  public void createProgramParticipants(Integer programId, Integer[] participants) {
 
-    if (participants != null){
-      for (Integer participant: participants){
+    if (participants != null) {
+      for (Integer participant : participants) {
         Account user =
-          accountService.getAccount(participant)
-              .orElseThrow(
-                  () -> new ResourceNotFoundException("User with id " + participant + " not found."));
-  
-        ProgramParticipant programParticipant = new ProgramParticipant(
-          new ProgramParticipantId(programId, user.getAccountId()),
-          null,
-          "Subscribed",
-          true,
-          ZonedDateTime.now());
+            accountService
+                .getAccount(participant)
+                .orElseThrow(
+                    () ->
+                        new ResourceNotFoundException(
+                            "User with id " + participant + " not found."));
 
-          programParticipantRepository.save(programParticipant);
-          log.info("Created participant : " + programParticipant);
+        ProgramParticipant programParticipant =
+            new ProgramParticipant(
+                new ProgramParticipantId(programId, user.getAccountId()),
+                null,
+                "Subscribed",
+                true,
+                ZonedDateTime.now());
+
+        programParticipantRepository.save(programParticipant);
+        log.info("Created participant : " + programParticipant);
       }
 
       log.info("Participants creation is successful");
-  
     }
-      log.info("There are no participants for this program.");
-    }
+    log.info("There are no participants for this program.");
+  }
 
   /**
    * Method to modify an existing program. Any attachment not already in the database will be added.

@@ -189,7 +189,7 @@ export default function CreateTrainingSessionForm() {
       console.log(jsonPayload);
       log.info(JSON.stringify(jsonPayload, null, 2));
       console.log(JSON.stringify(jsonPayload, null, 2));
-  
+
       // Prepare API body
       const formData = new FormData();
       const programData = {
@@ -205,28 +205,28 @@ export default function CreateTrainingSessionForm() {
         endTime: values.endTime,
         location: values.location,
       };
-  
+
       formData.append(
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
         }),
       );
-  
+
       // Append attachments if available
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           formData.append("attachments", file);
         });
       }
-  
+
       // Append participants (each selected member's id)
       if (selectedMembers && selectedMembers.length > 0) {
         selectedMembers.forEach((memberId) => {
           formData.append("participantsId", memberId.toString());
         });
       }
-  
+
       // API submit form
       setLoading(true);
       const create = await createTrainingSession(accountId, formData);
@@ -234,19 +234,19 @@ export default function CreateTrainingSessionForm() {
       log.info("create", create);
       if (create === null) {
         throw new Error(
-          "Error from useCreateTrainingSession.createTrainingSession!"
+          "Error from useCreateTrainingSession.createTrainingSession!",
         );
       }
-  
+
       log.info("createTrainingSession submit success ✔");
-  
+
       // Toast popup for successful submission
       toast({
         variant: "success",
         title: "Form submitted successfully ✔",
         description: "Program was added to your calendar.",
       });
-  
+
       form.reset();
       setSelectedMembers([]);
       // Navigate to home page
@@ -264,7 +264,6 @@ export default function CreateTrainingSessionForm() {
       setLoading(false);
     }
   };
-  
 
   // Watch for changes to frequency
   // ... conditionally display endDate when frequency != "DAILY"
