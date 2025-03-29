@@ -61,7 +61,6 @@ import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
 import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
-import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
@@ -74,7 +73,7 @@ export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { form } = useFormHandler();
-  const { createTrainingSession, error } = useCreateTrainingSession();
+  const { createTrainingSession } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
   const {
     players,
