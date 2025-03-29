@@ -30,15 +30,21 @@ vi.mock("@capacitor/core", () => ({
 
 import PrivateRoute from "./PrivateRoute";
 
-const renderWithRouter = (ui: React.ReactElement, initialEntries = ["/private"]) => {
+const renderWithRouter = (
+  ui: React.ReactElement,
+  initialEntries = ["/private"],
+) => {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
       <Routes>
         <Route path="/private" element={ui}>
-          <Route index element={<div data-testid="private-outlet">Private Content</div>} />
+          <Route
+            index
+            element={<div data-testid="private-outlet">Private Content</div>}
+          />
         </Route>
       </Routes>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 };
 
@@ -70,14 +76,18 @@ describe("PrivateRoute", () => {
   it("redirects when requiredRole is not met", async () => {
     mockGetBearerToken.mockReturnValue("my-token");
     mockGetCookies.mockReturnValue({ accountId: 1, type: "PLAYER" });
-    renderWithRouter(<PrivateRoute requiredRole="COACH" redirectingRoute="/login" />);
+    renderWithRouter(
+      <PrivateRoute requiredRole="COACH" redirectingRoute="/login" />,
+    );
     expect(screen.queryByTestId("private-outlet")).not.toBeInTheDocument();
   });
 
   it("renders Outlet when authenticated and role is matched", async () => {
     mockGetBearerToken.mockReturnValue("my-token");
     mockGetCookies.mockReturnValue({ accountId: 1, type: "PLAYER" });
-    renderWithRouter(<PrivateRoute requiredRole="PLAYER" redirectingRoute="/login" />);
+    renderWithRouter(
+      <PrivateRoute requiredRole="PLAYER" redirectingRoute="/login" />,
+    );
     expect(await screen.findByTestId("private-outlet")).toBeInTheDocument();
   });
 
