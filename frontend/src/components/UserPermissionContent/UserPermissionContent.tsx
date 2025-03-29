@@ -190,7 +190,7 @@ const UserPermissionContent: React.FC = () => {
                           value={newRole}
                           onValueChange={handleRoleChange}
                         >
-                          <SelectTrigger>
+                          <SelectTrigger data-testid="select-trigger">
                             <SelectValue placeholder="Select Role" />
                           </SelectTrigger>
                           <SelectContent>
