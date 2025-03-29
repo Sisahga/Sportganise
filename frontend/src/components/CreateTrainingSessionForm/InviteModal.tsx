@@ -14,7 +14,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 export interface Member {
   id: number;
   name: string;
-  email: string;
   role: string; // e.g., "Coach", "Player", etc.
 }
 
@@ -41,7 +40,6 @@ export default function InviteModal({
       members.filter(
         (member) =>
           member.name.toLowerCase().includes(search.toLowerCase()) ||
-          member.email.toLowerCase().includes(search.toLowerCase()) ||
           member.role.toLowerCase().includes(search.toLowerCase()),
       ),
     );
@@ -87,7 +85,6 @@ export default function InviteModal({
               <tr>
                 <th className="p-2">Invite</th>
                 <th className="p-2">Name</th>
-                <th className="p-2">Email</th>
                 <th className="p-2">Role</th>
               </tr>
             </thead>
@@ -102,7 +99,6 @@ export default function InviteModal({
                     />
                   </td>
                   <td className="p-2">{member.name}</td>
-                  <td className="p-2">{member.email}</td>
                   <td className="p-2">{member.role}</td>
                 </tr>
               ))}

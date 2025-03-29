@@ -23,11 +23,14 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
+import { isSameDay, isWithinInterval } from "date-fns";
 
 export default function TrainingSessionsList({
   selectedMonth,
   programsProp,
+  selectedDate,
 }: {
+  selectedDate?: Date;
   selectedMonth: Date;
   programsProp: ReturnType<typeof usePrograms>;
 }) {
@@ -131,12 +134,24 @@ export default function TrainingSessionsList({
         : program.programDetails.occurrenceDate,
     );
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
-    const dateFilter =
-      programDate >= dateRange[0].startDate &&
-      programDate <= dateRange[0].endDate;
+    if (selectedDate) {
+      // If a specific date is selected, filter by that date
+      const dateFilter = isSameDay(programDate, selectedDate);
+      const typeFilter =
+        selectedProgramType.length === 0 ||
+        selectedProgramType.includes(program.programDetails.programType);
+      return dateFilter && typeFilter;
+    }
+
+    const dateFilter = isWithinInterval(programDate, {
+      start: dateRange[0].startDate,
+      end: dateRange[0].endDate,
+    });
+
     const typeFilter =
       selectedProgramType.length === 0 ||
       selectedProgramType.includes(program.programDetails.programType);
+
     return dateFilter && typeFilter;
   });
 
@@ -174,11 +189,14 @@ export default function TrainingSessionsList({
         <span className="flex mt-8 mx-1">
           <div>
             <p className="text-lg text-primaryColour text-sec font-semibold">
-              Upcoming Programs
+              {selectedDate
+                ? `Programs on ${selectedDate.toLocaleDateString()}`
+                : "Upcoming Programs"}
             </p>
             <p className="text-xs text-gray-400 mt-1">
-              {dateRange[0].startDate.toLocaleDateString()} -{" "}
-              {dateRange[0].endDate.toLocaleDateString()}
+              {selectedDate
+                ? selectedDate.toLocaleDateString()
+                : `${dateRange[0].startDate.toLocaleDateString()} - ${dateRange[0].endDate.toLocaleDateString()}`}
             </p>
           </div>
 
@@ -251,12 +269,19 @@ export default function TrainingSessionsList({
                   </div>
                   {/**Cancel filters button */}
                   <Button
-                    className="px-12 mt-8 mb-8"
+                    className="px-12 mt-8 mb-4"
                     variant="outline"
                     onClick={handleCancel}
                   >
                     Cancel
                   </Button>
+
+                  {/**Done button */}
+                  <DrawerClose asChild>
+                    <Button className="px-12 mt-2 mb-8" variant="default">
+                      Done
+                    </Button>
+                  </DrawerClose>
                 </div>
               </ScrollArea>
             </DrawerContent>

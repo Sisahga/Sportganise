@@ -8,16 +8,14 @@ describe("InviteModal Component", () => {
     {
       id: 1,
       name: "Walter White",
-      email: "walter@example.com",
       role: "Coach",
     },
     {
       id: 2,
       name: "Jesse Pinkman",
-      email: "jesse@example.com",
       role: "Player",
     },
-    { id: 3, name: "Saul Goodman", email: "saul@example.com", role: "Admin" },
+    { id: 3, name: "Saul Goodman", role: "Admin" },
   ];
 
   const mockOnClose = vi.fn();
