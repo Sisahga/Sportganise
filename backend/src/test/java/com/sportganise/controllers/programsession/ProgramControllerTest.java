@@ -231,7 +231,8 @@ public class ProgramControllerTest {
                 Mockito.anyString(),
                 Mockito.anyList(),
                 Mockito.anyInt(),
-                Mockito.anyString()))
+                Mockito.anyString(),
+                Mockito.<Integer[]>any()))
         .thenReturn(mockProgramDto);
 
     mockMvc
