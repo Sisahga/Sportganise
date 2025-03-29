@@ -70,9 +70,9 @@ const accountApi = {
       throw new Error("Failed to update account");
     }
     if (data && response.ok) {
-      const currentCookies = getCookies();
+      const currentCookies = await getCookies();
       if (currentCookies) {
-        setCookies({
+        await setCookies({
           ...currentCookies,
           email: data.email || currentCookies.email,
         });
