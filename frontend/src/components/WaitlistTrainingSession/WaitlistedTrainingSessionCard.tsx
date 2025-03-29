@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Card } from "@/components/ui/card";
 import { Clock, MapPin, ChevronRight } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/EventBadgeType";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
@@ -27,11 +27,12 @@ const WaitlistedTrainingSessionCard: React.FC<
       <div className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
         <div className="flex w-full items-center gap-2">
           <Avatar>
-            <AvatarFallback>
+            <AvatarFallback className="bg-primaryColour">
               <User2Icon color="#a1a1aa" />
             </AvatarFallback>
+            <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
           </Avatar>
-          <span>Coach Benjamin Luijan</span>
+          <span>{programDetails?.author ?? "N/A"}</span>
           <span className="ml-auto text-xs">
             {new Date(programDetails.occurrenceDate).toDateString()}
           </span>

@@ -107,7 +107,7 @@ const TrainingSessionContent = () => {
               user?.accountId,
             );
           setAccountAttendee(accountAttendee);
-          console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
+          console.log("AccountAttendee: ", accountAttendee);
           console.log(accountAttendee);
         } catch (error) {
           log.error("Failed to fetch program participant:", error);

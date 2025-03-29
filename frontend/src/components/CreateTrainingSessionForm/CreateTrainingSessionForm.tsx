@@ -61,7 +61,6 @@ import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
 import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
-import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
@@ -75,7 +74,7 @@ export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { form } = useFormHandler();
-  const { createTrainingSession, error } = useCreateTrainingSession();
+  const { createTrainingSession } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
   const {
     players,
@@ -178,8 +177,6 @@ export default function CreateTrainingSessionForm() {
     },
   ] as const;
 
-  const { invite } = useInviteToPrivateEvent();
-
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (values.visibility === "private" && selectedMembers.length === 0) {
@@ -216,15 +213,25 @@ export default function CreateTrainingSessionForm() {
         endTime: values.endTime,
         location: values.location,
       };
+
       formData.append(
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
         }),
       );
+
+      // Append attachments if available
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           formData.append("attachments", file);
+        });
+      }
+
+      // Append participants (each selected member's id)
+      if (selectedMembers && selectedMembers.length > 0) {
+        selectedMembers.forEach((memberId) => {
+          formData.append("participantsId", memberId.toString());
         });
       }
 
@@ -232,8 +239,6 @@ export default function CreateTrainingSessionForm() {
       setLoading(true);
       const create = await createTrainingSession(accountId, formData);
       setLoading(false);
-      console.log(error);
-      console.log("create", create);
       log.info("create", create);
       if (create === null) {
         throw new Error(
@@ -241,41 +246,22 @@ export default function CreateTrainingSessionForm() {
         );
       }
 
-      const programId = create.data.programId;
-
-      if (values.visibility === "private" && selectedMembers.length > 0) {
-        await Promise.all(
-          selectedMembers.map(async (accountId) => {
-            try {
-              await invite(accountId, programId!);
-            } catch (error) {
-              console.error(`Failed to invite member ${accountId}:`, error);
-            }
-          }),
-        );
-      }
-
-      console.log("loading", loading);
       log.info("createTrainingSession submit success ✔");
 
-      form.reset();
-      setSelectedMembers([]);
-
-      // Toast popup for user to say form submitted successfully
+      // Toast popup for successful submission
       toast({
         variant: "success",
         title: "Form submitted successfully ✔",
         description: "Program was added to your calendar.",
       });
 
+      form.reset();
+      setSelectedMembers([]);
       // Navigate to home page
       navigate(-1);
     } catch (err) {
-      console.error(
-        "Create training session form submission error (error)",
-        err,
-      );
-      log.error("Create training session form submission error (error)", err);
+      console.error("Create training session form submission error", err);
+      log.error("Create training session form submission error", err);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
