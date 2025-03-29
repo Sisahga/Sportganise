@@ -73,7 +73,7 @@ import { NotificationRequest } from "@/types/notifications";
 import useSendNotification from "@/hooks/useSendNotification";
 import AssignCoach from "../CreateTrainingSessionForm/AssignCoaches";
 import usePlayers from "@/hooks/usePlayers";
-import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
+import { Member } from "../CreateTrainingSessionForm/InviteModal";
 import usePlayers from "@/hooks/usePlayers";
 
 /**All select element options */
