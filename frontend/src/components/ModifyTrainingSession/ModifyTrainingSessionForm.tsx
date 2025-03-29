@@ -74,6 +74,7 @@ import useSendNotification from "@/hooks/useSendNotification";
 import AssignCoach from "../CreateTrainingSessionForm/AssignCoaches";
 import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
 import usePlayers from "@/hooks/usePlayers";
+
 /**All select element options */
 const types = [
   {
