@@ -68,6 +68,7 @@ import { ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
+import AssignCoach from "./AssignCoaches";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -89,6 +90,13 @@ export default function CreateTrainingSessionForm() {
   }));
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
+  const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
+
+  const handleCoachesSelection = (selectedCoaches: number[]) => {
+    setSelectedCoaches(selectedCoaches);
+    setShowSelectedCoaches(true);
+  };
   const minAttendees = selectedMembers.length;
 
   useEffect(() => {
@@ -377,6 +385,68 @@ export default function CreateTrainingSessionForm() {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>Select the program type.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="coaches"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    Coach*
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal text-muted-foreground",
+                          )}
+                        >
+                          <span>Select coaches</span>
+                          <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[250px] p-0" align="start">
+                      <AssignCoach
+                        members={members}
+                        field={field}
+                        onSelectCoaches={handleCoachesSelection}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Select the coaches in charge of the program
+                  </FormDescription>
+                  {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                  {showSelectedCoaches && (
+                    <div className="mt-2 bg-white border p-2 rounded">
+                      <div className="mb-2 font-medium"> Selected Coaches:</div>
+                      {selectedCoaches.length > 0 ? (
+                        <ul className="list-disc pl-5">
+                          {selectedCoaches.map((memberId) => {
+                            const member = members.find(
+                              (m) => m.id === memberId,
+                            );
+                            return (
+                              <li key={memberId}>
+                                {member ? member.name : "Unknown member"}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No coaches selected.
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
