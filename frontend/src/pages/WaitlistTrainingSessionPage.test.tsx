@@ -1,4 +1,5 @@
 import { vi } from "vitest";
+import { Program } from "@/types/trainingSessionDetails";
 
 const mockNavigate = vi.fn();
 vi.mock("react-router", async () => {
@@ -27,7 +28,7 @@ vi.mock(
     default: ({
       onSelectTraining,
     }: {
-      onSelectTraining: (program: any) => void;
+      onSelectTraining: (program: Program) => void;
     }) => (
       <div>
         WaitlistedTrainingSession
@@ -35,7 +36,7 @@ vi.mock(
           onClick={() =>
             onSelectTraining({
               programDetails: { programId: "1", name: "Program 1" },
-            })
+            } as unknown as Program)
           }
         >
           Select Training
@@ -60,7 +61,9 @@ describe("WaitlistTrainingSessionPage", () => {
   });
 
   it("renders header, footer, and WaitlistedTrainingSession components", () => {
-    mUsePrograms.mockReturnValue({ programs: [] } as any);
+    mUsePrograms.mockReturnValue({ programs: [] } as unknown as ReturnType<
+      typeof usePrograms
+    >);
 
     render(
       <BrowserRouter>
@@ -78,7 +81,9 @@ describe("WaitlistTrainingSessionPage", () => {
       programDetails: { programId: "1", name: "Program 1" },
       attendees: ["Attendee1"],
     };
-    mUsePrograms.mockReturnValue({ programs: [matchingProgram] } as any);
+    mUsePrograms.mockReturnValue({
+      programs: [matchingProgram],
+    } as unknown as ReturnType<typeof usePrograms>);
 
     render(
       <BrowserRouter>
@@ -100,7 +105,9 @@ describe("WaitlistTrainingSessionPage", () => {
   });
 
   it("navigates with empty attendees when no matching program is found", () => {
-    mUsePrograms.mockReturnValue({ programs: [] } as any);
+    mUsePrograms.mockReturnValue({ programs: [] } as unknown as ReturnType<
+      typeof usePrograms
+    >);
 
     render(
       <BrowserRouter>
