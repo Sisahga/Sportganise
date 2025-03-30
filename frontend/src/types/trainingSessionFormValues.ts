@@ -1,9 +1,10 @@
 export interface FormValues {
   title: string;
   type: string;
+  coaches: number[];
   startDate: Date;
-  endDate: Date;
-  recurring: boolean;
+  endDate?: Date;
+  frequency: string;
   visibility: string;
   description: string;
   attachment?: File[];
@@ -16,6 +17,7 @@ export interface FormValues {
 export interface ResponseFormValues {
   title: string;
   type: string;
+  coaches: number[];
   startDate: Date;
   endDate: Date;
   recurring: boolean;
