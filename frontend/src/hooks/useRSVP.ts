@@ -9,7 +9,7 @@ interface RSVPParams {
 
 const useRSVP = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  //const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Attendees | null>(null);
 
   const rsvp = async ({
@@ -17,7 +17,7 @@ const useRSVP = () => {
     accountId,
   }: RSVPParams): Promise<Attendees> => {
     setIsLoading(true);
-    setError(null);
+    //setError(null);
 
     try {
       console.log("Calling RSVP with:", { programId, accountId });
@@ -40,7 +40,7 @@ const useRSVP = () => {
     } catch (err: any) {
       const errorMessage = err?.message || "RSVP failed";
       console.error("RSVP error:", errorMessage);
-      setError(errorMessage);
+      //setError(errorMessage);
       throw err;
     } finally {
       setIsLoading(false);
@@ -48,11 +48,11 @@ const useRSVP = () => {
   };
 
   const reset = () => {
-    setError(null);
+    //setError(null);
     setData(null);
   };
 
-  return { rsvp, isLoading, error, data, reset };
+  return { rsvp, isLoading, data, reset };
 };
 
 export default useRSVP;
