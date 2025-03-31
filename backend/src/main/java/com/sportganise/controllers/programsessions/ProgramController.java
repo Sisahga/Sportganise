@@ -112,8 +112,6 @@ public class ProgramController {
       @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments,
       @RequestParam(required = false) Integer[] participantsId) {
 
-    // log.debug("ATTACHMENTS COUNT: {}", attachments.size());
-
     Account user =
         getAccount(accountId)
             .orElseThrow(
