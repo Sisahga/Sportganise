@@ -39,6 +39,8 @@ import useAbsent from "@/hooks/useAbsent";
 import { CookiesDto } from "@/types/auth";
 import OptInButton from "./OptInButton";
 import OptOutButton from "./OptOutButton";
+import useRSVP from "@/hooks/useRSVP";
+import programParticipantApi from "@/services/api/programParticipantApi";
 
 interface DropDownMenuButtonProps {
   user: CookiesDto | null | undefined;
@@ -63,6 +65,11 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
 
   //Confirmation of player absence
+  const { rsvp, isLoading: rsvpLoading, error: rsvpError } = useRSVP();
+  const [attendee, setAttendee] = useState<Attendees | undefined>(
+    accountAttendee
+  );
+  const [rsvpErrorMessage, setRsvpErrorMessage] = useState<string | null>(null);
   const { markAbsent, error: absentError } = useAbsent();
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -113,14 +120,83 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     setRSVPDialogOpen(true); // Open the alert dialog
   };
 
-  const handleRSVPConfirmation = () => {
-    setRSVPDialogOpen(false);
-    setRSVPConfirmationVisible(true); // Show RSVP confirmation message
-    if (onRefresh) onRefresh();
+  const handleRSVPConfirmation = async () => {
+    if (!user?.accountId || !programDetails?.programId) {
+      console.error("Missing account or program ID");
+      setRsvpErrorMessage("Missing account or program ID.");
+      return;
+    }
 
-    setTimeout(() => {
-      setRSVPConfirmationVisible(false);
-    }, 3000);
+    try {
+      // Step 1: Try to fetch participant — expected to 404 if not yet RSVPed
+      let existingParticipant: Attendees | null = null;
+
+      try {
+        existingParticipant = await programParticipantApi.getProgramParticipant(
+          programDetails.programId,
+          user.accountId
+        );
+      } catch (err: any) {
+        if (err.message?.includes("404")) {
+          console.warn("User is not yet a participant");
+        } else {
+          throw err; // Unexpected error
+        }
+      }
+
+      // Step 2: Determine visibility (default to 'public' for safety)
+      const visibility = programDetails.visibility?.toLowerCase() ?? "public";
+
+      // Step 3: If private and no participant, block RSVP
+      if (!existingParticipant && visibility === "private") {
+        const errorMsg = "You must be invited to RSVP to this private event.";
+        console.error(errorMsg);
+        setRsvpErrorMessage(errorMsg);
+        return;
+      }
+
+      const response = await rsvp({
+        programId: programDetails.programId,
+        accountId: user.accountId,
+        visibility: programDetails.visibility?.toLowerCase() ?? "public",
+      });
+
+      setAttendee(response);
+      console.log("RSVP success:", response);
+
+      setRSVPDialogOpen(false);
+      setRSVPConfirmationVisible(true);
+      if (onRefresh) onRefresh();
+
+      setTimeout(() => {
+        setRSVPConfirmationVisible(false);
+      }, 3000);
+    } catch (err: any) {
+      const errorMessage =
+        err?.message || "Failed to RSVP. Please try again later.";
+      console.error("RSVP failed:", errorMessage);
+      setRsvpErrorMessage(errorMessage);
+    }
+
+    // try {
+    //   const response = await rsvp(programDetails.programId, user.accountId);
+
+    //   if(response.isConfirmed) {
+    //     console.log("User is confirmed for the event!");
+    //   } else {
+    //     console.log("User was waitlisted.");
+    //   }
+    //   setRSVPDialogOpen(false);
+    //   setRSVPConfirmationVisible(true); // Show RSVP confirmation message
+
+    //   if (onRefresh) onRefresh(); // To re-fetch updated attendee list
+
+    //   setTimeout(() => {
+    //     setRSVPConfirmationVisible(false);
+    //   }, 3000);
+    // } catch (err) {
+    //   console.error("Failed to RSVP", err);
+    // }
   };
 
   const handleAbsentClick = () => {
@@ -182,10 +258,12 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             </DropdownMenuGroup>
           ) : (
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={handleRSVPClick}>
-                <LogIn color="green" />
-                <span className="text-green-500">RSVP</span>
-              </DropdownMenuItem>
+              {!attendee?.confirmed && (
+                <DropdownMenuItem onSelect={handleRSVPClick}>
+                  <LogIn color="green" />
+                  <span className="text-green-500">RSVP</span>
+                </DropdownMenuItem>
+              )}
               {/* Here instead I want to check if a player is of role waitlisted */}
               {accountAttendee?.confirmed === true && (
                 <DropdownMenuItem onSelect={handleAbsentClick}>
@@ -272,7 +350,13 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       </AlertDialog>
 
       {/* Pop up when player RSVP's to event */}
-      <AlertDialog open={isRSVPDialogOpen} onOpenChange={setRSVPDialogOpen}>
+      <AlertDialog
+        open={isRSVPDialogOpen}
+        onOpenChange={(open) => {
+          setRSVPDialogOpen(open);
+          if (!open) setRsvpErrorMessage(null);
+        }}
+      >
         <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -282,13 +366,21 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
               If you cannot attend the event anymore, you will have the option
               to mark yourself as absent.
             </AlertDialogDescription>
+            {rsvpError && (
+              <p className="text-red-500 mt-2 text-sm text-center">
+                {rsvpErrorMessage}
+              </p>
+            )}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setRSVPDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleRSVPConfirmation}>
-              Confirm
+            <AlertDialogAction
+              onClick={handleRSVPConfirmation}
+              disabled={rsvpLoading}
+            >
+              {rsvpLoading ? "Submitting..." : "Confirm"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
