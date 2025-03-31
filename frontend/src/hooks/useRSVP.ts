@@ -22,7 +22,6 @@ const useRSVP = () => {
     try {
       console.log("Calling RSVP with:", { programId, accountId });
 
-          programId,
       // Proceed to RSVP
       const success = await programParticipantApi.rsvpToProgram({
         programId,
