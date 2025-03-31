@@ -219,6 +219,15 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       await markAbsent(programDetails.programId, user?.accountId);
       setAbsentDialogOpen(false);
       setNotificationVisible(true);
+
+      // After "Mark as absent" successfull, refreshing to RSVP button
+      const updatedParticipant =
+        await programParticipantApi.getProgramParticipant(
+          programDetails.programId,
+          user?.accountId
+        );
+      setAttendee(updatedParticipant);
+
       if (onRefresh) onRefresh();
       console.log("Updated account?: ", accountAttendee);
       setTimeout(() => {
@@ -268,19 +277,18 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             </DropdownMenuGroup>
           ) : (
             <DropdownMenuGroup>
-              {!attendee?.confirmed && (
+              {attendee?.confirmed ? (
+                <DropdownMenuItem onSelect={handleAbsentClick}>
+                  <LogOut color="red" />
+                  <span className="text-red"> Mark absent </span>
+                </DropdownMenuItem>
+              ) : (
                 <DropdownMenuItem onSelect={handleRSVPClick}>
                   <LogIn color="green" />
                   <span className="text-green-500">RSVP</span>
                 </DropdownMenuItem>
               )}
-              {/* Here instead I want to check if a player is of role waitlisted */}
-              {accountAttendee?.confirmed === true && (
-                <DropdownMenuItem onSelect={handleAbsentClick}>
-                  <LogOut color="red" />
-                  <span className="text-red"> Mark absent </span>
-                </DropdownMenuItem>
-              )}
+
               {accountAttendee?.participantType?.toLowerCase() ===
                 "waitlisted" &&
                 accountAttendee?.rank === null &&
