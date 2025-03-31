@@ -70,6 +70,8 @@ import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import AssignCoach from "./AssignCoaches";
 
+type ModalKey = "invite" | "waitlist";
+
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -88,9 +90,10 @@ export default function CreateTrainingSessionForm() {
     email: player.email,
     role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"
   }));
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [openModal, setOpenModal] = useState<ModalKey>();
+  const [invitedMembers, setInvitedMembers] = useState<number[]>([]);
   const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
+  const [waitlistedMembers, setWaitlistedMembers] = useState<number[]>([]);
   const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
   const selectedType = useWatch({
     control: form.control,
@@ -104,7 +107,7 @@ export default function CreateTrainingSessionForm() {
     setSelectedCoaches(selectedCoaches);
     setShowSelectedCoaches(true);
   };
-  const minAttendees = selectedMembers.length;
+  const minAttendees = invitedMembers.length;
 
   useEffect(() => {
     if (form.getValues("capacity") === undefined) {
@@ -186,7 +189,7 @@ export default function CreateTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (values.visibility === "private" && selectedMembers.length === 0) {
+    if (values.visibility === "private" && invitedMembers.length === 0) {
       toast({
         variant: "destructive",
         title: "Validation Error",
@@ -235,8 +238,8 @@ export default function CreateTrainingSessionForm() {
       }
 
       // Append participants (each selected member's id)
-      if (selectedMembers && selectedMembers.length > 0) {
-        selectedMembers.forEach((memberId) => {
+      if (invitedMembers && invitedMembers.length > 0) {
+        invitedMembers.forEach((memberId) => {
           formData.append("participantsId", memberId.toString());
         });
       }
@@ -262,7 +265,7 @@ export default function CreateTrainingSessionForm() {
       });
 
       form.reset();
-      setSelectedMembers([]);
+      setInvitedMembers([]);
       // Navigate to home page
       navigate(-1);
     } catch (err) {
@@ -777,6 +780,43 @@ export default function CreateTrainingSessionForm() {
               )}
             /> */}
 
+            {/** Waitlist */}
+            <FormItem className="flex flex-col">
+              <FormLabel className="font-semibold text-base">
+                Waitlist
+              </FormLabel>
+              <FormDescription>
+                Select who will be added to the waitlist for this program.
+              </FormDescription>
+              <FormMessage />
+              <div className="mt-2 border p-2 rounded">
+                <div className="mb-2 font-medium">Selected Attendees:</div>
+                {waitlistedMembers.length > 0 ? (
+                  <ul className="list-disc pl-5">
+                    {waitlistedMembers.map((memberId) => {
+                      const member = members.find((m) => m.id === memberId);
+                      return (
+                        <li key={memberId}>
+                          {member ? member.name : "Unknown member"}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No member selected.
+                  </p>
+                )}
+                <Button
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => setOpenModal("waitlist")}
+                >
+                  Add Members
+                </Button>
+              </div>
+            </FormItem>
+
             {/** Visibility */}
             <FormField
               control={form.control}
@@ -819,7 +859,7 @@ export default function CreateTrainingSessionForm() {
                                   form.setValue("visibility", v.value);
                                   // Open the invite modal when selecting "private"
                                   if (v.value === "private") {
-                                    setShowInviteModal(true);
+                                    setOpenModal("invite");
                                   }
                                 }}
                               >
@@ -848,9 +888,9 @@ export default function CreateTrainingSessionForm() {
                       <div className="mb-2 font-medium">
                         Selected Attendees:
                       </div>
-                      {selectedMembers.length > 0 ? (
+                      {invitedMembers.length > 0 ? (
                         <ul className="list-disc pl-5">
-                          {selectedMembers.map((memberId) => {
+                          {invitedMembers.map((memberId) => {
                             const member = members.find(
                               (m) => m.id === memberId,
                             );
@@ -869,7 +909,7 @@ export default function CreateTrainingSessionForm() {
                       <Button
                         size="sm"
                         className="mt-2"
-                        onClick={() => setShowInviteModal(true)}
+                        onClick={() => setOpenModal("invite")}
                       >
                         Add Attendees
                       </Button>
@@ -1042,11 +1082,20 @@ export default function CreateTrainingSessionForm() {
       )}
       {/* Invite Modal */}
       <InviteModal
-        open={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
+        description="Invite members to training session."
+        open={openModal === "invite"}
+        onClose={() => setOpenModal(undefined)}
         members={members}
-        selectedMembers={selectedMembers}
-        setSelectedMembers={setSelectedMembers}
+        selectedMembers={invitedMembers}
+        setSelectedMembers={setInvitedMembers}
+      />
+      <InviteModal
+        description="Waitlist members for program."
+        open={openModal === "waitlist"}
+        onClose={() => setOpenModal(undefined)}
+        members={members}
+        selectedMembers={waitlistedMembers}
+        setSelectedMembers={setWaitlistedMembers}
       />
     </>
   );
