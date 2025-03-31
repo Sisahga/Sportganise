@@ -98,7 +98,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
     const response = await deleteProgram(
       user?.accountId,
-      programDetails.programId,
+      programDetails.programId
     );
 
     if (response) {
@@ -137,7 +137,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     }
 
     try {
-      // Step 1: Try to fetch participant — expected to 404 if not yet RSVPed
+      //Try to fetch participant — expected to 404 if not yet RSVPed
       let existingParticipant: Attendees | null = null;
 
       try {
@@ -146,17 +146,20 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
           user.accountId
         );
       } catch (err: any) {
-        if (err.message?.includes("404")) {
+        if (
+          err.message?.includes("404") ||
+          err.message?.toLowerCase().includes("not found")
+        ) {
           console.warn("User is not yet a participant");
         } else {
           throw err; // Unexpected error
         }
       }
 
-      // Step 2: Determine visibility (default to 'public' for safety)
+      // Determine visibility
       const visibility = programDetails.visibility?.toLowerCase() ?? "public";
 
-      // Step 3: If private and no participant, block RSVP
+      // If private and no participant, block RSVP
       if (!existingParticipant && visibility === "private") {
         const errorMsg = "You must be invited to RSVP to this private event.";
         console.error(errorMsg);
@@ -167,7 +170,6 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       const response = await rsvp({
         programId: programDetails.programId,
         accountId: user.accountId,
-        visibility: programDetails.visibility?.toLowerCase() ?? "public",
       });
 
       setAttendee(response);
@@ -443,8 +445,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* RSVP confirmation message */}
       {isRSVPConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Smile className="w-12 h-12" />
             <p className="text-center">
               Your presence is noted. Can&#39;t wait to see you!
@@ -455,8 +457,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Notification when player confirms absence */}
       {isNotificationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg shadow-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Frown className="w-12 h-12" />
             <p className="text-center">Your absence is noted.</p>
           </div>
