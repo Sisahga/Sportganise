@@ -41,6 +41,7 @@ import OptInButton from "./OptInButton";
 import OptOutButton from "./OptOutButton";
 import useRSVP from "@/hooks/useRSVP";
 import programParticipantApi from "@/services/api/programParticipantApi";
+import useDeleteProgram from "@/hooks/useDeleteProgram";
 
 interface DropDownMenuButtonProps {
   user: CookiesDto | null | undefined;
@@ -71,6 +72,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   );
   const [rsvpErrorMessage, setRsvpErrorMessage] = useState<string | null>(null);
   const { markAbsent, error: absentError } = useAbsent();
+  const { deleteProgram } = useDeleteProgram();
   const [isNotificationVisible, setNotificationVisible] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isRSVPDialogOpen, setRSVPDialogOpen] = useState(false);
@@ -90,14 +92,21 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     setDeleteDialogOpen(true); // Open the alert dialog
   };
 
-  const handleDeleteConfirmation = () => {
+  const handleDeleteConfirmation = async () => {
     setDeleteDialogOpen(false);
     setDeleteConfirmationVisible(true);
-    if (onRefresh) onRefresh();
 
-    setTimeout(() => {
-      setDeleteConfirmationVisible(false);
-    }, 3000);
+    const response = await deleteProgram(
+      user?.accountId,
+      programDetails.programId,
+    );
+
+    if (response) {
+      if (onRefresh) onRefresh();
+      setTimeout(() => {
+        setDeleteConfirmationVisible(false);
+      }, 3000);
+    }
   };
 
   const handlePostponeClick = () => {
@@ -419,7 +428,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         </div>
       )}
 
-      {/* Postpone event confirmation message */}
+      {/* Delete event confirmation message */}
       {isDeleteConfirmationVisible && (
         <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
           <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">

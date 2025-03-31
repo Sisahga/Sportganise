@@ -60,9 +60,7 @@ import { FUNDRAISER } from "@/constants/programconstants";
 import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
 import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
-import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
-import { useInviteToPrivateEvent } from "@/hooks/useInviteToPrivateEvent";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
@@ -70,12 +68,13 @@ import { ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
+import AssignCoach from "./AssignCoaches";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { form } = useFormHandler();
-  const { createTrainingSession, error } = useCreateTrainingSession();
+  const { createTrainingSession } = useCreateTrainingSession();
   const [loading, setLoading] = useState<boolean>(false);
   const {
     players,
@@ -91,6 +90,29 @@ export default function CreateTrainingSessionForm() {
   }));
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
+  const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
+
+  const handleCoachesSelection = (selectedCoaches: number[]) => {
+    setSelectedCoaches(selectedCoaches);
+    setShowSelectedCoaches(true);
+  };
+  const minAttendees = selectedMembers.length;
+
+  useEffect(() => {
+    if (form.getValues("capacity") === undefined) {
+      form.setValue("capacity", minAttendees);
+    }
+  }, [form, minAttendees]);
+
+  const maxAttendees = form.watch("capacity");
+
+  useEffect(() => {
+    if (maxAttendees < minAttendees) {
+      form.setValue("capacity", minAttendees);
+    }
+  }, [minAttendees, maxAttendees, form]);
+
   // AccountId from cookies
   const cookies = getCookies();
   const accountId = cookies ? getAccountIdCookie(cookies) : null;
@@ -155,8 +177,6 @@ export default function CreateTrainingSessionForm() {
     },
   ] as const;
 
-  const { invite } = useInviteToPrivateEvent();
-
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (values.visibility === "private" && selectedMembers.length === 0) {
@@ -192,15 +212,25 @@ export default function CreateTrainingSessionForm() {
         endTime: values.endTime,
         location: values.location,
       };
+
       formData.append(
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
         }),
       );
+
+      // Append attachments if available
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
           formData.append("attachments", file);
+        });
+      }
+
+      // Append participants (each selected member's id)
+      if (selectedMembers && selectedMembers.length > 0) {
+        selectedMembers.forEach((memberId) => {
+          formData.append("participantsId", memberId.toString());
         });
       }
 
@@ -208,8 +238,6 @@ export default function CreateTrainingSessionForm() {
       setLoading(true);
       const create = await createTrainingSession(accountId, formData);
       setLoading(false);
-      console.log(error);
-      console.log("create", create);
       log.info("create", create);
       if (create === null) {
         throw new Error(
@@ -217,41 +245,22 @@ export default function CreateTrainingSessionForm() {
         );
       }
 
-      const programId = create.data.programId;
-
-      if (values.visibility === "private" && selectedMembers.length > 0) {
-        await Promise.all(
-          selectedMembers.map(async (accountId) => {
-            try {
-              await invite(accountId, programId!);
-            } catch (error) {
-              console.error(`Failed to invite member ${accountId}:`, error);
-            }
-          }),
-        );
-      }
-
-      console.log("loading", loading);
       log.info("createTrainingSession submit success ✔");
 
-      form.reset();
-      setSelectedMembers([]);
-
-      // Toast popup for user to say form submitted successfully
+      // Toast popup for successful submission
       toast({
         variant: "success",
         title: "Form submitted successfully ✔",
         description: "Program was added to your calendar.",
       });
 
+      form.reset();
+      setSelectedMembers([]);
       // Navigate to home page
       navigate(-1);
     } catch (err) {
-      console.error(
-        "Create training session form submission error (error)",
-        err,
-      );
-      log.error("Create training session form submission error (error)", err);
+      console.error("Create training session form submission error", err);
+      log.error("Create training session form submission error", err);
       toast({
         variant: "destructive",
         title: "Uh oh! Something went wrong ✖",
@@ -376,6 +385,68 @@ export default function CreateTrainingSessionForm() {
                     </PopoverContent>
                   </Popover>
                   <FormDescription>Select the program type.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="coaches"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="font-semibold text-base">
+                    Coach*
+                  </FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "pl-3 text-left font-normal text-muted-foreground",
+                          )}
+                        >
+                          <span>Select coaches</span>
+                          <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[250px] p-0" align="start">
+                      <AssignCoach
+                        members={members}
+                        field={field}
+                        onSelectCoaches={handleCoachesSelection}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Select the coaches in charge of the program
+                  </FormDescription>
+                  {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                  {showSelectedCoaches && (
+                    <div className="mt-2 bg-white border p-2 rounded">
+                      <div className="mb-2 font-medium"> Selected Coaches:</div>
+                      {selectedCoaches.length > 0 ? (
+                        <ul className="list-disc pl-5">
+                          {selectedCoaches.map((memberId) => {
+                            const member = members.find(
+                              (m) => m.id === memberId,
+                            );
+                            return (
+                              <li key={memberId}>
+                                {member ? member.name : "Unknown member"}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          No coaches selected.
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -725,7 +796,6 @@ export default function CreateTrainingSessionForm() {
                           <CommandGroup>
                             {[
                               { label: "Public", value: PUBLIC },
-                              { label: "Members only", value: MEMBERS_ONLY },
                               { label: "Private", value: PRIVATE },
                             ].map((v) => (
                               <CommandItem
@@ -889,12 +959,15 @@ export default function CreateTrainingSessionForm() {
                     <Input
                       placeholder="Write the max number of attendees"
                       type="number"
+                      min={minAttendees}
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(
-                          e.target.value ? Number(e.target.value) : undefined,
-                        )
-                      }
+                      value={maxAttendees ?? minAttendees}
+                      onChange={(e) => {
+                        const newValue = e.target.value
+                          ? Number(e.target.value)
+                          : minAttendees;
+                        field.onChange(newValue);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

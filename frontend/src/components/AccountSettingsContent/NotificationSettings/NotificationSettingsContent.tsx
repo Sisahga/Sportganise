@@ -55,6 +55,22 @@ export default function NotificationSettings() {
   const { updateNotificationMethod } = useUpdateNotificationMethod();
   const { updateNotificationPermission } = useUpdateNotificationPermission();
 
+  // Check browser push notification support
+  const checkPushNotificationSupport = () => {
+    toast({
+      variant: "warning",
+      title: "⚠️ Limited Browser Notifications",
+      description:
+        "Your browser may not fully support push notifications. Some app features might be limited.",
+      duration: 10000,
+    });
+  };
+
+  // Check push notification support on component mount
+  useEffect(() => {
+    checkPushNotificationSupport();
+  }, []);
+
   const handleChannelToggle = async (method: NotificationMethodEnum) => {
     setNotificationMethods((prev) =>
       prev.map((item) =>

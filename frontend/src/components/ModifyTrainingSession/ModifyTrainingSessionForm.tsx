@@ -61,7 +61,6 @@ import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { MAIN_STREET } from "@/constants/programconstants";
 import { TEST_WATER_ROAD } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
-import { MEMBERS_ONLY } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
 import { DAILY } from "@/constants/programconstants";
 import { WEEKLY } from "@/constants/programconstants";
@@ -73,6 +72,9 @@ import { useWatch } from "react-hook-form";
 import { NotificationRequest } from "@/types/notifications";
 import useSendNotification from "@/hooks/useSendNotification";
 
+import AssignCoach from "../CreateTrainingSessionForm/AssignCoaches";
+import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
+import usePlayers from "@/hooks/usePlayers";
 /**All select element options */
 const types = [
   {
@@ -116,10 +118,6 @@ const visibilities = [
     value: PUBLIC,
   },
   {
-    label: "Members only",
-    value: MEMBERS_ONLY,
-  },
-  {
     label: "Private",
     value: PRIVATE,
   },
@@ -154,6 +152,13 @@ export default function ModifyTrainingSessionForm() {
   const [loading, setLoading] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
   const [attendees, setAttendees] = useState<Attendees[]>([]); // For US305+
+  const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
+  const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
+
+  const handleCoachesSelection = (selectedCoaches: number[]) => {
+    setSelectedCoaches(selectedCoaches);
+    setShowSelectedCoaches(true);
+  };
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
     recurrenceId: 0,
@@ -188,7 +193,28 @@ export default function ModifyTrainingSessionForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
-
+  // State for selected participant IDs (existing attendees)
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  // State to control the InviteModal's visibility
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const { players } = usePlayers();
+  const members: Member[] = players.map((player) => ({
+    id: player.accountId, // <-- now a number
+    name: `${player.firstName} ${player.lastName}`,
+    email: player.email,
+    role: player.type,
+  }));
+  useEffect(() => {
+    if (location.state && location.state.attendees) {
+      const attendeeIds = (location.state.attendees as Attendees[]).map(
+        (att) => att.accountId, // now a number
+      );
+      setSelectedMembers(attendeeIds);
+    }
+    if (location.state && location.state.programDetails) {
+      setProgramDetails(location.state.programDetails);
+    }
+  }, [location.state]);
   /** Update state */
   useEffect(() => {
     if (location.state && location.state.programDetails) {
@@ -250,11 +276,21 @@ export default function ModifyTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (values.visibility === "private" && selectedMembers.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description:
+          "Please select at least one participant for a private event.",
+      });
+      return;
+    }
     try {
       const json_payload = {
         ...values,
         programId: programDetails.programId ?? null,
         attachment: values.attachment ?? [],
+        attendees: values.visibility === "private" ? selectedMembers : [],
       };
       console.log(json_payload);
       log.info("Form to modify Training Session : ", json_payload);
@@ -473,6 +509,67 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>Select the program type.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="coaches"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="font-semibold text-base">
+                  Coach*
+                </FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-3 text-left font-normal text-muted-foreground",
+                        )}
+                      >
+                        <span>Select Coaches</span>
+                        <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[250px] p-0" align="start">
+                    <AssignCoach
+                      members={members}
+                      field={field}
+                      onSelectCoaches={handleCoachesSelection}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormDescription>
+                  Select the coaches in charge of the program
+                </FormDescription>
+                {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                {showSelectedCoaches && (
+                  <div className="mt-2 bg-white border p-2 rounded">
+                    <div className="mb-2 font-medium"> Selected Coaches:</div>
+                    {selectedCoaches.length > 0 ? (
+                      <ul className="list-disc pl-5">
+                        {selectedCoaches.map((memberId) => {
+                          const member = members.find((m) => m.id === memberId);
+                          return (
+                            <li key={memberId}>
+                              {member ? member.name : "Unknown member"}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No coaches selected.
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <FormMessage />
               </FormItem>
             )}
@@ -830,6 +927,9 @@ export default function ModifyTrainingSessionForm() {
                               key={visibility.value}
                               onSelect={() => {
                                 form.setValue("visibility", visibility.value);
+                                if (visibility.value === "private") {
+                                  setShowInviteModal(true);
+                                }
                               }}
                             >
                               <Check
@@ -852,8 +952,45 @@ export default function ModifyTrainingSessionForm() {
                   Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
+                {field.value === "private" && (
+                  <div className="mt-2 border p-2 rounded">
+                    <div className="mb-2 font-medium">
+                      Selected Participants:
+                    </div>
+                    {selectedMembers.length > 0 ? (
+                      <ul className="list-disc pl-5">
+                        {selectedMembers.map((memberId) => {
+                          const member = members.find((m) => m.id === memberId);
+                          return (
+                            <li key={memberId}>
+                              {member ? member.name : "Unknown member"}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        No participants selected.
+                      </p>
+                    )}
+                    <Button
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setShowInviteModal(true)}
+                    >
+                      Edit Participants
+                    </Button>
+                  </div>
+                )}
               </FormItem>
             )}
+          />
+          <InviteModal
+            open={showInviteModal}
+            onClose={() => setShowInviteModal(false)}
+            members={members}
+            selectedMembers={selectedMembers}
+            setSelectedMembers={setSelectedMembers}
           />
 
           {/** Description */}

@@ -10,6 +10,7 @@ import com.sportganise.entities.programsessions.Program;
 import com.sportganise.entities.programsessions.ProgramAttachment;
 import com.sportganise.entities.programsessions.ProgramAttachmentCompositeKey;
 import com.sportganise.entities.programsessions.ProgramParticipant;
+import com.sportganise.entities.programsessions.ProgramParticipantId;
 import com.sportganise.entities.programsessions.ProgramRecurrence;
 import com.sportganise.entities.programsessions.ProgramType;
 import com.sportganise.exceptions.EntityNotFoundException;
@@ -327,7 +328,8 @@ public class ProgramService {
       String location,
       List<MultipartFile> attachments,
       Integer accountId,
-      String frequency) {
+      String frequency,
+      Integer[] participantsId) {
 
     Account user = accountService.getAccountById(accountId);
     if (user == null) {
@@ -382,7 +384,46 @@ public class ProgramService {
       }
     }
 
+    if (participantsId != null) {
+      this.createProgramParticipants(savedProgram.getProgramId(), participantsId);
+    }
+
     return new ProgramDto(savedProgram, programAttachmentsDto);
+  }
+
+  /**
+   * Creates and links program participants for a new created program.
+   *
+   * @param programId Takes programId of program
+   * @param participants List of participants for the program
+   */
+  public void createProgramParticipants(Integer programId, Integer[] participants) {
+
+    if (participants != null) {
+      for (Integer participant : participants) {
+        Account user =
+            accountService
+                .getAccount(participant)
+                .orElseThrow(
+                    () ->
+                        new ResourceNotFoundException(
+                            "User with id " + participant + " not found."));
+
+        ProgramParticipant programParticipant =
+            new ProgramParticipant(
+                new ProgramParticipantId(programId, user.getAccountId()),
+                null,
+                "Subscribed",
+                true,
+                ZonedDateTime.now());
+
+        programParticipantRepository.save(programParticipant);
+        log.info("Created participant : " + programParticipant);
+      }
+
+      log.info("Participants creation is successful");
+    }
+    log.info("There are no participants for this program.");
   }
 
   /**
