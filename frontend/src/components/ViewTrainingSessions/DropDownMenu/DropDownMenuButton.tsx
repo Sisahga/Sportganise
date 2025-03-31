@@ -66,7 +66,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
 
   //Confirmation of player absence
-  const { rsvp, isLoading: rsvpLoading, error: rsvpError } = useRSVP();
+  const { rsvp, isLoading: rsvpLoading } = useRSVP();
   const [attendee, setAttendee] = useState<Attendees | undefined>(
     accountAttendee
   );
@@ -172,6 +172,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         accountId: user.accountId,
       });
 
+      setRsvpErrorMessage(null); // Clears old error messages before modal closes
+
       setAttendee(response);
       console.log("RSVP success:", response);
 
@@ -183,31 +185,28 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
         setRSVPConfirmationVisible(false);
       }, 3000);
     } catch (err: any) {
-      const errorMessage =
-        err?.message || "Failed to RSVP. Please try again later.";
+      let errorMessage = "Failed to RSVP. Please try again later.";
+
+      try {
+        if (err instanceof Response) {
+          const errorBody = await err.json();
+          errorMessage = errorBody.message || errorMessage;
+        } else if (typeof err.message === "string") {
+          try {
+            const parsed = JSON.parse(
+              err.message.split(" ").slice(1).join(" ")
+            );
+            errorMessage = parsed.message || errorMessage;
+          } catch {
+            errorMessage = err.message;
+          }
+        }
+      } catch (parseError) {
+        console.warn("Error parsing RSVP failure response:", parseError);
+      }
       console.error("RSVP failed:", errorMessage);
       setRsvpErrorMessage(errorMessage);
     }
-
-    // try {
-    //   const response = await rsvp(programDetails.programId, user.accountId);
-
-    //   if(response.isConfirmed) {
-    //     console.log("User is confirmed for the event!");
-    //   } else {
-    //     console.log("User was waitlisted.");
-    //   }
-    //   setRSVPDialogOpen(false);
-    //   setRSVPConfirmationVisible(true); // Show RSVP confirmation message
-
-    //   if (onRefresh) onRefresh(); // To re-fetch updated attendee list
-
-    //   setTimeout(() => {
-    //     setRSVPConfirmationVisible(false);
-    //   }, 3000);
-    // } catch (err) {
-    //   console.error("Failed to RSVP", err);
-    // }
   };
 
   const handleAbsentClick = () => {
@@ -377,7 +376,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
               If you cannot attend the event anymore, you will have the option
               to mark yourself as absent.
             </AlertDialogDescription>
-            {rsvpError && (
+            {rsvpErrorMessage && (
               <p className="text-red-500 mt-2 text-sm text-center">
                 {rsvpErrorMessage}
               </p>
@@ -419,8 +418,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Postpone event confirmation message */}
       {isPostponeConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Frown className="w-12 h-12" />
             <p className="text-center">
               You have successfully postponed the event. The participants will
@@ -432,8 +431,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Delete event confirmation message */}
       {isDeleteConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Frown className="w-12 h-12" />
             <p className="text-center">
               You have successfully deleted the event. The participants will be
