@@ -97,7 +97,8 @@ export default function CreateTrainingSessionForm() {
     name: "type",
   });
 
-  const showCoachField = selectedType === TRAINING || selectedType === SPECIALTRAINING;
+  const showCoachField =
+    selectedType === TRAINING || selectedType === SPECIALTRAINING;
 
   const handleCoachesSelection = (selectedCoaches: number[]) => {
     setSelectedCoaches(selectedCoaches);
@@ -435,7 +436,10 @@ export default function CreateTrainingSessionForm() {
                     {/* Only show the list of selected coaches when showSelectedCoaches is true */}
                     {showSelectedCoaches && (
                       <div className="mt-2 bg-white border p-2 rounded">
-                        <div className="mb-2 font-medium"> Selected Coaches:</div>
+                        <div className="mb-2 font-medium">
+                          {" "}
+                          Selected Coaches:
+                        </div>
                         {selectedCoaches.length > 0 ? (
                           <ul className="list-disc pl-5">
                             {selectedCoaches.map((memberId) => {
