@@ -329,7 +329,9 @@ public class ProgramService {
       List<MultipartFile> attachments,
       Integer accountId,
       String frequency,
-      Integer[] participantsId) {
+      Integer[] participantsId,
+      Integer[] waitlistsId,
+      Integer[] coachesId) {
 
     Account user = accountService.getAccountById(accountId);
     if (user == null) {
@@ -385,7 +387,15 @@ public class ProgramService {
     }
 
     if (participantsId != null) {
-      this.createProgramParticipants(savedProgram.getProgramId(), participantsId);
+      this.createProgramParticipants(savedProgram.getProgramId(), participantsId, "Subscribed", true);
+    }
+
+    if (waitlistsId != null) {
+      this.createProgramParticipants(savedProgram.getProgramId(), waitlistsId, "Waitlisted", false);
+    }
+
+    if (coachesId != null) {
+      this.createProgramParticipants(savedProgram.getProgramId(), coachesId, "Coach", false);
     }
 
     return new ProgramDto(savedProgram, programAttachmentsDto);
@@ -397,7 +407,8 @@ public class ProgramService {
    * @param programId Takes programId of program
    * @param participants List of participants for the program
    */
-  public void createProgramParticipants(Integer programId, Integer[] participants) {
+  public void createProgramParticipants(Integer programId, Integer[] participants, String participantType, 
+  Boolean isConfirmed) {
 
     if (participants != null) {
       for (Integer participant : participants) {
@@ -409,13 +420,18 @@ public class ProgramService {
                         new ResourceNotFoundException(
                             "User with id " + participant + " not found."));
 
+        ZonedDateTime confirmedDate = null;
+        if (isConfirmed) {
+          confirmedDate = ZonedDateTime.now();
+        }
+
         ProgramParticipant programParticipant =
             new ProgramParticipant(
                 new ProgramParticipantId(programId, user.getAccountId()),
                 null,
-                "Subscribed",
-                true,
-                ZonedDateTime.now());
+                participantType,
+                isConfirmed,
+                confirmedDate);
 
         programParticipantRepository.save(programParticipant);
         log.info("Created participant : " + programParticipant);
