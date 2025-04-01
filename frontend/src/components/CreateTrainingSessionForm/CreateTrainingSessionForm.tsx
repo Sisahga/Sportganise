@@ -92,6 +92,12 @@ export default function CreateTrainingSessionForm() {
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
   const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
+  const selectedType = useWatch({
+    control: form.control,
+    name: "type",
+  });
+
+  const showCoachField = selectedType === TRAINING || selectedType === SPECIALTRAINING;
 
   const handleCoachesSelection = (selectedCoaches: number[]) => {
     setSelectedCoaches(selectedCoaches);
@@ -366,6 +372,7 @@ export default function CreateTrainingSessionForm() {
                                 key={type.value}
                                 onSelect={() => {
                                   form.setValue("type", type.value);
+                                  console.log("bitch ass  ", type.value);
                                 }}
                               >
                                 <Check
@@ -390,67 +397,70 @@ export default function CreateTrainingSessionForm() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="coaches"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel className="font-semibold text-base">
-                    Coach*
-                  </FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "pl-3 text-left font-normal text-muted-foreground",
-                          )}
-                        >
-                          <span>Select coaches</span>
-                          <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[250px] p-0" align="start">
-                      <AssignCoach
-                        members={members}
-                        field={field}
-                        onSelectCoaches={handleCoachesSelection}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    Select the coaches in charge of the program
-                  </FormDescription>
-                  {/* Only show the list of selected coaches when showSelectedCoaches is true */}
-                  {showSelectedCoaches && (
-                    <div className="mt-2 bg-white border p-2 rounded">
-                      <div className="mb-2 font-medium"> Selected Coaches:</div>
-                      {selectedCoaches.length > 0 ? (
-                        <ul className="list-disc pl-5">
-                          {selectedCoaches.map((memberId) => {
-                            const member = members.find(
-                              (m) => m.id === memberId,
-                            );
-                            return (
-                              <li key={memberId}>
-                                {member ? member.name : "Unknown member"}
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          No coaches selected.
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Only show coach field if program type is Training Session or Special Training */}
+            {showCoachField && (
+              <FormField
+                control={form.control}
+                name="coaches"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="font-semibold text-base">
+                      Coach*
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal text-muted-foreground",
+                            )}
+                          >
+                            <span>Select coaches</span>
+                            <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[250px] p-0" align="start">
+                        <AssignCoach
+                          members={members}
+                          field={field}
+                          onSelectCoaches={handleCoachesSelection}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      Select the coaches in charge of the program
+                    </FormDescription>
+                    {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                    {showSelectedCoaches && (
+                      <div className="mt-2 bg-white border p-2 rounded">
+                        <div className="mb-2 font-medium"> Selected Coaches:</div>
+                        {selectedCoaches.length > 0 ? (
+                          <ul className="list-disc pl-5">
+                            {selectedCoaches.map((memberId) => {
+                              const member = members.find(
+                                (m) => m.id === memberId,
+                              );
+                              return (
+                                <li key={memberId}>
+                                  {member ? member.name : "Unknown member"}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            No coaches selected.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/** Start Date */}
             <FormField
