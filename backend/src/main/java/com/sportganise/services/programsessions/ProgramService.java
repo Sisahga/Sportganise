@@ -387,7 +387,8 @@ public class ProgramService {
     }
 
     if (participantsId != null) {
-      this.createProgramParticipants(savedProgram.getProgramId(), participantsId, "Subscribed", true);
+      this.createProgramParticipants(
+          savedProgram.getProgramId(), participantsId, "Subscribed", true);
     }
 
     if (waitlistsId != null) {
@@ -407,8 +408,8 @@ public class ProgramService {
    * @param programId Takes programId of program
    * @param participants List of participants for the program
    */
-  public void createProgramParticipants(Integer programId, Integer[] participants, String participantType, 
-  Boolean isConfirmed) {
+  public void createProgramParticipants(
+      Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
 
     if (participants != null) {
       for (Integer participant : participants) {

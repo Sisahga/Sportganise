@@ -30,15 +30,17 @@ export const formSchema = z
   })
   .superRefine((data, ctx) => {
     // Validate that coaches are provided if type is not Tournament or Fundraiser
-    if ((data.type === "TRAINING" || data.type === "SPECIALTRAINING") && 
-        data.coaches?.length === 0) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: "At least one coach is required for training sessions.",
-            path: ["coaches"],
-          });
-        }
-      })
+    if (
+      (data.type === "TRAINING" || data.type === "SPECIALTRAINING") &&
+      data.coaches?.length === 0
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "At least one coach is required for training sessions.",
+        path: ["coaches"],
+      });
+    }
+  })
   .superRefine((data, ctx) => {
     if (data.frequency !== "ONCE" && !data.endDate) {
       ctx.addIssue({
