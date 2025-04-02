@@ -39,7 +39,7 @@ function usePrograms() {
                   ? new Date(program.programDetails.occurrenceDate)
                   : program.programDetails.occurrenceDate,
             },
-          }),
+          })
         );
 
         //If date range is provided, filter programs
@@ -68,7 +68,7 @@ function usePrograms() {
         setLoading(false);
       }
     },
-    [programs],
+    [programs]
   );
 
   const fetchProgramDates = useCallback(async (accountId: number | null) => {
