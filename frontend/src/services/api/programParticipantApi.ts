@@ -34,29 +34,6 @@ const programParticipantApi = {
     return data;
   },
 
-  // rsvpToProgram: async (programId: number, accountId: number) => {
-  //   console.log("Calling RSVP with:", { programId, accountId });
-
-  //   const url = `${baseMappingUrl}/rsvp?programId=${programId}&accountId=${accountId}`;
-
-  //   const response = await fetch(url, {
-  //     method: "POST",
-  //     headers: {
-  //       Authorization: getBearerToken(),
-  //       //"Content-Type": "application/json",
-  //     },
-  //     //body,
-  //   });
-
-  //   if (!response.ok) {
-  //     const errorText = await response.text();
-  //     throw new Error(`RSVP failed: ${response.status} ${errorText}`);
-  //   }
-
-  //   const data: boolean = await response.json(); // Your backend returns a boolean
-  //   return data;
-  // },
-
   rsvpToProgram: async ({
     programId,
     accountId,
