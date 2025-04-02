@@ -179,7 +179,7 @@ describe("DropDownMenuButton component", () => {
       accountId: 12345,
       programId: 98765,
       participantType: "Subscribed",
-      confirmed: true,
+      confirmed: false,
       confirmedDate: null,
       rank: null,
     };
@@ -255,7 +255,7 @@ describe("DropDownMenuButton component", () => {
       accountId: 12345,
       programId: 999,
       participantType: "Subscribed",
-      confirmed: true,
+      confirmed: false,
       confirmedDate: null,
       rank: null,
     };
