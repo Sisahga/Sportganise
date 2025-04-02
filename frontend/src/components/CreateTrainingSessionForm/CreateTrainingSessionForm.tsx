@@ -69,7 +69,6 @@ import { ONCE } from "@/constants/programconstants";
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import AssignCoach from "./AssignCoaches";
-import useOptInParticipant from "@/hooks/useOptInParticipant";
 
 type ModalKey = "invite" | "waitlist";
 
@@ -188,8 +187,6 @@ export default function CreateTrainingSessionForm() {
     },
   ] as const;
 
-  const { optIn } = useOptInParticipant();
-
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (values.visibility === "private" && invitedMembers.length === 0) {
@@ -247,6 +244,11 @@ export default function CreateTrainingSessionForm() {
         });
       }
 
+      // Append waitlisted participants
+      waitlistedMembers.forEach((memberId) => {
+        formData.append("waitlistsId", memberId.toString());
+      });
+
       // API submit form
       setLoading(true);
       const create = await createTrainingSession(accountId, formData);
@@ -255,20 +257,6 @@ export default function CreateTrainingSessionForm() {
       if (create === null) {
         throw new Error(
           "Error from useCreateTrainingSession.createTrainingSession!",
-        );
-      }
-
-      const programId = create.data.programId as number | undefined;
-
-      if (programId !== undefined && waitlistedMembers.length > 0) {
-        await Promise.allSettled(
-          waitlistedMembers.map(async (accountId) => {
-            try {
-              await optIn(programId, accountId);
-            } catch (error) {
-              console.error(`Failed to waitlist member ${accountId}:`, error);
-            }
-          }),
         );
       }
 
