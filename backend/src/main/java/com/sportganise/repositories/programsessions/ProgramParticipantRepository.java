@@ -27,6 +27,17 @@ public interface ProgramParticipantRepository
   ProgramParticipant findWaitlistParticipant(
       @Param("programId") Integer programId, @Param("accountId") Integer accountId);
 
+  /** Find a participant for a specific program. */
+  @Query(
+      """
+      SELECT pp
+      FROM ProgramParticipant pp
+      WHERE pp.programParticipantId.programId = :programId
+      AND pp.programParticipantId.accountId = :accountId
+      """)
+  ProgramParticipant findParticipant(
+      @Param("programId") Integer programId, @Param("accountId") Integer accountId);
+
   /** Find the maximum rank of unconfirmed participants in a specific program. */
   @Query(
       """
