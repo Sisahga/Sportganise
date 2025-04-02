@@ -2,6 +2,7 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 import useGetCookies from "@/hooks/useGetCookies.ts";
 import { LoaderCircle } from "lucide-react";
+import React from "react";
 
 interface PublicRouteProps {
   redirectTo?: string;

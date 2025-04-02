@@ -38,7 +38,7 @@ public class BlocklistController {
         blockUserRequestDto.getAccountId(), blockUserRequestDto.getBlockedId());
     ResponseDto<Null> response =
         new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User blocked successfully", null);
-    return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   /**
@@ -54,6 +54,6 @@ public class BlocklistController {
     blocklistService.unblockUser(accountId, blockedId);
     ResponseDto<Null> response =
         new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User unblocked successfully", null);
-    return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }
