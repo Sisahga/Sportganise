@@ -9,7 +9,7 @@ const baseMappingUrl =
 const programParticipantApi = {
   getProgramParticipant: async (
     programId: number,
-    accountId: number | null | undefined
+    accountId: number | null | undefined,
   ) => {
     const url = `${baseMappingUrl}/get-participant?programId=${programId}&accountId=${accountId}`;
     const response = await fetch(url, {
@@ -60,7 +60,7 @@ const programParticipantApi = {
 
   markAbsent: async (
     programId: number,
-    accountId: number | null | undefined
+    accountId: number | null | undefined,
   ) => {
     const url = `${baseMappingUrl}/mark-absent?programId=${programId}&accountId=${accountId}`;
     const response = await fetch(url, {
@@ -87,7 +87,7 @@ const programParticipantApi = {
 
   inviteToPrivateEvent: async (
     accountId: number,
-    programId: number | null | undefined
+    programId: number | null | undefined,
   ) => {
     const url = `${baseMappingUrl}/invite-private?programId=${programId}&accountId=${accountId}`;
 

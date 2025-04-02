@@ -25,7 +25,7 @@ const useRSVP = () => {
       try {
         existingParticipant = await programParticipantApi.getProgramParticipant(
           programId,
-          accountId
+          accountId,
         );
         console.log("Existing participant found: ", existingParticipant);
       } catch (err: any) {
@@ -49,7 +49,7 @@ const useRSVP = () => {
 
       const updated = await programParticipantApi.getProgramParticipant(
         programId,
-        accountId
+        accountId,
       );
 
       setData(updated);

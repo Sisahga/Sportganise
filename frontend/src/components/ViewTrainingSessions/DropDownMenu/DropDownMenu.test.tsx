@@ -153,7 +153,7 @@ describe("DropDownMenuButton component", () => {
         programDetails={programDetails}
         attendees={attendees}
         onRefresh={vi.fn()}
-      />
+      />,
     );
 
     // Verify the trigger button is rendered
@@ -191,7 +191,7 @@ describe("DropDownMenuButton component", () => {
         programDetails={programDetails}
         attendees={attendees}
         onRefresh={vi.fn()}
-      />
+      />,
     );
 
     // Verify the trigger button is rendered
@@ -219,7 +219,7 @@ describe("DropDownMenuButton component", () => {
         programDetails={programDetails}
         attendees={attendees}
         onRefresh={vi.fn()}
-      />
+      />,
     );
 
     // Open the dropdown and click on the 'Postpone Event' item.
@@ -230,7 +230,7 @@ describe("DropDownMenuButton component", () => {
 
     // Verify that the postpone alert dialog is rendered
     const postponeDialogTitle = await screen.findByText(
-      /Would you like to postpone this event\?/i
+      /Would you like to postpone this event\?/i,
     );
     expect(postponeDialogTitle).toBeInTheDocument();
 
@@ -240,7 +240,7 @@ describe("DropDownMenuButton component", () => {
 
     // Check that the postpone confirmation message appears
     const confirmationMessage = await screen.findByText(
-      /You have successfully postponed the event/i
+      /You have successfully postponed the event/i,
     );
     expect(confirmationMessage).toBeInTheDocument();
   });
@@ -267,7 +267,7 @@ describe("DropDownMenuButton component", () => {
         programDetails={programDetails}
         attendees={attendees}
         onRefresh={vi.fn()}
-      />
+      />,
     );
 
     // Open the dropdown and click on the 'RSVP' item.
@@ -278,7 +278,7 @@ describe("DropDownMenuButton component", () => {
 
     // Verify that the RSVP alert dialog is rendered
     const rsvpDialogTitle = await screen.findByText(
-      /Would you like to confirm your presence\?/i
+      /Would you like to confirm your presence\?/i,
     );
     expect(rsvpDialogTitle).toBeInTheDocument();
 
@@ -288,7 +288,7 @@ describe("DropDownMenuButton component", () => {
 
     // Check that the RSVP confirmation message appears
     const confirmationMessage = await screen.findByText(
-      /Your presence is noted/i
+      /Your presence is noted/i,
     );
     expect(confirmationMessage).toBeInTheDocument();
   });

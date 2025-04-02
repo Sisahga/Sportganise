@@ -75,7 +75,7 @@ const TrainingSessionContent = () => {
       try {
         const response = await trainingSessionApi.getPrograms(user?.accountId);
         const program = response.data?.find(
-          (p: Program) => p.programDetails.programId === programId
+          (p: Program) => p.programDetails.programId === programId,
         );
         if (program) {
           setProgramDetails(program.programDetails);
@@ -104,7 +104,7 @@ const TrainingSessionContent = () => {
           const accountAttendee: Attendees =
             await waitlistParticipantsApi.getProgramParticipant(
               programId,
-              user?.accountId
+              user?.accountId,
             );
           setAccountAttendee(accountAttendee);
           console.log("AccountAttendee: ", accountAttendee);
@@ -124,7 +124,7 @@ const TrainingSessionContent = () => {
     try {
       const response = await trainingSessionApi.getPrograms(user?.accountId);
       const updatedProgram = response.data.find(
-        (p: Program) => p.programDetails.programId === programId
+        (p: Program) => p.programDetails.programId === programId,
       );
 
       if (updatedProgram) {
@@ -140,7 +140,7 @@ const TrainingSessionContent = () => {
       const exists = prev.some((a) => a.accountId === newAttendee.accountId);
       return exists
         ? prev.map((a) =>
-            a.accountId === newAttendee.accountId ? newAttendee : a
+            a.accountId === newAttendee.accountId ? newAttendee : a,
           )
         : [...prev, newAttendee];
     });
@@ -212,7 +212,7 @@ const TrainingSessionContent = () => {
                 {programDetails?.occurrenceDate
                   ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
                       "en-CA",
-                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
                     )
                   : "N/A"}
               </p>
@@ -221,7 +221,7 @@ const TrainingSessionContent = () => {
                 {programDetails.occurrenceDate && programDetails.durationMins
                   ? calculateEndTime(
                       new Date(programDetails.occurrenceDate),
-                      programDetails.durationMins
+                      programDetails.durationMins,
                     )
                   : "N/A"}
               </p>
@@ -373,9 +373,9 @@ const TrainingSessionContent = () => {
                   const waitlisted = attendees
                     .filter(
                       (
-                        attendee
+                        attendee,
                       ): attendee is { rank: number } & typeof attendee =>
-                        attendee.rank !== null
+                        attendee.rank !== null,
                     )
                     .sort((a, b) => a.rank - b.rank);
 
