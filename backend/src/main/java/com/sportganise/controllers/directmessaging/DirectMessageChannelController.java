@@ -192,14 +192,16 @@ public class DirectMessageChannelController {
 
     ResponseDto<DeleteChannelRequestResponseDto> responseDto;
     if (deleteReqResponse.isEmpty()) {
-      responseDto = ResponseDto.<DeleteChannelRequestResponseDto>builder()
+      responseDto =
+          ResponseDto.<DeleteChannelRequestResponseDto>builder()
               .statusCode(HttpStatus.NO_CONTENT.value())
               .message("The channel was immediately approved for deletion.")
               .data(null)
               .build();
       log.info("The channel was immediately approved for deletion.");
     } else {
-      responseDto = ResponseDto.<DeleteChannelRequestResponseDto>builder()
+      responseDto =
+          ResponseDto.<DeleteChannelRequestResponseDto>builder()
               .statusCode(HttpStatus.OK.value())
               .message("Delete channel request sent successfully")
               .data(deleteReqResponse.get())
