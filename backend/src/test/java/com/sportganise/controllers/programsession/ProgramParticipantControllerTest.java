@@ -227,7 +227,10 @@ public class ProgramParticipantControllerTest {
 
   @Test
   public void testOptOutParticipant_ParticipantNotFound() throws Exception {
-    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).setControllerAdvice(new GlobalExceptionHandler()).build();
+    this.mockMvc =
+        MockMvcBuilders.standaloneSetup(programParticipantController)
+            .setControllerAdvice(new GlobalExceptionHandler())
+            .build();
     String errorMessage = "Participant not found";
     when(waitlistService.optOutParticipant(programId, accountId))
         .thenThrow(new ResourceNotFoundException(errorMessage));
