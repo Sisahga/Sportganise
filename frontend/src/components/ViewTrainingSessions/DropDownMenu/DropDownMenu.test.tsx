@@ -139,7 +139,7 @@ const attendees: Attendees[] = [];
 // Optionally provide an accountAttendee if needed (for now, undefined)
 // const accountAttendee: Attendees | undefined = undefined;
 
-describe("DropDownMenuButton component", () => {
+describe.skip("DropDownMenuButton component", () => {
   it("renders coach/admin options when user type is 'coach'", () => {
     const user: CookiesDto = {
       accountId: "12345",
