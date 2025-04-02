@@ -169,6 +169,68 @@ describe("DropDownMenuButton component", () => {
     expect(screen.getByText(/Delete Event/i)).toBeInTheDocument();
   });
 
+  it("renders RSVP when player has not confirmed", () => {
+    const user: CookiesDto = {
+      accountId: "12345",
+      type: "player",
+    } as unknown as CookiesDto;
+
+    const accountAttendee: Attendees = {
+      accountId: 12345,
+      programId: 98765,
+      participantType: "Subscribed",
+      confirmed: false,
+      confirmedDate: null,
+      rank: null,
+    };
+
+    render(
+      <DropDownMenuButton
+        user={user}
+        accountAttendee={accountAttendee}
+        programDetails={programDetails}
+        attendees={attendees}
+        onRefresh={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Add new item"));
+
+    expect(screen.getByText(/RSVP/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Mark absent/i)).not.toBeInTheDocument(); // optional
+  });
+
+  it("renders 'Mark absent' when player is already confirmed", () => {
+    const user: CookiesDto = {
+      accountId: "12345",
+      type: "player",
+    } as unknown as CookiesDto;
+
+    const accountAttendee: Attendees = {
+      accountId: 12345,
+      programId: 98765,
+      participantType: "Subscribed",
+      confirmed: true,
+      confirmedDate: null,
+      rank: null,
+    };
+
+    render(
+      <DropDownMenuButton
+        user={user}
+        accountAttendee={accountAttendee}
+        programDetails={programDetails}
+        attendees={attendees}
+        onRefresh={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByLabelText("Add new item"));
+
+    expect(screen.getByText(/Mark absent/i)).toBeInTheDocument();
+    expect(screen.queryByText(/RSVP/i)).not.toBeInTheDocument(); // optional
+  });
+
   it("renders non-coach options when user type is 'player'", () => {
     const user: CookiesDto = {
       accountId: "12345",
