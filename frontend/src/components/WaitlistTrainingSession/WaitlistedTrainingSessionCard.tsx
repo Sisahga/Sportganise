@@ -6,6 +6,9 @@ import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/EventBadgeType";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { calculateEndTime } from "@/utils/calculateEndTime";
+import { getCookies } from "@/services/cookiesService";
+import useGetParticipant from "@/hooks/useGetParticipant";
+import ParticipantStatusBadgeType from "../ViewTrainingSessions/BadgeTypes/ParticipantStatusBadgeType";
 
 interface WaitlistedTrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -19,6 +22,12 @@ const WaitlistedTrainingSessionCard: React.FC<
     return null; // Prevent rendering if programDetails is missing
   }
 
+  const accountId = getCookies().accountId;
+
+  const { data: userAttendee } = useGetParticipant(
+    programDetails.programId, // assuming programDetails contains the program ID as 'id'
+    accountId
+  );
   return (
     <Card
       onClick={() => onSelectTraining(programDetails)}
@@ -87,8 +96,13 @@ const WaitlistedTrainingSessionCard: React.FC<
         <span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
           {programDetails.description}
         </span>
-        <div className="flex">
+        <div className="flex items-center space-x-1">
           <EventBadgeType programType={programDetails.programType} />
+          {userAttendee && (userAttendee?.rank !== null ||
+              (userAttendee?.confirmed === false &&
+                userAttendee?.participantType === "Subscribed")) && (
+              <ParticipantStatusBadgeType attendees={userAttendee} />
+            )}
 
           {/* View Details Button */}
           <button
