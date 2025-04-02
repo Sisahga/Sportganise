@@ -92,21 +92,22 @@ export const verifyCode = async (
     { requiresAuth: false },
   );
 
-  if (response.statusCode === 200) {
+  if (response.statusCode === 201) {
+    log.debug("VerifyCode response: ", response);
     const cookies: CookiesDto = {
-      accountId: response.data?.cookies?.accountId || null,
-      firstName: response.data?.cookies?.firstName || "",
-      lastName: response.data?.cookies?.lastName || "",
-      email: response.data?.cookies?.email || "",
-      pictureUrl: response.data?.cookies?.pictureUrl || null,
-      type: response.data?.cookies?.type || null,
-      phone: response.data?.cookies?.phone || null,
-      organisationIds: response.data?.cookies?.organisationIds || [],
+      accountId: response.data?.accountId || null,
+      firstName: response.data?.firstName || "",
+      lastName: response.data?.lastName || "",
+      email: response.data?.email || "",
+      pictureUrl: response.data?.pictureUrl || null,
+      type: response.data?.type || null,
+      phone: response.data?.phone || null,
+      organisationIds: response.data?.organisationIds || [],
       jwtToken: null,
     };
 
     await setCookies(cookies);
-    await setAuthToken(response.data?.cookies?.jwtToken || "");
+    await setAuthToken(response.data?.jwtToken || "");
 
     return response;
   } else {

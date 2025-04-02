@@ -49,7 +49,15 @@ export interface VerifyCodeRequest {
 }
 
 export interface VerifyCodeResponse {
-  cookies: CookiesDto | null;
+  accountId: number | null;
+  firstName: string;
+  lastName: string;
+  email: string;
+  pictureUrl: string | null;
+  type: string | null;
+  phone: string | null;
+  organisationIds: number[];
+  jwtToken: string | null;
 }
 
 export interface ChangePasswordFormValues {
