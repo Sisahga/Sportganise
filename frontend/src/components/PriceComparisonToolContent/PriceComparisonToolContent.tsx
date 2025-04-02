@@ -11,7 +11,6 @@ import { useState } from "react";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -24,6 +23,7 @@ import {
   searchProducts,
   ProductSearchResponse,
 } from "@/services/api/productSearchApi";
+import PriceComparisonSkeleton from "./PriceComparisonSkeleton";
 
 // Define columns for React Table
 const columns = [
@@ -65,7 +65,14 @@ const columns = [
         <DollarSign size={15} className="mx-2" />
       </div>
     ),
-    cell: (props: any) => <div>${parseFloat(props.getValue()).toFixed(2)}</div>,
+    cell: (props: any) => {
+      const value = props.getValue();
+      return isNaN(parseFloat(value)) ? (
+        <div className="text-xs text-gray-400 italic">{value}</div>
+      ) : (
+        <div>${parseFloat(value).toFixed(2)}</div>
+      );
+    },
   },
   {
     accessorKey: "link",
@@ -92,6 +99,7 @@ export default function PriceComparisonToolContent() {
   const [tableData, setTableData] = useState<ProductSearchResponse[]>([]);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc" | null>(null);
   const [searchInput, setSearchInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const table = useReactTable({
     data: tableData,
@@ -115,11 +123,14 @@ export default function PriceComparisonToolContent() {
   // Fetch live data on search
   const handleSearch = async () => {
     try {
+      setLoading(true);
       const products = await searchProducts(searchInput);
       setTableData(products);
     } catch (error) {
       console.error("Search failed:", error);
       setTableData([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,6 +156,11 @@ export default function PriceComparisonToolContent() {
             className="font-font pl-10 h-10 sm:h-12 w-full bg-white border border-gray-200 rounded-lg text-sm sm:text-base"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSearch();
+              }
+            }}
           />
         </div>
         <Button
@@ -164,61 +180,98 @@ export default function PriceComparisonToolContent() {
       </div>
 
       {/* Data Table */}
-      <Table className="table">
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext(),
-                  )}
-                </TableHead>
+      {loading ? (
+        <PriceComparisonSkeleton />
+      ) : (
+        <Table className="table">
+          {/* Render table header only if we have rows */}
+          {table.getRowModel().rows.length > 0 && (
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </TableHead>
+                  ))}
+                </TableRow>
               ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-
-        <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-6 text-center">
-                No data available
-              </TableCell>
-            </TableRow>
+            </TableHeader>
           )}
-        </TableBody>
-        <TableCaption>Compare sports equipment prices.</TableCaption>
-      </Table>
+
+          {/* Body section handles all states: data, welcome message, no results */}
+          <TableBody>
+            {table.getRowModel().rows.length > 0 && (
+              <>
+                {table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </>
+            )}
+
+            {!searchInput.trim() && table.getRowModel().rows.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-center py-12"
+                >
+                  <div className="text-lg font-semibold text-textColour mb-2">
+                    Ready to find the best deals?
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    Start by searching for your favorite sports gear above.
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+
+            {searchInput.trim() && table.getRowModel().rows.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="text-center py-12"
+                >
+                  <div className="text-sm text-gray-500">
+                    No results found. Try a different keyword.
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      )}
 
       {/* Pagination */}
-      <div className="flex space-x-2 justify-center my-5">
-        <Button
-          variant="outline"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+      {table.getRowModel().rows.length > 0 && (
+        <div className="flex space-x-2 justify-center my-5">
+          <Button
+            variant="outline"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductSearchRequestDto {
-    private String query;
-    private String country;
+  private String query;
+  private String country;
 }
