@@ -114,7 +114,7 @@ const trainingSessionApi = {
       return;
     }
 
-    const response = await ApiService.delete<any>(
+    const response = await ApiService.delete<Response>(
       `${EXTENDED_BASE_URL}/${accountId}/delete-program/${programId}`,
     );
 

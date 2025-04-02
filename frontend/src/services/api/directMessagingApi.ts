@@ -9,6 +9,7 @@ import {
 } from "@/types/dmchannels.ts";
 import {
   DeleteChannelRequestDto,
+  DeleteChannelRequestResponseDto,
   SetDeleteApproverStatusDto,
 } from "@/types/deleteRequest.ts";
 import { LastMessageComponent, MessageComponent } from "@/types/messaging.ts";
@@ -107,7 +108,9 @@ const directMessagingApi = {
   requestChannelDelete: async (
     deleteChannelRequestDto: DeleteChannelRequestDto,
   ) => {
-    const response = await ApiService.post<ResponseDto<any>>(
+    const response = await ApiService.post<
+      ResponseDto<DeleteChannelRequestResponseDto | null>
+    >(
       `${EXTENDED_BASE_URL}/channel/delete-channel-request`,
       deleteChannelRequestDto,
     );
@@ -124,9 +127,9 @@ const directMessagingApi = {
     }
   },
   getIsDeleteChannelRequestActive: async (channelId: number) => {
-    const response = await ApiService.get<ResponseDto<any>>(
-      `${EXTENDED_BASE_URL}/channel/delete-request-active/${channelId}`,
-    );
+    const response = await ApiService.get<
+      ResponseDto<DeleteChannelRequestResponseDto | null>
+    >(`${EXTENDED_BASE_URL}/channel/delete-request-active/${channelId}`);
     if (response.statusCode === 204) {
       const data: ResponseDto<null> = {
         statusCode: 204,
@@ -141,7 +144,9 @@ const directMessagingApi = {
   setApproverDeleteStatus: async (
     setDeleteApproverStatusDto: SetDeleteApproverStatusDto,
   ) => {
-    const response = await ApiService.patch<ResponseDto<any>>(
+    const response = await ApiService.patch<
+      ResponseDto<DeleteChannelRequestResponseDto | null>
+    >(
       `${EXTENDED_BASE_URL}/channel/set-delete-approver-status`,
       setDeleteApproverStatusDto,
     );

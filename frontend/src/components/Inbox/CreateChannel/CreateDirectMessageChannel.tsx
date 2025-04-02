@@ -19,7 +19,7 @@ export default function CreateDirectMessagingChannel() {
   >([]);
   const { createChannel } = useCreateChannel();
 
-  let currentUser = {
+  const currentUser = {
     accountId: userId,
     firstName: cookies?.firstName || "",
     lastName: cookies?.lastName || "",
