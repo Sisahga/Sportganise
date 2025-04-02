@@ -28,7 +28,7 @@ const useRSVP = () => {
           accountId,
         );
         console.log("Existing participant found: ", existingParticipant);
-      } catch (err: any) {
+      } catch {
         console.warn("No existing participant found. Could be uninvited.");
       }
 
@@ -54,9 +54,12 @@ const useRSVP = () => {
 
       setData(updated);
       return updated;
-    } catch (err: any) {
-      const errorMessage = err?.message || "RSVP failed";
-      console.error("RSVP HOOK Error:", errorMessage);
+    } catch (err: unknown) {
+      let errorMessage = "RSVP failed";
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      console.error("Error:", errorMessage);
       throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
