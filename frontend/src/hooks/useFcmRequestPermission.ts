@@ -24,7 +24,7 @@ export const useRequestNotificationPermission = () => {
             token: token,
           };
           const response = await storeFcmToken(fcmTokenDto);
-          if (response.status != 200) {
+          if (response.statusCode != 200) {
             toast({
               title: "Notification Setup Failure",
               description:
