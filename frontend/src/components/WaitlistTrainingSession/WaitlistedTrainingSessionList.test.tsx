@@ -16,7 +16,7 @@ const dummyProgramDetails: ProgramDetails = {
   expiryDate: new Date("2023-03-01T12:00:00Z"),
   frequency: "Weekly",
   location: "Test Location",
-  visibility: "Public",
+  visibility: "public",
   author: "Coach Benjamin Luijan",
   cancelled: false,
   reccurenceDate: new Date("2023-03-08T10:00:00Z"),
@@ -51,14 +51,14 @@ describe("WaitlistedTrainingSessionList", () => {
     waitlistProgramsReturn.error = "Some error";
     render(<WaitlistedTrainingSessionList onSelectTraining={vi.fn()} />);
     expect(
-      screen.getByText("Error loading waitlist programs"),
+      screen.getByText("Error loading waitlist programs")
     ).toBeInTheDocument();
   });
 
   it("renders loader when loading is true", () => {
     waitlistProgramsReturn.loading = true;
     const { container } = render(
-      <WaitlistedTrainingSessionList onSelectTraining={vi.fn()} />,
+      <WaitlistedTrainingSessionList onSelectTraining={vi.fn()} />
     );
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });
@@ -67,7 +67,7 @@ describe("WaitlistedTrainingSessionList", () => {
     waitlistProgramsReturn.data = [];
     render(<WaitlistedTrainingSessionList onSelectTraining={vi.fn()} />);
     expect(
-      screen.getByText("No waitlisted programs available"),
+      screen.getByText("No waitlisted programs available")
     ).toBeInTheDocument();
   });
 
