@@ -52,10 +52,18 @@ export const getBearerToken = () => {
   }
 };
 
+export type TBody =
+  | Record<string, unknown>
+  | object
+  | FormData
+  | string
+  | null
+  | undefined;
+
 export interface ApiRequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
-  body?: any;
+  body?: TBody;
   requiresAuth?: boolean;
   isMultipart?: boolean;
 }
@@ -86,7 +94,7 @@ export class ApiService {
       }
     }
 
-    let requestHeaders = { ...headers };
+    const requestHeaders = { ...headers };
     let requestBody = body;
 
     // Ensure headers for non GET requests.
@@ -113,7 +121,7 @@ export class ApiService {
         const fetchOptions: RequestInit = {
           method,
           headers: requestHeaders,
-          body: requestBody,
+          body: requestBody as BodyInit,
         };
 
         console.log("fetchOptions: ", fetchOptions);
@@ -143,7 +151,7 @@ export class ApiService {
 
   static post<T>(
     endpoint: string,
-    body: any,
+    body: TBody,
     options: Omit<ApiRequestOptions, "method" | "body"> = {},
   ) {
     return this.request<T>(endpoint, { ...options, method: "POST", body });
@@ -151,7 +159,7 @@ export class ApiService {
 
   static put<T>(
     endpoint: string,
-    body: any,
+    body: TBody,
     options: Omit<ApiRequestOptions, "method" | "body"> = {},
   ) {
     return this.request<T>(endpoint, { ...options, method: "PUT", body });
@@ -159,7 +167,7 @@ export class ApiService {
 
   static patch<T>(
     endpoint: string,
-    body: any,
+    body: TBody,
     options: Omit<ApiRequestOptions, "method" | "body"> = {},
   ) {
     return this.request<T>(endpoint, { ...options, method: "PATCH", body });

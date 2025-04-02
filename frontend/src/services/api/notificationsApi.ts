@@ -45,10 +45,13 @@ const notificationsApi = {
     );
   },
   sendNotification: async (request: NotificationRequest) => {
-    return await ApiService.post<any>(`${EXTENDED_BASE_URL}/send`, request);
+    return await ApiService.post<ResponseDto<null>>(
+      `${EXTENDED_BASE_URL}/send`,
+      request,
+    );
   },
   storeFcmToken: async (tokenDto: StoreFcmTokenDto) => {
-    return await ApiService.post<any>(
+    return await ApiService.post<ResponseDto<null>>(
       `${EXTENDED_BASE_URL}/store-token`,
       tokenDto,
     );

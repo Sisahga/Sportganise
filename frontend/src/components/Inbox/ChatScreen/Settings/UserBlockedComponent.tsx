@@ -41,7 +41,7 @@ const UserBlockedComponent = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchChannelMembers(currentUserId).then((_) => {
+    fetchChannelMembers(currentUserId).then(() => {
       setLoading(false);
     });
   }, [fetchChannelMembers]);

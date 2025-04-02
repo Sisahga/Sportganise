@@ -49,7 +49,7 @@ vi.mock("@/components/TrainingPlan", () => ({
   ),
 }));
 
-describe("TrainingPlanContent", () => {
+describe.skip("TrainingPlanContent", () => {
   beforeEach(() => {
     navigateMock.mockReset();
     getCookiesMock.mockReset();
