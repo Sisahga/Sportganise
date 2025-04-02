@@ -387,6 +387,36 @@ const TrainingSessionContent = () => {
             </>
           )}
 
+{user?.accountId && (
+  <div className="my-6 mx-2 p-4 border rounded-md bg-gray-50 text-center">
+    {!accountAttendee ? (
+      <p className="text-gray-600">
+        You're not part of this program.
+      </p>
+    ) : accountAttendee.participantType?.toLowerCase() === "subscribed" && accountAttendee.confirmed === false ? (
+      <p className="text-red-600 font-medium">
+        You're absent for this session.
+      </p>
+    ) : accountAttendee.rank !== null ? (
+      <div>
+        <p className="text-amber-600 font-medium">
+          You're on the waitlist for this session.
+        </p>
+        <p className="text-gray-600 mt-1">
+          Your current position: <span className="font-bold">{accountAttendee.rank}</span> 
+          {accountAttendee.rank === 1 ? 
+            " (You'll be the next person to get a spot if someone cancels)" : 
+            ""}
+        </p>
+      </div>
+    ) : (
+      <p className="text-green-600 font-medium">
+        You're confirmed for this session.
+      </p>
+    )}
+  </div>
+)}
+
         {/**Conditionally render different menu options based on account type */}
         <DropDownMenuButton
           user={user}
