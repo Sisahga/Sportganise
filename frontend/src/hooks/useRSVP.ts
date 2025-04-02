@@ -5,6 +5,7 @@ import { Attendees } from "@/types/trainingSessionDetails";
 interface RSVPParams {
   programId: number;
   accountId: number;
+  visibility: string;
 }
 
 const useRSVP = () => {
@@ -14,20 +15,38 @@ const useRSVP = () => {
   const rsvp = async ({
     programId,
     accountId,
+    visibility,
   }: RSVPParams): Promise<Attendees> => {
     setIsLoading(true);
-
+    console.log("RSVP HOOK: Starting RSVP...");
     try {
-      console.log("Calling RSVP with:", { programId, accountId });
+      // Try to get existing participant
+      let existingParticipant: Attendees | null = null;
+      try {
+        existingParticipant = await programParticipantApi.getProgramParticipant(
+          programId,
+          accountId
+        );
+        console.log("Existing participant found: ", existingParticipant);
+      } catch (err: any) {
+        console.warn("No existing participant found. Could be uninvited.");
+      }
 
-      // Proceed to RSVP
+      const isPrivate = visibility.toLowerCase() === "private";
+
+      if (isPrivate && !existingParticipant) {
+        console.warn("Cannot RSVP to private event without invite.");
+        throw new Error("You were not invited to this private event.");
+      }
+
+      // Force RSVP attempt — don't trust backend's confirmed:true
       const success = await programParticipantApi.rsvpToProgram({
         programId,
         accountId,
       });
+
       if (!success) throw new Error("RSVP failed");
 
-      // Re-fetch the newly updated participant data
       const updated = await programParticipantApi.getProgramParticipant(
         programId,
         accountId
@@ -37,9 +56,8 @@ const useRSVP = () => {
       return updated;
     } catch (err: any) {
       const errorMessage = err?.message || "RSVP failed";
-      console.error("RSVP error:", errorMessage);
-      //setError(errorMessage);
-      throw err;
+      console.error("RSVP HOOK Error:", errorMessage);
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -158,91 +158,58 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
   const handleRSVPConfirmation = async () => {
     if (!user?.accountId || !programDetails?.programId) return;
+
+    const visibility = programDetails.visibility?.toLowerCase();
+    const isPrivate = visibility === "private";
+
     try {
-      await rsvp({
+      // Get participant info (if exists)
+      let participant: Attendees | null = null;
+      try {
+        participant = await programParticipantApi.getProgramParticipant(
+          programDetails.programId,
+          user.accountId
+        );
+        console.log("Fetched participant:", participant);
+      } catch (err: any) {
+        console.warn("Participant not found:", err?.message || err);
+      }
+
+      // Handle private event
+      if (isPrivate && (!participant || !participant.participantType)) {
+        console.warn("RSVP blocked: not invited to private event");
+        alert("RSVP failed: You are not invited to this private event.");
+        setRSVPDialogOpen(false);
+        return;
+      }
+
+      // If already confirmed, no action needed
+      if (participant?.confirmed) {
+        console.log("Already confirmed, skipping RSVP");
+        setRSVPDialogOpen(false);
+        return;
+      }
+
+      //Proceed with RSVP
+      const updated = await rsvp({
         programId: programDetails.programId,
         accountId: user.accountId,
+        visibility: programDetails.visibility?.toLowerCase() ?? "public",
       });
-      await refreshAttendee();
+
+      setAttendee(updated);
+      if (updateAttendeesList && updated?.confirmed) {
+        updateAttendeesList(updated);
+      }
+
       setRSVPDialogOpen(false);
       setRSVPConfirmationVisible(true);
-      // if (onRefresh) onRefresh();
       setTimeout(() => setRSVPConfirmationVisible(false), 3000);
-    } catch (err) {
-      setRSVPDialogOpen(false); // Close dialog silently
+    } catch (err: any) {
+      console.error("RSVP failed:", err?.message || err);
+      alert("RSVP failed: " + (err?.message || "Unknown error"));
+      setRSVPDialogOpen(false);
     }
-    //   if (!user?.accountId || !programDetails?.programId) {
-    //     console.error("Missing account or program ID");
-    //     // setRsvpErrorMessage("Missing account or program ID.");
-    //     return;
-    //   }
-
-    //   try {
-    //     //Try to fetch participant — expected to 404 if not yet RSVPed
-    //     // let existingParticipant: Attendees | null = null;
-
-    //     // try {
-    //     //   existingParticipant = await programParticipantApi.getProgramParticipant(
-    //     //     programDetails.programId,
-    //     //     user.accountId
-    //     //   );
-    //     // } catch (err: any) {
-    //     //   if (
-    //     //     err.message?.includes("404") ||
-    //     //     err.message?.toLowerCase().includes("not found")
-    //     //   ) {
-    //     //     console.warn("User is not yet a participant");
-    //     //   } else {
-    //     //     throw err; // Unexpected error
-    //     //   }
-    //     // }
-
-    //     // // Determine visibility
-    //     // const visibility = programDetails.visibility?.toLowerCase() ?? "public";
-
-    //     // // If private and no participant, block RSVP
-    //     // if (!existingParticipant && visibility === "private") {
-    //     //   const errorMsg = "You must be invited to RSVP to this private event.";
-    //     //   console.error(errorMsg);
-    //     //   setRsvpErrorMessage(errorMsg);
-    //     //   return;
-    //     // }
-
-    //     const response = await rsvp({
-    //       programId: programDetails.programId,
-    //       accountId: user.accountId,
-    //     });
-
-    //     //setRsvpErrorMessage(null); // Clears old error messages before modal closes
-
-    //     setAttendee(response);
-    //     console.log("RSVP success:", response);
-
-    //     setRSVPDialogOpen(false);
-    //     setRSVPConfirmationVisible(true);
-    //     if (onRefresh) onRefresh();
-
-    //     setTimeout(() => {
-    //       setRSVPConfirmationVisible(false);
-    //     }, 3000);
-    //   } catch (err: any) {
-    //     // let errorMessage = "Failed to RSVP. Please try again later.";
-
-    //     // if (err instanceof Response) {
-    //     //   try {
-    //     //     const json = await err.json();
-    //     //     if (json?.message) {
-    //     //       errorMessage = json.message;
-    //     //     }
-    //     //   } catch {
-    //     //     errorMessage = "You are already confirmed for this event.";
-    //     //   }
-    //     // }
-    //     //console.error("RSVP failed:", errorMessage);
-    //     console.error("RSVP failed:", err?.message || err);
-    //     setRSVPDialogOpen(false);
-    //     setRSVPConfirmationVisible(false);
-    //   }
   };
 
   const handleAbsentClick = () => {
@@ -261,7 +228,6 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       // After "Mark as absent" successfull, refreshing to RSVP button
       const updatedParticipant =
         await programParticipantApi.getProgramParticipant(
-          
           programDetails.programId,
           user?.accountId
         );

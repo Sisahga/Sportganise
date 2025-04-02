@@ -4,8 +4,15 @@ export interface Attendees {
   programId: number;
   confirmedDate: Date | null;
   confirmed: boolean;
-  participantType: string | null;
+  // participantType: string | null;
+  /**
+   * - "Subscribed": confirmed participant
+   * - "Invited": allowed to RSVP for private
+   * - "Waitlisted": waiting for spot
+   */
+  participantType: "Subscribed" | "Invited" | "Waitlisted" | null;
   rank: number | null;
+  isInvited?: boolean;
 }
 
 export interface ProgramDetails {
@@ -21,7 +28,7 @@ export interface ProgramDetails {
   expiryDate: Date;
   frequency: string;
   location: string;
-  visibility: string;
+  visibility: "public" | "private";
   author: string;
   cancelled: boolean;
   reccurenceDate: Date;

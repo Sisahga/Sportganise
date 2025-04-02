@@ -61,7 +61,7 @@ const TrainingSessionContent = () => {
     location: "",
     programAttachments: [],
     frequency: "",
-    visibility: "",
+    visibility: "public",
     author: "",
     cancelled: false,
     reccurenceDate: new Date(),
@@ -134,19 +134,6 @@ const TrainingSessionContent = () => {
     } catch (error) {
       log.error("Failed to refresh program data:", error);
     }
-    // const programs = await trainingSessionApi.getPrograms(user?.accountId);
-    // if (programs.data) {
-    //   const program = programs.data.find(
-    //     (p: Program) => p.programDetails.programId === programDetails.programId
-    //   );
-    //   if (program) {
-    //     console.log("Refreshed programs: ", programs);
-    //     setAttendees(program.attendees);
-    //     setProgramDetails(program.programDetails);
-    //     console.log("Refreshed attendees: ", program.attendees);
-    //     console.log("Refreshed programDetails: ", program.programDetails);
-    //   } else console.log("No program found");
-    // }
   };
   const updateAttendeesList = (newAttendee: Attendees) => {
     setAttendees((prev) => {
