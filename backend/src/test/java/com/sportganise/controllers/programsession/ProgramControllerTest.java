@@ -232,6 +232,8 @@ public class ProgramControllerTest {
                 Mockito.anyList(),
                 Mockito.anyInt(),
                 Mockito.anyString(),
+                Mockito.<Integer[]>any(),
+                Mockito.<Integer[]>any(),
                 Mockito.<Integer[]>any()))
         .thenReturn(mockProgramDto);
 
@@ -351,7 +353,8 @@ public class ProgramControllerTest {
             Mockito.argThat(list -> list.size() == 2), // Assert 2 attachments were passed
             Mockito.eq(mockProgramModifyRequestDto.getAttachmentsToRemove()),
             Mockito.eq(2),
-            Mockito.eq(mockProgramModifyRequestDto.getFrequency()));
+            Mockito.eq(mockProgramModifyRequestDto.getFrequency()),
+            Mockito.eq(null));
   }
 
   @Test

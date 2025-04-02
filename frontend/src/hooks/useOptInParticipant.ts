@@ -29,6 +29,7 @@ const useOptInParticipant = () => {
         }
         setError(errorMessage);
         log.error("Error opting in user into waitlist:", err);
+        throw err;
       } finally {
         setLoading(false);
       }

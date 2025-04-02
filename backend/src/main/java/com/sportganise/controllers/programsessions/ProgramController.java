@@ -110,7 +110,9 @@ public class ProgramController {
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
       @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments,
-      @RequestParam(required = false) Integer[] participantsId) {
+      @RequestParam(required = false) Integer[] participantsId,
+      @RequestParam(required = false) Integer[] waitlistsId,
+      @RequestParam(required = false) Integer[] coachesId) {
 
     // log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
@@ -144,7 +146,9 @@ public class ProgramController {
               attachments,
               accountId,
               programCreateRequestDto.getFrequency(),
-              participantsId);
+              participantsId,
+              waitlistsId,
+              coachesId);
 
       log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
 
@@ -176,7 +180,8 @@ public class ProgramController {
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
       @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
-      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
+      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments,
+      @RequestParam(required = false) Integer[] waitlistsId) {
 
     Account user =
         getAccount(accountId)
@@ -220,7 +225,8 @@ public class ProgramController {
               attachments,
               programModifyRequestDto.getAttachmentsToRemove(),
               accountId,
-              programModifyRequestDto.getFrequency());
+              programModifyRequestDto.getFrequency(),
+              waitlistsId);
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");

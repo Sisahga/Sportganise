@@ -1,7 +1,7 @@
 export interface FormValues {
   title: string;
   type: string;
-  coaches: number[];
+  coaches?: number[];
   startDate: Date;
   endDate?: Date;
   frequency: string;

@@ -23,6 +23,7 @@ interface InviteModalProps {
   members: Member[];
   selectedMembers: number[];
   setSelectedMembers: React.Dispatch<React.SetStateAction<number[]>>;
+  description?: string;
 }
 
 export default function InviteModal({
@@ -31,6 +32,7 @@ export default function InviteModal({
   members,
   selectedMembers,
   setSelectedMembers,
+  description,
 }: InviteModalProps) {
   const [search, setSearch] = useState("");
   const [filteredMembers, setFilteredMembers] = useState<Member[]>(members);
@@ -68,9 +70,11 @@ export default function InviteModal({
       >
         <DialogHeader>
           <DialogTitle>Select Members</DialogTitle>
-          <DialogDescription id="invite-dialog-description">
-            Invite members to training sessions.
-          </DialogDescription>
+          {description ? (
+            <DialogDescription id="invite-dialog-description">
+              {description}
+            </DialogDescription>
+          ) : null}
         </DialogHeader>
         <div className="mb-4">
           <Input
@@ -83,7 +87,7 @@ export default function InviteModal({
           <table className="w-full text-left">
             <thead>
               <tr>
-                <th className="p-2">Invite</th>
+                <th className="p-2">Selected</th>
                 <th className="p-2">Name</th>
                 <th className="p-2">Role</th>
               </tr>
