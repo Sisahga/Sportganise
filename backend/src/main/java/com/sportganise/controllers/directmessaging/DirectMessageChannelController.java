@@ -198,7 +198,7 @@ public class DirectMessageChannelController {
               .data(null)
               .build();
       log.info("The channel was immediately approved for deletion.");
-      return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(responseDto, HttpStatus.OK);
     } else {
       ResponseDto<DeleteChannelRequestResponseDto> responseDto =
           ResponseDto.<DeleteChannelRequestResponseDto>builder()
@@ -238,7 +238,7 @@ public class DirectMessageChannelController {
               .data(null)
               .build();
       log.info("The request for delete was denied. Request removed.");
-      return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(responseDto, HttpStatus.OK);
     }
     DeleteChannelRequestResponseDto deleteReqResponse =
         this.directMessageChannelService.setDeleteApproverStatus(setApproverStatusDto);
@@ -280,7 +280,7 @@ public class DirectMessageChannelController {
               .message("No active delete request found for this channel.")
               .data(null)
               .build();
-      return new ResponseEntity<>(responseDto, HttpStatus.NO_CONTENT);
+      return new ResponseEntity<>(responseDto, HttpStatus.OK);
     } else {
       ResponseDto<DeleteChannelRequestResponseDto> responseDto =
           ResponseDto.<DeleteChannelRequestResponseDto>builder()

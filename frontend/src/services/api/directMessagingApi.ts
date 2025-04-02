@@ -107,12 +107,12 @@ const directMessagingApi = {
   requestChannelDelete: async (
     deleteChannelRequestDto: DeleteChannelRequestDto,
   ) => {
-    const response = await ApiService.post<any>(
+    const response = await ApiService.post<ResponseDto<any>>(
       `${EXTENDED_BASE_URL}/channel/delete-channel-request`,
       deleteChannelRequestDto,
     );
 
-    if (response.status === 204) {
+    if (response.statusCode === 204) {
       const data: ResponseDto<null> = {
         statusCode: 204,
         message: "Channel immediately and successfully deleted.",
@@ -124,10 +124,10 @@ const directMessagingApi = {
     }
   },
   getIsDeleteChannelRequestActive: async (channelId: number) => {
-    const response = await ApiService.get<any>(
+    const response = await ApiService.get<ResponseDto<any>>(
       `${EXTENDED_BASE_URL}/channel/delete-request-active/${channelId}`,
     );
-    if (response.status === 204) {
+    if (response.statusCode === 204) {
       const data: ResponseDto<null> = {
         statusCode: 204,
         message: "No delete request found",
@@ -141,12 +141,12 @@ const directMessagingApi = {
   setApproverDeleteStatus: async (
     setDeleteApproverStatusDto: SetDeleteApproverStatusDto,
   ) => {
-    const response = await ApiService.patch<any>(
+    const response = await ApiService.patch<ResponseDto<any>>(
       `${EXTENDED_BASE_URL}/channel/set-delete-approver-status`,
       setDeleteApproverStatusDto,
     );
     log.info("Set Approver Delete Status Response:", response);
-    if (response.status === 204) {
+    if (response.statusCode === 204) {
       const data: ResponseDto<null> = {
         statusCode: 204,
         message: "No delete request found",

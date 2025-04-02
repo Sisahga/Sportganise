@@ -25,7 +25,7 @@ const postApi = {
     const response = await ApiService.get<ResponseDto<Post>>(url);
 
     log.debug("Response status:", response.statusCode);
-    if (response.statusCode === 201) {
+    if (response.statusCode === 200) {
       log.debug("Post successfully fetched.");
       return response;
     } else {
