@@ -42,6 +42,7 @@ import OptOutButton from "./OptOutButton";
 import useRSVP from "@/hooks/useRSVP";
 import programParticipantApi from "@/services/api/programParticipantApi";
 import useDeleteProgram from "@/hooks/useDeleteProgram";
+import { useToast } from "@/hooks/use-toast";
 
 interface DropDownMenuButtonProps {
   user: CookiesDto | null | undefined;
@@ -88,6 +89,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     useState(false);
   const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] =
     useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setAttendee(accountAttendee);
@@ -178,7 +180,13 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       // Handle private event
       if (isPrivate && (!participant || !participant.participantType)) {
         console.warn("RSVP blocked: not invited to private event");
-        alert("RSVP failed: You are not invited to this private event.");
+        // alert("RSVP failed: You are not invited to this private event.");
+        toast({
+          variant: "destructive",
+          title: "RSVP Failed",
+          description: "You are not invited to this private event.",
+        });
+
         setRSVPDialogOpen(false);
         return;
       }
@@ -207,7 +215,11 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       setTimeout(() => setRSVPConfirmationVisible(false), 3000);
     } catch (err: any) {
       console.error("RSVP failed:", err?.message || err);
-      alert("RSVP failed: " + (err?.message || "Unknown error"));
+      toast({
+        variant: "destructive",
+        title: "RSVP Failed",
+        description: err?.message || "Unknown error occurred while RSVPing.",
+      });
       setRSVPDialogOpen(false);
     }
   };
@@ -477,6 +489,27 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
           </div>
         </div>
       )}
+
+      {/* RSVP error toast */}
+      {/* <ToastProvider>
+        <ToastViewport />
+
+        {showRSVPError && (
+          <Toast
+            variant="destructive"
+            onOpenChange={(open) => {
+              if (!open) setShowRSVPError(false);
+            }}
+          >
+            <div className="flex flex-col space-y-1">
+              <ToastTitle>RSVP Failed</ToastTitle>
+              <ToastDescription>
+                You are not invited to this private event.
+              </ToastDescription>
+            </div>
+          </Toast>
+        )}
+      </ToastProvider> */}
     </div>
   );
 };
