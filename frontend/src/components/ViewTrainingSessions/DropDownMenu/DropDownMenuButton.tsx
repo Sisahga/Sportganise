@@ -173,8 +173,12 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
           user.accountId,
         );
         console.log("Fetched participant:", participant);
-      } catch (err: any) {
-        console.warn("Participant not found:", err?.message || err);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.warn("Participant not found:", err.message);
+        } else {
+          console.warn("Participant not found:", String(err));
+        }
       }
 
       // Handle private event
@@ -213,12 +217,13 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       setRSVPDialogOpen(false);
       setRSVPConfirmationVisible(true);
       setTimeout(() => setRSVPConfirmationVisible(false), 3000);
-    } catch (err: any) {
-      console.error("RSVP failed:", err?.message || err);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "RSVP failed";
+      console.error("RSVP failed:", message);
       toast({
         variant: "destructive",
         title: "RSVP Failed",
-        description: err?.message || "Unknown error occurred while RSVPing.",
+        description: message,
       });
       setRSVPDialogOpen(false);
     }
