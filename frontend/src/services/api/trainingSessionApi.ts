@@ -126,7 +126,7 @@ const trainingSessionApi = {
 
       log.info("trainingSessionApi.getPrograms:", response);
       log.info(
-        "trainingSessionApi.getPrograms: SHOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOW ME THIS SHSIT ARIGBHASJDFHKSDFHSAJKFHKASDHFKASHDFKHAKSFHDN",
+        "trainingSessionApi.getPrograms: ",
         data,
       );
 

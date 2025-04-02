@@ -18,6 +18,9 @@ import {
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
 import { ONCE } from "@/constants/programconstants";
+import { getCookies } from "@/services/cookiesService";
+import ParticipantStatusBadgeType from "./BadgeTypes/ParticipantStatusBadgeType";
+import useGetParticipant from "@/hooks/useGetParticipant";
 
 interface TrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -34,6 +37,13 @@ const TrainingSessionCard: React.FC<Program> = ({
     navigate(path, { state: data });
   };
   log.debug("Rendering training session card.");
+
+  const accountId = getCookies().accountId;
+
+  const { data: userAttendee } = useGetParticipant(
+    programDetails.programId, // assuming programDetails contains the program ID as 'id'
+    accountId
+  );
 
   return (
     <Card>
@@ -108,25 +118,30 @@ const TrainingSessionCard: React.FC<Program> = ({
         <span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
           {programDetails?.description}
         </span>
-        <div className="flex">
-          {programDetails?.programType && (
-            <EventBadgeType programType={programDetails.programType} />
-          )}
+        <div className="flex items-center space-x-1">
+  {programDetails?.programType && (
+    <EventBadgeType programType={programDetails.programType} />
+  )}
+  {userAttendee && (userAttendee?.rank !== null ||
+    (userAttendee?.confirmed === false &&
+      userAttendee?.participantType === "Subscribed")) && (
+    <ParticipantStatusBadgeType attendees={userAttendee} />
+  )}
 
-          {/*Click to view details */}
-          <button
-            onClick={() =>
-              handleNavigation("/pages/ViewTrainingSessionPage", {
-                programDetails,
-                attendees,
-              })
-            }
-            className="ml-2 flex items-center bg-transparent"
-          >
-            <ChevronRight size={17} color="#82DBD8" />
-            <p className="font-medium text-secondaryColour">View details</p>
-          </button>
-        </div>
+  {/* Click to view details */}
+  <button
+    onClick={() =>
+      handleNavigation("/pages/ViewTrainingSessionPage", {
+        programDetails,
+        attendees,
+      })
+    }
+    className="flex items-center bg-transparent"
+  >
+    <ChevronRight size={17} color="#82DBD8" />
+    <p className="font-medium text-secondaryColour">View details</p>
+  </button>
+</div>
       </div>
     </Card>
   );
