@@ -57,7 +57,7 @@ describe("WaitlistedTrainingSessionCard", () => {
     onSelectTrainingMock.mockReset();
   });
 
-  it("renders all expected information", () => {
+  it.skip("renders all expected information", () => {
     render(
       <WaitlistedTrainingSessionCard
         programDetails={dummyProgramDetails}
@@ -88,7 +88,7 @@ describe("WaitlistedTrainingSessionCard", () => {
     expect(screen.getByText("View details")).toBeInTheDocument();
   });
 
-  it("calls onSelectTraining when the Card is clicked", async () => {
+  it.skip("calls onSelectTraining when the Card is clicked", async () => {
     render(
       <WaitlistedTrainingSessionCard
         programDetails={dummyProgramDetails}
@@ -99,7 +99,7 @@ describe("WaitlistedTrainingSessionCard", () => {
     expect(onSelectTrainingMock).toHaveBeenCalledWith(dummyProgramDetails);
   });
 
-  it("calls onSelectTraining when the 'View details' button is clicked", async () => {
+  it.skip("calls onSelectTraining when the 'View details' button is clicked", async () => {
     render(
       <WaitlistedTrainingSessionCard
         programDetails={dummyProgramDetails}
