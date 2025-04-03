@@ -96,13 +96,15 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
                   : lastMessage.messageContent.split("*")[3]}
               </p>
             )}
-            {isSpecialMessage(channel.lastMessage) && channel.lastMessage && (
-              <p className="text-sm text-gray-500 mt-1 truncate italic">
-                {parseInt(channel.lastMessage.split("*")[1]) === userId
-                  ? channel.lastMessage.split("*")[2]
-                  : channel.lastMessage.split("*")[3]}
-              </p>
-            )}
+            {lastMessage?.type !== "JOIN" &&
+              isSpecialMessage(channel.lastMessage) &&
+              channel.lastMessage && (
+                <p className="text-sm text-gray-500 mt-1 truncate italic">
+                  {parseInt(channel.lastMessage.split("*")[1]) === userId
+                    ? channel.lastMessage.split("*")[2]
+                    : channel.lastMessage.split("*")[3]}
+                </p>
+              )}
           </div>
           <div className="flex flex-col min-w-fit">{extraInfo}</div>
         </div>
