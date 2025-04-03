@@ -125,10 +125,7 @@ const trainingSessionApi = {
       }
 
       log.info("trainingSessionApi.getPrograms:", response);
-      log.info(
-        "trainingSessionApi.getPrograms: ",
-        data,
-      );
+      log.info("trainingSessionApi.getPrograms: ", data);
 
       return data.data
         .map((program) => program.programDetails?.occurrenceDate)

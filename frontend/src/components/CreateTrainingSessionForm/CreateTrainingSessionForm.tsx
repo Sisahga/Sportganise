@@ -791,43 +791,43 @@ export default function CreateTrainingSessionForm() {
 
             {/** Waitlist */}
             {showField && (
-  <FormItem className="flex flex-col">
-    <FormLabel className="font-semibold text-base">
-      Waitlist
-    </FormLabel>
-    <FormDescription>
-      Select who will be added to the waitlist for this program.
-    </FormDescription>
-    <FormMessage />
-    <div className="mt-2 border p-2 rounded">
-      <div className="mb-2 font-medium">Selected Attendees:</div>
-      {waitlistedMembers.length > 0 ? (
-        <ul className="list-disc pl-5">
-          {waitlistedMembers.map((memberId) => {
-            const member = members.find((m) => m.id === memberId);
-            return (
-              <li key={memberId}>
-                {member ? member.name : "Unknown member"}
-              </li>
-            );
-          })}
-        </ul>
-      ) : (
-        <p className="text-sm text-muted-foreground">
-          No member selected.
-        </p>
-      )}
-      <Button
-        type="button"
-        size="sm"
-        className="mt-2"
-        onClick={() => setOpenModal("waitlist")}
-      >
-        Add Members
-      </Button>
-    </div>
-  </FormItem>
-)}
+              <FormItem className="flex flex-col">
+                <FormLabel className="font-semibold text-base">
+                  Waitlist
+                </FormLabel>
+                <FormDescription>
+                  Select who will be added to the waitlist for this program.
+                </FormDescription>
+                <FormMessage />
+                <div className="mt-2 border p-2 rounded">
+                  <div className="mb-2 font-medium">Selected Attendees:</div>
+                  {waitlistedMembers.length > 0 ? (
+                    <ul className="list-disc pl-5">
+                      {waitlistedMembers.map((memberId) => {
+                        const member = members.find((m) => m.id === memberId);
+                        return (
+                          <li key={memberId}>
+                            {member ? member.name : "Unknown member"}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No member selected.
+                    </p>
+                  )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => setOpenModal("waitlist")}
+                  >
+                    Add Members
+                  </Button>
+                </div>
+              </FormItem>
+            )}
 
             {/** Visibility */}
             <FormField
