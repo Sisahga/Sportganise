@@ -73,7 +73,8 @@ import useSendNotification from "@/hooks/useSendNotification";
 import useGetCookies from "@/hooks/useGetCookies.ts";
 
 import AssignCoach from "../CreateTrainingSessionForm/AssignCoaches";
-import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
+import SelectMembersModal from "../CreateTrainingSessionForm/SelectMembersModal";
+import { Member } from "../CreateTrainingSessionForm/types";
 import usePlayers from "@/hooks/usePlayers";
 /**All select element options */
 const types = [
@@ -200,7 +201,7 @@ export default function ModifyTrainingSessionForm() {
   });
   // State for selected participant IDs (existing attendees)
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
-  // State to control the InviteModal's visibility
+  // State to control the SelectMembersModal's visibility
   const { players } = usePlayers();
   const members: Member[] = players.map((player) => ({
     id: player.accountId, // <-- now a number
@@ -942,7 +943,7 @@ export default function ModifyTrainingSessionForm() {
               </Button>
             </div>
           </FormItem>
-          <InviteModal
+          <SelectMembersModal
             description="Waitlist members for program."
             open={openModal === "waitlist"}
             onClose={() => setOpenModal(undefined)}
@@ -1051,7 +1052,7 @@ export default function ModifyTrainingSessionForm() {
               </FormItem>
             )}
           />
-          <InviteModal
+          <SelectMembersModal
             description="Invite members to training session."
             open={openModal === "invite"}
             onClose={() => setOpenModal(undefined)}

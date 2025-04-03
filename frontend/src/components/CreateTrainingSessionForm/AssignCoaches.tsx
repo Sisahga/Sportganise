@@ -8,7 +8,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/Button";
-import { Member } from "./InviteModal";
+import { Member } from "./types";
 import { Checkbox } from "../ui/checkbox";
 import { ControllerRenderProps } from "react-hook-form";
 import { FormValues } from "@/types/trainingSessionFormValues";
@@ -87,12 +87,12 @@ const AssignCoach: React.FC<AssignCoachProps> = ({
         </div>
 
         <div className="max-h-60 overflow-y-auto">
-          <table className="w-full">
+          <table className="w-full text-left">
             <thead>
               <tr>
-                <td className="p-2 font-bold">Select</td>
-                <td className="p-2 font-bold">Name</td>
-                <td className="p-2 font-bold">Role</td>
+                <th className="p-2">Selected</th>
+                <th className="p-2">Name</th>
+                <th className="p-2">Role</th>
               </tr>
             </thead>
             <tbody>
