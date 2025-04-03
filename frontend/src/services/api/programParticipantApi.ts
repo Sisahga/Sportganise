@@ -1,4 +1,5 @@
 import { Attendees, ProgramDetails } from "@/types/trainingSessionDetails";
+import { RSVPRequestDto } from "@/types/participation";
 import { getBearerToken } from "../apiHelper";
 import log from "loglevel";
 
@@ -8,7 +9,7 @@ const baseMappingUrl =
 const programParticipantApi = {
   getProgramParticipant: async (
     programId: number,
-    accountId: number | null | undefined,
+    accountId: number | null | undefined
   ) => {
     const url = `${baseMappingUrl}/get-participant?programId=${programId}&accountId=${accountId}`;
     const response = await fetch(url, {
@@ -33,9 +34,33 @@ const programParticipantApi = {
     return data;
   },
 
+  rsvpToProgram: async ({
+    programId,
+    accountId,
+  }: RSVPRequestDto): Promise<boolean> => {
+    console.log("Calling RSVP with:", { programId, accountId });
+
+    const url = `${baseMappingUrl}/rsvp?programId=${programId}&accountId=${accountId}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`RSVP failed: ${response.status} ${errorText}`);
+    }
+
+    const data: boolean = await response.json();
+    return data;
+  },
+
   markAbsent: async (
     programId: number,
-    accountId: number | null | undefined,
+    accountId: number | null | undefined
   ) => {
     const url = `${baseMappingUrl}/mark-absent?programId=${programId}&accountId=${accountId}`;
     const response = await fetch(url, {
@@ -62,9 +87,13 @@ const programParticipantApi = {
 
   inviteToPrivateEvent: async (
     accountId: number,
-    programId: number | null | undefined,
+    programId: number | null | undefined
   ) => {
     const url = `${baseMappingUrl}/invite-private?programId=${programId}&accountId=${accountId}`;
+
+    console.log("inviteToPrivateEvent CALLED with:", { programId, accountId });
+    log.info("inviteToPrivateEvent CALLED with:", { programId, accountId });
+
     const response = await fetch(url, {
       method: "POST",
       headers: {
