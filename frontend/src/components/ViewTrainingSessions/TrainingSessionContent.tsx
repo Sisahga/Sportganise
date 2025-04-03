@@ -24,6 +24,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
 import { getFileName } from "@/utils/getFileName";
+import { formatDate } from "@/utils/formatDate";
 
 // Data structure for data received from API call
 import { Program, ProgramDetails } from "@/types/trainingSessionDetails";
@@ -186,16 +187,16 @@ const TrainingSessionContent = () => {
             <p className="text-sm text-gray-500">
               {programDetails?.reccurenceDate &&
               programDetails?.frequency !== ONCE
-                ? new Date(programDetails.reccurenceDate).toDateString()
+                ? formatDate(programDetails.reccurenceDate).toDateString()
                 : programDetails?.occurrenceDate
-                  ? new Date(programDetails.occurrenceDate).toDateString()
+                  ? formatDate(programDetails.occurrenceDate).toDateString()
                   : "N/A"}
             </p>
             {programDetails?.expiryDate ? (
               <div className="flex items-center gap-2">
                 <hr className="w-1 h-px border-0 bg-gray-500 " />
                 <p className="text-sm text-gray-500">
-                  {new Date(programDetails.expiryDate).toDateString()}
+                  {formatDate(programDetails.expiryDate).toDateString()}
                 </p>
               </div>
             ) : (

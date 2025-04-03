@@ -243,21 +243,28 @@ export default function ModifyTrainingSessionForm() {
     form.setValue("title", programDetails.title);
     form.setValue("capacity", programDetails.capacity);
     form.setValue("type", programDetails.programType.toUpperCase());
-    form.setValue("startDate", new Date(programDetails.occurrenceDate));
+    const tempStartDate = new Date(programDetails.occurrenceDate); // handle UTC to EDT, must add back 4 hrs
+    tempStartDate.setHours(tempStartDate.getHours() + 4); // done so the proper start dates are displayed
+    form.setValue("startDate", tempStartDate);
+
     if (
       !(
         programDetails.frequency === null ||
-        programDetails.frequency.toUpperCase() === ONCE // TODO
+        programDetails.frequency.toUpperCase() === ONCE
       )
     ) {
-      form.setValue("endDate", new Date(programDetails.expiryDate));
+      const tempEndDate = new Date(programDetails.expiryDate); // handle UTC to EDT, must add back 4 hrs
+      tempEndDate.setHours(tempEndDate.getHours() + 4); // done so the proper start dates are displayed
+      form.setValue("endDate", new Date(tempEndDate));
+    } else {
+      form.setValue("endDate", undefined); // force endDate=null for frequency=once
     }
+
     if (programDetails.frequency) {
       form.setValue("frequency", programDetails.frequency.toUpperCase());
     } else {
       form.setValue("frequency", ONCE);
     }
-    //form.setValue("recurring", programDetails.recurring);
     form.setValue("visibility", programDetails.visibility.toLowerCase());
     form.setValue("description", programDetails.description);
     if (programDetails.programAttachments) {
@@ -283,6 +290,7 @@ export default function ModifyTrainingSessionForm() {
       const fileName = attachment.attachmentUrl;
       attachmentsToRemove.push(fileName);
     });
+    log.debug("Modify --> Set values in form:", form.getValues());
   }, [programDetails, attachmentsToRemove, form]);
 
   /** Handle form submission and networking logic */
@@ -331,16 +339,24 @@ export default function ModifyTrainingSessionForm() {
       }
       console.warn("attachmentsToRemove : ", attachmentsToRemove);
 
+      const tempStartDate = values.startDate;
+      tempStartDate.setHours(tempStartDate.getHours() - 4);
+      console.warn("values.startDate", values.startDate);
+      console.warn("tempStartDate to ISOString:", tempStartDate.toISOString()); // adds back 4 when shouldn't add 4, should subtract by 4
+      const tempEndDate = values.endDate;
+      tempEndDate?.setHours(tempEndDate?.getHours() - 4);
+      console.warn("values.endDate", values.endDate);
+      console.warn("tempEndDate", tempEndDate?.toISOString());
       const programData = {
         title: values.title,
         type: values.type,
-        startDate: values.startDate.toISOString(),
+        startDate: tempStartDate.toISOString(),
         // If you're changing an event from recurring to non recurring, endDate will already be initialized.
         // therefore, must ensure endDate: null is sent in API body.
         endDate:
-          values.frequency === ONCE
+          values.frequency.toUpperCase() === ONCE
             ? null
-            : (values.endDate?.toISOString() ?? null),
+            : (tempEndDate?.toISOString() ?? null),
         frequency: values.frequency,
         visibility: values.visibility,
         description: values.description,
