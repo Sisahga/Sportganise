@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import usePrograms from "@/hooks/usePrograms";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -83,6 +84,7 @@ export default function CreateTrainingSessionForm() {
     loading: playersLoading,
     error: playersError,
   } = usePlayers();
+  const programs = usePrograms();
 
   const members: Member[] = players.map((player) => ({
     id: player.accountId,
@@ -512,6 +514,7 @@ export default function CreateTrainingSessionForm() {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        programsProp={programs}
                       />
                     </PopoverContent>
                   </Popover>
@@ -637,6 +640,7 @@ export default function CreateTrainingSessionForm() {
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
+                          programsProp={programs}
                         />
                       </PopoverContent>
                     </Popover>
