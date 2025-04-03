@@ -1,9 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import InviteModal, { Member } from "./InviteModal"; // Adjust the import path if necessary
+import SelectMembersModal from "./SelectMembersModal"; // Adjust the import path if necessary
 import { vi } from "vitest";
+import { Member } from "./types";
 
-describe("InviteModal Component", () => {
+describe("SelectMembersModal Component", () => {
   const mockMembers: Member[] = [
     {
       id: 1,
@@ -23,7 +24,7 @@ describe("InviteModal Component", () => {
 
   it("renders the modal with the correct title and members", () => {
     render(
-      <InviteModal
+      <SelectMembersModal
         open={true}
         onClose={mockOnClose}
         members={mockMembers}
@@ -40,7 +41,7 @@ describe("InviteModal Component", () => {
 
   it("filters members based on search input", () => {
     render(
-      <InviteModal
+      <SelectMembersModal
         open={true}
         onClose={mockOnClose}
         members={mockMembers}
@@ -59,7 +60,7 @@ describe("InviteModal Component", () => {
 
   it("selects and deselects a member", () => {
     render(
-      <InviteModal
+      <SelectMembersModal
         open={true}
         onClose={mockOnClose}
         members={mockMembers}
@@ -75,7 +76,7 @@ describe("InviteModal Component", () => {
 
   it("closes the modal when the Done button is clicked", () => {
     render(
-      <InviteModal
+      <SelectMembersModal
         open={true}
         onClose={mockOnClose}
         members={mockMembers}

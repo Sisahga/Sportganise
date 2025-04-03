@@ -2,7 +2,7 @@ import { useNavigate } from "react-router";
 import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
 import log from "loglevel";
 import { useCallback, useEffect, useState } from "react";
-import InviteModal, { Member } from "./InviteModal";
+import SelectMembersModal from "./SelectMembersModal";
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
@@ -66,6 +66,8 @@ import { useWatch } from "react-hook-form";
 import useGetCookies from "@/hooks/useGetCookies.ts";
 import AssignCoach from "./AssignCoaches";
 import { frequencies, locations, programTypes } from "./constants";
+import { Member } from "./types";
+import { MemberList } from "./MembersList";
 
 type ModalKey = "invite" | "waitlist";
 
@@ -402,30 +404,12 @@ export default function CreateTrainingSessionForm() {
                     </FormDescription>
                     {/* Only show the list of selected coaches after first selecting values */}
                     {showSelectedCoaches && (
-                      <div className="mt-2 bg-white border p-2 rounded">
-                        <div className="mb-2 font-medium">
-                          {" "}
-                          Selected Coaches:
-                        </div>
-                        {selectedCoaches.length > 0 ? (
-                          <ul className="list-disc pl-5">
-                            {selectedCoaches.map((memberId) => {
-                              const member = members.find(
-                                (m) => m.id === memberId,
-                              );
-                              return (
-                                <li key={memberId}>
-                                  {member ? member.name : "Unknown member"}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">
-                            No coaches selected.
-                          </p>
-                        )}
-                      </div>
+                      <MemberList
+                        members={members}
+                        selectedMemberIds={selectedCoaches}
+                        title="Selected Coaches:"
+                        noneSelectedMsg="No coaches selected."
+                      />
                     )}
                     <FormMessage />
                   </FormItem>
@@ -754,24 +738,10 @@ export default function CreateTrainingSessionForm() {
                   Select who will be added to the waitlist for this program.
                 </FormDescription>
                 <FormMessage />
-                <div className="mt-2 border p-2 rounded">
-                  <div className="mb-2 font-medium">Selected Attendees:</div>
-                  {waitlistedMembers.length > 0 ? (
-                    <ul className="list-disc pl-5">
-                      {waitlistedMembers.map((memberId) => {
-                        const member = members.find((m) => m.id === memberId);
-                        return (
-                          <li key={memberId}>
-                            {member ? member.name : "Unknown member"}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No member selected.
-                    </p>
-                  )}
+                <MemberList
+                  members={members}
+                  selectedMemberIds={waitlistedMembers}
+                >
                   <Button
                     type="button"
                     size="sm"
@@ -780,7 +750,7 @@ export default function CreateTrainingSessionForm() {
                   >
                     Add Members
                   </Button>
-                </div>
+                </MemberList>
               </FormItem>
             )}
 
@@ -851,28 +821,12 @@ export default function CreateTrainingSessionForm() {
                   </FormDescription>
                   <FormMessage />
                   {field.value === "private" && (
-                    <div className="mt-2 border p-2 rounded">
-                      <div className="mb-2 font-medium">
-                        Selected Attendees:
-                      </div>
-                      {invitedMembers.length > 0 ? (
-                        <ul className="list-disc pl-5">
-                          {invitedMembers.map((memberId) => {
-                            const member = members.find(
-                              (m) => m.id === memberId,
-                            );
-                            return (
-                              <li key={memberId}>
-                                {member ? member.name : "Unknown member"}
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          No attendees selected.
-                        </p>
-                      )}
+                    <MemberList
+                      members={members}
+                      selectedMemberIds={invitedMembers}
+                      title="Selected Attendees:"
+                      noneSelectedMsg="No attendees selected."
+                    >
                       <Button
                         type="button"
                         size="sm"
@@ -881,7 +835,7 @@ export default function CreateTrainingSessionForm() {
                       >
                         Add Attendees
                       </Button>
-                    </div>
+                    </MemberList>
                   )}
                 </FormItem>
               )}
@@ -1050,7 +1004,7 @@ export default function CreateTrainingSessionForm() {
         </Form>
       )}
       {/* Invite Modal */}
-      <InviteModal
+      <SelectMembersModal
         description="Invite members to training session."
         open={openModal === "invite"}
         onClose={() => setOpenModal(undefined)}
@@ -1058,7 +1012,7 @@ export default function CreateTrainingSessionForm() {
         selectedMembers={invitedMembers}
         setSelectedMembers={setInvitedMembers}
       />
-      <InviteModal
+      <SelectMembersModal
         description="Waitlist members for program."
         open={openModal === "waitlist"}
         onClose={() => setOpenModal(undefined)}
