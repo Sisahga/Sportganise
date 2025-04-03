@@ -1020,10 +1020,12 @@ export default function CreateTrainingSessionForm() {
                       type="number"
                       min={minAttendees}
                       {...field}
-              
                       onChange={(e) => {
-                        const value = e.target.value === "" ? undefined : Number(e.target.value);
-    field.onChange(value);
+                        const value =
+                          e.target.value === ""
+                            ? undefined
+                            : Number(e.target.value);
+                        field.onChange(value);
                       }}
                       value={maxAttendees === undefined ? "" : maxAttendees}
                     />
