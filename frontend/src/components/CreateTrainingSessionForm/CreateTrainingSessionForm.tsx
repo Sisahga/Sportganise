@@ -249,6 +249,11 @@ export default function CreateTrainingSessionForm() {
         formData.append("waitlistsId", memberId.toString());
       });
 
+      // Append coaches
+      selectedCoaches.forEach((memberId) => {
+        formData.append("coachesId", memberId.toString());
+      });
+
       // API submit form
       setLoading(true);
       const create = await createTrainingSession(accountId, formData);
