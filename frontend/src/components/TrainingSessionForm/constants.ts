@@ -5,13 +5,15 @@ import {
   FUNDRAISER,
   MONTHLY,
   ONCE,
+  PRIVATE,
+  PUBLIC,
   SPECIALTRAINING,
   TOURNAMENT,
   TRAINING,
   WEEKLY,
 } from "@/constants/programconstants";
 
-export const programTypes = [
+export const PROGRAM_TYPES = [
   {
     label: "Training Session",
     value: TRAINING,
@@ -30,7 +32,7 @@ export const programTypes = [
   },
 ] as const;
 
-export const frequencies = [
+export const FREQUENCIES = [
   {
     label: "Daily",
     value: DAILY,
@@ -49,7 +51,7 @@ export const frequencies = [
   },
 ] as const;
 
-export const locations = [
+export const LOCATIONS = [
   {
     label: "Centre de loisirs St-Denis",
     value: CENTRE_DE_LOISIRS_ST_DENIS,
@@ -57,5 +59,16 @@ export const locations = [
   {
     label: "Collège de Maisonnneuve",
     value: COLLEGE_DE_MAISONNEUVE,
+  },
+] as const;
+
+export const VISIBILITIES = [
+  {
+    label: "Public",
+    value: PUBLIC,
+  },
+  {
+    label: "Private",
+    value: PRIVATE,
   },
 ] as const;

@@ -54,22 +54,20 @@ import {
 // Import constants for select fields
 import { TRAINING } from "@/constants/programconstants";
 import { SPECIALTRAINING } from "@/constants/programconstants";
-import { PUBLIC } from "@/constants/programconstants";
-import { PRIVATE } from "@/constants/programconstants";
-import { DAILY } from "@/constants/programconstants";
-import { WEEKLY } from "@/constants/programconstants";
-import { MONTHLY } from "@/constants/programconstants";
-import { ONCE } from "@/constants/programconstants";
+import { DAILY, WEEKLY, MONTHLY, ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import useGetCookies from "@/hooks/useGetCookies.ts";
 import AssignCoach from "./AssignCoaches";
-import { frequencies, locations, programTypes } from "./constants";
-import { Member } from "./types";
+import {
+  FREQUENCIES,
+  LOCATIONS,
+  PROGRAM_TYPES,
+  VISIBILITIES,
+} from "./constants";
+import { Member, ModalKey } from "./types";
 import { MemberList } from "./MembersList";
-
-type ModalKey = "invite" | "waitlist";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -323,7 +321,7 @@ export default function CreateTrainingSessionForm() {
                           )}
                         >
                           {field.value
-                            ? programTypes.find(
+                            ? PROGRAM_TYPES.find(
                                 (type) => type.value === field.value,
                               )?.label
                             : "Select type"}
@@ -337,7 +335,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No type found.</CommandEmpty>
                           <CommandGroup>
-                            {programTypes.map((type) => (
+                            {PROGRAM_TYPES.map((type) => (
                               <CommandItem
                                 value={type.label}
                                 key={type.value}
@@ -484,7 +482,7 @@ export default function CreateTrainingSessionForm() {
                           )}
                         >
                           {field.value
-                            ? frequencies.find(
+                            ? FREQUENCIES.find(
                                 (frequency) => frequency.value === field.value,
                               )?.label
                             : "Select frequency"}
@@ -498,7 +496,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No frequency found.</CommandEmpty>
                           <CommandGroup>
-                            {frequencies.map((frequency) => (
+                            {FREQUENCIES.map((frequency) => (
                               <CommandItem
                                 value={frequency.label}
                                 key={frequency.value}
@@ -656,7 +654,7 @@ export default function CreateTrainingSessionForm() {
                           )}
                         >
                           {field.value
-                            ? locations.find(
+                            ? LOCATIONS.find(
                                 (location) => location.value === field.value,
                               )?.label
                             : "Select location"}
@@ -670,7 +668,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No location found.</CommandEmpty>
                           <CommandGroup>
-                            {locations.map((location) => (
+                            {LOCATIONS.map((location) => (
                               <CommandItem
                                 value={location.label}
                                 key={location.value}
@@ -785,10 +783,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No visibility found.</CommandEmpty>
                           <CommandGroup>
-                            {[
-                              { label: "Public", value: PUBLIC },
-                              { label: "Private", value: PRIVATE },
-                            ].map((v) => (
+                            {VISIBILITIES.map((v) => (
                               <CommandItem
                                 key={v.value}
                                 value={v.label}

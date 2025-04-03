@@ -51,20 +51,7 @@ import log from "loglevel";
 import BackButton from "../ui/back-button";
 import { getFileName } from "@/utils/getFileName";
 // Import constants for select fields
-import { TRAINING } from "@/constants/programconstants";
-import { SPECIALTRAINING } from "@/constants/programconstants";
-import { TOURNAMENT } from "@/constants/programconstants";
-import { FUNDRAISER } from "@/constants/programconstants";
-import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
-import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
-import { MAIN_STREET } from "@/constants/programconstants";
-import { TEST_WATER_ROAD } from "@/constants/programconstants";
-import { PUBLIC } from "@/constants/programconstants";
-import { PRIVATE } from "@/constants/programconstants";
-import { DAILY } from "@/constants/programconstants";
-import { WEEKLY } from "@/constants/programconstants";
-import { MONTHLY } from "@/constants/programconstants";
-import { ONCE } from "@/constants/programconstants";
+import { DAILY, WEEKLY, MONTHLY, ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
@@ -74,75 +61,14 @@ import useGetCookies from "@/hooks/useGetCookies.ts";
 
 import AssignCoach from "./AssignCoaches";
 import SelectMembersModal from "./SelectMembersModal";
-import { Member } from "./types";
+import { Member, ModalKey } from "./types";
 import usePlayers from "@/hooks/usePlayers";
-/**All select element options */
-const types = [
-  {
-    label: "Training Session",
-    value: TRAINING,
-  },
-  {
-    label: "Fundraiser",
-    value: FUNDRAISER,
-  },
-  {
-    label: "Tournament",
-    value: TOURNAMENT,
-  },
-  {
-    label: "Special Training",
-    value: SPECIALTRAINING,
-  },
-] as const;
-const frequencies = [
-  {
-    label: "Daily",
-    value: DAILY,
-  },
-  {
-    label: "Weekly",
-    value: WEEKLY,
-  },
-  {
-    label: "Monthly",
-    value: MONTHLY,
-  },
-  {
-    label: "One time",
-    value: ONCE,
-  },
-] as const;
-const visibilities = [
-  {
-    label: "Public",
-    value: PUBLIC,
-  },
-  {
-    label: "Private",
-    value: PRIVATE,
-  },
-] as const;
-const locations = [
-  {
-    label: "Centre de loisirs St-Denis",
-    value: CENTRE_DE_LOISIRS_ST_DENIS,
-  },
-  {
-    label: "Collège de Maisonnneuve",
-    value: COLLEGE_DE_MAISONNEUVE,
-  },
-  {
-    label: "123 test water rd.",
-    value: TEST_WATER_ROAD,
-  },
-  {
-    label: "123 Main st",
-    value: MAIN_STREET,
-  },
-] as const;
-
-type ModalKey = "invite" | "waitlist";
+import {
+  FREQUENCIES,
+  LOCATIONS,
+  PROGRAM_TYPES,
+  VISIBILITIES,
+} from "./constants";
 
 export default function ModifyTrainingSessionForm() {
   const { userId, cookies, preLoading } = useGetCookies();
@@ -494,8 +420,9 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? types.find((type) => type.value === field.value)
-                              ?.label
+                          ? PROGRAM_TYPES.find(
+                              (type) => type.value === field.value,
+                            )?.label
                           : "Select type"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -507,7 +434,7 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No type found.</CommandEmpty>
                         <CommandGroup>
-                          {types.map((type) => (
+                          {PROGRAM_TYPES.map((type) => (
                             <CommandItem
                               value={type.label}
                               key={type.value}
@@ -665,7 +592,7 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? frequencies.find(
+                          ? FREQUENCIES.find(
                               (frequency) => frequency.value === field.value,
                             )?.label
                           : "Select frequency"}
@@ -679,7 +606,7 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No frequency found.</CommandEmpty>
                         <CommandGroup>
-                          {frequencies.map((frequency) => (
+                          {FREQUENCIES.map((frequency) => (
                             <CommandItem
                               value={frequency.label}
                               key={frequency.value}
@@ -837,7 +764,7 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? locations.find(
+                          ? LOCATIONS.find(
                               (location) => location.value === field.value,
                             )?.label
                           : "Select location"}
@@ -851,7 +778,7 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No location found.</CommandEmpty>
                         <CommandGroup>
-                          {locations.map((location) => (
+                          {LOCATIONS.map((location) => (
                             <CommandItem
                               value={location.label}
                               key={location.value}
@@ -973,7 +900,7 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? visibilities.find(
+                          ? VISIBILITIES.find(
                               (visibility) => visibility.value === field.value,
                             )?.label
                           : "Select visibility"}
@@ -987,7 +914,7 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No visibility found.</CommandEmpty>
                         <CommandGroup>
-                          {visibilities.map((visibility) => (
+                          {VISIBILITIES.map((visibility) => (
                             <CommandItem
                               value={visibility.label}
                               key={visibility.value}
