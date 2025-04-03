@@ -69,6 +69,7 @@ import {
   PROGRAM_TYPES,
   VISIBILITIES,
 } from "./constants";
+import { MemberList } from "./MembersList";
 
 export default function ModifyTrainingSessionForm() {
   const { userId, cookies, preLoading } = useGetCookies();
@@ -80,15 +81,14 @@ export default function ModifyTrainingSessionForm() {
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<ModalKey>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
-  const [attendees, setAttendees] = useState<Attendees[]>([]); // For US305+
+  const [attendees, setAttendees] = useState<Attendees[]>([]);
 
   const [waitlistedMembers, setWaitlistedMembers] = useState<number[]>([]);
   const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
   const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
 
-  const handleCoachesSelection = (selectedCoaches: number[]) => {
-    setSelectedCoaches(selectedCoaches);
+  const handleCoachesSelection = (newSelectedCoaches: number[]) => {
+    setSelectedCoaches(newSelectedCoaches);
     setShowSelectedCoaches(true);
   };
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
@@ -499,25 +499,12 @@ export default function ModifyTrainingSessionForm() {
                 </FormDescription>
                 {/* Only show the list of selected coaches when showSelectedCoaches is true */}
                 {showSelectedCoaches && (
-                  <div className="mt-2 bg-white border p-2 rounded">
-                    <div className="mb-2 font-medium"> Selected Coaches:</div>
-                    {selectedCoaches.length > 0 ? (
-                      <ul className="list-disc pl-5">
-                        {selectedCoaches.map((memberId) => {
-                          const member = members.find((m) => m.id === memberId);
-                          return (
-                            <li key={memberId}>
-                              {member ? member.name : "Unknown member"}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        No coaches selected.
-                      </p>
-                    )}
-                  </div>
+                  <MemberList
+                    members={members}
+                    selectedMemberIds={selectedCoaches}
+                    title="Selected Coaches:"
+                    noneSelectedMsg="No coaches selected."
+                  />
                 )}
 
                 <FormMessage />
@@ -843,24 +830,7 @@ export default function ModifyTrainingSessionForm() {
               Select who will be added to the waitlist for this program.
             </FormDescription>
             <FormMessage />
-            <div className="mt-2 border p-2 rounded">
-              <div className="mb-2 font-medium">Selected Attendees:</div>
-              {waitlistedMembers.length > 0 ? (
-                <ul className="list-disc pl-5">
-                  {waitlistedMembers.map((memberId) => {
-                    const member = members.find((m) => m.id === memberId);
-                    return (
-                      <li key={memberId}>
-                        {member ? member.name : "Unknown member"}
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  No member selected.
-                </p>
-              )}
+            <MemberList members={members} selectedMemberIds={waitlistedMembers}>
               <Button
                 size="sm"
                 className="mt-2"
@@ -868,7 +838,7 @@ export default function ModifyTrainingSessionForm() {
               >
                 Add Members
               </Button>
-            </div>
+            </MemberList>
           </FormItem>
           <SelectMembersModal
             description="Waitlist members for program."
@@ -946,26 +916,12 @@ export default function ModifyTrainingSessionForm() {
                 </FormDescription>
                 <FormMessage />
                 {field.value === "private" && (
-                  <div className="mt-2 border p-2 rounded">
-                    <div className="mb-2 font-medium">
-                      Selected Participants:
-                    </div>
-                    {selectedMembers.length > 0 ? (
-                      <ul className="list-disc pl-5">
-                        {selectedMembers.map((memberId) => {
-                          const member = members.find((m) => m.id === memberId);
-                          return (
-                            <li key={memberId}>
-                              {member ? member.name : "Unknown member"}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        No participants selected.
-                      </p>
-                    )}
+                  <MemberList
+                    members={members}
+                    selectedMemberIds={selectedMembers}
+                    title="Selected Participants:"
+                    noneSelectedMsg="No participants selected."
+                  >
                     <Button
                       type="button"
                       size="sm"
@@ -974,7 +930,7 @@ export default function ModifyTrainingSessionForm() {
                     >
                       Edit Participants
                     </Button>
-                  </div>
+                  </MemberList>
                 )}
               </FormItem>
             )}
