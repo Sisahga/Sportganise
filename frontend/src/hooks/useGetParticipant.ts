@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import programParticipantApi from "@/services/api/programParticipantApi";
 import { Attendees } from "@/types/trainingSessionDetails";
 
@@ -10,27 +10,30 @@ const useGetParticipant = (
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Only fetch if a valid programId and accountId are provided
+  const fetchParticipant = useCallback(async () => {
     if (programId && accountId !== null && accountId !== undefined) {
       setLoading(true);
-      programParticipantApi
-        .getProgramParticipant(programId, accountId)
-        .then((result) => {
-          setData(result);
-          setError(null);
-        })
-        .catch((err) => {
-          setError(err.message || "An error occurred");
-          setData(null);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      try {
+        const result = await programParticipantApi.getProgramParticipant(
+          programId,
+          accountId,
+        );
+        setData(result);
+        setError(null);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("An unknown error occurred");
+        }
+        setData(null);
+      } finally {
+        setLoading(false);
+      }
     }
   }, [programId, accountId]);
 
-  return { data, loading, error };
+  return { data, loading, error, fetchParticipant };
 };
 
 export default useGetParticipant;
