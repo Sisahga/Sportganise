@@ -136,7 +136,7 @@ const TrainingSessionContent = () => {
 
     try {
       const response = await trainingSessionApi.getPrograms(user?.accountId);
-      const updatedProgram = response.data.find(
+      const updatedProgram = response?.data?.find(
         (p: Program) => p.programDetails.programId === programId,
       );
 
