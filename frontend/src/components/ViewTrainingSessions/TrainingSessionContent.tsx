@@ -61,7 +61,7 @@ const TrainingSessionContent = () => {
     location: "",
     programAttachments: [],
     frequency: "",
-    visibility: "",
+    visibility: "public",
     author: "",
     cancelled: false,
     reccurenceDate: new Date(),
@@ -118,19 +118,32 @@ const TrainingSessionContent = () => {
   }, [location.state.programDetails.programId, user?.accountId]);
 
   const handleRefresh = async () => {
-    const programs = await trainingSessionApi.getPrograms(user?.accountId);
-    if (programs.data) {
-      const program = programs.data.find(
-        (p: Program) => p.programDetails.programId === programDetails.programId,
+    const programId = location.state?.programDetails?.programId;
+    if (!programId) return;
+
+    try {
+      const response = await trainingSessionApi.getPrograms(user?.accountId);
+      const updatedProgram = response.data.find(
+        (p: Program) => p.programDetails.programId === programId,
       );
-      if (program) {
-        console.log("Refreshed programs: ", programs);
-        setAttendees(program.attendees);
-        setProgramDetails(program.programDetails);
-        console.log("Refreshed attendees: ", program.attendees);
-        console.log("Refreshed programDetails: ", program.programDetails);
-      } else console.log("No program found");
+
+      if (updatedProgram) {
+        setProgramDetails(updatedProgram.programDetails);
+        setAttendees(updatedProgram.attendees);
+      }
+    } catch (error) {
+      log.error("Failed to refresh program data:", error);
     }
+  };
+  const updateAttendeesList = (newAttendee: Attendees) => {
+    setAttendees((prev) => {
+      const exists = prev.some((a) => a.accountId === newAttendee.accountId);
+      return exists
+        ? prev.map((a) =>
+            a.accountId === newAttendee.accountId ? newAttendee : a,
+          )
+        : [...prev, newAttendee];
+    });
   };
 
   useEffect(() => {
@@ -307,44 +320,42 @@ const TrainingSessionContent = () => {
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
         {/**Can render attendees list to Players or General when program type us not training session*/}
-        {!(
-          (user?.type?.toLowerCase() === "general" ||
-            user?.type?.toLowerCase() === "player") &&
-          programDetails.programType.toLowerCase() === "training"
-        ) && (
-          <>
-            <div className="flex items-center">
-              <h2 className="text-lg font-semibold">Attendees</h2>
-              <p className="text-sm font-medium text-gray-500 ml-3">
-                {Array.isArray(attendees)
-                  ? attendees.filter((attendee) => attendee.confirmed).length
-                  : 0}
-                /{programDetails.capacity}
+        <div className="flex items-center">
+          <h2 className="text-lg font-semibold">Attendees</h2>
+          <p className="text-sm font-medium text-gray-500 ml-3">
+            {Array.isArray(attendees)
+              ? attendees.filter((attendee) => attendee.confirmed).length
+              : 0}
+            /{programDetails.capacity}
+          </p>
+        </div>
+        {/** Attendees list visible to coach/admin only */}
+        {(user?.type?.toLowerCase() === "coach" ||
+          user?.type?.toLowerCase() === "admin") && (
+          <div className="mx-2">
+            {attendees.length > 0 ? (
+              attendees.map((attendee, index) => {
+                console.log("Attendee Information:", attendee); // Added console log
+                return attendee.participantType?.toLowerCase() ===
+                  "subscribed" || attendee.confirmed ? (
+                  <div key={index}>
+                    <RegisteredPlayer
+                      accountAttendee={attendee}
+                      onRefresh={handleRefresh}
+                    />
+                  </div>
+                ) : null;
+              })
+            ) : (
+              <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                There are no attendees
               </p>
-            </div>
-            <div className="mx-2">
-              {attendees.length > 0 ? (
-                attendees.map((attendee, index) => {
-                  console.log("Attendee Information:", attendee); // Added console log
-                  return attendee.participantType?.toLowerCase() ===
-                    "subscribed" || attendee.confirmed ? (
-                    <div key={index}>
-                      <RegisteredPlayer
-                        accountAttendee={attendee}
-                        onRefresh={handleRefresh}
-                      />
-                    </div>
-                  ) : null;
-                })
-              ) : (
-                <p className="text-cyan-300 text-sm font-normal m-5 text-center">
-                  There are no attendees
-                </p>
-              )}
-            </div>
-            <div className="mb-8"></div>
-          </>
+            )}
+          </div>
         )}
+        <div className="mb-8"></div>
+        {/* </> */}
+        {/* )} */}
 
         {!(
           (user?.type?.toLowerCase() === "general" ||
@@ -424,6 +435,7 @@ const TrainingSessionContent = () => {
           programDetails={programDetails}
           attendees={attendees}
           onRefresh={handleRefresh}
+          updateAttendeesList={updateAttendeesList}
         />
       </div>
     </div>
