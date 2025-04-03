@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,7 +39,10 @@ import useAbsent from "@/hooks/useAbsent";
 import { CookiesDto } from "@/types/auth";
 import OptInButton from "./OptInButton";
 import OptOutButton from "./OptOutButton";
+import useRSVP from "@/hooks/useRSVP";
+import programParticipantApi from "@/services/api/programParticipantApi";
 import useDeleteProgram from "@/hooks/useDeleteProgram";
+import { useToast } from "@/hooks/use-toast";
 
 interface DropDownMenuButtonProps {
   user: CookiesDto | null | undefined;
@@ -47,6 +50,7 @@ interface DropDownMenuButtonProps {
   programDetails: ProgramDetails;
   attendees: Attendees[];
   onRefresh: () => void;
+  updateAttendeesList?: (attendess: Attendees) => void;
 }
 
 export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
@@ -55,6 +59,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   programDetails,
   attendees,
   onRefresh,
+  updateAttendeesList,
 }: DropDownMenuButtonProps) => {
   const navigate = useNavigate();
   const handleNavigation = (path: string, data: Program) => {
@@ -64,6 +69,11 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   log.debug("Rendering DropDownMenuButton for TrainingSessionContent");
 
   //Confirmation of player absence
+  const { rsvp, isLoading: rsvpLoading } = useRSVP();
+  const [attendee, setAttendee] = useState<Attendees | undefined>(
+    accountAttendee,
+  );
+  //const [rsvpErrorMessage, setRsvpErrorMessage] = useState<string | null>(null);
   const { markAbsent, error: absentError } = useAbsent();
   const { deleteProgram } = useDeleteProgram();
   const [isNotificationVisible, setNotificationVisible] = useState(false);
@@ -79,6 +89,32 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     useState(false);
   const [isDeleteConfirmationVisible, setDeleteConfirmationVisible] =
     useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    setAttendee(accountAttendee);
+  }, [accountAttendee]);
+
+  const refreshAttendee = async () => {
+    if (!user?.accountId || !programDetails?.programId) return;
+    try {
+      const updated = await programParticipantApi.getProgramParticipant(
+        programDetails.programId,
+        user.accountId,
+      );
+      setAttendee(updated);
+      if (
+        updateAttendeesList &&
+        (user?.type?.toLowerCase() === "player" ||
+          user?.type?.toLowerCase() === "general") &&
+        updated?.confirmed
+      ) {
+        updateAttendeesList(updated);
+      }
+    } catch {
+      setAttendee(undefined); // reset if not found
+    }
+  };
 
   const handleDeleteClick = () => {
     setDropdownOpen(false); //Close the dropdown
@@ -122,14 +158,75 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     setRSVPDialogOpen(true); // Open the alert dialog
   };
 
-  const handleRSVPConfirmation = () => {
-    setRSVPDialogOpen(false);
-    setRSVPConfirmationVisible(true); // Show RSVP confirmation message
-    if (onRefresh) onRefresh();
+  const handleRSVPConfirmation = async () => {
+    if (!user?.accountId || !programDetails?.programId) return;
 
-    setTimeout(() => {
-      setRSVPConfirmationVisible(false);
-    }, 3000);
+    const visibility = programDetails.visibility?.toLowerCase();
+    const isPrivate = visibility === "private";
+
+    try {
+      // Get participant info (if exists)
+      let participant: Attendees | null = null;
+      try {
+        participant = await programParticipantApi.getProgramParticipant(
+          programDetails.programId,
+          user.accountId,
+        );
+        console.log("Fetched participant:", participant);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.warn("Participant not found:", err.message);
+        } else {
+          console.warn("Participant not found:", String(err));
+        }
+      }
+
+      // Handle private event
+      if (isPrivate && (!participant || !participant.participantType)) {
+        console.warn("RSVP blocked: not invited to private event");
+        // alert("RSVP failed: You are not invited to this private event.");
+        toast({
+          variant: "destructive",
+          title: "RSVP Failed",
+          description: "You are not invited to this private event.",
+        });
+
+        setRSVPDialogOpen(false);
+        return;
+      }
+
+      // If already confirmed, no action needed
+      if (participant?.confirmed) {
+        console.log("Already confirmed, skipping RSVP");
+        setRSVPDialogOpen(false);
+        return;
+      }
+
+      //Proceed with RSVP
+      const updated = await rsvp({
+        programId: programDetails.programId,
+        accountId: user.accountId,
+        visibility: programDetails.visibility?.toLowerCase() ?? "public",
+      });
+
+      setAttendee(updated);
+      if (updateAttendeesList && updated?.confirmed) {
+        updateAttendeesList(updated);
+      }
+
+      setRSVPDialogOpen(false);
+      setRSVPConfirmationVisible(true);
+      setTimeout(() => setRSVPConfirmationVisible(false), 3000);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "RSVP failed";
+      console.error("RSVP failed:", message);
+      toast({
+        variant: "destructive",
+        title: "RSVP Failed",
+        description: message,
+      });
+      setRSVPDialogOpen(false);
+    }
   };
 
   const handleAbsentClick = () => {
@@ -138,10 +235,21 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   };
 
   const handleAbsentConfirmation = async () => {
+    if (!user?.accountId || !programDetails?.programId) return;
     try {
-      await markAbsent(programDetails.programId, user?.accountId);
+      await markAbsent(programDetails.programId, user.accountId);
+      await refreshAttendee();
       setAbsentDialogOpen(false);
       setNotificationVisible(true);
+
+      // After "Mark as absent" successfull, refreshing to RSVP button
+      const updatedParticipant =
+        await programParticipantApi.getProgramParticipant(
+          programDetails.programId,
+          user?.accountId,
+        );
+      setAttendee(updatedParticipant);
+
       if (onRefresh) onRefresh();
       console.log("Updated account?: ", accountAttendee);
       setTimeout(() => {
@@ -191,17 +299,18 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
             </DropdownMenuGroup>
           ) : (
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={handleRSVPClick}>
-                <LogIn color="green" />
-                <span className="text-green-500">RSVP</span>
-              </DropdownMenuItem>
-              {/* Here instead I want to check if a player is of role waitlisted */}
-              {accountAttendee?.confirmed === true && (
+              {attendee?.confirmed ? (
                 <DropdownMenuItem onSelect={handleAbsentClick}>
                   <LogOut color="red" />
                   <span className="text-red"> Mark absent </span>
                 </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onSelect={handleRSVPClick}>
+                  <LogIn color="green" />
+                  <span className="text-green-500">RSVP</span>
+                </DropdownMenuItem>
               )}
+
               {accountAttendee?.participantType?.toLowerCase() ===
                 "waitlisted" &&
                 accountAttendee?.rank === null &&
@@ -281,7 +390,14 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       </AlertDialog>
 
       {/* Pop up when player RSVP's to event */}
-      <AlertDialog open={isRSVPDialogOpen} onOpenChange={setRSVPDialogOpen}>
+      <AlertDialog
+        open={isRSVPDialogOpen}
+        onOpenChange={setRSVPDialogOpen}
+        // onOpenChange={(open) => {
+        //   setRSVPDialogOpen(open);
+        //   if (!open) setRsvpErrorMessage(null);
+        // }}
+      >
         <AlertDialogContent className="max-w-xs sm:max-w-sm md:max-w-lg overflow-y-auto max-h-[90vh] rounded-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -291,13 +407,21 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
               If you cannot attend the event anymore, you will have the option
               to mark yourself as absent.
             </AlertDialogDescription>
+            {/* {false && rsvpErrorMessage && (
+              <p className="text-red-500 mt-2 text-sm text-center">
+                {rsvpErrorMessage}
+              </p>
+            )} */}
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setRSVPDialogOpen(false)}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleRSVPConfirmation}>
-              Confirm
+            <AlertDialogAction
+              onClick={handleRSVPConfirmation}
+              disabled={rsvpLoading}
+            >
+              {rsvpLoading ? "Submitting..." : "Confirm"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -325,8 +449,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Postpone event confirmation message */}
       {isPostponeConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Frown className="w-12 h-12" />
             <p className="text-center">
               You have successfully postponed the event. The participants will
@@ -338,8 +462,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Delete event confirmation message */}
       {isDeleteConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Frown className="w-12 h-12" />
             <p className="text-center">
               You have successfully deleted the event. The participants will be
@@ -351,8 +475,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* RSVP confirmation message */}
       {isRSVPConfirmationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Smile className="w-12 h-12" />
             <p className="text-center">
               Your presence is noted. Can&#39;t wait to see you!
@@ -363,8 +487,8 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
       {/* Notification when player confirms absence */}
       {isNotificationVisible && (
-        <div className="fixed inset-0 flex items-center justify-center px-4 max-w-ws sm:max-w-sm md:max-w-md">
-          <div className="bg-teal-500 text-white p-4 rounded-lg shadow-lg flex flex-col items-center space-y-2">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-teal-700 text-white p-6 rounded-xl shadow-lg flex flex-col items-center space-y-4 max-w-sm w-full">
             <Frown className="w-12 h-12" />
             <p className="text-center">Your absence is noted.</p>
           </div>

@@ -177,7 +177,7 @@ export default function ModifyTrainingSessionForm() {
     location: "",
     programAttachments: [],
     frequency: "",
-    visibility: "",
+    visibility: "public",
     author: "",
     cancelled: false,
     reccurenceDate: new Date(),

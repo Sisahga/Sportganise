@@ -118,7 +118,7 @@ export default function CreateTrainingSessionForm() {
   const maxAttendees = form.watch("capacity");
 
   useEffect(() => {
-    if (maxAttendees < minAttendees) {
+    if (maxAttendees !== undefined && maxAttendees < minAttendees) {
       form.setValue("capacity", minAttendees);
     }
   }, [minAttendees, maxAttendees, form]);
@@ -1028,13 +1028,14 @@ export default function CreateTrainingSessionForm() {
                       type="number"
                       min={minAttendees}
                       {...field}
-                      value={maxAttendees ?? minAttendees}
                       onChange={(e) => {
-                        const newValue = e.target.value
-                          ? Number(e.target.value)
-                          : minAttendees;
-                        field.onChange(newValue);
+                        const value =
+                          e.target.value === ""
+                            ? undefined
+                            : Number(e.target.value);
+                        field.onChange(value);
                       }}
+                      value={maxAttendees === undefined ? "" : maxAttendees}
                     />
                   </FormControl>
                   <FormMessage />
