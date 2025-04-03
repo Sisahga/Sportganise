@@ -4,7 +4,7 @@ import { Attendees } from "@/types/trainingSessionDetails";
 
 const useGetParticipant = (
   programId: number,
-  accountId: number | null | undefined
+  accountId: number | null | undefined,
 ) => {
   const [data, setData] = useState<Attendees | null>(null);
   const [loading, setLoading] = useState<boolean>(false);

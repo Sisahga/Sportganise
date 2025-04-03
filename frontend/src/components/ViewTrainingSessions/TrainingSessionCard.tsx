@@ -42,7 +42,7 @@ const TrainingSessionCard: React.FC<Program> = ({
 
   const { data: userAttendee } = useGetParticipant(
     programDetails.programId, // assuming programDetails contains the program ID as 'id'
-    accountId
+    accountId,
   );
 
   return (
@@ -119,29 +119,30 @@ const TrainingSessionCard: React.FC<Program> = ({
           {programDetails?.description}
         </span>
         <div className="flex items-center space-x-1">
-  {programDetails?.programType && (
-    <EventBadgeType programType={programDetails.programType} />
-  )}
-  {userAttendee && (userAttendee?.rank !== null ||
-    (userAttendee?.confirmed === false &&
-      userAttendee?.participantType === "Subscribed")) && (
-    <ParticipantStatusBadgeType attendees={userAttendee} />
-  )}
+          {programDetails?.programType && (
+            <EventBadgeType programType={programDetails.programType} />
+          )}
+          {userAttendee &&
+            (userAttendee?.rank !== null ||
+              (userAttendee?.confirmed === false &&
+                userAttendee?.participantType === "Subscribed")) && (
+              <ParticipantStatusBadgeType attendees={userAttendee} />
+            )}
 
-  {/* Click to view details */}
-  <button
-    onClick={() =>
-      handleNavigation("/pages/ViewTrainingSessionPage", {
-        programDetails,
-        attendees,
-      })
-    }
-    className="flex items-center bg-transparent"
-  >
-    <ChevronRight size={17} color="#82DBD8" />
-    <p className="font-medium text-secondaryColour">View details</p>
-  </button>
-</div>
+          {/* Click to view details */}
+          <button
+            onClick={() =>
+              handleNavigation("/pages/ViewTrainingSessionPage", {
+                programDetails,
+                attendees,
+              })
+            }
+            className="flex items-center bg-transparent"
+          >
+            <ChevronRight size={17} color="#82DBD8" />
+            <p className="font-medium text-secondaryColour">View details</p>
+          </button>
+        </div>
       </div>
     </Card>
   );

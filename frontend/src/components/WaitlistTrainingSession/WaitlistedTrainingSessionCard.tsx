@@ -18,16 +18,17 @@ interface WaitlistedTrainingSessionCardProps {
 const WaitlistedTrainingSessionCard: React.FC<
   WaitlistedTrainingSessionCardProps
 > = ({ programDetails, onSelectTraining }) => {
-  if (!programDetails) {
-    return null; // Prevent rendering if programDetails is missing
-  }
-
   const accountId = getCookies().accountId;
 
   const { data: userAttendee } = useGetParticipant(
-    programDetails.programId, // assuming programDetails contains the program ID as 'id'
-    accountId
+    programDetails.programId,
+    accountId,
   );
+
+  if (!programDetails) {
+    return null; // Prevent rendering if programDetails is missing
+  }
+  
   return (
     <Card
       onClick={() => onSelectTraining(programDetails)}
@@ -98,7 +99,8 @@ const WaitlistedTrainingSessionCard: React.FC<
         </span>
         <div className="flex items-center space-x-1">
           <EventBadgeType programType={programDetails.programType} />
-          {userAttendee && (userAttendee?.rank !== null ||
+          {userAttendee &&
+            (userAttendee?.rank !== null ||
               (userAttendee?.confirmed === false &&
                 userAttendee?.participantType === "Subscribed")) && (
               <ParticipantStatusBadgeType attendees={userAttendee} />

@@ -283,18 +283,25 @@ public class WaitlistService {
       return userParticipants.stream()
           // Only include participants with the role "Coach" or "Waitlisted"
           .filter(pp -> "Coach".equals(pp.getType()) || "Waitlisted".equals(pp.getType()))
-          .map(pp -> programRepository.findById(pp.getProgramParticipantId().getProgramId()).orElse(null))
+          .map(
+              pp ->
+                  programRepository
+                      .findById(pp.getProgramParticipantId().getProgramId())
+                      .orElse(null))
           .distinct() // Remove duplicate programs if user is in multiple roles
-          .filter(program -> {
-              long confirmedCount = participantRepository.countConfirmedParticipants(program.getProgramId());
-              return confirmedCount < program.getCapacity();
-          })
-          .map(program -> {
-              List<ProgramAttachmentDto> programAttachments = getProgramAttachments(program.getProgramId());
-              return new ProgramDto(program, programAttachments);
-          })
+          .filter(
+              program -> {
+                long confirmedCount =
+                    participantRepository.countConfirmedParticipants(program.getProgramId());
+                return confirmedCount < program.getCapacity();
+              })
+          .map(
+              program -> {
+                List<ProgramAttachmentDto> programAttachments =
+                    getProgramAttachments(program.getProgramId());
+                return new ProgramDto(program, programAttachments);
+              })
           .collect(Collectors.toList());
-      
     }
   }
 
