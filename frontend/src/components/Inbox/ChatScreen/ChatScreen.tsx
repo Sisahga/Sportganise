@@ -139,7 +139,7 @@ const ChatScreen: React.FC = () => {
     } else if (message.type === "UNBLOCK") {
       setChannelIsBlocked(false);
     } else if (message.type === "DELETE") {
-      setDeleteRequestActive(true);
+      fetchDeleteRequest().then((_) => _);
     }
     if (message.attachments.length !== 0) {
       const dupMessage = document.getElementById(message.messageId.toString());
@@ -389,7 +389,7 @@ const ChatScreen: React.FC = () => {
 
   // Connect to WebSocket
   useEffect(() => {
-    if (!connected) {
+    if (!connected && cookies && userId) {
       connectWebSocket().then(() => {
         if (!connected) {
           document
@@ -398,7 +398,7 @@ const ChatScreen: React.FC = () => {
         }
       });
     }
-  }, [channelId]);
+  }, [cookies, userId, connected]);
 
   // Scroll to bottom once messages load.
   useEffect(() => {
