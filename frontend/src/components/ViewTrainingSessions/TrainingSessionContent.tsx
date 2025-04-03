@@ -416,15 +416,16 @@ const TrainingSessionContent = () => {
         <p className="text-gray-600 mt-1">
           Your current position: <span className="font-bold">{accountAttendee.rank}</span> 
           {accountAttendee.rank === 1 ? 
-            " (You'll be the next person to get a spot if someone cancels)" : 
+            " (You'll be the next person to get a spot)" : 
             ""}
         </p>
       </div>
-    ) : (
+    ) : accountAttendee.confirmed === true ? (
       <p className="text-green-600 font-medium">
         You're confirmed for this session.
       </p>
-    )}
+    ):
+    null}
   </div>
 )}
 
