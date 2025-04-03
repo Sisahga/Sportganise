@@ -116,7 +116,7 @@ function usePrograms() {
         }
 
         if (["daily", "weekly", "biweekly", "monthly"].includes(freq)) {
-          let current = new Date(start);
+          const current = new Date(start);
           while (current.getTime() <= end.getTime()) {
             expandedDates.push(new Date(current)); // clone before mutation
 
