@@ -329,7 +329,9 @@ public class ProgramService {
       List<MultipartFile> attachments,
       Integer accountId,
       String frequency,
-      Integer[] participantsId) {
+      Integer[] participantsId,
+      Integer[] waitlistsId,
+      Integer[] coachesId) {
 
     Account user = accountService.getAccountById(accountId);
     if (user == null) {
@@ -385,7 +387,16 @@ public class ProgramService {
     }
 
     if (participantsId != null) {
-      this.createProgramParticipants(savedProgram.getProgramId(), participantsId);
+      this.createProgramParticipants(
+          savedProgram.getProgramId(), participantsId, "Subscribed", true);
+    }
+
+    if (waitlistsId != null) {
+      this.createProgramParticipants(savedProgram.getProgramId(), waitlistsId, "Waitlisted", false);
+    }
+
+    if (coachesId != null) {
+      this.createProgramParticipants(savedProgram.getProgramId(), coachesId, "Coach", false);
     }
 
     return new ProgramDto(savedProgram, programAttachmentsDto);
@@ -397,7 +408,8 @@ public class ProgramService {
    * @param programId Takes programId of program
    * @param participants List of participants for the program
    */
-  public void createProgramParticipants(Integer programId, Integer[] participants) {
+  public void createProgramParticipants(
+      Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
 
     if (participants != null) {
       for (Integer participant : participants) {
@@ -409,13 +421,18 @@ public class ProgramService {
                         new ResourceNotFoundException(
                             "User with id " + participant + " not found."));
 
+        ZonedDateTime confirmedDate = null;
+        if (isConfirmed) {
+          confirmedDate = ZonedDateTime.now();
+        }
+
         ProgramParticipant programParticipant =
             new ProgramParticipant(
                 new ProgramParticipantId(programId, user.getAccountId()),
                 null,
-                "Subscribed",
-                true,
-                ZonedDateTime.now());
+                participantType,
+                isConfirmed,
+                confirmedDate);
 
         programParticipantRepository.save(programParticipant);
         log.info("Created participant : " + programParticipant);
@@ -463,7 +480,8 @@ public class ProgramService {
       List<MultipartFile> attachmentsToAdd,
       @Nullable List<String> attachmentsToRemove,
       Integer accountId,
-      String frequency)
+      String frequency,
+      Integer[] waitlistsId)
       throws IOException {
 
     Program existingProgram =
@@ -561,7 +579,7 @@ public class ProgramService {
     existingProgram.setLocation(location);
     existingProgram.setFrequency(frequency);
 
-    programRepository.save(existingProgram);
+    Program savedProgram = programRepository.save(existingProgram);
 
     log.debug("PROGRAM ID OF MODIFIED PROGRAM: {} ", existingProgram.getProgramId());
 
@@ -598,7 +616,61 @@ public class ProgramService {
         log.debug("PROGRAM ATTACHMENTS COUNT: {} ", programAttachments.size());
       }
     }
+
+    if (waitlistsId != null) {
+      this.modifyProgramParticipants(savedProgram.getProgramId(), waitlistsId, "Waitlisted", false);
+    }
+
     return new ProgramDto(existingProgram, programAttachmentDtos);
+  }
+
+  /**
+   * Creates and links program participants for an existing created program.
+   *
+   * @param programId Takes programId of program
+   * @param participants List of participants for the program
+   */
+  public void modifyProgramParticipants(
+      Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
+
+    if (participants == null) {
+      log.info("There are no participants for this program.");
+      return;
+    }
+
+    for (Integer participant : participants) {
+      Account user =
+          accountService
+              .getAccount(participant)
+              .orElseThrow(
+                  () ->
+                      new ResourceNotFoundException("User with id " + participant + " not found."));
+
+      ProgramParticipant existingParticipant =
+          programParticipantRepository.findParticipant(programId, user.getAccountId());
+      if (existingParticipant != null) {
+        log.info("User " + user.getAccountId() + " already a participant for this program.");
+        continue;
+      }
+
+      ZonedDateTime confirmedDate = null;
+      if (isConfirmed) {
+        confirmedDate = ZonedDateTime.now();
+      }
+
+      ProgramParticipant programParticipant =
+          new ProgramParticipant(
+              new ProgramParticipantId(programId, user.getAccountId()),
+              null,
+              participantType,
+              isConfirmed,
+              confirmedDate);
+
+      programParticipantRepository.save(programParticipant);
+      log.info("Created participant : " + programParticipant);
+    }
+
+    log.info("Participants creation is successful");
   }
 
   /**

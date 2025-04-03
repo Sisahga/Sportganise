@@ -1,4 +1,5 @@
 import { Attendees, ProgramDetails } from "@/types/trainingSessionDetails";
+import { RSVPRequestDto } from "@/types/participation";
 import { getBearerToken } from "../apiHelper";
 import log from "loglevel";
 
@@ -30,6 +31,30 @@ const programParticipantApi = {
 
     const data: Attendees = await response.json();
     console.log("Heres the data:", data);
+    return data;
+  },
+
+  rsvpToProgram: async ({
+    programId,
+    accountId,
+  }: RSVPRequestDto): Promise<boolean> => {
+    console.log("Calling RSVP with:", { programId, accountId });
+
+    const url = `${baseMappingUrl}/rsvp?programId=${programId}&accountId=${accountId}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: getBearerToken(),
+      },
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`RSVP failed: ${response.status} ${errorText}`);
+    }
+
+    const data: boolean = await response.json();
     return data;
   },
 
@@ -65,6 +90,10 @@ const programParticipantApi = {
     programId: number | null | undefined,
   ) => {
     const url = `${baseMappingUrl}/invite-private?programId=${programId}&accountId=${accountId}`;
+
+    console.log("inviteToPrivateEvent CALLED with:", { programId, accountId });
+    log.info("inviteToPrivateEvent CALLED with:", { programId, accountId });
+
     const response = await fetch(url, {
       method: "POST",
       headers: {

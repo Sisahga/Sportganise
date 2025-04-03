@@ -24,7 +24,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
             "http://localhost:3000", // Frontend server
             "http://localhost:5173", // Frontend running locally
             "https://onibad.sportganise.com",
-            "http://localhost")
+            "http://localhost",
+            "capacitor://localhost")
         .withSockJS();
   }
 

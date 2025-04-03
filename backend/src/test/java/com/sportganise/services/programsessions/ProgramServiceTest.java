@@ -324,7 +324,9 @@ public class ProgramServiceTest {
                     Collections.emptyList(), // Empty list for attachments to add
                     Collections.emptyList(), // Empty list for attachments to remove
                     2,
-                    null)); // Mock account ID
+                    null, // Mock account ID
+                    null // Mock waitlistsId
+                    ));
 
     assertEquals("Program not found with ID: 1", exception.getMessage());
     verify(programRepository).findById(1);
@@ -406,7 +408,8 @@ public class ProgramServiceTest {
         Collections.emptyList(),
         Collections.emptyList(),
         1,
-        "daily");
+        "daily",
+        null);
 
     verify(programRecurrenceRepository)
         .deleteOverflowingRecurrences(any(ZonedDateTime.class), any(Integer.class));
@@ -455,7 +458,8 @@ public class ProgramServiceTest {
         Collections.emptyList(),
         Collections.emptyList(),
         1,
-        "daily");
+        "daily",
+        null);
 
     System.out.println("Last Occurrence: " + lastrecurrence);
 

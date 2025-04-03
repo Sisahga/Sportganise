@@ -54,6 +54,7 @@ function CustomDayContent({
   eventDates,
 }: DayContentProps & { eventDates: Date[] }) {
   const weekend = isSaturday(date) || isSunday(date);
+
   const isEventDay = eventDates.some((eventDate: Date) =>
     isSameDay(eventDate, date),
   );

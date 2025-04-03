@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import usePrograms from "@/hooks/usePrograms";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -70,6 +71,8 @@ import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import AssignCoach from "./AssignCoaches";
 
+type ModalKey = "invite" | "waitlist";
+
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -81,6 +84,7 @@ export default function CreateTrainingSessionForm() {
     loading: playersLoading,
     error: playersError,
   } = usePlayers();
+  const programs = usePrograms();
 
   const members: Member[] = players.map((player) => ({
     id: player.accountId,
@@ -88,16 +92,24 @@ export default function CreateTrainingSessionForm() {
     email: player.email,
     role: player.type, // e.g., "PLAYER", "COACH", "ADMIN"
   }));
-  const [showInviteModal, setShowInviteModal] = useState(false);
-  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  const [openModal, setOpenModal] = useState<ModalKey>();
+  const [invitedMembers, setInvitedMembers] = useState<number[]>([]);
   const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
+  const [waitlistedMembers, setWaitlistedMembers] = useState<number[]>([]);
   const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
+  const selectedType = useWatch({
+    control: form.control,
+    name: "type",
+  });
+
+  const showField =
+    selectedType === TRAINING || selectedType === SPECIALTRAINING;
 
   const handleCoachesSelection = (selectedCoaches: number[]) => {
     setSelectedCoaches(selectedCoaches);
     setShowSelectedCoaches(true);
   };
-  const minAttendees = selectedMembers.length;
+  const minAttendees = invitedMembers.length;
 
   useEffect(() => {
     if (form.getValues("capacity") === undefined) {
@@ -108,7 +120,7 @@ export default function CreateTrainingSessionForm() {
   const maxAttendees = form.watch("capacity");
 
   useEffect(() => {
-    if (maxAttendees < minAttendees) {
+    if (maxAttendees !== undefined && maxAttendees < minAttendees) {
       form.setValue("capacity", minAttendees);
     }
   }, [minAttendees, maxAttendees, form]);
@@ -179,7 +191,7 @@ export default function CreateTrainingSessionForm() {
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (values.visibility === "private" && selectedMembers.length === 0) {
+    if (values.visibility === "private" && invitedMembers.length === 0) {
       toast({
         variant: "destructive",
         title: "Validation Error",
@@ -228,11 +240,21 @@ export default function CreateTrainingSessionForm() {
       }
 
       // Append participants (each selected member's id)
-      if (selectedMembers && selectedMembers.length > 0) {
-        selectedMembers.forEach((memberId) => {
+      if (invitedMembers && invitedMembers.length > 0) {
+        invitedMembers.forEach((memberId) => {
           formData.append("participantsId", memberId.toString());
         });
       }
+
+      // Append waitlisted participants
+      waitlistedMembers.forEach((memberId) => {
+        formData.append("waitlistsId", memberId.toString());
+      });
+
+      // Append coaches
+      selectedCoaches.forEach((memberId) => {
+        formData.append("coachesId", memberId.toString());
+      });
 
       // API submit form
       setLoading(true);
@@ -255,7 +277,7 @@ export default function CreateTrainingSessionForm() {
       });
 
       form.reset();
-      setSelectedMembers([]);
+      setInvitedMembers([]);
       // Navigate to home page
       navigate(-1);
     } catch (err) {
@@ -390,67 +412,73 @@ export default function CreateTrainingSessionForm() {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="coaches"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel className="font-semibold text-base">
-                    Coach*
-                  </FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "pl-3 text-left font-normal text-muted-foreground",
-                          )}
-                        >
-                          <span>Select coaches</span>
-                          <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[250px] p-0" align="start">
-                      <AssignCoach
-                        members={members}
-                        field={field}
-                        onSelectCoaches={handleCoachesSelection}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    Select the coaches in charge of the program
-                  </FormDescription>
-                  {/* Only show the list of selected coaches when showSelectedCoaches is true */}
-                  {showSelectedCoaches && (
-                    <div className="mt-2 bg-white border p-2 rounded">
-                      <div className="mb-2 font-medium"> Selected Coaches:</div>
-                      {selectedCoaches.length > 0 ? (
-                        <ul className="list-disc pl-5">
-                          {selectedCoaches.map((memberId) => {
-                            const member = members.find(
-                              (m) => m.id === memberId,
-                            );
-                            return (
-                              <li key={memberId}>
-                                {member ? member.name : "Unknown member"}
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          No coaches selected.
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Only show coach field if program type is Training Session or Special Training */}
+            {showField && (
+              <FormField
+                control={form.control}
+                name="coaches"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="font-semibold text-base">
+                      Coach*
+                    </FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal text-muted-foreground",
+                            )}
+                          >
+                            <span>Select coaches</span>
+                            <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[250px] p-0" align="start">
+                        <AssignCoach
+                          members={members}
+                          field={field}
+                          onSelectCoaches={handleCoachesSelection}
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription>
+                      Select the coaches in charge of the program
+                    </FormDescription>
+                    {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                    {showSelectedCoaches && (
+                      <div className="mt-2 bg-white border p-2 rounded">
+                        <div className="mb-2 font-medium">
+                          {" "}
+                          Selected Coaches:
+                        </div>
+                        {selectedCoaches.length > 0 ? (
+                          <ul className="list-disc pl-5">
+                            {selectedCoaches.map((memberId) => {
+                              const member = members.find(
+                                (m) => m.id === memberId,
+                              );
+                              return (
+                                <li key={memberId}>
+                                  {member ? member.name : "Unknown member"}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">
+                            No coaches selected.
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             {/** Start Date */}
             <FormField
@@ -486,6 +514,7 @@ export default function CreateTrainingSessionForm() {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        programsProp={programs}
                       />
                     </PopoverContent>
                   </Popover>
@@ -611,6 +640,7 @@ export default function CreateTrainingSessionForm() {
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
+                          programsProp={programs}
                         />
                       </PopoverContent>
                     </Popover>
@@ -763,6 +793,46 @@ export default function CreateTrainingSessionForm() {
               )}
             /> */}
 
+            {/** Waitlist */}
+            {showField && (
+              <FormItem className="flex flex-col">
+                <FormLabel className="font-semibold text-base">
+                  Waitlist
+                </FormLabel>
+                <FormDescription>
+                  Select who will be added to the waitlist for this program.
+                </FormDescription>
+                <FormMessage />
+                <div className="mt-2 border p-2 rounded">
+                  <div className="mb-2 font-medium">Selected Attendees:</div>
+                  {waitlistedMembers.length > 0 ? (
+                    <ul className="list-disc pl-5">
+                      {waitlistedMembers.map((memberId) => {
+                        const member = members.find((m) => m.id === memberId);
+                        return (
+                          <li key={memberId}>
+                            {member ? member.name : "Unknown member"}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      No member selected.
+                    </p>
+                  )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => setOpenModal("waitlist")}
+                  >
+                    Add Members
+                  </Button>
+                </div>
+              </FormItem>
+            )}
+
             {/** Visibility */}
             <FormField
               control={form.control}
@@ -805,7 +875,7 @@ export default function CreateTrainingSessionForm() {
                                   form.setValue("visibility", v.value);
                                   // Open the invite modal when selecting "private"
                                   if (v.value === "private") {
-                                    setShowInviteModal(true);
+                                    setOpenModal("invite");
                                   }
                                 }}
                               >
@@ -834,9 +904,9 @@ export default function CreateTrainingSessionForm() {
                       <div className="mb-2 font-medium">
                         Selected Attendees:
                       </div>
-                      {selectedMembers.length > 0 ? (
+                      {invitedMembers.length > 0 ? (
                         <ul className="list-disc pl-5">
-                          {selectedMembers.map((memberId) => {
+                          {invitedMembers.map((memberId) => {
                             const member = members.find(
                               (m) => m.id === memberId,
                             );
@@ -853,9 +923,10 @@ export default function CreateTrainingSessionForm() {
                         </p>
                       )}
                       <Button
+                        type="button"
                         size="sm"
                         className="mt-2"
-                        onClick={() => setShowInviteModal(true)}
+                        onClick={() => setOpenModal("invite")}
                       >
                         Add Attendees
                       </Button>
@@ -961,13 +1032,14 @@ export default function CreateTrainingSessionForm() {
                       type="number"
                       min={minAttendees}
                       {...field}
-                      value={maxAttendees ?? minAttendees}
                       onChange={(e) => {
-                        const newValue = e.target.value
-                          ? Number(e.target.value)
-                          : minAttendees;
-                        field.onChange(newValue);
+                        const value =
+                          e.target.value === ""
+                            ? undefined
+                            : Number(e.target.value);
+                        field.onChange(value);
                       }}
+                      value={maxAttendees === undefined ? "" : maxAttendees}
                     />
                   </FormControl>
                   <FormMessage />
@@ -1028,11 +1100,20 @@ export default function CreateTrainingSessionForm() {
       )}
       {/* Invite Modal */}
       <InviteModal
-        open={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
+        description="Invite members to training session."
+        open={openModal === "invite"}
+        onClose={() => setOpenModal(undefined)}
         members={members}
-        selectedMembers={selectedMembers}
-        setSelectedMembers={setSelectedMembers}
+        selectedMembers={invitedMembers}
+        setSelectedMembers={setInvitedMembers}
+      />
+      <InviteModal
+        description="Waitlist members for program."
+        open={openModal === "waitlist"}
+        onClose={() => setOpenModal(undefined)}
+        members={members}
+        selectedMembers={waitlistedMembers}
+        setSelectedMembers={setWaitlistedMembers}
       />
     </>
   );

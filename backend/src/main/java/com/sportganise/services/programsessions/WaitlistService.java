@@ -281,6 +281,8 @@ public class WaitlistService {
     } else {
       List<ProgramParticipant> userParticipants = participantRepository.findByAccountId(accountId);
       return userParticipants.stream()
+          // Only include participants with the role "Coach" or "Waitlisted"
+          .filter(pp -> "Coach".equals(pp.getType()) || "Waitlisted".equals(pp.getType()))
           .map(
               pp ->
                   programRepository
@@ -405,25 +407,44 @@ public class WaitlistService {
    * @return True if the user is newly registered as a participant, false otherwise.
    */
   public boolean rsvpToEvent(Integer accountId, Integer programId) {
+    Program program = this.getProgram(programId);
 
-    ProgramParticipant participant = getParticipant(programId, accountId);
+    if (program.getProgramType().equals(ProgramType.TRAINING)
+        || program.getProgramType().equals(ProgramType.SPECIALTRAINING)) {
+      log.warn("RSVP not allowed for this program type");
+      return false;
+    }
+
+    ProgramParticipant participant =
+        participantRepository
+            .findById(new ProgramParticipantId(programId, accountId))
+            .orElseGet(
+                () -> {
+                  Account account =
+                      accountRepository
+                          .findById(accountId)
+                          .orElseThrow(
+                              () ->
+                                  new AccountNotFoundException(
+                                      "Account not found for id: " + accountId));
+                  return new ProgramParticipant(
+                      new ProgramParticipantId(programId, account.getAccountId()),
+                      null,
+                      null,
+                      false,
+                      null);
+                });
 
     if (participant.isConfirmed()) {
-      log.warn("Participant already confirmed to program");
+      log.warn("Participant already confirmed program");
       throw new ProgramInvitationiException("Participant already confirmed to program");
     }
 
-    Program program = this.getProgram(programId);
-    if (!program.getProgramType().equals(ProgramType.TRAINING)) {
-      participant.setConfirmed(true);
-      participant.setConfirmedDate(ZonedDateTime.now());
-      participantRepository.save(participant);
+    participant.setConfirmed(true);
+    participant.setConfirmedDate(ZonedDateTime.now());
+    participantRepository.save(participant);
 
-      return participant.isConfirmed();
-    }
-
-    log.warn("RSVP not allowed for this program type");
-    return false;
+    return participant.isConfirmed();
   }
 
   /**

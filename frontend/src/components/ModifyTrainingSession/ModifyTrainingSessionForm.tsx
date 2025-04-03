@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import usePrograms from "@/hooks/usePrograms";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CloudUpload, Paperclip } from "lucide-react";
@@ -141,6 +142,8 @@ const locations = [
   },
 ] as const;
 
+type ModalKey = "invite" | "waitlist";
+
 export default function ModifyTrainingSessionForm() {
   const [accountId, setAccountId] = useState<number | null | undefined>();
   const { toast } = useToast();
@@ -150,10 +153,14 @@ export default function ModifyTrainingSessionForm() {
     [],
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<ModalKey>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
   const [attendees, setAttendees] = useState<Attendees[]>([]); // For US305+
+
+  const [waitlistedMembers, setWaitlistedMembers] = useState<number[]>([]);
   const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
   const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
+  const programs = usePrograms();
 
   const handleCoachesSelection = (selectedCoaches: number[]) => {
     setSelectedCoaches(selectedCoaches);
@@ -172,7 +179,7 @@ export default function ModifyTrainingSessionForm() {
     location: "",
     programAttachments: [],
     frequency: "",
-    visibility: "",
+    visibility: "public",
     author: "",
     cancelled: false,
     reccurenceDate: new Date(),
@@ -196,7 +203,6 @@ export default function ModifyTrainingSessionForm() {
   // State for selected participant IDs (existing attendees)
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   // State to control the InviteModal's visibility
-  const [showInviteModal, setShowInviteModal] = useState(false);
   const { players } = usePlayers();
   const members: Member[] = players.map((player) => ({
     id: player.accountId, // <-- now a number
@@ -210,6 +216,11 @@ export default function ModifyTrainingSessionForm() {
         (att) => att.accountId, // now a number
       );
       setSelectedMembers(attendeeIds);
+
+      const waitlistedIds = (location.state.attendees as Attendees[])
+        .filter((attendee) => attendee.participantType === "Waitlisted")
+        .map((attendee) => attendee.accountId);
+      setWaitlistedMembers(waitlistedIds);
     }
     if (location.state && location.state.programDetails) {
       setProgramDetails(location.state.programDetails);
@@ -346,6 +357,11 @@ export default function ModifyTrainingSessionForm() {
           type: "application/json",
         }),
       );
+
+      // Append waitlisted participants
+      waitlistedMembers.forEach((memberId) => {
+        formData.append("waitlistsId", memberId.toString());
+      });
 
       // API call submit form
       setLoading(true);
@@ -609,6 +625,7 @@ export default function ModifyTrainingSessionForm() {
                       selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
+                      programsProp={programs}
                     />
                   </PopoverContent>
                 </Popover>
@@ -886,6 +903,49 @@ export default function ModifyTrainingSessionForm() {
             )}
           /> */}
 
+          {/** Waitlist */}
+          <FormItem className="flex flex-col">
+            <FormLabel className="font-semibold text-base">Waitlist</FormLabel>
+            <FormDescription>
+              Select who will be added to the waitlist for this program.
+            </FormDescription>
+            <FormMessage />
+            <div className="mt-2 border p-2 rounded">
+              <div className="mb-2 font-medium">Selected Attendees:</div>
+              {waitlistedMembers.length > 0 ? (
+                <ul className="list-disc pl-5">
+                  {waitlistedMembers.map((memberId) => {
+                    const member = members.find((m) => m.id === memberId);
+                    return (
+                      <li key={memberId}>
+                        {member ? member.name : "Unknown member"}
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  No member selected.
+                </p>
+              )}
+              <Button
+                size="sm"
+                className="mt-2"
+                onClick={() => setOpenModal("waitlist")}
+              >
+                Add Members
+              </Button>
+            </div>
+          </FormItem>
+          <InviteModal
+            description="Waitlist members for program."
+            open={openModal === "waitlist"}
+            onClose={() => setOpenModal(undefined)}
+            members={members}
+            selectedMembers={waitlistedMembers}
+            setSelectedMembers={setWaitlistedMembers}
+          />
+
           {/** Visibility */}
           <FormField
             control={form.control}
@@ -928,7 +988,7 @@ export default function ModifyTrainingSessionForm() {
                               onSelect={() => {
                                 form.setValue("visibility", visibility.value);
                                 if (visibility.value === "private") {
-                                  setShowInviteModal(true);
+                                  setOpenModal("invite");
                                 }
                               }}
                             >
@@ -974,9 +1034,10 @@ export default function ModifyTrainingSessionForm() {
                       </p>
                     )}
                     <Button
+                      type="button"
                       size="sm"
                       className="mt-2"
-                      onClick={() => setShowInviteModal(true)}
+                      onClick={() => setOpenModal("invite")}
                     >
                       Edit Participants
                     </Button>
@@ -986,8 +1047,9 @@ export default function ModifyTrainingSessionForm() {
             )}
           />
           <InviteModal
-            open={showInviteModal}
-            onClose={() => setShowInviteModal(false)}
+            description="Invite members to training session."
+            open={openModal === "invite"}
+            onClose={() => setOpenModal(undefined)}
             members={members}
             selectedMembers={selectedMembers}
             setSelectedMembers={setSelectedMembers}

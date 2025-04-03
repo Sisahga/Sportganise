@@ -36,9 +36,7 @@ public class WebConfig implements WebMvcConfigurer {
     config.addAllowedOrigin("http://localhost:5173");
     config.addAllowedOrigin("https://onibad.sportganise.com");
     config.addAllowedOrigin("postman");
-    //    if (environment.equals("DEV")) {
-    //      config.addAllowedOrigin("postman");
-    //    }
+    config.addAllowedOrigin("capacitor://localhost");
     config.addAllowedHeader("*");
     config.setAllowedMethods(
         Arrays.asList(

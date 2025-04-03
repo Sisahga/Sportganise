@@ -4,7 +4,7 @@ export const formSchema = z
   .object({
     title: z.string().max(30, "Only 30 characters accepted."),
     type: z.string(),
-    coaches: z.array(z.number()).min(1, "At least one coach is required"),
+    coaches: z.array(z.number()).optional(),
     startDate: z.coerce.date(),
     endDate: z.coerce.date().optional(),
     frequency: z.string(),
@@ -27,6 +27,19 @@ export const formSchema = z
       .string()
       .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Invalid end time format"),
     location: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    // Validate that coaches are provided if type is not Tournament or Fundraiser
+    if (
+      (data.type === "TRAINING" || data.type === "SPECIALTRAINING") &&
+      data.coaches?.length === 0
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "At least one coach is required for training sessions.",
+        path: ["coaches"],
+      });
+    }
   })
   .superRefine((data, ctx) => {
     if (data.frequency !== "ONCE" && !data.endDate) {
