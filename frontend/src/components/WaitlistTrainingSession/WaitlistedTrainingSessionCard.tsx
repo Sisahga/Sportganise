@@ -1,14 +1,15 @@
 /* eslint-disable react/prop-types */
 import { Card } from "@/components/ui/card";
-import { Clock, MapPin, ChevronRight } from "lucide-react";
+import { Clock, MapPin, ChevronRight, LoaderCircle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/EventBadgeType";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { calculateEndTime } from "@/utils/calculateEndTime";
-import { getCookies } from "@/services/cookiesService";
 import useGetParticipant from "@/hooks/useGetParticipant";
 import ParticipantStatusBadgeType from "../ViewTrainingSessions/BadgeTypes/ParticipantStatusBadgeType";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import React, { useEffect } from "react";
 
 interface WaitlistedTrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -18,15 +19,29 @@ interface WaitlistedTrainingSessionCardProps {
 const WaitlistedTrainingSessionCard: React.FC<
   WaitlistedTrainingSessionCardProps
 > = ({ programDetails, onSelectTraining }) => {
-  const accountId = getCookies().accountId;
+  const { userId, preLoading } = useGetCookies();
 
-  const { data: userAttendee } = useGetParticipant(
+  const { data: userAttendee, fetchParticipant } = useGetParticipant(
     programDetails?.programId,
-    accountId,
+    userId,
   );
+
+  useEffect(() => {
+    if (!preLoading && userId) {
+      fetchParticipant().then((_) => _);
+    }
+  }, [preLoading, userId, fetchParticipant]);
 
   if (!programDetails) {
     return null; // Prevent rendering if programDetails is missing
+  }
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   return (

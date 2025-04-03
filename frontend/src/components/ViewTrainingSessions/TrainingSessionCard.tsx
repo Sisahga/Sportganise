@@ -18,9 +18,10 @@ import {
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
 import { ONCE } from "@/constants/programconstants";
-import { getCookies } from "@/services/cookiesService";
 import ParticipantStatusBadgeType from "./BadgeTypes/ParticipantStatusBadgeType";
 import useGetParticipant from "@/hooks/useGetParticipant";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import React, { useEffect } from "react";
 
 interface TrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -38,12 +39,18 @@ const TrainingSessionCard: React.FC<Program> = ({
   };
   log.debug("Rendering training session card.");
 
-  const accountId = getCookies().accountId;
+  const { userId, preLoading } = useGetCookies();
 
-  const { data: userAttendee } = useGetParticipant(
+  const { data: userAttendee, fetchParticipant } = useGetParticipant(
     programDetails.programId, // assuming programDetails contains the program ID as 'id'
-    accountId,
+    userId,
   );
+
+  useEffect(() => {
+    if (!preLoading && userId) {
+      fetchParticipant().then((_) => _);
+    }
+  }, [preLoading, userId]);
 
   return (
     <Card>
