@@ -72,9 +72,9 @@ import { NotificationRequest } from "@/types/notifications";
 import useSendNotification from "@/hooks/useSendNotification";
 import useGetCookies from "@/hooks/useGetCookies.ts";
 
-import AssignCoach from "../TrainingSessionForm/AssignCoaches";
-import SelectMembersModal from "../TrainingSessionForm/SelectMembersModal";
-import { Member } from "../TrainingSessionForm/types";
+import AssignCoach from "./AssignCoaches";
+import SelectMembersModal from "./SelectMembersModal";
+import { Member } from "./types";
 import usePlayers from "@/hooks/usePlayers";
 /**All select element options */
 const types = [
