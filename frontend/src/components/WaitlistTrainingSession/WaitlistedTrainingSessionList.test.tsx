@@ -16,7 +16,7 @@ const dummyProgramDetails: ProgramDetails = {
   expiryDate: new Date("2023-03-01T12:00:00Z"),
   frequency: "Weekly",
   location: "Test Location",
-  visibility: "Public",
+  visibility: "public",
   author: "Coach Benjamin Luijan",
   cancelled: false,
   reccurenceDate: new Date("2023-03-08T10:00:00Z"),
