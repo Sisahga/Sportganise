@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
 import log from "loglevel";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import InviteModal, { Member } from "./InviteModal";
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
@@ -54,10 +54,6 @@ import {
 // Import constants for select fields
 import { TRAINING } from "@/constants/programconstants";
 import { SPECIALTRAINING } from "@/constants/programconstants";
-import { TOURNAMENT } from "@/constants/programconstants";
-import { FUNDRAISER } from "@/constants/programconstants";
-import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
-import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
 import { PUBLIC } from "@/constants/programconstants";
 import { PRIVATE } from "@/constants/programconstants";
 import { DAILY } from "@/constants/programconstants";
@@ -69,6 +65,7 @@ import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import useGetCookies from "@/hooks/useGetCookies.ts";
 import AssignCoach from "./AssignCoaches";
+import { frequencies, locations, programTypes } from "./constants";
 
 type ModalKey = "invite" | "waitlist";
 
@@ -100,13 +97,14 @@ export default function CreateTrainingSessionForm() {
     name: "type",
   });
 
-  const showField =
+  const isTrainingOrSpecial =
     selectedType === TRAINING || selectedType === SPECIALTRAINING;
 
-  const handleCoachesSelection = (selectedCoaches: number[]) => {
-    setSelectedCoaches(selectedCoaches);
+  const handleCoachesSelection = useCallback((newSelectedCoaches: number[]) => {
+    setSelectedCoaches(newSelectedCoaches);
     setShowSelectedCoaches(true);
-  };
+  }, []);
+
   const minAttendees = invitedMembers.length;
 
   useEffect(() => {
@@ -142,53 +140,6 @@ export default function CreateTrainingSessionForm() {
       log.debug(`CreateTrainingSessionForm accountId : ${userId}`);
     }
   }, [userId, navigate, cookies]);
-
-  const types = [
-    {
-      label: "Training Session",
-      value: TRAINING,
-    },
-    {
-      label: "Fundraiser",
-      value: FUNDRAISER,
-    },
-    {
-      label: "Tournament",
-      value: TOURNAMENT,
-    },
-    {
-      label: "Special Training",
-      value: SPECIALTRAINING,
-    },
-  ] as const;
-  const frequencies = [
-    {
-      label: "Daily",
-      value: DAILY,
-    },
-    {
-      label: "Weekly",
-      value: WEEKLY,
-    },
-    {
-      label: "Monthly",
-      value: MONTHLY,
-    },
-    {
-      label: "One time",
-      value: ONCE,
-    },
-  ] as const;
-  const locations = [
-    {
-      label: "Centre de loisirs St-Denis",
-      value: CENTRE_DE_LOISIRS_ST_DENIS,
-    },
-    {
-      label: "Collège de Maisonnneuve",
-      value: COLLEGE_DE_MAISONNEUVE,
-    },
-  ] as const;
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -370,8 +321,9 @@ export default function CreateTrainingSessionForm() {
                           )}
                         >
                           {field.value
-                            ? types.find((type) => type.value === field.value)
-                                ?.label
+                            ? programTypes.find(
+                                (type) => type.value === field.value,
+                              )?.label
                             : "Select type"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -383,7 +335,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No type found.</CommandEmpty>
                           <CommandGroup>
-                            {types.map((type) => (
+                            {programTypes.map((type) => (
                               <CommandItem
                                 value={type.label}
                                 key={type.value}
@@ -414,7 +366,7 @@ export default function CreateTrainingSessionForm() {
             />
 
             {/* Only show coach field if program type is Training Session or Special Training */}
-            {showField && (
+            {isTrainingOrSpecial && (
               <FormField
                 control={form.control}
                 name="coaches"
@@ -448,7 +400,7 @@ export default function CreateTrainingSessionForm() {
                     <FormDescription>
                       Select the coaches in charge of the program
                     </FormDescription>
-                    {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                    {/* Only show the list of selected coaches after first selecting values */}
                     {showSelectedCoaches && (
                       <div className="mt-2 bg-white border p-2 rounded">
                         <div className="mb-2 font-medium">
@@ -793,7 +745,7 @@ export default function CreateTrainingSessionForm() {
             /> */}
 
             {/** Waitlist */}
-            {showField && (
+            {isTrainingOrSpecial && (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
                   Waitlist
