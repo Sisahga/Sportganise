@@ -20,8 +20,6 @@ import ChannelSettingsDropdown from "./Settings/ChannelSettingsDropdown";
 import useSendMessage from "@/hooks/useSendMessage";
 import UserBlockedComponent from "@/components/Inbox/ChatScreen/Settings/UserBlockedComponent";
 import log from "loglevel";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
-
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -41,6 +39,7 @@ import { NotificationRequest } from "@/types/notifications.ts";
 import { MAX_BODY_LENGTH } from "@/constants/notification.constants.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
 import ChatScreenSkeleton from "@/components/Inbox/ChatScreen/ChatScreenSkeleton.tsx";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 log.setLevel("debug");
 
@@ -64,9 +63,6 @@ const ChatScreen: React.FC = () => {
     isBlocked,
   } = state as ChatScreenProps;
 
-  const cookies = getCookies();
-  const currentUserId = getAccountIdCookie(cookies);
-
   const navigate = useNavigate();
 
   // States
@@ -88,7 +84,9 @@ const ChatScreen: React.FC = () => {
   const [disableFetching, setDisableFetching] = useState<boolean>(false);
 
   // Hooks.
+  const { userId, cookies, preLoading } = useGetCookies();
   const {
+    fetchMessages,
     messages,
     setMessages,
     loading,
@@ -100,13 +98,17 @@ const ChatScreen: React.FC = () => {
   const { sendDirectMessage } = useSendMessage();
   const { uploadAttachments } = useUploadAttachments();
   const {
+    fetchDeleteRequest,
     deleteRequestActive,
     deleteRequest,
     setDeleteRequestActive,
     setDeleteRequest,
     currentMemberStatus,
-  } = useGetDeleteChannelRequest(channelId, currentUserId); // Check if a delete request is active.
-  const { members } = useChannelMembers(channelId, currentUserId, channelType);
+  } = useGetDeleteChannelRequest(channelId, userId); // Check if a delete request is active.
+  const { fetchChannelMembers, members } = useChannelMembers(
+    channelId,
+    channelType,
+  );
   const { sendNotification } = useSendNotification();
 
   const chatScrollRef = useRef<HTMLDivElement>(null);
@@ -257,13 +259,13 @@ const ChatScreen: React.FC = () => {
     }
 
     const messagePayload: SendMessageComponent = {
-      senderId: currentUserId,
+      senderId: userId,
       channelId: channelId,
       messageContent: data.message || "",
       sentAt: new Date().toISOString(),
       type: "CHAT",
-      senderFirstName: cookies.firstName,
-      avatarUrl: cookies.pictureUrl,
+      senderFirstName: cookies?.firstName || "",
+      avatarUrl: cookies?.pictureUrl || "",
     };
     setMessageStatus("Sending...");
 
@@ -293,9 +295,9 @@ const ChatScreen: React.FC = () => {
       });
       formData.append("channelId", channelId.toString());
       formData.append("messageId", response.messageId.toString());
-      formData.append("senderId", currentUserId.toString());
-      formData.append("senderFirstName", cookies.firstName);
-      formData.append("senderAvatarUrl", cookies.pictureUrl || "");
+      formData.append("senderId", userId.toString());
+      formData.append("senderFirstName", cookies?.firstName || "");
+      formData.append("senderAvatarUrl", cookies?.pictureUrl || "");
       const uploadResponse: ResponseDto<MessageComponent> =
         await uploadAttachments(formData);
       if (uploadResponse.statusCode === 200) {
@@ -346,15 +348,15 @@ const ChatScreen: React.FC = () => {
       channelType === "SIMPLE"
         ? members.map((member) => member.accountId)
         : members
-            .filter((member) => member.accountId !== currentUserId)
+            .filter((member) => member.accountId !== userId)
             .map((member) => member.accountId);
 
     log.debug("notifiees: ", notifiees);
 
     const notifTitle =
       channelType === "GROUP"
-        ? `${currentChannelName} - ${cookies.firstName} sent a message`
-        : `${cookies.firstName}`;
+        ? `${currentChannelName} - ${cookies?.firstName} sent a message`
+        : `${cookies?.firstName}`;
 
     const notifRequest: NotificationRequest = {
       title: notifTitle,
@@ -374,6 +376,16 @@ const ChatScreen: React.FC = () => {
       log.debug("Chat screen ref is null.");
     }
   };
+
+  useEffect(() => {
+    if (!preLoading && cookies && userId) {
+      fetchMessages(userId).then((_) => _);
+      fetchChannelMembers(userId).then((_) => _);
+      fetchDeleteRequest().then((_) => _);
+    } else {
+      log.debug("No cookies or no user id.");
+    }
+  }, [preLoading, userId, cookies]);
 
   // Connect to WebSocket
   useEffect(() => {
@@ -452,7 +464,7 @@ const ChatScreen: React.FC = () => {
     };
   }, [fetchMoreMessages, hasMoreMessages, loadingMore, disableFetching]);
 
-  if (loading) {
+  if (preLoading || loading) {
     return <ChatScreenSkeleton />;
   }
 
@@ -503,18 +515,21 @@ const ChatScreen: React.FC = () => {
               {currentChannelName}
             </h1>
           </div>
-          <ChannelSettingsDropdown
-            channelType={channelType}
-            channelId={channelId}
-            webSocketRef={webSocketServiceRef.current}
-            isBlocked={channelIsBlocked}
-            currentUserId={currentUserId}
-            channelName={channelName}
-            setCurrentChannelName={setCurrentChannelName}
-            currentChannelPictureUrl={currentChannelImageUrl}
-            setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
-            isDeleteRequestActive={deleteRequestActive}
-          />
+          {cookies && (
+            <ChannelSettingsDropdown
+              channelType={channelType}
+              channelId={channelId}
+              webSocketRef={webSocketServiceRef.current}
+              isBlocked={channelIsBlocked}
+              currentUserId={userId}
+              channelName={channelName}
+              setCurrentChannelName={setCurrentChannelName}
+              currentChannelPictureUrl={currentChannelImageUrl}
+              setCurrentChannelPictureUrl={setCurrentChannelImageUrl}
+              isDeleteRequestActive={deleteRequestActive}
+              cookies={cookies}
+            />
+          )}
         </div>
       </header>
 
@@ -529,15 +544,16 @@ const ChatScreen: React.FC = () => {
       </div>
 
       {/* Don't display to non-admin group members */}
-      {deleteRequestActive && currentMemberStatus !== undefined && (
+      {cookies && deleteRequestActive && currentMemberStatus !== undefined && (
         <DeleteRequest
           deleteRequestActive={deleteRequestActive}
           deleteRequest={deleteRequest}
-          currentUserId={currentUserId}
+          currentUserId={userId}
           currentUserApproverStatus={currentMemberStatus}
           setDeleteRequestActive={setDeleteRequestActive}
           websocketRef={webSocketServiceRef.current}
           setDeleteRequest={setDeleteRequest}
+          cookies={cookies}
         />
       )}
 
@@ -550,7 +566,7 @@ const ChatScreen: React.FC = () => {
         )}
         <ChatMessages
           messages={messages}
-          currentUserId={currentUserId}
+          currentUserId={userId}
           activateSkeleton={activateSkeleton}
           skeletonId={skeletonId}
           skeletonCount={skeletonCount}
@@ -559,13 +575,16 @@ const ChatScreen: React.FC = () => {
       </div>
 
       {/* Show blocked component if channel is blocked */}
-      <UserBlockedComponent
-        showBlockedMessage={channelIsBlocked}
-        channelIsBlocked={channelIsBlocked}
-        webSocketRef={webSocketServiceRef.current}
-        channelId={channelId}
-        channelType={channelType}
-      />
+      {cookies && (
+        <UserBlockedComponent
+          showBlockedMessage={channelIsBlocked}
+          channelIsBlocked={channelIsBlocked}
+          webSocketRef={webSocketServiceRef.current}
+          channelId={channelId}
+          channelType={channelType}
+          cookies={cookies}
+        />
+      )}
 
       {attachments.length > 0 && (
         <div className="flex flex-col">

@@ -3,9 +3,10 @@ import { useNavigate } from "react-router";
 import { ChannelItemProps } from "@/types/dmchannels.ts";
 import useLastMessage from "@/hooks/useLastMessage.ts";
 import log from "loglevel";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 import DefaultGroupAvatar from "@/assets/defaultGroupAvatar.png";
 import DefaultAvatar from "@/assets/defaultAvatar.png";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import { LoaderCircle } from "lucide-react";
 
 const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   channel,
@@ -13,8 +14,7 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
   extraInfo,
 }) => {
   const navigate = useNavigate();
-  const cookies = getCookies();
-  const userId = getAccountIdCookie(cookies);
+  const { userId, preLoading } = useGetCookies();
 
   const { lastMessage } = useLastMessage(channel.channelId);
 
@@ -48,6 +48,14 @@ const MessagingDashboardChannelItem: React.FC<ChannelItemProps> = ({
       handleClick();
     }
   };
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   // Horizontal layout (Messages)
   if (layout === "horizontal") {

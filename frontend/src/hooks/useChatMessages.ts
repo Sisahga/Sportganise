@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { MessageComponent } from "@/types/messaging.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 import { MESSAGE_FETCH_LIMIT } from "@/constants/messaging.constants.ts";
 
 function useChatMessages(channelId: number, read: boolean) {
@@ -11,37 +10,38 @@ function useChatMessages(channelId: number, read: boolean) {
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const [hasMoreMessages, setHasMoreMessages] = useState<boolean>(true);
   const [lastSentAt, setLastSentAt] = useState<string | null>(null);
-  const cookies = getCookies();
-  const userId = getAccountIdCookie(cookies);
 
   // Initial fetch of messages
-  const fetchMessages = async () => {
-    try {
-      setLoading(true);
-      console.log("Fetching intial messages...");
-      const response = await directMessagingApi.getDirectMessages(channelId);
-      if (response.length > 0) {
-        // Assume that there are more messages if the response length is equal to the fetch limit
-        setHasMoreMessages(response.length === MESSAGE_FETCH_LIMIT);
-        setLastSentAt(response[response.length - 1].sentAt);
-        // Reverse the messages so that the latest message is at the bottom
-        response.reverse();
-        setMessages(response);
+  const fetchMessages = useCallback(
+    async (userId: number) => {
+      try {
+        setLoading(true);
+        console.log("Fetching intial messages...");
+        const response = await directMessagingApi.getDirectMessages(channelId);
+        if (response.length > 0) {
+          // Assume that there are more messages if the response length is equal to the fetch limit
+          setHasMoreMessages(response.length === MESSAGE_FETCH_LIMIT);
+          setLastSentAt(response[response.length - 1].sentAt);
+          // Reverse the messages so that the latest message is at the bottom
+          response.reverse();
+          setMessages(response);
 
-        if (!read) {
-          await directMessagingApi.markChannelAsRead(channelId, userId);
+          if (!read) {
+            await directMessagingApi.markChannelAsRead(channelId, userId);
+          }
+        } else {
+          setLastSentAt(null);
+          setHasMoreMessages(false);
         }
-      } else {
-        setLastSentAt(null);
-        setHasMoreMessages(false);
+      } catch (err) {
+        console.error("Error fetching chat messages:", err);
+        setError("Failed to load messages.");
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error("Error fetching chat messages:", err);
-      setError("Failed to load messages.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [channelId],
+  );
 
   // Fetch more messages dynamically
   const fetchMoreMessages = useCallback(async () => {
@@ -74,17 +74,8 @@ function useChatMessages(channelId: number, read: boolean) {
     }
   }, [channelId, hasMoreMessages, loadingMore, lastSentAt]);
 
-  useEffect(() => {
-    if (!channelId) {
-      setError("Invalid channel ID");
-      setLoading(false);
-      return;
-    }
-
-    fetchMessages().then((r) => r);
-  }, [channelId]);
-
   return {
+    fetchMessages,
     messages,
     setMessages,
     loading,

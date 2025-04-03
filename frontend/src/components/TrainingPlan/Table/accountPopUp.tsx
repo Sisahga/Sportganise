@@ -7,15 +7,17 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/Button";
-import { User2Icon } from "lucide-react";
+import { LoaderCircle, User2Icon } from "lucide-react";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import log from "loglevel";
 import { useNavigate } from "react-router";
 import { CreateChannelDto } from "@/types/dmchannels";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
+import { getAccountIdCookie } from "@/services/cookiesService";
 import useCreateChannel from "@/hooks/useCreateChannel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import AttendeeBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/AttendeeBadgeType";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import { useEffect, useState } from "react";
 
 interface AccountPopUpProps {
   accountId: number;
@@ -36,11 +38,20 @@ const AccountPopUp: React.FC<AccountPopUpProps> = ({
     data: accountDetails,
     loading,
     error,
-  } = usePersonalInformation(accountId);
+    fetchAccountData,
+  } = usePersonalInformation();
   const navigate = useNavigate();
-  const cookies = getCookies();
-  const currentUserId = getAccountIdCookie(cookies);
+  const { cookies, preLoading } = useGetCookies();
   const { createChannel } = useCreateChannel();
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
+
+  useEffect(() => {
+    if (!preLoading && cookies) {
+      const accId = getAccountIdCookie(cookies);
+      setCurrentUserId(accId);
+      fetchAccountData(accId).then((_) => _);
+    }
+  }, [preLoading, cookies]);
 
   const handleSendMessage = async () => {
     const memberIds = [currentUserId, accountId];
@@ -68,7 +79,7 @@ const AccountPopUp: React.FC<AccountPopUpProps> = ({
             channelName: channelResponse.data.channelName,
             channelType: channelResponse.data.channelType,
             channelImageBlob: channelResponse.data.avatarUrl,
-            read: channelResponse.statusCode === 201 ? false : true,
+            read: channelResponse.statusCode !== 201,
           },
         });
       }
@@ -77,6 +88,14 @@ const AccountPopUp: React.FC<AccountPopUpProps> = ({
     }
   };
   log.debug("Rendering ParticipantPopUp");
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

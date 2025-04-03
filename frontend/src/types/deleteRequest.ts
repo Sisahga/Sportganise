@@ -1,5 +1,6 @@
 import React from "react";
 import WebSocketService from "@/services/WebSocketService.ts";
+import { CookiesDto } from "@/types/auth.ts";
 
 export enum DeleteChannelRequestMemberStatus {
   APPROVED = "APPROVED",
@@ -17,6 +18,7 @@ export interface DeleteRequestProps {
   setDeleteRequest: React.Dispatch<
     React.SetStateAction<DeleteChannelRequestResponseDto | null>
   >;
+  cookies: CookiesDto;
 }
 
 export interface DeleteChannelRequestDto {

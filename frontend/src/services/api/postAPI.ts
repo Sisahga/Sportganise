@@ -1,6 +1,5 @@
 import { getBearerToken } from "@/services/apiHelper";
 import { Post, ApiResponse } from "@/types/postdetail";
-import { getCookies } from "../cookiesService";
 import log from "loglevel";
 
 const BASE_API_URL = import.meta.env.VITE_API_BASE_URL + "/api/forum/posts";
@@ -15,16 +14,13 @@ const BASE_API_URL = import.meta.env.VITE_API_BASE_URL + "/api/forum/posts";
  */
 const postApi = {
   // Get Post Details
-  getPost: async (postId: number): Promise<ApiResponse<Post>> => {
-    const user = getCookies();
-    log.debug(
-      "Fetching post API, Post ID:",
-      postId,
-      user.accountId,
-      BASE_API_URL,
-    );
+  getPost: async (
+    postId: number,
+    userId: number,
+  ): Promise<ApiResponse<Post>> => {
+    log.debug("Fetching post API, Post ID:", postId, userId, BASE_API_URL);
 
-    const url = `${BASE_API_URL}/${postId}/${user.accountId}`;
+    const url = `${BASE_API_URL}/${postId}/${userId}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {

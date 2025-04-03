@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, LoaderCircle } from "lucide-react";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CloudUpload, Paperclip } from "lucide-react";
@@ -47,7 +47,6 @@ import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
 import { Attendees } from "@/types/trainingSessionDetails";
 import useModifyTrainingSession from "@/hooks/useModifyProgram";
-import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
 import { getFileName } from "@/utils/getFileName";
@@ -71,6 +70,7 @@ import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import { NotificationRequest } from "@/types/notifications";
 import useSendNotification from "@/hooks/useSendNotification";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 import AssignCoach from "../CreateTrainingSessionForm/AssignCoaches";
 import InviteModal, { Member } from "../CreateTrainingSessionForm/InviteModal";
@@ -144,7 +144,7 @@ const locations = [
 type ModalKey = "invite" | "waitlist";
 
 export default function ModifyTrainingSessionForm() {
-  const [accountId, setAccountId] = useState<number | null | undefined>();
+  const { userId, cookies, preLoading } = useGetCookies();
   const { toast } = useToast();
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
@@ -186,13 +186,13 @@ export default function ModifyTrainingSessionForm() {
   const { sendNotification } = useSendNotification();
 
   useEffect(() => {
-    const user = getCookies();
-    if (!user || user.type === "GENERAL" || user.type === "PLAYER") {
-      navigate("/");
+    if (!preLoading) {
+      if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
+        navigate("/");
+      }
+      log.debug(`Modify Training Session Form accountId : ${userId}`);
     }
-    setAccountId(user?.accountId);
-    log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [accountId, navigate]);
+  }, [userId, preLoading, navigate]);
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -364,7 +364,7 @@ export default function ModifyTrainingSessionForm() {
       // API call submit form
       setLoading(true);
       const modify = await modifyTrainingSession(
-        accountId,
+        userId,
         programDetails.programId,
         formData,
       );
@@ -417,6 +417,14 @@ export default function ModifyTrainingSessionForm() {
     control: form.control,
     name: "frequency",
   });
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <div className="mb-32">

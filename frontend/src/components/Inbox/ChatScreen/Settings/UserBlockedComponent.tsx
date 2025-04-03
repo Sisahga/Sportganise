@@ -13,14 +13,14 @@ import {
   SendMessageComponent,
   UserBlockedComponentProps,
 } from "@/types/messaging.ts";
-import { LockIcon as UserUnlock } from "lucide-react";
-import { useState } from "react";
+import { LoaderCircle, LockIcon as UserUnlock } from "lucide-react";
+import { useEffect, useState } from "react";
 import useUnblockUser from "@/hooks/useUnblockUser.ts";
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
 import useChannelMembers from "@/hooks/useChannelMembers.ts";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import log from "loglevel";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
+import { getAccountIdCookie } from "@/services/cookiesService.ts";
 
 const UserBlockedComponent = ({
   showBlockedMessage,
@@ -28,13 +28,23 @@ const UserBlockedComponent = ({
   webSocketRef,
   channelId,
   channelType,
+  cookies,
 }: UserBlockedComponentProps) => {
-  const cookies = getCookies();
   const currentUserId = getAccountIdCookie(cookies);
-  const { members } = useChannelMembers(channelId, currentUserId, channelType);
+  const { fetchChannelMembers, members } = useChannelMembers(
+    channelId,
+    channelType,
+  );
   const { unblockUser } = useUnblockUser();
   const { sendDirectMessage } = useSendMessage();
   const [showComponent, setShowComponent] = useState(showBlockedMessage);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchChannelMembers(currentUserId).then((_) => {
+      setLoading(false);
+    });
+  }, [fetchChannelMembers]);
 
   const handleUnblock = async () => {
     log.info("Unblocking user...");
@@ -61,6 +71,14 @@ const UserBlockedComponent = ({
       }
     }
   };
+
+  if (loading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <Drawer

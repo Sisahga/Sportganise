@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { RenameGroupDialog } from "./RenameGroupChat";
+import { CookiesDto } from "@/types/auth.ts";
 
 const renameChannelMock = vi.fn();
 vi.mock("@/hooks/useRenameChannel", () => ({
@@ -24,6 +25,18 @@ vi.mock("@/services/cookiesService", () => ({
   clearCookies: vi.fn(),
 }));
 
+const mockCookies: CookiesDto = {
+  accountId: 1,
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@example.com",
+  pictureUrl: "https://example.com/profile.jpg",
+  type: "user",
+  phone: "+1234567890",
+  organisationIds: [101, 102],
+  jwtToken: "fake.jwt.token",
+};
+
 describe("RenameGroupDialog", () => {
   const onCloseMock = vi.fn();
   const webSocketRef = null; // satisfies WebSocketService | null
@@ -46,6 +59,7 @@ describe("RenameGroupDialog", () => {
         setCurrentChannelName={setCurrentChannelNameMock}
         currentUserId={currentUserId}
         webSocketRef={webSocketRef}
+        cookies={mockCookies}
       />,
     );
     expect(screen.getByText("Rename Group")).toBeTruthy();
@@ -71,6 +85,7 @@ describe("RenameGroupDialog", () => {
         setCurrentChannelName={setCurrentChannelNameMock}
         currentUserId={currentUserId}
         webSocketRef={webSocketRef}
+        cookies={mockCookies}
       />,
     );
     const newNameInput = screen.getByLabelText("New Name");
@@ -93,6 +108,7 @@ describe("RenameGroupDialog", () => {
         setCurrentChannelName={setCurrentChannelNameMock}
         currentUserId={currentUserId}
         webSocketRef={webSocketRef}
+        cookies={mockCookies}
       />,
     );
     const newNameInput = screen.getByLabelText("New Name");
@@ -128,6 +144,7 @@ describe("RenameGroupDialog", () => {
         setCurrentChannelName={setCurrentChannelNameMock}
         currentUserId={currentUserId}
         webSocketRef={webSocketRef}
+        cookies={mockCookies}
       />,
     );
     const cancelButton = screen.getByRole("button", { name: "Cancel" });

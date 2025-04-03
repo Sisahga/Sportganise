@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { MembersSettingsDialog } from "./MembersSettings";
 import { GroupChannelMemberRole } from "@/types/dmchannels";
+import { CookiesDto } from "@/types/auth.ts";
 
 vi.mock("@/services/api/directMessagingApi", () => ({
   default: {
@@ -35,6 +36,18 @@ vi.mock("@/services/cookiesService", () => ({
 vi.mock("@/components/Inbox/AddMembers", () => ({
   default: () => <div data-testid="add-members">AddMembers Component</div>,
 }));
+
+const mockCookies: CookiesDto = {
+  accountId: 1,
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@example.com",
+  pictureUrl: "https://example.com/profile.jpg",
+  type: "user",
+  phone: "+1234567890",
+  organisationIds: [101, 102],
+  jwtToken: "fake.jwt.token",
+};
 
 describe("MembersSettingsDialog", () => {
   const onCloseMock = vi.fn();
@@ -73,6 +86,7 @@ describe("MembersSettingsDialog", () => {
         channelId={channelId}
         websocketRef={websocketRef}
         currentUserId={currentUserId}
+        cookies={mockCookies}
       />,
     );
     expect(screen.getByText("Members Settings")).toBeTruthy();
@@ -89,6 +103,7 @@ describe("MembersSettingsDialog", () => {
         channelId={channelId}
         websocketRef={websocketRef}
         currentUserId={currentUserId}
+        cookies={mockCookies}
       />,
     );
     const removeButton = screen.getByRole("button", {
@@ -109,6 +124,7 @@ describe("MembersSettingsDialog", () => {
         channelId={channelId}
         websocketRef={websocketRef}
         currentUserId={currentUserId}
+        cookies={mockCookies}
       />,
     );
     const removeButton = screen.getByRole("button", {
@@ -140,6 +156,7 @@ describe("MembersSettingsDialog", () => {
         channelId={channelId}
         websocketRef={websocketRef}
         currentUserId={currentUserId}
+        cookies={mockCookies}
       />,
     );
     const addMembersButton = screen.getByRole("button", {

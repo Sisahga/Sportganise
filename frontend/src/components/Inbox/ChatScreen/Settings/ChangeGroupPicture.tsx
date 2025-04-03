@@ -20,7 +20,6 @@ import {
   MAX_SINGLE_FILE_SIZE_TEXT,
 } from "@/constants/file.constants.ts";
 import { useToast } from "@/hooks/use-toast.ts";
-import { getCookies } from "@/services/cookiesService.ts";
 
 export function ChangePictureDialog({
   isOpen,
@@ -30,9 +29,8 @@ export function ChangePictureDialog({
   setCurrentChannelPictureUrl,
   webSocketRef,
   currentUserId,
+  cookies,
 }: ChangePictureDialogProps) {
-  const cookies = getCookies();
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [popupChannelPicture, setPopupChannelPicture] = useState<
     string | undefined

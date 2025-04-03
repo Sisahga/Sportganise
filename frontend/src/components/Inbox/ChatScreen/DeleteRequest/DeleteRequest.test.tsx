@@ -10,6 +10,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { BrowserRouter } from "react-router";
 import DeleteRequest from "./DeleteRequest.tsx";
 import { DeleteChannelRequestMemberStatus } from "@/types/deleteRequest.ts";
+import { CookiesDto } from "@/types/auth.ts";
 
 const mockNavigate = vi.fn();
 
@@ -21,6 +22,18 @@ vi.mock("react-router", async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+const mockCookies: CookiesDto = {
+  accountId: 1,
+  firstName: "John",
+  lastName: "Doe",
+  email: "john.doe@example.com",
+  pictureUrl: "https://example.com/profile.jpg",
+  type: "user",
+  phone: "+1234567890",
+  organisationIds: [101, 102],
+  jwtToken: "fake.jwt.token",
+};
 
 // TODO: fix test.
 describe.skip("DeleteRequest", () => {
@@ -53,6 +66,7 @@ describe.skip("DeleteRequest", () => {
           setDeleteRequestActive={vi.fn()}
           websocketRef={null}
           setDeleteRequest={vi.fn()}
+          cookies={mockCookies}
         />
       </BrowserRouter>,
     );

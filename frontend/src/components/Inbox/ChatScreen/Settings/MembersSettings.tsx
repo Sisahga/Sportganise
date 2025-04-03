@@ -29,7 +29,6 @@ import useSendMessage from "@/hooks/useSendMessage.ts";
 import AddMembers from "@/components/Inbox/AddMembers.tsx";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import directMessagingApi from "@/services/api/directMessagingApi.ts";
-import { getCookies } from "@/services/cookiesService.ts";
 
 export function MembersSettingsDialog({
   isOpen,
@@ -38,8 +37,8 @@ export function MembersSettingsDialog({
   channelId,
   websocketRef,
   currentUserId,
+  cookies,
 }: MembersSettingsDialogProps) {
-  const cookies = getCookies();
   const userFirstName = cookies.firstName;
   const [members, setMembers] = useState<ChannelMember[]>(channelMembers);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);

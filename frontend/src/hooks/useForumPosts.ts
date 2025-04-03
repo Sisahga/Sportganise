@@ -10,6 +10,7 @@ const useForumPosts = () => {
 
   //Fetch all posts
   const fetchPostsData = async (
+    currentUserId: number,
     searchTerm?: string,
     occurrenceDate?: string,
     type?: string,
@@ -21,6 +22,7 @@ const useForumPosts = () => {
     setLoading(true);
     try {
       const result = await fetchPosts(
+        currentUserId,
         searchTerm,
         occurrenceDate,
         type,
@@ -42,6 +44,7 @@ const useForumPosts = () => {
 
   // Reset all filters except searchTerm
   const resetFilters = async (
+    currentUserId: number,
     searchTerm: string,
     setOccurrenceDate: (value: string) => void,
     setType: (value: string) => void,
@@ -60,9 +63,9 @@ const useForumPosts = () => {
       setPage(1);
       setLimit(10);
 
-      await fetchPosts(searchTerm);
+      await fetchPosts(currentUserId, searchTerm);
 
-      const updatedPosts = await fetchPosts(searchTerm);
+      const updatedPosts = await fetchPosts(currentUserId, searchTerm);
       log.info("Filters reset succesfully");
       setPosts(updatedPosts);
     } catch (error) {

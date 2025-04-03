@@ -51,7 +51,6 @@ import {
   Paperclip,
   Loader2,
 } from "lucide-react";
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 // Import constants for select fields
 import { TRAINING } from "@/constants/programconstants";
 import { SPECIALTRAINING } from "@/constants/programconstants";
@@ -68,6 +67,7 @@ import { ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 import AssignCoach from "./AssignCoaches";
 
 type ModalKey = "invite" | "waitlist";
@@ -124,21 +124,24 @@ export default function CreateTrainingSessionForm() {
   }, [minAttendees, maxAttendees, form]);
 
   // AccountId from cookies
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, cookies, preLoading } = useGetCookies();
   useEffect(() => {
-    if (!accountId) {
-      log.debug("No accountId found");
+    if (!preLoading) {
+      if (!userId) {
+        log.debug("No accountId found");
+      }
+      log.info(`CreateTrainingSessionForm accountId is ${userId}`);
     }
-    log.info(`CreateTrainingSessionForm accountId is ${accountId}`);
-  }, [accountId]);
+  }, [userId]);
 
   useEffect(() => {
-    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
-      navigate("/");
+    if (!preLoading) {
+      if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
+        navigate("/");
+      }
+      log.debug(`CreateTrainingSessionForm accountId : ${userId}`);
     }
-    log.debug(`CreateTrainingSessionForm accountId : ${accountId}`);
-  }, [accountId, navigate, cookies]);
+  }, [userId, navigate, cookies]);
 
   const types = [
     {
@@ -256,7 +259,7 @@ export default function CreateTrainingSessionForm() {
 
       // API submit form
       setLoading(true);
-      const create = await createTrainingSession(accountId, formData);
+      const create = await createTrainingSession(userId, formData);
       setLoading(false);
       log.info("create", create);
       if (create === null) {
@@ -301,7 +304,7 @@ export default function CreateTrainingSessionForm() {
 
   return (
     <>
-      {playersLoading ? (
+      {playersLoading || preLoading ? (
         <div>Loading players...</div>
       ) : playersError ? (
         <div>Error loading players</div>

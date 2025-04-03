@@ -25,7 +25,6 @@ import log from "loglevel";
 import ResponseDto from "@/types/response.ts";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
-import { getCookies } from "@/services/cookiesService.ts";
 
 export default function DeleteRequest({
   deleteRequestActive,
@@ -35,8 +34,8 @@ export default function DeleteRequest({
   setDeleteRequestActive,
   websocketRef,
   setDeleteRequest,
+  cookies,
 }: DeleteRequestProps) {
-  const cookies = getCookies();
   const navigate = useNavigate();
 
   const { setApproverDeleteStatus } = useSetApproverDeleteStatus();

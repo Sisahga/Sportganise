@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   Dialog,
@@ -19,7 +17,6 @@ import useRenameChannel from "@/hooks/useRenameChannel.ts";
 import log from "loglevel";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
-import { getCookies } from "@/services/cookiesService.ts";
 
 export function RenameGroupDialog({
   isOpen,
@@ -29,9 +26,8 @@ export function RenameGroupDialog({
   setCurrentChannelName,
   currentUserId,
   webSocketRef,
+  cookies,
 }: RenameGroupDialogProps) {
-  const cookies = getCookies();
-
   const [currentName, setCurrentName] = useState(channelName);
   const [newName, setNewName] = useState("");
 

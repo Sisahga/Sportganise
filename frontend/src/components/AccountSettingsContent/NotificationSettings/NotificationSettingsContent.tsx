@@ -56,7 +56,7 @@ export default function NotificationSettings() {
         }
       });
     }
-  }, [userId]);
+  }, [userId, preLoading]);
 
   useEffect(() => {
     console.log(notificationMethods, notificationTypes);
