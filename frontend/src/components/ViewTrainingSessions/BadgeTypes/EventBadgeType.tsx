@@ -30,3 +30,7 @@ export default function EventBadgeType({ programType }: EventBadgeTypeProps) {
 
   return <Badge {...badgeProps}>{programType.toLowerCase()}</Badge>;
 }
+
+export function AttendingBadge() {
+  return <Badge className="bg-green-500 text-white">Attending</Badge>;
+}
