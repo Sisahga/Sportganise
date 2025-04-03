@@ -401,7 +401,9 @@ const TrainingSessionContent = () => {
         {user?.accountId && (
           <div className="my-6 mx-2 p-4 border rounded-md bg-gray-50 text-center">
             {!accountAttendee ? (
-              <p className="text-gray-600">You&apos;re not part of this program.</p>
+              <p className="text-gray-600">
+                You&apos;re not part of this program.
+              </p>
             ) : accountAttendee.participantType?.toLowerCase() ===
                 "subscribed" && accountAttendee.confirmed === false ? (
               <p className="text-red-600 font-medium">

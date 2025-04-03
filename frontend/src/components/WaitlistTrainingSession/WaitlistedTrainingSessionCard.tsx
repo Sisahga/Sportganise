@@ -21,14 +21,14 @@ const WaitlistedTrainingSessionCard: React.FC<
   const accountId = getCookies().accountId;
 
   const { data: userAttendee } = useGetParticipant(
-    programDetails.programId,
+    programDetails?.programId,
     accountId,
   );
 
   if (!programDetails) {
     return null; // Prevent rendering if programDetails is missing
   }
-  
+
   return (
     <Card
       onClick={() => onSelectTraining(programDetails)}
