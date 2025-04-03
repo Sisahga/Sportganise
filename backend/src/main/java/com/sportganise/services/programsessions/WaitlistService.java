@@ -281,6 +281,8 @@ public class WaitlistService {
     } else {
       List<ProgramParticipant> userParticipants = participantRepository.findByAccountId(accountId);
       return userParticipants.stream()
+          // Only include participants with the role "Coach" or "Waitlisted"
+          .filter(pp -> "Coach".equals(pp.getType()) || "Waitlisted".equals(pp.getType()))
           .map(
               pp ->
                   programRepository
