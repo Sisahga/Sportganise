@@ -1031,6 +1031,7 @@ export default function ModifyTrainingSessionForm() {
                       </p>
                     )}
                     <Button
+                      type="button"
                       size="sm"
                       className="mt-2"
                       onClick={() => setOpenModal("invite")}
