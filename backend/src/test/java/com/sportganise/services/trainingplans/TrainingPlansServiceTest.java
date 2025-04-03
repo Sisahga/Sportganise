@@ -8,6 +8,7 @@ import com.sportganise.dto.trainingplans.UploadTrainingPlansResponseDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.trainingplans.TrainingPlan;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.FileProcessingException;
 import com.sportganise.exceptions.ForbiddenException;
 import com.sportganise.exceptions.ResourceNotFoundException;
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +56,7 @@ public class TrainingPlansServiceTest {
     TrainingPlan plan2 = new TrainingPlan(2, 2, "url2.1", false, ZonedDateTime.now().minusDays(1));
     TrainingPlan plan3 = new TrainingPlan(3, 2, "url2.2", true, ZonedDateTime.now());
 
-    when(accountService.getAccount(userId)).thenReturn(Optional.of(user));
+    when(accountService.getAccount(userId)).thenReturn(user);
     when(accountService.hasPermissions(user.getType())).thenReturn(true);
     when(trainingPlansRepository.findTrainingPlans())
         .thenReturn(Arrays.asList(plan1, plan2, plan3));
@@ -75,7 +75,7 @@ public class TrainingPlansServiceTest {
     user.setAccountId(userId);
     user.setType(AccountType.GENERAL);
 
-    when(accountService.getAccount(userId)).thenReturn(Optional.of(user));
+    when(accountService.getAccount(userId)).thenReturn(user);
     when(accountService.hasPermissions(user.getType())).thenReturn(false);
 
     ForbiddenException exception =
@@ -88,13 +88,12 @@ public class TrainingPlansServiceTest {
   void shouldThrowResourceNotFoundException_whenUserNotFound() {
     Integer userId = 3;
 
-    when(accountService.getAccount(userId)).thenReturn(Optional.empty());
+    when(accountService.getAccount(userId))
+        .thenThrow(new AccountNotFoundException("User not found."));
 
-    ResourceNotFoundException exception =
+    AccountNotFoundException exception =
         assertThrows(
-            ResourceNotFoundException.class, () -> trainingPlansService.getTrainingPlans(userId));
-
-    assertEquals("User not found.", exception.getMessage());
+            AccountNotFoundException.class, () -> trainingPlansService.getTrainingPlans(userId));
   }
 
   @Test
@@ -104,7 +103,7 @@ public class TrainingPlansServiceTest {
     user.setAccountId(userId);
     user.setType(AccountType.COACH);
 
-    when(accountService.getAccount(userId)).thenReturn(Optional.of(user));
+    when(accountService.getAccount(userId)).thenReturn(user);
     when(accountService.hasPermissions(user.getType())).thenReturn(true);
     when(trainingPlansRepository.findTrainingPlans()).thenReturn(List.of());
 
@@ -123,7 +122,7 @@ public class TrainingPlansServiceTest {
     user.setAccountId(accountId);
     user.setType(AccountType.COACH);
 
-    when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
+    when(accountService.getAccount(accountId)).thenReturn(user);
     when(accountService.hasPermissions(user.getType())).thenReturn(true);
 
     when(mockFile1.getOriginalFilename()).thenReturn("plan1.pdf");
@@ -157,7 +156,7 @@ public class TrainingPlansServiceTest {
     user.setAccountId(accountId);
     user.setType(AccountType.PLAYER);
 
-    when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
+    when(accountService.getAccount(accountId)).thenReturn(user);
     when(accountService.hasPermissions(user.getType())).thenReturn(false);
 
     ForbiddenException exception =
@@ -178,11 +177,12 @@ public class TrainingPlansServiceTest {
     Integer accountId = 1;
     List<MultipartFile> files = Arrays.asList(mockFile1, mockFile2);
 
-    when(accountService.getAccount(accountId)).thenReturn(Optional.empty());
+    when(accountService.getAccount(accountId))
+        .thenThrow(new AccountNotFoundException("User not found."));
 
-    ResourceNotFoundException exception =
+    AccountNotFoundException exception =
         assertThrows(
-            ResourceNotFoundException.class,
+            AccountNotFoundException.class,
             () -> {
               trainingPlansService.uploadTrainingPlans(files, accountId);
             });
@@ -202,7 +202,7 @@ public class TrainingPlansServiceTest {
     user.setAccountId(accountId);
     user.setType(AccountType.COACH);
 
-    when(accountService.getAccount(accountId)).thenReturn(Optional.of(user));
+    when(accountService.getAccount(accountId)).thenReturn(user);
     when(accountService.hasPermissions(user.getType())).thenReturn(true);
 
     when(mockFile1.getOriginalFilename()).thenReturn("plan1.pdf");

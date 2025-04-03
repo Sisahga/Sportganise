@@ -18,7 +18,7 @@ function useChatMessages(channelId: number, read: boolean) {
         setLoading(true);
         console.log("Fetching intial messages...");
         const response = await directMessagingApi.getDirectMessages(channelId);
-        if (response.length > 0) {
+        if (response && response.length > 0) {
           // Assume that there are more messages if the response length is equal to the fetch limit
           setHasMoreMessages(response.length === MESSAGE_FETCH_LIMIT);
           setLastSentAt(response[response.length - 1].sentAt);
@@ -57,7 +57,7 @@ function useChatMessages(channelId: number, read: boolean) {
         lastSentAt,
       );
 
-      if (response.length > 0) {
+      if (response && response.length > 0) {
         setHasMoreMessages(response.length === MESSAGE_FETCH_LIMIT);
         setLastSentAt(response[response.length - 1].sentAt);
         response.reverse();

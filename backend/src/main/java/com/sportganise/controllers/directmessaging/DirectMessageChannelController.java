@@ -89,7 +89,7 @@ public class DirectMessageChannelController {
    * @return HTTP Code 200 and List of Direct Message Channels.
    */
   @GetMapping("/get-channels/{accountId}")
-  public ResponseEntity<List<ListDirectMessageChannelDto>> getChannels(
+  public ResponseEntity<ResponseDto<List<ListDirectMessageChannelDto>>> getChannels(
       @PathVariable int accountId) {
     List<ListDirectMessageChannelDto> channels =
         directMessageChannelService.getDirectMessageChannels(accountId);
@@ -97,7 +97,11 @@ public class DirectMessageChannelController {
       log.info("Found {} channels for account {}", channels.size(), accountId);
       log.info("Channels: {}", channels);
     }
-    return new ResponseEntity<>(channels, HttpStatus.OK);
+
+    ResponseDto<List<ListDirectMessageChannelDto>> response =
+        new ResponseDto<>(HttpStatus.OK.value(), "Channels retrieved successfully", channels);
+
+    return ResponseEntity.ok(response);
   }
 
   /**

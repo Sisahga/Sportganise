@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -147,13 +146,7 @@ public class TrainingPlansService {
    * @return Account object.
    */
   private Account getUser(Integer accountId) {
-    Optional<Account> userOptional = getAccountById(accountId);
-
-    if (userOptional.isEmpty()) {
-      throw new ResourceNotFoundException("User not found.");
-    }
-
-    Account user = userOptional.get();
+    Account user = this.accountService.getAccount(accountId);
     log.debug("USER ID: {}", user.getAccountId());
     return user;
   }
@@ -164,7 +157,7 @@ public class TrainingPlansService {
    * @param accountId Id of Account.
    * @return return an Optional of Account object.
    */
-  private Optional<Account> getAccountById(Integer accountId) {
+  private Account getAccountById(Integer accountId) {
     return accountService.getAccount(accountId);
   }
 

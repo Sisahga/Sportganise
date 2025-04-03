@@ -16,22 +16,22 @@ export interface Attendees {
 }
 
 export interface ProgramDetails {
-  programAttachments: ProgramAttachments[];
   programId: number;
   recurrenceId: number;
   programType: string;
   title: string;
   description: string;
+  author: string;
   capacity: number;
   occurrenceDate: Date;
+  reccurenceDate: Date;
   durationMins: number;
   expiryDate: Date;
   frequency: string;
   location: string;
   visibility: "public" | "private";
-  author: string;
-  cancelled: boolean;
-  reccurenceDate: Date;
+  isCancelled: boolean;
+  programAttachments: ProgramAttachments[];
 }
 
 export interface ProgramAttachments {

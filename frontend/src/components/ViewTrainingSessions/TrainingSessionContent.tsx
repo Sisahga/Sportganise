@@ -67,7 +67,7 @@ const TrainingSessionContent = () => {
     frequency: "",
     visibility: "public",
     author: "",
-    cancelled: false,
+    isCancelled: false,
     reccurenceDate: new Date(),
   });
 

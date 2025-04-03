@@ -1,8 +1,9 @@
-import { getBearerToken } from "@/services/apiHelper";
-import { Post, ApiResponse } from "@/types/postdetail";
+import { ApiService } from "@/services/apiHelper";
+import { FeedbackResponseDto, Post } from "@/types/postdetail";
 import log from "loglevel";
+import ResponseDto from "@/types/response.ts";
 
-const BASE_API_URL = import.meta.env.VITE_API_BASE_URL + "/api/forum/posts";
+const EXTENDED_BASE_URL = "/api/forum/posts";
 
 /**
  * Post APIs
@@ -13,89 +14,65 @@ const BASE_API_URL = import.meta.env.VITE_API_BASE_URL + "/api/forum/posts";
  * - deleteFeedback(postId, feedbackId) -> deletes feedback from a post
  */
 const postApi = {
-  // Get Post Details
   getPost: async (
     postId: number,
     userId: number,
-  ): Promise<ApiResponse<Post>> => {
-    log.debug("Fetching post API, Post ID:", postId, userId, BASE_API_URL);
+  ): Promise<ResponseDto<Post>> => {
+    log.debug("Fetching post API, Post ID:", postId, userId, EXTENDED_BASE_URL);
 
-    const url = `${BASE_API_URL}/${postId}/${userId}`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: getBearerToken(),
-        "Content-Type": "application/json",
-      },
-    });
+    const url = `${EXTENDED_BASE_URL}/${postId}/${userId}`;
 
-    log.debug("Response status:", response.status);
-    if (!response.ok) {
-      const error = await response.json();
-      log.error("Error fetching post:", error);
+    const response = await ApiService.get<ResponseDto<Post>>(url);
+
+    log.debug("Response status:", response.statusCode);
+    if (response.statusCode === 201) {
+      log.debug("Post successfully fetched.");
+      return response;
+    } else {
+      log.error("Error Code:", response.statusCode);
       throw new Error(
-        error?.message || `Error fetching post with ID ${postId}`,
+        response?.message || `Error fetching post with ID ${postId}`,
       );
     }
-
-    const data = await response.json();
-    log.debug("Fetched post data:", data);
-    return data;
   },
 
-  // Like a Post
   likePost: async (
     postId: number,
     accountId: number,
-  ): Promise<ApiResponse<null>> => {
+  ): Promise<ResponseDto<null>> => {
     log.debug("Liking post API, Post ID:", postId, "Account ID:", accountId);
 
-    const url = `${BASE_API_URL}/${postId}/like`;
-    log.debug("Request URL:", url);
+    const url = `${EXTENDED_BASE_URL}/${postId}/like`;
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: getBearerToken(),
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ accountId }),
+    const response = await ApiService.post<ResponseDto<null>>(url, {
+      accountId,
     });
 
-    if (response.status === 500) {
-      const error = await response.json();
-      log.error("Error Code:", response.status);
-      throw new Error(error?.message || `Error liking post with ID ${postId}`);
+    if (response.statusCode === 201) {
+      log.debug("Post successfully liked.");
+      return response;
+    } else {
+      log.error("Error Code:", response.statusCode);
+      throw new Error(
+        response?.message || `Error liking post with ID ${postId}`,
+      );
     }
-
-    const data = await response.json();
-    log.debug("Post liked successfully, response data:", data);
-    return data;
   },
 
-  // Unlike a Post
   unlikePost: async (postId: number, accountId: number): Promise<void> => {
     log.debug("Unliking post API, Post ID:", postId, "Account ID:", accountId);
 
-    const url = `${BASE_API_URL}/${postId}/unlike/${accountId}`;
+    const url = `${EXTENDED_BASE_URL}/${postId}/unlike/${accountId}`;
     log.debug("Request URL:", url);
 
-    const response = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
+    const response = await ApiService.delete<ResponseDto<string>>(url);
 
-    log.debug("Response status:", response.status);
-    if (!response.ok) {
-      const error = await response.json();
-      log.error("Error unliking post:", error);
+    if (response.statusCode !== 204) {
+      log.error("Error unliking post: ", response.message);
       throw new Error(
-        error?.message || `Error unliking post with ID ${postId}`,
+        response?.message || `Error unliking post with ID ${postId}`,
       );
     }
-
     log.debug("Post unliked successfully");
   },
 
@@ -114,30 +91,31 @@ const postApi = {
       content,
     );
 
-    const url = `${BASE_API_URL}/${postId}/add-feedback`;
+    const url = `${EXTENDED_BASE_URL}/${postId}/add-feedback`;
     log.debug("Request URL:", url);
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: getBearerToken(),
-        "Content-Type": "application/json",
+    const response = await ApiService.post<ResponseDto<FeedbackResponseDto>>(
+      url,
+      {
+        accountId,
+        content,
       },
-      body: JSON.stringify({ accountId, content }),
-    });
+    );
 
-    if (!response.ok) {
-      const error = await response.json();
-      log.error("Error adding feedback:", error);
+    if (response.statusCode === 201 && response.data) {
+      log.debug("Feedback successfully added.");
+      return response.data.feedbackId;
+    } else if (response.statusCode === 201 && !response.data) {
+      log.error("Successful response but no feedback ID returned in response.");
       throw new Error(
-        error?.message || `Error adding feedback to post with ID ${postId}`,
+        `Error adding feedback to post with ID ${postId}: No feedback ID returned.`,
+      );
+    } else {
+      log.error("Error Code:", response.statusCode);
+      throw new Error(
+        response?.message || `Error adding feedback to post with ID ${postId}`,
       );
     }
-
-    const data = await response.json();
-    log.debug("Feedback added successfully, response data:", data);
-
-    return data.data.feedbackId;
   },
 
   // Delete Feedback from Post
@@ -149,26 +127,20 @@ const postApi = {
       feedbackId,
     );
 
-    const url = `${BASE_API_URL}/${postId}/delete-feedback/${feedbackId}`;
+    const url = `${EXTENDED_BASE_URL}/${postId}/delete-feedback/${feedbackId}`;
     log.debug("Request URL:", url);
 
-    const response = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
+    const response = await ApiService.delete<ResponseDto<string>>(url);
 
-    if (!response.ok) {
-      const error = await response.json();
-      log.error("Error deleting feedback:", error);
+    if (response.statusCode === 204) {
+      log.debug("Feedback successfully deleted.");
+    } else {
+      log.error("Error Code:", response.statusCode);
       throw new Error(
-        error?.message || `Error deleting feedback from post with ID ${postId}`,
+        response?.message ||
+          `Error deleting feedback from post with ID ${postId}`,
       );
     }
-
-    const data = await response.json();
-    log.debug("Feedback deleted successfully, response data:", data);
   },
 };
 

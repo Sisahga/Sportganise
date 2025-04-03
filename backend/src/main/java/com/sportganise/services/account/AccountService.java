@@ -24,7 +24,6 @@ import com.sportganise.services.account.auth.Auth0ApiService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -239,9 +238,12 @@ public class AccountService {
    *
    * @param id id of the account.
    * @return The Account with the matching email.
+   * @throws AccountNotFoundException if the account is not found.
    */
-  public Optional<Account> getAccount(Integer id) {
-    return accountRepository.findById(id);
+  public Account getAccount(Integer id) {
+    return accountRepository
+        .findById(id)
+        .orElseThrow(() -> new AccountNotFoundException("Account not found"));
   }
 
   /**

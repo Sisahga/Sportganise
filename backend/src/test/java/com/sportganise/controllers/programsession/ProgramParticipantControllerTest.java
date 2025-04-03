@@ -6,7 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.sportganise.controllers.programsessions.ProgramParticipantController;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
-import com.sportganise.exceptions.ParticipantNotFoundException;
+import com.sportganise.exceptions.GlobalExceptionHandler;
+import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.services.programsessions.WaitlistService;
 import java.util.Collections;
 import java.util.List;
@@ -51,9 +52,9 @@ public class ProgramParticipantControllerTest {
                     .param("programId", programId.toString())
                     .param("accountId", accountId.toString()))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.programId").value(programId))
-            .andExpect(jsonPath("$.accountId").value(accountId))
-            .andExpect(jsonPath("$.confirmed").value(false))
+            .andExpect(jsonPath("$.data.programId").value(programId))
+            .andExpect(jsonPath("$.data.accountId").value(accountId))
+            .andExpect(jsonPath("$.data.confirmed").value(false))
             .andReturn();
 
     assertNotNull(result);
@@ -62,10 +63,13 @@ public class ProgramParticipantControllerTest {
 
   @Test
   public void testMarkAbsent_ParticipantNotFound() throws Exception {
-    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    this.mockMvc =
+        MockMvcBuilders.standaloneSetup(programParticipantController)
+            .setControllerAdvice(new GlobalExceptionHandler())
+            .build();
     when(waitlistService.markAbsent(programId, accountId))
         .thenThrow(
-            new ParticipantNotFoundException(
+            new ResourceNotFoundException(
                 "Participant not found on waitlist for program: "
                     + programId
                     + ", account: "
@@ -76,9 +80,10 @@ public class ProgramParticipantControllerTest {
             MockMvcRequestBuilders.patch("/api/program-participant/mark-absent")
                 .param("programId", programId.toString())
                 .param("accountId", accountId.toString()))
-        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.statusCode").value(404))
         .andExpect(
-            content().string("Participant not found on waitlist for program: 1, account: 2"));
+            jsonPath("$.message")
+                .value("Participant not found on waitlist for program: 1, account: 2"));
 
     verify(waitlistService).markAbsent(programId, accountId);
   }
@@ -95,7 +100,7 @@ public class ProgramParticipantControllerTest {
                 .param("programId", programId.toString())
                 .param("accountId", accountId.toString()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.confirmed").value(false));
+        .andExpect(jsonPath("$.data.confirmed").value(false));
 
     verify(waitlistService).markAbsent(programId, accountId);
   }
@@ -140,25 +145,28 @@ public class ProgramParticipantControllerTest {
                 .param("programId", programId.toString())
                 .param("accountId", accountId.toString()))
         .andExpect(status().isOk())
-        .andExpect(content().string(expectedRank.toString()));
+        .andExpect(jsonPath("$.data").value(expectedRank));
 
     verify(waitlistService).optProgramParticipantDto(programId, accountId);
   }
 
   @Test
   public void testOptProgramParticipant_ParticipantNotFound() throws Exception {
-    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    this.mockMvc =
+        MockMvcBuilders.standaloneSetup(programParticipantController)
+            .setControllerAdvice(new GlobalExceptionHandler())
+            .build();
     String errorMessage = "Participant not found";
     when(waitlistService.optProgramParticipantDto(programId, accountId))
-        .thenThrow(new ParticipantNotFoundException(errorMessage));
+        .thenThrow(new ResourceNotFoundException(errorMessage));
 
     mockMvc
         .perform(
             MockMvcRequestBuilders.patch("/api/program-participant/opt-participant")
                 .param("programId", programId.toString())
                 .param("accountId", accountId.toString()))
-        .andExpect(status().isNotFound())
-        .andExpect(content().string(errorMessage));
+        .andExpect(jsonPath("$.statusCode").value(404))
+        .andExpect(jsonPath("$.message").value(errorMessage));
 
     verify(waitlistService).optProgramParticipantDto(programId, accountId);
   }
@@ -176,25 +184,27 @@ public class ProgramParticipantControllerTest {
                 .param("programId", programId.toString())
                 .param("accountId", accountId.toString()))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.confirmed").value(true));
+        .andExpect(jsonPath("$.data.confirmed").value(true));
 
     verify(waitlistService).confirmParticipant(programId, accountId);
   }
 
   @Test
   public void testConfirmParticipant_ParticipantNotFound() throws Exception {
-    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    this.mockMvc =
+        MockMvcBuilders.standaloneSetup(programParticipantController)
+            .setControllerAdvice(new GlobalExceptionHandler())
+            .build();
     String errorMessage = "Participant not found";
     when(waitlistService.confirmParticipant(programId, accountId))
-        .thenThrow(new ParticipantNotFoundException(errorMessage));
+        .thenThrow(new ResourceNotFoundException(errorMessage));
 
     mockMvc
         .perform(
             MockMvcRequestBuilders.patch("/api/program-participant/confirm-participant")
                 .param("programId", programId.toString())
                 .param("accountId", accountId.toString()))
-        .andExpect(status().isNotFound())
-        .andExpect(content().string(errorMessage));
+        .andExpect(jsonPath("$.statusCode").value(404));
 
     verify(waitlistService).confirmParticipant(programId, accountId);
   }
@@ -217,18 +227,18 @@ public class ProgramParticipantControllerTest {
 
   @Test
   public void testOptOutParticipant_ParticipantNotFound() throws Exception {
-    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+    this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).setControllerAdvice(new GlobalExceptionHandler()).build();
     String errorMessage = "Participant not found";
     when(waitlistService.optOutParticipant(programId, accountId))
-        .thenThrow(new ParticipantNotFoundException(errorMessage));
+        .thenThrow(new ResourceNotFoundException(errorMessage));
 
     mockMvc
         .perform(
             MockMvcRequestBuilders.patch("/api/program-participant/out-participant")
                 .param("accountId", accountId.toString())
                 .param("programId", programId.toString()))
-        .andExpect(status().isNotFound())
-        .andExpect(content().string(errorMessage));
+        .andExpect(jsonPath("$.statusCode").value(404))
+        .andExpect(jsonPath("$.message").value(errorMessage));
 
     verify(waitlistService).optOutParticipant(programId, accountId);
   }

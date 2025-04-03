@@ -45,9 +45,17 @@ export default function HeaderNav() {
     setIsDrawerOpen(false);
   };
 
+  let isNavigating = false;
   const clearCookiesAndNavigate = async () => {
-    await clearCookies();
-    navigate("/login");
+    if (isNavigating) return;
+
+    isNavigating = true;
+    try {
+      await clearCookies();
+      navigate("/login");
+    } catch (error) {
+      log.error("Error clearing cookies:", error);
+    }
   };
 
   if (preLoading) {

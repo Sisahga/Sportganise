@@ -5,6 +5,7 @@ import {
 } from "@/services/cookiesService.ts";
 import { useCallback, useEffect, useState } from "react";
 import { CookiesDto } from "@/types/auth.ts";
+import log from "loglevel";
 
 const useGetCookies = () => {
   const [cookies, setCookies] = useState<CookiesDto>();
@@ -13,6 +14,7 @@ const useGetCookies = () => {
   const [preLoading, setPreLoading] = useState<boolean>(true);
 
   const fetchCookies = useCallback(async () => {
+    log.info("Fetching cookies...");
     const response = await getCookies();
     setCookies(response);
     setUserId(getAccountIdCookie(response));

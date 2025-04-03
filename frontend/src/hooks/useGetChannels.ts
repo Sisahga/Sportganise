@@ -12,13 +12,18 @@ const useGetChannels = () => {
   const fetchChannels = useCallback(async (userId: number) => {
     try {
       const response = await directMessagingApi.getChannels(userId);
-      setChannels(response);
-      response.forEach((channel) => {
-        if (!channel.read) {
-          setUnreadChannelCount((prev) => prev + 1);
-        }
-      });
-      setLoading(false);
+      if (!response) {
+        setError("No channels found.");
+        return;
+      } else {
+        setChannels(response);
+        response.forEach((channel) => {
+          if (!channel.read) {
+            setUnreadChannelCount((prev) => prev + 1);
+          }
+        });
+        setLoading(false);
+      }
     } catch (err) {
       log.error("Error fetching chat messages:", err);
       setError("Failed to load messages.");

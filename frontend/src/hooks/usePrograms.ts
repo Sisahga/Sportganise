@@ -23,7 +23,7 @@ function usePrograms() {
         log.info("Fetching programs for accountId:", accountId);
         const response = await trainingSessionApi.getPrograms(accountId);
 
-        if (!response || response.statusCode !== 200) {
+        if (!response || response?.statusCode !== 200) {
           throw new Error("Failed to fetch all programs.");
         }
 

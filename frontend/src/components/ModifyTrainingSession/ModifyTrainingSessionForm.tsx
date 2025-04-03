@@ -179,7 +179,7 @@ export default function ModifyTrainingSessionForm() {
     frequency: "",
     visibility: "public",
     author: "",
-    cancelled: false,
+    isCancelled: false,
     reccurenceDate: new Date(),
   });
   const { modifyTrainingSession } = useModifyTrainingSession();

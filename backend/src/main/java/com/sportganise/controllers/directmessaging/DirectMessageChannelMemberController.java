@@ -126,7 +126,7 @@ public class DirectMessageChannelMemberController {
    * @return ResponseEntity with status 200 if successful, 404 if not.
    */
   @PutMapping("/{channelId}/{accountId}/mark-as-read")
-  public ResponseEntity<Void> markChannelAsRead(
+  public ResponseEntity<ResponseDto<Void>> markChannelAsRead(
       @PathVariable int channelId, @PathVariable int accountId) {
     int updatedRows =
         this.directMessageChannelMemberService.markChannelAsRead(channelId, accountId);
@@ -141,7 +141,9 @@ public class DirectMessageChannelMemberController {
         "Successfully marked channel as read for channel id: {} and account id: {}",
         channelId,
         accountId);
-    return ResponseEntity.ok().build();
+    ResponseDto<Void> response =
+        new ResponseDto<>(HttpStatus.OK.value(), "Channel marked as read successfully", null);
+    return ResponseEntity.ok(response);
   }
 
   /**
