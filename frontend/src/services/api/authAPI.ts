@@ -2,7 +2,6 @@ import log from "loglevel";
 import {
   CookiesDto,
   LoginRequest,
-  LoginResponse,
   ModifyPasswordRequest,
   ModifyPasswordResponse,
   SendCodeRequest,
@@ -15,148 +14,140 @@ import {
   ResetPasswordRequest,
 } from "@/types/auth";
 import { isCookiesDto, setCookies } from "@/services/cookiesService";
-import { setAuthToken } from "@/services/apiHelper.ts";
+import { ApiService, setAuthToken } from "@/services/apiHelper.ts";
+import ResponseDto from "@/types/response.ts";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-export const login = async (data: LoginRequest): Promise<LoginResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+const EXTENDED_BASE_URL = "/api/auth";
 
-  if (!response.ok) {
-    // Try parsing the error response as JSON
-    const errorResponse = await response.json().catch(() => null);
-
+export const login = async (
+  data: LoginRequest,
+): Promise<ResponseDto<CookiesDto>> => {
+  const response = await ApiService.post<ResponseDto<CookiesDto>>(
+    `${EXTENDED_BASE_URL}/login`,
+    data,
+    { requiresAuth: false },
+  );
+  console.log("Login response: ", response);
+  if (response.statusCode === 200) {
+    console.log("Data: ", response.data);
+    if (response.data && isCookiesDto(response.data)) {
+      await setCookies(response.data);
+      await setAuthToken(response.data.jwtToken || "");
+      return response;
+    } else {
+      log.warn("No cookies data found in login response.");
+      throw new Error("No cookies data found in login response.");
+    }
+  } else {
     const errorMessage =
-      errorResponse?.message || `HTTP error! status: ${response.status}`;
+      response.message || `HTTP error! status: ${response.statusCode}`;
     throw new Error(errorMessage);
   }
-
-  const loginResponse: LoginResponse = await response.json();
-
-  if (loginResponse.data && isCookiesDto(loginResponse.data)) {
-    setCookies(loginResponse.data);
-    setAuthToken(loginResponse.data.jwtToken || "");
-  } else {
-    log.warn("No cookies data found in login response");
-  }
-
-  return loginResponse;
 };
 
-export const signUp = async (data: SignUpRequest): Promise<SignUpResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+export const signUp = async (
+  data: SignUpRequest,
+): Promise<ResponseDto<SignUpResponse>> => {
+  const response = await ApiService.post<ResponseDto<SignUpResponse>>(
+    `${EXTENDED_BASE_URL}/signup`,
+    data,
+    { requiresAuth: false },
+  );
 
-  console.log("Raw response:", response);
+  log.debug("SignUp response: ", response);
 
-  if (!response.ok) {
-    const errorResponse = await response.text();
-    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+  if (response.statusCode === 201) {
+    return response;
+  } else {
+    const errorMessage =
+      response.message || `HTTP error! status: ${response.statusCode}`;
+    throw new Error(errorMessage);
   }
-
-  return await response.json();
 };
 
 export const sendCode = async (
   data: SendCodeRequest,
-): Promise<SendCodeResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/send-code`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+): Promise<ResponseDto<SendCodeResponse>> => {
+  const response = await ApiService.post<ResponseDto<SendCodeResponse>>(
+    `${EXTENDED_BASE_URL}/send-code`,
+    data,
+    { requiresAuth: false },
+  );
 
-  if (!response.ok) {
-    const errorResponse = await response.text();
-    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+  if (response.statusCode === 201) {
+    return response;
+  } else {
+    const errorMessage =
+      response.message || `HTTP error! status: ${response.statusCode}`;
+    throw new Error(errorMessage);
   }
-  return await response.json();
 };
 
 export const verifyCode = async (
   data: VerifyCodeRequest,
-): Promise<VerifyCodeResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/verify-code`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+): Promise<ResponseDto<VerifyCodeResponse>> => {
+  const response = await ApiService.post<ResponseDto<VerifyCodeResponse>>(
+    `${EXTENDED_BASE_URL}/verify-code`,
+    data,
+    { requiresAuth: false },
+  );
 
-  if (!response.ok) {
-    const errorResponse = await response.text();
-    throw new Error(errorResponse || `HTTP error! status: ${response.status}`);
+  if (response.statusCode === 200) {
+    const cookies: CookiesDto = {
+      accountId: response.data?.cookies?.accountId || null,
+      firstName: response.data?.cookies?.firstName || "",
+      lastName: response.data?.cookies?.lastName || "",
+      email: response.data?.cookies?.email || "",
+      pictureUrl: response.data?.cookies?.pictureUrl || null,
+      type: response.data?.cookies?.type || null,
+      phone: response.data?.cookies?.phone || null,
+      organisationIds: response.data?.cookies?.organisationIds || [],
+      jwtToken: null,
+    };
+
+    await setCookies(cookies);
+    await setAuthToken(response.data?.cookies?.jwtToken || "");
+
+    return response;
+  } else {
+    const errorMessage =
+      response.message || `HTTP error! status: ${response.statusCode}`;
+    throw new Error(errorMessage);
   }
-
-  const verifyCodeResponse: VerifyCodeResponse = await response.json();
-  const cookies: CookiesDto = {
-    accountId: verifyCodeResponse.data?.accountId || null,
-    firstName: verifyCodeResponse.data?.firstName || "",
-    lastName: verifyCodeResponse.data?.lastName || "",
-    email: verifyCodeResponse.data?.email || "",
-    pictureUrl: verifyCodeResponse.data?.pictureUrl || null,
-    type: verifyCodeResponse.data?.type || null,
-    phone: verifyCodeResponse.data?.phone || null,
-    organisationIds: verifyCodeResponse.data?.organisationIds || [],
-    jwtToken: null,
-  };
-  setCookies(cookies);
-  setAuthToken(verifyCodeResponse.data?.jwtToken || "");
-
-  return verifyCodeResponse;
 };
 
 export const resetPassword = async (
   data: ResetPasswordRequest,
-): Promise<ResetPasswordResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+): Promise<ResponseDto<ResetPasswordResponse>> => {
+  const response = await ApiService.patch<ResponseDto<ResetPasswordResponse>>(
+    `${EXTENDED_BASE_URL}/reset-password`,
+    data,
+    { requiresAuth: false },
+  );
 
-  if (!response.ok) {
-    const errorResponse = await response.json();
-    throw new Error(
-      errorResponse.message || `HTTP error! status: ${response.status}`,
-    );
+  if (response.statusCode === 200) {
+    return response;
+  } else {
+    const errorMessage =
+      response.message || `HTTP error! status: ${response.statusCode}`;
+    throw new Error(errorMessage);
   }
-
-  return await response.json();
 };
 
 export const modifyPassword = async (
   data: ModifyPasswordRequest,
-): Promise<ModifyPasswordResponse> => {
-  const response = await fetch(`${API_BASE_URL}/api/auth/modify-password`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+): Promise<ResponseDto<ModifyPasswordResponse>> => {
+  const response = await ApiService.patch<ResponseDto<ModifyPasswordResponse>>(
+    `${EXTENDED_BASE_URL}/modify-password`,
+    data,
+    { requiresAuth: false },
+  );
 
-  if (!response.ok) {
-    const errorResponse = await response.json(); // Parse the response as JSON
-    throw new Error(
-      errorResponse.message || `HTTP error! status: ${response.status}`,
-    );
+  if (response.statusCode === 200) {
+    return response;
+  } else {
+    const errorMessage =
+      response.message || `HTTP error! status: ${response.statusCode}`;
+    throw new Error(errorMessage);
   }
-
-  return await response.json();
 };

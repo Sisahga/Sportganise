@@ -41,7 +41,7 @@ export function RenameGroupDialog({
         channelName: newName,
       };
       const response = await renameChannel(renameChannelDto);
-      if (response?.status === 200) {
+      if (response?.statusCode === 200) {
         log.info("Channel renamed successfully");
         const updaterMessageView = `You changed the group name to ${newName}`;
         const otherMessageView = `${cookies.firstName} group name was changed to ${newName}`;
@@ -60,7 +60,7 @@ export function RenameGroupDialog({
         setNewName("");
         setCurrentChannelName(newName);
         onClose();
-      } else if (response?.status === 404) {
+      } else if (response?.statusCode === 404) {
         log.error("Channel not found");
       } else {
         log.error("Error renaming channel");

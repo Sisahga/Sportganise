@@ -1,37 +1,33 @@
 import { Attendees, ProgramDetails } from "@/types/trainingSessionDetails";
+import { ApiService } from "../apiHelper";
 import { RSVPRequestDto } from "@/types/participation";
-import { getBearerToken } from "../apiHelper";
 import log from "loglevel";
+import ResponseDto from "@/types/response.ts";
 
-const baseMappingUrl =
-  import.meta.env.VITE_API_BASE_URL + "/api/program-participant";
+const EXTENDED_BASE_URL = "/api/program-participant";
 
 const programParticipantApi = {
   getProgramParticipant: async (
     programId: number,
     accountId: number | null | undefined,
   ) => {
-    const url = `${baseMappingUrl}/get-participant?programId=${programId}&accountId=${accountId}`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
-    console.log("In ProgramParticipantApi.getProgramParticipant");
-    log.info("------ In ProgramParticipantApi.getProgramParticipant");
-    console.log("response in ProgramParticipantApi:", response);
-    log.info("response in ProgramParticipantApi:", response);
+    const url = `${EXTENDED_BASE_URL}/get-participant?programId=${programId}&accountId=${accountId}`;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      log.error(`Error: ${response.status}`, errorText);
-      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    const response = await ApiService.get<ResponseDto<Attendees>>(url);
+
+    log.info("Fetch Program Participant response: ", response);
+
+    if (response.statusCode === 200 && response.data) {
+      return response.data;
+    } else if (response.statusCode === 200 && !response.data) {
+      log.error("No data found for program participant");
+      throw new Error("No data found for program participant");
+    } else {
+      log.error("Error fetching program participant: ", response);
+      throw new Error(
+        `Error fetching program participant: ${response.statusCode} - ${response.message}`,
+      );
     }
-
-    const data: Attendees = await response.json();
-    console.log("Heres the data:", data);
-    return data;
   },
 
   rsvpToProgram: async ({
@@ -40,128 +36,97 @@ const programParticipantApi = {
   }: RSVPRequestDto): Promise<boolean> => {
     console.log("Calling RSVP with:", { programId, accountId });
 
-    const url = `${baseMappingUrl}/rsvp?programId=${programId}&accountId=${accountId}`;
+    const url = `${EXTENDED_BASE_URL}/rsvp?programId=${programId}&accountId=${accountId}`;
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
+    const response = await ApiService.post<ResponseDto<boolean>>(url, {});
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`RSVP failed: ${response.status} ${errorText}`);
+    if (response.statusCode === 200 && response.data) {
+      return response.data;
+    } else {
+      throw new Error(
+        `RSVP failed: ${response.statusCode} ${response.message}`,
+      );
     }
-
-    const data: boolean = await response.json();
-    return data;
   },
 
   markAbsent: async (
     programId: number,
     accountId: number | null | undefined,
   ) => {
-    const url = `${baseMappingUrl}/mark-absent?programId=${programId}&accountId=${accountId}`;
-    const response = await fetch(url, {
-      method: "PATCH",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
-    console.log("In ProgramParticipantApi.markAbsent");
-    log.info("------ In ProgramParticipantApi.markAbsent");
-    console.log("response in ProgramParticipantApi:", response);
-    log.info("response in ProgramParticipantApi:", response);
+    const url = `${EXTENDED_BASE_URL}/mark-absent?programId=${programId}&accountId=${accountId}`;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      log.error(`Error: ${response.status}`, errorText);
-      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    const response = await ApiService.patch<ResponseDto<Attendees>>(url, {});
+    log.info("Response mark absent :", response);
+
+    if (response.statusCode === 200 && response.data) {
+      return response.data;
+    } else if (response.statusCode === 200 && !response.data) {
+      log.error("No data found for program participant");
+      throw new Error("No data found for program participant");
+    } else {
+      log.error("Error fetching program participant: ", response);
+      throw new Error(
+        `Error fetching program participant: ${response.statusCode} - ${response.message}`,
+      );
     }
-
-    const data: Attendees = await response.json();
-    console.log("Heres the data:", data);
-    return data;
   },
 
   inviteToPrivateEvent: async (
     accountId: number,
     programId: number | null | undefined,
   ) => {
-    const url = `${baseMappingUrl}/invite-private?programId=${programId}&accountId=${accountId}`;
+    const url = `${EXTENDED_BASE_URL}/invite-private?programId=${programId}&accountId=${accountId}`;
 
-    console.log("inviteToPrivateEvent CALLED with:", { programId, accountId });
-    log.info("inviteToPrivateEvent CALLED with:", { programId, accountId });
+    const response = await ApiService.post<ResponseDto<void>>(url, {});
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
-    console.log("In ProgramParticipantApi.inviteToPrivateEvent");
-    log.info("------ In ProgramParticipantApi.inviteToPrivateEvent");
-    console.log("response in inviteToPrivateEvent:", response);
-    log.info("response in inviteToPrivateEvent:", response);
+    log.info("Response in inviteToPrivateEvent:", response);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      log.error(`Error: ${response.status}`, errorText);
-      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    if (response.statusCode === 201) {
+      return response.data;
+    } else {
+      log.error("Error fetching program participant: ", response);
+      throw new Error(
+        `Error fetching program participant: ${response.statusCode} - ${response.message}`,
+      );
     }
-
-    const data: Attendees = await response.json();
-    console.log("Heres the data:", data);
-    return data;
   },
 
   optIn: async (programId: number, accountId: number | undefined) => {
-    const url = `${baseMappingUrl}/opt-participant?programId=${programId}&accountId=${accountId}`;
-    const response = await fetch(url, {
-      method: "PATCH",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
-    console.log("In waitlistParticipantsApi.optIn");
-    log.info("------ In waitlistParticipantsApi.optIn");
-    console.log("response in waitlistParticipantsApi.optIn:", response);
+    const url = `${EXTENDED_BASE_URL}/opt-participant?programId=${programId}&accountId=${accountId}`;
+
+    const response = await ApiService.patch<ResponseDto<number>>(url, {});
     log.info("response in waitlistParticipantsApi.optIn:", response);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      log.error(`Error: ${response.status}`, errorText);
-      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    if (response.statusCode === 200 && response.data) {
+      return response.data;
+    } else if (response.statusCode === 200 && !response.data) {
+      log.error("No data found for program participant");
+      throw new Error("No data found for program participant");
+    } else {
+      log.error("Error fetching program participant: ", response);
+      throw new Error(
+        `Error fetching program participant: ${response.statusCode} - ${response.message}`,
+      );
     }
-
-    const data: number = await response.json();
-    console.log("Heres the data:", data);
-    return data;
   },
 
   waitlistPrograms: async (accountId: number) => {
-    const url = `${baseMappingUrl}/waitlist-programs?accountId=${accountId}`;
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
-    console.log("In waitlistParticipantsApi.optIn");
-    log.info("------ In waitlistParticipantsApi.optIn");
-    console.log("response in waitlistParticipantsApi.optIn:", response);
-    log.info("response in waitlistParticipantsApi.optIn:", response);
+    const url = `${EXTENDED_BASE_URL}/waitlist-programs?accountId=${accountId}`;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      log.error(`Error: ${response.status}`, errorText);
-      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    const response = await ApiService.get<ResponseDto<ProgramDetails[]>>(url);
+    log.info("Response in waitlistParticipantsApi.optIn :", response);
+
+    if (response.statusCode === 200 && response.data) {
+      return response.data;
+    } else if (response.statusCode === 200 && !response.data) {
+      log.error("No data found for program participant");
+      throw new Error("No data found for program participant");
+    } else {
+      log.error("Error fetching program participant: ", response);
+      throw new Error(
+        `Error fetching program participant: ${response.statusCode} - ${response.message}`,
+      );
     }
-
-    const data: ProgramDetails[] = await response.json();
-    console.log("Heres the data:", data);
-    return data;
   },
 };
 

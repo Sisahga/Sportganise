@@ -71,7 +71,7 @@ export function MembersSettingsDialog({
         channelId,
         selectedMember.accountId,
       );
-      if (response?.status === 200) {
+      if (response?.statusCode === 200) {
         log.info(
           `Member ${selectedMember.accountId} removed from channel ${channelId}`,
         );
@@ -107,7 +107,7 @@ export function MembersSettingsDialog({
     };
     const response =
       await directMessagingApi.addChannelMembers(addChannelMembersDto);
-    if (response?.status === 201) {
+    if (response?.statusCode === 201) {
       log.info(`${memberIds.length} new members added to channel ${channelId}`);
       let newMemberNames = "";
       let counter = 0;

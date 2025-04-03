@@ -178,7 +178,7 @@ const ChannelSettingsDropdown = ({
   // Leaves group.
   const handleLeaveGroup = async () => {
     const response = await removeChannelMember(channelId, currentUserId);
-    if (response?.status === 200) {
+    if (response?.statusCode === 200) {
       log.info(`User ${currentUserId} left group ${channelId}`);
       const leaveMessageRemoverViewContent = "You left the group.";
       const leaveMessageContent = `${cookies.firstName} left the group.`;

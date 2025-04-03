@@ -1,40 +1,35 @@
 import { BlockUserRequestDto } from "@/types/blocklist.ts";
-import { getBearerToken } from "@/services/apiHelper.ts";
+import { ApiService } from "@/services/apiHelper.ts";
+import log from "loglevel";
+import ResponseDto from "@/types/response.ts";
 
-const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/blocklist";
+const EXTENDED_BASE_URL = "/api/blocklist";
 
 const blocklistApi = {
   blockUser: async (blockUserRequestDto: BlockUserRequestDto) => {
-    console.log(
+    log.debug(
       "Block user request object sending to api: ",
       blockUserRequestDto,
     );
-    const response = await fetch(`${baseMappingUrl}/block`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: getBearerToken(),
-      },
-      body: JSON.stringify(blockUserRequestDto),
-    });
-    return response.status;
+
+    const response = await ApiService.post<ResponseDto<null>>(
+      `${EXTENDED_BASE_URL}/block`,
+      blockUserRequestDto,
+    );
+
+    return response.statusCode;
   },
   unblockUser: async (blockUserRequestDto: BlockUserRequestDto) => {
-    console.log(
+    log.debug(
       "Unblock user request object sending to api: ",
       blockUserRequestDto,
     );
-    const response = await fetch(
-      `${baseMappingUrl}/unblock/${blockUserRequestDto.accountId}/${blockUserRequestDto.blockedId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: getBearerToken(),
-        },
-      },
+
+    const response = await ApiService.delete<ResponseDto<null>>(
+      `${EXTENDED_BASE_URL}/unblock/${blockUserRequestDto.accountId}/${blockUserRequestDto.blockedId}`,
     );
-    return response.status;
+
+    return response.statusCode;
   },
 };
 export default blocklistApi;

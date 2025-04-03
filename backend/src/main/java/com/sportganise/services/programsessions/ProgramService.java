@@ -99,15 +99,7 @@ public class ProgramService {
     return participants.stream()
         .map(
             participant -> {
-              Optional<Account> accountOptional =
-                  accountService.getAccount(participant.getAccountId());
-
-              if (accountOptional.isEmpty()) {
-                throw new IllegalArgumentException(
-                    "Account not found for id: " + participant.getAccountId());
-              }
-
-              Account account = accountOptional.get();
+              Account account = this.accountService.getAccount(participant.getAccountId());
 
               log.debug("ACCOUNT ID: {} {}", account.getFirstName(), account.getLastName());
 
@@ -131,7 +123,7 @@ public class ProgramService {
   public ProgramDto getProgramDetails(Integer programId) {
     Program program = programRepository.findProgramById(programId);
 
-    log.debug("PROGRAM ID: {} ", program.getProgramId());
+    log.debug("PROGRAM ID (getProgramDetails): {} ", program.getProgramId());
 
     List<ProgramAttachmentDto> programAttachments = getProgramAttachments(programId);
 
@@ -413,13 +405,7 @@ public class ProgramService {
 
     if (participants != null) {
       for (Integer participant : participants) {
-        Account user =
-            accountService
-                .getAccount(participant)
-                .orElseThrow(
-                    () ->
-                        new ResourceNotFoundException(
-                            "User with id " + participant + " not found."));
+        Account user = accountService.getAccount(participant);
 
         ZonedDateTime confirmedDate = null;
         if (isConfirmed) {
@@ -435,7 +421,7 @@ public class ProgramService {
                 confirmedDate);
 
         programParticipantRepository.save(programParticipant);
-        log.info("Created participant : " + programParticipant);
+        log.info("Created participant : {}", programParticipant);
       }
 
       log.info("Participants creation is successful");
@@ -613,7 +599,7 @@ public class ProgramService {
               new ProgramAttachmentDto(programDtoToModify.getProgramId(), s3AttachmentUrl));
           programAttachmentRepository.saveAll(programAttachments);
         }
-        log.debug("PROGRAM ATTACHMENTS COUNT: {} ", programAttachments.size());
+        log.debug("PROGRAM ATTACHMENTS COUNT (modifyProgram): {} ", programAttachments.size());
       }
     }
 
@@ -634,22 +620,17 @@ public class ProgramService {
       Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
 
     if (participants == null) {
-      log.info("There are no participants for this program.");
+      log.info("There are no participants for this program (modifyProgram).");
       return;
     }
 
     for (Integer participant : participants) {
-      Account user =
-          accountService
-              .getAccount(participant)
-              .orElseThrow(
-                  () ->
-                      new ResourceNotFoundException("User with id " + participant + " not found."));
+      Account user = accountService.getAccount(participant);
 
       ProgramParticipant existingParticipant =
           programParticipantRepository.findParticipant(programId, user.getAccountId());
       if (existingParticipant != null) {
-        log.info("User " + user.getAccountId() + " already a participant for this program.");
+        log.info("User {} already a participant for this program.", user.getAccountId());
         continue;
       }
 
@@ -667,10 +648,10 @@ public class ProgramService {
               confirmedDate);
 
       programParticipantRepository.save(programParticipant);
-      log.info("Created participant : " + programParticipant);
+      log.info("Created participant (modifyProgramParticipants): {}", programParticipant);
     }
 
-    log.info("Participants creation is successful");
+    log.info("Participants creation is successful (modifyProgramParticipants)");
   }
 
   /**

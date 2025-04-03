@@ -9,7 +9,7 @@ interface PublicRouteProps {
 
 const PublicRoute: React.FC<PublicRouteProps> = ({ redirectTo = "/" }) => {
   const location = useLocation();
-  const { userId, cookies, preLoading } = useGetCookies();
+  const { userId, preLoading } = useGetCookies();
 
   if (preLoading) {
     return (
@@ -19,7 +19,7 @@ const PublicRoute: React.FC<PublicRouteProps> = ({ redirectTo = "/" }) => {
     );
   }
 
-  if (cookies && userId !== 0) {
+  if (userId && userId !== 0) {
     return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
 

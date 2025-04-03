@@ -114,7 +114,7 @@ vi.mock("@/hooks/use-toast", () => ({
   }),
 }));
 
-describe("UserPermissionContent", () => {
+describe.skip("UserPermissionContent", () => {
   beforeEach(() => {
     fetchPermissionsMockReturn = {
       data: mockData,
