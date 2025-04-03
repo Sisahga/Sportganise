@@ -274,7 +274,7 @@ public class ProgramParticipantController {
    * @return A success boolean in the form of isConfirmed.
    */
   @PostMapping("/rsvp")
-  public ResponseEntity<?> rsvpParticipant(
+  public ResponseEntity<ResponseDto<Boolean>> rsvpParticipant(
       @RequestParam Integer programId, @RequestParam Integer accountId) {
 
     log.info("Processing RSVP for programId: {}, accountId: {}", programId, accountId);
@@ -283,16 +283,20 @@ public class ProgramParticipantController {
       boolean rsvpSuccess = waitlistService.rsvpToEvent(accountId, programId);
       if (rsvpSuccess) {
         log.info("RSVP successful for programId: {}, accountId: {}", programId, accountId);
-        return ResponseEntity.ok(true);
+        ResponseDto<Boolean> responseDto =
+            ResponseDto.<Boolean>builder()
+                .statusCode(HttpStatus.OK.value())
+                .message("RSVP successful")
+                .data(true)
+                .build();
+        return ResponseEntity.ok(responseDto);
       }
       log.warn("RSVP failed - program not eligible for direct confirmation");
-      return ResponseEntity.badRequest()
-          .body("RSVP failed - program not eligible for direct confirmation");
-
+      return ResponseDto.badRequest(null, "RSVP failed");
     } catch (ParticipantNotFoundException e) {
       log.error(
           "Participant not found for RSVP: programId: {}, accountId: {}", programId, accountId);
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+      throw new ResourceNotFoundException(e.getMessage());
     }
   }
 }
