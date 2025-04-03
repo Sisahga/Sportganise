@@ -25,7 +25,7 @@ export interface ProgramDetails {
   expiryDate: Date;
   frequency: string;
   location: string;
-  visibility: string;
+  visibility: "public";
   author: string;
   cancelled: boolean;
   reccurenceDate: Date;
@@ -44,7 +44,7 @@ const dummyProgramDetails: ProgramDetails = {
   expiryDate: new Date("2023-03-01T12:00:00Z"),
   frequency: "Weekly",
   location: "Test Location",
-  visibility: "Public",
+  visibility: "public",
   author: "Coach Benjamin Luijan",
   cancelled: false,
   reccurenceDate: new Date("2023-03-08T10:00:00Z"),
@@ -62,7 +62,7 @@ describe("WaitlistedTrainingSessionCard", () => {
       <WaitlistedTrainingSessionCard
         programDetails={dummyProgramDetails}
         onSelectTraining={onSelectTrainingMock}
-      />,
+      />
     );
     expect(screen.getByText("Coach Benjamin Luijan")).toBeInTheDocument();
     expect(screen.getByText(dummyProgramDetails.title)).toBeInTheDocument();
@@ -74,16 +74,16 @@ describe("WaitlistedTrainingSessionCard", () => {
         timeZone: "UTC",
         hour: "2-digit",
         minute: "2-digit",
-      },
+      }
     );
     expect(screen.getByText(expectedTime)).toBeInTheDocument();
     expect(screen.getByText("11:00 AM")).toBeInTheDocument();
     expect(
-      screen.getByText(`${dummyProgramDetails.durationMins} min`),
+      screen.getByText(`${dummyProgramDetails.durationMins} min`)
     ).toBeInTheDocument();
     expect(screen.getByText(dummyProgramDetails.location)).toBeInTheDocument();
     expect(
-      screen.getByText(dummyProgramDetails.description),
+      screen.getByText(dummyProgramDetails.description)
     ).toBeInTheDocument();
     expect(screen.getByText("View details")).toBeInTheDocument();
   });
@@ -93,7 +93,7 @@ describe("WaitlistedTrainingSessionCard", () => {
       <WaitlistedTrainingSessionCard
         programDetails={dummyProgramDetails}
         onSelectTraining={onSelectTrainingMock}
-      />,
+      />
     );
     await userEvent.click(screen.getByText(dummyProgramDetails.title));
     expect(onSelectTrainingMock).toHaveBeenCalledWith(dummyProgramDetails);
@@ -104,7 +104,7 @@ describe("WaitlistedTrainingSessionCard", () => {
       <WaitlistedTrainingSessionCard
         programDetails={dummyProgramDetails}
         onSelectTraining={onSelectTrainingMock}
-      />,
+      />
     );
     const viewDetailsButton = screen.getByText("View details");
     await userEvent.click(viewDetailsButton);
@@ -117,7 +117,7 @@ describe("WaitlistedTrainingSessionCard", () => {
         // @ts-expect-error testing behavior with missing programDetails
         programDetails={null}
         onSelectTraining={onSelectTrainingMock}
-      />,
+      />
     );
     expect(container.firstChild).toBeNull();
   });
