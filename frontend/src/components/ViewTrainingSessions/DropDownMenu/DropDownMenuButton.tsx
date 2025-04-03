@@ -71,7 +71,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
   //Confirmation of player absence
   const { rsvp, isLoading: rsvpLoading } = useRSVP();
   const [attendee, setAttendee] = useState<Attendees | undefined>(
-    accountAttendee
+    accountAttendee,
   );
   //const [rsvpErrorMessage, setRsvpErrorMessage] = useState<string | null>(null);
   const { markAbsent, error: absentError } = useAbsent();
@@ -100,7 +100,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
     try {
       const updated = await programParticipantApi.getProgramParticipant(
         programDetails.programId,
-        user.accountId
+        user.accountId,
       );
       setAttendee(updated);
       if (
@@ -127,7 +127,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
 
     const response = await deleteProgram(
       user?.accountId,
-      programDetails.programId
+      programDetails.programId,
     );
 
     if (response) {
@@ -170,7 +170,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       try {
         participant = await programParticipantApi.getProgramParticipant(
           programDetails.programId,
-          user.accountId
+          user.accountId,
         );
         console.log("Fetched participant:", participant);
       } catch (err: unknown) {
@@ -246,7 +246,7 @@ export const DropDownMenuButton: React.FC<DropDownMenuButtonProps> = ({
       const updatedParticipant =
         await programParticipantApi.getProgramParticipant(
           programDetails.programId,
-          user?.accountId
+          user?.accountId,
         );
       setAttendee(updatedParticipant);
 
