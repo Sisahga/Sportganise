@@ -88,7 +88,7 @@ const trainingSessionApi = {
           `trainingSessionApi.getPrograms : Response not ok! (${response.status})`,
         );
       }
-
+      log.debug("CALLED GET PROGRAMS SUCCESSFULLY.");
       return response.json();
     } catch (error) {
       console.error("Error in getPrograms:", error);

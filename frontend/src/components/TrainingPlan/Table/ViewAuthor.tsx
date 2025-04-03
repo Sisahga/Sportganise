@@ -1,16 +1,17 @@
 // React
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // Hooks
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 // Services
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
+import { getAccountIdCookie } from "@/services/cookiesService";
 // UI Components
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 // Icons
-import { User2Icon } from "lucide-react";
+import { LoaderCircle, User2Icon } from "lucide-react";
 // Log
 import log from "loglevel";
 import AccountPopUp from "./accountPopUp";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 // Display Author Personal Details in Table Row
 interface ViewAuthorProps {
@@ -22,11 +23,27 @@ export const ViewAuthor: React.FC<ViewAuthorProps> = ({
 }: ViewAuthorProps) => {
   log.info("Rendered ViewAuthor component");
   // Fetch Person Details
-  const { data: accountDetails } = usePersonalInformation(userId);
+  const { data: accountDetails, fetchAccountData } = usePersonalInformation();
   // Handle Navigation (to Messages page)
-  const cookies = getCookies();
-  const currentUserId = getAccountIdCookie(cookies);
+  const { cookies, preLoading } = useGetCookies();
+  const [currentUserId, setCurrentUserId] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!preLoading && cookies) {
+      const accId = getAccountIdCookie(cookies);
+      setCurrentUserId(accId);
+      fetchAccountData(accId).then((_) => _);
+    }
+  }, [preLoading, cookies, fetchAccountData]);
+
+  if (preLoading) {
+    return (
+      <div className="flex items-center">
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <div>

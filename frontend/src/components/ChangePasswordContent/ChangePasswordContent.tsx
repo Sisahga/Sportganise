@@ -15,27 +15,27 @@ import PasswordChecklist from "react-password-checklist";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCookies, getEmailCookie } from "@/services/cookiesService";
 import useModifyPassword from "@/hooks/useModifyPassword";
 import { ChangePasswordFormValues } from "@/types/auth";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
 import { KeyRound } from "lucide-react";
 import { Separator } from "../ui/separator";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const ChangePasswordContent: React.FC = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const cookies = getCookies();
-  const email = cookies ? getEmailCookie(cookies) : null;
+  const { preLoading, cookies, email } = useGetCookies();
 
   useEffect(() => {
-    if (!cookies || !email) {
-      log.warn("No valid session. Redirecting to login.");
-      navigate("/login");
+    if (!preLoading) {
+      if (!cookies || !email) {
+        log.warn("No valid session. Redirecting to login.");
+        navigate("/login");
+      }
     }
-  }, [cookies, email, navigate]);
+  }, [cookies, email, navigate, preLoading]);
 
   const form = useForm<ChangePasswordFormValues>({
     defaultValues: {
@@ -115,7 +115,7 @@ const ChangePasswordContent: React.FC = () => {
       return;
     }
 
-    modifyPassword({
+    await modifyPassword({
       email: data.email,
       oldPassword: data.oldPassword,
       newPassword: data.password,
@@ -138,6 +138,10 @@ const ChangePasswordContent: React.FC = () => {
     }
   }, [Message, error, toast]);
 
+  if (preLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="">
       <BackButton />
@@ -145,7 +149,7 @@ const ChangePasswordContent: React.FC = () => {
       {/* Card for the entire form */}
       <Card className="shadow-md mb-24 mt-4 mx-auto max-w-2xl">
         <CardHeader>
-          <CardTitle className="flex justify-center text-2xl font-bold items-center justify-center gap-2">
+          <CardTitle className="flex text-2xl font-bold items-center justify-center gap-2">
             <KeyRound className="h-6 w-6" />
             Change Password
           </CardTitle>

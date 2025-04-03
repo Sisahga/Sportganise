@@ -1,62 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import GroupSection from "@/components/Inbox/GroupMessages/GroupSection";
 import MessagesSection from "../SimpleMessages/MessagesSection.tsx";
-import { Channel } from "@/types/dmchannels.ts";
-import directMessagingApi from "@/services/api/directMessagingApi.ts";
 import "./MessagingDashboard.css";
 import log from "loglevel";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 import {
   GroupSkeleton,
   MessageSkeleton,
 } from "@/components/Inbox/DirectMessagesDashboard/MessagingDashboardSkeletons.tsx";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import useGetChannels from "@/hooks/useGetChannels.ts";
 
 function DirectMessagesDashboard() {
-  const cookies = getCookies();
-  const accountId = getAccountIdCookie(cookies);
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [unreadChannelCount, setUnreadChannelCount] = useState<number>(0);
   const navigate = useNavigate();
+  const { userId, preLoading } = useGetCookies();
+  const { channels, error, loading, unreadChannelCount, fetchChannels } =
+    useGetChannels();
 
-  const simpleChannels = channels.filter(
-    (channel) => channel.channelType === "SIMPLE",
+  const simpleChannels = useMemo(
+    () => channels.filter((channel) => channel.channelType === "SIMPLE"),
+    [channels],
   );
-  const groupChannels = channels.filter(
-    (channel) => channel.channelType === "GROUP",
+  const groupChannels = useMemo(
+    () => channels.filter((channel) => channel.channelType === "GROUP"),
+    [channels],
   );
 
-  const fetchChannels = async () => {
-    try {
-      const response = await directMessagingApi.getChannels(accountId);
-      setChannels(response);
-      response.forEach((channel) => {
-        if (!channel.read) {
-          setUnreadChannelCount((prev) => prev + 1);
-        }
-      });
-      setLoading(false);
-    } catch (err) {
-      log.error("Error fetching chat messages:", err);
-      setError("Failed to load messages.");
+  useEffect(() => {
+    if (!preLoading) {
+      fetchChannels(userId).then((_) => _);
     }
-  };
+  }, [userId, preLoading]);
 
   useEffect(() => {
-    fetchChannels().then((r) => r);
-  }, []);
-
+    if (!preLoading && channels) {
+      log.debug("Simple Channels: ", simpleChannels);
+    }
+  }, [simpleChannels, preLoading]);
   useEffect(() => {
-    log.debug("Simple Channels: ", simpleChannels);
-  }, [simpleChannels]);
-  useEffect(() => {
-    log.debug("Group Channels: ", groupChannels);
-  }, [groupChannels]);
+    if (!preLoading && channels) {
+      log.debug("Group Channels: ", groupChannels);
+    }
+  }, [groupChannels, preLoading]);
 
-  if (loading) {
+  if (preLoading || loading) {
     return (
       <div className="flex mx-auto flex-col sm:w-3/4 lg:w-3/5 gap-6 relative overflow-y-scroll pt-10 min-h-screen">
         <div className="w-full max-w-2xl mx-auto p-4 space-y-6">

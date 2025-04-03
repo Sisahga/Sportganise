@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import { Navigate, Outlet, useLocation } from "react-router";
-import { getCookies } from "@/services/cookiesService";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import { LoaderCircle } from "lucide-react";
 
 interface PublicRouteProps {
   redirectTo?: string;
@@ -8,10 +9,17 @@ interface PublicRouteProps {
 
 const PublicRoute: React.FC<PublicRouteProps> = ({ redirectTo = "/" }) => {
   const location = useLocation();
-  const user = getCookies();
+  const { userId, cookies, preLoading } = useGetCookies();
 
-  console.log(user);
-  if (user?.accountId) {
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
+
+  if (cookies && userId !== 0) {
     return <Navigate to={redirectTo} replace state={{ from: location }} />;
   }
 

@@ -34,7 +34,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getCookies } from "@/services/cookiesService";
 import { useToast } from "@/hooks/use-toast";
 import { AccountPermissions } from "@/types/account";
 import BackButton from "../ui/back-button";
@@ -46,6 +45,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "../ui/dialog";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const UserPermissionContent: React.FC = () => {
   const itemsPerPage = 5;
@@ -63,12 +63,15 @@ const UserPermissionContent: React.FC = () => {
   const [newRole, setNewRole] = useState<string>("");
   const [openAlertDialog, setOpenAlertDialog] = useState<boolean>(false);
 
+  const { cookies, preLoading } = useGetCookies();
+
   useEffect(() => {
-    const user = getCookies();
-    if (!user || user.type !== "ADMIN") {
-      navigate("/");
+    if (!preLoading) {
+      if (!cookies || cookies.type !== "ADMIN") {
+        navigate("/");
+      }
     }
-  }, [navigate]);
+  }, [navigate, cookies, preLoading]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -113,7 +116,7 @@ const UserPermissionContent: React.FC = () => {
   const paginatedData = data.slice(startIndex, startIndex + itemsPerPage);
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
-  if (loading) {
+  if (preLoading || loading) {
     return <div>Loading...</div>;
   }
 
@@ -125,7 +128,7 @@ const UserPermissionContent: React.FC = () => {
     <div>
       <BackButton />
       <div className="pb-20 container max-w-2xl mx-auto">
-        <Card className="space-y-2 max-w-3xl mx-auto mt-4 border shadow-md mx-auto max-w-2xl">
+        <Card className="space-y-2 max-w-3xl mt-4 border shadow-md mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl font-bold flex items-center justify-center gap-2 mt-4">
               <FileKey2 className="h-6 w-6" />

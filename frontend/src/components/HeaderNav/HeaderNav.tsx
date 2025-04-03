@@ -8,31 +8,31 @@ import {
 } from "@/components/ui/drawer";
 import logo from "../../assets/Logo.png";
 import { useState, useEffect } from "react";
-import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import { clearCookies } from "@/services/cookiesService";
-import { CookiesDto } from "@/types/auth";
 import useWaitlistPrograms from "@/hooks/useWaitlistPrograms";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
   const [accountType, setAccountType] = useState<string | null | undefined>();
-  const [user, setUser] = useState<CookiesDto>();
+
+  const { userId, cookies, preLoading } = useGetCookies();
 
   useEffect(() => {
-    const userCookie = getCookies();
-    setUser(userCookie);
-    setAccountType(userCookie?.type);
-  }, [accountType]);
+    if (!preLoading && cookies) {
+      setAccountType(cookies.type);
+    }
+  }, [preLoading, cookies]);
   const navigate = useNavigate();
 
   const { data: waitlistData, waitlistPrograms } = useWaitlistPrograms();
   useEffect(() => {
-    if (user?.accountId) {
-      waitlistPrograms(user.accountId);
+    if (userId) {
+      waitlistPrograms(userId).then((_) => _);
     }
-  }, [user, waitlistPrograms]);
+  }, [userId, waitlistPrograms]);
 
   useEffect(() => {
     if (waitlistData) {
@@ -45,10 +45,14 @@ export default function HeaderNav() {
     setIsDrawerOpen(false);
   };
 
-  const clearCookiesAndNavigate = () => {
-    clearCookies();
+  const clearCookiesAndNavigate = async () => {
+    await clearCookies();
     navigate("/login");
   };
+
+  if (preLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>

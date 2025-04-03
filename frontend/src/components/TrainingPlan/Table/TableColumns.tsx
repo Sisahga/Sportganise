@@ -8,14 +8,22 @@ import { DropDownMenu } from "./DropDownMenu";
 // UI Component
 import { Button } from "@/components/ui/Button";
 // Icons
-import { File, User, Calendar, CircleArrowOutUpRight } from "lucide-react";
+import {
+  File,
+  User,
+  Calendar,
+  CircleArrowOutUpRight,
+  LoaderCircle,
+} from "lucide-react";
 // Helper Util Functions
 import { getDate } from "@/utils/getDate";
 import { getFileName } from "@/utils/getFileName";
 // Types
 import { TrainingPlan } from "@/types/trainingplans";
 // Services
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
+import { getAccountIdCookie } from "@/services/cookiesService";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import { useEffect, useState } from "react";
 
 // Table Column Definitions
 // ... follows type TrainingPlan
@@ -101,14 +109,28 @@ export const columns: ColumnDef<TrainingPlan>[] = [
       const planId = row.original.planId; // Access planId from outside its scope
       const userId = row.original.userId;
       const shared = row.original.shared;
-      const cookies = getCookies();
-      const accountId = cookies ? getAccountIdCookie(cookies) : null;
+      const { cookies, preLoading } = useGetCookies();
+      const [accountId, setAccountId] = useState<number>(0);
+
+      useEffect(() => {
+        if (!preLoading && cookies) {
+          setAccountId(getAccountIdCookie(cookies));
+        }
+      }, [preLoading, cookies]);
+
       // Display The Drop Down Menu only for the files that belong to the current logged in user
       // A user cannot share or delete files that do no belong to them
+      if (preLoading) {
+        return (
+          <div>
+            <LoaderCircle className="animate-spin h-6 w-6" />
+          </div>
+        );
+      }
       return (
         accountId === userId && (
           <div>
-            <DropDownMenu planId={planId} userId={userId} shared={shared} />
+            <DropDownMenu planId={planId} accId={userId} shared={shared} />
           </div>
         )
       );

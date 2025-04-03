@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import ResponseDto from "@/types/response";
 import { TrainingPlan, TrainingPlansDto } from "@/types/trainingplans";
 import trainingPlanApi from "@/services/api/trainingPlanApi";
@@ -7,10 +7,9 @@ import log from "loglevel";
 /**
  * Fetches all training plans created by and shared with the current user.
  *
- * @param accountId
  * @returns myTrainingPlans[], sharedTrainingPlans[], loading, error
  */
-function useTrainingPlans(accountId: number | null | undefined) {
+function useTrainingPlans() {
   const [myTrainingPlans, setMyTrainingPlans] = useState<TrainingPlan[]>([]); // Training plans created by current user
   const [sharedTrainingPlans, setSharedTrainingPlans] = useState<
     TrainingPlan[]
@@ -18,7 +17,7 @@ function useTrainingPlans(accountId: number | null | undefined) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchTrainingPlans = async () => {
+  const fetchTrainingPlans = useCallback(async (accountId: number) => {
     try {
       // Call API
       const response: ResponseDto<TrainingPlansDto> =
@@ -46,15 +45,13 @@ function useTrainingPlans(accountId: number | null | undefined) {
       setError("Error fetching training plan(s)!");
       console.error(err);
       log.error(err);
-    }
-  };
-  // Call fetchTrainingPlans() and Update States Safely
-  useEffect(() => {
-    fetchTrainingPlans().then(() => {
+    } finally {
       setLoading(false);
-    });
+    }
   }, []);
+
   return {
+    fetchTrainingPlans,
     myTrainingPlans,
     sharedTrainingPlans,
     loading,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User2Icon } from "lucide-react";
 import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
@@ -23,8 +23,13 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
     data: accountDetails,
     loading,
     error,
-  } = usePersonalInformation(accountAttendee?.accountId);
+    fetchAccountData,
+  } = usePersonalInformation();
   log.debug("Rendering RegisteredPlayer");
+
+  useEffect(() => {
+    fetchAccountData(accountAttendee.accountId).then((_) => _);
+  }, [fetchAccountData]);
 
   return (
     <div>

@@ -6,8 +6,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 // Hooks
 import useUploadTrainingPlan from "@/hooks/useUploadTrainingPlan";
-// Services
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 // Logs
 import log from "loglevel";
 // Types
@@ -31,7 +29,8 @@ import {
 } from "@/components/ui/file-upload";
 import { useToast } from "@/hooks/use-toast";
 // Icons
-import { CloudUpload, Paperclip, Loader2 } from "lucide-react";
+import { CloudUpload, Paperclip, Loader2, LoaderCircle } from "lucide-react";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 // Form Schema Definition with Zod
 const formSchema = z.object({
@@ -50,14 +49,15 @@ export default function UploadTrainingPlanFiles() {
   const [loading, setLoading] = useState<boolean>(false);
 
   // Cookies
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, preLoading } = useGetCookies();
   useEffect(() => {
-    if (!accountId) {
-      log.debug("UploadTrainingPlanForm -> No accountId found");
+    if (!preLoading) {
+      if (!userId || userId === 0) {
+        log.debug("UploadTrainingPlanForm -> No accountId found");
+      }
+      log.info(`UploadTrainingPlanForm -> accountId is ${userId}`);
     }
-    log.info(`UploadTrainingPlanForm -> accountId is ${accountId}`);
-  }, [accountId]);
+  }, [userId, preLoading]);
 
   // API Hook for Form Submission
   const { uploadTrainingPlans } = useUploadTrainingPlan();
@@ -82,7 +82,7 @@ export default function UploadTrainingPlanFiles() {
       // Call API Submit Form
       setLoading(true);
       const uploadingTrainingPlanResponse = await uploadTrainingPlans(
-        accountId,
+        userId,
         formData, // FormData[]: File
       );
 
@@ -116,6 +116,14 @@ export default function UploadTrainingPlanFiles() {
       setLoading(false);
     }
   };
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <div>

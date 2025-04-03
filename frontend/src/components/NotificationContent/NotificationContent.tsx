@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import log from "loglevel";
 import { Notification } from "@/types/notifications";
 import useGetNotificationAlerts from "@/hooks/useGetNotificationAlerts.ts";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 import useMarkNotificationsRead from "@/hooks/useMarkNotificationsRead.ts";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import { LoaderCircle } from "lucide-react";
 
 log.setLevel("info");
 
 //using mock data just to show stakeholder UI and get feedback
 export default function NotificationsPage() {
-  const cookies = getCookies();
-  const userId = getAccountIdCookie(cookies);
+  const { userId, preLoading } = useGetCookies();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -115,16 +115,18 @@ export default function NotificationsPage() {
   log.debug("Read notifications:", readNotifications);
 
   useEffect(() => {
-    getNotifications(userId).then((response) => {
-      if (response.statusCode === 200 && response.data) {
-        setNotifications(response.data.notifications);
-      } else if (response.statusCode === 200 && !response.data) {
-        setNotifications([]);
-      } else {
-        setNotifications([]);
-      }
-    });
-  }, [userId]);
+    if (!preLoading) {
+      getNotifications(userId).then((response) => {
+        if (response.statusCode === 200 && response.data) {
+          setNotifications(response.data.notifications);
+        } else if (response.statusCode === 200 && !response.data) {
+          setNotifications([]);
+        } else {
+          setNotifications([]);
+        }
+      });
+    }
+  }, [userId, preLoading]);
 
   useEffect(() => {
     setLoading(false);
@@ -137,8 +139,12 @@ export default function NotificationsPage() {
     });
   }, [notifications]);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (preLoading || loading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   return (

@@ -1,12 +1,12 @@
 import * as React from "react";
 import { useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import { DayPicker, DayContentProps } from "react-day-picker";
 import { isSaturday, isSunday, format, isSameDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/Button";
 import usePrograms from "@/hooks/usePrograms";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   selectedMonth?: Date;
@@ -76,8 +76,7 @@ function Calendar({
   programsProp,
   ...props
 }: CalendarProps) {
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, preLoading } = useGetCookies();
   const eventDates = programsProp?.eventDates ?? [];
   const fetchProgramDates = programsProp?.fetchProgramDates;
 
@@ -86,23 +85,33 @@ function Calendar({
 
   // Fetch event dates when the Calendar component mounts
   useEffect(() => {
-    if (!accountId || !fetchProgramDates) return;
+    if (!preLoading) {
+      if (!userId || !fetchProgramDates) return;
 
-    let cancelled = false;
+      let cancelled = false;
 
-    const load = async () => {
-      if (!cancelled) {
-        console.log(" CALENDAR FETCH triggered for accountId:", accountId);
-        await fetchProgramDates(accountId);
-      }
-    };
+      const load = async () => {
+        if (!cancelled) {
+          console.log(" CALENDAR FETCH triggered for accountId:", userId);
+          await fetchProgramDates(userId);
+        }
+      };
 
-    load();
+      load().then((_) => _);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [accountId, fetchProgramDates]);
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [userId, fetchProgramDates, preLoading]);
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <DayPicker

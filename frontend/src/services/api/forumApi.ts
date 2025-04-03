@@ -1,12 +1,12 @@
 import { getBearerToken } from "@/services/apiHelper";
 import { PostDto, PostResponse } from "@/types/forum";
-import { getCookies } from "../cookiesService";
 import log from "loglevel";
 
 const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/forum";
 
 /**
  * Fetches posts based on various query parameters.
+ * - currentUserId: ID of the current user.
  * - searchTerm: (Optional) Term to search in posts.
  * - occurrenceDate: (Optional) Date of occurrence to filter posts.
  * - type: (Optional) Type of posts to filter.
@@ -17,6 +17,7 @@ const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/forum";
  * @returns Promise<PostDto[]> List of posts.
  */
 const fetchPosts = async (
+  currentUserId: number,
   searchTerm?: string,
   occurrenceDate?: string,
   type?: string,
@@ -25,9 +26,8 @@ const fetchPosts = async (
   sortBy?: string,
   sortDir?: string,
 ): Promise<PostDto[]> => {
-  const orgId = 1; //change when org id setup properly
-  const user = getCookies();
-  let url = `${baseMappingUrl}/posts/search/${orgId}/${user.accountId}?`;
+  const orgId = 1; // change when org id setup properly
+  let url = `${baseMappingUrl}/posts/search/${orgId}/${currentUserId}?`;
 
   const queryParams = [];
 

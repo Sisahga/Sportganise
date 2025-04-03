@@ -8,19 +8,19 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/Button";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { User2Icon } from "lucide-react";
+import { LoaderCircle, User2Icon } from "lucide-react";
 import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import log from "loglevel";
 import { useLocation, useNavigate } from "react-router";
 import { CreateChannelDto } from "@/types/dmchannels";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 import useCreateChannel from "@/hooks/useCreateChannel";
 import useAbsent from "@/hooks/useAbsent";
 import { useEffect } from "react";
 import { Attendees } from "@/types/trainingSessionDetails";
 import useConfirmParticipant from "@/hooks/useConfirmParticipant";
 import useRejectParticipant from "@/hooks/useRejectParticipant";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 interface ParticipantPopUpProps {
   accountAttendee: Attendees;
@@ -44,16 +44,22 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
     data: accountDetails,
     loading,
     error,
-  } = usePersonalInformation(accountId);
+    fetchAccountData,
+  } = usePersonalInformation();
   const navigate = useNavigate();
-  const cookies = getCookies();
-  const currentUserId = getAccountIdCookie(cookies);
+  const { userId, preLoading } = useGetCookies(); // userId here is the currentUserId
   const { createChannel } = useCreateChannel();
   const location = useLocation();
   const programId = location.state.programDetails.programId;
 
+  useEffect(() => {
+    if (!preLoading) {
+      fetchAccountData(userId).then((_) => _);
+    }
+  }, [preLoading, userId, fetchAccountData]);
+
   const handleSendMessage = async () => {
-    const memberIds = [currentUserId, accountId];
+    const memberIds = [userId, accountId];
     const newChannelDetails: CreateChannelDto = {
       channelId: null,
       channelName: "",
@@ -63,10 +69,7 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
       avatarUrl: null,
     };
 
-    const channelResponse = await createChannel(
-      newChannelDetails,
-      currentUserId,
-    );
+    const channelResponse = await createChannel(newChannelDetails, userId);
     if (
       channelResponse?.statusCode === 201 ||
       channelResponse?.statusCode === 302
@@ -78,7 +81,7 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
             channelName: channelResponse.data.channelName,
             channelType: channelResponse.data.channelType,
             channelImageBlob: channelResponse.data.avatarUrl,
-            read: channelResponse.statusCode === 201 ? false : true,
+            read: channelResponse.statusCode !== 201,
           },
         });
       }
@@ -153,6 +156,14 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
       console.error("Error opting out:", error);
     }
   };
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
