@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -76,9 +76,7 @@ export default function ModifyTrainingSessionForm() {
   const { toast } = useToast();
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
-  let [attachmentsToRemove /* setAttachmentsToRemove */] = useState<string[]>(
-    [],
-  );
+  const attachmentsToRemove = useRef<string[]>([])
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<ModalKey>();
   const [attendees, setAttendees] = useState<Attendees[]>([]);
@@ -119,7 +117,7 @@ export default function ModifyTrainingSessionForm() {
       }
       log.debug(`Modify Training Session Form accountId : ${userId}`);
     }
-  }, [userId, preLoading, navigate]);
+  }, [userId, cookies, preLoading, navigate]);
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
@@ -129,7 +127,7 @@ export default function ModifyTrainingSessionForm() {
   const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   // State to control the SelectMembersModal's visibility
   const { players } = usePlayers();
-  const members: Member[] = players.map((player) => ({
+  const members = players.map<Member>((player) => ({
     id: player.accountId, // <-- now a number
     name: `${player.firstName} ${player.lastName}`,
     email: player.email,
@@ -206,9 +204,9 @@ export default function ModifyTrainingSessionForm() {
     // Append all programDetials.attachmentUrls to new string[]
     programDetails.programAttachments.map((attachment) => {
       const fileName = attachment.attachmentUrl;
-      attachmentsToRemove.push(fileName);
+      attachmentsToRemove.current.push(fileName);
     });
-  }, [programDetails, attachmentsToRemove, form]);
+  }, [programDetails, form]);
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -237,7 +235,7 @@ export default function ModifyTrainingSessionForm() {
       //if file.name of values.attachment exists in attachmentToRemove that means that we want to keep that old file
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
-          if (!attachmentsToRemove.includes(file.name)) {
+          if (!attachmentsToRemove.current.includes(file.name)) {
             formData.append("attachments", file); //attachment to add
             log.debug("File in form field appended to formData : ", file);
           }
@@ -249,12 +247,12 @@ export default function ModifyTrainingSessionForm() {
 
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
-          attachmentsToRemove = attachmentsToRemove.filter(
+          attachmentsToRemove.current = attachmentsToRemove.current.filter(
             (urlName) => urlName !== file.name,
           );
         });
       }
-      console.warn("attachmentsToRemove : ", attachmentsToRemove);
+      console.warn("attachmentsToRemove : ", attachmentsToRemove.current);
 
       const programData = {
         title: values.title,
@@ -273,7 +271,7 @@ export default function ModifyTrainingSessionForm() {
         startTime: values.startTime,
         endTime: values.endTime,
         location: values.location,
-        attachmentsToRemove: attachmentsToRemove ?? [],
+        attachmentsToRemove: attachmentsToRemove.current ?? [],
       };
       console.warn("programData:", programData);
       formData.append(
