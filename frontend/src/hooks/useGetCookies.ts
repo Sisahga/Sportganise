@@ -15,15 +15,16 @@ const useGetCookies = () => {
 
   const fetchCookies = useCallback(async () => {
     log.info("Fetching cookies...");
-    const response = await getCookies();
-    setCookies(response);
-    setUserId(getAccountIdCookie(response));
-    setEmail(getEmailCookie(response));
-    setPreLoading(false);
+    return await getCookies();
   }, []);
 
   useEffect(() => {
-    fetchCookies().then((_) => _);
+    fetchCookies().then((res) => {
+      setCookies(res);
+      setUserId(getAccountIdCookie(res));
+      setEmail(getEmailCookie(res));
+      setPreLoading(false);
+    });
   }, [fetchCookies]);
 
   return {
