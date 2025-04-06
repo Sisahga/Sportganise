@@ -76,7 +76,7 @@ export default function ModifyTrainingSessionForm() {
   const { toast } = useToast();
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
-  const attachmentsToRemove = useRef<string[]>([])
+  const attachmentsToRemove = useRef<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<ModalKey>();
   const [attendees, setAttendees] = useState<Attendees[]>([]);
