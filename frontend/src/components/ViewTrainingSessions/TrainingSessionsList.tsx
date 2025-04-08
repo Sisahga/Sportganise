@@ -24,7 +24,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Filter, Loader2, X } from "lucide-react";
 import log from "loglevel";
 import { isSameDay, isWithinInterval } from "date-fns";
-
 export default function TrainingSessionsList({
   selectedMonth,
   programsProp,
@@ -58,25 +57,25 @@ export default function TrainingSessionsList({
   const todayDayIndex = today.getDay(); // index of today's day of the week
   const startOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`,
+    `Today's date is ${today.getDate()} and today's index day number is ${todayDayIndex}. So, the start date of the week is ${today.getDate() - todayDayIndex}`
   );
   startOfWeek.setDate(today.getDate() - todayDayIndex); // start of the week date = today's date - day of week
   const endOfWeek = new Date(today); // same day as today
   log.debug(
-    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`,
+    `Today's date is ${today.getDate()} and today's index number is ${todayDayIndex}. So, the end date of the week is ${today.getDate() + (6 - todayDayIndex)}`
   );
   endOfWeek.setDate(today.getDate() + (6 - todayDayIndex)); // end of week date = today's date + nb of days left in week
 
   const startOfMonth = new Date(
     selectedMonth.getFullYear(),
     selectedMonth.getMonth(),
-    1,
+    1
   ); // First day of the current month
 
   const endOfMonth = new Date(
     selectedMonth.getFullYear(),
     selectedMonth.getMonth() + 1,
-    0,
+    0
   ); // Last day of the month
 
   // Start Date Range
@@ -123,7 +122,7 @@ export default function TrainingSessionsList({
   const [selectedProgramType, setSelectedProgramType] = useState<string[]>([]);
   // List of programDetails.programTypes For Check
   const programTypes = Array.from(
-    new Set(programs.map((program) => program.programDetails.programType)),
+    new Set(programs.map((program) => program.programDetails.programType))
   );
 
   // Filter Programs by Date Range
@@ -131,7 +130,7 @@ export default function TrainingSessionsList({
     const programDate = new Date(
       program.programDetails.reccurenceDate
         ? program.programDetails.reccurenceDate
-        : program.programDetails.occurrenceDate,
+        : program.programDetails.occurrenceDate
     );
     programDate.setHours(0, 0, 0, 0); // to compare the dateRange and occurenceDate regardless of time
     if (selectedDate) {
@@ -140,6 +139,7 @@ export default function TrainingSessionsList({
       const typeFilter =
         selectedProgramType.length === 0 ||
         selectedProgramType.includes(program.programDetails.programType);
+
       return dateFilter && typeFilter;
     }
 
@@ -259,7 +259,7 @@ export default function TrainingSessionsList({
                             setSelectedProgramType((prev) =>
                               checked
                                 ? [...prev, type]
-                                : prev.filter((t) => t !== type),
+                                : prev.filter((t) => t !== type)
                             );
                           }}
                         />
@@ -305,14 +305,15 @@ export default function TrainingSessionsList({
                 new Date(
                   a.programDetails.reccurenceDate
                     ? a.programDetails.reccurenceDate
-                    : a.programDetails.occurrenceDate,
+                    : a.programDetails.occurrenceDate
                 ).getTime() -
                 new Date(
                   b.programDetails.reccurenceDate
                     ? b.programDetails.reccurenceDate
-                    : b.programDetails.occurrenceDate,
-                ).getTime(),
+                    : b.programDetails.occurrenceDate
+                ).getTime()
             )
+
             .map((program, index) => (
               <div key={index} className="my-5">
                 <TrainingSessionCard
