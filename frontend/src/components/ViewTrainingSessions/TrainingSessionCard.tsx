@@ -42,7 +42,7 @@ const TrainingSessionCard: React.FC<Program> = ({
 
   const { data: userAttendee } = useGetParticipant(
     programDetails.programId, // assuming programDetails contains the program ID as 'id'
-    accountId,
+    accountId
   );
 
   return (
@@ -77,7 +77,7 @@ const TrainingSessionCard: React.FC<Program> = ({
                 {programDetails?.occurrenceDate
                   ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
                       "en-CA",
-                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
+                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" }
                     )
                   : "N/A"}
               </p>
@@ -86,7 +86,7 @@ const TrainingSessionCard: React.FC<Program> = ({
                 {programDetails?.occurrenceDate && programDetails?.durationMins
                   ? calculateEndTime(
                       new Date(programDetails.occurrenceDate),
-                      programDetails.durationMins,
+                      programDetails.durationMins
                     )
                   : "N/A"}
               </p>
