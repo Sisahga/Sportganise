@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import usePrograms from "@/hooks/usePrograms";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -83,6 +84,7 @@ export default function CreateTrainingSessionForm() {
     loading: playersLoading,
     error: playersError,
   } = usePlayers();
+  const programs = usePrograms();
 
   const members: Member[] = players.map((player) => ({
     id: player.accountId,
@@ -227,7 +229,7 @@ export default function CreateTrainingSessionForm() {
         "programData",
         new Blob([JSON.stringify(programData)], {
           type: "application/json",
-        }),
+        })
       );
 
       // Append attachments if available
@@ -261,7 +263,7 @@ export default function CreateTrainingSessionForm() {
       log.info("create", create);
       if (create === null) {
         throw new Error(
-          "Error from useCreateTrainingSession.createTrainingSession!",
+          "Error from useCreateTrainingSession.createTrainingSession!"
         );
       }
 
@@ -363,7 +365,7 @@ export default function CreateTrainingSessionForm() {
                           role="combobox"
                           className={cn(
                             "justify-between",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
@@ -393,7 +395,7 @@ export default function CreateTrainingSessionForm() {
                                     "mr-2 h-4 w-4",
                                     type.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {type.label}
@@ -426,7 +428,7 @@ export default function CreateTrainingSessionForm() {
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "pl-3 text-left font-normal text-muted-foreground",
+                              "pl-3 text-left font-normal text-muted-foreground"
                             )}
                           >
                             <span>Select coaches</span>
@@ -456,7 +458,7 @@ export default function CreateTrainingSessionForm() {
                           <ul className="list-disc pl-5">
                             {selectedCoaches.map((memberId) => {
                               const member = members.find(
-                                (m) => m.id === memberId,
+                                (m) => m.id === memberId
                               );
                               return (
                                 <li key={memberId}>
@@ -494,7 +496,7 @@ export default function CreateTrainingSessionForm() {
                           variant={"outline"}
                           className={cn(
                             "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value ? (
@@ -512,6 +514,7 @@ export default function CreateTrainingSessionForm() {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        programsProp={programs}
                       />
                     </PopoverContent>
                   </Popover>
@@ -541,12 +544,12 @@ export default function CreateTrainingSessionForm() {
                           role="combobox"
                           className={cn(
                             "justify-between",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
                             ? frequencies.find(
-                                (frequency) => frequency.value === field.value,
+                                (frequency) => frequency.value === field.value
                               )?.label
                             : "Select frequency"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -572,7 +575,7 @@ export default function CreateTrainingSessionForm() {
                                     "mr-2 h-4 w-4",
                                     frequency.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {frequency.label}
@@ -619,7 +622,7 @@ export default function CreateTrainingSessionForm() {
                             variant={"outline"}
                             className={cn(
                               "pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground",
+                              !field.value && "text-muted-foreground"
                             )}
                           >
                             {field.value ? (
@@ -637,6 +640,7 @@ export default function CreateTrainingSessionForm() {
                           selected={field.value}
                           onSelect={field.onChange}
                           initialFocus
+                          programsProp={programs}
                         />
                       </PopoverContent>
                     </Popover>
@@ -713,12 +717,12 @@ export default function CreateTrainingSessionForm() {
                           role="combobox"
                           className={cn(
                             "justify-between",
-                            !field.value && "text-muted-foreground",
+                            !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
                             ? locations.find(
-                                (location) => location.value === field.value,
+                                (location) => location.value === field.value
                               )?.label
                             : "Select location"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -744,7 +748,7 @@ export default function CreateTrainingSessionForm() {
                                     "mr-2 h-4 w-4",
                                     location.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {location.label}
@@ -846,7 +850,7 @@ export default function CreateTrainingSessionForm() {
                           role="combobox"
                           className={cn(
                             !field.value ? "text-muted-foreground" : "",
-                            "justify-between",
+                            "justify-between"
                           )}
                         >
                           {field.value ? field.value : "Select visibility"}
@@ -880,7 +884,7 @@ export default function CreateTrainingSessionForm() {
                                     "mr-2 h-4 w-4",
                                     v.value === field.value
                                       ? "opacity-100"
-                                      : "opacity-0",
+                                      : "opacity-0"
                                   )}
                                 />
                                 {v.label}
@@ -904,7 +908,7 @@ export default function CreateTrainingSessionForm() {
                         <ul className="list-disc pl-5">
                           {invitedMembers.map((memberId) => {
                             const member = members.find(
-                              (m) => m.id === memberId,
+                              (m) => m.id === memberId
                             );
                             return (
                               <li key={memberId}>
