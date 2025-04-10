@@ -7,7 +7,6 @@ import "react-date-range/dist/theme/default.css";
 import TrainingSessionCard from "./TrainingSessionCard";
 import usePrograms from "@/hooks/usePrograms";
 import { Program } from "@/types/trainingSessionDetails";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService";
 import {
   Drawer,
   DrawerTrigger,
@@ -21,9 +20,10 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Filter, Loader2, X } from "lucide-react";
+import { Filter, Loader2, LoaderCircle, X } from "lucide-react";
 import log from "loglevel";
 import { isSameDay, isWithinInterval } from "date-fns";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 export default function TrainingSessionsList({
   selectedMonth,
@@ -37,14 +37,15 @@ export default function TrainingSessionsList({
   log.debug("Rendering TrainingSessionList");
 
   // AccountId from cookies
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, preLoading } = useGetCookies();
   useEffect(() => {
-    if (!accountId) {
-      log.debug("No accountId found");
+    if (!preLoading) {
+      if (!userId || userId === 0) {
+        log.debug("No accountId found");
+      }
+      log.info(`TrainingSessionList accountId is ${userId}`);
     }
-    log.info(`TrainingSessionList accountId is ${accountId}`);
-  }, [accountId]);
+  }, [userId, preLoading]);
 
   // Fetch programs on component mount
   const { programs, error, loading, fetchPrograms } = programsProp;
@@ -89,34 +90,45 @@ export default function TrainingSessionsList({
   ]);
 
   useEffect(() => {
-    if (!accountId) return;
+    if (!preLoading) {
+      if (!userId || userId === 0) return;
 
-    const prevStart = dateRange[0].startDate;
-    const prevEnd = dateRange[0].endDate;
+      const prevStart = dateRange[0].startDate;
+      const prevEnd = dateRange[0].endDate;
 
-    if (
-      prevStart.getTime() !== startOfMonth.getTime() ||
-      prevEnd.getTime() !== endOfMonth.getTime()
-    ) {
-      setDateRange([
-        {
-          startDate: startOfMonth,
-          endDate: endOfMonth,
-          key: "selection",
-        },
-      ]);
+      if (
+        prevStart.getTime() !== startOfMonth.getTime() ||
+        prevEnd.getTime() !== endOfMonth.getTime()
+      ) {
+        setDateRange([
+          {
+            startDate: startOfMonth,
+            endDate: endOfMonth,
+            key: "selection",
+          },
+        ]);
+      }
     }
-  }, [accountId, selectedMonth]);
+  }, [userId, selectedMonth, preLoading]);
 
   useEffect(() => {
-    if (!accountId || !dateRange[0].startDate || !dateRange[0].endDate) return;
+    if (!preLoading) {
+      if (
+        !userId ||
+        userId === 0 ||
+        !dateRange[0].startDate ||
+        !dateRange[0].endDate
+      )
+        return;
 
-    const { startDate, endDate } = dateRange[0];
-    fetchPrograms(accountId, startDate, endDate);
+      const { startDate, endDate } = dateRange[0];
+      fetchPrograms(userId, startDate, endDate).then((_) => _);
+    }
   }, [
-    accountId,
+    userId,
     dateRange[0].startDate.getTime(),
     dateRange[0].endDate.getTime(),
+    preLoading,
   ]);
 
   // Handle Selected Program Type
@@ -167,7 +179,7 @@ export default function TrainingSessionsList({
       },
     ]);
 
-    fetchPrograms(accountId, newStartDate, newEndDate);
+    fetchPrograms(userId, newStartDate, newEndDate).then((_) => _);
   }
 
   // Handle Cancel
@@ -180,6 +192,14 @@ export default function TrainingSessionsList({
       },
     ]); // reset date range
     setSelectedProgramType([]); // reset selected program type state
+  }
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   return (

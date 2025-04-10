@@ -8,49 +8,59 @@ import { AddTrainingPlanButton } from "@/components/TrainingPlan";
 // UI Components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Icons
-import { Loader2 } from "lucide-react";
+import { Loader2, LoaderCircle } from "lucide-react";
 // Hooks
 import useTrainingPlans from "@/hooks/useTrainingPlans";
-// Services
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 // Logs
 import log from "loglevel";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 export default function TrainingPlanContent() {
   log.info("Rendered TrainingPlanContent component");
   const navigate = useNavigate();
 
   // Get AccountId From Cookie
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
-  useEffect(() => {
-    if (!accountId) {
-      log.debug("TrainingPlanContent -> No accountId found");
-    }
-    log.info(`TrainingPlanContent -> accountId is ${accountId}`);
-  }, [accountId]);
+  const { userId, cookies, preLoading } = useGetCookies();
+
+  // Fetch Training Plans Created By and Shared With Current User
+  const {
+    fetchTrainingPlans,
+    myTrainingPlans,
+    sharedTrainingPlans,
+    loading,
+    error,
+  } = useTrainingPlans(); // myTrainingPlans, sharedTrainingPlans = [] can be passed to <TrainingPlanTable />
 
   // Reroute User By Account Type
   useEffect(() => {
-    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
-      navigate("/");
+    if (!preLoading) {
+      if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
+        navigate("/");
+      } else {
+        fetchTrainingPlans(userId).then((_) => _);
+        log.debug(`TrainingPlanContent -> accountType is ${cookies?.type}`);
+      }
     }
-    log.debug(`TrainingPlanContent -> accountType is ${cookies?.type}`);
-  }, [navigate, cookies]);
+  }, [navigate, preLoading, cookies, fetchTrainingPlans, userId]);
 
-  // Fetch Training Plans Created By and Shared With Current User
-  const { myTrainingPlans, sharedTrainingPlans, loading, error } =
-    useTrainingPlans(accountId); // myTrainingPlans, sharedTrainingPlans = [] can be passed to <TrainingPlanTable />
   useEffect(() => {
-    log.info("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
-    log.info(
+    log.debug("TrainingPlanContent -> myTrainingPlans are", myTrainingPlans);
+    log.debug(
       "TrainingPlanContent -> sharedTrainingPlans are",
       sharedTrainingPlans,
     );
-  });
+  }, [myTrainingPlans, sharedTrainingPlans]);
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   // Block Page for Null AccountId
-  if (!accountId) {
+  if (!userId || userId === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="font-semibold text-center text-red text-xl md:text-2xl lg:text-3xl mb-3">

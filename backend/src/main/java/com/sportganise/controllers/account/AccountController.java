@@ -11,9 +11,9 @@ import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.services.account.AccountService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Null;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,11 +48,23 @@ public class AccountController {
     return "Welcome to Sportganise";
   }
 
-  // GET: Account (1) by ID.
+  /**
+   * Fetches an account by id.
+   *
+   * @param id ID of the account.
+   * @return ResponseDto containing the fetched account.
+   */
   @GetMapping("/{id}")
-  public ResponseEntity<Optional<Account>> getAccount(@PathVariable Integer id) {
-    log.info("Received request to get account.");
-    return new ResponseEntity<>(this.accountService.getAccount(id), HttpStatus.OK);
+  public ResponseEntity<ResponseDto<Account>> getAccount(@PathVariable Integer id) {
+    log.debug("Received request to get account.");
+    Account account = this.accountService.getAccount(id);
+    ResponseDto<Account> responseDto =
+        ResponseDto.<Account>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Account fetched successfully")
+            .data(account)
+            .build();
+    return ResponseEntity.ok(responseDto);
   }
 
   /**
@@ -64,18 +76,23 @@ public class AccountController {
    *     otherwise.
    */
   @PutMapping("/{accountId}")
-  public ResponseEntity<Void> updateAccount(
+  public ResponseEntity<ResponseDto<Null>> updateAccount(
       @PathVariable Integer accountId, @RequestBody @Valid UpdateAccountDto body) {
     log.info("Received request to update account.");
 
     try {
       this.accountService.updateAccount(accountId, body);
     } catch (AccountNotFoundException e) {
-      log.warn("Request failed: " + e.getMessage());
-      return ResponseEntity.notFound().build();
+      log.warn("Request failed for updating account (not found): {}", e.getMessage());
+      throw new AccountNotFoundException(e.getMessage());
     }
 
-    return ResponseEntity.noContent().build();
+    ResponseDto<Null> responseDto =
+        ResponseDto.<Null>builder()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .message("Account updated successfully")
+            .build();
+    return ResponseEntity.ok(responseDto);
   }
 
   /**
@@ -93,14 +110,19 @@ public class AccountController {
     try {
       this.accountService.updateAccountPicture(accountId, file);
     } catch (AccountNotFoundException e) {
-      log.warn("Request failed: " + e.getMessage());
+      log.warn("Account not found when updating picture: {}", e.getMessage());
       return ResponseDto.notFound(null, e.getMessage());
     } catch (IOException e) {
-      log.warn("Request failed: " + e.getMessage());
+      log.warn("Failed to update profile picture: {}", e.getMessage());
       return ResponseDto.internalServerError(null, "Failed to upload file.");
     }
 
-    return ResponseEntity.noContent().build();
+    ResponseDto<Void> responseDto =
+        ResponseDto.<Void>builder()
+            .statusCode(HttpStatus.NO_CONTENT.value())
+            .message("Account picture updated successfully")
+            .build();
+    return ResponseEntity.ok(responseDto);
   }
 
   /**
@@ -125,10 +147,10 @@ public class AccountController {
     try {
       this.accountService.updateAccountRole(accountId, newType);
     } catch (AccountNotFoundException e) {
-      log.warn("Request failed: " + e.getMessage());
+      log.warn("Account Not Found: {}", e.getMessage());
       return ResponseDto.notFound(null, e.getMessage());
     } catch (InvalidAccountTypeException e) {
-      log.warn("Request failed: " + e.getMessage());
+      log.warn("Invalid Account Type: {}", e.getMessage());
       return ResponseDto.badRequest(null, e.getMessage());
     }
 
@@ -143,12 +165,18 @@ public class AccountController {
    * @return A list of all users in the organization that aren't blocked by the user or vice-versa.
    */
   @GetMapping("/get-all-users/{organizationId}/{accountId}")
-  public ResponseEntity<List<AccountDetailsDirectMessaging>> getAllUsers(
+  public ResponseEntity<ResponseDto<List<AccountDetailsDirectMessaging>>> getAllUsers(
       @PathVariable int organizationId, @PathVariable int accountId) {
     log.info("Received request to list all users not blocked by account.");
-    return new ResponseEntity<>(
-        this.accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, accountId),
-        HttpStatus.OK);
+    List<AccountDetailsDirectMessaging> users =
+        this.accountService.getAllNonBlockedAccountsByOrganizationId(organizationId, accountId);
+    ResponseDto<List<AccountDetailsDirectMessaging>> responseDto =
+        ResponseDto.<List<AccountDetailsDirectMessaging>>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Users fetched successfully")
+            .data(users)
+            .build();
+    return ResponseEntity.ok(responseDto);
   }
 
   /**
@@ -157,9 +185,16 @@ public class AccountController {
    * @return The list of all users.
    */
   @GetMapping("/permissions")
-  public ResponseEntity<List<AccountPermissions>> getAccountPermissions() {
+  public ResponseEntity<ResponseDto<List<AccountPermissions>>> getAccountPermissions() {
     log.debug("Received request to list all accounts with permissions.");
-    return ResponseEntity.ok(this.accountService.getAccountPermissions());
+    List<AccountPermissions> permissions = this.accountService.getAccountPermissions();
+    ResponseDto<List<AccountPermissions>> responseDto =
+        ResponseDto.<List<AccountPermissions>>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Permissions fetched successfully")
+            .data(permissions)
+            .build();
+    return ResponseEntity.ok(responseDto);
   }
 
   /**

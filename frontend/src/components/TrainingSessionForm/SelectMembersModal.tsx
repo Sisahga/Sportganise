@@ -10,30 +10,27 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Member } from "./types";
 
-export interface Member {
-  id: number;
-  name: string;
-  role: string; // e.g., "Coach", "Player", etc.
-}
-
-interface InviteModalProps {
+interface SelectMembersModalProps {
   open: boolean;
   onClose: () => void;
   members: Member[];
   selectedMembers: number[];
   setSelectedMembers: React.Dispatch<React.SetStateAction<number[]>>;
   description?: string;
+  title?: string;
 }
 
-export default function InviteModal({
+export default function SelectMembersModal({
   open,
   onClose,
   members,
   selectedMembers,
   setSelectedMembers,
   description,
-}: InviteModalProps) {
+  title = "Select Members",
+}: SelectMembersModalProps) {
   const [search, setSearch] = useState("");
   const [filteredMembers, setFilteredMembers] = useState<Member[]>(members);
 
@@ -66,16 +63,17 @@ export default function InviteModal({
     >
       <DialogContent
         className="max-w-lg"
-        aria-describedby="invite-dialog-description"
+        aria-describedby="select-dialog-description"
       >
         <DialogHeader>
-          <DialogTitle>Select Members</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
           {description ? (
-            <DialogDescription id="invite-dialog-description">
+            <DialogDescription id="select-dialog-description">
               {description}
             </DialogDescription>
           ) : null}
         </DialogHeader>
+
         <div className="mb-4">
           <Input
             value={search}
@@ -83,6 +81,7 @@ export default function InviteModal({
             placeholder="Search members..."
           />
         </div>
+
         <div className="max-h-60 overflow-y-auto">
           <table className="w-full text-left">
             <thead>
@@ -109,6 +108,7 @@ export default function InviteModal({
             </tbody>
           </table>
         </div>
+
         <DialogFooter>
           <Button onClick={onClose}>Done</Button>
         </DialogFooter>

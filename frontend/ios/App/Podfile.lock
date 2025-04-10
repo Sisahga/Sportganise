@@ -1,22 +1,46 @@
 PODS:
   - Capacitor (7.0.1):
     - CapacitorCordova
+  - CapacitorCommunityHttp (1.4.1):
+    - Capacitor
   - CapacitorCordova (7.0.1)
+  - CapacitorKeyboard (7.0.0):
+    - Capacitor
+  - CapacitorPreferences (7.0.0):
+    - Capacitor
+  - CapacitorPushNotifications (7.0.0):
+    - Capacitor
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/.pnpm/@capacitor+ios@7.0.1_@capacitor+core@7.0.1/node_modules/@capacitor/ios`)"
+  - "CapacitorCommunityHttp (from `../../node_modules/.pnpm/@capacitor-community+http@1.4.1/node_modules/@capacitor-community/http`)"
   - "CapacitorCordova (from `../../node_modules/.pnpm/@capacitor+ios@7.0.1_@capacitor+core@7.0.1/node_modules/@capacitor/ios`)"
+  - "CapacitorKeyboard (from `../../node_modules/.pnpm/@capacitor+keyboard@7.0.0_@capacitor+core@7.0.1/node_modules/@capacitor/keyboard`)"
+  - "CapacitorPreferences (from `../../node_modules/.pnpm/@capacitor+preferences@7.0.0_@capacitor+core@7.0.1/node_modules/@capacitor/preferences`)"
+  - "CapacitorPushNotifications (from `../../node_modules/.pnpm/@capacitor+push-notifications@7.0.0_@capacitor+core@7.0.1/node_modules/@capacitor/push-notifications`)"
 
 EXTERNAL SOURCES:
   Capacitor:
     :path: "../../node_modules/.pnpm/@capacitor+ios@7.0.1_@capacitor+core@7.0.1/node_modules/@capacitor/ios"
+  CapacitorCommunityHttp:
+    :path: "../../node_modules/.pnpm/@capacitor-community+http@1.4.1/node_modules/@capacitor-community/http"
   CapacitorCordova:
     :path: "../../node_modules/.pnpm/@capacitor+ios@7.0.1_@capacitor+core@7.0.1/node_modules/@capacitor/ios"
+  CapacitorKeyboard:
+    :path: "../../node_modules/.pnpm/@capacitor+keyboard@7.0.0_@capacitor+core@7.0.1/node_modules/@capacitor/keyboard"
+  CapacitorPreferences:
+    :path: "../../node_modules/.pnpm/@capacitor+preferences@7.0.0_@capacitor+core@7.0.1/node_modules/@capacitor/preferences"
+  CapacitorPushNotifications:
+    :path: "../../node_modules/.pnpm/@capacitor+push-notifications@7.0.0_@capacitor+core@7.0.1/node_modules/@capacitor/push-notifications"
 
 SPEC CHECKSUMS:
   Capacitor: de199cba6c8b20995428ad0b7cb0bc6ca625ffd4
+  CapacitorCommunityHttp: 7eba71da94e070e37a26a60483350285a33e3903
   CapacitorCordova: 63d476958d5022d76f197031e8b7ea3519988c64
+  CapacitorKeyboard: 4db71e694e7afb5d7c0be09b05495c19f7d6c914
+  CapacitorPreferences: 8e4bef1f937fc991a19d7ea99330c36a62edd24b
+  CapacitorPushNotifications: 2e0132cd2f1a5d696bcbfc3725c2b6ffcb9275d4
 
-PODFILE CHECKSUM: 17d79c2801fbd64bd5cd1e2b5290af3aa9bba3e7
+PODFILE CHECKSUM: fad21dde253116645f5e07c485592038fcfbc806
 
 COCOAPODS: 1.16.2

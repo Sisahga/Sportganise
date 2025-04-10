@@ -1,18 +1,18 @@
 import { Button } from "@/components/ui/Button.tsx";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, LoaderCircle } from "lucide-react";
 import { useNavigate } from "react-router";
 import AddMembers from "../AddMembers.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
 import useCreateChannel from "@/hooks/useCreateChannel.ts";
 import { CreateChannelDto } from "@/types/dmchannels.ts";
 import log from "loglevel";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 import { motion } from "framer-motion";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 export default function CreateDirectMessagingChannel() {
-  const cookies = getCookies();
-  const userId = getAccountIdCookie(cookies);
+  const { userId, cookies, preLoading } = useGetCookies();
+
   const navigate = useNavigate();
   const [selectedUsers, setSelectedUsers] = useState<
     AccountDetailsDirectMessaging[]
@@ -21,13 +21,24 @@ export default function CreateDirectMessagingChannel() {
 
   const currentUser = {
     accountId: userId,
-    firstName: cookies.firstName,
-    lastName: cookies.lastName,
-    pictureUrl: cookies.pictureUrl || "",
-    type: cookies.type!,
-    phone: cookies.phone || "",
+    firstName: cookies?.firstName || "",
+    lastName: cookies?.lastName || "",
+    pictureUrl: cookies?.pictureUrl || "",
+    type: cookies?.type || "",
+    phone: cookies?.phone || "",
     selected: true,
   };
+
+  useEffect(() => {
+    if (!preLoading && cookies && userId) {
+      currentUser.accountId = userId;
+      currentUser.firstName = cookies.firstName;
+      currentUser.lastName = cookies.lastName;
+      currentUser.pictureUrl = cookies.pictureUrl || "";
+      currentUser.type = cookies.type || "";
+      currentUser.phone = cookies.phone || "";
+    }
+  }, [preLoading, userId, cookies]);
 
   const handleCreateChannel = async () => {
     const updatedUsersWithCurrent = [...selectedUsers, currentUser];
@@ -72,6 +83,14 @@ export default function CreateDirectMessagingChannel() {
       log.error("Error creating channel:", channelResponse);
     }
   };
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <div

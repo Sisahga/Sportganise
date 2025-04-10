@@ -133,18 +133,18 @@ class DirectMessageChannelControllerUnitTest {
     mockMvc
         .perform(MockMvcRequestBuilders.get("/api/messaging/channel/get-channels/" + accountId))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].channelId", is(channel1.getChannelId())))
-        .andExpect(jsonPath("$[0].channelType", is(channel1.getChannelType())))
-        .andExpect(jsonPath("$[0].channelName", is(channel1.getChannelName())))
-        .andExpect(jsonPath("$[0].channelImageBlob", is(channel1.getChannelImageBlob())))
-        .andExpect(jsonPath("$[0].lastMessage", is(channel1.getLastMessage())))
-        .andExpect(jsonPath("$[0].read", is(channel1.getRead())))
-        .andExpect(jsonPath("$[1].channelId", is(channel2.getChannelId())))
-        .andExpect(jsonPath("$[1].channelType", is(channel2.getChannelType())))
-        .andExpect(jsonPath("$[1].channelName", is(channel2.getChannelName())))
-        .andExpect(jsonPath("$[1].channelImageBlob", is(channel2.getChannelImageBlob())))
-        .andExpect(jsonPath("$[1].lastMessage", is(channel2.getLastMessage())))
-        .andExpect(jsonPath("$[1].read", is(channel2.getRead())));
+        .andExpect(jsonPath("$.data[0].channelId", is(channel1.getChannelId())))
+        .andExpect(jsonPath("$.data[0].channelType", is(channel1.getChannelType())))
+        .andExpect(jsonPath("$.data[0].channelName", is(channel1.getChannelName())))
+        .andExpect(jsonPath("$.data[0].channelImageBlob", is(channel1.getChannelImageBlob())))
+        .andExpect(jsonPath("$.data[0].lastMessage", is(channel1.getLastMessage())))
+        .andExpect(jsonPath("$.data[0].read", is(channel1.getRead())))
+        .andExpect(jsonPath("$.data[1].channelId", is(channel2.getChannelId())))
+        .andExpect(jsonPath("$.data[1].channelType", is(channel2.getChannelType())))
+        .andExpect(jsonPath("$.data[1].channelName", is(channel2.getChannelName())))
+        .andExpect(jsonPath("$.data[1].channelImageBlob", is(channel2.getChannelImageBlob())))
+        .andExpect(jsonPath("$.data[1].lastMessage", is(channel2.getLastMessage())))
+        .andExpect(jsonPath("$.data[1].read", is(channel2.getRead())));
     verify(dmChannelService, times(1)).getDirectMessageChannels(accountId);
   }
 
@@ -155,7 +155,9 @@ class DirectMessageChannelControllerUnitTest {
     mockMvc
         .perform(MockMvcRequestBuilders.get("/api/messaging/channel/get-channels/" + accountId))
         .andExpect(status().isOk())
-        .andExpect(content().string(""));
+        .andExpect(jsonPath("$.statusCode").value(200))
+        .andExpect(jsonPath("$.message").value("Channels retrieved successfully"))
+        .andExpect(jsonPath("$.data").doesNotExist());
     verify(dmChannelService, times(1)).getDirectMessageChannels(accountId);
   }
 

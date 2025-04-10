@@ -13,8 +13,7 @@ export const useSignUp = () => {
 
     try {
       // Sign Up API call
-      const signUpResponse = await signUp(requestData);
-      return signUpResponse;
+      return await signUp(requestData);
     } catch (err) {
       const errorMessage =
         (err as Error).message || "An unexpected error occured.";

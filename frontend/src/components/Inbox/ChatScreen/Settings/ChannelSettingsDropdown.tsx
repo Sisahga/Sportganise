@@ -10,6 +10,7 @@ import {
   Ban,
   Edit,
   Image,
+  LoaderCircle,
   LogOutIcon,
   MoreHorizontal,
   Trash2,
@@ -43,7 +44,6 @@ import { ChangePictureDialog } from "@/components/Inbox/ChatScreen/Settings/Chan
 import { LeaveGroupDialog } from "@/components/Inbox/ChatScreen/Settings/LeaveGroup.tsx";
 import useRemoveChannelMember from "@/hooks/useRemoveChannelMember.ts";
 import { useNavigate } from "react-router";
-import { getCookies } from "@/services/cookiesService.ts";
 import useDeleteRequest from "@/hooks/useDeleteRequest.ts";
 import { useToast } from "@/hooks/use-toast.ts";
 
@@ -58,9 +58,8 @@ const ChannelSettingsDropdown = ({
   currentChannelPictureUrl,
   setCurrentChannelPictureUrl,
   isDeleteRequestActive,
+  cookies,
 }: ChannelSettingsDropdownProps) => {
-  const cookies = getCookies();
-
   // States.
   const [isBlockOpen, setIsBlockOpen] = useState(false);
   const [userBlocked, setUserBlocked] = useState(isBlocked);
@@ -73,7 +72,10 @@ const ChannelSettingsDropdown = ({
     useState<GroupChannelMemberRole | null>(null);
 
   // Hooks.
-  const { members } = useChannelMembers(channelId, currentUserId, channelType);
+  const { fetchChannelMembers, members } = useChannelMembers(
+    channelId,
+    channelType,
+  );
   const { blockUser } = useBlockUser();
   const { removeChannelMember } = useRemoveChannelMember();
   const { sendDirectMessage } = useSendMessage();
@@ -176,7 +178,7 @@ const ChannelSettingsDropdown = ({
   // Leaves group.
   const handleLeaveGroup = async () => {
     const response = await removeChannelMember(channelId, currentUserId);
-    if (response?.status === 200) {
+    if (response?.statusCode === 200) {
       log.info(`User ${currentUserId} left group ${channelId}`);
       const leaveMessageRemoverViewContent = "You left the group.";
       const leaveMessageContent = `${cookies.firstName} left the group.`;
@@ -198,14 +200,28 @@ const ChannelSettingsDropdown = ({
   };
 
   useEffect(() => {
-    if (channelType === "GROUP") {
-      for (let i = 0; i < members.length; i++) {
-        if (members[i].accountId === currentUserId) {
-          setCurrentMemberRole(members[i].role);
+    fetchChannelMembers(currentUserId).then((_) => _);
+  }, [fetchChannelMembers]);
+
+  useEffect(() => {
+    if (members.length > 0) {
+      if (channelType === "GROUP") {
+        for (let i = 0; i < members.length; i++) {
+          if (members[i].accountId === currentUserId) {
+            setCurrentMemberRole(members[i].role);
+          }
         }
       }
     }
   }, [members]);
+
+  if (members.length === 0) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -309,6 +325,7 @@ const ChannelSettingsDropdown = ({
         channelId={channelId}
         websocketRef={webSocketRef}
         currentUserId={currentUserId}
+        cookies={cookies}
       />
       <RenameGroupDialog
         isOpen={isRenameGroupOpen}
@@ -318,6 +335,7 @@ const ChannelSettingsDropdown = ({
         setCurrentChannelName={setCurrentChannelName}
         currentUserId={currentUserId}
         webSocketRef={webSocketRef}
+        cookies={cookies}
       />
       <ChangePictureDialog
         isOpen={isChangePictureOpen}
@@ -327,6 +345,7 @@ const ChannelSettingsDropdown = ({
         setCurrentChannelPictureUrl={setCurrentChannelPictureUrl}
         webSocketRef={webSocketRef}
         currentUserId={currentUserId}
+        cookies={cookies}
       />
       <LeaveGroupDialog
         isOpen={isLeaveGroupOpen}

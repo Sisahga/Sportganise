@@ -102,8 +102,8 @@ public class ProgramServiceTest {
             .build();
 
     Mockito.when(programRepository.findParticipantsByProgramId(1)).thenReturn(mockParticipants);
-    Mockito.when(accountService.getAccount(101)).thenReturn(Optional.of(account1));
-    Mockito.when(accountService.getAccount(102)).thenReturn(Optional.of(account2));
+    Mockito.when(accountService.getAccount(101)).thenReturn(account1);
+    Mockito.when(accountService.getAccount(102)).thenReturn(account2);
 
     List<ProgramParticipantDto> participantDtos = programService.getParticipants(1);
 
@@ -468,7 +468,7 @@ public class ProgramServiceTest {
 
   @Test
   void cancel_shouldCallProgramRepository_cancelMethods() {
-    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(List.of(1));
 
     programService.cancel(1, 1, false, false, true);
     verify(programRecurrenceRepository, times(1)).cancelProgramRecurrences(any());
@@ -477,7 +477,7 @@ public class ProgramServiceTest {
 
   @Test
   void cancel_shouldCallProgramRepository_uncancelMethods() {
-    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(List.of(1));
 
     programService.cancel(1, 1, false, false, false);
     verify(programRecurrenceRepository, times(1)).uncancelProgramRecurrences(any());
@@ -487,7 +487,7 @@ public class ProgramServiceTest {
   @Test
   void cancel_shouldCallProgramRecurrenceRepository_cancelMethods() {
     ProgramRecurrence mockRecurrence = ProgramRecurrence.builder().programId(1).build();
-    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(List.of(1));
     when(programRecurrenceRepository.findProgramRecurrenceById(1)).thenReturn(mockRecurrence);
     programService.cancel(1, 1, true, false, true);
     verify(programRecurrenceRepository, times(1)).cancelRecurrence(any());
@@ -496,7 +496,7 @@ public class ProgramServiceTest {
   @Test
   void cancel_shouldCallProgramRecurrenceRepository_uncancelMethods() {
     ProgramRecurrence mockRecurrence = ProgramRecurrence.builder().programId(1).build();
-    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(1));
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(List.of(1));
     when(programRecurrenceRepository.findProgramRecurrenceById(1)).thenReturn(mockRecurrence);
     programService.cancel(1, 1, true, false, false);
     verify(programRecurrenceRepository, times(1)).uncancelRecurrence(any());
@@ -518,7 +518,7 @@ public class ProgramServiceTest {
     Program mockProgram = Program.builder().programId(1).build();
     when(accountService.getAccountById(1))
         .thenReturn(Account.builder().accountId(1).type(AccountType.COACH).build());
-    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(Arrays.asList(2));
+    when(programParticipantRepository.findProgramCoachIds(1)).thenReturn(List.of(2));
 
     assertThrows(
         com.sportganise.exceptions.InsufficientPermissionsException.class,

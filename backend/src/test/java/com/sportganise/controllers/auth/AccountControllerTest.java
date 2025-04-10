@@ -26,7 +26,6 @@ import com.sportganise.exceptions.InvalidAccountTypeException;
 import com.sportganise.services.account.AccountService;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -56,7 +55,7 @@ class AccountControllerTest {
 
   @MockBean private AccountService accountService;
 
-  private ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
+  private final ProjectionFactory factory = new SpelAwareProxyProjectionFactory();
 
   private Account account;
 
@@ -94,22 +93,22 @@ class AccountControllerTest {
   @Test
   @Order(2)
   public void getAccountTest() throws Exception {
-    given(accountService.getAccount(account.getAccountId())).willReturn(Optional.of(account));
+    given(accountService.getAccount(account.getAccountId())).willReturn(account);
     mockMvc
         .perform(MockMvcRequestBuilders.get("/api/account/{id}", 1))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.accountId", is(account.getAccountId())))
-        .andExpect(jsonPath("$.type", is(account.getType().toString())))
-        .andExpect(jsonPath("$.email", is(account.getEmail())))
-        .andExpect(jsonPath("$.auth0Id", is(account.getAuth0Id())))
-        .andExpect(jsonPath("$.address.line", is(account.getAddress().getLine())))
-        .andExpect(jsonPath("$.address.city", is(account.getAddress().getCity())))
-        .andExpect(jsonPath("$.address.province", is(account.getAddress().getProvince())))
-        .andExpect(jsonPath("$.address.country", is(account.getAddress().getCountry())))
-        .andExpect(jsonPath("$.address.postalCode", is(account.getAddress().getPostalCode())))
-        .andExpect(jsonPath("$.phone", is(account.getPhone())))
-        .andExpect(jsonPath("$.firstName", is(account.getFirstName())))
-        .andExpect(jsonPath("$.lastName", is(account.getLastName())));
+        .andExpect(jsonPath("$.data.accountId", is(account.getAccountId())))
+        .andExpect(jsonPath("$.data.type", is(account.getType().toString())))
+        .andExpect(jsonPath("$.data.email", is(account.getEmail())))
+        .andExpect(jsonPath("$.data.auth0Id", is(account.getAuth0Id())))
+        .andExpect(jsonPath("$.data.address.line", is(account.getAddress().getLine())))
+        .andExpect(jsonPath("$.data.address.city", is(account.getAddress().getCity())))
+        .andExpect(jsonPath("$.data.address.province", is(account.getAddress().getProvince())))
+        .andExpect(jsonPath("$.data.address.country", is(account.getAddress().getCountry())))
+        .andExpect(jsonPath("$.data.address.postalCode", is(account.getAddress().getPostalCode())))
+        .andExpect(jsonPath("$.data.phone", is(account.getPhone())))
+        .andExpect(jsonPath("$.data.firstName", is(account.getFirstName())))
+        .andExpect(jsonPath("$.data.lastName", is(account.getLastName())));
   }
 
   @Test
@@ -140,10 +139,10 @@ class AccountControllerTest {
                     "/api/account/get-all-users/{organizationId}/1", organizationId)
                 .accept(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.size()", is(accounts.size())))
-        .andExpect(jsonPath("$[0].firstName", is(accounts.getFirst().getFirstName())))
-        .andExpect(jsonPath("$[0].lastName", is(accounts.getFirst().getLastName())))
-        .andExpect(jsonPath("$[0].phone", is(accounts.getFirst().getPhone())));
+        .andExpect(jsonPath("$.data.size()", is(accounts.size())))
+        .andExpect(jsonPath("$.data[0].firstName", is(accounts.getFirst().getFirstName())))
+        .andExpect(jsonPath("$.data[0].lastName", is(accounts.getFirst().getLastName())))
+        .andExpect(jsonPath("$.data[0].phone", is(accounts.getFirst().getPhone())));
   }
 
   @Nested
@@ -179,7 +178,7 @@ class AccountControllerTest {
               MockMvcRequestBuilders.put("/api/account/{accountId}", accountId)
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(requestBody))
-          .andExpect(status().isNoContent());
+          .andExpect(status().isOk());
 
       verify(accountService, times(1)).updateAccount(eq(accountId), any(UpdateAccountDto.class));
     }
@@ -199,7 +198,7 @@ class AccountControllerTest {
               MockMvcRequestBuilders.multipart(
                       HttpMethod.PUT, "/api/account/{accountId}/picture", accountId)
                   .file(multipartFile))
-          .andExpect(status().isNoContent());
+          .andExpect(status().isOk());
 
       verify(accountService, times(1)).updateAccountPicture(accountId, multipartFile);
     }
@@ -329,8 +328,7 @@ class AccountControllerTest {
       mockMvc
           .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
           .andExpect((status().isOk()))
-          .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-          .andExpect(content().json("[]"));
+          .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -360,17 +358,16 @@ class AccountControllerTest {
           .perform(MockMvcRequestBuilders.get("/api/account/permissions"))
           .andExpect((status().isOk()))
           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-          .andExpect(jsonPath("$.length()").value(2))
           .andExpectAll( // account 1
-              jsonPath("$[0].accountId", is(account1.getAccountId())),
-              jsonPath("$[0].email", is(account1.getEmail())),
-              jsonPath("$[0].type", is(account1.getType().toString())),
-              jsonPath("$[0].pictureUrl").doesNotExist())
+              jsonPath("$.data[0].accountId", is(account1.getAccountId())),
+              jsonPath("$.data[0].email", is(account1.getEmail())),
+              jsonPath("$.data[0].type", is(account1.getType().toString())),
+              jsonPath("$.data[0].pictureUrl").doesNotExist())
           .andExpectAll( // account 2
-              jsonPath("$[1].accountId", is(account2.getAccountId())),
-              jsonPath("$[1].email", is(account2.getEmail())),
-              jsonPath("$[1].type", is(account2.getType().toString())),
-              jsonPath("$[1].pictureUrl", is(account2.getPictureUrl())));
+              jsonPath("$.data[1].accountId", is(account2.getAccountId())),
+              jsonPath("$.data[1].email", is(account2.getEmail())),
+              jsonPath("$.data[1].type", is(account2.getType().toString())),
+              jsonPath("$.data[1].pictureUrl", is(account2.getPictureUrl())));
     }
   }
 

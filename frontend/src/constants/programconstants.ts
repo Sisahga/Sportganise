@@ -1,6 +1,6 @@
 // Program Type Constants
 export const TRAINING = "TRAINING";
-export const SPECIALTRAINING = "SPECIALTRAINING";
+export const SPECIALTRAINING = "SPECIAL TRAINING";
 export const FUNDRAISER = "FUNDRAISER";
 export const TOURNAMENT = "TOURNAMENT";
 

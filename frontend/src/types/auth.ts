@@ -3,12 +3,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LoginResponse {
-  statusCode: number;
-  message: string;
-  data: null | { token: string } | CookiesDto; // If the server returns a token or any other data
-}
-
 export interface CookiesDto {
   accountId: number | null;
   firstName: string;
@@ -38,9 +32,7 @@ export interface SignUpRequest {
 }
 
 export interface SignUpResponse {
-  statusCode: number;
-  message: string;
-  data: null | { email: string };
+  email: string;
 }
 
 export interface SendCodeRequest {
@@ -48,9 +40,7 @@ export interface SendCodeRequest {
 }
 
 export interface SendCodeResponse {
-  statusCode: number;
-  message: string;
-  data: string; // Email to which the code was sent
+  email: string; // Email to which the code was sent
 }
 
 export interface VerifyCodeRequest {
@@ -59,9 +49,15 @@ export interface VerifyCodeRequest {
 }
 
 export interface VerifyCodeResponse {
-  statusCode: number;
-  message: string;
-  data: null | CookiesDto;
+  accountId: number | null;
+  firstName: string;
+  lastName: string;
+  email: string;
+  pictureUrl: string | null;
+  type: string | null;
+  phone: string | null;
+  organisationIds: number[];
+  jwtToken: string | null;
 }
 
 export interface ChangePasswordFormValues {
@@ -78,8 +74,7 @@ export interface ModifyPasswordRequest {
 }
 
 export interface ModifyPasswordResponse {
-  statusCode: number;
-  message: string;
+  email: string;
 }
 
 export interface ResetPasswordRequest {
@@ -88,9 +83,7 @@ export interface ResetPasswordRequest {
 }
 
 export interface ResetPasswordResponse {
-  statusCode: number;
-  message: string;
-  data: string;
+  email: string;
 }
 
 export interface ResetPasswordFormValues {

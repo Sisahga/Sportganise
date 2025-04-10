@@ -6,34 +6,38 @@ import {
   Settings,
   KeyRound,
   UserX,
+  LoaderCircle,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
-import {
-  getCookies,
-  getAccountIdCookie,
-  getTypeCookie,
-} from "@/services/cookiesService";
+import { getTypeCookie } from "@/services/cookiesService";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const ProfileContent: React.FC = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<string | null>(null);
 
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, cookies, preLoading } = useGetCookies();
+
+  const { data, loading, error, fetchAccountData } = usePersonalInformation();
 
   useEffect(() => {
-    if (!cookies) {
-      navigate("/login");
-    } else {
-      setUserType(getTypeCookie(cookies));
+    if (!preLoading) {
+      if (!cookies) {
+        navigate("/login");
+      } else {
+        setUserType(getTypeCookie(cookies));
+        fetchAccountData(userId).then((_) => _);
+      }
     }
-  }, [cookies, accountId, navigate]);
+  }, [cookies, userId, preLoading, navigate]);
 
-  const { data, loading, error } = usePersonalInformation(accountId || 0);
-
-  if (loading) {
-    return <div>Loading...</div>;
+  if (preLoading || loading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   if (error) {

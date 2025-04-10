@@ -40,7 +40,7 @@ public class BlocklistControllerUnitTest {
             MockMvcRequestBuilders.post("/api/blocklist/block")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto)))
-        .andExpect(status().isNoContent())
+        .andExpect(status().isOk())
         .andExpect(jsonPath("$.statusCode").value(204))
         .andExpect(jsonPath("$.message").value("User blocked successfully"))
         .andExpect(jsonPath("$.data").isEmpty());
@@ -61,7 +61,7 @@ public class BlocklistControllerUnitTest {
             MockMvcRequestBuilders.delete(
                     "/api/blocklist/unblock/{accountId}/{blockedId}", accountId, blockedId)
                 .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isNoContent())
+        .andExpect(status().isOk())
         .andExpect(jsonPath("$.statusCode").value(204))
         .andExpect(jsonPath("$.message").value("User unblocked successfully"))
         .andExpect(jsonPath("$.data").isEmpty());

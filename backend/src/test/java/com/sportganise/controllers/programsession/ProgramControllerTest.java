@@ -11,6 +11,7 @@ import com.sportganise.dto.programsessions.*;
 import com.sportganise.entities.account.Account;
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.programsessions.ProgramType;
+import com.sportganise.exceptions.AccountNotFoundException;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +21,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -101,7 +101,7 @@ public class ProgramControllerTest {
 
   @Test
   public void testGetProgramDetails_AccountNotFound() throws Exception {
-    Mockito.when(accountService.getAccount(999)).thenReturn(Optional.empty());
+    Mockito.when(accountService.getAccount(999)).thenThrow(AccountNotFoundException.class);
 
     mockMvc.perform(get("/api/programs/999/details")).andExpect(status().isNotFound());
   }
@@ -113,7 +113,7 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.PLAYER);
 
-    Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(2)).thenReturn(mockAccount);
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
 
     mockMvc.perform(get("/api/programs/2/details")).andExpect(status().isNotFound());
@@ -126,7 +126,7 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(2)).thenReturn(mockAccount);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(programService.getPrograms()).thenReturn(List.of(mockProgramDto));
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
@@ -162,7 +162,7 @@ public class ProgramControllerTest {
     ProgramDetailsParticipantsDto mockProgramDetailsParticipantsDtos =
         new ProgramDetailsParticipantsDto(mockProgramDto, new ArrayList<>());
 
-    Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(2)).thenReturn(mockAccount);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
     Mockito.when(programService.getPrograms()).thenReturn(List.of(mockProgramDto));
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
@@ -215,7 +215,7 @@ public class ProgramControllerTest {
             MediaType.APPLICATION_PDF_VALUE,
             "PDF content".getBytes());
 
-    Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(2)).thenReturn(mockAccount);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(
             programService.createProgramDto(
@@ -259,7 +259,7 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(3);
     mockAccount.setType(AccountType.PLAYER);
 
-    Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(3)).thenReturn(mockAccount);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
     // Ensure the JSON payload is valid and formatted correctly
@@ -324,7 +324,7 @@ public class ProgramControllerTest {
             MediaType.APPLICATION_PDF_VALUE,
             "Sample PDF Content".getBytes());
 
-    Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(2)).thenReturn(mockAccount);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(programService.getProgramDetails(111)).thenReturn(mockProgramDto);
 
@@ -359,7 +359,7 @@ public class ProgramControllerTest {
 
   @Test
   public void testModifyProgram_UserNotFound() throws Exception {
-    Mockito.when(accountService.getAccount(123)).thenReturn(Optional.empty());
+    Mockito.when(accountService.getAccount(123)).thenThrow(AccountNotFoundException.class);
 
     MockMultipartFile programData =
         new MockMultipartFile(
@@ -391,7 +391,7 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(3);
     mockAccount.setType(AccountType.PLAYER);
 
-    Mockito.when(accountService.getAccount(3)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(3)).thenReturn(mockAccount);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(false);
 
     MockMultipartFile programData =
@@ -423,7 +423,7 @@ public class ProgramControllerTest {
     mockAccount.setAccountId(2);
     mockAccount.setType(AccountType.COACH);
 
-    Mockito.when(accountService.getAccount(2)).thenReturn(Optional.of(mockAccount));
+    Mockito.when(accountService.getAccount(2)).thenReturn(mockAccount);
     Mockito.when(accountService.hasPermissions(mockAccount.getType())).thenReturn(true);
     Mockito.when(programService.getProgramDetails(999)).thenReturn(null);
 

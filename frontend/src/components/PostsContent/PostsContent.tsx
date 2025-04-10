@@ -5,6 +5,7 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  LoaderCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { formatDistanceToNow } from "date-fns";
@@ -24,21 +25,22 @@ import {
 
 import BackButton from "../ui/back-button";
 import { useLocation } from "react-router";
-import { getCookies } from "@/services/cookiesService";
 import { Feedback } from "@/types/postdetail";
 import { usePostLike } from "@/hooks/usePostLike";
 import { useFeedback } from "@/hooks/useFeedback";
 import { usePost } from "@/hooks/usePost";
 import log from "loglevel";
 import { Badge } from "../ui/badge";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const PostsContent: React.FC = () => {
   const commentsPerPage = 5;
   const location = useLocation();
   const postId = location.state?.postId;
-  const user = getCookies();
 
-  const { post, loading: postLoading, error } = usePost(postId);
+  const { userId, cookies, preLoading } = useGetCookies();
+
+  const { post, loading: postLoading, error, fetchPost } = usePost(postId);
   const { likePost, unlikePost } = usePostLike();
   const { addFeedback, deleteFeedback } = useFeedback();
 
@@ -50,12 +52,18 @@ const PostsContent: React.FC = () => {
   const [liked, setLiked] = useState<boolean>(post ? post.liked : false);
   const [likeCount, setLikeCount] = useState<number>(post?.likeCount || 0);
 
+  useEffect(() => {
+    if (!preLoading && cookies) {
+      fetchPost(userId).then((_) => _);
+    }
+  }, [preLoading, cookies, fetchPost]);
+
   const canDelete = (creationDate: string, commentAuthorId: number) => {
     const creationTime = new Date(creationDate).getTime();
     const currentTime = Date.now();
     const timeDiff = currentTime - creationTime;
     const timeLimit = 30 * 60 * 1000;
-    return timeDiff <= timeLimit && commentAuthorId === user.accountId;
+    return timeDiff <= timeLimit && commentAuthorId === userId;
   };
 
   const handleLike = (postId: number) => {
@@ -67,55 +75,59 @@ const PostsContent: React.FC = () => {
     if (liked) {
       setLiked(false);
       setLikeCount(likeCount - 1);
-      log.debug(`Post ${postId} disliked by user ${user.accountId}`);
-      unlikePost(postId, user.accountId);
+      log.debug(`Post ${postId} disliked by user ${userId}`);
+      unlikePost(postId, userId).then((_) => _);
     } else {
       setLiked(true);
       setLikeCount(likeCount + 1);
-      log.debug(`Post ${postId} liked by user ${user.accountId}`);
-      likePost(postId, user.accountId);
+      log.debug(`Post ${postId} liked by user ${userId}`);
+      likePost(postId, userId).then((_) => _);
     }
   };
 
   const handleAddComment = async () => {
-    if (!post || !newComment.trim() || user === null || user.type === null)
+    if (
+      !post ||
+      !newComment.trim() ||
+      cookies === null ||
+      cookies?.type === null
+    )
       return;
+    else if (cookies && cookies.type) {
+      const tempId = Date.now();
+      const newCommentObj: Feedback = {
+        feedbackId: tempId,
+        author: {
+          accountId: userId ?? 0,
+          name: `${cookies.firstName} ${cookies.lastName}`,
+          type: cookies.type,
+          pictureUrl: cookies.pictureUrl || "",
+        },
+        description: newComment,
+        creationDate: new Date().toISOString(),
+      };
 
-    const tempId = Date.now();
-    const newCommentObj: Feedback = {
-      feedbackId: tempId,
-      author: {
-        accountId: user.accountId ?? 0,
-        name: `${user.firstName} ${user.lastName}`,
-        type: user.type,
-        pictureUrl: user.pictureUrl || "",
-      },
-      description: newComment,
-      creationDate: new Date().toISOString(),
-    };
+      setComments((prevComments) => [newCommentObj, ...prevComments]);
+      setNewComment("");
+      setCurrentPage(1);
 
-    setComments((prevComments) => [newCommentObj, ...prevComments]);
-    setNewComment("");
-    setCurrentPage(1);
-
-    try {
-      const feedbackId = await addFeedback(
-        postId,
-        user.accountId ?? 0,
-        newComment,
-      );
-      log.info(`Comment added with Feedback ID: ${feedbackId}`);
-      if (feedbackId) {
-        setComments((prevComments) =>
-          prevComments.map((comment) =>
-            comment.feedbackId === tempId
-              ? { ...comment, feedbackId }
-              : comment,
-          ),
-        );
+      try {
+        const feedbackId = await addFeedback(postId, userId ?? 0, newComment);
+        log.info(`Comment added with Feedback ID: ${feedbackId}`);
+        if (feedbackId) {
+          setComments((prevComments) =>
+            prevComments.map((comment) =>
+              comment.feedbackId === tempId
+                ? { ...comment, feedbackId }
+                : comment,
+            ),
+          );
+        }
+      } catch (err) {
+        log.error("Failed to add comment:", err);
       }
-    } catch (err) {
-      log.error("Failed to add comment:", err);
+    } else {
+      log.error("Cookies are null or type is null");
     }
   };
 
@@ -126,7 +138,7 @@ const PostsContent: React.FC = () => {
       prevComments.filter((feedback) => feedback.feedbackId !== feedbackId),
     );
 
-    deleteFeedback(postId, feedbackId);
+    deleteFeedback(postId, feedbackId).then((_) => _);
     log.info("Deleting comment for Feedback ID:", feedbackId);
   };
 
@@ -157,12 +169,14 @@ const PostsContent: React.FC = () => {
     }
   };
 
-  if (postLoading) {
+  if (preLoading || postLoading) {
     return (
       <div className="py-4 min-h-screen pb-20">
         <BackButton />
         <div className="container mx-auto py-6">
-          <p>Loading post...</p>
+          <p>
+            Loading post <LoaderCircle className="animate-spin h-6 w-6" />
+          </p>
         </div>
       </div>
     );

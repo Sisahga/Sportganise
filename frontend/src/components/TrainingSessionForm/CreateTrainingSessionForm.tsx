@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router";
 import useCreateTrainingSession from "@/hooks/useCreateTrainingSession";
 import log from "loglevel";
-import { useEffect, useState } from "react";
-import InviteModal, { Member } from "./InviteModal";
+import { useCallback, useEffect, useState } from "react";
+import SelectMembersModal from "./SelectMembersModal";
 import * as z from "zod";
 import useFormHandler from "@/hooks/useFormHandler";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
@@ -51,26 +51,23 @@ import {
   Paperclip,
   Loader2,
 } from "lucide-react";
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 // Import constants for select fields
 import { TRAINING } from "@/constants/programconstants";
 import { SPECIALTRAINING } from "@/constants/programconstants";
-import { TOURNAMENT } from "@/constants/programconstants";
-import { FUNDRAISER } from "@/constants/programconstants";
-import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
-import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
-import { PUBLIC } from "@/constants/programconstants";
-import { PRIVATE } from "@/constants/programconstants";
-import { DAILY } from "@/constants/programconstants";
-import { WEEKLY } from "@/constants/programconstants";
-import { MONTHLY } from "@/constants/programconstants";
-import { ONCE } from "@/constants/programconstants";
+import { DAILY, WEEKLY, MONTHLY, ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 import AssignCoach from "./AssignCoaches";
-
-type ModalKey = "invite" | "waitlist";
+import {
+  FREQUENCIES,
+  LOCATIONS,
+  PROGRAM_TYPES,
+  VISIBILITIES,
+} from "./constants";
+import { Member, ModalKey } from "./types";
+import { MemberList } from "./MembersList";
 
 export default function CreateTrainingSessionForm() {
   const navigate = useNavigate();
@@ -100,13 +97,14 @@ export default function CreateTrainingSessionForm() {
     name: "type",
   });
 
-  const showField =
+  const isTrainingOrSpecial =
     selectedType === TRAINING || selectedType === SPECIALTRAINING;
 
-  const handleCoachesSelection = (selectedCoaches: number[]) => {
-    setSelectedCoaches(selectedCoaches);
+  const handleCoachesSelection = useCallback((newSelectedCoaches: number[]) => {
+    setSelectedCoaches(newSelectedCoaches);
     setShowSelectedCoaches(true);
-  };
+  }, []);
+
   const minAttendees = invitedMembers.length;
 
   useEffect(() => {
@@ -124,68 +122,24 @@ export default function CreateTrainingSessionForm() {
   }, [minAttendees, maxAttendees, form]);
 
   // AccountId from cookies
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, cookies, preLoading } = useGetCookies();
   useEffect(() => {
-    if (!accountId) {
-      log.debug("No accountId found");
+    if (!preLoading) {
+      if (!userId) {
+        log.debug("No accountId found");
+      }
+      log.info(`CreateTrainingSessionForm accountId is ${userId}`);
     }
-    log.info(`CreateTrainingSessionForm accountId is ${accountId}`);
-  }, [accountId]);
+  }, [userId]);
 
   useEffect(() => {
-    if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
-      navigate("/");
+    if (!preLoading) {
+      if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
+        navigate("/");
+      }
+      log.debug(`CreateTrainingSessionForm accountId : ${userId}`);
     }
-    log.debug(`CreateTrainingSessionForm accountId : ${accountId}`);
-  }, [accountId, navigate, cookies]);
-
-  const types = [
-    {
-      label: "Training Session",
-      value: TRAINING,
-    },
-    {
-      label: "Fundraiser",
-      value: FUNDRAISER,
-    },
-    {
-      label: "Tournament",
-      value: TOURNAMENT,
-    },
-    {
-      label: "Special Training",
-      value: SPECIALTRAINING,
-    },
-  ] as const;
-  const frequencies = [
-    {
-      label: "Daily",
-      value: DAILY,
-    },
-    {
-      label: "Weekly",
-      value: WEEKLY,
-    },
-    {
-      label: "Monthly",
-      value: MONTHLY,
-    },
-    {
-      label: "One time",
-      value: ONCE,
-    },
-  ] as const;
-  const locations = [
-    {
-      label: "Centre de loisirs St-Denis",
-      value: CENTRE_DE_LOISIRS_ST_DENIS,
-    },
-    {
-      label: "Collège de Maisonnneuve",
-      value: COLLEGE_DE_MAISONNEUVE,
-    },
-  ] as const;
+  }, [userId, navigate, cookies]);
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -256,7 +210,7 @@ export default function CreateTrainingSessionForm() {
 
       // API submit form
       setLoading(true);
-      const create = await createTrainingSession(accountId, formData);
+      const create = await createTrainingSession(userId, formData);
       setLoading(false);
       log.info("create", create);
       if (create === null) {
@@ -301,7 +255,7 @@ export default function CreateTrainingSessionForm() {
 
   return (
     <>
-      {playersLoading ? (
+      {playersLoading || preLoading ? (
         <div>Loading players...</div>
       ) : playersError ? (
         <div>Error loading players</div>
@@ -367,8 +321,9 @@ export default function CreateTrainingSessionForm() {
                           )}
                         >
                           {field.value
-                            ? types.find((type) => type.value === field.value)
-                                ?.label
+                            ? PROGRAM_TYPES.find(
+                                (type) => type.value === field.value,
+                              )?.label
                             : "Select type"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
@@ -380,7 +335,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No type found.</CommandEmpty>
                           <CommandGroup>
-                            {types.map((type) => (
+                            {PROGRAM_TYPES.map((type) => (
                               <CommandItem
                                 value={type.label}
                                 key={type.value}
@@ -411,7 +366,7 @@ export default function CreateTrainingSessionForm() {
             />
 
             {/* Only show coach field if program type is Training Session or Special Training */}
-            {showField && (
+            {isTrainingOrSpecial && (
               <FormField
                 control={form.control}
                 name="coaches"
@@ -445,32 +400,14 @@ export default function CreateTrainingSessionForm() {
                     <FormDescription>
                       Select the coaches in charge of the program
                     </FormDescription>
-                    {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                    {/* Only show the list of selected coaches after first selecting values */}
                     {showSelectedCoaches && (
-                      <div className="mt-2 bg-white border p-2 rounded">
-                        <div className="mb-2 font-medium">
-                          {" "}
-                          Selected Coaches:
-                        </div>
-                        {selectedCoaches.length > 0 ? (
-                          <ul className="list-disc pl-5">
-                            {selectedCoaches.map((memberId) => {
-                              const member = members.find(
-                                (m) => m.id === memberId,
-                              );
-                              return (
-                                <li key={memberId}>
-                                  {member ? member.name : "Unknown member"}
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        ) : (
-                          <p className="text-sm text-muted-foreground">
-                            No coaches selected.
-                          </p>
-                        )}
-                      </div>
+                      <MemberList
+                        members={members}
+                        selectedMemberIds={selectedCoaches}
+                        title="Selected Coaches:"
+                        noneSelectedMsg="No coaches selected."
+                      />
                     )}
                     <FormMessage />
                   </FormItem>
@@ -545,7 +482,7 @@ export default function CreateTrainingSessionForm() {
                           )}
                         >
                           {field.value
-                            ? frequencies.find(
+                            ? FREQUENCIES.find(
                                 (frequency) => frequency.value === field.value,
                               )?.label
                             : "Select frequency"}
@@ -559,7 +496,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No frequency found.</CommandEmpty>
                           <CommandGroup>
-                            {frequencies.map((frequency) => (
+                            {FREQUENCIES.map((frequency) => (
                               <CommandItem
                                 value={frequency.label}
                                 key={frequency.value}
@@ -717,7 +654,7 @@ export default function CreateTrainingSessionForm() {
                           )}
                         >
                           {field.value
-                            ? locations.find(
+                            ? LOCATIONS.find(
                                 (location) => location.value === field.value,
                               )?.label
                             : "Select location"}
@@ -731,7 +668,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No location found.</CommandEmpty>
                           <CommandGroup>
-                            {locations.map((location) => (
+                            {LOCATIONS.map((location) => (
                               <CommandItem
                                 value={location.label}
                                 key={location.value}
@@ -790,7 +727,7 @@ export default function CreateTrainingSessionForm() {
             /> */}
 
             {/** Waitlist */}
-            {showField && (
+            {isTrainingOrSpecial && (
               <FormItem className="flex flex-col">
                 <FormLabel className="font-semibold text-base">
                   Waitlist
@@ -799,24 +736,10 @@ export default function CreateTrainingSessionForm() {
                   Select who will be added to the waitlist for this program.
                 </FormDescription>
                 <FormMessage />
-                <div className="mt-2 border p-2 rounded">
-                  <div className="mb-2 font-medium">Selected Attendees:</div>
-                  {waitlistedMembers.length > 0 ? (
-                    <ul className="list-disc pl-5">
-                      {waitlistedMembers.map((memberId) => {
-                        const member = members.find((m) => m.id === memberId);
-                        return (
-                          <li key={memberId}>
-                            {member ? member.name : "Unknown member"}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      No member selected.
-                    </p>
-                  )}
+                <MemberList
+                  members={members}
+                  selectedMemberIds={waitlistedMembers}
+                >
                   <Button
                     type="button"
                     size="sm"
@@ -825,7 +748,7 @@ export default function CreateTrainingSessionForm() {
                   >
                     Add Members
                   </Button>
-                </div>
+                </MemberList>
               </FormItem>
             )}
 
@@ -860,10 +783,7 @@ export default function CreateTrainingSessionForm() {
                         <CommandList>
                           <CommandEmpty>No visibility found.</CommandEmpty>
                           <CommandGroup>
-                            {[
-                              { label: "Public", value: PUBLIC },
-                              { label: "Private", value: PRIVATE },
-                            ].map((v) => (
+                            {VISIBILITIES.map((v) => (
                               <CommandItem
                                 key={v.value}
                                 value={v.label}
@@ -896,28 +816,12 @@ export default function CreateTrainingSessionForm() {
                   </FormDescription>
                   <FormMessage />
                   {field.value === "private" && (
-                    <div className="mt-2 border p-2 rounded">
-                      <div className="mb-2 font-medium">
-                        Selected Attendees:
-                      </div>
-                      {invitedMembers.length > 0 ? (
-                        <ul className="list-disc pl-5">
-                          {invitedMembers.map((memberId) => {
-                            const member = members.find(
-                              (m) => m.id === memberId,
-                            );
-                            return (
-                              <li key={memberId}>
-                                {member ? member.name : "Unknown member"}
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      ) : (
-                        <p className="text-sm text-muted-foreground">
-                          No attendees selected.
-                        </p>
-                      )}
+                    <MemberList
+                      members={members}
+                      selectedMemberIds={invitedMembers}
+                      title="Selected Attendees:"
+                      noneSelectedMsg="No attendees selected."
+                    >
                       <Button
                         type="button"
                         size="sm"
@@ -926,7 +830,7 @@ export default function CreateTrainingSessionForm() {
                       >
                         Add Attendees
                       </Button>
-                    </div>
+                    </MemberList>
                   )}
                 </FormItem>
               )}
@@ -1095,7 +999,7 @@ export default function CreateTrainingSessionForm() {
         </Form>
       )}
       {/* Invite Modal */}
-      <InviteModal
+      <SelectMembersModal
         description="Invite members to training session."
         open={openModal === "invite"}
         onClose={() => setOpenModal(undefined)}
@@ -1103,7 +1007,7 @@ export default function CreateTrainingSessionForm() {
         selectedMembers={invitedMembers}
         setSelectedMembers={setInvitedMembers}
       />
-      <InviteModal
+      <SelectMembersModal
         description="Waitlist members for program."
         open={openModal === "waitlist"}
         onClose={() => setOpenModal(undefined)}

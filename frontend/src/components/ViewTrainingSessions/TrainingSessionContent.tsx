@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import log from "loglevel";
-import { getCookies } from "@/services/cookiesService";
 
 // Created components imports
 import DropDownMenuButton from "./DropDownMenu/DropDownMenuButton";
@@ -18,6 +17,7 @@ import {
   Hourglass,
   Repeat,
   User2Icon,
+  LoaderCircle,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -34,8 +34,11 @@ import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 import { ONCE, WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const TrainingSessionContent = () => {
+  const { cookies, preLoading } = useGetCookies();
+
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
   const [accountAttendee, setAccountAttendee] = useState<Attendees>();
   const location = useLocation(); // Location state data sent from Calendar page card
@@ -43,10 +46,11 @@ const TrainingSessionContent = () => {
 
   log.debug("Rendering TrainingSessionContent");
   useEffect(() => {
-    const user = getCookies();
-    setUser(user);
-    log.info("Training Session Card account type : ", user);
-  }, [navigate]);
+    if (!preLoading && cookies) {
+      setUser(cookies);
+      log.info("Training Session Card account type : ", cookies.type);
+    }
+  }, [navigate, cookies, preLoading]);
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
@@ -63,7 +67,7 @@ const TrainingSessionContent = () => {
     frequency: "",
     visibility: "public",
     author: "",
-    cancelled: false,
+    isCancelled: false,
     reccurenceDate: new Date(),
   });
 
@@ -90,32 +94,41 @@ const TrainingSessionContent = () => {
   };
 
   useEffect(() => {
-    // Fetch fresh data when the component mounts
-    fetchProgramData();
-  }, [user, location.state?.programDetails?.programId]);
+    if (!preLoading && cookies) {
+      // Fetch fresh data when cookies are available.
+      fetchProgramData().then((_) => _);
+    }
+  }, [user, location.state?.programDetails?.programId, preLoading, cookies]);
 
   useEffect(() => {
-    //TODO: define a useHook instead of all this code, who knows
-    const fetchParticipant = async () => {
-      const programId = location.state?.programDetails?.programId;
-      console.log("ProgramID:", programId, user?.accountId);
-      if (programId && user?.accountId) {
-        try {
-          const accountAttendee: Attendees =
-            await waitlistParticipantsApi.getProgramParticipant(
-              programId,
-              user?.accountId,
-            );
-          setAccountAttendee(accountAttendee);
-          console.log("AccountAttendee: ", accountAttendee);
-          console.log(accountAttendee);
-        } catch (error) {
-          log.error("Failed to fetch program participant:", error);
+    if (!preLoading && cookies) {
+      //TODO: define a useHook instead of all this code, who knows
+      const fetchParticipant = async () => {
+        const programId = location.state?.programDetails?.programId;
+        console.log("ProgramID:", programId, user?.accountId);
+        if (programId && user?.accountId) {
+          try {
+            const accountAttendee: Attendees =
+              await waitlistParticipantsApi.getProgramParticipant(
+                programId,
+                user?.accountId,
+              );
+            setAccountAttendee(accountAttendee);
+            console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
+            console.log(accountAttendee);
+          } catch (error) {
+            log.error("Failed to fetch program participant:", error);
+          }
         }
-      }
-    };
-    fetchParticipant();
-  }, [location.state.programDetails.programId, user?.accountId]);
+      };
+      fetchParticipant().then((_) => _);
+    }
+  }, [
+    location.state.programDetails.programId,
+    user?.accountId,
+    preLoading,
+    cookies,
+  ]);
 
   const handleRefresh = async () => {
     const programId = location.state?.programDetails?.programId;
@@ -123,7 +136,7 @@ const TrainingSessionContent = () => {
 
     try {
       const response = await trainingSessionApi.getPrograms(user?.accountId);
-      const updatedProgram = response.data.find(
+      const updatedProgram = response?.data?.find(
         (p: Program) => p.programDetails.programId === programId,
       );
 
@@ -150,6 +163,14 @@ const TrainingSessionContent = () => {
     console.log("Updated attendees:", attendees);
     console.log("Update programDetails: ", programDetails);
   }, [attendees]);
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <div className="mb-32 mt-5">
@@ -405,7 +426,7 @@ const TrainingSessionContent = () => {
                 You&apos;re not part of this program.
               </p>
             ) : accountAttendee.participantType?.toLowerCase() ===
-                "subscribed" && accountAttendee.confirmed === false ? (
+                "subscribed" && !accountAttendee.confirmed ? (
               <p className="text-red-600 font-medium">
                 You&apos;re absent for this session.
               </p>
@@ -422,7 +443,7 @@ const TrainingSessionContent = () => {
                     : ""}
                 </p>
               </div>
-            ) : accountAttendee.confirmed === true ? (
+            ) : accountAttendee.confirmed ? (
               <p className="text-green-600 font-medium">
                 You&apos;re confirmed for this session.
               </p>
