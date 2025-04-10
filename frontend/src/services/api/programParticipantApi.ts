@@ -8,10 +8,10 @@ const EXTENDED_BASE_URL = "/api/program-participant";
 
 const programParticipantApi = {
   getProgramParticipant: async (
-    programId: number,
+    reccurenceId: number,
     accountId: number | null | undefined,
   ) => {
-    const url = `${EXTENDED_BASE_URL}/get-participant?programId=${programId}&accountId=${accountId}`;
+    const url = `${EXTENDED_BASE_URL}/get-participant?reccurenceId=${reccurenceId}&accountId=${accountId}`;
 
     const response = await ApiService.get<ResponseDto<Attendees>>(url);
 
@@ -50,10 +50,10 @@ const programParticipantApi = {
   },
 
   markAbsent: async (
-    programId: number,
+    reccurenceId: number,
     accountId: number | null | undefined,
   ) => {
-    const url = `${EXTENDED_BASE_URL}/mark-absent?programId=${programId}&accountId=${accountId}`;
+    const url = `${EXTENDED_BASE_URL}/mark-absent?reccurenceId=${reccurenceId}&accountId=${accountId}`;
 
     const response = await ApiService.patch<ResponseDto<Attendees>>(url, {});
     log.info("Response mark absent :", response);
@@ -91,8 +91,8 @@ const programParticipantApi = {
     }
   },
 
-  optIn: async (programId: number, accountId: number | undefined) => {
-    const url = `${EXTENDED_BASE_URL}/opt-participant?programId=${programId}&accountId=${accountId}`;
+  optIn: async (reccurenceId: number, accountId: number | undefined) => {
+    const url = `${EXTENDED_BASE_URL}/opt-participant?reccurenceId=${reccurenceId}&accountId=${accountId}`;
 
     const response = await ApiService.patch<ResponseDto<number>>(url, {});
     log.info("response in waitlistParticipantsApi.optIn:", response);

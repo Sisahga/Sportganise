@@ -74,14 +74,15 @@ const TrainingSessionContent = () => {
   const [attendees, setAttendees] = useState<Attendees[]>([]);
 
   const fetchProgramData = async () => {
-    const programId = location.state?.programDetails?.programId;
-    if (programId && user?.accountId) {
+    const recurrenceId = location.state?.programDetails?.recurrenceId;
+    if (recurrenceId && user?.accountId) {
       try {
         const response = await trainingSessionApi.getPrograms(user?.accountId);
         const program = response.data?.find(
-          (p: Program) => p.programDetails.programId === programId,
+          (p: Program) => p.programDetails.recurrenceId === recurrenceId,
         );
         if (program) {
+          console.log("LOOK OVER HERE,", program)
           setProgramDetails(program.programDetails);
           setAttendees(program.attendees);
         } else {
@@ -104,17 +105,17 @@ const TrainingSessionContent = () => {
     if (!preLoading && cookies) {
       //TODO: define a useHook instead of all this code, who knows
       const fetchParticipant = async () => {
-        const programId = location.state?.programDetails?.programId;
-        console.log("ProgramID:", programId, user?.accountId);
-        if (programId && user?.accountId) {
+        const recurrenceId = location.state?.programDetails?.recurrenceId;
+        console.log("ProgramID:", recurrenceId, user?.accountId);
+        if (recurrenceId && user?.accountId) {
           try {
             const accountAttendee: Attendees =
               await waitlistParticipantsApi.getProgramParticipant(
-                programId,
+                recurrenceId,
                 user?.accountId,
               );
             setAccountAttendee(accountAttendee);
-            console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
+            console.log("Account Attendee check: ", accountAttendee);
             console.log(accountAttendee);
           } catch (error) {
             log.error("Failed to fetch program participant:", error);
@@ -124,20 +125,20 @@ const TrainingSessionContent = () => {
       fetchParticipant().then((_) => _);
     }
   }, [
-    location.state.programDetails.programId,
+    location.state.programDetails.recurrenceId,
     user?.accountId,
     preLoading,
     cookies,
   ]);
 
   const handleRefresh = async () => {
-    const programId = location.state?.programDetails?.programId;
-    if (!programId) return;
+    const recurrenceId = location.state?.programDetails?.recurrenceId;
+    if (!recurrenceId) return;
 
     try {
       const response = await trainingSessionApi.getPrograms(user?.accountId);
       const updatedProgram = response?.data?.find(
-        (p: Program) => p.programDetails.programId === programId,
+        (p: Program) => p.programDetails.recurrenceId === recurrenceId,
       );
 
       if (updatedProgram) {
