@@ -312,6 +312,7 @@ const ChatScreen: React.FC = () => {
               : data.message || "";
         }
         await sendNotif(notifBody);
+        setMessageStatus("Delivered");
       } else {
         log.error("Error uploading attachments:", uploadResponse.message);
         toast({
@@ -332,9 +333,8 @@ const ChatScreen: React.FC = () => {
           ? `${data.message.substring(0, MAX_BODY_LENGTH)}...`
           : data.message || "";
       await sendNotif(notifBody);
+      setMessageStatus("Delivered");
     }
-
-    setMessageStatus("Delivered");
 
     form.reset();
     resetTextAreaHeight(
