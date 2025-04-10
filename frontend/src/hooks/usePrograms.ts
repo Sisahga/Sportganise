@@ -42,15 +42,25 @@ function usePrograms() {
           }),
         );
 
+        function normalizeToStartOfDay(date: Date): Date {
+          return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        }
+
         //If date range is provided, filter programs
+
         if (startDate && endDate) {
+          const normStart = normalizeToStartOfDay(startDate);
+          const normEnd = normalizeToStartOfDay(endDate);
+
           formattedPrograms = formattedPrograms.filter((program: Program) => {
-            const occurrence = new Date(program.programDetails.occurrenceDate);
-            const recurrence = new Date(
-              program.programDetails.reccurenceDate ?? occurrence,
+            const occurrence = normalizeToStartOfDay(
+              new Date(program.programDetails.occurrenceDate),
+            );
+            const recurrence = normalizeToStartOfDay(
+              new Date(program.programDetails.reccurenceDate ?? occurrence),
             );
 
-            return recurrence >= startDate && occurrence <= endDate;
+            return recurrence >= normStart && occurrence <= normEnd;
           });
         }
 
