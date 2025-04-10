@@ -13,7 +13,7 @@ function usePrograms() {
     async (accountId: number | null, startDate?: Date, endDate?: Date) => {
       if (!accountId) {
         console.warn("Skipping fetchPrograms because accountId is null.");
-        setPrograms([]); // Prevent UI from breaking
+        setPrograms([]);
         setLoading(false);
         return;
       }
@@ -23,7 +23,7 @@ function usePrograms() {
         log.info("Fetching programs for accountId:", accountId);
         const response = await trainingSessionApi.getPrograms(accountId);
 
-        if (!response || response?.statusCode !== 200) {
+        if (!response || response.statusCode !== 200) {
           throw new Error("Failed to fetch all programs.");
         }
 
@@ -45,8 +45,12 @@ function usePrograms() {
         //If date range is provided, filter programs
         if (startDate && endDate) {
           formattedPrograms = formattedPrograms.filter((program: Program) => {
-            const programDate = new Date(program.programDetails.occurrenceDate);
-            return programDate >= startDate && programDate <= endDate;
+            const occurrence = new Date(program.programDetails.occurrenceDate);
+            const recurrence = new Date(
+              program.programDetails.reccurenceDate ?? occurrence,
+            );
+
+            return recurrence >= startDate && occurrence <= endDate;
           });
         }
 
@@ -77,10 +81,35 @@ function usePrograms() {
       return;
     }
 
+    function normalizeToStartOfDay(date: Date): Date {
+      return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
     try {
-      log.info("Fetching program dates for accountId:", accountId);
-      const eventDates = await trainingSessionApi.getProgramDates(accountId);
-      setEventDates(eventDates ?? []);
+      log.info("Fetching programs to extract recurrence dates...");
+      const response = await trainingSessionApi.getPrograms(accountId);
+
+      if (!response?.data || !Array.isArray(response.data)) {
+        console.error("Invalid program response format.");
+        setEventDates([]);
+        return;
+      }
+
+      const programs: Program[] = response.data;
+
+      const expandedDates: Date[] = programs.map((program) => {
+        const rawDate =
+          program.programDetails.reccurenceDate ??
+          program.programDetails.occurrenceDate;
+        return normalizeToStartOfDay(new Date(rawDate));
+      });
+
+      log.info(
+        "Collected recurrence dates:",
+        expandedDates.map((d) => d.toDateString()),
+      );
+
+      setEventDates(expandedDates);
     } catch (err) {
       console.error("Error fetching program dates:", err);
       log.error("Error fetching program dates:", err);
