@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon, LoaderCircle } from "lucide-react";
+import usePrograms from "@/hooks/usePrograms";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CloudUpload, Paperclip } from "lucide-react";
@@ -80,7 +81,7 @@ export default function ModifyTrainingSessionForm() {
   const [loading, setLoading] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<ModalKey>();
   const [attendees, setAttendees] = useState<Attendees[]>([]);
-
+  const programs = usePrograms();
   const [waitlistedMembers, setWaitlistedMembers] = useState<number[]>([]);
   const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
   const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
@@ -544,6 +545,7 @@ export default function ModifyTrainingSessionForm() {
                       selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
+                      programsProp={programs}
                     />
                   </PopoverContent>
                 </Popover>
