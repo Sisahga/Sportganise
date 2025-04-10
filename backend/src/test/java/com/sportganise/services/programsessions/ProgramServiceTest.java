@@ -1,6 +1,7 @@
 package com.sportganise.services.programsessions;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.sportganise.dto.programsessions.ProgramAttachmentDto;
@@ -101,7 +102,7 @@ public class ProgramServiceTest {
             .phone("222-222-2222")
             .build();
 
-    Mockito.when(programRepository.findParticipantsByProgramId(1)).thenReturn(mockParticipants);
+    Mockito.when(programRepository.findParticipantsByRecurrenceId(1)).thenReturn(mockParticipants);
     Mockito.when(accountService.getAccount(101)).thenReturn(account1);
     Mockito.when(accountService.getAccount(102)).thenReturn(account2);
 
@@ -112,13 +113,13 @@ public class ProgramServiceTest {
     assertEquals(2, participantDtos.size());
 
     ProgramParticipantDto participantDto1 = participantDtos.getFirst();
-    assertEquals(1, participantDto1.getProgramId());
+    assertEquals(1, participantDto1.getRecurrenceId());
     assertEquals(101, participantDto1.getAccountId());
     assertTrue(participantDto1.isConfirmed());
     assertEquals(participant1.getConfirmedDate(), participantDto1.getConfirmedDate());
 
     ProgramParticipantDto participantDto2 = participantDtos.get(1);
-    assertEquals(1, participantDto2.getProgramId());
+    assertEquals(1, participantDto2.getRecurrenceId());
     assertEquals(102, participantDto2.getAccountId());
     assertFalse(participantDto2.isConfirmed());
     assertEquals(participant2.getConfirmedDate(), participantDto2.getConfirmedDate());

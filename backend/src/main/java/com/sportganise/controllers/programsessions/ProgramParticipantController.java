@@ -38,17 +38,17 @@ public class ProgramParticipantController {
   /**
    * Adds a participant to a program's waitlist and assigns them a rank.
    *
-   * @param programId The ID of the program.
+   * @param reccurenceId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return ResponseDto with status 200 OK along with the participant DTO.
    */
   @GetMapping("/get-participant")
   public ResponseEntity<ResponseDto<ProgramParticipantDto>> fetchProgramParticipant(
-      @RequestParam Integer programId, @RequestParam Integer accountId) {
-    log.info("Fetchin participant: programId: {}, accountId: {}", programId, accountId);
+      @RequestParam Integer reccurenceId, @RequestParam Integer accountId) {
+    log.info("Fetchin participant: reccurenceId: {}, accountId: {}", reccurenceId, accountId);
     try {
-      ProgramParticipantDto participant = waitlistService.fetchParticipant(programId, accountId);
-      log.info("Fetched participant. programId: {}, accountId: {}", programId, accountId);
+      ProgramParticipantDto participant = waitlistService.fetchParticipant(reccurenceId, accountId);
+      log.info("Fetched participant. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
 
       ResponseDto<ProgramParticipantDto> responseDto =
           ResponseDto.<ProgramParticipantDto>builder()
@@ -59,8 +59,8 @@ public class ProgramParticipantController {
       return ResponseEntity.ok(responseDto);
     } catch (ParticipantNotFoundException e) {
       log.error(
-          "Participant not found for fetch. programId: {}, accountId: {}. Error: {}",
-          programId,
+          "Participant not found for fetch. reccurenceId: {}, accountId: {}. Error: {}",
+          reccurenceId,
           accountId,
           e.getMessage());
       throw new ResourceNotFoundException(e.getMessage());
@@ -70,20 +70,20 @@ public class ProgramParticipantController {
   /**
    * Adds a participant to a program's waitlist and assigns them a rank.
    *
-   * @param programId The ID of the program.
+   * @param reccurenceId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return The rank assigned to the participant.
    */
   @PatchMapping("/opt-participant")
   public ResponseEntity<ResponseDto<Integer>> optProgramParticipant(
-      @RequestParam Integer programId, @RequestParam Integer accountId) {
-    log.info("Opting in participant: programId: {}, accountId: {}", programId, accountId);
+      @RequestParam Integer reccurenceId, @RequestParam Integer accountId) {
+    log.info("Opting in participant: reccurenceId: {}, accountId: {}", reccurenceId, accountId);
 
     try {
-      Integer rank = waitlistService.optProgramParticipantDto(programId, accountId);
+      Integer rank = waitlistService.optProgramParticipantDto(reccurenceId, accountId);
       log.info(
-          "Successfully opted in participant. programId: {}, accountId: {}, with rank: {}",
-          programId,
+          "Successfully opted in participant. reccurenceId: {}, accountId: {}, with rank: {}",
+          reccurenceId,
           accountId,
           rank);
       ResponseDto<Integer> responseDto =
@@ -95,8 +95,8 @@ public class ProgramParticipantController {
       return ResponseEntity.ok(responseDto);
     } catch (ParticipantNotFoundException e) {
       log.error(
-          "Participant not found for opt-in. programId: {}, accountId: {}. Error: {}",
-          programId,
+          "Participant not found for opt-in. reccurenceId: {}, accountId: {}. Error: {}",
+          reccurenceId,
           accountId,
           e.getMessage());
       throw new ResourceNotFoundException(e.getMessage());
@@ -112,14 +112,14 @@ public class ProgramParticipantController {
    */
   @PatchMapping("/confirm-participant")
   public ResponseEntity<ResponseDto<ProgramParticipantDto>> confirmParticipant(
-      @RequestParam Integer programId, @RequestParam Integer accountId) {
-    log.info("Confirming participant. programId: {}, accountId: {}", programId, accountId);
+      @RequestParam Integer reccurenceId, @RequestParam Integer accountId) {
+    log.info("Confirming participant. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
 
     try {
       ProgramParticipantDto confirmedParticipant =
-          waitlistService.confirmParticipant(programId, accountId);
+          waitlistService.confirmParticipant(reccurenceId, accountId);
       log.info(
-          "Participant confirmed successfully. programId: {}, accountId: {}", programId, accountId);
+          "Participant confirmed successfully. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
       ResponseDto<ProgramParticipantDto> responseDto =
           ResponseDto.<ProgramParticipantDto>builder()
               .statusCode(HttpStatus.OK.value())
@@ -129,8 +129,8 @@ public class ProgramParticipantController {
       return ResponseEntity.ok(responseDto);
     } catch (ParticipantNotFoundException e) {
       log.error(
-          "Participant confirmation failed. programId: {}, accountId: {}. Error: {}",
-          programId,
+          "Participant confirmation failed. reccurenceId: {}, accountId: {}. Error: {}",
+          reccurenceId,
           accountId,
           e.getMessage());
       throw new ResourceNotFoundException(e.getMessage());
@@ -141,19 +141,19 @@ public class ProgramParticipantController {
    * Removes a participant from a program's waitlist.
    *
    * @param accountId The ID of the participant's account.
-   * @param programId The ID of the program.
+   * @param reccurenceId The ID of the program.
    * @return A DTO representing the participant who opted out.
    */
   @PatchMapping("/out-participant")
   public ResponseEntity<ResponseDto<ProgramParticipantDto>> optOutParticipant(
-      @RequestParam Integer accountId, @RequestParam Integer programId) {
-    log.info("Opting out participant. programId: {}, accountId: {}", programId, accountId);
+      @RequestParam Integer accountId, @RequestParam Integer reccurenceId) {
+    log.info("Opting out participant. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
 
     try {
       ProgramParticipantDto outParticipant =
-          waitlistService.optOutParticipant(programId, accountId);
+          waitlistService.optOutParticipant(reccurenceId, accountId);
       log.info(
-          "Participant opted out successfully. programId: {}, accountId: {}", programId, accountId);
+          "Participant opted out successfully. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
       ResponseDto<ProgramParticipantDto> responseDto =
           ResponseDto.<ProgramParticipantDto>builder()
               .statusCode(HttpStatus.OK.value())
@@ -163,8 +163,8 @@ public class ProgramParticipantController {
       return ResponseEntity.ok(responseDto);
     } catch (ParticipantNotFoundException e) {
       log.error(
-          "Participant opt-out failed. programId: {}, accountId: {}. Error: {}",
-          programId,
+          "Participant opt-out failed. reccurenceId: {}, accountId: {}. Error: {}",
+          reccurenceId,
           accountId,
           e.getMessage());
       throw new ResourceNotFoundException(e.getMessage());
@@ -174,18 +174,18 @@ public class ProgramParticipantController {
   /**
    * Retrieves a list of all participants currently opted into a program.
    *
-   * @param programId The ID of the program.
+   * @param reccurenceId The ID of the program.
    * @return A list of DTOs representing the opted-in participants.
    */
   @GetMapping("/queue")
   public ResponseEntity<List<ProgramParticipantDto>> getOptedParticipants(
-      @RequestParam Integer programId) {
-    log.info("Fetching opted participants queue for programId: {}", programId);
+      @RequestParam Integer reccurenceId) {
+    log.info("Fetching opted participants queue for reccurenceId: {}", reccurenceId);
 
     List<ProgramParticipantDto> optedInParticipants =
-        waitlistService.allOptedParticipants(programId);
+        waitlistService.allOptedParticipants(reccurenceId);
     log.info(
-        "Retrieved {} opted participants for programId: {}", optedInParticipants.size(), programId);
+        "Retrieved {} opted participants for reccurenceId: {}", optedInParticipants.size(), reccurenceId);
     return ResponseEntity.ok(optedInParticipants);
   }
 
@@ -193,19 +193,19 @@ public class ProgramParticipantController {
    * Marks a participant as absent for a program by setting isConfirmed to false.
    *
    * @param accountId The ID of the participant's account.
-   * @param programId The ID of the program.
+   * @param reccurenceId The ID of the program.
    * @return A DTO representing the participant who confirmed absent.
    */
   @PatchMapping("/mark-absent")
   public ResponseEntity<ResponseDto<ProgramParticipantDto>> markAbsent(
-      @RequestParam Integer programId, @RequestParam Integer accountId) {
-    log.info("Marking participant as absent. programId: {}, accountId: {}", programId, accountId);
+      @RequestParam Integer reccurenceId, @RequestParam Integer accountId) {
+    log.info("Marking participant as absent. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
 
     try {
-      ProgramParticipantDto programParticipant = waitlistService.markAbsent(programId, accountId);
+      ProgramParticipantDto programParticipant = waitlistService.markAbsent(reccurenceId, accountId);
       log.info(
-          "Successfully marked participant as absent. programId: {}, accountId: {}",
-          programId,
+          "Successfully marked participant as absent. reccurenceId: {}, accountId: {}",
+          reccurenceId,
           accountId);
       log.info("Program participant: {}", programParticipant);
       ResponseDto<ProgramParticipantDto> responseDto =
@@ -217,8 +217,8 @@ public class ProgramParticipantController {
       return ResponseEntity.ok(responseDto);
     } catch (ParticipantNotFoundException e) {
       log.error(
-          "Mark absent failed. programId: {}, accountId: {}. Error: {}",
-          programId,
+          "Mark absent failed. reccurenceId: {}, accountId: {}. Error: {}",
+          reccurenceId,
           accountId,
           e.getMessage());
       throw new ResourceNotFoundException(e.getMessage());

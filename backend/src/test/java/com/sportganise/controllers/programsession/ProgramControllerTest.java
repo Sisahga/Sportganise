@@ -74,7 +74,7 @@ public class ProgramControllerTest {
     mockProgramDto.setVisibility("public");
     mockProgramDto.setProgramAttachments(List.of(mockProgramAttachmentDto));
 
-    mockProgramParticipantDto.setProgramId(111);
+    mockProgramParticipantDto.setRecurrenceId(111);
     mockProgramParticipantDto.setAccountId(1);
     mockProgramParticipantDto.setConfirmed(true);
     mockProgramParticipantDto.setConfirmedDate(ZonedDateTime.now());
