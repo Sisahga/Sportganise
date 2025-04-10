@@ -114,13 +114,13 @@ CREATE TABLE program_attachments (
 );
 
 CREATE TABLE program_participants (
-	program_id INTEGER NOT NULL REFERENCES program(program_id) ON DELETE CASCADE,
+	recurrence_id INTEGER NOT NULL REFERENCES program_recurrence(recurrence_id) ON DELETE CASCADE,
 	account_id INTEGER NOT NULL REFERENCES account(account_id) ON DELETE CASCADE,
 	type VARCHAR(20),
 	rank INTEGER, 
 	is_confirmed BOOLEAN DEFAULT FALSE,
 	confirm_date TIMESTAMPTZ,
-	PRIMARY KEY (program_id, account_id),
+	PRIMARY KEY (recurrence_id, account_id),
 	CONSTRAINT check_confirmation
 CHECK (( is_confirmed = TRUE AND confirm_date IS NOT NULL) OR (is_confirmed = FALSE AND confirm_date IS NULL))
 );
