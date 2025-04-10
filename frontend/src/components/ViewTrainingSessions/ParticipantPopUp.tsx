@@ -50,13 +50,13 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
   const { userId, preLoading } = useGetCookies(); // userId here is the currentUserId
   const { createChannel } = useCreateChannel();
   const location = useLocation();
-  const programId = location.state.programDetails.programId;
+  const recurrenceId = location.state.programDetails.recurrenceId;
 
   useEffect(() => {
     if (!preLoading) {
-      fetchAccountData(userId).then((_) => _);
+      fetchAccountData(accountId).then((_) => _);
     }
-  }, [preLoading, userId, fetchAccountData]);
+  }, [preLoading, accountId, fetchAccountData]);
 
   const handleSendMessage = async () => {
     const memberIds = [userId, accountId];
@@ -111,14 +111,14 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
 
   const handleAbsentClick = async () => {
     try {
-      await markAbsent(programId, accountId);
+      await markAbsent(recurrenceId, accountId);
       console.log("Loading... ", absentLoading);
       console.log("Marked Absent Participant: ", absentData);
       console.log("error maybe", absentError);
       if (onRefresh) onRefresh();
       onClose();
     } catch {
-      console.log("programID", programId);
+      console.log("recurrenceId", recurrenceId);
       console.log(
         "Error marking the user as absent in DropDownMenuButton",
         absentError,
@@ -128,14 +128,14 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
 
   const handleConfirmClick = async () => {
     try {
-      await confirmParticipant(programId, accountId);
+      await confirmParticipant(recurrenceId, accountId);
       console.log("Loading... ", confirming);
       console.log("Confirming Participant: ", confirmData);
       console.log("error", confirmError);
       if (onRefresh) onRefresh();
       onClose();
     } catch {
-      console.log("programID", programId);
+      console.log("recurrenceId", recurrenceId);
       console.log(
         "Error confirming the user in ParticipantPopUp",
         confirmError,
@@ -147,7 +147,7 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
   // New function to handle the opt out action.
   const handleOptOutClick = async () => {
     try {
-      await rejectParticipant(programId, accountId);
+      await rejectParticipant(recurrenceId, accountId);
       console.log("Participant opted out");
       // Add additional opt out logic here if needed.
       if (onRefresh) onRefresh();
