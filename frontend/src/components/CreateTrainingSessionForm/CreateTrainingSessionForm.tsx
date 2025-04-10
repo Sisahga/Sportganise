@@ -211,11 +211,18 @@ export default function CreateTrainingSessionForm() {
 
       // Prepare API body
       const formData = new FormData();
+      // Adjust endDate to end of day so that it works for recurring events
+      let adjustedEndDate = values.endDate;
+      if (adjustedEndDate) {
+        adjustedEndDate = new Date(adjustedEndDate);
+        adjustedEndDate.setHours(23, 59, 59, 999);
+      }
+
       const programData = {
         title: values.title,
         type: values.type,
         startDate: values.startDate.toISOString(),
-        endDate: values.endDate?.toISOString() ?? null,
+        endDate: adjustedEndDate?.toISOString() ?? null,
         frequency: values.frequency,
         visibility: values.visibility,
         description: values.description,
