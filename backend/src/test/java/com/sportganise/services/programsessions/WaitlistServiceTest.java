@@ -177,7 +177,7 @@ public class WaitlistServiceTest {
 
     ProgramParticipantDto result =
         programParticipantService.optOutParticipant(
-            validParticipant.getProgramId(), validParticipant.getAccountId());
+            validParticipant.getRecurrenceId(), validParticipant.getAccountId());
 
     assertNull(validParticipant.getRank());
     verify(participantRepository).updateRanks(eq(1), eq(3));
@@ -284,7 +284,7 @@ public class WaitlistServiceTest {
     assertEquals(participant.getRank(), dto.getRank());
     assertEquals(participant.isConfirmed(), dto.isConfirmed());
     assertEquals(participant.getProgramParticipantId().getAccountId(), dto.getAccountId());
-    assertEquals(participant.getProgramParticipantId().getProgramId(), dto.getProgramId());
+    assertEquals(participant.getProgramParticipantId().getRecurrenceId(), dto.getRecurrenceId());
   }
 
   @Test
@@ -305,7 +305,7 @@ public class WaitlistServiceTest {
       Integer programId, Integer accountId, Integer rank, boolean isConfirmed) {
     ProgramParticipant participant = new ProgramParticipant();
     ProgramParticipantId id = new ProgramParticipantId();
-    id.setProgramId(programId);
+    id.setRecurrenceId(programId);
     id.setAccountId(accountId);
     participant.setProgramParticipantId(id);
     participant.setRank(rank);
@@ -315,7 +315,7 @@ public class WaitlistServiceTest {
 
   private void assertDtoMatchesParticipant(
       ProgramParticipant participant, ProgramParticipantDto dto) {
-    assertEquals(participant.getProgramParticipantId().getProgramId(), dto.getProgramId());
+    assertEquals(participant.getProgramParticipantId().getRecurrenceId(), dto.getRecurrenceId());
     assertEquals(participant.getProgramParticipantId().getAccountId(), dto.getAccountId());
     assertEquals(participant.getRank(), dto.getRank());
     assertEquals(participant.isConfirmed(), dto.isConfirmed());
