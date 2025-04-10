@@ -13,7 +13,7 @@ function usePrograms() {
     async (accountId: number | null, startDate?: Date, endDate?: Date) => {
       if (!accountId) {
         console.warn("Skipping fetchPrograms because accountId is null.");
-        setPrograms([]); // Prevent UI from breaking
+        setPrograms([]);
         setLoading(false);
         return;
       }
@@ -81,12 +81,12 @@ function usePrograms() {
       return;
     }
 
-    //Normalize dates to midnight
     function normalizeToStartOfDay(date: Date): Date {
       return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     }
+    
     try {
-      log.info("Fetching full programs to extract recurrence dates...");
+      log.info("Fetching programs to extract recurrence dates...");
       const response = await trainingSessionApi.getPrograms(accountId);
 
       if (!response?.data || !Array.isArray(response.data)) {
@@ -96,58 +96,19 @@ function usePrograms() {
       }
 
       const programs: Program[] = response.data;
-      const expandedDates: Date[] = [];
 
-      for (const program of programs) {
-        const { occurrenceDate, reccurenceDate, frequency } =
-          program.programDetails;
+      const expandedDates: Date[] = programs.map((program) => {
+        const rawDate =
+          program.programDetails.reccurenceDate ??
+          program.programDetails.occurrenceDate;
+        return normalizeToStartOfDay(new Date(rawDate));
+      });
 
-        const start = normalizeToStartOfDay(new Date(occurrenceDate));
-        const endRaw = new Date(reccurenceDate ?? occurrenceDate);
-        endRaw.setDate(endRaw.getDate() + 1); //ensures inclusion of last day
-        const end = normalizeToStartOfDay(endRaw);
-        const freq = frequency?.toLowerCase?.() ?? "once";
-
-        console.log("Expanding program:", {
-          title: program.programDetails.title,
-          start: start.toDateString(),
-          end: end.toDateString(),
-          freq,
-        });
-
-        if (!frequency) {
-          console.warn("Missing frequency in program:", program);
-        }
-
-        if (["daily", "weekly", "biweekly", "monthly"].includes(freq)) {
-          const current = new Date(start);
-          while (current.getTime() <= end.getTime()) {
-            expandedDates.push(new Date(current)); // clone before mutation
-
-            switch (freq) {
-              case "daily":
-                current.setDate(current.getDate() + 1);
-                break;
-              case "weekly":
-                current.setDate(current.getDate() + 7);
-                break;
-              case "biweekly":
-                current.setDate(current.getDate() + 14);
-                break;
-              case "monthly":
-                current.setMonth(current.getMonth() + 1);
-                break;
-            }
-          }
-        } else {
-          expandedDates.push(start); // one-time events
-        }
-      }
-
-      console.log(
-        "Expanded event dates:",
+      log.info(
+        "Collected recurrence dates:",
         expandedDates.map((d) => d.toDateString())
       );
+
       setEventDates(expandedDates);
     } catch (err) {
       console.error("Error fetching program dates:", err);
