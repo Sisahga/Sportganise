@@ -20,8 +20,8 @@ import lombok.Setter;
 public class ProgramParticipantId implements Serializable {
 
   @NotNull
-  @Column(name = "program_id")
-  private Integer programId;
+  @Column(name = "recurrence_id")
+  private Integer recurrenceId;
 
   @NotNull
   @Column(name = "account_id")

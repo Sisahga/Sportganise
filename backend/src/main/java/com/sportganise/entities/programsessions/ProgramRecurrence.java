@@ -2,9 +2,12 @@ package com.sportganise.entities.programsessions;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
@@ -14,13 +17,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /** Entity Model for Program Recurrence table. */
-@Setter
+@Entity
+@Table(name = "program_recurrence")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "program_recurrence")
 public class ProgramRecurrence {
 
   @Id
@@ -31,19 +34,16 @@ public class ProgramRecurrence {
   @Column(name = "program_id")
   private Integer programId;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "program_id", insertable = false, updatable = false)
+  private Program program;
+
   @Column(name = "occurrence_date")
   private ZonedDateTime occurrenceDate;
 
   @Column(name = "cancelled")
   private boolean cancelled;
 
-  /**
-   * Constructor for Program Recurrence.
-   *
-   * @param programId the program id.
-   * @param occurrenceDate the occurrence date.
-   * @param cancelled the cancelled status.
-   */
   public ProgramRecurrence(Integer programId, ZonedDateTime occurrenceDate, boolean cancelled) {
     this.programId = programId;
     this.occurrenceDate = occurrenceDate;

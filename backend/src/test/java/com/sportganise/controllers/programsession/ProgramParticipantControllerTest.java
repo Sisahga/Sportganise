@@ -35,7 +35,7 @@ public class ProgramParticipantControllerTest {
     MockitoAnnotations.openMocks(this);
 
     validParticipantDto = new ProgramParticipantDto();
-    validParticipantDto.setProgramId(programId);
+    validParticipantDto.setRecurrenceId(programId);
     validParticipantDto.setAccountId(accountId);
     validParticipantDto.setConfirmed(false);
   }

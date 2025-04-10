@@ -35,8 +35,8 @@ public class ProgramParticipant {
   @Column(name = "confirm_date")
   private ZonedDateTime confirmedDate;
 
-  public Integer getProgramId() {
-    return programParticipantId.getProgramId();
+  public Integer getRecurrenceId() {
+    return programParticipantId.getRecurrenceId();
   }
 
   public Integer getAccountId() {
@@ -47,7 +47,7 @@ public class ProgramParticipant {
     this.programParticipantId.setAccountId(accountId);
   }
 
-  public void setProgramId(Integer programId) {
-    this.programParticipantId.setProgramId(programId);
+  public void setRecurrenceId(Integer recurrenceId) {
+    this.programParticipantId.setRecurrenceId(recurrenceId);
   }
 }

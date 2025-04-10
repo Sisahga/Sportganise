@@ -87,12 +87,12 @@ public class ProgramService {
   /**
    * Get participants list of a program.
    *
-   * @param programId Id of session
+   * @param recurrenceId Id of session
    * @return List of participants of a program
    */
-  public List<ProgramParticipantDto> getParticipants(Integer programId) {
+  public List<ProgramParticipantDto> getParticipants(Integer recurrenceId) {
     List<ProgramParticipant> participants =
-        programRepository.findParticipantsByProgramId(programId);
+        programRepository.findParticipantsByRecurrenceId(recurrenceId);
 
     log.debug("PARTICIPANTS COUNT: {} ", participants.size());
 
@@ -105,7 +105,7 @@ public class ProgramService {
 
               return new ProgramParticipantDto(
                   account.getAccountId(),
-                  programId,
+                  recurrenceId,
                   participant.getRank(),
                   participant.getType(),
                   participant.isConfirmed(),
@@ -278,7 +278,7 @@ public class ProgramService {
         .map(
             programDto -> {
               List<ProgramParticipantDto> participants =
-                  hasPermissions ? getParticipants(programDto.getProgramId()) : new ArrayList<>();
+                  hasPermissions ? getParticipants(programDto.getRecurrenceId()) : new ArrayList<>();
 
               log.debug("PROGRAM PARTICIPANTS COUNT: {}", participants.size());
 
@@ -744,6 +744,7 @@ public class ProgramService {
   public void createProgramRecurrences(
       ZonedDateTime startDate, ZonedDateTime expiryDate, String frequency, Integer programId) {
     ZonedDateTime currentOccurrence = startDate;
+    Program program = getProgramById(programId);
     while (currentOccurrence.isBefore(expiryDate) || currentOccurrence.isEqual(expiryDate)) {
       ProgramRecurrence recurrence = new ProgramRecurrence(programId, currentOccurrence, false);
       programRecurrenceRepository.save(recurrence);
