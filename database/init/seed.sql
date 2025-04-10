@@ -89,12 +89,27 @@ INSERT INTO account_organization (org_id, account_id) VALUES
 INSERT INTO program_attachments (program_id, attachment_url) VALUES
 (1, 'https://sportganise-bucket.s3.us-east-2.amazonaws.com/apocalypticLove.png');
 
-INSERT INTO program_participants (program_id, account_id, type, is_confirmed, confirm_date) VALUES
+INSERT INTO program_participants (recurrence_id, account_id, type, is_confirmed, confirm_date) VALUES
 (1, 3, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
 (1, 4, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
 (1, 5, 'Waitlisted', FALSE, null),
 (1, 6, 'Waitlisted', FALSE, null),
-(1,2, 'Coach', FALSE, null);
+(1,2, 'Coach', FALSE, null),
+(2, 3, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
+(2, 4, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
+(2, 5, 'Waitlisted', FALSE, null),
+(2, 6, 'Waitlisted', FALSE, null),
+(2,2, 'Coach', FALSE, null),
+(3, 3, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
+(3, 4, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
+(3, 5, 'Waitlisted', FALSE, null),
+(3, 6, 'Waitlisted', FALSE, null),
+(3,2, 'Coach', FALSE, null),
+(4, 3, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
+(4, 4, 'Subscribed', TRUE, '2024-06-20 10:30:00'),
+(4, 5, 'Waitlisted', FALSE, null),
+(4, 6, 'Waitlisted', FALSE, null),
+(4,2, 'Coach', FALSE, null);
 
 
 INSERT INTO label_program (label_id, program_id, type) VALUES
