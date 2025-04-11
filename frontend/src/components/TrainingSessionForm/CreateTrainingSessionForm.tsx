@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Calendar as CalendarIcon } from "lucide-react";
+import usePrograms from "@/hooks/usePrograms";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -80,6 +81,7 @@ export default function CreateTrainingSessionForm() {
     loading: playersLoading,
     error: playersError,
   } = usePlayers();
+  const programs = usePrograms();
 
   const members: Member[] = players.map((player) => ({
     id: player.accountId,
@@ -163,11 +165,17 @@ export default function CreateTrainingSessionForm() {
 
       // Prepare API body
       const formData = new FormData();
+      // Adjust endDate to end of day so that it works for recurring events
+      let adjustedEndDate = values.endDate;
+      if (adjustedEndDate) {
+        adjustedEndDate = new Date(adjustedEndDate);
+        adjustedEndDate.setHours(23, 59, 59, 999);
+      }
       const programData = {
         title: values.title,
         type: values.type,
         startDate: values.startDate.toISOString(),
-        endDate: values.endDate?.toISOString() ?? null,
+        endDate: adjustedEndDate?.toISOString() ?? null,
         frequency: values.frequency,
         visibility: values.visibility,
         description: values.description,
@@ -449,6 +457,7 @@ export default function CreateTrainingSessionForm() {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
+                        programsProp={programs}
                       />
                     </PopoverContent>
                   </Popover>
