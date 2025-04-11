@@ -19,6 +19,7 @@ export default function WaitlistedTrainingSessionList({
     loading,
     waitlistPrograms,
   } = useWaitlistPrograms();
+
   const [user, setUser] = useState<CookiesDto>();
   const { cookies, preLoading } = useGetCookies();
 
