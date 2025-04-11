@@ -36,7 +36,7 @@ public interface ProgramParticipantRepository
       AND pp.programParticipantId.accountId = :accountId
       """)
   ProgramParticipant findParticipant(
-      @Param("recurrenceId") Integer recurrenceId, @Param("accountId") Integer accountId); 
+      @Param("recurrenceId") Integer recurrenceId, @Param("accountId") Integer accountId);
 
   /** Find the maximum rank of unconfirmed participants in a specific program. */
   @Query(

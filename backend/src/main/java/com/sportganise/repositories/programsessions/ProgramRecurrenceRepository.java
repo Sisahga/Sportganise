@@ -50,17 +50,15 @@ public interface ProgramRecurrenceRepository extends JpaRepository<ProgramRecurr
   List<ProgramRecurrence> findProgramRecurrenceByProgramId(Integer programId);
 
   @Query(
-    value = """
+      value =
+          """
       SELECT pr.*
       FROM program_recurrence pr
       JOIN program p ON p.program_id = pr.program_id
       WHERE p.type = CAST(:programType AS program_type)
       """,
-    nativeQuery = true
-  )
+      nativeQuery = true)
   List<ProgramRecurrence> findAllByProgramType(@Param("programType") String programType);
-  
-
 
   /**
    * Finds the last recurrence for a program.

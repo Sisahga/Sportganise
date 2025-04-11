@@ -106,7 +106,7 @@ public class ProgramParticipantController {
   /**
    * Confirms a participant's spot in a program.
    *
-   * @param programId The ID of the program.
+   * @param reccurenceId The ID of the program.
    * @param accountId The ID of the participant's account.
    * @return A DTO representing the confirmed participant.
    */
@@ -119,7 +119,9 @@ public class ProgramParticipantController {
       ProgramParticipantDto confirmedParticipant =
           waitlistService.confirmParticipant(reccurenceId, accountId);
       log.info(
-          "Participant confirmed successfully. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
+          "Participant confirmed successfully. reccurenceId: {}, accountId: {}",
+          reccurenceId,
+          accountId);
       ResponseDto<ProgramParticipantDto> responseDto =
           ResponseDto.<ProgramParticipantDto>builder()
               .statusCode(HttpStatus.OK.value())
@@ -153,7 +155,9 @@ public class ProgramParticipantController {
       ProgramParticipantDto outParticipant =
           waitlistService.optOutParticipant(reccurenceId, accountId);
       log.info(
-          "Participant opted out successfully. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
+          "Participant opted out successfully. reccurenceId: {}, accountId: {}",
+          reccurenceId,
+          accountId);
       ResponseDto<ProgramParticipantDto> responseDto =
           ResponseDto.<ProgramParticipantDto>builder()
               .statusCode(HttpStatus.OK.value())
@@ -185,7 +189,9 @@ public class ProgramParticipantController {
     List<ProgramParticipantDto> optedInParticipants =
         waitlistService.allOptedParticipants(reccurenceId);
     log.info(
-        "Retrieved {} opted participants for reccurenceId: {}", optedInParticipants.size(), reccurenceId);
+        "Retrieved {} opted participants for reccurenceId: {}",
+        optedInParticipants.size(),
+        reccurenceId);
     return ResponseEntity.ok(optedInParticipants);
   }
 
@@ -199,10 +205,12 @@ public class ProgramParticipantController {
   @PatchMapping("/mark-absent")
   public ResponseEntity<ResponseDto<ProgramParticipantDto>> markAbsent(
       @RequestParam Integer reccurenceId, @RequestParam Integer accountId) {
-    log.info("Marking participant as absent. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
+    log.info(
+        "Marking participant as absent. reccurenceId: {}, accountId: {}", reccurenceId, accountId);
 
     try {
-      ProgramParticipantDto programParticipant = waitlistService.markAbsent(reccurenceId, accountId);
+      ProgramParticipantDto programParticipant =
+          waitlistService.markAbsent(reccurenceId, accountId);
       log.info(
           "Successfully marked participant as absent. reccurenceId: {}, accountId: {}",
           reccurenceId,

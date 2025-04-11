@@ -44,6 +44,13 @@ public class ProgramRecurrence {
   @Column(name = "cancelled")
   private boolean cancelled;
 
+  /**
+   * Constructor for creating a new program recurrence.
+   *
+   * @param programId The ID of the program this recurrence belongs to
+   * @param occurrenceDate The date and time when this recurrence occurs
+   * @param cancelled Whether this recurrence is cancelled
+   */
   public ProgramRecurrence(Integer programId, ZonedDateTime occurrenceDate, boolean cancelled) {
     this.programId = programId;
     this.occurrenceDate = occurrenceDate;
