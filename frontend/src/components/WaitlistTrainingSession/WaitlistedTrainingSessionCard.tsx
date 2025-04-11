@@ -1,11 +1,15 @@
 /* eslint-disable react/prop-types */
 import { Card } from "@/components/ui/card";
-import { Clock, MapPin, ChevronRight } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Clock, MapPin, ChevronRight, LoaderCircle } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User2Icon, Hourglass } from "lucide-react";
 import EventBadgeType from "@/components/ViewTrainingSessions/BadgeTypes/EventBadgeType";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { calculateEndTime } from "@/utils/calculateEndTime";
+import useGetParticipant from "@/hooks/useGetParticipant";
+import ParticipantStatusBadgeType from "../ViewTrainingSessions/BadgeTypes/ParticipantStatusBadgeType";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import React, { useEffect } from "react";
 
 interface WaitlistedTrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -15,8 +19,29 @@ interface WaitlistedTrainingSessionCardProps {
 const WaitlistedTrainingSessionCard: React.FC<
   WaitlistedTrainingSessionCardProps
 > = ({ programDetails, onSelectTraining }) => {
+  const { userId, preLoading } = useGetCookies();
+
+  const { data: userAttendee, fetchParticipant } = useGetParticipant(
+    programDetails?.programId,
+    userId,
+  );
+
+  useEffect(() => {
+    if (!preLoading && userId) {
+      fetchParticipant().then((_) => _);
+    }
+  }, [preLoading, userId, fetchParticipant]);
+
   if (!programDetails) {
     return null; // Prevent rendering if programDetails is missing
+  }
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   return (
@@ -27,11 +52,12 @@ const WaitlistedTrainingSessionCard: React.FC<
       <div className="flex flex-col items-start gap-2 whitespace-nowrap border-b p-4 text-sm leading-tight last:border-b-0 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
         <div className="flex w-full items-center gap-2">
           <Avatar>
-            <AvatarFallback>
+            <AvatarFallback className="bg-primaryColour">
               <User2Icon color="#a1a1aa" />
             </AvatarFallback>
+            <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
           </Avatar>
-          <span>Coach Benjamin Luijan</span>
+          <span>{programDetails?.author ?? "N/A"}</span>
           <span className="ml-auto text-xs">
             {new Date(programDetails.occurrenceDate).toDateString()}
           </span>
@@ -86,8 +112,14 @@ const WaitlistedTrainingSessionCard: React.FC<
         <span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
           {programDetails.description}
         </span>
-        <div className="flex">
+        <div className="flex items-center space-x-1">
           <EventBadgeType programType={programDetails.programType} />
+          {userAttendee &&
+            (userAttendee?.rank !== null ||
+              (userAttendee?.confirmed === false &&
+                userAttendee?.participantType === "Subscribed")) && (
+              <ParticipantStatusBadgeType attendees={userAttendee} />
+            )}
 
           {/* View Details Button */}
           <button

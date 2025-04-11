@@ -16,7 +16,7 @@ const useWaitlistPrograms = () => {
         await programParticipantApi.waitlistPrograms(accountId);
       setData(dataWaitlist);
       log.info("Waitlist programs fetched succesfully.");
-      console.log("Participant information: ", dataWaitlist);
+      console.log("Waitlist information: ", dataWaitlist);
     } catch (err) {
       let errorMessage = "An error occurred while fetching waitlist programs.";
       if (err instanceof Error) {

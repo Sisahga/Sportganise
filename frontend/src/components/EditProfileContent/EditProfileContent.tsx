@@ -33,24 +33,25 @@ import {
   maxFileSizeInBytes,
 } from "./ProfileValidation";
 import { useToast } from "@/hooks/use-toast";
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { UpdateAccountPayload } from "@/types/account";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const EditProfileContent: React.FC = () => {
   const navigate = useNavigate();
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, preLoading } = useGetCookies();
 
   useEffect(() => {
-    if (!accountId) {
-      log.info("No accountId found, redirecting to login.");
-      navigate("/login");
+    if (!preLoading) {
+      if (!userId) {
+        log.info("No accountId found, redirecting to login.");
+        navigate("/login");
+      }
     }
-  }, [accountId, navigate]);
+  }, [userId, navigate]);
 
-  const { data, loading, error } = usePersonalInformation(accountId || 0);
+  const { fetchAccountData, data, loading, error } = usePersonalInformation();
   const [image, setImage] = useState<string>("https://via.placeholder.com/150");
   const [isInfoDialogOpen, setIsInfoDialogOpen] = useState(false);
   const [isImageChangeDialogOpen, setIsImageChangeDialogOpen] = useState(false);
@@ -73,6 +74,12 @@ const EditProfileContent: React.FC = () => {
       country: "",
     },
   });
+
+  useEffect(() => {
+    if (!preLoading || userId !== 0) {
+      fetchAccountData(userId).then((_) => _);
+    }
+  }, [userId, fetchAccountData, preLoading]);
 
   useEffect(() => {
     if (data) {
@@ -109,7 +116,7 @@ const EditProfileContent: React.FC = () => {
     }
   }, [success, message, toast]);
 
-  if (loading) {
+  if (preLoading || loading) {
     return <div>Loading...</div>;
   }
 
@@ -153,7 +160,7 @@ const EditProfileContent: React.FC = () => {
     if (newImage) {
       //Hook for update profile picture API
       const { success, message } = await updateProfilePicture(
-        accountId || 0,
+        userId || 0,
         newImage,
       );
 
@@ -203,7 +210,7 @@ const EditProfileContent: React.FC = () => {
       },
     };
 
-    updateAccount(accountId || 0, payload);
+    updateAccount(userId || 0, payload);
     setTimeout(() => {
       navigate("/pages/PersonalInformationPage");
     }, 500);
@@ -220,16 +227,13 @@ const EditProfileContent: React.FC = () => {
 
       <div className="flex flex-col items-center justify-center mx-auto max-w-2xl">
         <div className="relative">
-          <img
-            className="h-48 w-48 rounded-full border-2 border-gray-300 mx-auto my-2"
-            src={image}
-            alt="Profile"
-          />
-          <Label
-            htmlFor="file-input"
-            className="absolute bottom-3 right-3 translate-x-1/2 translate-y-1/2 cursor-pointer rounded-full shadow-lg hover:bg-gray-100 hover:shadow-xl transition"
-          >
-            <CirclePlus className="rounded-full w-10 h-10 hover:scale-110 hover:text-black transition-transform " />
+          <Label htmlFor="file-input" className="cursor-pointer">
+            <img
+              className="h-48 w-48 rounded-full border-2 border-gray-300 mx-auto my-2"
+              src={image}
+              alt="Profile"
+            />
+            <CirclePlus className="absolute bottom-2 right-2 bg-white p-1 shadow-lg text-primaryColour text-sm hover:scale-110 rounded-full w-10 h-10 hover:scale-110 hover:text-primaryColour transition-transform" />
           </Label>
 
           <Input

@@ -10,42 +10,65 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import { SquarePen } from "lucide-react";
+import { LoaderCircle, SquarePen } from "lucide-react";
 import { useForm } from "react-hook-form";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const PersonalInformationContent: React.FC = () => {
   const navigate = useNavigate();
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, cookies, preLoading } = useGetCookies();
 
-  const { data, loading, error } = usePersonalInformation(accountId || 0);
+  const { data, loading, error, fetchAccountData } = usePersonalInformation();
   const form = useForm({
     defaultValues: {
-      firstName: data?.firstName ?? "",
-      lastName: data?.lastName ?? "",
-      email: data?.email ?? "",
-      phone: data?.phone ?? "",
-      address: data?.address?.line ?? "",
-      city: data?.address?.city ?? "",
-      province: data?.address?.province ?? "",
-      postalCode: data?.address?.postalCode ?? "",
-      country: data?.address?.country ?? "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      province: "",
+      postalCode: "",
+      country: "",
     },
   });
 
   useEffect(() => {
-    if (!cookies || !accountId) {
-      log.warn("No cookies or account ID found. Redirecting to login...");
-      navigate("/login");
+    if (!preLoading) {
+      if (!cookies || !userId) {
+        log.warn("No cookies or account ID found. Redirecting to login...");
+        navigate("/login");
+      } else if (cookies && userId !== 0) {
+        fetchAccountData(userId).then((_) => _);
+      }
     }
-  }, [cookies, accountId, navigate]);
+  }, [cookies, userId, preLoading, navigate]);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  useEffect(() => {
+    if (!preLoading && data) {
+      form.reset({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        address: data.address?.line ?? "",
+        city: data.address?.city ?? "",
+        province: data.address?.province ?? "",
+        postalCode: data.address?.postalCode ?? "",
+        country: data.address?.country ?? "",
+      });
+    }
+  }, [data, preLoading]);
+
+  if (preLoading || loading || !data) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   if (error) return <div className="text-red">{error}</div>;

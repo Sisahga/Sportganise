@@ -79,6 +79,21 @@ public class GlobalExceptionHandler {
         .build();
   }
 
+  /**
+   * Handle account not found exception.
+   *
+   * @param e exception
+   * @return response dto with status 404.
+   */
+  @ExceptionHandler(AccountNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public ResponseDto<?> handleAccountNotFoundException(AccountNotFoundException e) {
+    return ResponseDto.builder()
+        .statusCode(HttpStatus.NOT_FOUND.value())
+        .message(e.getMessage())
+        .build();
+  }
+
   // <editor-fold desc="Region: Auth Exceptions">
 
   /**

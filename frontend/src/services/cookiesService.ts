@@ -2,44 +2,104 @@ import Cookies from "js-cookie";
 import { CookiesDto } from "@/types/auth";
 import log from "loglevel";
 import { removeAuthToken } from "@/services/apiHelper.ts";
+import { Preferences } from "@capacitor/preferences";
+import { isMobilePlatform } from "@/utils/isMobilePlatform.ts";
 
-export const setCookies = (cookies: CookiesDto) => {
-  Cookies.set("accountId", cookies.accountId?.toString() || "", {
-    path: "/",
-    expires: 14,
-  });
-  Cookies.set("firstName", cookies.firstName, { path: "/", expires: 14 });
-  Cookies.set("lastName", cookies.lastName, { path: "/", expires: 14 });
-  Cookies.set("email", cookies.email, { path: "/", expires: 14 });
-  Cookies.set("pictureUrl", cookies.pictureUrl || "", {
-    path: "/",
-    expires: 14,
-  });
-  Cookies.set("type", cookies.type || "", { path: "/", expires: 14 });
-  Cookies.set("phone", cookies.phone || "", { path: "/", expires: 14 });
-  Cookies.set("organisationIds", JSON.stringify(cookies.organisationIds), {
-    path: "/",
-    expires: 14,
-  });
+export const setCookies = async (cookies: CookiesDto) => {
+  if (isMobilePlatform()) {
+    await Preferences.set({
+      key: "accountId",
+      value: cookies.accountId?.toString() || "",
+    });
+    await Preferences.set({ key: "firstName", value: cookies.firstName });
+    await Preferences.set({ key: "lastName", value: cookies.lastName });
+    await Preferences.set({ key: "email", value: cookies.email });
+    await Preferences.set({
+      key: "pictureUrl",
+      value: cookies.pictureUrl || "",
+    });
+    await Preferences.set({ key: "type", value: cookies.type || "" });
+    await Preferences.set({ key: "phone", value: cookies.phone || "" });
+    await Preferences.set({
+      key: "organisationIds",
+      value: JSON.stringify(cookies.organisationIds),
+    });
+  } else {
+    Cookies.set("accountId", cookies.accountId?.toString() || "", {
+      path: "/",
+      expires: 14,
+    });
+    Cookies.set("firstName", cookies.firstName, { path: "/", expires: 14 });
+    Cookies.set("lastName", cookies.lastName, { path: "/", expires: 14 });
+    Cookies.set("email", cookies.email, { path: "/", expires: 14 });
+    Cookies.set("pictureUrl", cookies.pictureUrl || "", {
+      path: "/",
+      expires: 14,
+    });
+    Cookies.set("type", cookies.type || "", { path: "/", expires: 14 });
+    Cookies.set("phone", cookies.phone || "", { path: "/", expires: 14 });
+    Cookies.set("organisationIds", JSON.stringify(cookies.organisationIds), {
+      path: "/",
+      expires: 14,
+    });
+  }
 };
 
-export const getCookies = (): CookiesDto => {
+export const getCookies = async (): Promise<CookiesDto> => {
   try {
-    return {
-      accountId: Cookies.get("accountId")
-        ? parseInt(Cookies.get("accountId")!, 10)
-        : null,
-      firstName: Cookies.get("firstName") || "",
-      lastName: Cookies.get("lastName") || "",
-      email: Cookies.get("email") || "",
-      pictureUrl: Cookies.get("pictureUrl") || null,
-      type: Cookies.get("type") || "",
-      phone: Cookies.get("phone") || "",
-      organisationIds: Cookies.get("organisationIds")
-        ? JSON.parse(Cookies.get("organisationIds")!)
-        : [],
-      jwtToken: null,
-    };
+    if (isMobilePlatform()) {
+      const [
+        accountId,
+        firstName,
+        lastName,
+        email,
+        pictureUrl,
+        type,
+        phone,
+        organisationIds,
+        jwtToken,
+      ] = await Promise.all([
+        Preferences.get({ key: "accountId" }),
+        Preferences.get({ key: "firstName" }),
+        Preferences.get({ key: "lastName" }),
+        Preferences.get({ key: "email" }),
+        Preferences.get({ key: "pictureUrl" }),
+        Preferences.get({ key: "type" }),
+        Preferences.get({ key: "phone" }),
+        Preferences.get({ key: "organisationIds" }),
+        Preferences.get({ key: "jwtToken" }),
+      ]);
+
+      return {
+        accountId: accountId.value ? parseInt(accountId.value, 10) : null,
+        firstName: firstName.value || "",
+        lastName: lastName.value || "",
+        email: email.value || "",
+        pictureUrl: pictureUrl.value || null,
+        type: type.value || "",
+        phone: phone.value || "",
+        organisationIds: organisationIds.value
+          ? JSON.parse(organisationIds.value)
+          : [],
+        jwtToken: jwtToken.value || null,
+      };
+    } else {
+      return {
+        accountId: Cookies.get("accountId")
+          ? parseInt(Cookies.get("accountId")!, 10)
+          : null,
+        firstName: Cookies.get("firstName") || "",
+        lastName: Cookies.get("lastName") || "",
+        email: Cookies.get("email") || "",
+        pictureUrl: Cookies.get("pictureUrl") || null,
+        type: Cookies.get("type") || "",
+        phone: Cookies.get("phone") || "",
+        organisationIds: Cookies.get("organisationIds")
+          ? JSON.parse(Cookies.get("organisationIds")!)
+          : [],
+        jwtToken: null,
+      };
+    }
   } catch (e) {
     log.error("Failed to parse cookies:", e);
     return {
@@ -111,23 +171,27 @@ export const isCookiesDto = (
   return false;
 };
 
-export const clearCookies = () => {
-  const cookieNames = [
-    "accountId",
-    "firstName",
-    "lastName",
-    "email",
-    "pictureUrl",
-    "type",
-    "phone",
-    "organisationIds",
-  ];
+export const clearCookies = async () => {
+  if (isMobilePlatform()) {
+    await Preferences.clear();
+  } else {
+    const cookieNames = [
+      "accountId",
+      "firstName",
+      "lastName",
+      "email",
+      "pictureUrl",
+      "type",
+      "phone",
+      "organisationIds",
+    ];
 
-  cookieNames.forEach((name) => {
-    Cookies.remove(name, { path: "/" });
-  });
+    cookieNames.forEach((name) => {
+      Cookies.remove(name, { path: "/" });
+    });
+  }
 
-  removeAuthToken();
+  await removeAuthToken();
 };
 
 // Stores a product in the recently viewed cookie

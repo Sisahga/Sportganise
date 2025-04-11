@@ -1,6 +1,6 @@
 // Program Type Constants
 export const TRAINING = "TRAINING";
-export const SPECIALTRAINING = "SPECIALTRAINING";
+export const SPECIALTRAINING = "SPECIAL TRAINING";
 export const FUNDRAISER = "FUNDRAISER";
 export const TOURNAMENT = "TOURNAMENT";
 
@@ -12,7 +12,6 @@ export const MAIN_STREET = "123 Main St";
 
 // Program Visbilities Constants
 export const PUBLIC = "public";
-export const MEMBERS_ONLY = "members";
 export const PRIVATE = "private";
 
 // Program Frequencies Constants

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
 import log from "loglevel";
-import { getCookies } from "@/services/cookiesService";
 
 // Created components imports
 import DropDownMenuButton from "./DropDownMenu/DropDownMenuButton";
@@ -18,6 +17,7 @@ import {
   Hourglass,
   Repeat,
   User2Icon,
+  LoaderCircle,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -26,7 +26,7 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 import { getFileName } from "@/utils/getFileName";
 
 // Data structure for data received from API call
-import { ProgramDetails } from "@/types/trainingSessionDetails";
+import { Program, ProgramDetails } from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
@@ -34,8 +34,11 @@ import waitlistParticipantsApi from "@/services/api/programParticipantApi";
 import { ONCE, WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const TrainingSessionContent = () => {
+  const { cookies, preLoading } = useGetCookies();
+
   const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
   const [accountAttendee, setAccountAttendee] = useState<Attendees>();
   const location = useLocation(); // Location state data sent from Calendar page card
@@ -43,10 +46,11 @@ const TrainingSessionContent = () => {
 
   log.debug("Rendering TrainingSessionContent");
   useEffect(() => {
-    const user = getCookies();
-    setUser(user);
-    log.info("Training Session Card account type : ", user);
-  }, [navigate]);
+    if (!preLoading && cookies) {
+      setUser(cookies);
+      log.info("Training Session Card account type : ", cookies.type);
+    }
+  }, [navigate, cookies, preLoading]);
 
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
@@ -61,21 +65,21 @@ const TrainingSessionContent = () => {
     location: "",
     programAttachments: [],
     frequency: "",
-    visibility: "",
+    visibility: "public",
     author: "",
-    cancelled: false,
+    isCancelled: false,
     reccurenceDate: new Date(),
   });
 
   const [attendees, setAttendees] = useState<Attendees[]>([]);
 
   const fetchProgramData = async () => {
-    const programId = location.state?.programDetails?.programId;
-    if (programId && user?.accountId) {
+    const recurrenceId = location.state?.programDetails?.recurrenceId;
+    if (recurrenceId && user?.accountId) {
       try {
         const response = await trainingSessionApi.getPrograms(user?.accountId);
         const program = response.data?.find(
-          (p) => p.programDetails.programId === programId,
+          (p: Program) => p.programDetails.recurrenceId === recurrenceId,
         );
         if (program) {
           setProgramDetails(program.programDetails);
@@ -90,53 +94,83 @@ const TrainingSessionContent = () => {
   };
 
   useEffect(() => {
-    // Fetch fresh data when the component mounts
-    fetchProgramData();
-  }, [user, location.state?.programDetails?.programId]);
+    if (!preLoading && cookies) {
+      // Fetch fresh data when cookies are available.
+      fetchProgramData().then((_) => _);
+    }
+  }, [user, location.state?.programDetails?.programId, preLoading, cookies]);
 
   useEffect(() => {
-    //TODO: define a useHook instead of all this code, who knows
-    const fetchParticipant = async () => {
-      const programId = location.state?.programDetails?.programId;
-      console.log("ProgramID:", programId, user?.accountId);
-      if (programId && user?.accountId) {
-        try {
-          const accountAttendee: Attendees =
-            await waitlistParticipantsApi.getProgramParticipant(
-              programId,
-              user?.accountId,
-            );
-          setAccountAttendee(accountAttendee);
-          console.log("WHAT IS HAPPENING IM SO CONFUSED", accountAttendee);
-          console.log(accountAttendee);
-        } catch (error) {
-          log.error("Failed to fetch program participant:", error);
+    if (!preLoading && cookies) {
+      //TODO: define a useHook instead of all this code, who knows
+      const fetchParticipant = async () => {
+        const recurrenceId = location.state?.programDetails?.recurrenceId;
+        console.log("ProgramID:", recurrenceId, user?.accountId);
+        if (recurrenceId && user?.accountId) {
+          try {
+            const accountAttendee: Attendees =
+              await waitlistParticipantsApi.getProgramParticipant(
+                recurrenceId,
+                user?.accountId,
+              );
+            setAccountAttendee(accountAttendee);
+            console.log("Account Attendee check: ", accountAttendee);
+            console.log(accountAttendee);
+          } catch (error) {
+            log.error("Failed to fetch program participant:", error);
+          }
         }
-      }
-    };
-    fetchParticipant();
-  }, [location.state.programDetails.programId, user?.accountId]);
+      };
+      fetchParticipant().then((_) => _);
+    }
+  }, [
+    location.state.programDetails.recurrenceId,
+    user?.accountId,
+    preLoading,
+    cookies,
+  ]);
 
   const handleRefresh = async () => {
-    const programs = await trainingSessionApi.getPrograms(user?.accountId);
-    if (programs.data) {
-      const program = programs.data.find(
-        (p) => p.programDetails.programId === programDetails.programId,
+    const recurrenceId = location.state?.programDetails?.recurrenceId;
+    if (!recurrenceId) return;
+
+    try {
+      const response = await trainingSessionApi.getPrograms(user?.accountId);
+      const updatedProgram = response?.data?.find(
+        (p: Program) => p.programDetails.recurrenceId === recurrenceId,
       );
-      if (program) {
-        console.log("Refreshed programs: ", programs);
-        setAttendees(program.attendees);
-        setProgramDetails(program.programDetails);
-        console.log("Refreshed attendees: ", program.attendees);
-        console.log("Refreshed programDetails: ", program.programDetails);
-      } else console.log("No program found");
+
+      if (updatedProgram) {
+        setProgramDetails(updatedProgram.programDetails);
+        setAttendees(updatedProgram.attendees);
+      }
+    } catch (error) {
+      log.error("Failed to refresh program data:", error);
     }
+  };
+  const updateAttendeesList = (newAttendee: Attendees) => {
+    setAttendees((prev) => {
+      const exists = prev.some((a) => a.accountId === newAttendee.accountId);
+      return exists
+        ? prev.map((a) =>
+            a.accountId === newAttendee.accountId ? newAttendee : a,
+          )
+        : [...prev, newAttendee];
+    });
   };
 
   useEffect(() => {
     console.log("Updated attendees:", attendees);
     console.log("Update programDetails: ", programDetails);
   }, [attendees]);
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <div className="mb-32 mt-5">
@@ -307,44 +341,42 @@ const TrainingSessionContent = () => {
 
         {/**Conditionally render subscribed players only to Admin or Coach */}
         {/**Can render attendees list to Players or General when program type us not training session*/}
-        {!(
-          (user?.type?.toLowerCase() === "general" ||
-            user?.type?.toLowerCase() === "player") &&
-          programDetails.programType.toLowerCase() === "training"
-        ) && (
-          <>
-            <div className="flex items-center">
-              <h2 className="text-lg font-semibold">Attendees</h2>
-              <p className="text-sm font-medium text-gray-500 ml-3">
-                {Array.isArray(attendees)
-                  ? attendees.filter((attendee) => attendee.confirmed).length
-                  : 0}
-                /{programDetails.capacity}
+        <div className="flex items-center">
+          <h2 className="text-lg font-semibold">Attendees</h2>
+          <p className="text-sm font-medium text-gray-500 ml-3">
+            {Array.isArray(attendees)
+              ? attendees.filter((attendee) => attendee.confirmed).length
+              : 0}
+            /{programDetails.capacity}
+          </p>
+        </div>
+        {/** Attendees list visible to coach/admin only */}
+        {(user?.type?.toLowerCase() === "coach" ||
+          user?.type?.toLowerCase() === "admin") && (
+          <div className="mx-2">
+            {attendees.length > 0 ? (
+              attendees.map((attendee, index) => {
+                console.log("Attendee Information:", attendee); // Added console log
+                return attendee.participantType?.toLowerCase() ===
+                  "subscribed" || attendee.confirmed ? (
+                  <div key={index}>
+                    <RegisteredPlayer
+                      accountAttendee={attendee}
+                      onRefresh={handleRefresh}
+                    />
+                  </div>
+                ) : null;
+              })
+            ) : (
+              <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                There are no attendees
               </p>
-            </div>
-            <div className="mx-2">
-              {attendees.length > 0 ? (
-                attendees.map((attendee, index) => {
-                  console.log("Attendee Information:", attendee); // Added console log
-                  return attendee.participantType?.toLowerCase() ===
-                    "subscribed" || attendee.confirmed ? (
-                    <div key={index}>
-                      <RegisteredPlayer
-                        accountAttendee={attendee}
-                        onRefresh={handleRefresh}
-                      />
-                    </div>
-                  ) : null;
-                })
-              ) : (
-                <p className="text-cyan-300 text-sm font-normal m-5 text-center">
-                  There are no attendees
-                </p>
-              )}
-            </div>
-            <div className="mb-8"></div>
-          </>
+            )}
+          </div>
         )}
+        <div className="mb-8"></div>
+        {/* </> */}
+        {/* )} */}
 
         {!(
           (user?.type?.toLowerCase() === "general" ||
@@ -387,6 +419,38 @@ const TrainingSessionContent = () => {
             </>
           )}
 
+        {user?.accountId && (
+          <div className="my-6 mx-2 p-4 border rounded-md bg-gray-50 text-center">
+            {!accountAttendee ? (
+              <p className="text-gray-600">
+                You&apos;re not part of this program.
+              </p>
+            ) : accountAttendee.participantType?.toLowerCase() ===
+                "subscribed" && !accountAttendee.confirmed ? (
+              <p className="text-red-600 font-medium">
+                You&apos;re absent for this session.
+              </p>
+            ) : accountAttendee.rank !== null ? (
+              <div>
+                <p className="text-amber-600 font-medium">
+                  You&apos;re on the waitlist for this session.
+                </p>
+                <p className="text-gray-600 mt-1">
+                  Your current position:{" "}
+                  <span className="font-bold">{accountAttendee.rank}</span>
+                  {accountAttendee.rank === 1
+                    ? " (You'll be the next person to get a spot)"
+                    : ""}
+                </p>
+              </div>
+            ) : accountAttendee.confirmed ? (
+              <p className="text-green-600 font-medium">
+                You&apos;re confirmed for this session.
+              </p>
+            ) : null}
+          </div>
+        )}
+
         {/**Conditionally render different menu options based on account type */}
         <DropDownMenuButton
           user={user}
@@ -394,6 +458,7 @@ const TrainingSessionContent = () => {
           programDetails={programDetails}
           attendees={attendees}
           onRefresh={handleRefresh}
+          updateAttendeesList={updateAttendeesList}
         />
       </div>
     </div>

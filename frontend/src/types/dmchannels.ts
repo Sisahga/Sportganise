@@ -1,6 +1,7 @@
 import React from "react";
 import WebSocketService from "@/services/WebSocketService.ts";
 import { AccountDetailsDirectMessaging } from "@/types/account.ts";
+import { CookiesDto } from "@/types/auth.ts";
 
 export enum GroupChannelMemberRole {
   ADMIN = "ADMIN",
@@ -60,6 +61,7 @@ export interface ChannelSettingsDropdownProps {
   currentChannelPictureUrl: string;
   setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
   isDeleteRequestActive: boolean;
+  cookies: CookiesDto;
 }
 
 export interface ChannelMember {
@@ -77,6 +79,7 @@ export interface MembersSettingsDialogProps {
   channelId: number;
   websocketRef: WebSocketService | null;
   currentUserId: number;
+  cookies: CookiesDto;
 }
 
 export interface LeaveGroupDialogProps {
@@ -110,6 +113,7 @@ export interface RenameGroupDialogProps {
   setCurrentChannelName: React.Dispatch<React.SetStateAction<string>>;
   currentUserId: number;
   webSocketRef: WebSocketService | null;
+  cookies: CookiesDto;
 }
 
 export interface RenameChannelDto {
@@ -125,6 +129,7 @@ export interface ChangePictureDialogProps {
   setCurrentChannelPictureUrl: React.Dispatch<React.SetStateAction<string>>;
   webSocketRef: WebSocketService | null;
   currentUserId: number;
+  cookies: CookiesDto;
 }
 
 export interface UpdateChannelPictureResponse {

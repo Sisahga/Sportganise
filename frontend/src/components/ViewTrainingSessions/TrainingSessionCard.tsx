@@ -18,6 +18,10 @@ import {
 // Helper function imports
 import { calculateEndTime } from "@/utils/calculateEndTime";
 import { ONCE } from "@/constants/programconstants";
+import ParticipantStatusBadgeType from "./BadgeTypes/ParticipantStatusBadgeType";
+import useGetParticipant from "@/hooks/useGetParticipant";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import React, { useEffect } from "react";
 
 interface TrainingSessionCardProps {
   programDetails: ProgramDetails;
@@ -34,6 +38,19 @@ const TrainingSessionCard: React.FC<Program> = ({
     navigate(path, { state: data });
   };
   log.debug("Rendering training session card.");
+
+  const { userId, preLoading } = useGetCookies();
+
+  const { data: userAttendee, fetchParticipant } = useGetParticipant(
+    programDetails.programId, // assuming programDetails contains the program ID as 'id'
+    userId,
+  );
+
+  useEffect(() => {
+    if (!preLoading && userId) {
+      fetchParticipant().then((_) => _);
+    }
+  }, [preLoading, userId]);
 
   return (
     <Card>
@@ -108,12 +125,18 @@ const TrainingSessionCard: React.FC<Program> = ({
         <span className="line-clamp-2 w-[260px] whitespace-break-spaces text-xs">
           {programDetails?.description}
         </span>
-        <div className="flex">
+        <div className="flex items-center space-x-1">
           {programDetails?.programType && (
             <EventBadgeType programType={programDetails.programType} />
           )}
+          {userAttendee &&
+            (userAttendee?.rank !== null ||
+              (userAttendee?.confirmed === false &&
+                userAttendee?.participantType === "Subscribed")) && (
+              <ParticipantStatusBadgeType attendees={userAttendee} />
+            )}
 
-          {/*Click to view details */}
+          {/* Click to view details */}
           <button
             onClick={() =>
               handleNavigation("/pages/ViewTrainingSessionPage", {
@@ -121,7 +144,7 @@ const TrainingSessionCard: React.FC<Program> = ({
                 attendees,
               })
             }
-            className="ml-2 flex items-center bg-transparent"
+            className="flex items-center bg-transparent"
           >
             <ChevronRight size={17} color="#82DBD8" />
             <p className="font-medium text-secondaryColour">View details</p>

@@ -1,8 +1,11 @@
-import { getBearerToken } from "@/services/apiHelper";
+import { ApiService, getBearerToken } from "@/services/apiHelper";
 import { Attendees } from "@/types/trainingSessionDetails";
+import ResponseDto from "@/types/response.ts";
+import log from "loglevel";
 
 const baseMappingUrl =
   import.meta.env.VITE_API_BASE_URL + "/api/program-participant";
+const EXTENDED_BASE_URL = "/api/program-participant";
 
 const waitlistApi = {
   /** Fetch all waitlist programs */
@@ -32,25 +35,23 @@ const waitlistApi = {
 
   /** Opt-in (Join) Waitlist */
   joinQueue: async (programId: number, accountId: number): Promise<number> => {
-    try {
-      const response = await fetch(`${baseMappingUrl}/opt-participant`, {
-        method: "PATCH",
-        headers: {
-          Authorization: getBearerToken(),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ programId, accountId }),
-      });
+    const response = await ApiService.patch<ResponseDto<number>>(
+      `${EXTENDED_BASE_URL}/opt-participant`,
+      {
+        programId,
+        accountId,
+      },
+    );
 
-      if (!response.ok) {
-        throw new Error(`Failed to join the waitlist: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.rank;
-    } catch (error) {
-      console.error("Error joining the waitlist:", error);
-      throw error;
+    if (response.statusCode === 200 && response.data) {
+      console.log("joinQueue response: ", response);
+      return response.data;
+    } else if (response.statusCode === 200 && !response.data) {
+      log.warn("No data returned from joinQueue API.");
+      return 0;
+    } else {
+      log.error("Error thrown in waitlistApi.joinQueue.");
+      throw new Error("Error thrown in waitlistApi.joinQueue.");
     }
   },
 
@@ -58,28 +59,23 @@ const waitlistApi = {
     programId: number,
     accountId: number,
   ): Promise<Attendees | null> => {
-    try {
-      const response = await fetch(
-        `${baseMappingUrl}/confirm-participant?programId=${programId}&accountId=${accountId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: getBearerToken(),
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ programId, accountId }),
-        },
-      );
+    const response = await ApiService.patch<ResponseDto<Attendees>>(
+      `${EXTENDED_BASE_URL}/confirm-participant?programId=${programId}&accountId=${accountId}`,
+      {
+        programId,
+        accountId,
+      },
+    );
 
-      if (!response.ok) {
-        throw new Error(`Failed to confirm participant: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error confirming participant:", error);
+    if (response.statusCode === 200 && response.data) {
+      console.log("confirmParticipant response: ", response);
+      return response.data;
+    } else if (response.statusCode === 200 && !response.data) {
+      log.warn("No data returned from confirmParticipant API.");
       return null;
+    } else {
+      log.error("Error thrown in waitlistApi.confirmParticipant.");
+      throw new Error("Error thrown in waitlistApi.confirmParticipant.");
     }
   },
   /** Reject (remove) a participant from the waitlist */
@@ -87,28 +83,23 @@ const waitlistApi = {
     programId: number,
     accountId: number,
   ): Promise<Attendees | null> => {
-    try {
-      const response = await fetch(
-        `${baseMappingUrl}/out-participant?programId=${programId}&accountId=${accountId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: getBearerToken(),
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ programId, accountId }),
-        },
-      );
+    const response = await ApiService.patch<ResponseDto<Attendees>>(
+      `${EXTENDED_BASE_URL}/out-participant?programId=${programId}&accountId=${accountId}`,
+      {
+        programId,
+        accountId,
+      },
+    );
 
-      if (!response.ok) {
-        throw new Error(`Failed to reject participant: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error rejecting participant:", error);
+    if (response.statusCode === 200 && response.data) {
+      console.log("rejectParticipant response: ", response);
+      return response.data;
+    } else if (response.statusCode === 200 && !response.data) {
+      log.warn("No data returned from rejectParticipant API.");
       return null;
+    } else {
+      log.error("Error thrown in waitlistApi.rejectParticipant.");
+      throw new Error("Error thrown in waitlistApi.rejectParticipant.");
     }
   },
 };

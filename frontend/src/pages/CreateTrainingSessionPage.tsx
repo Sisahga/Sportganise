@@ -1,4 +1,4 @@
-import { CreateTrainingSessionForm } from "@/components/CreateTrainingSessionForm";
+import { CreateTrainingSessionForm } from "@/components/TrainingSessionForm";
 
 export default function CreateTrainingSessionPage() {
   return (

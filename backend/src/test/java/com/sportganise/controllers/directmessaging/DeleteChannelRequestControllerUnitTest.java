@@ -80,7 +80,7 @@ public class DeleteChannelRequestControllerUnitTest {
     ResponseEntity<ResponseDto<DeleteChannelRequestResponseDto>> response =
         deleteChannelRequestController.setDeleteChannelApproverStatus(setApproverStatusDto);
 
-    assertThat(response.getStatusCode(), is(HttpStatus.NO_CONTENT));
+    assertThat(response.getStatusCode(), is(HttpStatus.OK));
     assertThat(
         Objects.requireNonNull(response.getBody()).getStatusCode(),
         is(HttpStatus.NO_CONTENT.value()));

@@ -43,18 +43,26 @@ public class DirectMessageController {
    * /api/messaging/directmessage/get-messages/{channelId}?lastSentAt={lastSentAt}
    *
    * @param channelId The ID of the channel.
-   * @return List of messages in the channel with status 200.
+   * @return ResponseEntity with a list of DirectMessageDto objects.
    */
   @GetMapping("/get-messages/{channelId}")
-  public ResponseEntity<List<DirectMessageDto>> getChannelMessages(
+  public ResponseEntity<ResponseDto<List<DirectMessageDto>>> getChannelMessages(
       @PathVariable int channelId, @RequestParam(required = false) String lastSentAt) {
     ZonedDateTime lastSentAtDateTime = null;
     if (lastSentAt != null && !lastSentAt.isEmpty()) {
       lastSentAtDateTime = ZonedDateTime.parse(lastSentAt);
     }
 
-    return new ResponseEntity<>(
-        directMessageService.getChannelMessages(channelId, lastSentAtDateTime), HttpStatus.OK);
+    List<DirectMessageDto> messages =
+        directMessageService.getChannelMessages(channelId, lastSentAtDateTime);
+
+    ResponseDto<List<DirectMessageDto>> response =
+        ResponseDto.<List<DirectMessageDto>>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Messages fetched successfully.")
+            .data(messages)
+            .build();
+    return ResponseEntity.ok(response);
   }
 
   /**

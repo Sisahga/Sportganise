@@ -1,8 +1,11 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 import { clearCookies, getCookies } from "@/services/cookiesService";
 import { getBearerToken } from "@/services/apiHelper.ts";
-import { Capacitor } from "@capacitor/core";
 import { useRequestNotificationPermission } from "@/hooks/useFcmRequestPermission.ts";
+import { CookiesDto } from "@/types/auth.ts";
+import { useEffect, useState } from "react";
+import { isMobilePlatform } from "@/utils/isMobilePlatform.ts";
+import { LoaderCircle } from "lucide-react";
 /* eslint-disable react/prop-types */
 
 interface PrivateRouteProps {
@@ -15,7 +18,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   redirectingRoute = "/login",
 }) => {
   const location = useLocation();
-  const user = getCookies();
+  const [user, setUser] = useState<CookiesDto | null>(null);
   const token = getBearerToken();
   const notified = localStorage.getItem("pushNotifications");
 
@@ -23,21 +26,32 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 
   // If user already granted permission, it won't do anything.
   const initializeFcm = async (userId: number) => {
-    if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
+    if (!isMobilePlatform()) {
       await requestPermission(userId);
     } else {
       console.warn("Mobile app suspected.");
     }
   };
 
-  if (
-    token === null ||
-    token === "" ||
-    token === undefined ||
-    user.accountId === null ||
-    user.accountId === undefined
-  ) {
-    clearCookies();
+  const fetchUser = async () => {
+    const cookies = await getCookies();
+    setUser(cookies);
+  };
+
+  useEffect(() => {
+    fetchUser().then((r) => r);
+  }, []);
+
+  if (!user) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-8 w-8" />
+      </div>
+    );
+  }
+
+  if (!user.accountId || !token) {
+    clearCookies().then((r) => r);
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
     );

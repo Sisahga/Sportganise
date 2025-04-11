@@ -11,10 +11,11 @@ import {
 import log from "loglevel";
 import { Link, useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 import { useState, useEffect } from "react";
-import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import HomeContentSkeleton from "@/components/HomeContent/HomeContentSkeleton.tsx";
+import usePrograms from "@/hooks/usePrograms";
+import { TrainingSessionsList } from "../ViewTrainingSessions";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 log.info("HomeContent component is being rendered.");
 
@@ -29,24 +30,25 @@ interface FeatureCardProps {
 
 export default function HomeContent() {
   const [accountType, setAccountType] = useState<string | null | undefined>();
-  useEffect(() => {
-    const user = getCookies();
-    setAccountType(user?.type);
-  }, [accountType]);
-
   const navigate = useNavigate();
+  const [selectedMonth] = useState<Date>(new Date());
+  const programsProp = usePrograms();
   const [firstName, setFirstName] = useState<string | null>(null);
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
-  const { data, loading, error } = usePersonalInformation(accountId || 0);
+  const [error, setError] = useState<string | null>(null);
+
+  const { cookies, preLoading } = useGetCookies();
 
   useEffect(() => {
-    if (data) {
-      setFirstName(data.firstName);
+    if (!preLoading && cookies) {
+      setAccountType(cookies.type);
+      setFirstName(cookies.firstName);
+      setError(null);
+    } else {
+      setError("Failed to get account data.");
     }
-  }, [data]);
+  }, [preLoading, cookies]);
 
-  if (loading) {
+  if (preLoading) {
     return <HomeContentSkeleton />;
   }
 
@@ -202,6 +204,23 @@ export default function HomeContent() {
                   <FeatureCard delay={0.1 * index} key={index} {...feature} />
                 ))}
               </div>
+            </div>
+
+            <div style={{ marginTop: "0 !important" }}>
+              <TrainingSessionsList
+                selectedMonth={selectedMonth}
+                programsProp={programsProp}
+              />
+            </div>
+            <div className="flex items-center justify-center">
+              <Link
+                to="/pages/CalendarPage"
+                className="inline-flex items-center justify-center font-medium text-primaryColour
+                hover:text-primaryColour hover:bg-textPlaceholderColour/40 text-sm px-6 py-2 border rounded-md
+                h-auto mb-4 group transition-all duration-300 hover:shadow-md"
+              >
+                See all Programs
+              </Link>
             </div>
           </div>
         </div>

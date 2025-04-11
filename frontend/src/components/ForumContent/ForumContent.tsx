@@ -4,6 +4,7 @@ import {
   MessageCircle,
   ChevronLeft,
   ChevronRight,
+  LoaderCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useNavigate } from "react-router";
@@ -28,12 +29,14 @@ import useForumPosts from "@/hooks/useForumPosts";
 import { Badge } from "../ui/badge";
 import { PostDto } from "@/types/forum";
 import { usePostLike } from "@/hooks/usePostLike";
-import { getCookies } from "@/services/cookiesService";
+import useGetCookies from "@/hooks/useGetCookies.ts";
+import log from "loglevel";
 
 const ForumContent: React.FC = () => {
-  const user = getCookies();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { userId, preLoading } = useGetCookies();
 
   const { posts, loading, error, fetchPostsData, resetFilters } =
     useForumPosts();
@@ -66,23 +69,30 @@ const ForumContent: React.FC = () => {
   });
 
   useEffect(() => {
-    const timer = setTimeout(
-      () => {
-        fetchPostsData(
-          searchTerm,
-          occurrenceDate,
-          type,
-          postsPerPage,
-          currentPage,
-          sortBy,
-          sortDir,
+    if (!preLoading) {
+      if (userId !== 0) {
+        const timer = setTimeout(
+          () => {
+            fetchPostsData(
+              userId,
+              searchTerm,
+              occurrenceDate,
+              type,
+              postsPerPage,
+              currentPage,
+              sortBy,
+              sortDir,
+            ).then((_) => _);
+          },
+          searchTerm ? 500 : 0,
         );
-      },
-      searchTerm ? 500 : 0,
-    );
 
-    return () => clearTimeout(timer);
-  }, [searchTerm, currentPage]);
+        return () => clearTimeout(timer);
+      } else {
+        log.warn("User ID is not set. Cannot fetch posts.");
+      }
+    }
+  }, [searchTerm, currentPage, preLoading, userId]);
 
   const navigatePostDetail = (postId: number) => {
     navigate(`/pages/PostDetailPage`, { state: { postId } });
@@ -101,9 +111,9 @@ const ForumContent: React.FC = () => {
           const newLikeCount = Liked ? post.likeCount + 1 : post.likeCount - 1;
 
           if (Liked) {
-            likePost(postId, user.accountId);
+            likePost(postId, userId).then((_) => _);
           } else {
-            unlikePost(postId, user.accountId);
+            unlikePost(postId, userId).then((_) => _);
           }
 
           return {
@@ -119,6 +129,7 @@ const ForumContent: React.FC = () => {
 
   const handleApplyFilters = () => {
     fetchPostsData(
+      userId,
       searchTerm,
       occurrenceDate,
       type,
@@ -126,11 +137,12 @@ const ForumContent: React.FC = () => {
       currentPage,
       sortBy,
       sortDir,
-    );
+    ).then((_) => _);
   };
 
   const handleClearFilters = () => {
     resetFilters(
+      userId,
       searchTerm,
       setOccurrenceDate,
       setType,
@@ -139,11 +151,15 @@ const ForumContent: React.FC = () => {
       setSortDir,
       setCurrentPage,
       setPostsPerPage,
-    );
+    ).then((_) => _);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (preLoading || loading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   if (error) {

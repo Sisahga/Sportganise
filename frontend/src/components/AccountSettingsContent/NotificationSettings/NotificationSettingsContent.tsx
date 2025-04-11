@@ -20,27 +20,12 @@ import {
   UpdateNotificationPermissionRequestDto,
 } from "@/types/notifications.ts";
 import useGetNotificationSettings from "@/hooks/useGetNotificationSettings.ts";
-import { getAccountIdCookie, getCookies } from "@/services/cookiesService.ts";
 import useUpdateNotificationMethod from "@/hooks/useUpdateNotificationMethod.ts";
 import { toast } from "@/hooks/use-toast.ts";
 import useUpdateNotificationPermission from "@/hooks/useUpdateNotificationPermission.ts";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 export default function NotificationSettings() {
-  const cookies = getCookies();
-  const userId = getAccountIdCookie(cookies);
-
-  // Display names for enum values.
-  const NotificationMethodDisplayNames: Record<NotificationMethodEnum, string> =
-    {
-      [NotificationMethodEnum.PUSH]: "Phone/Browser",
-      [NotificationMethodEnum.EMAIL]: "Email",
-    };
-  const NotificationTypeDisplayNames: Record<NotificationTypeEnum, string> = {
-    [NotificationTypeEnum.TRAINING_SESSIONS]: "Training Sessions",
-    [NotificationTypeEnum.EVENTS]: "Events",
-    [NotificationTypeEnum.MESSAGING]: "Direct Messages",
-  };
-
   // States.
   const [notificationMethods, setNotificationMethods] = useState<
     NotificationMethod[] | []
@@ -54,6 +39,59 @@ export default function NotificationSettings() {
   const { getNotificationSettings } = useGetNotificationSettings();
   const { updateNotificationMethod } = useUpdateNotificationMethod();
   const { updateNotificationPermission } = useUpdateNotificationPermission();
+  const { userId, preLoading } = useGetCookies();
+
+  useEffect(() => {
+    if (!preLoading || userId !== 0) {
+      getNotificationSettings(userId).then((response) => {
+        if (response.statusCode === 200 && response.data) {
+          setNotificationMethods(response.data.notificationMethods);
+          setNotificationTypes(response.data.notificationComponents);
+        } else {
+          return (
+            <div>
+              Error retrieving notifications settings. Please try again later.
+            </div>
+          );
+        }
+      });
+    }
+  }, [userId, preLoading]);
+
+  useEffect(() => {
+    console.log(notificationMethods, notificationTypes);
+    if (notificationMethods.length > 0 && notificationTypes.length > 0) {
+      setLoading(false);
+    }
+  }, [notificationTypes, notificationMethods]);
+
+  // Display names for enum values.
+  const NotificationMethodDisplayNames: Record<NotificationMethodEnum, string> =
+    {
+      [NotificationMethodEnum.PUSH]: "Phone/Browser",
+      [NotificationMethodEnum.EMAIL]: "Email",
+    };
+  const NotificationTypeDisplayNames: Record<NotificationTypeEnum, string> = {
+    [NotificationTypeEnum.TRAINING_SESSIONS]: "Training Sessions",
+    [NotificationTypeEnum.EVENTS]: "Events",
+    [NotificationTypeEnum.MESSAGING]: "Direct Messages",
+  };
+
+  // Check browser push notification support
+  const checkPushNotificationSupport = () => {
+    toast({
+      variant: "warning",
+      title: "⚠️ Limited Browser Notifications",
+      description:
+        "Your browser may not fully support push notifications. Some app features might be limited.",
+      duration: 10000,
+    });
+  };
+
+  // Check push notification support on component mount
+  useEffect(() => {
+    checkPushNotificationSupport();
+  }, []);
 
   const handleChannelToggle = async (method: NotificationMethodEnum) => {
     setNotificationMethods((prev) =>
@@ -128,29 +166,7 @@ export default function NotificationSettings() {
     }
   };
 
-  useEffect(() => {
-    getNotificationSettings(userId).then((response) => {
-      if (response.statusCode === 200 && response.data) {
-        setNotificationMethods(response.data.notificationMethods);
-        setNotificationTypes(response.data.notificationComponents);
-      } else {
-        return (
-          <div>
-            Error retrieving notifications settings. Please try again later.
-          </div>
-        );
-      }
-    });
-  }, [userId]);
-
-  useEffect(() => {
-    console.log(notificationMethods, notificationTypes);
-    if (notificationMethods.length > 0 && notificationTypes.length > 0) {
-      setLoading(false);
-    }
-  }, [notificationTypes, notificationMethods]);
-
-  if (loading) {
+  if (preLoading || loading) {
     return <div>Loading...</div>;
   }
 

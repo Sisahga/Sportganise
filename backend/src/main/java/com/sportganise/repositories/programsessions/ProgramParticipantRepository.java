@@ -20,22 +20,33 @@ public interface ProgramParticipantRepository
       """
       SELECT pp
       FROM ProgramParticipant pp
-      WHERE pp.programParticipantId.programId = :programId
+      WHERE pp.programParticipantId.recurrenceId = :recurrenceId
       AND pp.programParticipantId.accountId = :accountId
       AND pp.type = 'Waitlisted'
       """)
   ProgramParticipant findWaitlistParticipant(
-      @Param("programId") Integer programId, @Param("accountId") Integer accountId);
+      @Param("recurrenceId") Integer recurrenceId, @Param("accountId") Integer accountId);
+
+  /** Find a participant for a specific program. */
+  @Query(
+      """
+      SELECT pp
+      FROM ProgramParticipant pp
+      WHERE pp.programParticipantId.recurrenceId = :recurrenceId
+      AND pp.programParticipantId.accountId = :accountId
+      """)
+  ProgramParticipant findParticipant(
+      @Param("recurrenceId") Integer recurrenceId, @Param("accountId") Integer accountId);
 
   /** Find the maximum rank of unconfirmed participants in a specific program. */
   @Query(
       """
       SELECT MAX(pp.rank)
       FROM ProgramParticipant pp
-      WHERE pp.programParticipantId.programId = :programId
+      WHERE pp.programParticipantId.recurrenceId = :recurrenceId
       AND pp.isConfirmed = FALSE
       """)
-  Integer findMaxRank(@Param("programId") Integer programId);
+  Integer findMaxRank(@Param("recurrenceId") Integer recurrenceId);
 
   /** Update the ranks of participants after one is confirmed. */
   @Modifying
@@ -44,29 +55,29 @@ public interface ProgramParticipantRepository
       """
       UPDATE ProgramParticipant pp
       SET pp.rank = pp.rank - 1
-      WHERE pp.programParticipantId.programId = :programId
+      WHERE pp.programParticipantId.recurrenceId = :recurrenceId
       AND pp.rank > :rank
       """)
-  void updateRanks(@Param("programId") Integer programId, @Param("rank") Integer rank);
+  void updateRanks(@Param("recurrenceId") Integer recurrenceId, @Param("rank") Integer rank);
 
   /** Find all unconfirmed participants with a rank of at least 1 in a specific program. */
   @Query(
       """
       SELECT pp FROM ProgramParticipant pp
-      WHERE pp.programParticipantId.programId = :programId
+      WHERE pp.programParticipantId.recurrenceId = :recurrenceId
       AND pp.isConfirmed = FALSE
       AND pp.rank >= 1
       """)
-  List<ProgramParticipant> findOptedParticipants(@Param("programId") Integer programId);
+  List<ProgramParticipant> findOptedParticipants(@Param("recurrenceId") Integer recurrenceId);
 
   @Query(
       """
       SELECT COUNT(pp)
       FROM ProgramParticipant pp
-      WHERE pp.programParticipantId.programId = :programId
+      WHERE pp.programParticipantId.recurrenceId = :recurrenceId
       AND pp.isConfirmed = TRUE
       """)
-  int countConfirmedParticipants(@Param("programId") Integer programId);
+  int countConfirmedParticipants(@Param("recurrenceId") Integer recurrenceId);
 
   /**
    * Finds all ProgramParticipant entities for a given account ID.
@@ -82,8 +93,8 @@ public interface ProgramParticipantRepository
       """
               SELECT p.programParticipantId.accountId
               FROM ProgramParticipant p
-              WHERE p.programParticipantId.programId = :programId
+              WHERE p.programParticipantId.recurrenceId = :recurrenceId
               AND LOWER(p.type) = LOWER('COACH')
               """)
-  List<Integer> findProgramCoachIds(Integer programId);
+  List<Integer> findProgramCoachIds(Integer recurrenceId);
 }

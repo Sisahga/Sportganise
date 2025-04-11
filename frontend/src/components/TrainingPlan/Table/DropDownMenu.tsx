@@ -1,8 +1,6 @@
 // React
 import { useState } from "react";
 import { useEffect } from "react";
-// Services
-import { getCookies, getAccountIdCookie } from "@/services/cookiesService";
 // Hooks
 import useShareTrainingPlan from "@/hooks/useShareTrainingPlan";
 import { useToast } from "@/hooks/use-toast";
@@ -20,19 +18,26 @@ import { Button } from "@/components/ui/Button";
 // Custom Components
 import { ConfirmationDialog } from "./ConfirmationDialog";
 // Icons
-import { CircleDotDashed, Ellipsis, Share, Trash2 } from "lucide-react";
+import {
+  CircleDotDashed,
+  Ellipsis,
+  LoaderCircle,
+  Share,
+  Trash2,
+} from "lucide-react";
 // Logs
 import log from "loglevel";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 // Component Props
 interface DropDownMenuProps {
-  userId: number;
+  accId: number;
   planId: number;
   shared: boolean;
 }
 
 export const DropDownMenu: React.FC<DropDownMenuProps> = ({
-  userId,
+  accId,
   planId,
   shared,
 }: DropDownMenuProps) => {
@@ -46,14 +51,15 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
     useState(false); // Handle dialog open, close set by dialog component
 
   // Get AccountId From Cookie
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, preLoading } = useGetCookies();
   useEffect(() => {
-    if (!accountId) {
-      log.debug("TrainingPlanContent -> No accountId found");
+    if (!preLoading) {
+      if (!userId) {
+        log.debug("TrainingPlanContent -> No accountId found");
+      }
+      log.info(`TrainingPlanContent -> accountId is ${userId}`);
     }
-    log.info(`TrainingPlanContent -> accountId is ${accountId}`);
-  }, [accountId]);
+  }, [userId, preLoading]);
 
   // Share a Training Plan
   async function handleShare(userId: number, planId: number) {
@@ -107,6 +113,14 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
     }
   }
 
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
+
   return (
     <div>
       <DropdownMenu>
@@ -123,7 +137,7 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
               <DropdownMenuItem
                 onClick={() => {
                   log.debug("TableColumns -> Unshare planId", planId);
-                  handleUnshare(userId, planId);
+                  handleUnshare(accId, planId);
                 }}
               >
                 <CircleDotDashed />
@@ -133,7 +147,7 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
               <DropdownMenuItem
                 onClick={() => {
                   log.debug("TableColumns -> Sharing planId", planId);
-                  handleShare(userId, planId);
+                  handleShare(accId, planId);
                 }}
               >
                 <Share />
@@ -141,7 +155,7 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
               </DropdownMenuItem>
             )}
 
-            {accountId && accountId === userId && (
+            {userId && userId === accId && (
               <DropdownMenuItem
                 onClick={() => {
                   log.debug("TableColumns -> Deleting planId", planId);
@@ -157,8 +171,8 @@ export const DropDownMenu: React.FC<DropDownMenuProps> = ({
       </DropdownMenu>
       <ConfirmationDialog
         planId={planId}
-        accountId={accountId}
-        userId={userId}
+        accountId={userId}
+        userId={accId}
         open={isConfirmationDialogOpen}
         setIsOpen={setIsConfirmationDialogOpen}
       />

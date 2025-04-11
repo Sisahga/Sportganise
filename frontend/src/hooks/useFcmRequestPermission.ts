@@ -1,16 +1,16 @@
-import { messaging } from "../lib/firebaseFcmConfig.ts";
+import { messaging } from "../lib/firebaseFcmWebConfig.ts";
 import { getToken } from "firebase/messaging";
-import { Capacitor } from "@capacitor/core";
 import { useToast } from "@/hooks/use-toast.ts";
 import useStoreFcmToken from "@/hooks/useStoreFcmToken.ts";
 import { StoreFcmTokenDto } from "@/types/notifications.ts";
+import { isMobilePlatform } from "@/utils/isMobilePlatform.ts";
 
 export const useRequestNotificationPermission = () => {
   const { toast } = useToast();
   const { storeFcmToken } = useStoreFcmToken();
 
   const requestPermission = async (userId: number) => {
-    if (typeof Capacitor !== "undefined" && Capacitor.getPlatform() === "web") {
+    if (!isMobilePlatform() && messaging) {
       try {
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
@@ -24,7 +24,7 @@ export const useRequestNotificationPermission = () => {
             token: token,
           };
           const response = await storeFcmToken(fcmTokenDto);
-          if (response.status != 200) {
+          if (response.statusCode != 200) {
             toast({
               title: "Notification Setup Failure",
               description:
@@ -60,7 +60,7 @@ export const useRequestNotificationPermission = () => {
         }
         return false;
       }
-    } else if (typeof Capacitor !== "undefined") {
+    } else if (isMobilePlatform()) {
       // TODO: Implementation for mobile notifications
       return false;
     }

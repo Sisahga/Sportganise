@@ -1,11 +1,10 @@
-//import { FormValues } from "@/types/trainingSessionFormValues";
 import { Program } from "@/types/trainingSessionDetails";
 import { ProgramDetails } from "@/types/trainingSessionDetails";
 import ResponseDto from "@/types/response.ts";
 import log from "loglevel";
-import { getBearerToken } from "@/services/apiHelper.ts";
+import { ApiService } from "@/services/apiHelper.ts";
 
-const baseMappingUrl = import.meta.env.VITE_API_BASE_URL + "/api/programs";
+const EXTENDED_BASE_URL = "/api/programs";
 
 const trainingSessionApi = {
   /**Submit CreateTrainingSession form */
@@ -13,30 +12,23 @@ const trainingSessionApi = {
     accountId: number | null | undefined,
     jsonPayload: FormData,
   ) => {
-    const response = await fetch(
-      `${baseMappingUrl}/${accountId}/create-program`,
+    const response = await ApiService.post<ResponseDto<ProgramDetails>>(
+      `${EXTENDED_BASE_URL}/${accountId}/create-program`,
+      jsonPayload,
       {
-        method: "POST",
-        headers: {
-          Authorization: getBearerToken(),
-        },
-        body: jsonPayload,
+        isMultipart: true,
       },
     );
-    console.log("In trainingSessionApi.createTrainingSession");
-    log.info("------ In trainingSessionApi.createTrainingSession");
-    console.log("response in trainingSessionApi:", response);
-    log.info("response in trainingSessionApi:", response);
+    log.debug("Response in trainingSessionApi:", response);
 
-    if (!response.ok) {
-      const errorText = await response.text(); //read response as text
-      console.error(`Error: ${response.status}`, errorText);
-      log.error(`Error: ${response.status}`, errorText);
-      throw new Error(`HTTP error ${response.status}: ${errorText}`);
+    if (response.statusCode === 201) {
+      return response;
+    } else {
+      log.error("Error thrown in trainingSessionApi.createTrainingSession.");
+      throw new Error(
+        "Error thrown in trainingSessionApi.createTrainingSession.",
+      );
     }
-    log.info(response);
-    log.info("------- END OF 'trainingSessionApi.createTrainingSession'");
-    return response.json();
   },
   /**Submit ModifyTrainingSession form */
   modifyTrainingSession: async (
@@ -44,48 +36,95 @@ const trainingSessionApi = {
     programId: number,
     formValues: FormData,
   ) => {
-    const response = await fetch(
-      `${baseMappingUrl}/${accountId}/${programId}/modify-program`,
+    const response = await ApiService.post<ResponseDto<ProgramDetails>>(
+      `${EXTENDED_BASE_URL}/${accountId}/${programId}/modify-program`,
+      formValues,
       {
-        method: "POST",
-        headers: {
-          Authorization: getBearerToken(),
-        },
-        body: formValues,
+        isMultipart: true,
       },
     );
-    log.info(
+    log.debug(
       "Reponse from trainingSessionApi.modifyTrainignSession : ",
       response,
     );
 
-    if (!response.ok) {
+    if (response.statusCode === 200) {
+      return response;
+    } else {
+      log.error("Error thrown in trainingSessionApi.modifyTrainignSession.");
       throw new Error(
-        "trainingSessionApi.modifyTrainignSession : Reponse is not ok!",
+        "Error thrown in trainingSessionApi.modifyTrainignSession.",
       );
     }
-    const data: ResponseDto<ProgramDetails> = await response.json();
-    return data;
   },
 
   /**Fetch all programs info */
-  getPrograms: async (accountId: number | null | undefined) => {
-    const response = await fetch(`${baseMappingUrl}/${accountId}/details`, {
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
-    const data: ResponseDto<Program[]> = await response.json();
+  getPrograms: async (accountId?: number | null) => {
+    const response = await ApiService.get<ResponseDto<Program[]>>(
+      `${EXTENDED_BASE_URL}/${accountId}/details`,
+    );
 
-    if (!response.ok) {
-      throw new Error("trainingSessionApi.getPrograms : Response not ok!");
+    if (response.statusCode === 200) {
+      log.debug("Programs successfully fetched.");
+      return response;
+    } else {
+      log.error("Error fetching programs:", response.statusCode);
+      return response;
+    }
+  },
+
+  getProgramDates: async (accountId?: number | null) => {
+    if (!accountId) {
+      console.warn("Skipping fetchProgramDates because accountId is null.");
+      return [];
     }
 
-    log.info("trainingSessionApi.getPrograms:", response);
-    log.info("trainingSessionApi.getPrograms: ", data);
-    console.log("trainingSessionApi.getPrograms", response);
+    const response = await ApiService.get<ResponseDto<Program[]>>(
+      `${EXTENDED_BASE_URL}/${accountId}/details`,
+    );
 
-    return data;
+    if (response.statusCode === 200) {
+      if (!Array.isArray(response.data)) {
+        log.error("Error: API response is not an array.");
+        return [];
+      } else {
+        log.debug("trainingSessionApi.getPrograms:", response);
+        return response.data
+          .map((program) => program.programDetails?.occurrenceDate)
+          .filter(
+            (date) => typeof date === "string" && !isNaN(Date.parse(date)),
+          )
+          .map((date) => new Date(date));
+      }
+    } else {
+      log.error("Error fetching program dates:", response);
+      return [];
+    }
+  },
+
+  /**Delete Program */
+  deleteProgram: async (
+    accountId: number | null | undefined,
+    programId: number,
+  ) => {
+    if (!accountId || !programId) {
+      log.warn(
+        "Skipping deleteProgram because accountId or programId is null.",
+      );
+      return;
+    }
+
+    const response = await ApiService.delete<Response>(
+      `${EXTENDED_BASE_URL}/${accountId}/delete-program/${programId}`,
+    );
+
+    if (response.status === 204) {
+      log.debug("Program successfully deleted.");
+      return response;
+    } else {
+      log.error("Error deleting program:", response.status);
+      throw new Error("Error deleting program.");
+    }
   },
 };
 

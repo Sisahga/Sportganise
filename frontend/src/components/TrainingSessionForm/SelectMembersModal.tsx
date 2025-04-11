@@ -10,29 +10,27 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Member } from "./types";
 
-export interface Member {
-  id: number;
-  name: string;
-  email: string;
-  role: string; // e.g., "Coach", "Player", etc.
-}
-
-interface InviteModalProps {
+interface SelectMembersModalProps {
   open: boolean;
   onClose: () => void;
   members: Member[];
   selectedMembers: number[];
   setSelectedMembers: React.Dispatch<React.SetStateAction<number[]>>;
+  description?: string;
+  title?: string;
 }
 
-export default function InviteModal({
+export default function SelectMembersModal({
   open,
   onClose,
   members,
   selectedMembers,
   setSelectedMembers,
-}: InviteModalProps) {
+  description,
+  title = "Select Members",
+}: SelectMembersModalProps) {
   const [search, setSearch] = useState("");
   const [filteredMembers, setFilteredMembers] = useState<Member[]>(members);
 
@@ -41,7 +39,6 @@ export default function InviteModal({
       members.filter(
         (member) =>
           member.name.toLowerCase().includes(search.toLowerCase()) ||
-          member.email.toLowerCase().includes(search.toLowerCase()) ||
           member.role.toLowerCase().includes(search.toLowerCase()),
       ),
     );
@@ -54,7 +51,7 @@ export default function InviteModal({
   };
 
   useEffect(() => {
-    console.log("Current selected members OVAA HEEREE:", selectedMembers);
+    console.log("Current selected members:", selectedMembers);
   }, [selectedMembers]);
 
   return (
@@ -66,14 +63,17 @@ export default function InviteModal({
     >
       <DialogContent
         className="max-w-lg"
-        aria-describedby="invite-dialog-description"
+        aria-describedby="select-dialog-description"
       >
         <DialogHeader>
-          <DialogTitle>Select Members</DialogTitle>
-          <DialogDescription id="invite-dialog-description">
-            Invite members to training sessions.
-          </DialogDescription>
+          <DialogTitle>{title}</DialogTitle>
+          {description ? (
+            <DialogDescription id="select-dialog-description">
+              {description}
+            </DialogDescription>
+          ) : null}
         </DialogHeader>
+
         <div className="mb-4">
           <Input
             value={search}
@@ -81,13 +81,13 @@ export default function InviteModal({
             placeholder="Search members..."
           />
         </div>
+
         <div className="max-h-60 overflow-y-auto">
           <table className="w-full text-left">
             <thead>
               <tr>
-                <th className="p-2">Invite</th>
+                <th className="p-2">Selected</th>
                 <th className="p-2">Name</th>
-                <th className="p-2">Email</th>
                 <th className="p-2">Role</th>
               </tr>
             </thead>
@@ -102,13 +102,13 @@ export default function InviteModal({
                     />
                   </td>
                   <td className="p-2">{member.name}</td>
-                  <td className="p-2">{member.email}</td>
                   <td className="p-2">{member.role}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
         <DialogFooter>
           <Button onClick={onClose}>Done</Button>
         </DialogFooter>

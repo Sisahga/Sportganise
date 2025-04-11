@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import {
   Dialog,
@@ -19,7 +17,6 @@ import useRenameChannel from "@/hooks/useRenameChannel.ts";
 import log from "loglevel";
 import useSendMessage from "@/hooks/useSendMessage.ts";
 import { SendMessageComponent } from "@/types/messaging.ts";
-import { getCookies } from "@/services/cookiesService.ts";
 
 export function RenameGroupDialog({
   isOpen,
@@ -29,9 +26,8 @@ export function RenameGroupDialog({
   setCurrentChannelName,
   currentUserId,
   webSocketRef,
+  cookies,
 }: RenameGroupDialogProps) {
-  const cookies = getCookies();
-
   const [currentName, setCurrentName] = useState(channelName);
   const [newName, setNewName] = useState("");
 
@@ -45,7 +41,7 @@ export function RenameGroupDialog({
         channelName: newName,
       };
       const response = await renameChannel(renameChannelDto);
-      if (response?.status === 200) {
+      if (response?.statusCode === 200) {
         log.info("Channel renamed successfully");
         const updaterMessageView = `You changed the group name to ${newName}`;
         const otherMessageView = `${cookies.firstName} group name was changed to ${newName}`;
@@ -64,7 +60,7 @@ export function RenameGroupDialog({
         setNewName("");
         setCurrentChannelName(newName);
         onClose();
-      } else if (response?.status === 404) {
+      } else if (response?.statusCode === 404) {
         log.error("Channel not found");
       } else {
         log.error("Error renaming channel");

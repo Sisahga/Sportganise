@@ -1,14 +1,14 @@
 import log from "loglevel";
 import ResponseDto from "@/types/response";
 import {
-  UploadTrainingPlansDto, // trainingPlan: string[];
+  UploadTrainingPlansDto,
   TrainingPlansDto,
   DeleteTrainingPlanDto,
   ShareTrainingPlanDto,
 } from "@/types/trainingplans";
-import { getBearerToken } from "@/services/apiHelper.ts";
+import { ApiService } from "@/services/apiHelper.ts";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL + "/api/training-plans";
+const EXTENDED_BASE_URL = "/api/training-plans";
 
 /**
  * Training Plan APIs
@@ -23,45 +23,38 @@ const trainingPlanApi = {
     accountId: number | null | undefined,
     trainingPlans: FormData,
   ): Promise<ResponseDto<UploadTrainingPlansDto>> => {
-    const response = await fetch(`${API_BASE_URL}/${accountId}/upload`, {
-      method: "POST",
-      headers: {
-        Authorization: getBearerToken(),
+    const response = await ApiService.post<ResponseDto<UploadTrainingPlansDto>>(
+      `${EXTENDED_BASE_URL}/${accountId}/upload`,
+      trainingPlans,
+      {
+        isMultipart: true,
       },
-      body: trainingPlans,
-    });
-
-    if (!response.ok) {
-      log.error("trainingPlanApi.uploadTrainingPlans -> Error thrown!");
-      throw new Error("trainingPlanApi.uploadTrainingPlans -> Error thrown!");
-    }
-
-    const data: ResponseDto<UploadTrainingPlansDto> = await response.json();
-    log.info(
-      "trainingPlanApi.uploadTrainingPlans -> Upload training plan(s) response:",
-      data,
     );
-    return data;
+
+    if (response.statusCode === 201) {
+      log.debug("uploadTrainingPlans response: ", response);
+      return response;
+    } else {
+      log.error("Error thrown in trainingPlanApi.uploadTrainingPlans.");
+      throw new Error("Error thrown in trainingPlanApi.uploadTrainingPlans.");
+    }
   },
 
   // Fetch Training Plan(s)
   fetchTrainingPlans: async (
     accountId: number | null | undefined,
   ): Promise<ResponseDto<TrainingPlansDto>> => {
-    const response = await fetch(`${API_BASE_URL}/${accountId}/view-plans`, {
-      headers: {
-        Authorization: getBearerToken(),
-      },
-    });
+    const response = await ApiService.get<ResponseDto<TrainingPlansDto>>(
+      `${EXTENDED_BASE_URL}/${accountId}/view-plans`,
+    );
 
-    if (!response.ok) {
+    if (response.statusCode === 200) {
+      log.debug("trainingPlanApi.fetchTrainingPlans -> response is", response);
+      return response;
+    } else {
       log.error("Error thrown in trainingPlanApi.fetchTrainingPlans.");
       throw new Error("Error thrown in trainingPlanApi.fetchTrainingPlans.");
     }
-
-    const data: ResponseDto<TrainingPlansDto> = await response.json();
-    log.info("trainingPlanApi.fetchTrainingPlans -> response is", data);
-    return data;
   },
 
   // Delete a Selected Training Plan
@@ -69,25 +62,17 @@ const trainingPlanApi = {
     userId: number | null | undefined,
     planId: number,
   ): Promise<ResponseDto<DeleteTrainingPlanDto>> => {
-    const response = await fetch(
-      `${API_BASE_URL}/${userId}/${planId}/delete-plan`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: getBearerToken(),
-        },
-      },
-    );
+    const response = await ApiService.delete<
+      ResponseDto<DeleteTrainingPlanDto>
+    >(`${EXTENDED_BASE_URL}/${userId}/${planId}/delete-plan`);
 
-    if (!response.ok) {
-      log.error("trainingPlanApi.deleteTrainingPlan -> Error thrown!");
-      const data: ResponseDto<DeleteTrainingPlanDto> = await response.json();
-      throw new Error(data.message); // Throw specific HTTP dto message, to be caught at ConfirmationDialog
+    if (response.statusCode === 200) {
+      log.debug("trainingPlanApi.deleteTrainingPlan response: ", response);
+      return response;
+    } else {
+      log.error("Error thrown in trainingPlanApi.deleteTrainingPlan.");
+      throw new Error("Error thrown in trainingPlanApi.deleteTrainingPlan.");
     }
-
-    const data: ResponseDto<DeleteTrainingPlanDto> = await response.json();
-    log.info("trainingPlanApi.deleteTrainingPlan -> response is", data);
-    return data;
   },
 
   // Share a Selected Training Plan
@@ -95,25 +80,18 @@ const trainingPlanApi = {
     accountId: number | null | undefined,
     planId: number,
   ): Promise<ResponseDto<ShareTrainingPlanDto>> => {
-    const response = await fetch(
-      `${API_BASE_URL}/${accountId}/${planId}/share-plan`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: getBearerToken(),
-        },
-      },
+    const response = await ApiService.post<ResponseDto<ShareTrainingPlanDto>>(
+      `${EXTENDED_BASE_URL}/${accountId}/${planId}/share-plan`,
+      {},
     );
 
-    if (!response.ok) {
-      log.error("trainingPlanApi.shareTrainingPlan -> Error thrown!");
-      const data: ResponseDto<ShareTrainingPlanDto> = await response.json();
-      throw new Error(data.message); // Throw specific HTTP ResponseDto message
+    if (response.statusCode === 200) {
+      log.debug("trainingPlanApi.shareTrainingPlan response: ", response);
+      return response;
+    } else {
+      log.error("Error thrown in trainingPlanApi.shareTrainingPlan.");
+      throw new Error("Error thrown in trainingPlanApi.shareTrainingPlan.");
     }
-
-    const data: ResponseDto<ShareTrainingPlanDto> = await response.json();
-    log.info("trainingPlanApi.shareTrainingPlan -> response is", data);
-    return data;
   },
 };
 

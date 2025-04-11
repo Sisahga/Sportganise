@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ProgramParticipantDto {
   private Integer accountId;
-  private Integer programId;
+  private Integer recurrenceId;
   private Integer rank;
   private String participantType;
   private boolean isConfirmed;
@@ -23,7 +23,7 @@ public class ProgramParticipantDto {
   /** Constructor for class that converts ProgramParticipant entity. */
   public ProgramParticipantDto(ProgramParticipant programParticipant) {
     this.accountId = programParticipant.getAccountId();
-    this.programId = programParticipant.getProgramId();
+    this.recurrenceId = programParticipant.getRecurrenceId();
     this.rank = programParticipant.getRank();
     this.participantType = programParticipant.getType();
     this.isConfirmed = programParticipant.isConfirmed();

@@ -1,18 +1,37 @@
 # Sportganise
 A sport Management Application <br>
 
-![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white) 
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)
-![JUnit](https://img.shields.io/badge/JUnit-25A162?style=for-the-badge&logo=junit5&logoColor=white)
-![Mockito](https://img.shields.io/badge/Mockito-4EA94B?style=for-the-badge&logo=mockito&logoColor=white)
-![SLF4J](https://img.shields.io/badge/SLF4J-FF9900?style=for-the-badge&logo=slf4j&logoColor=white)
-![GitHub Workflow](https://img.shields.io/badge/GitHub_Workflow-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
-![Electron](https://img.shields.io/badge/Electron-47848F?style=for-the-badge&logo=electron&logoColor=white)
 
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=white)  ![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)  ![ShadCN](https://img.shields.io/badge/ShadCN-000000?style=for-the-badge&logo=shadcn&logoColor=white)  ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)  ![Prettier](https://img.shields.io/badge/Prettier-1A2C34?style=for-the-badge&logo=prettier&logoColor=white)  ![ESLint](https://img.shields.io/badge/ESLint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white)  
+
+
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)  ![Spotless](https://img.shields.io/badge/Spotless-000000?style=for-the-badge&logo=spotless&logoColor=white)  ![Checkstyle](https://img.shields.io/badge/Checkstyle-FFD700?style=for-the-badge&logo=checkstyle&logoColor=black)  ![AWS S3](https://img.shields.io/badge/AWS_S3-569A31?style=for-the-badge&logo=amazonaws&logoColor=white)  ![Firebase Cloud Messaging](https://img.shields.io/badge/Firebase_CM-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)  ![STOMP](https://img.shields.io/badge/STOMP-8A2BE2?style=for-the-badge&logo=stomp&logoColor=white)  
+
+
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white) 
+
+
+![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+
+
+![GitHub Workflow](https://img.shields.io/badge/GitHub_Workflow-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+
+
+![Vitest](https://img.shields.io/badge/Vitest-6E9F18?style=for-the-badge&logo=vitest&logoColor=white)  ![JUnit](https://img.shields.io/badge/JUnit-25A162?style=for-the-badge&logo=junit5&logoColor=white)  ![Mockito](https://img.shields.io/badge/Mockito-4EA94B?style=for-the-badge&logo=mockito&logoColor=white)  ![Hamcrest](https://img.shields.io/badge/Hamcrest-9932CC?style=for-the-badge&logo=hamcrest&logoColor=white)  
+
+
+![SLF4J](https://img.shields.io/badge/SLF4J-FF9900?style=for-the-badge&logo=slf4j&logoColor=white)  ![Loglevel](https://img.shields.io/badge/Loglevel-00ADD8?style=for-the-badge&logo=loglevel&logoColor=white)  
+
+
+![Auth0](https://img.shields.io/badge/Auth0-EB5424?style=for-the-badge&logo=auth0&logoColor=white)  
+
+
+![Capacitor](https://img.shields.io/badge/Capacitor-119EFF?style=for-the-badge&logo=capacitor&logoColor=white)
+
+
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white) 
+
+ 
 ## Link to Website
 https://onibad.sportganise.com
 
@@ -21,7 +40,7 @@ Release 1: https://drive.google.com/file/d/1UsRUmvnBbStKwHjvWQnSvQ8CL8Uo43cr/vie
 
 Release 2 (Jan 26): https://drive.google.com/file/d/1ZR2Kzu-3m0_4q3iK0jbFxGDulEswFCIK/view?usp=drive_link (if this one doesn't work try this one: https://drive.google.com/file/d/17PjGi0htj1HTh7uOTOJakSlLiGE2qZJv/view?usp=drive_link)
 
-Release 3 (Apr 5): -
+Release 3 (Apr 10): https://drive.google.com/file/d/1V3bfvwCYzG8lvrzbh-844e7TByA2oh8X/view?usp=sharing
 
 ## Important Files 
 |File  | Description  |

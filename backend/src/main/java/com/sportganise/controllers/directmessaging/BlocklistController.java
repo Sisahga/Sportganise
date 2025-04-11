@@ -29,7 +29,7 @@ public class BlocklistController {
    * Endpoint /api/blocklist/block: Post Mapping for blocking a user.
    *
    * @param blockUserRequestDto API object for blocking a user.
-   * @return HTTP Code 204 and No Content.
+   * @return ResponseDto with HTTP Code 204 and No Content.
    */
   @PostMapping("/block")
   public ResponseEntity<ResponseDto<Null>> blockUser(
@@ -38,7 +38,7 @@ public class BlocklistController {
         blockUserRequestDto.getAccountId(), blockUserRequestDto.getBlockedId());
     ResponseDto<Null> response =
         new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User blocked successfully", null);
-    return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 
   /**
@@ -46,7 +46,7 @@ public class BlocklistController {
    *
    * @param accountId The account ID of the user who wants to unblock another user.
    * @param blockedId The account ID of the user who is to be unblocked.
-   * @return HTTP Code 204 and No Content.
+   * @return ResponseDto HTTP Code 204 and No Content.
    */
   @DeleteMapping("/unblock/{accountId}/{blockedId}")
   public ResponseEntity<ResponseDto<Null>> unblockUser(
@@ -54,6 +54,6 @@ public class BlocklistController {
     blocklistService.unblockUser(accountId, blockedId);
     ResponseDto<Null> response =
         new ResponseDto<>(HttpStatus.NO_CONTENT.value(), "User unblocked successfully", null);
-    return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    return new ResponseEntity<>(response, HttpStatus.OK);
   }
 }

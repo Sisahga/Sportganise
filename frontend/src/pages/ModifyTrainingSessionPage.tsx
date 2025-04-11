@@ -1,4 +1,4 @@
-import { ModifyTrainingSessionForm } from "@/components/ModifyTrainingSession";
+import { ModifyTrainingSessionForm } from "@/components/TrainingSessionForm";
 import { ToastProvider, ToastViewport } from "@radix-ui/react-toast";
 
 export default function ModifyTrainingSessionPage() {

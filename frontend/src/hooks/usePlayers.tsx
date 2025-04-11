@@ -1,6 +1,8 @@
 // usePlayers.ts
 import { useEffect, useState } from "react";
 import accountApi from "@/services/api/accountApi";
+import log from "loglevel";
+import { toast } from "@/hooks/use-toast.ts";
 
 export interface Player {
   accountId: number;
@@ -19,14 +21,20 @@ export default function usePlayers() {
   async function fetchPlayers() {
     setLoading(true);
     try {
-      // call your API
       const response = await accountApi.getAllAccountsWithRoles();
 
-      // Log the raw response to confirm it's an array
-      console.log("Raw /api/account/permissions response:", response);
-
-      // If response is just an array, do NOT do response.data
-      setPlayers(response); // or response || []
+      log.debug("/api/account/permissions Response:", response);
+      if (response) {
+        setPlayers(response);
+      } else if (!response) {
+        setPlayers([]);
+        log.warn("No account data.");
+        toast({
+          title: "No account data.",
+          description: "No players found.",
+          variant: "warning",
+        });
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
@@ -39,7 +47,7 @@ export default function usePlayers() {
   }
 
   useEffect(() => {
-    fetchPlayers();
+    fetchPlayers().then((_) => _);
   }, []);
 
   return { players, loading, error, refetch: fetchPlayers };

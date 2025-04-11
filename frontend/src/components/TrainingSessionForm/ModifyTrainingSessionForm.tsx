@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
@@ -30,7 +30,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, LoaderCircle } from "lucide-react";
+import usePrograms from "@/hooks/usePrograms";
 //import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { CloudUpload, Paperclip } from "lucide-react";
@@ -47,113 +48,48 @@ import { ProgramDetails } from "@/types/trainingSessionDetails";
 import { formSchema } from "@/types/trainingSessionZodFormSchema";
 import { Attendees } from "@/types/trainingSessionDetails";
 import useModifyTrainingSession from "@/hooks/useModifyProgram";
-import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import BackButton from "../ui/back-button";
 import { getFileName } from "@/utils/getFileName";
 // Import constants for select fields
-import { TRAINING } from "@/constants/programconstants";
-import { SPECIALTRAINING } from "@/constants/programconstants";
-import { TOURNAMENT } from "@/constants/programconstants";
-import { FUNDRAISER } from "@/constants/programconstants";
-import { COLLEGE_DE_MAISONNEUVE } from "@/constants/programconstants";
-import { CENTRE_DE_LOISIRS_ST_DENIS } from "@/constants/programconstants";
-import { MAIN_STREET } from "@/constants/programconstants";
-import { TEST_WATER_ROAD } from "@/constants/programconstants";
-import { PUBLIC } from "@/constants/programconstants";
-import { MEMBERS_ONLY } from "@/constants/programconstants";
-import { PRIVATE } from "@/constants/programconstants";
-import { DAILY } from "@/constants/programconstants";
-import { WEEKLY } from "@/constants/programconstants";
-import { MONTHLY } from "@/constants/programconstants";
-import { ONCE } from "@/constants/programconstants";
+import { DAILY, WEEKLY, MONTHLY, ONCE } from "@/constants/programconstants";
 // Import dropZoneConfig for files
 import { dropZoneConfig } from "@/constants/drop.zone.config";
 import { useWatch } from "react-hook-form";
 import { NotificationRequest } from "@/types/notifications";
 import useSendNotification from "@/hooks/useSendNotification";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
-/**All select element options */
-const types = [
-  {
-    label: "Training Session",
-    value: TRAINING,
-  },
-  {
-    label: "Fundraiser",
-    value: FUNDRAISER,
-  },
-  {
-    label: "Tournament",
-    value: TOURNAMENT,
-  },
-  {
-    label: "Special Training",
-    value: SPECIALTRAINING,
-  },
-] as const;
-const frequencies = [
-  {
-    label: "Daily",
-    value: DAILY,
-  },
-  {
-    label: "Weekly",
-    value: WEEKLY,
-  },
-  {
-    label: "Monthly",
-    value: MONTHLY,
-  },
-  {
-    label: "One time",
-    value: ONCE,
-  },
-] as const;
-const visibilities = [
-  {
-    label: "Public",
-    value: PUBLIC,
-  },
-  {
-    label: "Members only",
-    value: MEMBERS_ONLY,
-  },
-  {
-    label: "Private",
-    value: PRIVATE,
-  },
-] as const;
-const locations = [
-  {
-    label: "Centre de loisirs St-Denis",
-    value: CENTRE_DE_LOISIRS_ST_DENIS,
-  },
-  {
-    label: "Collège de Maisonnneuve",
-    value: COLLEGE_DE_MAISONNEUVE,
-  },
-  {
-    label: "123 test water rd.",
-    value: TEST_WATER_ROAD,
-  },
-  {
-    label: "123 Main st",
-    value: MAIN_STREET,
-  },
-] as const;
+import AssignCoach from "./AssignCoaches";
+import SelectMembersModal from "./SelectMembersModal";
+import { Member, ModalKey } from "./types";
+import usePlayers from "@/hooks/usePlayers";
+import {
+  FREQUENCIES,
+  LOCATIONS,
+  PROGRAM_TYPES,
+  VISIBILITIES,
+} from "./constants";
+import { MemberList } from "./MembersList";
 
 export default function ModifyTrainingSessionForm() {
-  const [accountId, setAccountId] = useState<number | null | undefined>();
+  const { userId, cookies, preLoading } = useGetCookies();
   const { toast } = useToast();
   const location = useLocation(); // Location state data sent from training session details page
   const navigate = useNavigate();
-  let [attachmentsToRemove /* setAttachmentsToRemove */] = useState<string[]>(
-    [],
-  );
+  const attachmentsToRemove = useRef<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- For US305+
-  const [attendees, setAttendees] = useState<Attendees[]>([]); // For US305+
+  const [openModal, setOpenModal] = useState<ModalKey>();
+  const [attendees, setAttendees] = useState<Attendees[]>([]);
+  const programs = usePrograms();
+  const [waitlistedMembers, setWaitlistedMembers] = useState<number[]>([]);
+  const [selectedCoaches, setSelectedCoaches] = useState<number[]>([]);
+  const [showSelectedCoaches, setShowSelectedCoaches] = useState(false);
+
+  const handleCoachesSelection = (newSelectedCoaches: number[]) => {
+    setSelectedCoaches(newSelectedCoaches);
+    setShowSelectedCoaches(true);
+  };
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
     recurrenceId: 0,
@@ -167,28 +103,53 @@ export default function ModifyTrainingSessionForm() {
     location: "",
     programAttachments: [],
     frequency: "",
-    visibility: "",
+    visibility: "public",
     author: "",
-    cancelled: false,
+    isCancelled: false,
     reccurenceDate: new Date(),
   });
   const { modifyTrainingSession } = useModifyTrainingSession();
   const { sendNotification } = useSendNotification();
 
   useEffect(() => {
-    const user = getCookies();
-    if (!user || user.type === "GENERAL" || user.type === "PLAYER") {
-      navigate("/");
+    if (!preLoading) {
+      if (!cookies || cookies.type === "GENERAL" || cookies.type === "PLAYER") {
+        navigate("/");
+      }
+      log.debug(`Modify Training Session Form accountId : ${userId}`);
     }
-    setAccountId(user?.accountId);
-    log.debug(`Modify Training Session Form accountId : ${accountId}`);
-  }, [accountId, navigate]);
+  }, [userId, cookies, preLoading, navigate]);
 
   /** Initializes a form in a React component using react-hook-form with a Zod schema for validation*/
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
+  // State for selected participant IDs (existing attendees)
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
+  // State to control the SelectMembersModal's visibility
+  const { players } = usePlayers();
+  const members = players.map<Member>((player) => ({
+    id: player.accountId, // <-- now a number
+    name: `${player.firstName} ${player.lastName}`,
+    email: player.email,
+    role: player.type,
+  }));
+  useEffect(() => {
+    if (location.state && location.state.attendees) {
+      const attendeeIds = (location.state.attendees as Attendees[]).map(
+        (att) => att.accountId, // now a number
+      );
+      setSelectedMembers(attendeeIds);
 
+      const waitlistedIds = (location.state.attendees as Attendees[])
+        .filter((attendee) => attendee.participantType === "Waitlisted")
+        .map((attendee) => attendee.accountId);
+      setWaitlistedMembers(waitlistedIds);
+    }
+    if (location.state && location.state.programDetails) {
+      setProgramDetails(location.state.programDetails);
+    }
+  }, [location.state]);
   /** Update state */
   useEffect(() => {
     if (location.state && location.state.programDetails) {
@@ -244,17 +205,27 @@ export default function ModifyTrainingSessionForm() {
     // Append all programDetials.attachmentUrls to new string[]
     programDetails.programAttachments.map((attachment) => {
       const fileName = attachment.attachmentUrl;
-      attachmentsToRemove.push(fileName);
+      attachmentsToRemove.current.push(fileName);
     });
-  }, [programDetails, attachmentsToRemove, form]);
+  }, [programDetails, form]);
 
   /** Handle form submission and networking logic */
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    if (values.visibility === "private" && selectedMembers.length === 0) {
+      toast({
+        variant: "destructive",
+        title: "Validation Error",
+        description:
+          "Please select at least one participant for a private event.",
+      });
+      return;
+    }
     try {
       const json_payload = {
         ...values,
         programId: programDetails.programId ?? null,
         attachment: values.attachment ?? [],
+        attendees: values.visibility === "private" ? selectedMembers : [],
       };
       console.log(json_payload);
       log.info("Form to modify Training Session : ", json_payload);
@@ -265,7 +236,7 @@ export default function ModifyTrainingSessionForm() {
       //if file.name of values.attachment exists in attachmentToRemove that means that we want to keep that old file
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
-          if (!attachmentsToRemove.includes(file.name)) {
+          if (!attachmentsToRemove.current.includes(file.name)) {
             formData.append("attachments", file); //attachment to add
             log.debug("File in form field appended to formData : ", file);
           }
@@ -277,12 +248,12 @@ export default function ModifyTrainingSessionForm() {
 
       if (values.attachment && values.attachment.length > 0) {
         values.attachment.forEach((file) => {
-          attachmentsToRemove = attachmentsToRemove.filter(
+          attachmentsToRemove.current = attachmentsToRemove.current.filter(
             (urlName) => urlName !== file.name,
           );
         });
       }
-      console.warn("attachmentsToRemove : ", attachmentsToRemove);
+      console.warn("attachmentsToRemove : ", attachmentsToRemove.current);
 
       const programData = {
         title: values.title,
@@ -301,7 +272,7 @@ export default function ModifyTrainingSessionForm() {
         startTime: values.startTime,
         endTime: values.endTime,
         location: values.location,
-        attachmentsToRemove: attachmentsToRemove ?? [],
+        attachmentsToRemove: attachmentsToRemove.current ?? [],
       };
       console.warn("programData:", programData);
       formData.append(
@@ -311,10 +282,15 @@ export default function ModifyTrainingSessionForm() {
         }),
       );
 
+      // Append waitlisted participants
+      waitlistedMembers.forEach((memberId) => {
+        formData.append("waitlistsId", memberId.toString());
+      });
+
       // API call submit form
       setLoading(true);
       const modify = await modifyTrainingSession(
-        accountId,
+        userId,
         programDetails.programId,
         formData,
       );
@@ -367,6 +343,14 @@ export default function ModifyTrainingSessionForm() {
     control: form.control,
     name: "frequency",
   });
+
+  if (preLoading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
+  }
 
   return (
     <div className="mb-32">
@@ -435,8 +419,9 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? types.find((type) => type.value === field.value)
-                              ?.label
+                          ? PROGRAM_TYPES.find(
+                              (type) => type.value === field.value,
+                            )?.label
                           : "Select type"}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -448,7 +433,7 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No type found.</CommandEmpty>
                         <CommandGroup>
-                          {types.map((type) => (
+                          {PROGRAM_TYPES.map((type) => (
                             <CommandItem
                               value={type.label}
                               key={type.value}
@@ -473,6 +458,54 @@ export default function ModifyTrainingSessionForm() {
                   </PopoverContent>
                 </Popover>
                 <FormDescription>Select the program type.</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="coaches"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel className="font-semibold text-base">
+                  Coach*
+                </FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-3 text-left font-normal text-muted-foreground",
+                        )}
+                      >
+                        <span>Select Coaches</span>
+                        <ChevronsUpDown className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[250px] p-0" align="start">
+                    <AssignCoach
+                      members={members}
+                      field={field}
+                      onSelectCoaches={handleCoachesSelection}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormDescription>
+                  Select the coaches in charge of the program
+                </FormDescription>
+                {/* Only show the list of selected coaches when showSelectedCoaches is true */}
+                {showSelectedCoaches && (
+                  <MemberList
+                    members={members}
+                    selectedMemberIds={selectedCoaches}
+                    title="Selected Coaches:"
+                    noneSelectedMsg="No coaches selected."
+                  />
+                )}
+
                 <FormMessage />
               </FormItem>
             )}
@@ -512,6 +545,7 @@ export default function ModifyTrainingSessionForm() {
                       selected={field.value}
                       onSelect={field.onChange}
                       initialFocus
+                      programsProp={programs}
                     />
                   </PopoverContent>
                 </Popover>
@@ -545,7 +579,7 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? frequencies.find(
+                          ? FREQUENCIES.find(
                               (frequency) => frequency.value === field.value,
                             )?.label
                           : "Select frequency"}
@@ -559,7 +593,7 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No frequency found.</CommandEmpty>
                         <CommandGroup>
-                          {frequencies.map((frequency) => (
+                          {FREQUENCIES.map((frequency) => (
                             <CommandItem
                               value={frequency.label}
                               key={frequency.value}
@@ -717,7 +751,7 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? locations.find(
+                          ? LOCATIONS.find(
                               (location) => location.value === field.value,
                             )?.label
                           : "Select location"}
@@ -731,7 +765,7 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No location found.</CommandEmpty>
                         <CommandGroup>
-                          {locations.map((location) => (
+                          {LOCATIONS.map((location) => (
                             <CommandItem
                               value={location.label}
                               key={location.value}
@@ -789,6 +823,32 @@ export default function ModifyTrainingSessionForm() {
             )}
           /> */}
 
+          {/** Waitlist */}
+          <FormItem className="flex flex-col">
+            <FormLabel className="font-semibold text-base">Waitlist</FormLabel>
+            <FormDescription>
+              Select who will be added to the waitlist for this program.
+            </FormDescription>
+            <FormMessage />
+            <MemberList members={members} selectedMemberIds={waitlistedMembers}>
+              <Button
+                size="sm"
+                className="mt-2"
+                onClick={() => setOpenModal("waitlist")}
+              >
+                Add Members
+              </Button>
+            </MemberList>
+          </FormItem>
+          <SelectMembersModal
+            description="Waitlist members for program."
+            open={openModal === "waitlist"}
+            onClose={() => setOpenModal(undefined)}
+            members={members}
+            selectedMembers={waitlistedMembers}
+            setSelectedMembers={setWaitlistedMembers}
+          />
+
           {/** Visibility */}
           <FormField
             control={form.control}
@@ -810,7 +870,7 @@ export default function ModifyTrainingSessionForm() {
                         )}
                       >
                         {field.value
-                          ? visibilities.find(
+                          ? VISIBILITIES.find(
                               (visibility) => visibility.value === field.value,
                             )?.label
                           : "Select visibility"}
@@ -824,12 +884,15 @@ export default function ModifyTrainingSessionForm() {
                       <CommandList>
                         <CommandEmpty>No visibility found.</CommandEmpty>
                         <CommandGroup>
-                          {visibilities.map((visibility) => (
+                          {VISIBILITIES.map((visibility) => (
                             <CommandItem
                               value={visibility.label}
                               key={visibility.value}
                               onSelect={() => {
                                 form.setValue("visibility", visibility.value);
+                                if (visibility.value === "private") {
+                                  setOpenModal("invite");
+                                }
                               }}
                             >
                               <Check
@@ -852,8 +915,33 @@ export default function ModifyTrainingSessionForm() {
                   Select who can view the program in their dashboard.
                 </FormDescription>
                 <FormMessage />
+                {field.value === "private" && (
+                  <MemberList
+                    members={members}
+                    selectedMemberIds={selectedMembers}
+                    title="Selected Participants:"
+                    noneSelectedMsg="No participants selected."
+                  >
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="mt-2"
+                      onClick={() => setOpenModal("invite")}
+                    >
+                      Edit Participants
+                    </Button>
+                  </MemberList>
+                )}
               </FormItem>
             )}
+          />
+          <SelectMembersModal
+            description="Invite members to training session."
+            open={openModal === "invite"}
+            onClose={() => setOpenModal(undefined)}
+            members={members}
+            selectedMembers={selectedMembers}
+            setSelectedMembers={setSelectedMembers}
           />
 
           {/** Description */}

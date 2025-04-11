@@ -8,13 +8,11 @@ import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramModifyRequestDto;
 import com.sportganise.entities.account.Account;
 import com.sportganise.exceptions.ForbiddenException;
-import com.sportganise.exceptions.ResourceNotFoundException;
 import com.sportganise.exceptions.programexceptions.ProgramCreationException;
 import com.sportganise.exceptions.programexceptions.ProgramModificationException;
 import com.sportganise.services.account.AccountService;
 import com.sportganise.services.programsessions.ProgramService;
 import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,19 +59,11 @@ public class ProgramController {
 
     ResponseDto<List<ProgramDetailsParticipantsDto>> responseDto = new ResponseDto<>();
 
-    Optional<Account> userOptional = getAccount(accountId);
-
-    if (userOptional.isEmpty()) {
-      responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
-      responseDto.setMessage("User not found.");
-      return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
-    }
-
-    Account user = userOptional.get();
-    log.debug("USER ID:", user.getAccountId());
+    Account user = this.accountService.getAccount(accountId);
+    log.debug("USER ID (details): {}", user.getAccountId());
 
     List<ProgramDto> programDtos = programService.getPrograms();
-    log.debug("PROGRAMDTOS COUNT: ", programDtos.size());
+    log.debug("PROGRAMDTOS COUNT (details): {}", programDtos.size());
 
     if (programDtos.isEmpty()) {
       responseDto.setStatusCode(HttpStatus.NOT_FOUND.value());
@@ -84,10 +74,10 @@ public class ProgramController {
     List<ProgramDetailsParticipantsDto> allPrograms;
 
     boolean canDisplayAttendees = hasPermissions(user);
-    log.debug("HAS PERMISSION: ", canDisplayAttendees);
+    log.debug("HAS PERMISSION (details): {}", canDisplayAttendees);
 
     allPrograms = programService.getProgramDetailsParticipantsDto(programDtos, canDisplayAttendees);
-    log.debug("ALL PROGRAMS COUNT: ", allPrograms.size());
+    log.debug("ALL PROGRAMS COUNT (details): {}", allPrograms.size());
 
     responseDto.setStatusCode(HttpStatus.OK.value());
     responseDto.setMessage("Programs successfully fetched.");
@@ -109,23 +99,23 @@ public class ProgramController {
   public ResponseEntity<ResponseDto<ProgramDto>> createProgram(
       @PathVariable Integer accountId,
       @RequestPart("programData") ProgramCreateRequestDto programCreateRequestDto,
-      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
+      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments,
+      @RequestParam(required = false) Integer[] participantsId,
+      @RequestParam(required = false) Integer[] waitlistsId,
+      @RequestParam(required = false) Integer[] coachesId) {
 
     // log.debug("ATTACHMENTS COUNT: {}", attachments.size());
 
-    Account user =
-        getAccount(accountId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+    Account user = getAccount(accountId);
 
-    log.debug("USER ID: ", user.getAccountId());
+    log.debug("USER ID (create-program): {}", user.getAccountId());
 
     if (!hasPermissions(user)) {
       throw new ForbiddenException(
           "User with id: " + accountId + " does not have permission to create a program.");
     }
 
-    log.debug("HAS PERMISSION: ", hasPermissions(user));
+    log.debug("HAS PERMISSION (create-program): {}", hasPermissions(user));
 
     try {
       ProgramDto newProgramDto =
@@ -142,9 +132,12 @@ public class ProgramController {
               programCreateRequestDto.getLocation(),
               attachments,
               accountId,
-              programCreateRequestDto.getFrequency());
+              programCreateRequestDto.getFrequency(),
+              participantsId,
+              waitlistsId,
+              coachesId);
 
-      log.debug("NEW PROGRAMDTO ID: ", newProgramDto.getProgramId());
+      log.debug("NEW PROGRAMDTO ID: {}", newProgramDto.getProgramId());
 
       ResponseDto<ProgramDto> responseDto =
           ResponseDto.<ProgramDto>builder()
@@ -174,21 +167,19 @@ public class ProgramController {
       @PathVariable Integer accountId,
       @PathVariable Integer programId,
       @RequestPart("programData") ProgramModifyRequestDto programModifyRequestDto,
-      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments) {
+      @RequestParam(value = "attachments", required = false) List<MultipartFile> attachments,
+      @RequestParam(required = false) Integer[] waitlistsId) {
 
-    Account user =
-        getAccount(accountId)
-            .orElseThrow(
-                () -> new ResourceNotFoundException("User with id " + accountId + " not found."));
+    Account user = getAccount(accountId);
 
-    log.debug("USER ID: ", user.getAccountId());
+    log.debug("USER ID (modify-program): {}", user.getAccountId());
 
     if (!hasPermissions(user)) {
       throw new ForbiddenException(
           "User with id: " + accountId + " does not have permission to create a program.");
     }
 
-    log.debug("HAS PERMISSION: ", hasPermissions(user));
+    log.debug("HAS PERMISSION (modify-program): {}", hasPermissions(user));
 
     ResponseDto<ProgramDto> responseDto = new ResponseDto<>();
 
@@ -199,7 +190,7 @@ public class ProgramController {
       return ResponseEntity.status(responseDto.getStatusCode()).body(responseDto);
     }
 
-    log.debug("PROGRAM ID OF PROGRAM TO MODIFY: ", programDtoToModify.getProgramId());
+    log.debug("PROGRAM ID OF PROGRAM TO MODIFY: {}", programDtoToModify.getProgramId());
 
     try {
       ProgramDto updatedProgramDto =
@@ -218,7 +209,8 @@ public class ProgramController {
               attachments,
               programModifyRequestDto.getAttachmentsToRemove(),
               accountId,
-              programModifyRequestDto.getFrequency());
+              programModifyRequestDto.getFrequency(),
+              waitlistsId);
 
       responseDto.setStatusCode(HttpStatus.OK.value());
       responseDto.setMessage("Modified the program successfully.");
@@ -309,7 +301,7 @@ public class ProgramController {
   }
 
   /** Helper method to fetch and validate user account based on accountId. */
-  private Optional<Account> getAccount(Integer accountId) {
+  private Account getAccount(Integer accountId) {
     return accountService.getAccount(accountId);
   }
 

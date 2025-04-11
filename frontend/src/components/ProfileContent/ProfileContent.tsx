@@ -6,34 +6,38 @@ import {
   Settings,
   KeyRound,
   UserX,
+  LoaderCircle,
 } from "lucide-react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import usePersonalInformation from "@/hooks/usePersonalInfromation";
-import {
-  getCookies,
-  getAccountIdCookie,
-  getTypeCookie,
-} from "@/services/cookiesService";
+import { getTypeCookie } from "@/services/cookiesService";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 const ProfileContent: React.FC = () => {
   const navigate = useNavigate();
   const [userType, setUserType] = useState<string | null>(null);
 
-  const cookies = getCookies();
-  const accountId = cookies ? getAccountIdCookie(cookies) : null;
+  const { userId, cookies, preLoading } = useGetCookies();
+
+  const { data, loading, error, fetchAccountData } = usePersonalInformation();
 
   useEffect(() => {
-    if (!cookies) {
-      navigate("/login");
-    } else {
-      setUserType(getTypeCookie(cookies));
+    if (!preLoading) {
+      if (!cookies) {
+        navigate("/login");
+      } else {
+        setUserType(getTypeCookie(cookies));
+        fetchAccountData(userId).then((_) => _);
+      }
     }
-  }, [cookies, accountId, navigate]);
+  }, [cookies, userId, preLoading, navigate]);
 
-  const { data, loading, error } = usePersonalInformation(accountId || 0);
-
-  if (loading) {
-    return <div>Loading...</div>;
+  if (preLoading || loading) {
+    return (
+      <div>
+        <LoaderCircle className="animate-spin h-6 w-6" />
+      </div>
+    );
   }
 
   if (error) {
@@ -49,15 +53,17 @@ const ProfileContent: React.FC = () => {
           </h2>
 
           {/* Profile image */}
-          <img
-            className="h-48 w-48 rounded-full border-2 border-gray dark:border-gray-800 mx-auto my-2 object-cover"
-            src={data?.pictureUrl || "https://via.placeholder.com/150"}
-            alt="Profile"
-          />
-
-          <p className="text-3xl text-primaryColour font-medium">
-            {data?.firstName} {data?.lastName}
-          </p>
+          <Link to="/pages/PersonalInformationPage">
+            {" "}
+            <img
+              className="h-48 w-48 rounded-full border-2 border-gray dark:border-gray-800 mx-auto my-2 object-cover"
+              src={data?.pictureUrl || "https://via.placeholder.com/150"}
+              alt="Profile"
+            />
+            <p className="text-3xl text-primaryColour font-medium">
+              {data?.firstName} {data?.lastName}
+            </p>
+          </Link>
           <p className="text-lg font-semibold text-primaryColour">
             {data?.type
               ? data?.type.charAt(0).toUpperCase() + data?.type.slice(1)

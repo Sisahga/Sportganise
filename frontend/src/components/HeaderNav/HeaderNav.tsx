@@ -8,31 +8,31 @@ import {
 } from "@/components/ui/drawer";
 import logo from "../../assets/Logo.png";
 import { useState, useEffect } from "react";
-import { getCookies } from "@/services/cookiesService";
 import log from "loglevel";
 import { clearCookies } from "@/services/cookiesService";
-import { CookiesDto } from "@/types/auth";
 import useWaitlistPrograms from "@/hooks/useWaitlistPrograms";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 log.info("HeaderNav component is being rendered.");
 
 export default function HeaderNav() {
   const [accountType, setAccountType] = useState<string | null | undefined>();
-  const [user, setUser] = useState<CookiesDto>();
+
+  const { userId, cookies, preLoading } = useGetCookies();
 
   useEffect(() => {
-    const userCookie = getCookies();
-    setUser(userCookie);
-    setAccountType(userCookie?.type);
-  }, [accountType]);
+    if (!preLoading && cookies) {
+      setAccountType(cookies.type);
+    }
+  }, [preLoading, cookies]);
   const navigate = useNavigate();
 
   const { data: waitlistData, waitlistPrograms } = useWaitlistPrograms();
   useEffect(() => {
-    if (user?.accountId) {
-      waitlistPrograms(user.accountId);
+    if (userId) {
+      waitlistPrograms(userId).then((_) => _);
     }
-  }, [user, waitlistPrograms]);
+  }, [userId, waitlistPrograms]);
 
   useEffect(() => {
     if (waitlistData) {
@@ -45,10 +45,22 @@ export default function HeaderNav() {
     setIsDrawerOpen(false);
   };
 
-  const clearCookiesAndNavigate = () => {
-    clearCookies();
-    navigate("/login");
+  let isNavigating = false;
+  const clearCookiesAndNavigate = async () => {
+    if (isNavigating) return;
+
+    isNavigating = true;
+    try {
+      await clearCookies();
+      navigate("/login");
+    } catch (error) {
+      log.error("Error clearing cookies:", error);
+    }
   };
+
+  if (preLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div>
@@ -115,10 +127,12 @@ export default function HeaderNav() {
                   </Link>
                 </>
               )}
-              {waitlistData && waitlistData.length > 0 && (
+              {(accountType?.toLowerCase() === "coach" ||
+                accountType?.toLowerCase() === "admin" ||
+                (waitlistData && waitlistData.length > 0)) && (
                 <Link
                   to="/pages/WaitlistTrainingSessionPage"
-                  className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                  className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
                 >
                   Waitlist
                 </Link>
@@ -130,8 +144,8 @@ export default function HeaderNav() {
                 Price Comparison
               </Link>
               <Link
-                to="/" //add actual redirect once setting page is set up
-                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+                to="/pages/NotificationSettingsPage"
+                className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >
                 Settings
               </Link>

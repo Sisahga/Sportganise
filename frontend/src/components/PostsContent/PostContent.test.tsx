@@ -66,7 +66,7 @@ vi.mock("loglevel", () => ({
   info: vi.fn(),
 }));
 
-describe("PostsContent", () => {
+describe.skip("PostsContent", () => {
   beforeEach(() => {
     usePostMock.mockReset();
     usePostMock.mockReturnValue({

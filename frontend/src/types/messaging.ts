@@ -1,4 +1,5 @@
 import WebSocketService from "@/services/WebSocketService.ts";
+import { CookiesDto } from "@/types/auth.ts";
 
 export enum AttachmentType {
   IMAGE = "IMAGE",
@@ -56,6 +57,7 @@ export interface UserBlockedComponentProps {
   webSocketRef: WebSocketService | null;
   channelId: number;
   channelType: string;
+  cookies: CookiesDto;
 }
 
 export interface ChatImageDialogProps {

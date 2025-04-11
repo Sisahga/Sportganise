@@ -1,6 +1,7 @@
 /* *** FCM module for Mobile Apps **** */
 import { initializeApp } from "firebase/app";
-import { getMessaging } from "firebase/messaging";
+import { getMessaging, Messaging } from "firebase/messaging";
+import { Capacitor } from "@capacitor/core";
 
 // Base Firebase app configuration.
 const firebaseConfig = {
@@ -13,9 +14,11 @@ const firebaseConfig = {
   measurementId: "G-QWBV9P289D",
 };
 
-// Initialize Firebase.
-const app = initializeApp(firebaseConfig);
-// Initialize Firebase Cloud Messaging (FCM).
-const messaging = getMessaging(app);
+// Only initialize Firebase Web Messaging if running in a browser
+let messaging: Messaging | undefined;
+if (Capacitor.getPlatform() === "web") {
+  const app = initializeApp(firebaseConfig);
+  messaging = getMessaging(app);
+}
 
 export { messaging };

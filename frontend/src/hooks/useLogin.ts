@@ -5,13 +5,14 @@
 import log from "loglevel";
 import { useState } from "react";
 import { login } from "@/services/api/authAPI";
-import { LoginRequest, LoginResponse } from "@/types/auth";
+import { LoginRequest, CookiesDto } from "@/types/auth";
 import { isCookiesDto } from "@/services/cookiesService";
+import ResponseDto from "@/types/response.ts";
 
 export const useLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<LoginResponse | null>(null);
+  const [data, setData] = useState<ResponseDto<CookiesDto> | null>(null);
 
   const loginUser = async (requestData: LoginRequest) => {
     setIsLoading(true);

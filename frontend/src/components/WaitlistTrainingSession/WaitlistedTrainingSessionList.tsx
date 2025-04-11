@@ -3,8 +3,8 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import useWaitlistPrograms from "@/hooks/useWaitlistPrograms";
 import { Program } from "@/types/trainingSessionDetails";
-import { getCookies } from "@/services/cookiesService";
 import { CookiesDto } from "@/types/auth";
+import useGetCookies from "@/hooks/useGetCookies.ts";
 
 interface WaitlistedTrainingSessionListProps {
   onSelectTraining: (programDetails: Program) => void;
@@ -19,18 +19,21 @@ export default function WaitlistedTrainingSessionList({
     loading,
     waitlistPrograms,
   } = useWaitlistPrograms();
+
   const [user, setUser] = useState<CookiesDto>();
+  const { cookies, preLoading } = useGetCookies();
 
   // Run only once on component mount
   useEffect(() => {
-    const userCookie = getCookies();
-    setUser(userCookie);
-  }, []);
+    if (!preLoading && cookies) {
+      setUser(cookies);
+    }
+  }, [preLoading, cookies]);
 
   // Call backend when user is set
   useEffect(() => {
     if (user?.accountId) {
-      waitlistPrograms(user.accountId);
+      waitlistPrograms(user.accountId).then((_) => _);
     }
   }, [user, waitlistPrograms]);
 
@@ -49,7 +52,7 @@ export default function WaitlistedTrainingSessionList({
     );
   }
 
-  if (loading) {
+  if (preLoading || loading) {
     return (
       <div className="flex justify-center">
         <Loader2 className="animate-spin" size={30} color="#9ca3af" />

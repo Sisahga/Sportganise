@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback } from "react";
 import postApi from "@/services/api/postAPI";
 import { Post } from "@/types/postdetail";
 import log from "loglevel";
@@ -8,12 +8,12 @@ export const usePost = (postId: number) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchPost = async () => {
+  const fetchPost = useCallback(
+    async (userId: number) => {
       log.info(`Fetching post with ID: ${postId}`);
 
       try {
-        const response = await postApi.getPost(postId);
+        const response = await postApi.getPost(postId, userId);
         setPost(response.data);
         log.info(`Post fetched successfully:`, response.data);
       } catch (err) {
@@ -22,10 +22,9 @@ export const usePost = (postId: number) => {
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [postId],
+  );
 
-    fetchPost();
-  }, [postId]);
-
-  return { post, loading, error };
+  return { post, loading, error, fetchPost };
 };
