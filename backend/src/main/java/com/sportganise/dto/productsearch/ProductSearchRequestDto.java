@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO representing a product search request. Contains the search query and optional country filter.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

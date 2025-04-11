@@ -24,6 +24,8 @@ import {
   ProductSearchResponse,
 } from "@/services/api/productSearchApi";
 import PriceComparisonSkeleton from "./PriceComparisonSkeleton";
+import { addRecentlyViewedProduct } from "@/services/cookiesService.ts";
+import RecentlyViewedSidebar from "@/components/PriceComparisonToolContent/RecentlyViewedSidebar.tsx";
 
 // Define columns for React Table
 const columns = [
@@ -82,16 +84,31 @@ const columns = [
         <LinkIcon size={15} className="mx-2" />
       </div>
     ),
-    cell: (props: any) => (
-      <a
-        href={props.getValue()}
-        className="text-secondaryColour hover:underline"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Visit
-      </a>
-    ),
+    cell: (props: any) => {
+      const product = props.row.original; // get full row data
+
+      const handleVisitClick = () => {
+        addRecentlyViewedProduct({
+          title: product.title,
+          imageUrl: product.imageUrl,
+          price: product.price,
+          seller: product.seller,
+          link: product.link,
+        });
+      };
+
+      return (
+        <a
+          href={product.link}
+          onClick={handleVisitClick}
+          className="text-secondaryColour hover:underline"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Visit
+        </a>
+      );
+    },
   },
 ];
 
@@ -183,74 +200,81 @@ export default function PriceComparisonToolContent() {
       {loading ? (
         <PriceComparisonSkeleton />
       ) : (
-        <Table className="table">
-          {/* Render table header only if we have rows */}
-          {table.getRowModel().rows.length > 0 && (
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                    </TableHead>
+        <div className="flex flex-col md:flex-row md:items-start gap-4">
+          <div className="flex-1">
+            <Table className="table">
+              {/* Render table header only if we have rows */}
+              {table.getRowModel().rows.length > 0 && (
+                <TableHeader>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id}>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))}
-            </TableHeader>
-          )}
+                </TableHeader>
+              )}
 
-          {/* Body section handles all states: data, welcome message, no results */}
-          <TableBody>
-            {table.getRowModel().rows.length > 0 && (
-              <>
-                {table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </TableCell>
+              {/* Body section handles all states: data, welcome message, no results */}
+              <TableBody>
+                {table.getRowModel().rows.length > 0 && (
+                  <>
+                    {table.getRowModel().rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </TableCell>
+                        ))}
+                      </TableRow>
                     ))}
-                  </TableRow>
-                ))}
-              </>
-            )}
+                  </>
+                )}
 
-            {!searchInput.trim() && table.getRowModel().rows.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-center py-12"
-                >
-                  <div className="text-lg font-semibold text-textColour mb-2">
-                    Ready to find the best deals?
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Start by searching for your favorite sports gear above.
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
+                {!searchInput.trim() &&
+                  table.getRowModel().rows.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="text-center py-12"
+                      >
+                        <div className="text-lg font-semibold text-textColour mb-2">
+                          Ready to find the best deals?
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          Start by searching for your favorite sports gear
+                          above.
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
 
-            {searchInput.trim() && table.getRowModel().rows.length === 0 && (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="text-center py-12"
-                >
-                  <div className="text-sm text-gray-500">
-                    No results found. Try a different keyword.
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                {searchInput.trim() &&
+                  table.getRowModel().rows.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="text-center py-12"
+                      >
+                        <div className="text-sm text-gray-500">
+                          No results found. Try a different keyword.
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
       )}
 
       {/* Pagination */}
@@ -272,6 +296,7 @@ export default function PriceComparisonToolContent() {
           </Button>
         </div>
       )}
+      <RecentlyViewedSidebar />
     </div>
   );
 }
