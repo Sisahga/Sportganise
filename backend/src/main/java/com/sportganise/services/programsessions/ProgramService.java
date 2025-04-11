@@ -84,21 +84,25 @@ public class ProgramService {
     return programRepository.findById(id);
   }
 
-  /**
-   * Get participants list of a program.
-   *
-   * @param recurrenceId Id of session
-   * @return List of participants of a program
-   */
-  public List<ProgramParticipantDto> getParticipants(Integer recurrenceId) {
-    List<ProgramParticipant> participants =
-        programRepository.findParticipantsByRecurrenceId(recurrenceId);
+/**
+ * Get participants list of a program recurrence.
+ *
+ * @param recurrenceId Id of session recurrence (or programId for non-recurring programs)
+ * @return List of participants of a program recurrence
+ */
+public List<ProgramParticipantDto> getParticipants(Integer recurrenceId) {
+  if (recurrenceId == null) {
+      return new ArrayList<>();
+  }
+  
+  List<ProgramParticipant> participants =
+      programRepository.findParticipantsByRecurrenceId(recurrenceId);
 
-    log.debug("PARTICIPANTS COUNT: {} ", participants.size());
+  log.debug("PARTICIPANTS COUNT: {} ", participants.size());
 
-    return participants.stream()
-        .map(
-            participant -> {
+  return participants.stream()
+      .map(
+          participant -> {
               Account account = this.accountService.getAccount(participant.getAccountId());
 
               log.debug("ACCOUNT ID: {} {}", account.getFirstName(), account.getLastName());
@@ -110,9 +114,9 @@ public class ProgramService {
                   participant.getType(),
                   participant.isConfirmed(),
                   participant.getConfirmedDate());
-            })
-        .toList();
-  }
+          })
+      .toList();
+}
 
   /**
    * Method to fetch a single program and its details.
@@ -394,41 +398,69 @@ public class ProgramService {
     return new ProgramDto(savedProgram, programAttachmentsDto);
   }
 
-  /**
-   * Creates and links program participants for a new created program.
-   *
-   * @param programId Takes programId of program
-   * @param participants List of participants for the program
-   */
-  public void createProgramParticipants(
-      Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
+/**
+ * Modified method to create participants for each recurrence of a program.
+ * 
+ * @param programId Main program ID
+ * @param participants List of participant account IDs
+ * @param participantType Type of participant (Subscribed, Waitlisted, Coach)
+ * @param isConfirmed Whether the participant is confirmed
+ */
+public void createProgramParticipants(
+    Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
 
-    if (participants != null) {
-      for (Integer participant : participants) {
-        Account user = accountService.getAccount(participant);
+    if (participants == null || participants.length == 0) {
+        log.info("There are no participants for this program.");
+        return;
+    }
 
-        ZonedDateTime confirmedDate = null;
-        if (isConfirmed) {
-          confirmedDate = ZonedDateTime.now();
+    Program program = programRepository.findProgramById(programId);
+    boolean isRecurring = program.getFrequency() != null && !program.getFrequency().equalsIgnoreCase("once");
+    
+    if (isRecurring) {
+        // Get all recurrences for this program
+        List<ProgramRecurrence> recurrences = programRecurrenceRepository.findProgramRecurrenceByProgramId(programId);
+        log.debug("Adding participants to {} recurrences", recurrences.size());
+        
+        for (ProgramRecurrence recurrence : recurrences) {
+            for (Integer participantId : participants) {
+                Account user = accountService.getAccount(participantId);
+                
+                ZonedDateTime confirmedDate = isConfirmed ? ZonedDateTime.now() : null;
+                
+                ProgramParticipant programParticipant = new ProgramParticipant(
+                    new ProgramParticipantId(recurrence.getRecurrenceId(), user.getAccountId()),
+                    null,
+                    participantType,
+                    isConfirmed,
+                    confirmedDate);
+                
+                programParticipantRepository.save(programParticipant);
+                log.debug("Created participant for recurrence ID {}: {}", 
+                        recurrence.getRecurrenceId(), programParticipant);
+            }
         }
-
-        ProgramParticipant programParticipant =
-            new ProgramParticipant(
+    } else {
+        // Non-recurring program - just add participants to the main program
+        for (Integer participantId : participants) {
+            Account user = accountService.getAccount(participantId);
+            
+            ZonedDateTime confirmedDate = isConfirmed ? ZonedDateTime.now() : null;
+            
+            ProgramParticipant programParticipant = new ProgramParticipant(
                 new ProgramParticipantId(programId, user.getAccountId()),
                 null,
                 participantType,
                 isConfirmed,
                 confirmedDate);
-
-        programParticipantRepository.save(programParticipant);
-        log.info("Created participant : {}", programParticipant);
-      }
-
-      log.info("Participants creation is successful");
+            
+            programParticipantRepository.save(programParticipant);
+            log.info("Created participant: {}", programParticipant);
+        }
     }
-    log.info("There are no participants for this program.");
-  }
-
+    
+    log.info("Participants creation is successful");
+}
   /**
    * Method to modify an existing program. Any attachment not already in the database will be added.
    * Any attachment in the database but not included in the payload will be removed.
@@ -610,49 +642,86 @@ public class ProgramService {
     return new ProgramDto(existingProgram, programAttachmentDtos);
   }
 
-  /**
-   * Creates and links program participants for an existing created program.
-   *
-   * @param programId Takes programId of program
-   * @param participants List of participants for the program
-   */
-  public void modifyProgramParticipants(
-      Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
+/**
+ * Modified method to create or modify participants for an existing program and all its recurrences.
+ * 
+ * @param programId Takes programId of program
+ * @param participants List of participants for the program
+ * @param participantType Type of participant (Subscribed, Waitlisted, Coach)
+ * @param isConfirmed Whether the participant is confirmed
+ */
+public void modifyProgramParticipants(
+    Integer programId, Integer[] participants, String participantType, Boolean isConfirmed) {
 
     if (participants == null) {
-      log.info("There are no participants for this program (modifyProgram).");
-      return;
+        log.info("There are no participants for this program (modifyProgram).");
+        return;
     }
 
-    for (Integer participant : participants) {
-      Account user = accountService.getAccount(participant);
-
-      ProgramParticipant existingParticipant =
-          programParticipantRepository.findParticipant(programId, user.getAccountId());
-      if (existingParticipant != null) {
-        log.info("User {} already a participant for this program.", user.getAccountId());
-        continue;
-      }
-
-      ZonedDateTime confirmedDate = null;
-      if (isConfirmed) {
-        confirmedDate = ZonedDateTime.now();
-      }
-
-      ProgramParticipant programParticipant =
-          new ProgramParticipant(
-              new ProgramParticipantId(programId, user.getAccountId()),
-              null,
-              participantType,
-              isConfirmed,
-              confirmedDate);
-
-      programParticipantRepository.save(programParticipant);
-      log.info("Created participant (modifyProgramParticipants): {}", programParticipant);
+    Program program = programRepository.findProgramById(programId);
+    boolean isRecurring = program.getFrequency() != null && !program.getFrequency().equalsIgnoreCase("once");
+    
+    if (isRecurring) {
+        // Get all recurrences for this program
+        List<ProgramRecurrence> recurrences = programRecurrenceRepository.findProgramRecurrenceByProgramId(programId);
+        log.debug("Modifying participants for {} recurrences", recurrences.size());
+        
+        for (ProgramRecurrence recurrence : recurrences) {
+            for (Integer participantId : participants) {
+                Account user = accountService.getAccount(participantId);
+                
+                ProgramParticipant existingParticipant = 
+                    programParticipantRepository.findParticipant(recurrence.getRecurrenceId(), user.getAccountId());
+                    
+                if (existingParticipant != null) {
+                    log.info("User {} already a participant for recurrence {}", 
+                            user.getAccountId(), recurrence.getRecurrenceId());
+                    continue;
+                }
+                
+                ZonedDateTime confirmedDate = isConfirmed ? ZonedDateTime.now() : null;
+                
+                ProgramParticipant programParticipant = new ProgramParticipant(
+                    new ProgramParticipantId(recurrence.getRecurrenceId(), user.getAccountId()),
+                    null,
+                    participantType,
+                    isConfirmed,
+                    confirmedDate);
+                
+                programParticipantRepository.save(programParticipant);
+                log.debug("Created participant for recurrence {}: {}", 
+                        recurrence.getRecurrenceId(), programParticipant);
+            }
+        }
+    } else {
+        // Non-recurring program - just modify participants for the main program
+        for (Integer participantId : participants) {
+            Account user = accountService.getAccount(participantId);
+            
+            ProgramParticipant existingParticipant = 
+                programParticipantRepository.findParticipant(programId, user.getAccountId());
+                
+            if (existingParticipant != null) {
+                log.info("User {} already a participant for this program.", user.getAccountId());
+                continue;
+            }
+            
+            ZonedDateTime confirmedDate = isConfirmed ? ZonedDateTime.now() : null;
+            
+            ProgramParticipant programParticipant = new ProgramParticipant(
+                new ProgramParticipantId(programId, user.getAccountId()),
+                null,
+                participantType,
+                isConfirmed,
+                confirmedDate);
+            
+            programParticipantRepository.save(programParticipant);
+            log.info("Created participant (modifyProgramParticipants): {}", programParticipant);
+        }
     }
-
-    log.info("Participants creation is successful (modifyProgramParticipants)");
-  }
+    
+    log.info("Participants modification is successful");
+}
 
   /**
    * Method to create a list of ProgramRecurrence objects for a recurring program.
