@@ -33,7 +33,8 @@ public interface ProgramRepository extends JpaRepository<Program, Integer> {
       FROM ProgramParticipant p
       WHERE p.programParticipantId.recurrenceId = :recurrenceId
       """)
-  List<ProgramParticipant> findParticipantsByRecurrenceId(@Param("recurrenceId") Integer recurrenceId);
+  List<ProgramParticipant> findParticipantsByRecurrenceId(
+      @Param("recurrenceId") Integer recurrenceId);
 
   @Query(
       value = "SELECT * FROM program WHERE type = CAST(:programType AS program_type)",

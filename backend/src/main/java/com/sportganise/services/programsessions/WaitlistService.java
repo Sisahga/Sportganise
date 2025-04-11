@@ -146,7 +146,8 @@ public class WaitlistService {
    */
   public ProgramParticipantDto confirmParticipant(Integer recurrenceId, Integer accountId)
       throws ParticipantNotFoundException {
-    log.info("Confirming participant's spot (recurrenceId={}, accountId={})", recurrenceId, accountId);
+    log.info(
+        "Confirming participant's spot (recurrenceId={}, accountId={})", recurrenceId, accountId);
     return removeParticipant(recurrenceId, accountId, true);
   }
 
@@ -161,7 +162,9 @@ public class WaitlistService {
   public ProgramParticipantDto optOutParticipant(Integer recurrenceId, Integer accountId)
       throws ParticipantNotFoundException {
     log.info(
-        "Opting out participant from waitlist (recurrenceId={}, accountId={})", recurrenceId, accountId);
+        "Opting out participant from waitlist (recurrenceId={}, accountId={})",
+        recurrenceId,
+        accountId);
     return removeParticipant(recurrenceId, accountId, false);
   }
 
@@ -179,7 +182,10 @@ public class WaitlistService {
       Integer recurrenceId, Integer accountId, boolean confirmParticipant)
       throws ParticipantNotFoundException {
     log.debug(
-        "Participant removal/confirmation from waitlist (recurrenceId={}, accountId={}, confirm={})",
+        """
+        Participant removal/confirmation from waitlist (recurrenceId={},
+        accountId={}, confirm={})
+        """,
         recurrenceId,
         accountId);
 
@@ -267,8 +273,9 @@ public class WaitlistService {
 
     // TODO: Come back to this for the coach
     if (account.getType() == AccountType.ADMIN) {
-      List<ProgramRecurrence> programs = recurrenceRepository.findAllByProgramType(ProgramType.TRAINING.toString());
- 
+      List<ProgramRecurrence> programs =
+          recurrenceRepository.findAllByProgramType(ProgramType.TRAINING.toString());
+
       return programs.stream()
           .filter(
               program -> {
@@ -281,10 +288,11 @@ public class WaitlistService {
               program -> {
                 List<ProgramAttachmentDto> programAttachments =
                     getProgramAttachments(program.getProgramId());
-                ProgramDto pDto = new ProgramDto(getProgram(program.getProgramId()), programAttachments);
-                pDto.setReccurenceDate(program.getOccurrenceDate());
-                pDto.setRecurrenceId(program.getRecurrenceId());
-                return pDto;
+                ProgramDto programDto =
+                    new ProgramDto(getProgram(program.getProgramId()), programAttachments);
+                programDto.setReccurenceDate(program.getOccurrenceDate());
+                programDto.setRecurrenceId(program.getRecurrenceId());
+                return programDto;
               })
           .collect(Collectors.toList());
     } else {
@@ -294,7 +302,7 @@ public class WaitlistService {
           .filter(pp -> "Coach".equals(pp.getType()) || "Waitlisted".equals(pp.getType()))
           .map(
               pp ->
-                recurrenceRepository
+                  recurrenceRepository
                       .findById(pp.getProgramParticipantId().getRecurrenceId())
                       .orElse(null))
           .distinct() // Remove duplicate programs if user is in multiple roles
@@ -309,10 +317,11 @@ public class WaitlistService {
               program -> {
                 List<ProgramAttachmentDto> programAttachments =
                     getProgramAttachments(program.getProgramId());
-                ProgramDto pDto = new ProgramDto(getProgram(program.getProgramId()), programAttachments);
-                pDto.setReccurenceDate(program.getOccurrenceDate());
-                pDto.setRecurrenceId(program.getRecurrenceId());
-                return pDto;
+                ProgramDto programDto =
+                    new ProgramDto(getProgram(program.getProgramId()), programAttachments);
+                programDto.setReccurenceDate(program.getOccurrenceDate());
+                programDto.setRecurrenceId(program.getRecurrenceId());
+                return programDto;
               })
           .collect(Collectors.toList());
     }
