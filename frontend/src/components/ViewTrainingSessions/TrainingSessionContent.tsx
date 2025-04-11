@@ -82,7 +82,6 @@ const TrainingSessionContent = () => {
           (p: Program) => p.programDetails.recurrenceId === recurrenceId,
         );
         if (program) {
-          console.log("LOOK OVER HERE,", program)
           setProgramDetails(program.programDetails);
           setAttendees(program.attendees);
         } else {
