@@ -138,6 +138,12 @@ export default function HeaderNav() {
                 </Link>
               )}
               <Link
+                to="/pages/PriceComparisonToolPage"
+                className="text-lg font-font font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
+              >
+                Price Comparison
+              </Link>
+              <Link
                 to="/pages/NotificationSettingsPage"
                 className="text-lg font-medium bg-white text-primaryColour hover:text-secondaryColour inline-flex items-center justify-center"
               >

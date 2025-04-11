@@ -16,6 +16,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import VerificationCodePage from "./pages/VerificationCodePage";
 import CalendarPage from "./pages/CalendarPage";
 import ModifyTrainingSessionPage from "./pages/ModifyTrainingSessionPage";
+import PriceComparisonToolPage from "./pages/PriceComparisonToolPage";
 import BlockedUsersListPage from "./pages/BlockedUserListPage";
 import TrainingPlanPage from "./pages/TrainingPlanPage";
 import NotificationsPage from "./pages/NotificationsPage.tsx";
@@ -121,6 +122,10 @@ function App() {
             <Route
               path="/pages/NotificationSettingsPage"
               element={<NotificationSettingsPage />}
+            ></Route>
+            <Route
+              path="/pages/PriceComparisonToolPage"
+              element={<PriceComparisonToolPage />}
             ></Route>
           </Route>
           <Route

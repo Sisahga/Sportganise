@@ -193,3 +193,49 @@ export const clearCookies = async () => {
 
   await removeAuthToken();
 };
+
+// Stores a product in the recently viewed cookie
+export const addRecentlyViewedProduct = (product: {
+  title: string;
+  imageUrl: string;
+  price: string;
+  seller: string;
+  link: string;
+}) => {
+  try {
+    const cookieKey = "recentlyViewedProducts";
+    const existing = Cookies.get(cookieKey);
+    let recent: (typeof product)[] = existing ? JSON.parse(existing) : [];
+
+    // Remove if it already exists (based on link)
+    recent = recent.filter((item) => item.link !== product.link);
+
+    // Add to the start of the list
+    recent.unshift(product);
+
+    // Keep only 3 items max
+    if (recent.length > 3) recent = recent.slice(0, 3);
+
+    Cookies.set(cookieKey, JSON.stringify(recent), { path: "/", expires: 7 });
+  } catch (e) {
+    console.error("Failed to update recently viewed:", e);
+  }
+};
+
+// Gets the last 3 recently viewed products from cookies
+export const getRecentlyViewedProducts = (): {
+  title: string;
+  imageUrl: string;
+  price: string;
+  seller: string;
+  link: string;
+}[] => {
+  try {
+    const cookieKey = "recentlyViewedProducts";
+    const stored = Cookies.get(cookieKey);
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    console.error("Failed to parse recently viewed products:", e);
+    return [];
+  }
+};
