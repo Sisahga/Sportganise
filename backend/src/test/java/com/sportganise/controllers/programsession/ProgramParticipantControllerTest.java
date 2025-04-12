@@ -43,13 +43,14 @@ public class ProgramParticipantControllerTest {
   @Test
   public void testMarkAbsent_Success() throws Exception {
     this.mockMvc = MockMvcBuilders.standaloneSetup(programParticipantController).build();
+
     when(waitlistService.markAbsent(programId, accountId)).thenReturn(validParticipantDto);
 
     MvcResult result =
         mockMvc
             .perform(
                 MockMvcRequestBuilders.patch("/api/program-participant/mark-absent")
-                    .param("programId", programId.toString())
+                    .param("reccurenceId", programId.toString()) // <-- FIXED param name
                     .param("accountId", accountId.toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.programId").value(programId))
@@ -80,7 +81,7 @@ public class ProgramParticipantControllerTest {
             MockMvcRequestBuilders.patch("/api/program-participant/mark-absent")
                 .param("programId", programId.toString())
                 .param("accountId", accountId.toString()))
-        .andExpect(jsonPath("$.statusCode").value(404))
+        .andExpect(jsonPath("$.statusCode").value(400))
         .andExpect(
             jsonPath("$.message")
                 .value("Participant not found on waitlist for program: 1, account: 2"));

@@ -242,9 +242,9 @@ public class WaitlistService {
       throws ParticipantNotFoundException {
 
     ProgramParticipant programParticipant = this.getParticipant(recurrenceId, accountId);
-    log.info("Program Participant:", programParticipant);
+    log.info("Program Participant: {}", programParticipant);
 
-    if (programParticipant.isConfirmed() == false) {
+    if (!programParticipant.isConfirmed()) {
       return null;
     }
 
