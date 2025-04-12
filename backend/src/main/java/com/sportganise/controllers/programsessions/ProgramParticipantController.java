@@ -73,21 +73,25 @@ public class ProgramParticipantController {
    * Fetches participanst with account details (first name, last name) for a given program.
    *
    * @param programId The ID of the program.
-   * @return ResponseDto with status 200 OK along with the list of waitlisted and coach participants.
+   * @return ResponseDto with status 200 OK along with the list of waitlisted and coach
+   *     participants.
    */
   @GetMapping("/get-participants-detailed/{programId}")
   public ResponseEntity<ResponseDto<List<DetailedProgramParticipantDto>>> getDetailedParticipants(
-          @PathVariable Integer programId) {
+      @PathVariable Integer programId) {
     log.debug("Fetching waitlisted and coach participants for programId: {}", programId);
     List<DetailedProgramParticipantDto> participants =
         waitlistService.getProgramParticipantsWithAccountDetails(programId);
-    ResponseDto <List<DetailedProgramParticipantDto>> responseDto =
+    ResponseDto<List<DetailedProgramParticipantDto>> responseDto =
         ResponseDto.<List<DetailedProgramParticipantDto>>builder()
             .statusCode(HttpStatus.OK.value())
             .message("Waitlisted and coach participants fetched successfully")
             .data(participants)
             .build();
-    log.debug("Fetched {} waitlisted and coach participants for programId: {}", participants.size(), programId);
+    log.debug(
+        "Fetched {} waitlisted and coach participants for programId: {}",
+        participants.size(),
+        programId);
     return ResponseEntity.ok(responseDto);
   }
 

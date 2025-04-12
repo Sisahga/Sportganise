@@ -105,7 +105,8 @@ public interface ProgramParticipantRepository
    * @param programId the ID of the program for which to fetch participants.
    * @return a list of DetailedProgramParticipantDto objects containing participant details.
    */
-  @Query("""
+  @Query(
+      """
         SELECT new com.sportganise.dto.programsessions.DetailedProgramParticipantDto(
           pp.programParticipantId.accountId,
           pp.programParticipantId.recurrenceId,
