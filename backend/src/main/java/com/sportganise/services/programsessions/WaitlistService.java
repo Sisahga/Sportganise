@@ -513,7 +513,8 @@ public class WaitlistService {
    * @param programId The ID of the program.
    * @return A list of DetailedProgramParticipantDto objects representing the waitlisted and coach
    */
-  public List<DetailedProgramParticipantDto> getProgramParticipantsWithAccountDetails(Integer programId) {
+  public List<DetailedProgramParticipantDto> getProgramParticipantsWithAccountDetails(
+      Integer programId) {
     return participantRepository.fetchProgramParticipantsWithAccountDetails(programId);
   }
 }

@@ -2,13 +2,12 @@ package com.sportganise.dto.programsessions;
 
 import com.sportganise.entities.account.AccountType;
 import com.sportganise.entities.account.Address;
+import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.ZonedDateTime;
 
 @Getter
 @Setter
