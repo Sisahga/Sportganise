@@ -81,6 +81,16 @@ const programParticipantApi = {
     }
   },
 
+  markUnabsent: async (
+    recurrenceId: number,
+    accountId: number | null | undefined,
+  ) => {
+    return await ApiService.patch<ResponseDto<void>>(
+      `${EXTENDED_BASE_URL}/mark-unabsent?reccurenceId=${recurrenceId}&accountId=${accountId}`,
+      {},
+    );
+  },
+
   inviteToPrivateEvent: async (
     accountId: number,
     programId: number | null | undefined,
