@@ -266,7 +266,7 @@ public class ProgramParticipantController {
    *
    * @param reccurenceId The ID of the program.
    * @param accountId The ID of the participant's account.
-   * @return A DTO representing the participant who confirmed unabsent.
+   * @return A ResponseDto with status code 204 if successful, else 404 or 500.
    */
   @PatchMapping("/mark-unabsent")
   public ResponseEntity<ResponseDto<Void>> markUnabsent(
