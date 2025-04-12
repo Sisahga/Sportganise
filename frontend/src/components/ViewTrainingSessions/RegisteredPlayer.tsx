@@ -1,38 +1,24 @@
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { User2Icon } from "lucide-react";
 import AttendeeBadgeType from "./BadgeTypes/AttendeeBadgeType";
-import usePersonalInformation from "@/hooks/usePersonalInfromation";
 import ParticipantPopUp from "./ParticipantPopUp";
-import log from "loglevel";
 import { Badge } from "../ui/badge";
-import { Attendees } from "@/types/trainingSessionDetails";
+import { DetailedProgramParticipantDto } from "@/types/trainingSessionDetails";
 
 interface RegisteredPlayerProps {
-  accountAttendee: Attendees;
+  participant: DetailedProgramParticipantDto;
   onRefresh: () => void;
 }
 
 const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
-  accountAttendee,
+  participant,
   onRefresh,
 }: RegisteredPlayerProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const {
-    data: accountDetails,
-    loading,
-    error,
-    fetchAccountData,
-  } = usePersonalInformation();
-  log.debug("Rendering RegisteredPlayer");
-
-  useEffect(() => {
-    fetchAccountData(accountAttendee.accountId).then((_) => _);
-  }, [fetchAccountData]);
-
   return (
-    <div>
+    <>
       <div
         onClick={() => setIsModalOpen(true)}
         onKeyDown={(e) => {
@@ -42,53 +28,51 @@ const RegisteredPlayer: React.FC<RegisteredPlayerProps> = ({
         }}
         role="button"
         tabIndex={0}
-        className="cursor-pointer"
+        className="cursor-pointer bg-white rounded-lg shadow p-4 hover:opacity-50 transition-opacity"
       >
-        <div className="flex my-2">
-          {accountAttendee.rank && (
+        <div className="flex gap-4">
+          {participant.rank && (
             <div className="mr-2 self-center flex items-center justify-center">
               <Badge className="bg-secondaryColour text-white text-xs font-semibold">
-                {accountAttendee.rank}
+                {participant.rank}
               </Badge>
             </div>
           )}
-          <div className="mr-4 self-center">
-            <Avatar>
-              <AvatarImage src={accountDetails?.pictureUrl} />
+          <div>
+            <Avatar className="h-14 w-14">
+              <AvatarImage src={participant.profilePicture} />
               <AvatarFallback>
                 <User2Icon color="#a1a1aa" />
               </AvatarFallback>
             </Avatar>
           </div>
-          <div>
-            {loading ? (
-              <p className="text-cyan-300 text-sm font-normal mb-1">
-                Loading...
-              </p>
-            ) : error ? (
-              <p className="text-red text-sm font-normal mb-1">
-                Failed to load account details
-              </p>
-            ) : (
-              <h4 className="text-sm font-normal mb-1">
-                {accountDetails?.firstName} {accountDetails?.lastName}
-              </h4>
-            )}
-            <AttendeeBadgeType accountType={accountDetails?.type} />
-            {!accountAttendee.confirmed && accountAttendee.rank === null && (
-              <Badge variant="destructive">{"absent"}</Badge>
-            )}
+          <div className="flex-grow flex flex-col gap-2">
+            <h4 className="text-sm font-normal">
+              {participant.firstName} {participant.lastName}
+            </h4>
+            <div className="flex flex-col text-xs text-gray-500 font-light">
+              <span>{participant.email}</span>
+              <span>{participant.phone}</span>
+            </div>
+            <div className="flex gap-1">
+              <AttendeeBadgeType accountType={participant.accountType} />
+              {!participant.confirmed &&
+                participant.rank === null &&
+                participant.participantType !== "Coach" &&
+                participant.participantType !== "Waitlisted" && (
+                  <Badge variant="destructive">{"absent"}</Badge>
+                )}
+            </div>
           </div>
         </div>
-        <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
       </div>
       <ParticipantPopUp
-        accountAttendee={accountAttendee}
+        accountAttendee={participant}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onRefresh={onRefresh}
       />
-    </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 package com.sportganise.repositories.programsessions;
 
+import com.sportganise.dto.programsessions.DetailedProgramParticipantDto;
 import com.sportganise.entities.programsessions.ProgramParticipant;
 import com.sportganise.entities.programsessions.ProgramParticipantId;
 import jakarta.transaction.Transactional;
@@ -97,4 +98,32 @@ public interface ProgramParticipantRepository
               AND LOWER(p.type) = LOWER('COACH')
               """)
   List<Integer> findProgramCoachIds(Integer recurrenceId);
+
+  /**
+   * Fetches detailed information about program participants, including useful account details.
+   *
+   * @param programId the ID of the program for which to fetch participants.
+   * @return a list of DetailedProgramParticipantDto objects containing participant details.
+   */
+  @Query("""
+        SELECT new com.sportganise.dto.programsessions.DetailedProgramParticipantDto(
+          pp.programParticipantId.accountId,
+          pp.programParticipantId.recurrenceId,
+          pp.rank,
+          pp.type,
+          pp.isConfirmed,
+          pp.confirmedDate,
+          a.firstName,
+          a.lastName,
+          a.address,
+          a.phone,
+          a.email,
+          a.pictureUrl,
+          a.type
+        )
+        FROM ProgramParticipant pp
+        JOIN Account a ON pp.programParticipantId.accountId = a.accountId
+        WHERE pp.programParticipantId.recurrenceId = :programId
+        """)
+  List<DetailedProgramParticipantDto> fetchProgramParticipantsWithAccountDetails(Integer programId);
 }

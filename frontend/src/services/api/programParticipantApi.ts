@@ -1,4 +1,8 @@
-import { Attendees, ProgramDetails } from "@/types/trainingSessionDetails";
+import {
+  Attendees,
+  DetailedProgramParticipantDto,
+  ProgramDetails,
+} from "@/types/trainingSessionDetails";
 import { ApiService } from "../apiHelper";
 import { RSVPRequestDto } from "@/types/participation";
 import log from "loglevel";
@@ -28,6 +32,12 @@ const programParticipantApi = {
         `Error fetching program participant: ${response.statusCode} - ${response.message}`,
       );
     }
+  },
+
+  getCoachAndWaitlistedParticipants: async (programId: number) => {
+    return await ApiService.get<ResponseDto<DetailedProgramParticipantDto[]>>(
+      `${EXTENDED_BASE_URL}/get-participants-detailed/${programId}`,
+    );
   },
 
   rsvpToProgram: async ({

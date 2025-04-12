@@ -1,6 +1,7 @@
 package com.sportganise.controllers.programsessions;
 
 import com.sportganise.dto.ResponseDto;
+import com.sportganise.dto.programsessions.DetailedProgramParticipantDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
 import com.sportganise.exceptions.ParticipantNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,6 +67,28 @@ public class ProgramParticipantController {
           e.getMessage());
       throw new ResourceNotFoundException(e.getMessage());
     }
+  }
+
+  /**
+   * Fetches participanst with account details (first name, last name) for a given program.
+   *
+   * @param programId The ID of the program.
+   * @return ResponseDto with status 200 OK along with the list of waitlisted and coach participants.
+   */
+  @GetMapping("/get-participants-detailed/{programId}")
+  public ResponseEntity<ResponseDto<List<DetailedProgramParticipantDto>>> getDetailedParticipants(
+          @PathVariable Integer programId) {
+    log.debug("Fetching waitlisted and coach participants for programId: {}", programId);
+    List<DetailedProgramParticipantDto> participants =
+        waitlistService.getProgramParticipantsWithAccountDetails(programId);
+    ResponseDto <List<DetailedProgramParticipantDto>> responseDto =
+        ResponseDto.<List<DetailedProgramParticipantDto>>builder()
+            .statusCode(HttpStatus.OK.value())
+            .message("Waitlisted and coach participants fetched successfully")
+            .data(participants)
+            .build();
+    log.debug("Fetched {} waitlisted and coach participants for programId: {}", participants.size(), programId);
+    return ResponseEntity.ok(responseDto);
   }
 
   /**

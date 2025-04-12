@@ -34,7 +34,7 @@ test("displays loading", () => {
         },
       ]}
     >
-      <RegisteredPlayer accountAttendee={mockAttendee} onRefresh={() => {}} />
+      <RegisteredPlayer participant={mockAttendee} onRefresh={() => {}} />
     </MemoryRouter>,
   );
 

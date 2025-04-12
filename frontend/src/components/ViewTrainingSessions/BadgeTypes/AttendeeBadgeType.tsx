@@ -26,6 +26,7 @@ export default function AttendeeBadgeType({
   if (accountType === undefined) {
     return <Badge variant="destructive">no type</Badge>;
   }
+
   const badgeProps = getBadgeProps(accountType);
 
   return <Badge {...badgeProps}>{accountType.toLowerCase()}</Badge>;
