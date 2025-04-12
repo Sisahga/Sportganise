@@ -1,17 +1,35 @@
-// Data structure for data received from API call
+import { AccountType, Address } from "@/types/account.ts";
+
 export interface Attendees {
   accountId: number;
   programId: number;
   confirmedDate: Date | null;
   confirmed: boolean;
-  // participantType: string | null;
   /**
    * - "Subscribed": confirmed participant
    * - "Invited": allowed to RSVP for private
+   * - "Coach": coach of the program
    * - "Waitlisted": waiting for spot
    */
-  participantType: "Subscribed" | "Invited" | "Waitlisted" | null;
+  participantType: "Subscribed" | "Invited" | "Waitlisted" | "Coach" | null;
   rank: number | null;
+  isInvited?: boolean;
+}
+
+export interface DetailedProgramParticipantDto {
+  accountId: number;
+  programId: number;
+  confirmedDate: Date | null;
+  confirmed: boolean;
+  participantType: "Subscribed" | "Invited" | "Waitlisted" | "Coach";
+  rank: number | null;
+  firstName: string;
+  lastName: string;
+  address: Address;
+  email: string;
+  phone: string;
+  profilePicture: string;
+  accountType: AccountType;
   isInvited?: boolean;
 }
 

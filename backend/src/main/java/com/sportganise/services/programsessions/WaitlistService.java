@@ -1,5 +1,6 @@
 package com.sportganise.services.programsessions;
 
+import com.sportganise.dto.programsessions.DetailedProgramParticipantDto;
 import com.sportganise.dto.programsessions.ProgramAttachmentDto;
 import com.sportganise.dto.programsessions.ProgramDto;
 import com.sportganise.dto.programsessions.ProgramParticipantDto;
@@ -495,17 +496,24 @@ public class WaitlistService {
    * @return ProgramParticipant entity if program found.
    */
   public ProgramParticipant getParticipant(Integer recurrenceId, Integer accountId) {
-    ProgramParticipant programParticipant =
-        participantRepository
-            .findById(new ProgramParticipantId(recurrenceId, accountId))
-            .orElseThrow(
-                () ->
-                    new ParticipantNotFoundException(
-                        "Participant not found for program: "
-                            + recurrenceId
-                            + ", account: "
-                            + accountId));
+    return participantRepository
+        .findById(new ProgramParticipantId(recurrenceId, accountId))
+        .orElseThrow(
+            () ->
+                new ParticipantNotFoundException(
+                    "Participant not found for program: "
+                        + recurrenceId
+                        + ", account: "
+                        + accountId));
+  }
 
-    return programParticipant;
+  /**
+   * Fetches a list of waitlisted and coach participants for a given program.
+   *
+   * @param programId The ID of the program.
+   * @return A list of DetailedProgramParticipantDto objects representing the waitlisted and coach
+   */
+  public List<DetailedProgramParticipantDto> getProgramParticipantsWithAccountDetails(Integer programId) {
+    return participantRepository.fetchProgramParticipantsWithAccountDetails(programId);
   }
 }

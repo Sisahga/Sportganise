@@ -16,14 +16,14 @@ import { useLocation, useNavigate } from "react-router";
 import { CreateChannelDto } from "@/types/dmchannels";
 import useCreateChannel from "@/hooks/useCreateChannel";
 import useAbsent from "@/hooks/useAbsent";
-import { useEffect } from "react";
-import { Attendees } from "@/types/trainingSessionDetails";
+import React, { useEffect } from "react";
+import { DetailedProgramParticipantDto } from "@/types/trainingSessionDetails";
 import useConfirmParticipant from "@/hooks/useConfirmParticipant";
 import useRejectParticipant from "@/hooks/useRejectParticipant";
 import useGetCookies from "@/hooks/useGetCookies.ts";
 
 interface ParticipantPopUpProps {
-  accountAttendee: Attendees;
+  accountAttendee: DetailedProgramParticipantDto;
   isOpen: boolean;
   onClose: () => void;
   onRefresh: () => void;
@@ -169,7 +169,10 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto p-6 rounded-lg">
         <DialogHeader>
-          <DialogTitle>Player Information</DialogTitle>
+          <DialogTitle>
+            {accountAttendee.accountType === "COACH" ? "Coach" : "Player"}{" "}
+            Information
+          </DialogTitle>
         </DialogHeader>
         <div className="flex items-center gap-4">
           <Avatar className="w-16 h-16">
@@ -198,12 +201,15 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
           </div>
         </div>
         <DialogFooter>
-          <div className="flex flex-col w-full space-y-2">
+          <div className="flex flex-col w-full space-y-2 mt-4">
             {/* First row - Send Message button on right, Mark Absent on left if applicable */}
-            <div className="flex justify-between items-center w-full">
+            <div className="flex justify-end items-center w-full gap-2">
               <div>
                 {accountAttendee.confirmed && (
-                  <Button onClick={handleAbsentClick} className="bg-red">
+                  <Button
+                    onClick={handleAbsentClick}
+                    className="bg-red hover:bg-red hover:opacity-70 transition-opacity"
+                  >
                     Mark Absent
                   </Button>
                 )}

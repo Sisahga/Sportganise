@@ -26,7 +26,11 @@ import { calculateEndTime } from "@/utils/calculateEndTime";
 import { getFileName } from "@/utils/getFileName";
 
 // Data structure for data received from API call
-import { Program, ProgramDetails } from "@/types/trainingSessionDetails";
+import {
+  DetailedProgramParticipantDto,
+  Program,
+  ProgramDetails,
+} from "@/types/trainingSessionDetails";
 import { Attendees } from "@/types/trainingSessionDetails";
 import BackButton from "../ui/back-button";
 import { CookiesDto } from "@/types/auth";
@@ -35,23 +39,18 @@ import { ONCE, WEEKLY } from "@/constants/programconstants";
 import { MONTHLY } from "@/constants/programconstants";
 import trainingSessionApi from "@/services/api/trainingSessionApi";
 import useGetCookies from "@/hooks/useGetCookies.ts";
+import useGetDetailedProgramParticipants from "@/hooks/useGetDetailedProgramParticipants.ts";
 
 const TrainingSessionContent = () => {
   const { cookies, preLoading } = useGetCookies();
 
-  const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
-  const [accountAttendee, setAccountAttendee] = useState<Attendees>();
   const location = useLocation(); // Location state data sent from Calendar page card
   const navigate = useNavigate(); // Navigate back to Calendar page
+  const stateProgramId = location.state?.programDetails?.recurrenceId;
 
-  log.debug("Rendering TrainingSessionContent");
-  useEffect(() => {
-    if (!preLoading && cookies) {
-      setUser(cookies);
-      log.info("Training Session Card account type : ", cookies.type);
-    }
-  }, [navigate, cookies, preLoading]);
-
+  const [user, setUser] = useState<CookiesDto | null | undefined>(); // Handle account type. Only coach or admin can view list of attendees.
+  const [accountAttendee, setAccountAttendee] = useState<Attendees>();
+  const [attendees, setAttendees] = useState<Attendees[]>([]);
   const [programDetails, setProgramDetails] = useState<ProgramDetails>({
     programId: 0,
     recurrenceId: 0,
@@ -70,8 +69,11 @@ const TrainingSessionContent = () => {
     isCancelled: false,
     reccurenceDate: new Date(),
   });
-
-  const [attendees, setAttendees] = useState<Attendees[]>([]);
+  const [waitlistedAttendees, setWaitlistedAttendees] = useState<
+    DetailedProgramParticipantDto[]
+  >([]);
+  const [coaches, setCoaches] = useState<DetailedProgramParticipantDto[]>([]);
+  const [players, setPlayers] = useState<DetailedProgramParticipantDto[]>([]);
 
   const fetchProgramData = async () => {
     const recurrenceId = location.state?.programDetails?.recurrenceId;
@@ -92,6 +94,29 @@ const TrainingSessionContent = () => {
       }
     }
   };
+
+  const { loadingParticipants, participants, fetchRefreshedData } =
+    useGetDetailedProgramParticipants(stateProgramId);
+
+  useEffect(() => {
+    if (!loadingParticipants && participants) {
+      console.log("Participants: ", participants);
+      setCoaches(participants.filter((p) => p.participantType === "Coach"));
+      setWaitlistedAttendees(
+        participants.filter((p) => p.participantType === "Waitlisted"),
+      );
+      setPlayers(
+        participants.filter((p) => p.participantType === "Subscribed"),
+      );
+    }
+  }, [participants, loadingParticipants]);
+
+  useEffect(() => {
+    if (!preLoading && cookies) {
+      setUser(cookies);
+      log.info("Training Session Card account type : ", cookies.type);
+    }
+  }, [navigate, cookies, preLoading]);
 
   useEffect(() => {
     if (!preLoading && cookies) {
@@ -130,6 +155,14 @@ const TrainingSessionContent = () => {
     cookies,
   ]);
 
+  useEffect(() => {
+    log.debug("Attendees: ", attendees);
+  }, [attendees]);
+
+  useEffect(() => {
+    log.debug("Players: ", players);
+  }, [players]);
+
   const handleRefresh = async () => {
     const recurrenceId = location.state?.programDetails?.recurrenceId;
     if (!recurrenceId) return;
@@ -144,10 +177,32 @@ const TrainingSessionContent = () => {
         setProgramDetails(updatedProgram.programDetails);
         setAttendees(updatedProgram.attendees);
       }
+
+      const details_res = await fetchRefreshedData();
+      if (details_res) {
+        setCoaches(
+          details_res.filter(
+            (p: DetailedProgramParticipantDto) => p.participantType === "Coach",
+          ),
+        );
+        setWaitlistedAttendees(
+          details_res.filter(
+            (p: DetailedProgramParticipantDto) =>
+              p.participantType === "Waitlisted",
+          ),
+        );
+        setPlayers(
+          details_res.filter(
+            (p: DetailedProgramParticipantDto) =>
+              p.participantType === "Subscribed",
+          ),
+        );
+      }
     } catch (error) {
       log.error("Failed to refresh program data:", error);
     }
   };
+
   const updateAttendeesList = (newAttendee: Attendees) => {
     setAttendees((prev) => {
       const exists = prev.some((a) => a.accountId === newAttendee.accountId);
@@ -159,10 +214,31 @@ const TrainingSessionContent = () => {
     });
   };
 
-  useEffect(() => {
-    console.log("Updated attendees:", attendees);
-    console.log("Update programDetails: ", programDetails);
-  }, [attendees]);
+  const attendeeStatus = !accountAttendee ? (
+    <p className="text-gray-600">You&apos;re not part of this program.</p>
+  ) : accountAttendee.participantType?.toLowerCase() === "subscribed" &&
+    !accountAttendee.confirmed ? (
+    <p className="text-red-600 font-medium">
+      You&apos;re absent for this session.
+    </p>
+  ) : accountAttendee.rank !== null ? (
+    <div>
+      <p className="text-amber-600 font-medium">
+        You&apos;re on the waitlist for this session.
+      </p>
+      <p className="text-gray-600 mt-1">
+        Your current position:{" "}
+        <span className="font-bold">{accountAttendee.rank}</span>
+        {accountAttendee.rank === 1
+          ? " (You'll be the next person to get a spot)"
+          : ""}
+      </p>
+    </div>
+  ) : accountAttendee.confirmed ? (
+    <p className="text-green-600 font-medium">
+      You&apos;re confirmed for this session.
+    </p>
+  ) : null;
 
   if (preLoading) {
     return (
@@ -173,211 +249,264 @@ const TrainingSessionContent = () => {
   }
 
   return (
-    <div className="mb-32 mt-5">
+    <div className="mb-32">
       {/**Return to previous page */}
       <BackButton />
 
-      {/**Event title */}
-      <div className="flex items-center gap-3 my-5">
-        <Avatar className="w-16 h-16">
-          <AvatarFallback className="bg-primaryColour">
-            <User2Icon color="#a1a1aa" />
-          </AvatarFallback>
-          <AvatarImage src="/src/assets/Logo.png" alt="organisation" />
-        </Avatar>
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-secondaryColour">
-            {programDetails?.title ?? "N/A"}
-          </h2>
-          {programDetails?.programType && (
-            <EventBadgeType programType={programDetails.programType} />
-          )}
-        </div>
-      </div>
-
       {/**Session details */}
-      <div>
+      <div className="flex flex-col gap-8 lg:gap-12">
         {/**Session Info */}
-        <div className="grid gap-2 mx-2">
-          <div className="flex items-center gap-2">
-            <Calendar
-              size={15}
-              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-            />
-            <p className="text-sm text-gray-500">
-              {programDetails?.reccurenceDate &&
-              programDetails?.frequency !== ONCE
-                ? new Date(programDetails.reccurenceDate).toDateString()
-                : programDetails?.occurrenceDate
-                  ? new Date(programDetails.occurrenceDate).toDateString()
-                  : "N/A"}
-            </p>
-            {programDetails?.expiryDate ? (
+        <div className="flex flex-col justify-center w-fit mx-auto shadow-lg bg-white rounded-xl">
+          {/**Event title */}
+          <div className="flex items-center gap-3 py-6 px-8">
+            <Avatar className="w-16 h-16">
+              <AvatarFallback className="bg-primaryColour">
+                <User2Icon color="#a1a1aa" />
+              </AvatarFallback>
+              <AvatarImage
+                src="/src/assets/Logo.png"
+                alt="organisation"
+                className="object-cover"
+              />
+            </Avatar>
+            <div className="space-y-2">
+              <h2 className="text-xl font-semibold text-secondaryColour">
+                {programDetails?.title ?? "N/A"}
+              </h2>
+              {programDetails?.programType && (
+                <EventBadgeType programType={programDetails.programType} />
+              )}
+            </div>
+          </div>
+          <hr className="mx-8" />
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-8">
+            {/**Event description */}
+            <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
-                <hr className="w-1 h-px border-0 bg-gray-500 " />
+                <Calendar
+                  size={15}
+                  color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                />
                 <p className="text-sm text-gray-500">
-                  {new Date(programDetails.expiryDate).toDateString()}
+                  {programDetails?.reccurenceDate &&
+                  programDetails?.frequency !== ONCE
+                    ? new Date(programDetails.reccurenceDate).toDateString()
+                    : programDetails?.occurrenceDate
+                      ? new Date(programDetails.occurrenceDate).toDateString()
+                      : "N/A"}
+                </p>
+                {programDetails?.expiryDate ? (
+                  <div className="flex items-center gap-2">
+                    <hr className="w-1 h-px border-0 bg-gray-500 " />
+                    <p className="text-sm text-gray-500">
+                      {new Date(programDetails.expiryDate).toDateString()}
+                    </p>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock
+                  size={15}
+                  color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                />
+                <span className="flex items-center">
+                  <p className="text-sm text-gray-500">
+                    {programDetails?.occurrenceDate
+                      ? new Date(
+                          programDetails.occurrenceDate,
+                        ).toLocaleTimeString("en-CA", {
+                          timeZone: "UTC",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "N/A"}
+                  </p>
+                  <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
+                  <p className="text-sm text-gray-500">
+                    {programDetails.occurrenceDate &&
+                    programDetails.durationMins
+                      ? calculateEndTime(
+                          new Date(programDetails.occurrenceDate),
+                          programDetails.durationMins,
+                        )
+                      : "N/A"}
+                  </p>
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Hourglass
+                  size={15}
+                  color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                />
+                <p className="text-sm text-gray-500">
+                  {programDetails?.durationMins ?? "N/A"} min
                 </p>
               </div>
-            ) : (
-              ""
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock
-              size={15}
-              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-            />
-            <span className="flex items-center">
-              <p className="text-sm text-gray-500">
-                {programDetails?.occurrenceDate
-                  ? new Date(programDetails.occurrenceDate).toLocaleTimeString(
-                      "en-CA",
-                      { timeZone: "UTC", hour: "2-digit", minute: "2-digit" },
-                    )
-                  : "N/A"}
-              </p>
-              <hr className="mx-1 w-1 h-px border-0 bg-gray-500 " />
-              <p className="text-sm text-gray-500">
-                {programDetails.occurrenceDate && programDetails.durationMins
-                  ? calculateEndTime(
-                      new Date(programDetails.occurrenceDate),
-                      programDetails.durationMins,
-                    )
-                  : "N/A"}
-              </p>
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Hourglass
-              size={15}
-              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-            />
-            <p className="text-sm text-gray-500">
-              {programDetails?.durationMins ?? "N/A"} min
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Repeat
-              size={15}
-              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-            />
-            <p className="text-sm text-gray-500">
-              {programDetails?.frequency
-                ? programDetails?.frequency?.toLowerCase() || "one time"
-                : "N/A"}{" "}
-              {programDetails?.occurrenceDate &&
-                (programDetails?.frequency == WEEKLY ||
-                  programDetails?.frequency == MONTHLY) && (
-                  <>
-                    on{" "}
-                    {new Intl.DateTimeFormat("en-CA", {
-                      weekday: "long",
-                    }).format(new Date(programDetails.occurrenceDate))}
-                  </>
-                )}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <CircleUserRound
-              size={15}
-              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-            />
-            <p className="text-sm text-gray-500">
-              {programDetails?.author ?? "N/A"}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <MapPin
-              size={15}
-              color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-            />
-            <p className="text-sm text-gray-500">
-              {programDetails?.location ?? "N/A"}
-            </p>
-          </div>
-        </div>
-
-        {/**Information */}
-        <div className="my-10">
-          <h2 className="text-lg font-semibold my-2">Information</h2>
-          {programDetails?.description || programDetails?.programAttachments ? (
-            <div className="mx-2">
-              <p className="text-sm my-2 text-gray-500">
-                {programDetails?.description}
-              </p>
-              <div className="grid gap-2">
-                {programDetails.programAttachments.map((attachment, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center border-[1px] rounded-md p-2"
-                  >
-                    <FileText
-                      size={15}
-                      color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
-                      className="w-8 pr-2"
-                    />
-                    <div className="overflow-x-scroll">
-                      <a
-                        className="text-sm text-gray-500 hover:text-cyan-300"
-                        href={attachment.attachmentUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        download
-                      >
-                        {getFileName(attachment.attachmentUrl)}
-                      </a>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center gap-2">
+                <Repeat
+                  size={15}
+                  color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                />
+                <p className="text-sm text-gray-500">
+                  {programDetails?.frequency
+                    ? programDetails?.frequency?.toLowerCase() || "one time"
+                    : "N/A"}{" "}
+                  {programDetails?.occurrenceDate &&
+                    (programDetails?.frequency == WEEKLY ||
+                      programDetails?.frequency == MONTHLY) && (
+                      <>
+                        on{" "}
+                        {new Intl.DateTimeFormat("en-CA", {
+                          weekday: "long",
+                        }).format(new Date(programDetails.occurrenceDate))}
+                      </>
+                    )}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <CircleUserRound
+                  size={15}
+                  color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                />
+                <p className="text-sm text-gray-500">
+                  {programDetails?.author ?? "N/A"}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin
+                  size={15}
+                  color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                />
+                <p className="text-sm text-gray-500">
+                  {programDetails?.location ?? "N/A"}
+                </p>
               </div>
             </div>
-          ) : (
-            <p className="text-gray-500 text-sm font-normal m-5 text-center">
-              No information given
-            </p>
-          )}
+            {/**Information */}
+            <div className="flex flex-col gap-2">
+              <p className="text-lg font-semibold">Information</p>
+              {programDetails?.description ||
+              programDetails?.programAttachments ? (
+                <div className="flex flex-col gap-4">
+                  <p className="text-sm text-gray-500">
+                    {programDetails?.description}
+                  </p>
+                  {/** Program Attachments */}
+                  <div className="grid gap-2">
+                    {programDetails.programAttachments.map(
+                      (attachment, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center border-[1px] rounded-md p-2 max-w-sm"
+                        >
+                          <FileText
+                            size={15}
+                            color="rgb(107 114 128 / var(--tw-text-opacity, 1))"
+                            className="w-8 pr-2"
+                          />
+                          <div className="truncate overflow-hidden">
+                            <a
+                              className="text-sm text-gray-500 hover:text-cyan-300 block truncate"
+                              href={attachment.attachmentUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              download
+                            >
+                              {getFileName(attachment.attachmentUrl)}
+                            </a>
+                          </div>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm font-normal m-5 text-center">
+                  No information given
+                </p>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/**Conditionally render subscribed players only to Admin or Coach */}
-        {/**Can render attendees list to Players or General when program type us not training session*/}
-        <div className="flex items-center">
-          <h2 className="text-lg font-semibold">Attendees</h2>
-          <p className="text-sm font-medium text-gray-500 ml-3">
-            {Array.isArray(attendees)
-              ? attendees.filter((attendee) => attendee.confirmed).length
-              : 0}
-            /{programDetails.capacity}
-          </p>
-        </div>
-        {/** Attendees list visible to coach/admin only */}
-        {(user?.type?.toLowerCase() === "coach" ||
-          user?.type?.toLowerCase() === "admin") && (
-          <div className="mx-2">
-            {attendees.length > 0 ? (
-              attendees.map((attendee, index) => {
-                console.log("Attendee Information:", attendee); // Added console log
-                return attendee.participantType?.toLowerCase() ===
-                  "subscribed" || attendee.confirmed ? (
+        {/** Participants */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] px-8 lg:px-16 gap-8">
+          {/** Coaches **/}
+          <div className="flex flex-col gap-2">
+            <p className="font-semibold text-lg">Coaches</p>
+            <div className="flex flex-col gap-1">
+              {coaches.map((coach, index) => {
+                return (
                   <div key={index}>
                     <RegisteredPlayer
-                      accountAttendee={attendee}
+                      participant={coach}
                       onRefresh={handleRefresh}
                     />
                   </div>
-                ) : null;
-              })
-            ) : (
-              <p className="text-cyan-300 text-sm font-normal m-5 text-center">
-                There are no attendees
+                );
+              })}
+            </div>
+          </div>
+
+          {/** Conditionally render subscribed players only to Admin or Coach */}
+          {/** Can render attendees list to Players or General when program type is not training session*/}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold">Attendees</h2>
+              <p className="text-base font-medium text-gray-500">
+                (
+                {Array.isArray(attendees)
+                  ? attendees.filter((attendee) => attendee.confirmed).length
+                  : 0}
+                /{programDetails.capacity})
               </p>
+            </div>
+            {/** Attendees list visible to coach/admin only */}
+            {(user?.type?.toLowerCase() === "coach" ||
+              user?.type?.toLowerCase() === "admin") && (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-2 xl:gap-4">
+                {players.length > 0 ? (
+                  players.map((player, index) => {
+                    return player.participantType.toLowerCase() ===
+                      "subscribed" || player.confirmed ? (
+                      <div key={index}>
+                        <RegisteredPlayer
+                          participant={player}
+                          onRefresh={handleRefresh}
+                        />
+                      </div>
+                    ) : null;
+                  })
+                ) : (
+                  <p className="text-cyan-300 text-sm font-normal m-5 text-center">
+                    There are no attendees
+                  </p>
+                )}
+              </div>
             )}
           </div>
-        )}
-        <div className="mb-8"></div>
-        {/* </> */}
-        {/* )} */}
 
+          {/** Waitlisted Members **/}
+          <div className="flex flex-col gap-2">
+            <p className="font-semibold text-lg">Waitlisted Players</p>
+            <div className="flex flex-col gap-1">
+              {waitlistedAttendees.map((wa, index) => {
+                return (
+                  <div key={index}>
+                    <RegisteredPlayer
+                      participant={wa}
+                      onRefresh={handleRefresh}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/** Waitlist Queue */}
         {!(
           (user?.type?.toLowerCase() === "general" ||
             user?.type?.toLowerCase() === "player") &&
@@ -391,7 +520,7 @@ const TrainingSessionContent = () => {
               <div className="mx-2">
                 {(() => {
                   // Filter and type cast to ensure rank exists
-                  const waitlisted = attendees
+                  const waitlistedQueue = waitlistedAttendees
                     .filter(
                       (
                         attendee,
@@ -400,11 +529,11 @@ const TrainingSessionContent = () => {
                     )
                     .sort((a, b) => a.rank - b.rank);
 
-                  return waitlisted.length > 0 ? (
-                    waitlisted.map((attendee, index) => (
+                  return waitlistedQueue.length > 0 ? (
+                    waitlistedQueue.map((waitlistedQueuer, index) => (
                       <div key={index}>
                         <RegisteredPlayer
-                          accountAttendee={attendee}
+                          participant={waitlistedQueuer}
                           onRefresh={handleRefresh}
                         />
                       </div>
@@ -419,35 +548,11 @@ const TrainingSessionContent = () => {
             </>
           )}
 
-        {user?.accountId && (
-          <div className="my-6 mx-2 p-4 border rounded-md bg-gray-50 text-center">
-            {!accountAttendee ? (
-              <p className="text-gray-600">
-                You&apos;re not part of this program.
-              </p>
-            ) : accountAttendee.participantType?.toLowerCase() ===
-                "subscribed" && !accountAttendee.confirmed ? (
-              <p className="text-red-600 font-medium">
-                You&apos;re absent for this session.
-              </p>
-            ) : accountAttendee.rank !== null ? (
-              <div>
-                <p className="text-amber-600 font-medium">
-                  You&apos;re on the waitlist for this session.
-                </p>
-                <p className="text-gray-600 mt-1">
-                  Your current position:{" "}
-                  <span className="font-bold">{accountAttendee.rank}</span>
-                  {accountAttendee.rank === 1
-                    ? " (You'll be the next person to get a spot)"
-                    : ""}
-                </p>
-              </div>
-            ) : accountAttendee.confirmed ? (
-              <p className="text-green-600 font-medium">
-                You&apos;re confirmed for this session.
-              </p>
-            ) : null}
+        {user?.accountId && attendeeStatus && (
+          <div
+            className={`my-6 mx-2 p-4 border rounded-md bg-gray-50 text-center`}
+          >
+            {attendeeStatus}
           </div>
         )}
 
