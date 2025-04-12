@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * DTO for detailed program participant information.
- * This class contains all the necessary details about a program participant.
+ * DTO for detailed program participant information. This class contains all the necessary details
+ * about a program participant.
  */
 @Getter
 @Setter
