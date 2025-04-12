@@ -21,6 +21,8 @@ import { DetailedProgramParticipantDto } from "@/types/trainingSessionDetails";
 import useConfirmParticipant from "@/hooks/useConfirmParticipant";
 import useRejectParticipant from "@/hooks/useRejectParticipant";
 import useGetCookies from "@/hooks/useGetCookies.ts";
+import useMarkUnabsent from "@/hooks/useMarkUnabsent.ts";
+import { useToast } from "@/hooks/use-toast.ts";
 
 interface ParticipantPopUpProps {
   accountAttendee: DetailedProgramParticipantDto;
@@ -98,12 +100,16 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
     data: absentData,
   } = useAbsent();
 
+  const { markUnabsent } = useMarkUnabsent();
+
   const {
     confirmParticipant,
     confirming,
     error: confirmError,
     successData: confirmData,
   } = useConfirmParticipant();
+
+  const { toast } = useToast();
 
   useEffect(() => {
     console.log("Updated absentData:", absentData);
@@ -117,12 +123,40 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
       console.log("error maybe", absentError);
       if (onRefresh) onRefresh();
       onClose();
+      toast({
+        title: "Marked as absent",
+        description: "Player successfully marked as absent.",
+        variant: "default",
+      });
     } catch {
       console.log("recurrenceId", recurrenceId);
       console.log(
         "Error marking the user as absent in DropDownMenuButton",
         absentError,
       );
+    }
+  };
+
+  const handleUnabsentClick = async () => {
+    try {
+      const response = await markUnabsent(recurrenceId, accountId);
+      if (response.statusCode === 204) {
+        if (onRefresh) onRefresh();
+        onClose();
+        toast({
+          title: "Marked as unabsent",
+          description: "Player successfully marked as unabsent.",
+          variant: "default",
+        });
+      } else {
+        toast({
+          title: "Failed to mark unabsent",
+          description: response.message,
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      log.debug("Unexpected failure when calling the API service.", err);
     }
   };
 
@@ -214,6 +248,17 @@ const ParticipantPopUp: React.FC<ParticipantPopUpProps> = ({
                   </Button>
                 )}
               </div>
+              {!accountAttendee.confirmed &&
+                accountAttendee.rank === null &&
+                accountAttendee.participantType !== "Coach" &&
+                accountAttendee.participantType !== "Waitlisted" && (
+                  <Button
+                    onClick={handleUnabsentClick}
+                    className="bg-red hover:bg-red hover:opacity-70 transition-opacity"
+                  >
+                    Mark Unabsent
+                  </Button>
+                )}
               <Button onClick={handleSendMessage}>Send Message</Button>
             </div>
 

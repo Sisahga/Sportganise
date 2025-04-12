@@ -262,6 +262,42 @@ public class ProgramParticipantController {
   }
 
   /**
+   * Marks a participant as unabsent for a program by setting isConfirmed to true.
+   *
+   * @param reccurenceId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   * @return A DTO representing the participant who confirmed unabsent.
+   */
+  @PatchMapping("/mark-unabsent")
+  public ResponseEntity<ResponseDto<Void>> markUnabsent(
+      @RequestParam Integer reccurenceId, @RequestParam Integer accountId) {
+    log.info(
+        "Marking participant as unabsent. reccurenceId: {}, accountId: {}",
+        reccurenceId,
+        accountId);
+
+    try {
+      waitlistService.markUnabsent(reccurenceId, accountId);
+      log.info(
+          "Successfully marked participant as unabsent. reccurenceId: {}, accountId: {}",
+          reccurenceId,
+          accountId);
+      return ResponseEntity.ok(
+          ResponseDto.<Void>builder()
+              .statusCode(HttpStatus.NO_CONTENT.value())
+              .message("Participant marked as unabsent successfully")
+              .build());
+    } catch (ParticipantNotFoundException e) {
+      log.error(
+          "Mark unabsent failed. reccurenceId: {}, accountId: {}. Error: {}",
+          reccurenceId,
+          accountId,
+          e.getMessage());
+      throw new ResourceNotFoundException(e.getMessage());
+    }
+  }
+
+  /**
    * Fetches all the training sessions missing a player, making waitlist players available to join.
    */
   @GetMapping("/waitlist-programs")
