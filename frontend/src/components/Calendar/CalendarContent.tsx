@@ -16,24 +16,28 @@ export default function CalendarContent() {
         Schedule
       </h2>
 
-      <div className="w-[270px] justify-self-center my-5">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          selectedMonth={selectedMonth}
-          onMonthChange={setSelectedMonth}
-          programsProp={programsProp}
-        />
+      <div
+        className="flex flex-col items-center gap-8 lg:flex-row justify-center lg:mt-8
+                        lg:items-start lg:gap-12 mt-4 lg:mx-12 xl:mx-48"
+      >
+        <div className="p-4 shadow rounded-xl bg-white lg:w-1/2 md:w-1/2 sm:w-2/3 w-full">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            selectedMonth={selectedMonth}
+            onMonthChange={setSelectedMonth}
+            programsProp={programsProp}
+          />
+        </div>
+        <div className="lg:w-1/2 w-full">
+          <TrainingSessionsList
+            selectedMonth={selectedMonth}
+            programsProp={programsProp}
+            selectedDate={selectedDate}
+          />
+        </div>
       </div>
-
-      <hr className="h-px bg-gray-200 border-0 dark:bg-gray-700" />
-
-      <TrainingSessionsList
-        selectedMonth={selectedMonth}
-        programsProp={programsProp}
-        selectedDate={selectedDate}
-      />
     </div>
   );
 }

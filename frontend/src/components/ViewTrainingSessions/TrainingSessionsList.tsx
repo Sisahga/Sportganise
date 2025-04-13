@@ -203,10 +203,10 @@ export default function TrainingSessionsList({
   }
 
   return (
-    <div className="mt-5 lg:mx-24">
+    <div className="flex flex-grow w-full lg:w-auto">
       {/**List of events */}
-      <div>
-        <span className="flex mt-8 mx-1">
+      <div className="w-full">
+        <span className="flex mx-1 mb-4">
           <div>
             <p className="text-lg text-primaryColour text-sec font-semibold">
               {selectedDate
@@ -308,40 +308,42 @@ export default function TrainingSessionsList({
           </Drawer>
         </span>
 
-        {error ? (
-          <p className="text-red text-center my-5">Error loading programs</p>
-        ) : loading ? (
-          <div className="flex justify-center my-5">
-            <Loader2 className="animate-spin" size={30} color="#9ca3af" />
-          </div>
-        ) : filteredPrograms.length === 0 ? (
-          <p className="text-gray-500 text-center my-5">
-            There are no programs for the current dates.
-          </p>
-        ) : (
-          filteredPrograms
-            .sort(
-              (a, b) =>
-                new Date(
-                  a.programDetails.reccurenceDate
-                    ? a.programDetails.reccurenceDate
-                    : a.programDetails.occurrenceDate,
-                ).getTime() -
-                new Date(
-                  b.programDetails.reccurenceDate
-                    ? b.programDetails.reccurenceDate
-                    : b.programDetails.occurrenceDate,
-                ).getTime(),
-            )
-            .map((program, index) => (
-              <div key={index} className="my-5">
-                <TrainingSessionCard
-                  programDetails={program.programDetails}
-                  attendees={program.attendees}
-                />
-              </div>
-            ))
-        )}
+        <div className="flex flex-col gap-4 lg:max-h-[50vh] lg:overflow-y-scroll">
+          {error ? (
+            <p className="text-red text-center">Error loading programs</p>
+          ) : loading ? (
+            <div className="flex justify-center">
+              <Loader2 className="animate-spin" size={30} color="#9ca3af" />
+            </div>
+          ) : filteredPrograms.length === 0 ? (
+            <p className="text-gray-500 text-center">
+              There are no programs for the current dates.
+            </p>
+          ) : (
+            filteredPrograms
+              .sort(
+                (a, b) =>
+                  new Date(
+                    a.programDetails.reccurenceDate
+                      ? a.programDetails.reccurenceDate
+                      : a.programDetails.occurrenceDate,
+                  ).getTime() -
+                  new Date(
+                    b.programDetails.reccurenceDate
+                      ? b.programDetails.reccurenceDate
+                      : b.programDetails.occurrenceDate,
+                  ).getTime(),
+              )
+              .map((program, index) => (
+                <div key={index}>
+                  <TrainingSessionCard
+                    programDetails={program.programDetails}
+                    attendees={program.attendees}
+                  />
+                </div>
+              ))
+          )}
+        </div>
       </div>
     </div>
   );

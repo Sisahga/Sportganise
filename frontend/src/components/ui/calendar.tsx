@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect } from "react";
 import { ChevronLeft, ChevronRight, LoaderCircle } from "lucide-react";
 import { DayPicker, DayContentProps } from "react-day-picker";
-import { isSaturday, isSunday, format, isSameDay } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/Button";
 import usePrograms from "@/hooks/usePrograms";
@@ -13,23 +13,6 @@ export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   onMonthChange?: (month: Date) => void;
   programsProp?: ReturnType<typeof usePrograms>;
 };
-
-// Creating a small reusable dots for weekends
-function WeekendDot() {
-  return (
-    <span
-      style={{
-        height: "5px",
-        width: "5px",
-        borderRadius: "9999px",
-        backgroundColor: "orange",
-        position: "absolute",
-        top: "2px",
-        right: "2px",
-      }}
-    />
-  );
-}
 
 function EventHighlight() {
   return (
@@ -53,14 +36,12 @@ function CustomDayContent({
   date,
   eventDates,
 }: DayContentProps & { eventDates: Date[] }) {
-  const weekend = isSaturday(date) || isSunday(date);
   const isEventDay = eventDates.some((eventDate: Date) =>
     isSameDay(eventDate, date),
   );
 
   return (
     <span className="relative flex items-center justify-center w-full h-full">
-      {weekend && <WeekendDot />}
       {isEventDay && <EventHighlight />}
       {format(date, "d")}
     </span>
@@ -116,7 +97,6 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn("p-3", className)}
       // month={currentMonth}
       // onMonthChange={onMonthChange}
       month={selectedMonth} // Ensure this is the month that gets updated
@@ -125,7 +105,7 @@ function Calendar({
       }}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
+        month: "space-y-4 w-full",
         caption: "flex justify-center pt-1 relative items-center",
         caption_label: "text-md font-semibold",
         nav: "space-x-1 flex items-center",
@@ -136,10 +116,10 @@ function Calendar({
         nav_button_previous: "border-primaryColour/70 absolute left-1",
         nav_button_next: "border-primaryColour/70 absolute right-1",
         table: "w-full border-collapse space-y-1",
-        head_row: "flex",
+        head_row: "flex justify-between",
         head_cell:
           "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
-        row: "flex w-full mt-2",
+        row: "flex justify-between w-full mt-4",
         cell: cn(
           "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
           // Range classes:
