@@ -206,7 +206,7 @@ export default function HomeContent() {
               </div>
             </div>
 
-            <div style={{ marginTop: "0 !important" }}>
+            <div className="lg:mx-24" style={{ marginTop: "0 !important" }}>
               <TrainingSessionsList
                 selectedMonth={selectedMonth}
                 programsProp={programsProp}
