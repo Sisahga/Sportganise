@@ -256,6 +256,23 @@ public class WaitlistService {
   }
 
   /**
+   * Marks a participant as unabsent.
+   *
+   * @param reccurenceId The ID of the program.
+   * @param accountId The ID of the participant's account.
+   */
+  public void markUnabsent(Integer reccurenceId, Integer accountId)
+      throws ParticipantNotFoundException {
+    ProgramParticipant programParticipant = this.getParticipant(reccurenceId, accountId);
+    log.info("Marking unabsent participant {}", programParticipant);
+
+    programParticipant.setConfirmed(true);
+    programParticipant.setConfirmedDate(ZonedDateTime.now());
+
+    ProgramParticipant savedParticipant = participantRepository.save(programParticipant);
+  }
+
+  /**
    * Gets all programs that are open for waitlisted participants to join.
    *
    * @return A list of ProgramDto's containing the waitlisted .
