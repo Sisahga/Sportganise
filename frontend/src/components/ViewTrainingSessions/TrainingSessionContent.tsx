@@ -256,8 +256,8 @@ const TrainingSessionContent = () => {
       {/**Session details */}
       <div className="flex flex-col gap-8 lg:gap-12">
         {/**Session Info */}
-        <div className="flex flex-col justify-center w-fit mx-auto shadow-lg bg-white rounded-xl">
-          {/**Event title */}
+        <div className="flex flex-col justify-center w-fit mx-auto shadow-lg bg-white rounded-xl md:min-w-[640px] md:mt-4">
+          {/**Event Title */}
           <div className="flex items-center gap-3 py-6 px-8">
             <Avatar className="w-16 h-16">
               <AvatarFallback className="bg-primaryColour">
@@ -279,7 +279,8 @@ const TrainingSessionContent = () => {
             </div>
           </div>
           <hr className="mx-8" />
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-8">
+          {/**Event Details, Information and Attachments */}
+          <div className="flex flex-col md:flex-row gap-4 md:gap-12 py-6 px-8">
             {/**Event description */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-2">
@@ -432,7 +433,7 @@ const TrainingSessionContent = () => {
         </div>
 
         {/** Participants */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] px-8 lg:px-16 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_1fr] px-8 lg:px-4 xl:px-16 gap-8">
           {/** Coaches **/}
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">Coaches</p>
