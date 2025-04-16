@@ -43,8 +43,8 @@ export const removeAuthToken = async () => {
   }
 };
 
-export const getBearerToken = () => {
-  const token = getAuthToken();
+export const getBearerToken = async () => {
+  const token = await getAuthToken();
   if (token) {
     return `Bearer ${token}`;
   } else {
@@ -86,7 +86,7 @@ export class ApiService {
 
     if (requiresAuth) {
       console.log("Protected endpoint. Requires auth token.");
-      const bearerToken = getBearerToken();
+      const bearerToken = await getBearerToken();
       if (bearerToken) {
         headers["Authorization"] = bearerToken;
       } else {
