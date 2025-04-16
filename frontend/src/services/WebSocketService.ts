@@ -14,12 +14,14 @@ export default class WebSocketService {
     this.onMessageReceivedCallback = onMessageReceivedCallback;
   }
 
-  connect(): Promise<boolean> {
-    return new Promise(async (resolve) => {
+  async connect(): Promise<boolean> {
+    const token = await getBearerToken();
+
+    return new Promise((resolve) => {
       this.stompClient = new Client({
         webSocketFactory: () => new SockJS(this.url),
         connectHeaders: {
-          Authorization: await getBearerToken(),
+          Authorization: token || "",
         },
         onConnect: () => {
           console.log("WebSocket Connected!");
