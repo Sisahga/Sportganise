@@ -15,11 +15,11 @@ export default class WebSocketService {
   }
 
   connect(): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       this.stompClient = new Client({
         webSocketFactory: () => new SockJS(this.url),
         connectHeaders: {
-          Authorization: getBearerToken(),
+          Authorization: await getBearerToken(),
         },
         onConnect: () => {
           console.log("WebSocket Connected!");

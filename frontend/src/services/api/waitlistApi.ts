@@ -14,7 +14,7 @@ const waitlistApi = {
       const response = await fetch(`${baseMappingUrl}/waitlist-programs`, {
         method: "GET",
         headers: {
-          Authorization: getBearerToken(),
+          Authorization: await getBearerToken(),
           "Content-Type": "application/json",
         },
       });
