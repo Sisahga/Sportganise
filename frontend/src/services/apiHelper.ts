@@ -9,6 +9,7 @@ interface JwtPayload {
 
 export const getAuthToken = async () => {
   let token: string | null;
+
   if (isMobilePlatform()) {
     const { value } = await Preferences.get({ key: "auth_token" });
     token = value;
@@ -20,6 +21,7 @@ export const getAuthToken = async () => {
     const decodedToken: JwtPayload = jwtDecode(token);
     if (decodedToken.exp * 1000 < Date.now()) {
       await removeAuthToken();
+      console.error("Token expired. Please log in again.");
       return null;
     }
     return token;
@@ -48,7 +50,7 @@ export const getBearerToken = async () => {
   if (token) {
     return `Bearer ${token}`;
   } else {
-    return "";
+    return null;
   }
 };
 

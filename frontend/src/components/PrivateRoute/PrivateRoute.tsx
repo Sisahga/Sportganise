@@ -3,7 +3,7 @@ import { clearCookies, getCookies } from "@/services/cookiesService";
 import { getBearerToken } from "@/services/apiHelper.ts";
 import { useRequestNotificationPermission } from "@/hooks/useFcmRequestPermission.ts";
 import { CookiesDto } from "@/types/auth.ts";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { isMobilePlatform } from "@/utils/isMobilePlatform.ts";
 import { LoaderCircle } from "lucide-react";
 /* eslint-disable react/prop-types */
@@ -19,7 +19,8 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 }) => {
   const location = useLocation();
   const [user, setUser] = useState<CookiesDto | null>(null);
-  const token = getBearerToken();
+  const [bearerToken, setBearerToken] = useState<string | null>(null);
+  const [loadingToken, setLoadingToken] = useState(true);
   const notified = localStorage.getItem("pushNotifications");
 
   const { requestPermission } = useRequestNotificationPermission();
@@ -37,12 +38,18 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     const cookies = await getCookies();
     setUser(cookies);
   };
+  const fetchToken = async () => {
+    const token = await getBearerToken();
+    setBearerToken(token);
+    setLoadingToken(false);
+  };
 
   useEffect(() => {
     fetchUser().then((r) => r);
-  }, []);
+    fetchToken().then((r) => r);
+  }, [location.pathname]);
 
-  if (!user) {
+  if (!user || loadingToken) {
     return (
       <div>
         <LoaderCircle className="animate-spin h-8 w-8" />
@@ -50,7 +57,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     );
   }
 
-  if (!user.accountId || !token) {
+  if (!user.accountId || (!loadingToken && !bearerToken)) {
     clearCookies().then((r) => r);
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />
