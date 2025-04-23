@@ -45,36 +45,40 @@ const ProfileContent: React.FC = () => {
   }
 
   return (
-    <div className="pb-20">
-      <div className="container mx-auto max-w-2xl">
-        <div className="flex flex-col items-center justify-center my-4">
-          <h2 className="font-semibold text-3xl text-secondaryColour text-center">
-            Profile
-          </h2>
-
+    <div className="mt-4 flex flex-col gap-6 md:gap-6">
+      <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+        Profile
+      </h2>
+      <div
+        className="container mx-auto max-w-2xl md:flex md:gap-20 md:p-16
+                   md:shadow-xl md:rounded-xl md:bg-white md:border md:border-navbar"
+      >
+        <div className="flex flex-col items-center justify-between gap-2 md:gap-0">
           {/* Profile image */}
           <Link to="/pages/PersonalInformationPage">
             {" "}
             <img
-              className="h-48 w-48 rounded-full border-2 border-gray dark:border-gray-800 mx-auto my-2 object-cover"
+              className="h-44 w-44 rounded-full border-2 border-gray
+                        dark:border-gray-800 mx-auto object-cover"
               src={data?.pictureUrl || "https://via.placeholder.com/150"}
               alt="Profile"
             />
-            <p className="text-3xl text-primaryColour font-medium">
+          </Link>
+          <div className="flex flex-col justify-end items-center mb-4 md:mb-0">
+            <p className="text-xl text-center text-primaryColour font-medium">
               {data?.firstName} {data?.lastName}
             </p>
-          </Link>
-          <p className="text-lg font-semibold text-primaryColour">
-            {data?.type
-              ? data?.type.charAt(0).toUpperCase() + data?.type.slice(1)
-              : ""}
-          </p>
+            <p className="text-base font-semibold text-primaryColour">
+              {data?.type
+                ? data?.type.charAt(0).toUpperCase() + data?.type.slice(1)
+                : ""}
+            </p>
+          </div>
         </div>
-
-        <div className="flex flex-col mt-4">
+        <div className="flex flex-col mt-4 md:mt-0 md:flex-grow md:gap-4 md:justify-between">
           {/* Personal Information */}
           <Button
-            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
+            className="w-full px-4 py-6 mb-4 md:mb-0 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/PersonalInformationPage")}
           >
@@ -87,7 +91,7 @@ const ProfileContent: React.FC = () => {
 
           {/* Settings */}
           <Button
-            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
+            className="w-full px-4 py-6 mb-4 md:mb-0 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/NotificationSettingsPage")}
           >
@@ -100,7 +104,7 @@ const ProfileContent: React.FC = () => {
 
           {/* Change Password */}
           <Button
-            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
+            className="w-full px-4 py-6 mb-4 md:mb-0 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/ChangePasswordPage")}
           >
@@ -113,7 +117,7 @@ const ProfileContent: React.FC = () => {
 
           {/* Blocked Users */}
           <Button
-            className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
+            className="w-full px-4 py-6 mb-4 md:mb-0 text-left flex justify-between items-center rounded-xl"
             variant="outline"
             onClick={() => navigate("/pages/BlockedUserListPage")}
           >
@@ -127,7 +131,7 @@ const ProfileContent: React.FC = () => {
           {/* Modify Permissions - Only visible for ADMIN */}
           {userType === "ADMIN" && (
             <Button
-              className="w-full px-4 py-6 mb-4 text-left flex justify-between items-center rounded-xl"
+              className="w-full px-4 py-6 mb-4 md:mb-0 text-left flex justify-between items-center rounded-xl"
               variant="outline"
               onClick={() => navigate("/pages/ModifyPermissionPage")}
             >

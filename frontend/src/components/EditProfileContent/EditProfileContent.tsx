@@ -210,7 +210,7 @@ const EditProfileContent: React.FC = () => {
       },
     };
 
-    updateAccount(userId || 0, payload);
+    await updateAccount(userId || 0, payload);
     setTimeout(() => {
       navigate("/pages/PersonalInformationPage");
     }, 500);
@@ -222,199 +222,229 @@ const EditProfileContent: React.FC = () => {
   };
 
   return (
-    <div className="pb-8 min-h-screen">
+    <div className="pb-20 sm:pb-0 min-h-screen sm:min-h-auto">
       <BackButton />
+      <div className="flex flex-col gap-4 items-center -mt-5">
+        <h2 className="font-semibold text-3xl text-secondaryColour text-center">
+          Edit Personal Information
+        </h2>
+        <div
+          className="flex flex-col items-center justify-center mt-2 md:flex-row md:gap-16 md:bg-white
+                    md:shadow-xl md:w-fit md:pt-12 md:px-12 md:pb-8 md:rounded-xl md:items-start
+                    md:border md:border-navbar"
+        >
+          <div className="relative">
+            <Label htmlFor="file-input" className="cursor-pointer">
+              <img
+                className="h-48 w-48 object-cover rounded-full border-2 border-gray-300 mx-auto"
+                src={image}
+                alt="Profile"
+              />
+              <CirclePlus className="absolute bottom-2 right-2 bg-white p-1 shadow-lg text-primaryColour text-sm hover:scale-110 rounded-full w-10 h-10 hover:text-primaryColour transition-transform" />
+            </Label>
 
-      <div className="flex flex-col items-center justify-center mx-auto max-w-2xl">
-        <div className="relative">
-          <Label htmlFor="file-input" className="cursor-pointer">
-            <img
-              className="h-48 w-48 rounded-full border-2 border-gray-300 mx-auto my-2"
-              src={image}
-              alt="Profile"
+            <Input
+              type="file"
+              id="file-input"
+              className="hidden"
+              accept="image/*"
+              onChange={handleImageUpload}
             />
-            <CirclePlus className="absolute bottom-2 right-2 bg-white p-1 shadow-lg text-primaryColour text-sm hover:scale-110 rounded-full w-10 h-10 hover:scale-110 hover:text-primaryColour transition-transform" />
-          </Label>
+          </div>
 
-          <Input
-            type="file"
-            id="file-input"
-            className="hidden"
-            accept="image/*"
-            onChange={handleImageUpload}
-          />
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(handleSavePersonalInfo)}
+              className="p-4 space-y-4 mt-1 md:mt-0 md:p-0"
+            >
+              <div className="flex gap-4">
+                {/* First Name */}
+                <div className="w-1/2">
+                  <FormField
+                    name="firstName"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label htmlFor="firstName">First Name</Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            id="firstName"
+                            placeholder={"First Name"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="w-1/2">
+                  {/* Last Name */}
+                  <FormField
+                    name="lastName"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            id="lastName"
+                            placeholder={"Last Name"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-2/3">
+                  {/* Email */}
+                  <FormField
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label htmlFor="email">Email</Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            id="email"
+                            placeholder={"example@domain.com"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="w-1/3">
+                  {/* Phone */}
+                  <FormField
+                    name="phone"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label htmlFor="phone">Phone</Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            id="phone"
+                            placeholder={"111-111-1111"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-2/3">
+                  {/* Address */}
+                  <FormField
+                    name="address"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label htmlFor="address">Address</Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            id="address"
+                            placeholder={"Street Address"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="w-1/3">
+                  {/* Postal Code */}
+                  <FormField
+                    name="postalCode"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label htmlFor="postalCode">Postal Code</Label>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            id="postalCode"
+                            placeholder={"Postal Code"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              {/* City, Province, Postal Code */}
+              <div className="flex space-x-4">
+                <FormField
+                  name="city"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <Label htmlFor="city">City</Label>
+                      <FormControl>
+                        <Input {...field} id="city" placeholder={"City"} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="province"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <Label htmlFor="province">Province</Label>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          id="province"
+                          placeholder={"Province"}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  name="country"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <Label htmlFor="country">Country</Label>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          id="country"
+                          placeholder={"Country"}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              {/* Save Personal Info Button */}
+              <div className="flex justify-end w-full">
+                <Button className="mt-2 px-4 w-fit" type="submit">
+                  <Save />
+                  Save
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
-
-        <h2 className="mt-8 text-2xl font-light">Edit Personal Information</h2>
-
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(handleSavePersonalInfo)}
-            className="p-4 space-y-4 mt-1"
-          >
-            {/* First Name */}
-            <FormField
-              name="firstName"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="firstName">First Name</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      id="firstName"
-                      placeholder={"First Name"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Last Name */}
-            <FormField
-              name="lastName"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <FormControl>
-                    <Input {...field} id="lastName" placeholder={"Last Name"} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email */}
-            <FormField
-              name="email"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="email">Email</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      id="email"
-                      placeholder={"example@domain.com"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Phone */}
-            <FormField
-              name="phone"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="phone">Phone</Label>
-                  <FormControl>
-                    <Input {...field} id="phone" placeholder={"111-111-1111"} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Address */}
-            <FormField
-              name="address"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="address">Address</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      id="address"
-                      placeholder={"Street Address"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Postal Code */}
-            <FormField
-              name="postalCode"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <Label htmlFor="postalCode">Postal Code</Label>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      id="postalCode"
-                      placeholder={"Postal Code"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* City, Province, Postal Code */}
-            <div className="flex space-x-4">
-              <FormField
-                name="city"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <Label htmlFor="city">City</Label>
-                    <FormControl>
-                      <Input {...field} id="city" placeholder={"City"} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="province"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <Label htmlFor="province">Province</Label>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        id="province"
-                        placeholder={"Province"}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="country"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <Label htmlFor="country">Country</Label>
-                    <FormControl>
-                      <Input {...field} id="country" placeholder={"Country"} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Save Personal Info Button */}
-            <div className="flex justify-center pt-1 pb-12">
-              <Button className="w-30 h-10" type="submit">
-                <Save />
-                Save
-              </Button>
-            </div>
-          </form>
-        </Form>
       </div>
 
       <AlertDialog
