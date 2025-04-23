@@ -436,7 +436,7 @@ const EditProfileContent: React.FC = () => {
                 />
               </div>
               {/* Save Personal Info Button */}
-              <div className="flex justify-end w-full">
+              <div className="flex justify-center w-full">
                 <Button className="mt-2 px-4 w-fit" type="submit">
                   <Save />
                   Save
