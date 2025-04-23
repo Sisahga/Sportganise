@@ -437,7 +437,7 @@ const TrainingSessionContent = () => {
           {/** Coaches **/}
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">Coaches</p>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2 xl:gap-4">
               {coaches.map((coach, index) => {
                 return (
                   <div key={index}>
@@ -492,7 +492,7 @@ const TrainingSessionContent = () => {
           {/** Waitlisted Members **/}
           <div className="flex flex-col gap-2">
             <p className="font-semibold text-lg">Waitlisted Players</p>
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col gap-2 xl:gap-4">
               {waitlistedAttendees.map((wa, index) => {
                 return (
                   <div key={index}>
