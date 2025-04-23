@@ -9,7 +9,7 @@ const BackButton: React.FC = () => {
 
   return (
     <Button
-      className="rounded-xl font-semibold"
+      className="rounded-xl font-semibold relative -top-6 sm:mt-0"
       variant="outline"
       onClick={() => {
         navigate(-1);
