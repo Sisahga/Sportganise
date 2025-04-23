@@ -45,7 +45,7 @@ public class UserAuthProvider {
     log.debug("Creating token for login: {}", login);
 
     Date now = new Date();
-    Date validity = new Date(now.getTime() + 3_600_000);
+    Date validity = new Date(now.getTime() + 1_209_600_000L); // 2 Weeks Validity
 
     return JWT.create()
         .withSubject(login)
