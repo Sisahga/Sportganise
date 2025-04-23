@@ -57,7 +57,10 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
     );
   }
 
-  if (!user.accountId || (!loadingToken && !bearerToken)) {
+  if (
+    !user.accountId ||
+    (!loadingToken && (!bearerToken || bearerToken === ""))
+  ) {
     clearCookies().then((r) => r);
     return (
       <Navigate to={redirectingRoute} replace state={{ from: location }} />

@@ -50,7 +50,7 @@ export const getBearerToken = async () => {
   if (token) {
     return `Bearer ${token}`;
   } else {
-    return null;
+    return "";
   }
 };
 
