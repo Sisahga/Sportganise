@@ -288,19 +288,19 @@ const PersonalInformationContent: React.FC = () => {
                     )}
                   />
                 </div>
+                <div className="w-full flex justify-center">
+                  {/* Edit Profile Button */}
+                  <Button
+                    className="mt-2 px-4 w-fit"
+                    variant="default"
+                    onClick={() => navigate("/pages/EditProfilePage")}
+                  >
+                    <SquarePen />
+                    Edit
+                  </Button>
+                </div>
               </form>
             </Form>
-          </div>
-          <div className="w-full flex justify-end">
-            {/* Edit Profile Button */}
-            <Button
-              className="mt-2 px-4 w-fit"
-              variant="default"
-              onClick={() => navigate("/pages/EditProfilePage")}
-            >
-              <SquarePen />
-              Edit
-            </Button>
           </div>
         </div>
       </div>
